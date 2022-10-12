@@ -40,7 +40,6 @@ class ModalityFlowVerify(
 
     override suspend fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppVerifyRequest)
-        addSetupStep()
         addModalityConfigurationSteps()
         addCoreFetchGuidStep(appRequest.projectId, appRequest.verifyGuid)
         addCoreConsentStepIfRequired(VERIFY)

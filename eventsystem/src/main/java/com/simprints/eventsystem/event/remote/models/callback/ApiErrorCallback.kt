@@ -31,7 +31,7 @@ data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType
     }
 }
 
-fun ErrorCallbackPayload.Reason.fromDomainToApi() =
+fun Reason.fromDomainToApi() =
     when (this) {
         DIFFERENT_PROJECT_ID_SIGNED_IN -> ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN
         DIFFERENT_USER_ID_SIGNED_IN -> ApiReason.DIFFERENT_USER_ID_SIGNED_IN
@@ -42,8 +42,6 @@ fun ErrorCallbackPayload.Reason.fromDomainToApi() =
         ENROLMENT_LAST_BIOMETRICS_FAILED -> ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED
         FACE_LICENSE_MISSING -> ApiReason.FACE_LICENSE_MISSING
         FACE_LICENSE_INVALID -> ApiReason.FACE_LICENSE_INVALID
-        SETUP_OFFLINE_DURING_MODALITY_DOWNLOAD -> ApiReason.UNEXPECTED_ERROR
-        SETUP_MODALITY_DOWNLOAD_CANCELLED -> ApiReason.UNEXPECTED_ERROR
         FINGERPRINT_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         FACE_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         BACKEND_MAINTENANCE_ERROR -> ApiReason.BACKEND_MAINTENANCE_ERROR

@@ -4,10 +4,10 @@ import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
-import com.simprints.infra.resources.R
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
-import com.simprints.id.domain.alert.AlertActivityViewModel.*
+import com.simprints.id.domain.alert.AlertActivityViewModel.ButtonAction
+import com.simprints.id.domain.alert.AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -17,6 +17,7 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FA
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.resources.R
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -55,7 +56,7 @@ class AlertPresenter(
         initColours()
         initTextAndDrawables()
 
-        alertType.fromAlertToAlertTypeEvent()?.let {
+        alertType.fromAlertToAlertTypeEvent().let {
             inBackground {
                 eventRepository.addOrUpdateEvent(
                     AlertScreenEvent(
@@ -94,9 +95,6 @@ class AlertPresenter(
             ENROLMENT_LAST_BIOMETRICS_FAILED -> {
                 getParamsForLastBiometricsFailedAlert()
             }
-            MODALITY_DOWNLOAD_CANCELLED -> {
-                getParamsForModalityDownloadCancelledAlert()
-            }
             else -> {
                 emptyList()
             }
@@ -114,25 +112,6 @@ class AlertPresenter(
                 }
                 isFingerprint() -> {
                     listOf(view.getTranslatedString(R.string.enrol_last_biometrics_alert_message_fingerprint_param))
-                }
-                else -> {
-                    emptyList()
-                }
-            }
-        }
-    }
-
-    private fun getParamsForModalityDownloadCancelledAlert() = runBlocking(dispatcher) {
-        with(configManager.getProjectConfiguration().general.modalities) {
-            when {
-                isFingerprintAndFace() -> {
-                    listOf(view.getTranslatedString(R.string.fingerprint_face_feature_alert))
-                }
-                isFace() -> {
-                    listOf(view.getTranslatedString(R.string.face_feature_alert))
-                }
-                isFingerprint() -> {
-                    listOf(view.getTranslatedString(R.string.fingerprint_feature_alert))
                 }
                 else -> {
                     emptyList()
@@ -174,8 +153,6 @@ class AlertPresenter(
             AlertType.GUID_NOT_FOUND_OFFLINE -> {
                 startExitFormActivity()
             }
-            AlertType.OFFLINE_DURING_SETUP,
-            AlertType.SETUP_MODALITY_DOWNLOAD_CANCELLED -> view.closeActivityAfterCloseButton()
         }
     }
 

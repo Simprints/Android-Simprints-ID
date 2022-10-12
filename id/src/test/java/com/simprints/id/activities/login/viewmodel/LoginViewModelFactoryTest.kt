@@ -1,7 +1,6 @@
 package com.simprints.id.activities.login.viewmodel
 
-import com.google.common.truth.Truth
-import com.simprints.id.activities.setup.SetupViewModel
+import com.simprints.id.activities.coreexitform.CoreExitFormViewModel
 import io.mockk.mockk
 import io.mockk.spyk
 import org.junit.Test
@@ -18,8 +17,7 @@ class LoginViewModelFactoryTest {
             )
         )
 
-        val viewModel = factory.create(LoginViewModel::class.java)
-        Truth.assertThat(viewModel is LoginViewModel).isTrue()
+        factory.create(LoginViewModel::class.java)
     }
 
     @Test
@@ -33,7 +31,7 @@ class LoginViewModelFactoryTest {
 
         var exception: Exception? = null
         try {
-            factory.create(SetupViewModel::class.java)
+            factory.create(CoreExitFormViewModel::class.java)
         } catch (ex: Exception) {
             exception = ex
         }

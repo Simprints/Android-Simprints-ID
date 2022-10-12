@@ -78,8 +78,6 @@ dependencies {
     implementation(libs.androidX.navigation.fragment)
     implementation(libs.androidX.navigation.ui)
 
-    implementation(libs.playcore.core.ktx)
-
     // DI
     implementation(libs.hilt)
     implementation(libs.hilt.work)

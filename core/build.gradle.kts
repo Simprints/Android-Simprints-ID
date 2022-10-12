@@ -43,8 +43,6 @@ dependencies {
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.jackson.core)
 
-    implementation(libs.playcore.core)
-
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.coroutines.test)
