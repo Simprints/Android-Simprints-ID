@@ -38,7 +38,6 @@ open class Application : CoreApplication() {
             .application(this)
             .appModule(AppModule())
             .preferencesModule(PreferencesModule())
-            .serializerModule(SerializerModule())
             .syncModule(SyncModule())
             .viewModelModule(ViewModelModule())
             .build()
