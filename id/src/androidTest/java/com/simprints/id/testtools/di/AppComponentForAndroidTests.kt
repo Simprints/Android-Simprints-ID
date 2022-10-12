@@ -1,5 +1,6 @@
 package com.simprints.id.testtools.di
 
+import com.simprints.core.CoreModule
 import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.activities.login.LoginActivityAndroidTest
@@ -26,7 +27,6 @@ import javax.inject.Singleton
     modules = [
         AppModule::class,
         PreferencesModule::class,
-        SerializerModule::class,
         SecurityModule::class,
         DataModule::class,
         SyncModule::class,
@@ -44,6 +44,7 @@ import javax.inject.Singleton
         EnrolmentRecordsModule::class,
         RecentUserActivityModule::class,
         RecentUserActivityDataStoreModule::class,
+        CoreModule::class,
     ]
 )
 interface AppComponentForAndroidTests : AppComponent {
@@ -57,7 +58,6 @@ interface AppComponentForAndroidTests : AppComponent {
         fun dataModule(dataModule: DataModule): Builder
         fun appModule(appModule: AppModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
-        fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
         fun securityModule(securityModule: SecurityModule): Builder

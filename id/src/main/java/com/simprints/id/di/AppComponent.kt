@@ -1,9 +1,6 @@
 package com.simprints.id.di
 
-import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
-import com.simprints.core.sharedpreferences.PreferencesManager
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.core.CoreModule
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
@@ -47,24 +44,17 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
-import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.ConfigManagerModule
 import com.simprints.infra.config.DataStoreModule
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordsModule
-import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.ImagesModule
 import com.simprints.infra.license.LicenseModule
-import com.simprints.infra.license.LicenseRepository
-import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.LoginManagerModule
 import com.simprints.infra.login.SafetyNetModule
 import com.simprints.infra.network.NetworkModule
 import com.simprints.infra.realm.RealmModule
 import com.simprints.infra.recent.user.activity.RecentUserActivityDataStoreModule
-import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityModule
-import com.simprints.infra.security.SecurityManager
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -76,7 +66,6 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         DataModule::class,
         SecurityModule::class,
         PreferencesModule::class,
-        SerializerModule::class,
         SyncModule::class,
         DashboardActivityModule::class,
         ViewModelModule::class,
@@ -92,6 +81,7 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         EnrolmentRecordsModule::class,
         RecentUserActivityModule::class,
         RecentUserActivityDataStoreModule::class,
+        CoreModule::class,
     ]
 )
 @Singleton
@@ -107,7 +97,6 @@ interface AppComponent {
         fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun securityModule(securityModule: SecurityModule): Builder
-        fun serializerModule(serializerModule: SerializerModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
         fun dashboardActivityModule(dashboardActivityModule: DashboardActivityModule): Builder
         fun viewModelModule(viewModelModule: ViewModelModule): Builder
@@ -160,17 +149,4 @@ interface AppComponent {
     fun inject(preferencesManager: IdPreferencesManager)
     fun inject(remoteConfigWorker: RemoteConfigWorker)
     fun inject(storeUserLocationIntoCurrentSessionWorker: StoreUserLocationIntoCurrentSessionWorker)
-
-    fun getSessionEventsManager(): EventRepository
-    fun getTimeHelper(): TimeHelper
-    fun getEnrolmentRecordManager(): EnrolmentRecordManager
-    fun getPreferencesManager(): PreferencesManager
-    fun getIdPreferencesManager(): IdPreferencesManager
-    fun getImprovedSharedPreferences(): ImprovedSharedPreferences
-    fun getImageRepository(): ImageRepository
-    fun getLicenseRepository(): LicenseRepository
-    fun getLoginManager(): LoginManager
-    fun getConfigManager(): ConfigManager
-    fun getSecurityManager(): SecurityManager
-    fun getRecentUserActivityManager(): RecentUserActivityManager
 }

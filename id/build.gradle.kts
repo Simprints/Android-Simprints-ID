@@ -147,7 +147,6 @@ dependencies {
     kapt(libs.dagger.compiler)
 
     implementation(libs.fuzzywuzzy.core)
-    implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)
 
 //    implementation(libs.hilt)
