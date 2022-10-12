@@ -1,9 +1,10 @@
 package com.simprints.fingerprint.activities.connect.issues.otarecovery
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import org.junit.Rule
@@ -14,6 +15,9 @@ class OtaRecoveryViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val coroutineRule = TestCoroutineRule()
 
     private val scannerWrapper: ScannerWrapper = mockk()
     private val scannerManager: ScannerManager = mockk {
@@ -30,7 +34,7 @@ class OtaRecoveryViewModelTest {
         viewModel.handleTryAgainPressed()
         val connectScannerStatus = viewModel.isConnectionSuccess.getOrAwaitValue()
         //Then
-        Truth.assertThat(connectScannerStatus.peekContent()).isEqualTo(true)
+        assertThat(connectScannerStatus.peekContent()).isEqualTo(true)
     }
 
     @Test
@@ -42,6 +46,6 @@ class OtaRecoveryViewModelTest {
         viewModel.handleTryAgainPressed()
         val connectScannerStatus = viewModel.isConnectionSuccess.getOrAwaitValue()
         //Then
-        Truth.assertThat(connectScannerStatus.peekContent()).isEqualTo(false)
+        assertThat(connectScannerStatus.peekContent()).isEqualTo(false)
     }
 }
