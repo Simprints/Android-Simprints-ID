@@ -11,6 +11,10 @@ import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsF
 import com.simprints.eventsystem.event.local.*
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -30,19 +34,25 @@ import kotlin.coroutines.CoroutineContext
 abstract class EventSystemModule {
 
     @Binds
-    abstract fun provideSessionDataCache(impl: SessionDataCacheImpl): SessionDataCache
+    abstract fun bindSessionDataCache(impl: SessionDataCacheImpl): SessionDataCache
 
     @Binds
-    abstract fun provideSessionEventValidatorsFactory(impl: SessionEventValidatorsFactoryImpl): SessionEventValidatorsFactory
+    abstract fun bindSessionEventValidatorsFactory(impl: SessionEventValidatorsFactoryImpl): SessionEventValidatorsFactory
 
     @Binds
-    abstract fun provideEventRemoteDataSource(impl: EventRemoteDataSourceImpl): EventRemoteDataSource
+    abstract fun bindEventRemoteDataSource(impl: EventRemoteDataSourceImpl): EventRemoteDataSource
 
     @Binds
-    abstract fun provideEventDatabaseFactory(impl: DbEventDatabaseFactoryImpl): EventDatabaseFactory
+    abstract fun bindEventDatabaseFactory(impl: DbEventDatabaseFactoryImpl): EventDatabaseFactory
 
     @Binds
-    abstract fun provideEventLocalDataSource(impl: EventLocalDataSourceImpl): EventLocalDataSource
+    abstract fun bindEventLocalDataSource(impl: EventLocalDataSourceImpl): EventLocalDataSource
+
+    @Binds
+    abstract fun bindEventUpSyncScopeRepository(impl: EventUpSyncScopeRepositoryImpl): EventUpSyncScopeRepository
+
+    @Binds
+    abstract fun bindEventDownSyncScopeRepository(impl: EventDownSyncScopeRepositoryImpl): EventDownSyncScopeRepository
 
     @AssistedFactory
     interface EventRepositoryFactory {
