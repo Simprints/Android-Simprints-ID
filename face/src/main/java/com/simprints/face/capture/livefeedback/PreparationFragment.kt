@@ -10,16 +10,20 @@ import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.FaceOnboardingCompleteEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentPreparationBinding
-import org.koin.android.ext.android.inject
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * This class represents the screen the user is presented to prepare them on how to capture the face
  */
-class PreparationFragment: Fragment(R.layout.fragment_preparation) {
+@AndroidEntryPoint
+class PreparationFragment : Fragment(R.layout.fragment_preparation) {
     private val binding by viewBinding(FragmentPreparationBinding::bind)
 
-    private val faceSessionEventsManager: FaceSessionEventsManager by inject()
-    private val faceTimeHelper: FaceTimeHelper by inject()
+    @Inject
+    lateinit var faceSessionEventsManager: FaceSessionEventsManager
+    @Inject
+    lateinit var faceTimeHelper: FaceTimeHelper
     private val startTime = faceTimeHelper.now()
 
 

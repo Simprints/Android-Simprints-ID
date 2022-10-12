@@ -14,34 +14,21 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiSelector
-import com.simprints.face.KoinTestRule
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.infra.logging.Simber
 import io.mockk.mockk
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 
 @RunWith(AndroidJUnit4::class)
-class LiveFeedbackFragmentTest : KoinTest {
+class LiveFeedbackFragmentTest {
 
     private lateinit var device: UiDevice
     private val faceCaptureViewModel: FaceCaptureViewModel = mockk(relaxed = true)
     private val liveFeedBackVm: LiveFeedbackFragmentViewModel = mockk(relaxed = true)
-
-    private val testModule = module {
-        viewModel { faceCaptureViewModel }
-        viewModel { liveFeedBackVm }
-    }
-
-    @get:Rule
-    val koinTestRule = KoinTestRule(modules = listOf(testModule))
 
     @Before
     fun setUp() {
