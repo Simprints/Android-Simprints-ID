@@ -6,10 +6,11 @@ import androidx.core.graphics.toRect
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.face.models.PreviewFrame
 import com.simprints.face.models.Size
-import com.simprints.uicomponents.imageTools.LibYuvJni
+import com.simprints.face.imageTools.LibYuvJni
+import javax.inject.Inject
 import kotlin.math.min
 
-class FrameProcessor(private val libYuvJni: LibYuvJni) {
+class FrameProcessor @Inject constructor(private val libYuvJni: LibYuvJni) {
 
     fun previewFrameFrom(
         cameraFrame: Frame,

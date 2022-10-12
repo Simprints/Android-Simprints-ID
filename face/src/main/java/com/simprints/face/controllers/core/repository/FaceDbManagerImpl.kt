@@ -6,9 +6,10 @@ import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.Serializable
+import javax.inject.Inject
 
 
-class FaceDbManagerImpl(private val enrolmentRecordManager: EnrolmentRecordManager) :
+class FaceDbManagerImpl @Inject constructor(private val enrolmentRecordManager: EnrolmentRecordManager) :
     FaceDbManager {
 
     override suspend fun loadPeople(query: Serializable): Flow<FaceIdentity> =

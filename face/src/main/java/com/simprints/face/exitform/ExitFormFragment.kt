@@ -6,6 +6,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.tools.extentions.showToast
@@ -14,15 +15,13 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentExitFormBinding
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
+import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
 
-    private val mainVm: FaceCaptureViewModel by sharedViewModel()
-    private val vm: ExitFormViewModel by viewModel { parametersOf(mainVm) }
+    private val vm: ExitFormViewModel by viewModels()
     private val binding by viewBinding(FragmentExitFormBinding::bind)
 
     private val textWatcher = textWatcherOnChange {
