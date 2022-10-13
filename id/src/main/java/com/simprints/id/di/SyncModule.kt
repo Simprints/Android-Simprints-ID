@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
@@ -11,10 +10,8 @@ import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepositoryImpl
 import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
@@ -42,7 +39,6 @@ import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import dagger.Module
 import dagger.Provides
@@ -63,18 +59,6 @@ open class SyncModule {
         eventSyncCache: EventSyncCache
     ): EventSyncStateProcessor =
         EventSyncStateProcessorImpl(ctx, eventSyncCache)
-
-    @Provides
-    open fun provideEventUpSyncScopeRepo(
-        loginManager: LoginManager,
-        dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao,
-        dispatcher: DispatcherProvider
-    ): EventUpSyncScopeRepository =
-        EventUpSyncScopeRepositoryImpl(
-            loginManager,
-            dbEventUpSyncOperationStateDao,
-            dispatcher
-        )
 
     @Provides
     open fun providePeopleSyncManager(
@@ -104,19 +88,6 @@ open class SyncModule {
         imageUpSyncScheduler,
         configManager
     )
-
-    @Provides
-    open fun provideEventDownSyncScopeRepo(
-        loginManager: LoginManager,
-        preferencesManager: PreferencesManager,
-        downSyncOperationStateDao: DbEventDownSyncOperationStateDao,
-        dispatcher: DispatcherProvider
-    ): EventDownSyncScopeRepository =
-        EventDownSyncScopeRepositoryImpl(
-            loginManager,
-            downSyncOperationStateDao,
-            dispatcher
-        )
 
     @Provides
     open fun provideDownSyncWorkerBuilder(

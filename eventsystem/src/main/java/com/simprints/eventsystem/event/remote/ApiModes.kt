@@ -5,12 +5,12 @@ import com.simprints.core.domain.modality.Modes
 
 
 @Keep
-enum class ApiModes {
+internal enum class ApiModes {
     FINGERPRINT,
     FACE;
 }
 
-fun Modes.fromDomainToApi(): ApiModes =
+internal fun Modes.fromDomainToApi(): ApiModes =
     when (this) {
         Modes.FINGERPRINT -> ApiModes.FINGERPRINT
         Modes.FACE -> ApiModes.FACE

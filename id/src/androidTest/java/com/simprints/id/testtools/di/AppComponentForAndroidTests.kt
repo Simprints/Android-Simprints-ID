@@ -1,6 +1,7 @@
 package com.simprints.id.testtools.di
 
 import com.simprints.core.CoreModule
+import com.simprints.eventsystem.EventSystemModule
 import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.activities.login.LoginActivityAndroidTest
@@ -45,6 +46,7 @@ import javax.inject.Singleton
         RecentUserActivityModule::class,
         RecentUserActivityDataStoreModule::class,
         CoreModule::class,
+        EventSystemModule::class
     ]
 )
 interface AppComponentForAndroidTests : AppComponent {

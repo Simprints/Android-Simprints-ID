@@ -7,14 +7,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.EventRepositoryImpl
-import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
-import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactoryImpl
-import com.simprints.eventsystem.event.local.*
-import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig.VERSION_NAME
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
@@ -40,7 +34,6 @@ import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
@@ -63,52 +56,7 @@ open class AppModule {
     fun provideContext(app: Application): Context = app
 
     @Provides
-    open fun provideSessionDataCache(app: EventSystemApplication): SessionDataCache =
-        SessionDataCacheImpl(app)
-
-    @Provides
     open fun provideEventSystemApplication(): EventSystemApplication = EventSystemApplication()
-
-
-    @Provides
-    open fun provideSessionEventValidatorsBuilder(): SessionEventValidatorsFactory =
-        SessionEventValidatorsFactoryImpl()
-
-    @Provides
-    open fun provideDbEventDatabaseFactory(
-        ctx: Context,
-        secureDataManager: SecurityManager,
-    ): EventDatabaseFactory = DbEventDatabaseFactoryImpl(ctx, secureDataManager)
-
-    @Provides
-    @Singleton
-    open fun provideSessionEventsLocalDbManager(
-        factory: EventDatabaseFactory
-    ): EventLocalDataSource = EventLocalDataSourceImpl(factory)
-
-    @Provides
-    @Singleton
-    open fun provideEventRepository(
-        ctx: Context,
-        eventLocalDataSource: EventLocalDataSource,
-        eventRemoteDataSource: EventRemoteDataSource,
-        configManager: ConfigManager,
-        loginManager: LoginManager,
-        timeHelper: TimeHelper,
-        validatorFactory: SessionEventValidatorsFactory,
-        sessionDataCache: SessionDataCache
-    ): EventRepository = EventRepositoryImpl(
-        ctx.deviceId,
-        ctx.packageVersionName,
-        loginManager,
-        eventLocalDataSource,
-        eventRemoteDataSource,
-        timeHelper,
-        validatorFactory,
-        VERSION_NAME,
-        sessionDataCache,
-        configManager,
-    )
 
     @Provides
     fun provideModuleRepository(

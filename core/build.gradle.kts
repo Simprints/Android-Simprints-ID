@@ -31,8 +31,10 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+
     api(project(":moduleapi"))
     implementation(project(":infralogging"))
+    implementation(libs.libsimprints)
 
     api(libs.androidX.appcompat)
     implementation(libs.androidX.lifecycle.java8)

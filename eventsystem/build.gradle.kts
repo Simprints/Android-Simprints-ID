@@ -59,6 +59,10 @@ dependencies {
     api(libs.retrofit.core)
     api(libs.sqlCipher.core)
 
+    // DI
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
+
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.coroutines.test)
     testImplementation(libs.testing.robolectric.annotation)
@@ -67,4 +71,11 @@ dependencies {
     testImplementation(project(":testtools"))
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
+
+    androidTestImplementation(libs.testing.androidX.core.testing)
+    androidTestImplementation(libs.testing.androidX.ext.junit)
+    androidTestImplementation(libs.testing.androidX.rules)
+    androidTestImplementation(libs.testing.mockk.android)
+
+    androidTestImplementation(project(":infraenrolmentrecords"))
 }

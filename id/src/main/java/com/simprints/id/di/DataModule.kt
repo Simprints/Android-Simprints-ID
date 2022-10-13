@@ -1,9 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.event.remote.EventRemoteDataSource
-import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
 import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
@@ -22,12 +19,6 @@ import javax.inject.Singleton
 @DisableInstallInCheck
 @Module
 open class DataModule {
-
-    @Provides
-    open fun provideEventRemoteDataSource(
-        loginManager: LoginManager,
-        jsonHelper: JsonHelper
-    ): EventRemoteDataSource = EventRemoteDataSourceImpl(loginManager, jsonHelper)
 
     @Provides
     open fun provideLongConsentLocalDataSource(

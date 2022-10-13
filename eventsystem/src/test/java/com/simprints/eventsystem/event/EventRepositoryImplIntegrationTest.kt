@@ -42,7 +42,7 @@ class EventRepositoryImplIntegrationTest {
     lateinit var loginManager: LoginManager
 
     @MockK
-    lateinit var eventRemoteDataSource: EventRemoteDataSource
+    private lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -72,12 +72,12 @@ class EventRepositoryImplIntegrationTest {
         eventRepo = EventRepositoryImpl(
             "",
             "",
+            "",
             loginManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             timeHelper,
             sessionEventValidatorsFactory,
-            "",
             sessionDataCache,
             mockk()
         )
