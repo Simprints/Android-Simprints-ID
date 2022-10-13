@@ -63,8 +63,11 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
                     renderCapturingNotStarted()
                 LiveFeedbackFragmentViewModel.CapturingState.CAPTURING ->
                     renderCapturing()
-                LiveFeedbackFragmentViewModel.CapturingState.FINISHED ->
+                LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
+                    mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigate(R.id.action_liveFeedbackFragment_to_confirmationFragment)
+                }
+
             }
         }
     }
@@ -81,7 +84,9 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
             vm.process(
                 frame,
                 binding.captureOverlay.rectInCanvas,
-                Size(binding.captureOverlay.width, binding.captureOverlay.height)
+                Size(binding.captureOverlay.width, binding.captureOverlay.height),
+                mainVm.samplesToCapture,
+                mainVm.attemptNumber
             )
 
         } catch (t: Throwable) {

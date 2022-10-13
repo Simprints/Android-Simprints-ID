@@ -102,6 +102,8 @@ import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
+import com.simprints.id.tools.LocationManager
+import com.simprints.id.tools.LocationManagerImpl
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
@@ -217,6 +219,9 @@ abstract class IdAppModule {
 
     @Binds
     abstract fun provideEnrolResponseAdjudicationHelper(impl: EnrolResponseAdjudicationHelperImpl): EnrolResponseAdjudicationHelper
+
+    @Binds
+    abstract fun provideLocationManager(impl: LocationManagerImpl): LocationManager
 }
 
 @Module

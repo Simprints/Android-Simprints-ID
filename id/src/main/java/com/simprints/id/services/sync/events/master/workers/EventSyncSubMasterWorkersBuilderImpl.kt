@@ -3,8 +3,9 @@ package com.simprints.id.services.sync.events.master.workers
 import androidx.work.OneTimeWorkRequest
 import androidx.work.workDataOf
 import com.simprints.id.services.sync.events.common.*
+import javax.inject.Inject
 
-class EventSyncSubMasterWorkersBuilderImpl: EventSyncSubMasterWorkersBuilder {
+class EventSyncSubMasterWorkersBuilderImpl @Inject constructor(): EventSyncSubMasterWorkersBuilder {
 
     override fun buildStartSyncReporterWorker(uniqueSyncID: String) =
         OneTimeWorkRequest.Builder(EventStartSyncReporterWorker::class.java)
