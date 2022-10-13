@@ -4,6 +4,9 @@ import android.os.Build
 import android.os.Build.VERSION
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
+import com.simprints.core.DeviceID
+import com.simprints.core.LibSimprintsVersionName
+import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.*
@@ -36,16 +39,17 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.util.*
+import javax.inject.Inject
 
-open class EventRepositoryImpl(
-    private val deviceId: String,
-    private val appVersionName: String,
+internal open class EventRepositoryImpl @Inject constructor(
+    @DeviceID private val deviceId: String,
+    @PackageVersionName private val appVersionName: String,
+    @LibSimprintsVersionName override val libSimprintsVersionName: String,
     private val loginManager: LoginManager,
     private val eventLocalDataSource: EventLocalDataSource,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
-    override val libSimprintsVersionName: String,
     private val sessionDataCache: SessionDataCache,
     private val configManager: ConfigManager
 ) : EventRepository {

@@ -1,5 +1,6 @@
-package com.simprints.id.data.db.event.remote
+package com.simprints.eventsystem.event.remote
 
+import android.app.Application
 import android.os.Build
 import android.os.Build.VERSION
 import androidx.test.core.app.ApplicationProvider
@@ -35,18 +36,11 @@ import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.event.remote.EventRemoteDataSource
-import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
-import com.simprints.eventsystem.event.remote.EventRemoteInterface
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.createEnrolmentEventV1
-import com.simprints.id.Application
-import com.simprints.id.testtools.testingapi.TestProjectRule
-import com.simprints.id.testtools.testingapi.models.TestProject
-import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.enrolment.records.domain.models.FingerIdentifier
 import com.simprints.infra.enrolment.records.domain.models.fromDomainToModuleApi

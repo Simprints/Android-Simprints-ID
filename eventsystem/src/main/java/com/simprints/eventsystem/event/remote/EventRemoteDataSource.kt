@@ -5,7 +5,7 @@ import com.simprints.eventsystem.event.domain.models.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
 
-interface EventRemoteDataSource {
+internal interface EventRemoteDataSource {
 
     suspend fun count(query: ApiRemoteEventQuery): List<EventCount>
 

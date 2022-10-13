@@ -16,6 +16,7 @@ import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
@@ -215,7 +216,7 @@ fun EventRepositoryImplTest.verifyArtificialEventWasAdded(
     }
 }
 
-fun EventRepositoryImplTest.verifySessionHasNotGotUploaded(id: String) {
+internal fun EventRepositoryImplTest.verifySessionHasNotGotUploaded(id: String, eventRemoteDataSource: EventRemoteDataSource) {
     coVerify(exactly = 0) { eventLocalDataSource.loadAllFromSession(sessionId = id) }
     coVerify {
         eventRemoteDataSource.post(any(), match { event ->

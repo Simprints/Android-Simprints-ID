@@ -12,8 +12,9 @@ import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperatio
 import com.simprints.eventsystem.exceptions.MissingArgumentForDownSyncScopeException
 import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class EventDownSyncScopeRepositoryImpl(
+internal class EventDownSyncScopeRepositoryImpl @Inject constructor(
     val loginManager: LoginManager,
     private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
     private val dispatcher: DispatcherProvider

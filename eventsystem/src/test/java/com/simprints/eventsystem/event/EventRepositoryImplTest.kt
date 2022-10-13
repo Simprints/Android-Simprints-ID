@@ -52,7 +52,7 @@ class EventRepositoryImplTest {
     lateinit var eventLocalDataSource: EventLocalDataSource
 
     @MockK
-    lateinit var eventRemoteDataSource: EventRemoteDataSource
+    private lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -88,12 +88,12 @@ class EventRepositoryImplTest {
         eventRepo = EventRepositoryImpl(
             DEVICE_ID,
             APP_VERSION_NAME,
+            LIB_VERSION_NAME,
             loginManager,
             eventLocalDataSource,
             eventRemoteDataSource,
             timeHelper,
             sessionEventValidatorsFactory,
-            LIB_VERSION_NAME,
             sessionDataCache,
             configManager,
         )
@@ -293,7 +293,7 @@ class EventRepositoryImplTest {
                 canSyncAnalyticsDataToSimprints = false
             ).toList()
 
-            verifySessionHasNotGotUploaded(GUID3)
+            verifySessionHasNotGotUploaded(GUID3, eventRemoteDataSource)
         }
     }
 
