@@ -17,7 +17,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
@@ -40,7 +39,6 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.After
@@ -84,8 +82,6 @@ class AlertActivityTest {
     fun noParamForAlertActivity_theRightAlertShouldAppear() {
         launchAlertActivity()
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
-
-        coVerify(atLeast = 1) { eventRepository.addOrUpdateEvent(any<AlertScreenEvent>()) }
     }
 
     @Test
