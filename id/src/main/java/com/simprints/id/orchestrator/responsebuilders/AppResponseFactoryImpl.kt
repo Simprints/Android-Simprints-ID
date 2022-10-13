@@ -13,8 +13,9 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import javax.inject.Inject
 
-class AppResponseFactoryImpl(
+class AppResponseFactoryImpl @Inject constructor(
     private val enrolmentHelper: EnrolmentHelper,
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,

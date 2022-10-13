@@ -1,27 +1,30 @@
 package com.simprints.id.activities.requestLogin
 
 import android.os.Bundle
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.core.DeviceID
+import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.databinding.ActivityFrontBinding
-import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.extensions.packageVersionName
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
-open class RequestLoginActivity : BaseSplitActivity() {
+@AndroidEntryPoint
+class RequestLoginActivity : BaseSplitActivity() {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
+    @PackageVersionName
+    @Inject
+    lateinit var packageVersionName: String
 
-    lateinit var app: Application
+    @DeviceID
+    @Inject
+    lateinit var deviceId: String
+
     private val binding by viewBinding(ActivityFrontBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
-        app = application as Application
         title = getString(IDR.string.requestLogin_title)
 
         setContentView(binding.root)
@@ -34,11 +37,12 @@ open class RequestLoginActivity : BaseSplitActivity() {
         binding.libSimprintsVersionTextView.text = getString(IDR.string.libsimprints_label)
         binding.simprintsIdVersionTextView.text = getString(IDR.string.simprints_label)
         binding.requestLogin.text = getString(IDR.string.requestLogin_message)
-        binding.tvDeviceId.text = getString(IDR.string.device_id, app.deviceId)
+        binding.tvDeviceId.text = getString(IDR.string.device_id, deviceId)
     }
 
     private fun initSimprintsIdVersionTextView(simprintsIdVersion: String) {
-        val simprintsIdVersionString = String.format(getString(IDR.string.front_simprintsId_version), simprintsIdVersion)
+        val simprintsIdVersionString =
+            String.format(getString(IDR.string.front_simprintsId_version), simprintsIdVersion)
         binding.simprintsIdVersionTextView.text = simprintsIdVersionString
     }
 }

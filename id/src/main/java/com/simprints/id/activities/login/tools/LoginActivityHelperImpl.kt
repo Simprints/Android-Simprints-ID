@@ -3,10 +3,10 @@ package com.simprints.id.activities.login.tools
 import android.content.Intent
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.response.QrCodeResponse
+import javax.inject.Inject
 
-class LoginActivityHelperImpl(
-    private val jsonHelper: JsonHelper
-) : LoginActivityHelper {
+class LoginActivityHelperImpl @Inject constructor(private val jsonHelper: JsonHelper) :
+    LoginActivityHelper {
 
     override fun areMandatoryCredentialsPresent(
         projectId: String,
@@ -27,7 +27,8 @@ class LoginActivityHelperImpl(
 
     override fun tryParseQrCodeResponse(response: Intent): QrCodeResponse {
         val qrValue = response.getStringExtra(EXTRA_SCAN_RESULT)
-        return qrValue?.let { jsonHelper.fromJson<QrCodeResponse>(it) } ?: throw Throwable("qrValue null")
+        return qrValue?.let { jsonHelper.fromJson<QrCodeResponse>(it) }
+            ?: throw Throwable("qrValue null")
     }
 
     private companion object {

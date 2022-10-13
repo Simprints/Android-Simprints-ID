@@ -4,8 +4,9 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
+import javax.inject.Inject
 
-class SyncSchedulerImpl(
+class SyncSchedulerImpl @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
     private val configManager: ConfigManager,

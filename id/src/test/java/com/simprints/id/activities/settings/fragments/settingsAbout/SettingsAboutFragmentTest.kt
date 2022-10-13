@@ -11,7 +11,6 @@ import com.simprints.id.R
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration

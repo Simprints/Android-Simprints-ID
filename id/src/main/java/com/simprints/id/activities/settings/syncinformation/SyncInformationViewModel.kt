@@ -3,6 +3,7 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -16,22 +17,26 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.LoginManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import com.simprints.infra.images.ImageRepository
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SyncInformationViewModel(
+@HiltViewModel
+class SyncInformationViewModel @Inject constructor(
     private val downySyncHelper: EventDownSyncHelper,
     private val eventRepository: EventRepository,
     private val enrolmentRecordManager: EnrolmentRecordManager,
-    private val projectId: String,
+    private val loginManager: LoginManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
     private val configManager: ConfigManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val recordsInLocal = MutableLiveData<Int?>(null)
@@ -102,14 +107,20 @@ class SyncInformationViewModel(
     }
 
     private suspend fun fetchLocalRecordCount() =
-        enrolmentRecordManager.count(SubjectQuery(projectId = projectId))
+        enrolmentRecordManager.count(SubjectQuery(projectId = loginManager.getSignedInProjectIdOrEmpty()))
 
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
     private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
-        eventRepository.localCount(projectId = projectId, type = ENROLMENT_V2) +
-            // this is needed because of events created before 2021.1. Once all users update to 2021.1+ we can remove it
-            eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
+        eventRepository.localCount(
+            projectId = loginManager.getSignedInProjectIdOrEmpty(),
+            type = ENROLMENT_V2
+        ) +
+            // TODO remove. This is needed because of events created before 2021.1. Once all users update to 2021.1+ we can remove it
+            eventRepository.localCount(
+                projectId = loginManager.getSignedInProjectIdOrEmpty(),
+                type = ENROLMENT_RECORD_CREATION
+            )
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
         if (isDownSyncAllowed()) {
@@ -152,7 +163,7 @@ class SyncInformationViewModel(
         configManager.getDeviceConfiguration().selectedModules.map {
             ModuleCount(
                 it,
-                enrolmentRecordManager.count(SubjectQuery(projectId = projectId, moduleId = it))
+                enrolmentRecordManager.count(SubjectQuery(projectId = loginManager.getSignedInProjectIdOrEmpty(), moduleId = it))
             )
         }
 

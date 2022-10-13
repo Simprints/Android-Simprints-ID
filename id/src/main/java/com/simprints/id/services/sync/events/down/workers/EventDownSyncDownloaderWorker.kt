@@ -1,12 +1,15 @@
 package com.simprints.id.services.sync.events.down.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -17,12 +20,19 @@ import com.simprints.id.services.sync.events.master.internal.*
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class EventDownSyncDownloaderWorker(
-    context: Context,
-    params: WorkerParameters
+@HiltWorker
+class EventDownSyncDownloaderWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val downSyncHelper: EventDownSyncHelper,
+    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+    private val syncCache: EventSyncCache,
+    private val jsonHelper: JsonHelper,
+    private val dispatcher: DispatcherProvider,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     companion object {
@@ -33,28 +43,13 @@ class EventDownSyncDownloaderWorker(
 
     override val tag: String = EventDownSyncDownloaderWorker::class.java.simpleName
 
-    @Inject
-    lateinit var downSyncHelper: EventDownSyncHelper
-
-    @Inject
-    lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-
-    @Inject
-    lateinit var syncCache: EventSyncCache
-
-    @Inject
-    lateinit var jsonHelper: JsonHelper
-
-    @Inject
-    lateinit var dispatcher: DispatcherProvider
-
     internal var eventDownSyncDownloaderTask: EventDownSyncDownloaderTask =
         EventDownSyncDownloaderTaskImpl()
 
     private val downSyncOperationInput by lazy {
         val jsonInput = inputData.getString(INPUT_DOWN_SYNC_OPS)
             ?: throw IllegalArgumentException("input required")
-        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation>(
+        jsonHelper.fromJson<EventDownSyncOperation>(
             jsonInput
         )
     }
@@ -62,11 +57,9 @@ class EventDownSyncDownloaderWorker(
     private suspend fun getDownSyncOperation() =
         eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
-    override suspend fun doWork(): Result {
-        getComponent<EventDownSyncDownloaderWorker> { it.inject(this@EventDownSyncDownloaderWorker) }
-
-        return try {
-            withContext(dispatcher.io()) {
+    override suspend fun doWork(): Result =
+        withContext(dispatcher.io()) {
+            try {
                 Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
                 crashlyticsLog("Start - Params: $downSyncOperationInput")
@@ -85,12 +78,11 @@ class EventDownSyncDownloaderWorker(
                     workDataOf(OUTPUT_DOWN_SYNC to count),
                     "Total downloaded: $0 for $downSyncOperationInput"
                 )
+            } catch (t: Throwable) {
+                Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
+                retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t)
             }
-        } catch (t: Throwable) {
-            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
-            retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t)
         }
-    }
 
     private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t: Throwable): Result {
         return when (t) {

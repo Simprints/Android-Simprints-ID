@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
@@ -27,9 +26,6 @@ class SignerManagerImplTest {
 
     @MockK
     lateinit var mockLoginManager: LoginManager
-
-    @MockK
-    lateinit var mockPreferencesManager: PreferencesManager
 
     @MockK
     lateinit var mockSyncManager: SyncManager
@@ -62,7 +58,6 @@ class SignerManagerImplTest {
         signerManager = SignerManagerImpl(
             configManager,
             mockLoginManager,
-            mockPreferencesManager,
             mockEventSyncManager,
             mockSyncManager,
             mockSecurityStateScheduler,
@@ -157,7 +152,7 @@ class SignerManagerImplTest {
         verifyStoredCredentialsGotCleaned()
         verifyRemoteManagerGotSignedOut()
         verifyLastSyncInfoGotDeleted()
-        verifyAllSharedPreferencesExceptRealmKeysGotCleared()
+        coVerify(exactly = 1) { configManager.clearData() }
     }
 
     @Test
@@ -247,6 +242,4 @@ class SignerManagerImplTest {
 
     private fun verifyRemoteManagerGotSignedOut() = verify { mockLoginManager.signOut() }
     private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
-    private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() =
-        verify { mockPreferencesManager.clearAllSharedPreferences() }
 }

@@ -1,6 +1,9 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.core.DeviceID
+import com.simprints.core.DispatcherIO
+import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.EventRepository
@@ -11,7 +14,6 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -24,7 +26,6 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
@@ -34,40 +35,28 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SUB
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.USER_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent
 
-class CheckLoginFromIntentPresenter(
-    val view: CheckLoginFromIntentContract.View,
-    val deviceId: String,
-    component: AppComponent,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+class CheckLoginFromIntentPresenter @AssistedInject constructor(
+    @Assisted private val view: CheckLoginFromIntentContract.View,
+    @DeviceID private val deviceId: String,
+    private val recentUserActivityManager: RecentUserActivityManager,
+    private val eventRepository: EventRepository,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val simNetworkUtils: SimNetworkUtils,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) :
-    CheckLoginPresenter(view, component),
+    CheckLoginPresenter(view),
     CheckLoginFromIntentContract.Presenter {
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject
-    lateinit var recentUserActivityManager: RecentUserActivityManager
-
-    @Inject
-    lateinit var eventRepository: EventRepository
-
-    @Inject
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
-
-    @Inject
-    lateinit var simNetworkUtils: SimNetworkUtils
-
     internal lateinit var appRequest: AppRequest
-
-    init {
-        component.inject(this)
-    }
 
     override suspend fun setup() {
         try {

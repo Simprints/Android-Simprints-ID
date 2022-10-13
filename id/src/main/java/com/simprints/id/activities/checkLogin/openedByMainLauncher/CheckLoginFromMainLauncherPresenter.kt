@@ -1,15 +1,12 @@
 package com.simprints.id.activities.checkLogin.openedByMainLauncher
 
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.di.AppComponent
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
-class CheckLoginFromMainLauncherPresenter(
-    val view: CheckLoginFromMainLauncherContract.View,
-    component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromMainLauncherContract.Presenter {
-
-    init {
-        component.inject(this)
-    }
+class CheckLoginFromMainLauncherPresenter @AssistedInject constructor(
+    @Assisted private val view: CheckLoginFromMainLauncherContract.View,
+) : CheckLoginPresenter(view), CheckLoginFromMainLauncherContract.Presenter {
 
     override suspend fun start() {
         checkSignedInStateAndMoveOn()
@@ -24,7 +21,9 @@ class CheckLoginFromMainLauncherPresenter(
         view.openDashboardActivity()
     }
 
-    override fun isProjectIdStoredAndMatches(): Boolean = loginManager.getSignedInProjectIdOrEmpty().isNotEmpty()
+    override fun isProjectIdStoredAndMatches(): Boolean =
+        loginManager.getSignedInProjectIdOrEmpty().isNotEmpty()
 
-    override fun isUserIdStoredAndMatches(): Boolean = loginManager.getSignedInUserIdOrEmpty().isNotEmpty()
+    override fun isUserIdStoredAndMatches(): Boolean =
+        loginManager.getSignedInUserIdOrEmpty().isNotEmpty()
 }

@@ -1,10 +1,10 @@
 package com.simprints.id.activities.alert
 
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertActivityViewModel.ButtonAction
 import com.simprints.id.domain.alert.AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED
@@ -18,36 +18,23 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FI
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import javax.inject.Inject
 
 // TODO refactor to use ViewModel in order to remove the runBlocking
-class AlertPresenter(
-    val view: AlertContract.View,
-    val component: AppComponent,
-    private val alertType: AlertType,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+class AlertPresenter @AssistedInject constructor(
+    @Assisted private val view: AlertContract.View,
+    @Assisted private val alertType: AlertType,
+    private val eventRepository: EventRepository,
+    private val configManager: ConfigManager,
+    private val timeHelper: TimeHelper,
+    private val exitFormHelper: ExitFormHelper,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : AlertContract.Presenter {
 
-    @Inject
-    lateinit var eventRepository: EventRepository
-
-    @Inject
-    lateinit var configManager: ConfigManager
-
-    @Inject
-    lateinit var timeHelper: TimeHelper
-
-    @Inject
-    lateinit var exitFormHelper: ExitFormHelper
-
     private val alertViewModel = AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
-
-    init {
-        component.inject(this)
-    }
 
     override fun start() {
         logToCrashReport()

@@ -1,6 +1,7 @@
 package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
@@ -9,15 +10,26 @@ import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.*
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.canSyncDataToSimprints
+import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import com.simprints.infra.logging.Simber
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.withContext
 import java.util.*
-import javax.inject.Inject
 
-open class EventSyncMasterWorker(
-    private val appContext: Context,
-    params: WorkerParameters
+@HiltWorker
+open class EventSyncMasterWorker @AssistedInject constructor(
+    @Assisted private val appContext: Context,
+    @Assisted params: WorkerParameters,
+    private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,
+    private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
+    private val configManager: ConfigManager,
+    private val eventSyncCache: EventSyncCache,
+    private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
+    private val timeHelper: TimeHelper,
+    private val dispatcher: DispatcherProvider,
 ) : SimCoroutineWorker(appContext, params) {
 
     companion object {
@@ -31,27 +43,6 @@ open class EventSyncMasterWorker(
     }
 
     override val tag: String = EventSyncMasterWorker::class.java.simpleName
-
-    @Inject
-    lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder
-
-    @Inject
-    lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
-
-    @Inject
-    lateinit var configManager: ConfigManager
-
-    @Inject
-    lateinit var eventSyncCache: EventSyncCache
-
-    @Inject
-    lateinit var eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder
-
-    @Inject
-    lateinit var timeHelper: TimeHelper
-
-    @Inject
-    lateinit var dispatcher: DispatcherProvider
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(appContext)
@@ -67,10 +58,8 @@ open class EventSyncMasterWorker(
         UUID.randomUUID().toString()
     }
 
-    override suspend fun doWork(): Result {
-        getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
-
-        return withContext(dispatcher.io()) {
+    override suspend fun doWork(): Result =
+        withContext(dispatcher.io()) {
             try {
                 crashlyticsLog("Start")
                 val configuration = configManager.getProjectConfiguration()
@@ -123,7 +112,6 @@ open class EventSyncMasterWorker(
                 fail(t)
             }
         }
-    }
 
     private suspend fun isEventDownSyncAllowed() =
         with(configManager.getProjectConfiguration().synchronization) {

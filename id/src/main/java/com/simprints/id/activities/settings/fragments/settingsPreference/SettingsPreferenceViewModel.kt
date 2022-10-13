@@ -3,17 +3,21 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingsPreferenceViewModel(
+@HiltViewModel
+class SettingsPreferenceViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val generalConfiguration = MutableLiveData<GeneralConfiguration>()

@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.exceptions.unexpected.result.NoTaskResultException
 import com.simprints.fingerprint.orchestrator.Orchestrator
@@ -29,8 +31,8 @@ class OrchestratorViewModel @Inject constructor(
     private val runnableTaskDispatcher: RunnableTaskDispatcher,
     private val scannerManager: ScannerManager,
     private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
-    private val externalScope: CoroutineScope,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @ExternalScope private val externalScope: CoroutineScope,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val nextActivityCall = MutableLiveData<ActivityCall>()

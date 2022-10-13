@@ -16,8 +16,9 @@ import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class EventDownSyncWorkersBuilderImpl(
+class EventDownSyncWorkersBuilderImpl @Inject constructor(
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val jsonHelper: JsonHelper,
     private val configManager: ConfigManager,

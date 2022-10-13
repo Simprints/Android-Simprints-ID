@@ -4,21 +4,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.infra.config.ConfigManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class PrivacyNoticeViewModel(
+@HiltViewModel
+class PrivacyNoticeViewModel @Inject constructor(
     private val longConsentRepository: LongConsentRepository,
     private val configManager: ConfigManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val privacyNoticeViewState = MutableLiveData<PrivacyNoticeViewState>()

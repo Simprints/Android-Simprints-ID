@@ -2,39 +2,33 @@ package com.simprints.id.activities.longConsent
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.databinding.ActivityPrivacyNoticeBinding
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class PrivacyNoticeActivity : BaseSplitActivity() {
-
-    @Inject
-    lateinit var viewModelFactory: PrivacyNoticeViewModelFactory
 
     @Inject
     lateinit var deviceManager: DeviceManager
 
-    private lateinit var viewModel: PrivacyNoticeViewModel
+    private val viewModel: PrivacyNoticeViewModel by viewModels()
     private val binding by viewBinding(ActivityPrivacyNoticeBinding::inflate)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        (application as Application).component.also { it.inject(this) }
-        viewModel = ViewModelProvider(this, viewModelFactory).get(PrivacyNoticeViewModel::class.java)
-
         setContentView(binding.root)
-
         initActionBar()
 
         initInUi()
@@ -73,7 +67,9 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
             when (it) {
                 is PrivacyNoticeViewState.ConsentAvailable -> setConsentAvailable(it)
                 is PrivacyNoticeViewState.ConsentNotAvailable -> setConsentNotAvailable()
-                is PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(it.estimatedOutage)
+                is PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(
+                    it.estimatedOutage
+                )
                 is PrivacyNoticeViewState.DownloadInProgress -> setDownloadProgress()
             }
         })
@@ -103,7 +99,8 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
 
             errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) {
                 getString(
-                    IDR.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
+                    IDR.string.error_backend_maintenance_with_time_message,
+                    getFormattedEstimatedOutage(
                         estimatedOutage
                     )
                 )

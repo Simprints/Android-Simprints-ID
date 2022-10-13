@@ -7,7 +7,8 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 
-class ModalityFlowConfirmIdentity(private val coreStepProcessor: CoreStepProcessor) : ModalityFlow {
+class ModalityFlowConfirmIdentity(private val coreStepProcessor: CoreStepProcessor) :
+    ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 

@@ -3,17 +3,20 @@ package com.simprints.id.activities.settings.fragments.moduleselection
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ModuleSelectionViewModel(
+@HiltViewModel
+class ModuleSelectionViewModel @Inject constructor(
     private val repository: ModuleRepository,
     private val eventSyncManager: EventSyncManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val modulesList = MutableLiveData<List<Module>>(emptyList())

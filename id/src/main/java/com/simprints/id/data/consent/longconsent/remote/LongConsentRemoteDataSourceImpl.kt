@@ -5,11 +5,18 @@ import com.simprints.id.data.file.FileUrlRemoteInterface
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
+import java.net.URL
+import javax.inject.Inject
 
 class LongConsentRemoteDataSourceImpl(
     private val loginManager: LoginManager,
     private val consentDownloader: (FileUrl) -> ByteArray
 ) : LongConsentRemoteDataSource {
+
+    @Inject
+    constructor(
+        loginManager: LoginManager
+    ) : this(loginManager, { fileUrl -> URL(fileUrl.url).readBytes() })
 
     private val projectId by lazy {
         loginManager.getSignedInProjectIdOrEmpty()

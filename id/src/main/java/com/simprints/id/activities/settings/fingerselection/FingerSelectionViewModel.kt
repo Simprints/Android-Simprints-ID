@@ -3,18 +3,22 @@ package com.simprints.id.activities.settings.fingerselection
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FingerSelectionViewModel(
+@HiltViewModel
+class FingerSelectionViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val items = MutableLiveData<List<FingerSelectionItem>>()

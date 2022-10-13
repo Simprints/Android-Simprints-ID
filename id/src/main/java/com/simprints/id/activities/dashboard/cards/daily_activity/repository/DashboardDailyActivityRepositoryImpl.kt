@@ -5,8 +5,9 @@ import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActi
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
+import javax.inject.Inject
 
-class DashboardDailyActivityRepositoryImpl(
+class DashboardDailyActivityRepositoryImpl @Inject constructor(
     private val localDataSource: DailyActivityLocalDataSource,
     private val timeHelper: TimeHelper
 ) : DashboardDailyActivityRepository {

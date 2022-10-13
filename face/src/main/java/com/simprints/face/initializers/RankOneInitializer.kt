@@ -3,8 +3,9 @@ package com.simprints.face.initializers
 import android.app.Activity
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
+import javax.inject.Inject
 
-class RankOneInitializer : SdkInitializer {
+class RankOneInitializer @Inject constructor(): SdkInitializer {
     /**
      * This will try to load ROC library from jniLibs and then initialize using the [license].
      *

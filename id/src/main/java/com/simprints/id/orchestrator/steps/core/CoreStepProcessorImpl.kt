@@ -6,8 +6,9 @@ import com.simprints.id.orchestrator.steps.core.CoreRequestCode.*
 import com.simprints.id.orchestrator.steps.core.requests.*
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
+import javax.inject.Inject
 
-class CoreStepProcessorImpl : CoreStepProcessor {
+class CoreStepProcessorImpl @Inject constructor(): CoreStepProcessor {
 
     companion object {
         const val CONSENT_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"

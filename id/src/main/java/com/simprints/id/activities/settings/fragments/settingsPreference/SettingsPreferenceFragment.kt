@@ -8,22 +8,19 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.tools.extensions.enablePreference
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.setChangeListener
 import com.simprints.infra.config.domain.models.GeneralConfiguration
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
-    @Inject
-    lateinit var settingsPreferenceViewModelFactory: SettingsPreferenceViewModelFactory
-
-    private val settingsPreferenceViewModel by viewModels<SettingsPreferenceViewModel> { settingsPreferenceViewModelFactory }
+    private val settingsPreferenceViewModel: SettingsPreferenceViewModel by viewModels()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_general)
@@ -33,11 +30,7 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
-        val component = (requireActivity().application as Application).component
-        component.inject(this)
-
         setTextInLayout()
-
         initTextInLayout()
 
         settingsPreferenceViewModel.generalConfiguration.observe(this) {

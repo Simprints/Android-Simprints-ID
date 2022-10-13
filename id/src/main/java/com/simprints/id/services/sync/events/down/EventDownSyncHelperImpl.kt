@@ -26,10 +26,11 @@ import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class EventDownSyncHelperImpl(
+class EventDownSyncHelperImpl @Inject constructor(
     private val subjectRepository: EnrolmentRecordManager,
-    val eventRepository: EventRepository,
+    private val eventRepository: EventRepository,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
     private val configManager: ConfigManager,

@@ -17,8 +17,9 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class EventSyncManagerImpl(
+class EventSyncManagerImpl @Inject constructor(
     private val ctx: Context,
     private val eventSyncStateProcessor: EventSyncStateProcessor,
     private val downSyncScopeRepository: EventDownSyncScopeRepository,

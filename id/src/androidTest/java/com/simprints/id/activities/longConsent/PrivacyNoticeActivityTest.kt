@@ -13,7 +13,6 @@ import com.simprints.id.activities.login.SYNC_CARD_FAILED_BACKEND_MAINTENANCE_ST
 import com.simprints.id.activities.login.SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations

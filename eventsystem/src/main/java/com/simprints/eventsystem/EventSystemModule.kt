@@ -1,5 +1,6 @@
 package com.simprints.eventsystem
 
+import android.content.Context
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.EventRepositoryImpl
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
@@ -7,15 +8,18 @@ import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsF
 import com.simprints.eventsystem.event.local.*
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.event.remote.EventRemoteDataSourceImpl
+import com.simprints.eventsystem.events_sync.EventSyncStatusDatabase
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
+import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepositoryImpl
+import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStateDao
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
@@ -28,7 +32,7 @@ import kotlin.coroutines.CoroutineContext
         EventSystemProvider::class
     ]
 )
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class EventSystemModule {
 
     @Binds
@@ -58,7 +62,7 @@ abstract class EventSystemModule {
 }
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 internal class EventSystemProvider {
 
     @Provides
@@ -69,5 +73,20 @@ internal class EventSystemProvider {
     @Singleton
     fun provideWritableNonCancelableDispatcher(): CoroutineContext =
         provideIODispatcher() + NonCancellable
+
+    @Provides
+    @Singleton
+    fun provideDbEventUpSyncOperationStateDao(database: EventSyncStatusDatabase): DbEventUpSyncOperationStateDao =
+        database.upSyncOperationsDaoDb
+
+    @Provides
+    @Singleton
+    fun provideDbEventDownSyncOperationStateDao(database: EventSyncStatusDatabase): DbEventDownSyncOperationStateDao =
+        database.downSyncOperationsDao
+
+    @Provides
+    @Singleton
+    fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
+        EventSyncStatusDatabase.getDatabase(ctx)
 
 }

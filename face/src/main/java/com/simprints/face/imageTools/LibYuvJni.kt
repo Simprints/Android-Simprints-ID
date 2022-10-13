@@ -2,8 +2,9 @@ package com.simprints.face.imageTools
 
 import android.graphics.Rect
 import com.simprints.face.models.Size
+import javax.inject.Inject
 
-class LibYuvJni {
+class LibYuvJni @Inject constructor() {
 
     fun cropRotateYuvNV21(
         srcSize: Size, srcBytes: ByteArray,

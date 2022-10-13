@@ -10,9 +10,10 @@ import com.simprints.core.tools.extentions.nand
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
+import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
-class DashboardDailyActivityCardDisplayerImpl(
+class DashboardDailyActivityCardDisplayerImpl @Inject constructor(
     private val timeHelper: TimeHelper
 ) : DashboardDailyActivityCardDisplayer {
 

@@ -23,11 +23,12 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
 import splitties.systemservices.layoutInflater
 import java.util.*
+import javax.inject.Inject
 import kotlin.math.min
 import com.simprints.infra.resources.R as IDR
 
 
-class DashboardSyncCardDisplayerImpl(val timeHelper: TimeHelper) : DashboardSyncCardDisplayer {
+class DashboardSyncCardDisplayerImpl @Inject constructor(val timeHelper: TimeHelper) : DashboardSyncCardDisplayer {
 
     private var tickerToUpdateLastSyncTimeText: ReceiveChannel<Unit>? = null
     private var lastSyncTimeTextView: TextView? = null

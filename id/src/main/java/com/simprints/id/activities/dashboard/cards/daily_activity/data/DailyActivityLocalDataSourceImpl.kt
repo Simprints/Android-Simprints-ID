@@ -1,8 +1,9 @@
 package com.simprints.id.activities.dashboard.cards.daily_activity.data
 
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import javax.inject.Inject
 
-class DailyActivityLocalDataSourceImpl(
+class DailyActivityLocalDataSourceImpl @Inject constructor(
     private val recentUserActivityManager: RecentUserActivityManager
 ) : DailyActivityLocalDataSource {
 

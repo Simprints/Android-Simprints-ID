@@ -9,12 +9,12 @@ import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
+import javax.inject.Inject
 
-class GuidSelectionManagerImpl(
-    val deviceId: String,
-    val loginManager: LoginManager,
+class GuidSelectionManagerImpl @Inject constructor(
+    private val loginManager: LoginManager,
     private val timerHelper: TimeHelper,
-    val eventRepository: EventRepository
+    private val eventRepository: EventRepository
 ) : GuidSelectionManager {
 
     override suspend fun handleConfirmIdentityRequest(request: GuidSelectionRequest) {

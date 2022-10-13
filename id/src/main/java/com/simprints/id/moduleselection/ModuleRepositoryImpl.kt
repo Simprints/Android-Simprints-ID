@@ -9,8 +9,9 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.Simber
+import javax.inject.Inject
 
-class ModuleRepositoryImpl(
+class ModuleRepositoryImpl @Inject constructor(
     private val configManager: ConfigManager,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository

@@ -9,8 +9,9 @@ import com.simprints.infra.network.exceptions.isCausedFromBadNetworkConnection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class LongConsentRepositoryImpl(
+class LongConsentRepositoryImpl @Inject constructor(
     private val longConsentLocalDataSource: LongConsentLocalDataSource,
     private val longConsentRemoteDataSource: LongConsentRemoteDataSource,
 ) : LongConsentRepository {

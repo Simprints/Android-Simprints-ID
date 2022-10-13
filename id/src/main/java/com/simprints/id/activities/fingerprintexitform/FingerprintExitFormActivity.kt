@@ -5,12 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.onLayoutChange
 import com.simprints.core.tools.extentions.textWatcherOnChange
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult.Action
@@ -18,7 +18,6 @@ import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFor
 import com.simprints.id.data.exitform.FingerprintExitFormReason
 import com.simprints.id.databinding.ActivityFingerprintExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.core.tools.extentions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -28,11 +27,11 @@ import com.simprints.infra.resources.R as IDR
 
 class FingerprintExitFormActivity : BaseSplitActivity() {
 
-    private lateinit var viewModel: FingerprintExitFormViewModel
+    private val viewModel: FingerprintExitFormViewModel by viewModels()
     private val binding by viewBinding(ActivityFingerprintExitFormBinding::inflate)
 
-    @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var fingerprintExitFormViewModelFactory: FingerprintExitFormViewModelFactory
+    @Inject
+    lateinit var timeHelper: TimeHelper
 
     private var fingerprintExitFormStartTime: Long = 0
     private var fingerprintExitFormReason = FingerprintExitFormReason.OTHER
@@ -45,21 +44,11 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        injectDependencies()
-
         setTextInLayout()
-
-        viewModel = ViewModelProvider(this, fingerprintExitFormViewModelFactory)
-            .get(FingerprintExitFormViewModel::class.java)
         fingerprintExitFormStartTime = timeHelper.now()
 
         setRadioGroupListener()
         setLayoutChangeListener()
-    }
-
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
     }
 
     private fun setTextInLayout() {
@@ -67,7 +56,8 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
             whySkipFingerprintText.text = getString(IDR.string.why_did_you_skip_fingerprinting)
             fingerprintRbReligiousConcerns.text = getString(IDR.string.refusal_religious_concerns)
             fingerprintRbDataConcerns.text = getString(IDR.string.refusal_data_concerns)
-            fingerprintRbDoesNotHavePermission.text = getString(IDR.string.refusal_does_not_have_permission)
+            fingerprintRbDoesNotHavePermission.text =
+                getString(IDR.string.refusal_does_not_have_permission)
             fingerprintRbAppNotWorking.text = getString(IDR.string.refusal_app_not_working)
             fingerprintRbPersonNotPresent.text = getString(IDR.string.refusal_person_not_present)
             fingerprintRbTooYoung.text = getString(IDR.string.refusal_too_young)
@@ -155,7 +145,10 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
         binding.fingerprintBtSubmitExitForm.isEnabled = false
         binding.fingerprintExitFormText.requestFocus()
         setTextChangeListenerOnExitText()
-        inputMethodManager.showSoftInput(binding.fingerprintExitFormText, InputMethodManager.SHOW_IMPLICIT)
+        inputMethodManager.showSoftInput(
+            binding.fingerprintExitFormText,
+            InputMethodManager.SHOW_IMPLICIT
+        )
     }
 
     private fun setTextChangeListenerOnExitText() {
@@ -163,13 +156,15 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
     }
 
 
-    fun handleScanFingerprintsClick(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun handleScanFingerprintsClick(@Suppress("UNUSED_PARAMETER") view: View) {
         setResultAndFinish(Action.SCAN_FINGERPRINTS)
     }
 
-    fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        viewModel.addExitFormEvent(fingerprintExitFormStartTime, timeHelper.now(),
-            getExitFormText(), fingerprintExitFormReason)
+    fun handleSubmitClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        viewModel.addExitFormEvent(
+            fingerprintExitFormStartTime, timeHelper.now(),
+            getExitFormText(), fingerprintExitFormReason
+        )
         setResultAndFinish(Action.SUBMIT)
     }
 
@@ -182,8 +177,10 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
         Intent().putExtra(EXIT_FORM_BUNDLE_KEY, buildExitFormResult(exitFormActivityAction))
 
     private fun buildExitFormResult(exitFormActivityAction: Action) =
-        FingerprintExitFormActivityResult(exitFormActivityAction,
-            Answer(fingerprintExitFormReason, getExitFormText()))
+        FingerprintExitFormActivityResult(
+            exitFormActivityAction,
+            Answer(fingerprintExitFormReason, getExitFormText())
+        )
 
 
     override fun onBackPressed() {

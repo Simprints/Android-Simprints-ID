@@ -1,11 +1,12 @@
 package com.simprints.fingerprint.scanner.tools
 
 import android.annotation.SuppressLint
+import javax.inject.Inject
 
 /**
  * Helper class for converting to and from Vero serial numbers and MAC addresses.
  */
-class SerialNumberConverter {
+class SerialNumberConverter @Inject constructor() {
 
     /**
      * @param address the MAC address in "F0:AC:D7:CX:XX:XX" format

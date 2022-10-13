@@ -10,9 +10,10 @@ import io.rankone.rocsdk.embedded.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
+import javax.inject.Inject
 import kotlin.experimental.and
 
-class RankOneFaceDetector : FaceDetector {
+class RankOneFaceDetector @Inject constructor(): FaceDetector {
     private val maxFaces = 1
     private val falseDetectionRate = 0.1f
     private val relativeMinSize = 0.2f

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -15,15 +16,17 @@ import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class GuidSelectionActivity : BaseSplitActivity() {
 
     @Inject
-    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    lateinit var eventRepository: EventRepository
 
     @Inject
     lateinit var timeHelper: TimeHelper
@@ -36,10 +39,10 @@ class GuidSelectionActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
-        injectDependencies()
         Simber.d("GuidSelectionActivity started")
 
-        guidSelectionRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        guidSelectionRequest =
+            intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
         CoroutineScope(Dispatchers.Main).launch {
             handleGuidSelectionRequest()
@@ -47,11 +50,6 @@ class GuidSelectionActivity : BaseSplitActivity() {
             // It doesn't matter if it was an error, we always return a good result as before
             sendOkResult()
         }
-    }
-
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
     }
 
     @SuppressLint("CheckResult")

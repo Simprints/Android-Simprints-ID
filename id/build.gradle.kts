@@ -109,6 +109,8 @@ dependencies {
     api(project(":eventsystem"))
     api(project(":infralogin"))
     implementation(project(":clientapi"))
+    implementation(project(":face"))
+    implementation(project(":fingerprint"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
@@ -143,16 +145,12 @@ dependencies {
 
     // Service Location & DI
     implementation(libs.hilt)
+    implementation(libs.hilt.work)
     kapt(libs.hilt.kapt)
-    kapt(libs.dagger.compiler)
+    kapt(libs.hilt.compiler)
 
     implementation(libs.fuzzywuzzy.core)
     implementation(libs.jackson.core)
-
-//    implementation(libs.hilt)
-//    implementation(libs.hilt.work)
-//    kapt(libs.hilt.kapt)
-//    kapt(libs.hilt.compiler)
 
     // Firebase
     implementation(libs.firebase.storage)

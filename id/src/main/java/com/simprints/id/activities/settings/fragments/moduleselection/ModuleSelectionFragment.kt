@@ -12,13 +12,12 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
@@ -29,9 +28,11 @@ import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     ModuleSelectionListener, ChipClickListener {
 
@@ -48,9 +49,6 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     }
 
     @Inject
-    lateinit var viewModelFactory: ModuleSelectionViewModelFactory
-
-    @Inject
     lateinit var eventSyncManager: EventSyncManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
@@ -58,9 +56,7 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
     private val chipHelper by lazy { ModuleChipHelper(requireContext(), listener = this) }
 
     private val binding by viewBinding(FragmentModuleSelectionBinding::bind)
-    private val viewModel by lazy {
-        ViewModelProvider(this, viewModelFactory)[ModuleSelectionViewModel::class.java]
-    }
+    private val viewModel: ModuleSelectionViewModel by viewModels()
 
     private var modules = emptyList<Module>()
     private var modulesToSelect = emptyList<Module>()
@@ -69,9 +65,6 @@ class ModuleSelectionFragment : Fragment(R.layout.fragment_module_selection),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val component = (requireActivity().application as Application).component
-        component.inject(this)
 
         configureRecyclerView()
         configureTextViews()

@@ -18,8 +18,9 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import java.io.IOException
+import javax.inject.Inject
 
-class AuthenticationHelperImpl(
+class AuthenticationHelperImpl @Inject constructor(
     private val loginManager: LoginManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,

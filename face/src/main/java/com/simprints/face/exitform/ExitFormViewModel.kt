@@ -3,6 +3,7 @@ package com.simprints.face.exitform
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -10,6 +11,7 @@ import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.*
 import com.simprints.face.controllers.core.events.model.RefusalEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
+import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,16 +19,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExitFormViewModel @Inject constructor(
-    private val mainVM: FaceCaptureViewModel,
     private val faceSessionEventsManager: FaceSessionEventsManager,
     private val timeHelper: FaceTimeHelper
 ) : ViewModel() {
+
     var reason: RefusalAnswer? = null
     var exitFormStartTime: Long = 0
 
     val requestReasonEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestSelectOptionEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
     val requestFormSubmitEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
+    val finishFlowWithExitFormEvent: MutableLiveData<LiveDataEventWithContent<FaceExitFormResponse>> =
+        MutableLiveData()
 
     init {
         exitFormStartTime = timeHelper.now()
@@ -71,7 +75,7 @@ class ExitFormViewModel @Inject constructor(
 
     fun submitExitForm(exitFormText: String) {
         reason?.let {
-            mainVM.submitExitForm(it, exitFormText)
+            finishFlowWithExitFormEvent.send(FaceExitFormResponse(it, exitFormText))
             logExitFormEvent(reason = it, exitFormText = exitFormText)
         }
     }

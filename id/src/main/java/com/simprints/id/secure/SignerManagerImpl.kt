@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
@@ -11,11 +10,11 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.SimNetwork
+import javax.inject.Inject
 
-open class SignerManagerImpl(
+class SignerManagerImpl @Inject constructor(
     private val configManager: ConfigManager,
     private val loginManager: LoginManager,
-    private val preferencesManager: PreferencesManager,
     private val eventSyncManager: EventSyncManager,
     private val syncManager: SyncManager,
     private val securityStateScheduler: SecurityStateScheduler,
@@ -38,7 +37,7 @@ open class SignerManagerImpl(
         loginManager.signOut()
         syncManager.cancelBackgroundSyncs()
         eventSyncManager.deleteSyncInfo()
-        preferencesManager.clearAllSharedPreferences()
+        configManager.clearData()
         longConsentRepository.deleteLongConsents()
         simNetwork.resetApiBaseUrl()
         configManager.clearData()

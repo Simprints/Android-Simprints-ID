@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.controllers.fingerprint.config
 
-class ConfigurationController {
+import javax.inject.Inject
+
+class ConfigurationController @Inject constructor(){
 
     fun runConfiguration(@Suppress("UNUSED_PARAMETER") taskRequest: ConfigurationTaskRequest): ConfigurationTaskResult {
         // Do nothing

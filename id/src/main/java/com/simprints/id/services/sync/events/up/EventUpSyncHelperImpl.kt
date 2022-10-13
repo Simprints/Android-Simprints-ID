@@ -12,8 +12,9 @@ import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class EventUpSyncHelperImpl(
+class EventUpSyncHelperImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
     private val timerHelper: TimeHelper,

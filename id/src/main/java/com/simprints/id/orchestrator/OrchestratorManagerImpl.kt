@@ -23,8 +23,9 @@ import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import splitties.init.appCtx
+import javax.inject.Inject
 
-open class OrchestratorManagerImpl(
+class OrchestratorManagerImpl @Inject constructor(
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
     private val hotCache: HotCache,

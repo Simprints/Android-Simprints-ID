@@ -2,12 +2,11 @@ package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.domain.alert.AlertType
@@ -21,14 +20,13 @@ import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 
+@AndroidEntryPoint
 class OrchestratorActivity : BaseSplitActivity() {
-
-    @Inject
-    lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
 
     @Inject
     lateinit var syncManager: SyncManager
@@ -68,15 +66,9 @@ class OrchestratorActivity : BaseSplitActivity() {
         }
     }
 
-    private val vm: OrchestratorViewModel by lazy {
-        ViewModelProvider(this, orchestratorViewModelFactory).get(OrchestratorViewModel::class.java)
-    }
+    private val vm: OrchestratorViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        with((application as Application)) {
-            createOrchestratorComponent()
-            orchestratorComponent.inject(this@OrchestratorActivity)
-        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
 

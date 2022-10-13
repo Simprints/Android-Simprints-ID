@@ -12,12 +12,10 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestDataModule
-import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.coVerify
@@ -53,29 +51,12 @@ class SyncInformationActivityTest {
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
     private val imageRepository: ImageRepository = mockk(relaxed = true)
     private val configManager = mockk<ConfigManager>()
-    private val viewModelModule by lazy {
-        TestViewModelModule(
-            syncInformationViewModelFactorRule = DependencyRule.ReplaceRule {
-                SyncInformationViewModelFactory(
-                    downSyncHelper,
-                    eventRepository,
-                    enrolmentRecordManager,
-                    projectId,
-                    eventDownSyncScopeRepository,
-                    imageRepository,
-                    configManager,
-                    testCoroutineRule.testCoroutineDispatcher,
-                )
-            }
-        )
-    }
 
     @Before
     fun setUp() {
         UnitTestConfig(
             appModule,
             dataModule = dataModule,
-            viewModelModule = viewModelModule,
         ).fullSetup().inject(this)
     }
 

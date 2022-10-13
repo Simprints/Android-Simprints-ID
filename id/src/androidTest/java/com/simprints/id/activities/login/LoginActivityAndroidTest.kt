@@ -17,7 +17,6 @@ import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.testtools.di.TestSecurityModule
-import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

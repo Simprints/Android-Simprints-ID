@@ -14,8 +14,9 @@ import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.toList
+import javax.inject.Inject
 
-class FetchGuidHelperImpl(
+class FetchGuidHelperImpl @Inject constructor(
     private val downSyncHelper: EventDownSyncHelper,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val configManager: ConfigManager,

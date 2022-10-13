@@ -7,11 +7,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
@@ -21,13 +20,14 @@ import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class SyncInformationActivity : BaseSplitActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: SyncInformationViewModelFactory
+    private val viewModel: SyncInformationViewModel by viewModels()
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
@@ -36,16 +36,11 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
-    private lateinit var viewModel: SyncInformationViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
 
         title = getString(IDR.string.title_activity_sync_information)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(this, viewModelFactory)[SyncInformationViewModel::class.java]
 
         setTextInLayout()
         setupAdapters()

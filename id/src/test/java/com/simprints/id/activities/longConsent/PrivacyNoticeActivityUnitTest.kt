@@ -12,7 +12,6 @@ import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule

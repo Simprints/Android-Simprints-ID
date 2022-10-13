@@ -13,8 +13,9 @@ import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import javax.inject.Inject
 
-class ProjectAuthenticatorImpl(
+class ProjectAuthenticatorImpl @Inject constructor(
     private val loginManager: LoginManager,
     private val projectSecretManager: ProjectSecretManager,
     private val secureDataManager: SecurityManager,

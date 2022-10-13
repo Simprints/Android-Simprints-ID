@@ -5,21 +5,25 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class OrchestratorViewModel(
+@HiltViewModel
+class OrchestratorViewModel @Inject constructor(
     private val orchestratorManager: OrchestratorManager,
     private val orchestratorEventsHelper: OrchestratorEventsHelper,
     private val configManager: ConfigManager,
     private val eventRepository: EventRepository,
     private val domainToModuleApiConverter: DomainToModuleApiAppResponse,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val syncFrequency = MutableLiveData<SynchronizationConfiguration.Frequency>()

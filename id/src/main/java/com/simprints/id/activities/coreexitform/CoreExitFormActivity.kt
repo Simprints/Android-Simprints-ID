@@ -5,12 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.onLayoutChange
 import com.simprints.core.tools.extentions.textWatcherOnChange
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.GO_BACK
@@ -18,21 +18,22 @@ import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResul
 import com.simprints.id.data.exitform.CoreExitFormReason.*
 import com.simprints.id.databinding.ActivityCoreExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.core.tools.extentions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.AndroidEntryPoint
 import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class CoreExitFormActivity : BaseSplitActivity() {
 
-    private lateinit var viewModel: CoreExitFormViewModel
+    private val viewModel: CoreExitFormViewModel by viewModels()
     private val binding by viewBinding(ActivityCoreExitFormBinding::inflate)
 
-    @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var coreExitFormViewModelFactory: CoreExitFormViewModelFactory
+    @Inject
+    lateinit var timeHelper: TimeHelper
 
     private var exitFormStartTime: Long = 0
     private var exitFormReason = OTHER
@@ -44,21 +45,12 @@ class CoreExitFormActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        injectDependencies()
-
         setTextInLayout()
 
-        viewModel = ViewModelProvider(this, coreExitFormViewModelFactory).get(CoreExitFormViewModel::class.java)
         exitFormStartTime = timeHelper.now()
 
         setRadioGroupListener()
         setLayoutChangeListener()
-    }
-
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
     }
 
     private fun setTextInLayout() {
@@ -148,12 +140,17 @@ class CoreExitFormActivity : BaseSplitActivity() {
         }
     }
 
-    fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
+    fun handleGoBackClick(@Suppress("UNUSED_PARAMETER") view: View) {
         setResultAndFinish(GO_BACK)
     }
 
-    fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText(), exitFormReason)
+    fun handleSubmitClick(@Suppress("UNUSED_PARAMETER") view: View) {
+        viewModel.addExitFormEvent(
+            exitFormStartTime,
+            timeHelper.now(),
+            getExitFormText(),
+            exitFormReason
+        )
         setResultAndFinish(SUBMIT)
     }
 
@@ -168,8 +165,10 @@ class CoreExitFormActivity : BaseSplitActivity() {
         Intent().putExtra(EXIT_FORM_BUNDLE_KEY, buildExitFormResult(exitFormActivityAction))
 
     private fun buildExitFormResult(exitFormActivityAction: CoreExitFormActivityResult.Action) =
-        CoreExitFormActivityResult(exitFormActivityAction,
-            CoreExitFormActivityResult.Answer(exitFormReason, getExitFormText()))
+        CoreExitFormActivityResult(
+            exitFormActivityAction,
+            CoreExitFormActivityResult.Answer(exitFormReason, getExitFormText())
+        )
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
         binding.btSubmitExitForm.isEnabled = false

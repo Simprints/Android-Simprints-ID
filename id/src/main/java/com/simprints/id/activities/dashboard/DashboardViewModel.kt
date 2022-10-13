@@ -11,11 +11,14 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRe
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DashboardViewModel(
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
     private val projectDetailsRepository: DashboardProjectDetailsRepository,
     private val syncCardStateRepository: DashboardSyncCardStateRepository,
     private val dailyActivityRepository: DashboardDailyActivityRepository,

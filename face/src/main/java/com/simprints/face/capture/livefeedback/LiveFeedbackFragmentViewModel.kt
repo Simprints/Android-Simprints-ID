@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.otaliastudios.cameraview.frame.Frame
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
@@ -22,33 +23,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @HiltViewModel
-class LiveFeedbackFragmentViewModel(
+class LiveFeedbackFragmentViewModel @Inject constructor(
     private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
     private val frameProcessor: FrameProcessor,
     private val configManager: ConfigManager,
     private val faceSessionEventsManager: FaceSessionEventsManager,
     private val faceTimeHelper: FaceTimeHelper,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
-    @Inject
-    constructor(
-        mainVM: FaceCaptureViewModel,
-        faceDetector: FaceDetector,
-        frameProcessor: FrameProcessor,
-        configManager: ConfigManager,
-        faceSessionEventsManager: FaceSessionEventsManager,
-        faceTimeHelper: FaceTimeHelper,
-    ) : this(
-        mainVM,
-        faceDetector,
-        frameProcessor,
-        configManager,
-        faceSessionEventsManager,
-        faceTimeHelper,
-        Dispatchers.IO
-    )
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
