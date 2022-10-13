@@ -26,6 +26,7 @@ import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
+import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
@@ -133,8 +134,6 @@ class ConnectScannerViewModel(
         )
 
         scannerManager.scanner.connect()
-
-        addBluetoothConnectivityEvent()
         logMessageForCrashReport("ScannerManager: connectToVero")
     }
 
@@ -142,7 +141,6 @@ class ConnectScannerViewModel(
         postProgressAndMessage(step = 5, messageRes = R.string.connect_scanner_setup)
         scannerManager.scanner.setScannerInfoAndCheckAvailableOta()
         setLastConnectedScannerInfo()
-        addInfoSnapshotEventIfNecessary()
         logMessageForCrashReport("ScannerManager: setupVero")
     }
 
@@ -155,24 +153,8 @@ class ConnectScannerViewModel(
     private suspend fun wakeUpVero() {
         postProgressAndMessage(step = 7, messageRes = R.string.connect_scanner_wake_un20)
         scannerManager.scanner.sensorWakeUp()
-        updateBluetoothConnectivityEventWithVeroInfoIfNecessary()
         logMessageForCrashReport("ScannerManager: wakeUpVero")
     }
-
-    private fun updateBluetoothConnectivityEventWithVeroInfoIfNecessary() {
-        if (!scannerManager.isScannerAvailable)
-            return retryConnect()
-
-
-        with(scannerManager.scanner) {
-            if (versionInformation().generation == ScannerGeneration.VERO_1) {
-                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
-                    versionInformation().firmware.stm
-                )
-            }
-        }
-    }
-
     private fun postProgressAndMessage(step: Int,  @StringRes messageRes: Int) {
         val progress = computeProgress(step)
         this.progress.postValue(progress)
@@ -238,6 +220,9 @@ class ConnectScannerViewModel(
     }
 
     private fun handleSetupFinished() {
+        addScannerConnectionEvent()
+        addInfoSnapshotEventIfNecessary()
+
         progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
 
@@ -271,7 +256,7 @@ class ConnectScannerViewModel(
         backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_WITH_ERROR)
     }
 
-    private fun addBluetoothConnectivityEvent() {
+    private fun addScannerConnectionEvent() {
         if (!scannerManager.isScannerAvailable)
             return retryConnect()
 
@@ -284,12 +269,18 @@ class ConnectScannerViewModel(
                         scannerManager.currentScannerId ?: "",
                         scannerManager.currentMacAddress ?: "",
                         ScannerConnectionEvent.ScannerGeneration.get(versionInformation().generation),
-                        null
+                        hardwareVersion()
                     )
                 )
             )
         }
     }
+
+    private fun ScannerWrapper.hardwareVersion() =
+        when (versionInformation().generation) {
+            ScannerGeneration.VERO_1 -> versionInformation().firmware.stm
+            ScannerGeneration.VERO_2 -> versionInformation().hardwareVersion
+        }
 
     private fun addInfoSnapshotEventIfNecessary() {
         if (!scannerManager.isScannerAvailable)
