@@ -27,12 +27,12 @@ import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintmatcher.FingerprintMatcherModule
 import com.simprints.fingerprintmatcher.JNILibAfisModule
-import com.simprints.fingerprintscanner.FingerprintScannerModule
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.assisted.AssistedFactory
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 @Module(
@@ -88,6 +88,6 @@ abstract class FingerprintModule {
 object FingerprintDependenciesModule {
 
     @Provides
-    fun provideNfcAdapter(context: Context): ComponentNfcAdapter =
+    fun provideNfcAdapter(@ApplicationContext context: Context): ComponentNfcAdapter =
         AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(context))
 }

@@ -3,10 +3,11 @@ package com.simprints.id.services.sync.images.up
 import android.content.Context
 import androidx.work.*
 import com.simprints.id.BuildConfig
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class ImageUpSyncSchedulerImpl @Inject constructor(context: Context) : ImageUpSyncScheduler {
+class ImageUpSyncSchedulerImpl @Inject constructor(@ApplicationContext context: Context) : ImageUpSyncScheduler {
 
     private val workManager = WorkManager.getInstance(context)
 

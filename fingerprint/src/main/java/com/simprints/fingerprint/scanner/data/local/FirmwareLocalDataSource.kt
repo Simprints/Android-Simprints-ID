@@ -4,6 +4,7 @@ import android.content.Context
 import com.simprints.core.tools.utils.FileUtil
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
 
@@ -16,7 +17,7 @@ class FirmwareLocalDataSource(
     private val fileUtil: FileUtil = FileUtil
 ) {
     @Inject
-    constructor(context: Context) : this(context, FileUtil)
+    constructor(@ApplicationContext context: Context) : this(context, FileUtil)
 
     fun getAvailableScannerFirmwareVersions() =
         mapOf(

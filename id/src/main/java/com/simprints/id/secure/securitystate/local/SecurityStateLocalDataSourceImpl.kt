@@ -2,9 +2,10 @@ package com.simprints.id.secure.securitystate.local
 
 import android.content.Context
 import com.simprints.id.secure.models.SecurityState
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class SecurityStateLocalDataSourceImpl @Inject constructor(context: Context) :
+class SecurityStateLocalDataSourceImpl @Inject constructor(@ApplicationContext context: Context) :
     SecurityStateLocalDataSource {
 
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)

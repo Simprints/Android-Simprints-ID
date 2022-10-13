@@ -15,12 +15,13 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class EventSyncManagerImpl @Inject constructor(
-    private val ctx: Context,
+    @ApplicationContext private val ctx: Context,
     private val eventSyncStateProcessor: EventSyncStateProcessor,
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val upSyncScopeRepo: EventUpSyncScopeRepository,

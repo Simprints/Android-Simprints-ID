@@ -12,6 +12,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -34,7 +35,7 @@ object RecentUserActivityDataStoreModule {
     @Singleton
     @Provides
     internal fun provideProjectProtoDataStore(
-        appContext: Context,
+        @ApplicationContext appContext: Context,
         projectRealmMigration: RecentUserActivitySharedPrefsMigration
     ): DataStore<ProtoRecentUserActivity> {
         return DataStoreFactory.create(
