@@ -2,9 +2,10 @@ package com.simprints.infra.enrolment.records.worker
 
 import android.content.Context
 import androidx.work.*
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-internal class EnrolmentRecordSchedulerImpl @Inject constructor(context: Context) :
+internal class EnrolmentRecordSchedulerImpl @Inject constructor(@ApplicationContext context: Context) :
     EnrolmentRecordScheduler {
 
     companion object {

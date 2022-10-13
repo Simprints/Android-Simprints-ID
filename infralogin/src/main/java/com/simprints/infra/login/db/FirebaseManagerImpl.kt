@@ -16,6 +16,7 @@ import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -23,7 +24,7 @@ import javax.inject.Inject
 
 internal class FirebaseManagerImpl @Inject constructor(
     val loginInfoManager: LoginInfoManager,
-    val context: Context,
+    @ApplicationContext val context: Context,
 ) : RemoteDbManager {
 
     override suspend fun signIn(token: Token) {

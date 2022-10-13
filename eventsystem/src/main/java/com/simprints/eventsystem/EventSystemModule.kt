@@ -19,6 +19,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -86,7 +87,7 @@ internal class EventSystemProvider {
 
     @Provides
     @Singleton
-    fun provideEventsSyncStatusDatabase(ctx: Context): EventSyncStatusDatabase =
+    fun provideEventsSyncStatusDatabase(@ApplicationContext ctx: Context): EventSyncStatusDatabase =
         EventSyncStatusDatabase.getDatabase(ctx)
 
 }
