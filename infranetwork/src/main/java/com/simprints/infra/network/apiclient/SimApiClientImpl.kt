@@ -101,13 +101,8 @@ class SimApiClientImpl<T : SimRemoteInterface>(
         if (code() != 503) {
             return false
         }
-        val errorString = response()?.errorBody()?.string()
-        return if (errorString.isNullOrBlank()) {
-            false
-        } else {
-            val apiError = JsonHelper.fromJson<ApiError>(errorString)
-            apiError.error == BACKEND_MAINTENANCE_ERROR_STRING
-        }
+        val apiError = response()?.errorBody()?.string()?.let { JsonHelper.fromJson<ApiError>(it) }
+        return apiError?.error == BACKEND_MAINTENANCE_ERROR_STRING
     }
 
     private fun HttpException.parseEstimatedOutage(): Long? =

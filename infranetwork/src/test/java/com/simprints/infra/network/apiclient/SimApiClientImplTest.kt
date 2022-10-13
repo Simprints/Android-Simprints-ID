@@ -141,24 +141,6 @@ class SimApiClientImplTest {
         }
 
     @Test
-    fun `should throw a sync cloud integration exception when the response code is 503 with empty body and retry`() =
-        runTest(
-            StandardTestDispatcher()
-        ) {
-            val response = MockResponse()
-            response.setResponseCode(503)
-            mockWebServer.enqueue(response)
-            mockWebServer.enqueue(response)
-
-            val exception = assertThrows<SyncCloudIntegrationException> {
-                simApiClientImpl.executeCall { it.get() }
-            }
-            assertThat(exception.cause).isInstanceOf(HttpException::class.java)
-            assertThat(mockWebServer.takeRequest(100, TimeUnit.MICROSECONDS)).isNotNull()
-            assertThat(mockWebServer.takeRequest(100, TimeUnit.MICROSECONDS)).isNotNull()
-        }
-
-    @Test
     fun `should throw a sync cloud integration exception when it's 4xx error and not retry`() =
         runTest(
             StandardTestDispatcher()
