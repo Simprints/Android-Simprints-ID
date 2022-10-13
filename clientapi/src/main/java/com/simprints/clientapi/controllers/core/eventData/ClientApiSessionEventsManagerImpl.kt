@@ -4,6 +4,7 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
@@ -18,7 +19,6 @@ import com.simprints.infra.config.domain.models.canCoSyncAllData
 import com.simprints.infra.config.domain.models.canCoSyncAnalyticsData
 import com.simprints.infra.config.domain.models.canCoSyncBiometricData
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
@@ -28,7 +28,7 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
     private val timeHelper: ClientApiTimeHelper,
     private val workflowCacheClearer: WorkflowCacheClearer,
     private val configManager: ConfigManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String {
