@@ -3,7 +3,6 @@
 package com.simprints.id.testtools.di
 
 import android.content.Context
-import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.di.AppModule
@@ -24,9 +23,6 @@ class TestAppModule(
     private val qrCodeDetectorRule: DependencyRule = RealRule,
     private val qrCodeProducerRule: DependencyRule = RealRule
 ) : AppModule() {
-
-    override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
-        simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
     override fun provideLocationManager(ctx: Context): LocationManager =
         locationManagerRule.resolveDependency {
