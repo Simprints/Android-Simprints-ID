@@ -99,6 +99,26 @@ class QrCaptureActivityAndroidTest {
     }
 
     @Test
+    fun cameraException_shouldSendCancelledResult() {
+        coEvery { mockCameraHelper.startCamera(any(), any(), any()) } throws Exception()
+
+        qrCaptureActivity {
+        } assert {
+            resultIsCancelled()
+        }
+    }
+
+    @Test
+    fun cameraException_shouldFinishActivity() {
+        coEvery { mockCameraHelper.startCamera(any(), any(), any()) } throws Exception()
+
+        qrCaptureActivity {
+        } assert {
+            activityIsFinished()
+        }
+    }
+
+    @Test
     fun pressBack_shouldSendCancelledResult() {
         coEvery { mockChannel.receive() } returns INVALID_QR_SCAN_RESULT
 
