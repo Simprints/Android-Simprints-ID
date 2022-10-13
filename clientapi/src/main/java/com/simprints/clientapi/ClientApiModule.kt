@@ -75,13 +75,3 @@ interface ClientApiModule {
     fun bindClientApiTimeHelper(impl: ClientApiTimeHelperImpl): ClientApiTimeHelper
 
 }
-
-@Module
-@InstallIn(ActivityComponent::class)
-class ClientApiDispatcherModule {
-
-    @Provides
-    @Singleton
-    fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
-
-}

@@ -13,8 +13,10 @@ import com.simprints.clientapi.clientrequests.extractors.odk.OdkIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class OdkActivity : RequestActivity(), OdkContract.View {
 
     companion object {

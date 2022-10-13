@@ -13,10 +13,12 @@ import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.databinding.ActivityErrorBinding
 import com.simprints.core.tools.activity.BaseSplitActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import splitties.views.backgroundColor
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
 
     @Inject

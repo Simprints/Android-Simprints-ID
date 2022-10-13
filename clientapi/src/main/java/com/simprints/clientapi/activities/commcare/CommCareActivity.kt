@@ -11,8 +11,10 @@ import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     companion object {

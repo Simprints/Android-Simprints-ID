@@ -8,8 +8,10 @@ import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
 import com.simprints.libsimprints.*
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     private val action: LibSimprintsAction
