@@ -42,9 +42,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
+            android:exported="true"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:exported="true">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -57,9 +57,9 @@
             android:theme="@style/AppTheme.Launcher" />
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
+            android:exported="true"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:exported="true">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.clientapp.REGISTER_LAST_BIOMETRICS" />
                 <action android:name="com.simprints.clientapp.REGISTER" />
@@ -93,9 +93,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.qrcapture.QrCaptureActivity"
+        <activity
+            android:name=".activities.qrcapture.QrCaptureActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.requestLogin.RequestLoginActivity"
             android:launchMode="singleTop"
@@ -111,14 +112,16 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
-        <activity android:name=".activities.settings.ModuleSelectionActivity"
+        <activity
+            android:name=".activities.settings.ModuleSelectionActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar.MaterialComponents"/>
-        <activity android:name=".activities.settings.fingerselection.FingerSelectionActivity"
+            android:theme="@style/AppTheme.NoActionBar.MaterialComponents" />
+        <activity
+            android:name=".activities.settings.fingerselection.FingerSelectionActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar"/>
+            android:theme="@style/AppTheme.ActionBar" />
 
         <activity
             android:name=".activities.dashboard.DashboardActivity"
@@ -132,33 +135,28 @@
             android:name=".activities.guidselection.GuidSelectionActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.enrollast.EnrolLastBiometricsActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.settings.syncinformation.SyncInformationActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.setup.SetupActivity"
-            android:screenOrientation="portrait" />
-
-<!--        <provider-->
-<!--            android:name="androidx.startup.InitializationProvider"-->
-<!--            android:authorities="${applicationId}.androidx-startup"-->
-<!--            android:exported="false"-->
-<!--            tools:node="merge">-->
-<!--            &lt;!&ndash; If you are using androidx.startup to initialize other components &ndash;&gt;-->
-<!--            <meta-data-->
-<!--                android:name="androidx.work.WorkManagerInitializer"-->
-<!--                android:value="androidx.startup"-->
-<!--                tools:node="remove" />-->
-<!--        </provider>-->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!-- If you are using androidx.startup to initialize other components -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
 
         <meta-data
             android:name="preloaded_fonts"

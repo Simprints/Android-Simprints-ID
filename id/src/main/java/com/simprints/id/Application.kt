@@ -1,6 +1,8 @@
 package com.simprints.id
 
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.tools.extensions.deviceId
@@ -10,16 +12,13 @@ import com.simprints.infra.logging.SimberBuilder
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
+import javax.inject.Inject
 
 @HiltAndroidApp
-open class Application : CoreApplication() {
+open class Application : CoreApplication(), Configuration.Provider {
 
-//    @Inject
-//    lateinit var workerFactory: HiltWorkerFactory
-
-    private lateinit var applicationScope: CoroutineScope
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
@@ -27,44 +26,19 @@ open class Application : CoreApplication() {
         super.attachBaseContext(ctx)
     }
 
-//    open fun createComponent() {
-//        component = DaggerAppComponent
-//            .builder()
-//            .application(this)
-//            .appModule(AppModule())
-//            .syncModule(SyncModule())
-//            .build()
-//
-//    }
-//
-//    open fun createOrchestratorComponent() {
-//        orchestratorComponent = component
-//            .getOrchestratorComponent().orchestratorModule(OrchestratorModule())
-//            .build()
-//    }
-
-    open fun createApplicationCoroutineScope() {
-        // For operations that shouldn’t be cancelled,
-        // call them from a coroutine created by an
-        // application CoroutineScope
-        applicationScope = CoroutineScope(SupervisorJob())
-    }
-
     override fun onCreate() {
         super.onCreate()
         initApplication()
     }
 
-//    override fun getWorkManagerConfiguration() =
-//        Configuration.Builder()
-//            .setWorkerFactory(workerFactory)
-//            .build()
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
 
     open fun initApplication() {
-        //createComponent()
         handleUndeliverableExceptionInRxJava()
-        createApplicationCoroutineScope()
         SimberBuilder.initialize(this)
         Simber.tag(DEVICE_ID, true).i(deviceId)
     }

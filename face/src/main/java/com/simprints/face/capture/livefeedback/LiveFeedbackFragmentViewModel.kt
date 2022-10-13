@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.extentions.area
-import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
@@ -24,7 +23,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LiveFeedbackFragmentViewModel @Inject constructor(
-    private val mainVM: FaceCaptureViewModel,
     private val faceDetector: FaceDetector,
     private val frameProcessor: FrameProcessor,
     private val configManager: ConfigManager,
@@ -43,6 +41,7 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
 
     lateinit var fallbackCapture: FaceDetection
     val userCaptures = mutableListOf<FaceDetection>()
+    var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
@@ -53,7 +52,13 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
      * @param faceRectF is the box on the screen
      * @param size is the screen size
      */
-    fun process(frame: Frame, faceRectF: RectF, size: Size) {
+    fun process(
+        frame: Frame,
+        faceRectF: RectF,
+        size: Size,
+        samplesToCapture: Int,
+        attemptNumber: Int
+    ) {
         val captureStartTime = faceTimeHelper.now()
         val previewFrame = frameProcessor.previewFrameFrom(frame, faceRectF, size, false)
 
@@ -69,8 +74,8 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
             CapturingState.CAPTURING -> {
                 userCaptures += faceDetection
-                if (userCaptures.size == mainVM.samplesToCapture) {
-                    finishCapture()
+                if (userCaptures.size == samplesToCapture) {
+                    finishCapture(attemptNumber)
                 }
             }
             else -> {//no-op
@@ -85,18 +90,17 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     /**
      * If any of the user captures are good, use them. If not, use the fallback capture.
      */
-    private fun finishCapture() {
+    private fun finishCapture(attemptNumber: Int) {
         viewModelScope.launch(dispatcher) {
             val projectConfiguration = configManager.getProjectConfiguration()
-            val sortedQualifyingCaptures = userCaptures
+            sortedQualifyingCaptures = userCaptures
                 .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
                 .sortedByDescending { it.face?.quality }
                 .ifEmpty { listOf(fallbackCapture) }
 
-            sendAllCaptureEvents()
+            sendAllCaptureEvents(attemptNumber)
 
             capturingState.postValue(CapturingState.FINISHED)
-            mainVM.captureFinished(sortedQualifyingCaptures)
         }
     }
 
@@ -167,13 +171,13 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
         }
     }
 
-    private fun sendCaptureEvent(faceDetection: FaceDetection) {
+    private fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
         viewModelScope.launch(dispatcher) {
             val projectConfiguration = configManager.getProjectConfiguration()
             // The payloads of these two events need to have the same ids
             val faceCaptureEvent =
                 faceDetection.toFaceCaptureEvent(
-                    mainVM.attemptNumber,
+                    attemptNumber,
                     projectConfiguration.face!!.qualityThreshold.toFloat(),
                 )
 
@@ -193,10 +197,10 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
      *
      * This is already running in a background Thread because of CameraView, don't worry about the runBlocking.
      */
-    private fun sendAllCaptureEvents() = runBlocking {
+    private fun sendAllCaptureEvents(attemptNumber: Int) = runBlocking {
         val allDeferredEvents = mutableListOf<Deferred<Unit>>()
-        allDeferredEvents += userCaptures.map { async { sendCaptureEvent(it) } }
-        allDeferredEvents += async { sendCaptureEvent(fallbackCapture) }
+        allDeferredEvents += userCaptures.map { async { sendCaptureEvent(it, attemptNumber) } }
+        allDeferredEvents += async { sendCaptureEvent(fallbackCapture, attemptNumber) }
         allDeferredEvents.awaitAll()
     }
 
