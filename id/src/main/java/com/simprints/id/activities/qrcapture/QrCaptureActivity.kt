@@ -18,6 +18,7 @@ import com.simprints.id.activities.qrcapture.tools.CameraHelper
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.databinding.ActivityQrCaptureBinding
 import com.simprints.id.tools.extensions.hasPermission
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -59,16 +60,24 @@ class QrCaptureActivity : BaseSplitActivity() {
 
     private fun startCamera() {
         lifecycleScope.launch {
-            cameraHelper.startCamera(
-                this@QrCaptureActivity,
-                binding.cameraPreview,
-                qrCodeProducer
-            )
+            try {
+                cameraHelper.startCamera(
+                    this@QrCaptureActivity,
+                    binding.cameraPreview,
+                    qrCodeProducer
+                )
 
-            addFocusDrawable()
+                addFocusDrawable()
 
-            val qrCode = qrCodeProducer.qrCodeChannel.receive()
-            sendQrCodeInResultIfNotEmpty(qrCode)
+                val qrCode = qrCodeProducer.qrCodeChannel.receive()
+                sendQrCodeInResultIfNotEmpty(qrCode)
+            } catch (e: Exception) {
+                if (!isFinishing) {
+                    Simber.e(e)
+                    setResult(Activity.RESULT_CANCELED)
+                    finish()
+                }
+            }
         }
     }
 
