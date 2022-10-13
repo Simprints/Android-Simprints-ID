@@ -1,9 +1,7 @@
 package com.simprints.id.di
 
-import com.simprints.eventsystem.EventSystemModule
-import com.simprints.eventsystem.EventSystemProvider
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.core.CoreModule
+import com.simprints.eventsystem.EventSystemModule
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
@@ -85,8 +83,7 @@ import com.simprints.infra.security.SecurityModule as SecurityManagerModule
         RecentUserActivityModule::class,
         RecentUserActivityDataStoreModule::class,
         CoreModule::class,
-        EventSystemModule::class,
-        EventSystemProvider::class
+        EventSystemModule::class
     ]
 )
 @Singleton
