@@ -5,6 +5,7 @@ import androidx.work.*
 import com.simprints.fingerprint.BuildConfig
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -12,7 +13,7 @@ import javax.inject.Inject
  * Schedules the [FirmwareFileUpdateWorker] as necessary.
  */
 class FirmwareFileUpdateScheduler @Inject constructor(
-    private val context: Context,
+    @ApplicationContext private val context: Context,
     private val configManager: ConfigManager
 ) {
 

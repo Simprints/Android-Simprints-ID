@@ -4,6 +4,7 @@ import android.content.Context
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.remote.EnrolmentRecordRemoteDataSource
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 internal class EnrolmentRecordRepositoryImpl(
@@ -15,7 +16,7 @@ internal class EnrolmentRecordRepositoryImpl(
 
     @Inject
     constructor(
-        context: Context,
+        @ApplicationContext context: Context,
         remoteDataSource: EnrolmentRecordRemoteDataSource,
         subjectRepository: SubjectRepository
     ) : this(context, remoteDataSource, subjectRepository, BATCH_SIZE)

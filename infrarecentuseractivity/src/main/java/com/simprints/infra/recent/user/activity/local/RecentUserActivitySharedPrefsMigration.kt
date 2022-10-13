@@ -5,12 +5,13 @@ import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.ProtoRecentUserActivity
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
  * Can be removed once all the devices have been updated to 2022.3.0
  */
-internal class RecentUserActivitySharedPrefsMigration @Inject constructor(ctx: Context) :
+internal class RecentUserActivitySharedPrefsMigration @Inject constructor(@ApplicationContext ctx: Context) :
     DataMigration<ProtoRecentUserActivity> {
 
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)

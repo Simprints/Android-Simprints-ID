@@ -25,6 +25,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -59,7 +60,7 @@ object DataStoreModule {
     @Singleton
     @Provides
     internal fun provideProjectProtoDataStore(
-        appContext: Context,
+        @ApplicationContext appContext: Context,
         projectRealmMigration: ProjectRealmMigration
     ): DataStore<ProtoProject> {
         return DataStoreFactory.create(
@@ -72,7 +73,7 @@ object DataStoreModule {
     @Singleton
     @Provides
     internal fun provideProjectConfigurationProtoDataStore(
-        appContext: Context,
+        @ApplicationContext appContext: Context,
         projectConfigSharedPrefsMigration: ProjectConfigSharedPrefsMigration
     ): DataStore<ProtoProjectConfiguration> {
         return DataStoreFactory.create(
@@ -85,7 +86,7 @@ object DataStoreModule {
     @Singleton
     @Provides
     internal fun provideDeviceConfigurationProtoDataStore(
-        appContext: Context,
+        @ApplicationContext appContext: Context,
         deviceConfigSharedPrefsMigration: DeviceConfigSharedPrefsMigration
     ): DataStore<ProtoDeviceConfiguration> {
         return DataStoreFactory.create(

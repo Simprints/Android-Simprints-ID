@@ -8,13 +8,14 @@ import com.simprints.infra.config.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.local.models.toProto
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
  * Can be removed once all the devices have been updated to 2022.3.0
  */
 internal class ProjectConfigSharedPrefsMigration @Inject constructor(
-    ctx: Context,
+    @ApplicationContext ctx: Context,
     private val loginManager: LoginManager,
 ) : DataMigration<ProtoProjectConfiguration> {
 

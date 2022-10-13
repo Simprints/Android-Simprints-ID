@@ -5,13 +5,14 @@ import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import javax.inject.Inject
 
 internal class ImageLocalDataSourceImpl @Inject constructor(
-    private val ctx: Context,
+    @ApplicationContext private val ctx: Context,
     private val keyHelper: SecurityManager
 ) : ImageLocalDataSource {
 

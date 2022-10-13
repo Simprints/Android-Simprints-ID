@@ -2,10 +2,11 @@ package com.simprints.clientapi.data.sharedpreferences
 
 import android.content.Context
 import androidx.core.content.edit
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class SharedPreferencesManagerImpl @Inject constructor(
-    context: Context
+    @ApplicationContext context: Context
 ) : SharedPreferencesManager {
 
     companion object {

@@ -16,6 +16,7 @@ import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
@@ -30,7 +31,7 @@ object CoreModule {
 
     @Provides
     @Singleton
-    fun provideTimeHelper(context: Context): TimeHelper = KronosTimeHelperImpl(
+    fun provideTimeHelper(@ApplicationContext context: Context): TimeHelper = KronosTimeHelperImpl(
         AndroidClockFactory.createKronosClock(
             context,
             requestTimeoutMs = TimeUnit.SECONDS.toMillis(60),
@@ -41,7 +42,7 @@ object CoreModule {
 
     @Provides
     @Singleton
-    fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
+    fun provideSimNetworkUtils(@ApplicationContext ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
     @Singleton
@@ -58,13 +59,13 @@ object CoreModule {
     @DeviceID
     @Provides
     fun provideDeviceId(
-        context: Context
+        @ApplicationContext context: Context
     ): String = context.deviceId
 
     @PackageVersionName
     @Provides
     fun providePackageVersionName(
-        context: Context
+        @ApplicationContext context: Context
     ): String = context.packageVersionName
 
     @LibSimprintsVersionName
