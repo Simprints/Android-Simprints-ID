@@ -1,12 +1,12 @@
 package com.simprints.eventsystem.event.local
 
+import com.simprints.core.DispatcherIO
+import com.simprints.core.NonCancellableIO
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.local.models.fromDbToDomain
 import com.simprints.eventsystem.event.local.models.fromDomainToDb
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
@@ -15,8 +15,8 @@ import kotlin.coroutines.CoroutineContext
 
 internal open class EventLocalDataSourceImpl @Inject constructor(
     private val eventDatabaseFactory: EventDatabaseFactory,
-    private val readingDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val writingContext: CoroutineContext = readingDispatcher + NonCancellable
+    @DispatcherIO private val readingDispatcher: CoroutineDispatcher,
+    @NonCancellableIO private val writingContext: CoroutineContext
 ) : EventLocalDataSource {
 
     private val eventDao by lazy {

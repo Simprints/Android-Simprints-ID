@@ -15,9 +15,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 
 
 @Module
@@ -64,6 +68,15 @@ object CoreModule {
     fun provideLibSimprintsVersionName(): String =
         com.simprints.libsimprints.BuildConfig.LIBRARY_PACKAGE_NAME
 
+    @DispatcherIO
+    @Provides
+    fun provideDispatcherIo(): CoroutineDispatcher = Dispatchers.IO
+
+    @NonCancellableIO
+    @Provides
+    fun provideNonCancellableIO(
+        @DispatcherIO dispatcherIO: CoroutineDispatcher
+    ): CoroutineContext = dispatcherIO + NonCancellable
 
 }
 
@@ -78,3 +91,11 @@ annotation class PackageVersionName
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class DeviceID
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DispatcherIO
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class NonCancellableIO

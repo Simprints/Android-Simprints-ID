@@ -35,7 +35,7 @@ abstract class EventSystemModule {
     internal abstract fun bindSessionDataCache(impl: SessionDataCacheImpl): SessionDataCache
 
     @Binds
-    abstract fun bindSessionEventValidatorsFactory(impl: SessionEventValidatorsFactoryImpl): SessionEventValidatorsFactory
+    internal abstract fun bindSessionEventValidatorsFactory(impl: SessionEventValidatorsFactoryImpl): SessionEventValidatorsFactory
 
     @Binds
     internal abstract fun bindEventRemoteDataSource(impl: EventRemoteDataSourceImpl): EventRemoteDataSource
