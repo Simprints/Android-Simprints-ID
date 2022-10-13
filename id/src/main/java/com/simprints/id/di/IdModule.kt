@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import com.simprints.core.DeviceID
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
-import com.simprints.eventsystem.EventSystemModule
 import com.simprints.id.activities.alert.AlertContract
 import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentContract
@@ -117,8 +116,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.assisted.AssistedFactory
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
@@ -389,7 +386,7 @@ object IdDependenciesModule {
     @AbsolutePath
     @Provides
     @Singleton
-    fun provideAbsolutePath(context: Context): String = context.filesDir.absolutePath
+    fun provideAbsolutePath(@ApplicationContext context: Context): String = context.filesDir.absolutePath
 
     @EncryptedSharedPreferences
     @Provides
@@ -481,7 +478,4 @@ object IdDependenciesModule {
     @Singleton
     fun provideDomainToModuleApiAppResponse(): DomainToModuleApiAppResponse = DomainToModuleApiAppResponse
 
-    @Provides
-    @Singleton
-    fun provideContext(@ApplicationContext context: Context): Context = context
 }

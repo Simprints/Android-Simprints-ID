@@ -3,8 +3,8 @@ package com.simprints.infra.login
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
-import com.simprints.core.tools.extentions.deviceId
-import com.simprints.core.tools.extentions.packageVersionName
+import com.simprints.core.DeviceID
+import com.simprints.core.PackageVersionName
 import com.simprints.infra.login.db.FirebaseManagerImpl
 import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.infra.login.domain.AttestationManager
@@ -20,7 +20,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
 @Module
@@ -49,18 +49,20 @@ abstract class LoginManagerModule {
 object SafetyNetModule {
 
     @Provides
-    fun provideSafetyNetClient(context: Context): SafetyNetClient = SafetyNet.getClient(context)
+    fun provideSafetyNetClient(@ApplicationContext context: Context): SafetyNetClient = SafetyNet.getClient(context)
 
     @Provides
     internal fun provideSimApiClientFactory(
-        ctx: Context,
+        @ApplicationContext ctx: Context,
+        @DeviceID deviceID: String,
+        @PackageVersionName packageVersionName: String,
         remoteDbManager: RemoteDbManager,
         simNetwork: SimNetwork
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         simNetwork,
-        ctx.deviceId,
+        deviceID,
         ctx,
-        ctx.packageVersionName,
+        packageVersionName,
         remoteDbManager
     )
 

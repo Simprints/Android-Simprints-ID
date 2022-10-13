@@ -3,13 +3,14 @@ package com.simprints.eventsystem.event.local
 import android.content.Context
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import net.sqlcipher.database.SQLiteDatabase.getBytes
 import net.sqlcipher.database.SupportFactory
 import javax.inject.Inject
 
 
 internal class DbEventDatabaseFactoryImpl @Inject constructor(
-    val ctx: Context,
+    @ApplicationContext val ctx: Context,
     private val secureLocalDbKeyProvider: SecurityManager
 ) : EventDatabaseFactory {
 

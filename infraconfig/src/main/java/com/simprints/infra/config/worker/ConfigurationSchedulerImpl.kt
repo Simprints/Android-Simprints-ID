@@ -3,10 +3,11 @@ package com.simprints.infra.config.worker
 import android.content.Context
 import androidx.work.*
 import com.simprints.infra.config.BuildConfig
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-internal class ConfigurationSchedulerImpl @Inject constructor(context: Context) :
+internal class ConfigurationSchedulerImpl @Inject constructor(@ApplicationContext context: Context) :
     ConfigurationScheduler {
 
     companion object {
