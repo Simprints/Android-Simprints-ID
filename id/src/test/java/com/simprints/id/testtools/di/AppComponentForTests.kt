@@ -2,7 +2,6 @@ package com.simprints.id.testtools.di
 
 import com.simprints.core.CoreModule
 import com.simprints.eventsystem.EventSystemModule
-import com.simprints.eventsystem.EventSystemProvider
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
@@ -55,7 +54,6 @@ import javax.inject.Singleton
         RecentUserActivityModule::class,
         RecentUserActivityDataStoreModule::class,
         CoreModule::class,
-        EventSystemProvider::class,
         EventSystemModule::class
     ]
 )
