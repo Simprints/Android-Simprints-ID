@@ -6,8 +6,9 @@ import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedExce
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.infra.logging.Simber
+import javax.inject.Inject
 
-class RunnableTaskDispatcher(
+class RunnableTaskDispatcher @Inject constructor(
     private val configurationController: ConfigurationController
 ) {
 

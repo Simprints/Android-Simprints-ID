@@ -3,8 +3,9 @@ package com.simprints.fingerprint.activities.collect.domain
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import javax.inject.Inject
 
-class StartingStateDeterminer {
+class StartingStateDeterminer @Inject constructor() {
 
     fun determineStartingFingerStates(fingerprintsToCapture: List<FingerIdentifier>): List<FingerState> {
         val quantities = mutableMapOf<FingerIdentifier, Int>()

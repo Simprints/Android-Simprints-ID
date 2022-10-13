@@ -7,30 +7,38 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.simprints.core.DeviceID
+import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.extentions.showToast
-import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.enablePreference
-import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+
+@AndroidEntryPoint
 class SettingsAboutFragment : PreferenceFragmentCompat() {
 
-    private lateinit var packageVersionName: String
-    private lateinit var deviceId: String
+    @Inject
+    @PackageVersionName
+    lateinit var packageVersionName: String
+
+    @Inject
+    @DeviceID
+    lateinit var deviceId: String
+
     private val confirmationDialogForLogout: AlertDialog by lazy {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(IDR.string.confirmation_logout_title))
@@ -46,9 +54,7 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
             ).create()
     }
 
-    @Inject
-    lateinit var settingsAboutViewModelFactory: SettingsAboutViewModelFactory
-    private lateinit var settingsAboutViewModel: SettingsAboutViewModel
+    private val settingsAboutViewModel: SettingsAboutViewModel by viewModels()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_app_details)
@@ -57,19 +63,8 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
-        val component = (requireActivity().application as Application).component
-        component.inject(this)
-
-        settingsAboutViewModel = ViewModelProvider(
-            this,
-            settingsAboutViewModelFactory
-        )[SettingsAboutViewModel::class.java]
         setTextInLayout()
         setPreferenceListeners()
-
-        packageVersionName = requireActivity().packageVersionName
-        deviceId = requireActivity().deviceId
 
         loadPreferenceValuesAndBindThemToChangeListeners()
 
@@ -109,7 +104,8 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     private fun setTextInLayout() {
         getAppVersionPreference()?.title = getString(IDR.string.preference_app_version_title)
         getDeviceIdPreference()?.title = getString(IDR.string.preference_device_id_title)
-        getScannerVersionPreference()?.title = getString(IDR.string.preference_scanner_version_title)
+        getScannerVersionPreference()?.title =
+            getString(IDR.string.preference_scanner_version_title)
         getSyncAndSearchConfigurationPreference()?.title =
             getString(IDR.string.preference_sync_and_search_title)
         getLogoutPreference()?.title = getString(IDR.string.preference_logout_title)

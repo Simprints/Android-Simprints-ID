@@ -14,9 +14,10 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
+import javax.inject.Inject
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY as RESPONSE_BUNDLE_KEY
 
-class FingerprintStepProcessorImpl(
+class FingerprintStepProcessorImpl @Inject constructor(
     private val fingerprintRequestFactory: FingerprintRequestFactory,
     private val configManager: ConfigManager,
 ) : FingerprintStepProcessor {

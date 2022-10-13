@@ -16,10 +16,11 @@ import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import java.util.*
+import javax.inject.Inject
 
 private const val TAG = "ENROLMENT"
 
-class EnrolmentHelperImpl(
+class EnrolmentHelperImpl @Inject constructor(
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper

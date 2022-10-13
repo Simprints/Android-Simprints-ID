@@ -16,12 +16,8 @@ import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
@@ -44,25 +40,8 @@ class ConsentActivityTest {
     private val consentConfiguration = mockk<ConsentConfiguration>()
     private val viewModel = mockk<ConsentViewModel>()
 
-    private val consentViewModelFactory = mockk<ConsentViewModelFactory>()
-
-    private val viewModelModule by lazy {
-        TestViewModelModule(
-            consentViewModelFactoryRule = DependencyRule.ReplaceRule {
-                consentViewModelFactory
-            }
-        )
-    }
-
-    private val module by lazy {
-        TestAppModule(app)
-    }
-
     @Before
     fun setUp() {
-        UnitTestConfig(module, viewModelModule = viewModelModule).fullSetup().inject(this)
-
-        every { consentViewModelFactory.create<ConsentViewModel>(any(), any()) } returns viewModel
         every { viewModel.modalities } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<List<GeneralConfiguration.Modality>>>().onChanged(modalities)

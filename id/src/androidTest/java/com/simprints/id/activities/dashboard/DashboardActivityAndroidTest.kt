@@ -15,7 +15,6 @@ import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestViewModelModule
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.di.DependencyRule
@@ -38,9 +37,6 @@ class DashboardActivityAndroidTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var mockViewModelFactory: DashboardViewModelFactory
-
-    @MockK
     lateinit var mockViewModel: DashboardViewModel
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
@@ -51,11 +47,6 @@ class DashboardActivityAndroidTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every {
-            mockViewModelFactory.create<DashboardViewModel>(
-                any(), any()
-            )
-        } returns mockViewModel
 
         AndroidTestConfig(
             appModule = appModule,
@@ -108,10 +99,4 @@ class DashboardActivityAndroidTest {
 
         onView(withId(R.id.dashboard_sync_card)).check(matches(isDisplayed()))
     }
-
-    private fun buildViewModelModule() = TestViewModelModule(
-        dashboardViewModelFactoryRule = DependencyRule.ReplaceRule {
-            mockViewModelFactory
-        }
-    )
 }

@@ -3,8 +3,9 @@ package com.simprints.face.match.rankone
 import com.simprints.face.match.FaceMatcher
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.rocConstants.ROC_FAST_FV_SIZE
+import javax.inject.Inject
 
-class RankOneFaceMatcher : FaceMatcher() {
+class RankOneFaceMatcher @Inject constructor(): FaceMatcher() {
     override suspend fun getComparisonScore(probe: ByteArray, matchAgainst: ByteArray): Float {
         val probeTemplate = roc.new_uint8_t_array(ROC_FAST_FV_SIZE.toInt())
         roc.memmove(roc.roc_cast(probeTemplate), probe)

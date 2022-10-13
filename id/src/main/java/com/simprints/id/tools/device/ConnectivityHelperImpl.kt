@@ -5,9 +5,10 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import javax.inject.Inject
 
 
-class ConnectivityHelperImpl(private val ctx: Context) : ConnectivityHelper {
+class ConnectivityHelperImpl @Inject constructor(private val ctx: Context) : ConnectivityHelper {
 
     private val connectivityManager by lazy {
         ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

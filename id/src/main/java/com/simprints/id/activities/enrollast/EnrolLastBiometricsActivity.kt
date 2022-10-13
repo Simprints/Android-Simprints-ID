@@ -4,45 +4,31 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import com.simprints.infra.logging.Simber
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class EnrolLastBiometricsActivity : BaseSplitActivity() {
-
-    @Inject
-    lateinit var enrolmentHelper: EnrolmentHelper
-
-    @Inject
-    lateinit var timeHelper: TimeHelper
-
-    @Inject
-    lateinit var viewModelFactory: EnrolLastBiometricsViewModelFactory
 
     private lateinit var enrolLastBiometricsRequest: EnrolLastBiometricsRequest
 
-    private val vm: EnrolLastBiometricsViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory)[EnrolLastBiometricsViewModel::class.java]
-    }
+    private val vm: EnrolLastBiometricsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
-        injectDependencies()
         Simber.d("EnrolLastBiometrics started")
 
         enrolLastBiometricsRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE)
@@ -61,7 +47,11 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
     private fun observeViewState() {
         vm.getViewStateLiveData().observe(this) {
             if (it is ViewState.Success) {
-                Toast.makeText(this, getString(IDR.string.enrol_last_biometrics_success), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    getString(IDR.string.enrol_last_biometrics_success),
+                    Toast.LENGTH_LONG
+                ).show()
                 sendOkResult(it.newGuid)
             } else {
                 AlertActivityHelper.launchAlert(
@@ -70,12 +60,6 @@ class EnrolLastBiometricsActivity : BaseSplitActivity() {
                 )
             }
         }
-    }
-
-
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

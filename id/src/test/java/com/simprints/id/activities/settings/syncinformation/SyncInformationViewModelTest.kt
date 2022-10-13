@@ -26,6 +26,7 @@ import com.simprints.infra.config.domain.models.SynchronizationConfiguration.Fre
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration.Frequency.PERIODICALLY
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
@@ -64,6 +65,9 @@ class SyncInformationViewModelTest {
     @MockK
     lateinit var eventSyncManager: EventSyncManager
 
+    @MockK
+    lateinit var loginManager: LoginManager
+
     private val synchronizationConfiguration = mockk<SynchronizationConfiguration>()
     private val deviceConfiguration = mockk<DeviceConfiguration>()
     private val projectId = DEFAULT_PROJECT_ID
@@ -78,12 +82,13 @@ class SyncInformationViewModelTest {
             every { synchronization } returns synchronizationConfiguration
         }
         coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns projectId
 
         viewModel = SyncInformationViewModel(
             downSyncHelper,
             eventRepository,
             enrolmentRecordManager,
-            projectId,
+            loginManager,
             eventDownSyncScopeRepository,
             imageRepository,
             configManager,

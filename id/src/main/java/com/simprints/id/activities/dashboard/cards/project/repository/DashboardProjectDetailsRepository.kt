@@ -4,8 +4,9 @@ import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjec
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import javax.inject.Inject
 
-class DashboardProjectDetailsRepository(
+class DashboardProjectDetailsRepository @Inject constructor(
     private val configManager: ConfigManager,
     private val loginManager: LoginManager,
     private val recentUserActivityManager: RecentUserActivityManager

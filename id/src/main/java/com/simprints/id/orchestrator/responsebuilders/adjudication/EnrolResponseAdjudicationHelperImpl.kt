@@ -4,8 +4,9 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import javax.inject.Inject
 
-class EnrolResponseAdjudicationHelperImpl : EnrolResponseAdjudicationHelper {
+class EnrolResponseAdjudicationHelperImpl @Inject constructor(): EnrolResponseAdjudicationHelper {
 
     override fun getAdjudicationAction(
         projectConfiguration: ProjectConfiguration,

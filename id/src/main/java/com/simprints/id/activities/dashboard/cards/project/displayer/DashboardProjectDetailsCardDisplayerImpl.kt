@@ -7,9 +7,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
+import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
-class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDisplayer {
+class DashboardProjectDetailsCardDisplayerImpl @Inject constructor(): DashboardProjectDetailsCardDisplayer {
 
     private lateinit var root: LinearLayout
 

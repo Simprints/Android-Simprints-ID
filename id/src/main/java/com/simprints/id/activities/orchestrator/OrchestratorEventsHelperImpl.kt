@@ -8,8 +8,9 @@ import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.moduleapi.app.responses.IAppResponseTier
+import javax.inject.Inject
 
-class OrchestratorEventsHelperImpl(
+class OrchestratorEventsHelperImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper
 ) : OrchestratorEventsHelper {

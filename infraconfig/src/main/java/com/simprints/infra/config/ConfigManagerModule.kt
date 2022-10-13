@@ -25,7 +25,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -34,7 +33,7 @@ private const val PROJECT_CONFIG_DATA_STORE_FILE_NAME = "project_config_prefs.pb
 private const val DEVICE_CONFIG_DATA_STORE_FILE_NAME = "device_config_prefs.pb"
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class ConfigManagerModule {
 
     @Binds

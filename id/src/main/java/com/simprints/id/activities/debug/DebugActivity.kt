@@ -13,7 +13,6 @@ import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.id.Application
 import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
@@ -25,13 +24,14 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class DebugActivity : BaseSplitActivity() {
 
     @Inject
@@ -69,9 +69,6 @@ class DebugActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val component = (application as Application).component
-        component.inject(this)
-
         setContentView(binding.root)
 
         eventSyncManager.getLastSyncState().observe(this) { state ->
@@ -169,13 +166,10 @@ class DebugActivity : BaseSplitActivity() {
 
     private fun coloredText(text: String, color: Int): SpannableString {
         val spannableString = SpannableString(text)
-        try {
-            spannableString.setSpan(
-                ForegroundColorSpan(color), 0,
-                text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        } catch (e: Exception) {
-        }
+        spannableString.setSpan(
+            ForegroundColorSpan(color), 0,
+            text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
         return spannableString
     }
 

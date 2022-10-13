@@ -9,15 +9,15 @@ import com.simprints.core.tools.extentions.packageVersionName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.KronosTimeHelperImpl
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -25,7 +25,7 @@ import kotlin.coroutines.CoroutineContext
 
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 object CoreModule {
 
     @Provides
@@ -50,6 +50,10 @@ object CoreModule {
     @Provides
     @Singleton
     fun provideJsonHelper(): JsonHelper = JsonHelper
+
+    @Provides
+    @Singleton
+    fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImpl
 
     @DeviceID
     @Provides
@@ -78,6 +82,9 @@ object CoreModule {
         @DispatcherIO dispatcherIO: CoroutineDispatcher
     ): CoroutineContext = dispatcherIO + NonCancellable
 
+    @ExternalScope
+    @Provides
+    fun provideExternalScope(): CoroutineScope = CoroutineScope(SupervisorJob())
 }
 
 @Qualifier
@@ -99,3 +106,7 @@ annotation class DispatcherIO
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class NonCancellableIO
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ExternalScope

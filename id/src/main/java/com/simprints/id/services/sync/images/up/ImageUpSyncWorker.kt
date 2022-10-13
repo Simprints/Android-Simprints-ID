@@ -1,28 +1,27 @@
 package com.simprints.id.services.sync.images.up
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.id.Application
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.infra.images.ImageRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class ImageUpSyncWorker(
-    context: Context,
-    params: WorkerParameters,
+@HiltWorker
+class ImageUpSyncWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val imageRepository: ImageRepository,
+    private val dispatcher: DispatcherProvider
 ) : SimCoroutineWorker(context, params) {
 
     override val tag: String = ImageUpSyncWorker::class.java.simpleName
 
-    @Inject lateinit var imageRepository: ImageRepository
-    @Inject lateinit var dispatcher: DispatcherProvider
-
-    override suspend fun doWork(): Result {
-        (applicationContext as Application).component.inject(this@ImageUpSyncWorker)
-
-        return withContext(dispatcher.io()) {
+    override suspend fun doWork(): Result =
+        withContext(dispatcher.io()) {
             crashlyticsLog("Start")
 
             try {
@@ -35,5 +34,4 @@ class ImageUpSyncWorker(
                 retry(t = ex)
             }
         }
-    }
 }

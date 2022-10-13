@@ -1,12 +1,10 @@
 package com.simprints.id.testtools.di
 
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.di.SecurityModule
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.ProjectSecretManager
@@ -36,7 +34,6 @@ class TestSecurityModule(
     override fun provideSignerManager(
         configManager: ConfigManager,
         loginManager: LoginManager,
-        preferencesManager: PreferencesManager,
         eventSyncManager: EventSyncManager,
         syncManager: SyncManager,
         securityStateScheduler: SecurityStateScheduler,
@@ -47,7 +44,6 @@ class TestSecurityModule(
         super.provideSignerManager(
             configManager,
             loginManager,
-            preferencesManager,
             eventSyncManager,
             syncManager,
             securityStateScheduler,

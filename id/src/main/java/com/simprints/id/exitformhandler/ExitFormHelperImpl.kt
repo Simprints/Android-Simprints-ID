@@ -14,8 +14,9 @@ import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormRespons
 import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import javax.inject.Inject
 
-class ExitFormHelperImpl : ExitFormHelper {
+class ExitFormHelperImpl @Inject constructor(): ExitFormHelper {
 
     override fun getExitFormActivityClassFromModalities(modalities: List<GeneralConfiguration.Modality>): String? =
         if (isSingleModality(modalities)) {

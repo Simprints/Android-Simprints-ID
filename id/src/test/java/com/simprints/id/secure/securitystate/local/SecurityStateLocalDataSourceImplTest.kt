@@ -1,33 +1,31 @@
 package com.simprints.id.secure.securitystate.local
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.sharedpreferences.ImprovedSharedPreferences
 import com.simprints.id.secure.models.SecurityState
-import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
-import org.junit.Before
 import org.junit.Test
 
 class SecurityStateLocalDataSourceImplTest {
 
-    @MockK lateinit var mockPrefs: ImprovedSharedPreferences
-
-    private lateinit var localDataSource: SecurityStateLocalDataSourceImpl
-
-    @Before
-    fun setUp() {
-        MockKAnnotations.init(this)
-
-        localDataSource = SecurityStateLocalDataSourceImpl(mockPrefs)
+    private val ctx = mockk<Context> {
+        every { getSharedPreferences(any(), any()) } returns prefs
     }
+    private val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+    private val prefs = mockk<SharedPreferences>(relaxed = true) {
+        every { edit() } returns editor
+    }
+
+    private val localDataSource = SecurityStateLocalDataSourceImpl(ctx)
 
     @Test
     fun shouldGetSecurityStatusFromSharedPreferences() {
         val expected = SecurityState.Status.COMPROMISED
         every {
-            mockPrefs.getString(
+            prefs.getString(
                 SecurityStateLocalDataSourceImpl.KEY_SECURITY_STATUS,
                 SecurityStateLocalDataSourceImpl.DEFAULT_SECURITY_STATUS
             )
@@ -45,7 +43,7 @@ class SecurityStateLocalDataSourceImplTest {
         localDataSource.securityStatus = status
 
         verify {
-            mockPrefs.edit().putPrimitive(
+            editor.putString(
                 SecurityStateLocalDataSourceImpl.KEY_SECURITY_STATUS,
                 status.name
             )

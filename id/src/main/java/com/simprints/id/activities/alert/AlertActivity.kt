@@ -13,50 +13,47 @@ import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.databinding.ActivityAlertBinding
-import com.simprints.id.di.AppComponent
+import com.simprints.id.di.IdAppModule
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.infra.resources.R
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class AlertActivity : BaseSplitActivity(), AlertContract.View {
 
     private val binding by viewBinding(ActivityAlertBinding::inflate)
 
-    override lateinit var viewPresenter: AlertContract.Presenter
+    @Inject
+    lateinit var presenterFactory: IdAppModule.AlertPresenterFactory
+
+    override val viewPresenter: AlertContract.Presenter by lazy {
+        presenterFactory.create(this, alertTypeType)
+    }
     private lateinit var alertTypeType: AlertType
+
     @Inject
     lateinit var exitFormHelper: ExitFormHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        (application as Application).component.inject(this)
         title = getString(R.string.alert_title)
 
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val app = application as Application
-
-        injectDependencies(app.component)
 
         alertTypeType = intent.extras?.let {
             it.get(AlertActRequest.BUNDLE_KEY) as AlertActRequest
         }?.alertType ?: AlertType.UNEXPECTED_ERROR
 
-        viewPresenter = AlertPresenter(this, app.component, alertTypeType)
         viewPresenter.start()
-    }
-
-    private fun injectDependencies(component: AppComponent) {
-        component.inject(this)
     }
 
     override fun getColorForColorRes(@ColorRes colorRes: Int) =

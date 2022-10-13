@@ -18,11 +18,12 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
-class DashboardSyncCardStateRepositoryImpl(
-    val eventSyncManager: EventSyncManager,
-    val deviceManager: DeviceManager,
+class DashboardSyncCardStateRepositoryImpl @Inject constructor(
+    private val eventSyncManager: EventSyncManager,
+    deviceManager: DeviceManager,
     private val configManager: ConfigManager,
     private val cacheSync: EventSyncCache,
     private val timeHelper: TimeHelper

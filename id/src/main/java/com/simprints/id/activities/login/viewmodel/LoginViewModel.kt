@@ -7,10 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class LoginViewModel(
+@HiltViewModel
+class LoginViewModel @Inject constructor(
     private val authenticationHelper: AuthenticationHelper,
     private val dispatcher: DispatcherProvider
 ) : ViewModel() {

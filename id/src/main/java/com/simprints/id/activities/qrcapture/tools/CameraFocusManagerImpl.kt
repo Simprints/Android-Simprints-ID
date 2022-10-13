@@ -8,8 +8,9 @@ import androidx.camera.core.*
 import androidx.camera.view.PreviewView
 import com.simprints.infra.logging.Simber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class CameraFocusManagerImpl : CameraFocusManager {
+class CameraFocusManagerImpl @Inject constructor(): CameraFocusManager {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun setUpFocusOnTap(cameraPreview: PreviewView, camera: Camera) {

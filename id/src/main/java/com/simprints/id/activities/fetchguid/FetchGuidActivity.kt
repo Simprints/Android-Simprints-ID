@@ -3,9 +3,9 @@ package com.simprints.id.activities.fetchguid
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -22,33 +22,23 @@ import com.simprints.id.orchestrator.steps.core.requests.FetchGUIDRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class FetchGuidActivity : BaseSplitActivity() {
 
     private lateinit var fetchGuidRequest: FetchGUIDRequest
-    private lateinit var viewModel: FetchGuidViewModel
-
-    @Inject lateinit var fetchGuidViewModelFactory: FetchGuidViewModelFactory
-    @Inject lateinit var preferencesManager: PreferencesManager
+    private val viewModel: FetchGuidViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fetch_guid)
 
-        fetchGuidRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
-
-        injectDependencies()
-        viewModel = ViewModelProvider(this, fetchGuidViewModelFactory).get(FetchGuidViewModel::class.java)
-
+        fetchGuidRequest =
+            intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
         tryToFetchGuid()
-
         setupObserversForUi()
-    }
-
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
     }
 
     private fun setupObserversForUi() {
@@ -58,9 +48,12 @@ class FetchGuidActivity : BaseSplitActivity() {
     }
 
     private fun launchAlertIfPersonFetchFailedOrFinish(subjectSource: SubjectFetchResult.SubjectSource) {
-        when(subjectSource) {
+        when (subjectSource) {
             NOT_FOUND_IN_LOCAL_AND_REMOTE -> launchAlert(this, AlertType.GUID_NOT_FOUND_ONLINE)
-            NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR -> launchAlert(this, AlertType.GUID_NOT_FOUND_OFFLINE)
+            NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR -> launchAlert(
+                this,
+                AlertType.GUID_NOT_FOUND_OFFLINE
+            )
             else -> {
                 setResultAndFinish(FetchGUIDResponse(true))
             }

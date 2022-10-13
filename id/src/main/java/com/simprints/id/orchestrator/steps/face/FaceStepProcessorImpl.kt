@@ -12,8 +12,9 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
+import javax.inject.Inject
 
-class FaceStepProcessorImpl(
+class FaceStepProcessorImpl @Inject constructor(
     private val faceRequestFactory: FaceRequestFactory,
     private val configManager: ConfigManager,
 ) : FaceStepProcessor {

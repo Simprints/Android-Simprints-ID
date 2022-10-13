@@ -6,30 +6,28 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.databinding.ActivityFingerSelectionBinding
 import com.simprints.id.tools.extensions.showToast
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class FingerSelectionActivity : BaseSplitActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: FingerSelectionViewModelFactory
-    private lateinit var viewModel: FingerSelectionViewModel
+    private val viewModel: FingerSelectionViewModel by viewModels()
     private val binding by viewBinding(ActivityFingerSelectionBinding::inflate)
 
     private lateinit var fingerSelectionAdapter: FingerSelectionItemAdapter
 
     private val itemTouchHelper = ItemTouchHelper(
-        object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
+        object : SimpleCallback(UP or DOWN or START or END, 0) {
 
             override fun onSelectedChanged(
                 viewHolder: RecyclerView.ViewHolder?,
@@ -78,13 +76,8 @@ class FingerSelectionActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
         setContentView(binding.root)
-
         configureToolbar()
-
-        viewModel =
-            ViewModelProvider(this, viewModelFactory)[FingerSelectionViewModel::class.java]
 
         initTextInLayout()
         initRecyclerView()

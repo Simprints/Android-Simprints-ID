@@ -7,8 +7,10 @@ import androidx.work.WorkManager
 import com.simprints.id.services.sync.events.common.getUniqueSyncIdTag
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import javax.inject.Inject
 
-class SyncWorkersLiveDataProviderImpl(val ctx: Context) : SyncWorkersLiveDataProvider {
+class SyncWorkersLiveDataProviderImpl @Inject constructor(ctx: Context) :
+    SyncWorkersLiveDataProvider {
 
     private val wm = WorkManager.getInstance(ctx)
 

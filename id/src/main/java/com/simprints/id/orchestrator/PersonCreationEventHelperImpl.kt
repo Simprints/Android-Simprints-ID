@@ -6,6 +6,7 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
@@ -16,12 +17,20 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.orchestrator.steps.Step.Result
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.toList
+import javax.inject.Inject
 
 class PersonCreationEventHelperImpl(
-    val eventRepository: EventRepository,
-    val timeHelper: TimeHelper,
+    private val eventRepository: EventRepository,
+    private val timeHelper: TimeHelper,
     private val encodingUtils: EncodingUtils
 ) : PersonCreationEventHelper {
+
+    @Inject
+    constructor(eventRepository: EventRepository, timeHelper: TimeHelper) : this(
+        eventRepository,
+        timeHelper,
+        EncodingUtilsImpl
+    )
 
     override suspend fun addPersonCreationEventIfNeeded(steps: List<Result>) {
         val currentSession = eventRepository.getCurrentCaptureSessionEvent()

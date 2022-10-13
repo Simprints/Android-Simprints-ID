@@ -2,7 +2,6 @@ package com.simprints.id.activities.checkLogin
 
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
@@ -20,7 +19,6 @@ import javax.inject.Inject
 
 abstract class CheckLoginPresenter(
     private val view: CheckLoginContract.View,
-    component: AppComponent
 ) {
 
     @Inject
@@ -40,11 +38,6 @@ abstract class CheckLoginPresenter(
 
     @Inject
     lateinit var securityStateRepository: SecurityStateRepository
-
-    init {
-        component.inject(this)
-    }
-
     protected suspend fun checkSignedInStateAndMoveOn() {
         try {
             checkSignedInOrThrow()

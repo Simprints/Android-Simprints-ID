@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.textWatcherOnChange
@@ -22,19 +23,19 @@ import com.simprints.core.tools.extentions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.AndroidEntryPoint
 import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class FaceExitFormActivity : BaseSplitActivity() {
 
-    private lateinit var viewModel: FaceExitFormViewModel
+    private val viewModel: FaceExitFormViewModel by viewModels()
     private val binding by viewBinding(ActivityFaceExitFormBinding::inflate)
 
     @Inject
     lateinit var timeHelper: TimeHelper
-    @Inject
-    lateinit var faceExitFormViewModelFactory: FaceExitFormViewModelFactory
 
     private var exitFormStartTime: Long = 0
     private var faceExitFormReason = OTHER
@@ -46,21 +47,12 @@ class FaceExitFormActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        injectDependencies()
-
         setTextInLayout()
 
-        viewModel = ViewModelProvider(this, faceExitFormViewModelFactory).get(FaceExitFormViewModel::class.java)
         exitFormStartTime = timeHelper.now()
 
         setRadioGroupListener()
         setLayoutChangeListener()
-    }
-
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
     }
 
     private fun setTextInLayout() {

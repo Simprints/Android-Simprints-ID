@@ -2,8 +2,6 @@ package com.simprints.fingerprint
 
 import android.content.Context
 import android.nfc.NfcAdapter
-import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -35,18 +33,16 @@ import dagger.Module
 import dagger.Provides
 import dagger.assisted.AssistedFactory
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import javax.inject.Singleton
+import dagger.hilt.components.SingletonComponent
 
 @Module(
     includes = [
         FingerprintDependenciesModule::class,
         FingerprintMatcherModule::class,
         JNILibAfisModule::class,
-        FingerprintScannerModule::class,
     ]
 )
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class FingerprintModule {
 
     @AssistedFactory
@@ -88,19 +84,10 @@ abstract class FingerprintModule {
 }
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 object FingerprintDependenciesModule {
 
     @Provides
     fun provideNfcAdapter(context: Context): ComponentNfcAdapter =
         AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(context))
-}
-
-@Module
-@InstallIn(ActivityComponent::class)
-object FingerprintDispatcherModule {
-
-    @Provides
-    @Singleton
-    fun provideDispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider()
 }

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.di.AppModule
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.DeviceManager

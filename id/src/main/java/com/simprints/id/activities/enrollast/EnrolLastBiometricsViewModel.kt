@@ -20,8 +20,11 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class EnrolLastBiometricsViewModel(
+@HiltViewModel
+class EnrolLastBiometricsViewModel @Inject constructor(
     private val enrolmentHelper: EnrolmentHelper,
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager

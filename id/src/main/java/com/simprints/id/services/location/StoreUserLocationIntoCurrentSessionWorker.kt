@@ -1,6 +1,7 @@
 package com.simprints.id.services.location
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
@@ -10,37 +11,33 @@ import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.tools.LocationManager
 import com.simprints.infra.logging.Simber
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 const val STORE_USER_LOCATION_WORKER_TAG = "StoreUserLocationWorkerTag"
 
 /**
  * Worker that collects user's last known location and save it into current session
  */
-class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: WorkerParameters) :
+@HiltWorker
+class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val eventRepository: EventRepository,
+    private val locationManager: LocationManager,
+    private val dispatcherProvider: DispatcherProvider,
+) :
     SimCoroutineWorker(context, params) {
 
 
     override val tag: String = StoreUserLocationIntoCurrentSessionWorker::class.java.simpleName
 
-    @Inject
-    lateinit var eventRepository: EventRepository
-
-    @Inject
-    lateinit var locationManager: LocationManager
-
-    @Inject
-    lateinit var dispatcherProvider: DispatcherProvider
-
-    override suspend fun doWork(): Result {
-        getComponent<StoreUserLocationIntoCurrentSessionWorker> {
-            it.inject(this@StoreUserLocationIntoCurrentSessionWorker)
-        }
-        return withContext(dispatcherProvider.main()) {
+    override suspend fun doWork(): Result =
+        withContext(dispatcherProvider.main()) {
             try {
                 val locationsFlow = createLocationFlow()
                 locationsFlow.filterNotNull().collect { location ->
@@ -54,7 +51,6 @@ class StoreUserLocationIntoCurrentSessionWorker(context: Context, params: Worker
             }
             success()
         }
-    }
 
     private fun createLocationFlow(): Flow<android.location.Location?> {
         val locationRequest = LocationRequest.create().apply {

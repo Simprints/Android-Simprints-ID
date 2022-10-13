@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.work.*
 import com.simprints.id.BuildConfig
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class SecurityStateSchedulerImpl(context: Context) : SecurityStateScheduler {
+class SecurityStateSchedulerImpl @Inject constructor(context: Context) : SecurityStateScheduler {
 
     private val workManager = WorkManager.getInstance(context)
 

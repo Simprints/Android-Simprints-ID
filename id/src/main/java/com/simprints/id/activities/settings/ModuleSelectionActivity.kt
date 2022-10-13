@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.MenuItem
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.databinding.SettingsToolbarBinding
+import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
-
+@AndroidEntryPoint
 class ModuleSelectionActivity : BaseSplitActivity() {
 
     private lateinit var moduleSelectionFragment: ModuleSelectionFragment
@@ -18,7 +18,6 @@ class ModuleSelectionActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
 
         setContentView(binding.root)
         configureToolbar()

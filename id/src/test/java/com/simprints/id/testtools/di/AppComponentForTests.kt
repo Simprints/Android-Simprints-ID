@@ -35,12 +35,10 @@ import javax.inject.Singleton
 @Component(
     modules = [
         AppModule::class,
-        PreferencesModule::class,
         DataModule::class,
         SyncModule::class,
         DashboardActivityModule::class,
         SecurityModule::class,
-        ViewModelModule::class,
         LoginManagerModule::class,
         NetworkModule::class,
         SafetyNetModule::class,
@@ -67,9 +65,7 @@ interface AppComponentForTests : AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun dataModule(dataModule: DataModule): Builder
         fun syncModule(syncModule: SyncModule): Builder
-        fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun securityModule(securityModule: SecurityModule): Builder
-        fun viewModelModule(viewModelModule: ViewModelModule): Builder
 
         fun build(): AppComponentForTests
     }

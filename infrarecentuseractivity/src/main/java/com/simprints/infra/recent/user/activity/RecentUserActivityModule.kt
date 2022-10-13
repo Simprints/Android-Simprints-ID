@@ -12,14 +12,13 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 private const val RECENT_USER_ACTIVITY_DATA_STORE_FILE_NAME = "recent_user_activity_prefs.pb"
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class RecentUserActivityModule {
     @Binds
     internal abstract fun provideManager(impl: RecentUserActivityManagerImpl): RecentUserActivityManager

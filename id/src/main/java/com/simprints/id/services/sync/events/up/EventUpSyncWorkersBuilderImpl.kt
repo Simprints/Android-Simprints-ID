@@ -11,8 +11,9 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class EventUpSyncWorkersBuilderImpl(
+class EventUpSyncWorkersBuilderImpl @Inject constructor(
     private val upSyncScopeRepository: EventUpSyncScopeRepository,
     private val jsonHelper: JsonHelper
 ) : EventUpSyncWorkersBuilder {

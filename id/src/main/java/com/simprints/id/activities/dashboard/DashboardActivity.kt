@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
@@ -29,6 +28,7 @@ import com.simprints.id.databinding.ActivityDashboardCardProjectDetailsBinding
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.ticker
@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class DashboardActivity : BaseSplitActivity() {
 
     private var syncAgainTicker: ReceiveChannel<Unit>? = null
@@ -50,12 +51,9 @@ class DashboardActivity : BaseSplitActivity() {
     lateinit var dailyActivityCardDisplayer: DashboardDailyActivityCardDisplayer
 
     @Inject
-    lateinit var viewModelFactory: DashboardViewModelFactory
-
-    @Inject
     lateinit var eventSyncManager: EventSyncManager
 
-    private lateinit var viewModel: DashboardViewModel
+    private val viewModel: DashboardViewModel by viewModels()
     private val binding by viewBinding(ActivityDashboardBinding::inflate)
 
     // set bindings for included layouts
@@ -73,14 +71,11 @@ class DashboardActivity : BaseSplitActivity() {
     @ObsoleteCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val component = (application as Application).component
-        component.inject(this)
 
         setContentView(binding.root)
         title = getString(IDR.string.dashboard_label)
 
         setupActionBar()
-        viewModel = ViewModelProvider(this, viewModelFactory)[DashboardViewModel::class.java]
         setupCards()
         observeConfiguration()
         observeCardData()

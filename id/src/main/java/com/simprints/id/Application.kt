@@ -3,7 +3,6 @@ package com.simprints.id
 import android.content.Context
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.di.*
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
@@ -20,8 +19,6 @@ open class Application : CoreApplication() {
 //    @Inject
 //    lateinit var workerFactory: HiltWorkerFactory
 
-    lateinit var component: AppComponent
-    lateinit var orchestratorComponent: OrchestratorComponent
     private lateinit var applicationScope: CoroutineScope
 
     override fun attachBaseContext(base: Context) {
@@ -30,23 +27,21 @@ open class Application : CoreApplication() {
         super.attachBaseContext(ctx)
     }
 
-    open fun createComponent() {
-        component = DaggerAppComponent
-            .builder()
-            .application(this)
-            .appModule(AppModule())
-            .preferencesModule(PreferencesModule())
-            .syncModule(SyncModule())
-            .viewModelModule(ViewModelModule())
-            .build()
-
-    }
-
-    open fun createOrchestratorComponent() {
-        orchestratorComponent = component
-            .getOrchestratorComponent().orchestratorModule(OrchestratorModule())
-            .build()
-    }
+//    open fun createComponent() {
+//        component = DaggerAppComponent
+//            .builder()
+//            .application(this)
+//            .appModule(AppModule())
+//            .syncModule(SyncModule())
+//            .build()
+//
+//    }
+//
+//    open fun createOrchestratorComponent() {
+//        orchestratorComponent = component
+//            .getOrchestratorComponent().orchestratorModule(OrchestratorModule())
+//            .build()
+//    }
 
     open fun createApplicationCoroutineScope() {
         // For operations that shouldn’t be cancelled,
@@ -67,7 +62,7 @@ open class Application : CoreApplication() {
 
 
     open fun initApplication() {
-        createComponent()
+        //createComponent()
         handleUndeliverableExceptionInRxJava()
         createApplicationCoroutineScope()
         SimberBuilder.initialize(this)

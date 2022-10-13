@@ -6,8 +6,9 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRe
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import javax.inject.Inject
 
-class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
+class FingerprintRequestFactoryImpl @Inject constructor() : FingerprintRequestFactory {
 
     override fun buildFingerprintCaptureRequest(fingersToCapture: List<Finger>): FingerprintCaptureRequest =
         FingerprintCaptureRequest(

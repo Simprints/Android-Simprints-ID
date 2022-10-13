@@ -6,12 +6,11 @@ import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.eventsystem.event.EventRepository
@@ -20,8 +19,6 @@ import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type
-import com.simprints.id.Application
-import com.simprints.infra.resources.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.databinding.ActivityConsentBinding
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -33,20 +30,19 @@ import com.simprints.id.orchestrator.steps.core.response.AskConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.tools.LocationManager
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.resources.R
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class ConsentActivity : BaseSplitActivity() {
 
-    private lateinit var viewModel: ConsentViewModel
+    private val viewModel: ConsentViewModel by viewModels()
     private val binding by viewBinding(ActivityConsentBinding::inflate)
 
     private lateinit var askConsentRequestReceived: AskConsentRequest
-
-    @Inject
-    lateinit var viewModelFactory: ConsentViewModelFactory
 
     @Inject
     lateinit var timeHelper: TimeHelper
@@ -56,12 +52,6 @@ class ConsentActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var eventRepository: EventRepository
-
-    @Inject
-    lateinit var locationManager: LocationManager
-
-    @Inject
-    lateinit var jsonHelper: JsonHelper
 
     private var startConsentEventTime: Long = 0
     private var consentConfiguration: ConsentConfiguration = ConsentConfiguration(
@@ -79,21 +69,12 @@ class ConsentActivity : BaseSplitActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        injectDependencies()
-
         startConsentEventTime = timeHelper.now()
 
         askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE)
             ?: throw InvalidAppRequest()
 
-        viewModel = ViewModelProvider(this, viewModelFactory)[ConsentViewModel::class.java]
-
         fetchData()
-    }
-
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
     }
 
     private fun fetchData() {

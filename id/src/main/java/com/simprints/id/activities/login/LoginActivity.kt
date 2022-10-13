@@ -3,12 +3,11 @@ package com.simprints.id.activities.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
@@ -16,7 +15,6 @@ import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
-import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
@@ -29,15 +27,14 @@ import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class LoginActivity : BaseSplitActivity() {
 
     private val binding by viewBinding(ActivityLoginBinding::inflate)
-
-    @Inject
-    lateinit var viewModelFactory: LoginViewModelFactory
 
     @Inject
     lateinit var loginActivityHelper: LoginActivityHelper
@@ -51,16 +48,14 @@ class LoginActivity : BaseSplitActivity() {
     }
 
     private lateinit var progressDialog: SimProgressDialog
-    private lateinit var viewModel: LoginViewModel
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
 
         setContentView(binding.root)
 
         simNetwork.resetApiBaseUrl()
-        viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
         initUI()
         observeSignInResult()
     }
@@ -104,7 +99,9 @@ class LoginActivity : BaseSplitActivity() {
     private fun handleSignInResult(result: AuthenticateDataResult) {
         when (result) {
             AuthenticateDataResult.Authenticated -> handleSignInSuccess()
-            is AuthenticateDataResult.BackendMaintenanceError -> handleSignInFailedBackendMaintenanceError(result.estimatedOutage)
+            is AuthenticateDataResult.BackendMaintenanceError -> handleSignInFailedBackendMaintenanceError(
+                result.estimatedOutage
+            )
             AuthenticateDataResult.BadCredentials -> handleSignInFailedInvalidCredentials()
             AuthenticateDataResult.Offline -> handleSignInFailedNoConnection()
             AuthenticateDataResult.SafetyNetInvalidClaim,

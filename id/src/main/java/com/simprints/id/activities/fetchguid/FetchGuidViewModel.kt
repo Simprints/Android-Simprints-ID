@@ -12,10 +12,13 @@ import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.Candidat
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
 import com.simprints.id.tools.device.DeviceManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class FetchGuidViewModel(
+@HiltViewModel
+class FetchGuidViewModel @Inject constructor(
     private val fetchGuidHelper: FetchGuidHelper,
     private val deviceManager: DeviceManager,
     private val eventRepository: EventRepository,

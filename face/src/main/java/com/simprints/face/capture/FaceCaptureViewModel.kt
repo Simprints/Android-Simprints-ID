@@ -3,16 +3,15 @@ package com.simprints.face.capture
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.CAPTURE
-import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.face.models.FaceDetection
 import com.simprints.infra.config.ConfigManager
@@ -27,17 +26,11 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
-class FaceCaptureViewModel(
+class FaceCaptureViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val faceImageManager: FaceImageManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
-
-    @Inject
-    constructor(
-        configManager: ConfigManager,
-        faceImageManager: FaceImageManager,
-    ) : this(configManager, faceImageManager, Dispatchers.IO)
 
     var faceDetections = listOf<FaceDetection>()
 
@@ -46,8 +39,6 @@ class FaceCaptureViewModel(
     val unexpectedErrorEvent: MutableLiveData<LiveDataEvent> = MutableLiveData()
 
     val finishFlowEvent: MutableLiveData<LiveDataEventWithContent<FaceCaptureResponse>> =
-        MutableLiveData()
-    val finishFlowWithExitFormEvent: MutableLiveData<LiveDataEventWithContent<FaceExitFormResponse>> =
         MutableLiveData()
 
     var attemptNumber: Int = 0
@@ -111,10 +102,6 @@ class FaceCaptureViewModel(
             faceDetection.securedImageRef =
                 faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
         }
-    }
-
-    fun submitExitForm(reason: RefusalAnswer, exitFormText: String) {
-        finishFlowWithExitFormEvent.send(FaceExitFormResponse(reason, exitFormText))
     }
 
     fun submitError(throwable: Throwable) {
