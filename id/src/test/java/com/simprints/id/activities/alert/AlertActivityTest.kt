@@ -35,6 +35,7 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.testtools.android.hasImage
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
+import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -46,7 +47,7 @@ import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@HiltAndroidTest
 class AlertActivityTest {
 
     private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext

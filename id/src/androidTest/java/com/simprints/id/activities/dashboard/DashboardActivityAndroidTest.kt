@@ -13,11 +13,8 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
-import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -40,18 +37,10 @@ class DashboardActivityAndroidTest {
     lateinit var mockViewModel: DashboardViewModel
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-    private val appModule by lazy {
-        TestAppModule(app)
-    }
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
-        AndroidTestConfig(
-            appModule = appModule,
-            viewModelModule = buildViewModelModule()
-        ).initComponent().testAppComponent.inject(this)
     }
 
     @Test

@@ -7,7 +7,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.integration.createFingerprintCaptureRequestIntent
@@ -28,17 +30,23 @@ import io.mockk.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @HiltAndroidTest
-@Config(application = HiltTestApplication::class)
+@RunWith(AndroidJUnit4::class)
 @MediumTest
 class OrchestratorActivityAndroidTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
     private val mockCoroutineScope = CoroutineScope(Dispatchers.Main + Job())
@@ -59,18 +67,18 @@ class OrchestratorActivityAndroidTest {
             mockk(relaxed = true),
             scannerManagerMock,
             firmwareFileUpdateSchedulerMock,
-            mockCoroutineScope
+            mockCoroutineScope,
+            UnconfinedTestDispatcher(),
         )
     )
 
-    private lateinit var scenario: ActivityScenario<OrchestratorActivity>
+    @BindValue @JvmField
+    val flowProvider = mockk<FlowProvider>()
 
-    @get:Rule
-    var hiltRule = HiltAndroidRule(this)
+    private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
     @Before
     fun setUp() {
-        hiltRule.inject()
         Intents.init()
     }
 

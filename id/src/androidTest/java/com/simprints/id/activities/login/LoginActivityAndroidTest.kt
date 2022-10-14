@@ -1,23 +1,15 @@
 package com.simprints.id.activities.login
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.tools.LoginActivityHelper
-import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
-import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestSecurityModule
-import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -34,39 +26,9 @@ class LoginActivityAndroidTest {
     @MockK
     lateinit var mockLoginActivityHelper: LoginActivityHelper
 
-    private val testDispatcherProvider = DefaultDispatcherProvider()
-    private val app = ApplicationProvider.getApplicationContext<Application>()
-
-    private val appModule by lazy {
-        TestAppModule(app)
-    }
-
-    private val securityModule by lazy {
-        TestSecurityModule(
-            loginActivityHelperRule = DependencyRule.ReplaceRule {
-                mockLoginActivityHelper
-            },
-            authenticationHelperRule = DependencyRule.MockkRule
-        )
-    }
-
-    private val viewModelModule by lazy {
-        TestViewModelModule(
-            loginViewModelFactoryRule = DependencyRule.ReplaceRule {
-                LoginViewModelFactory(mockAuthenticationHelper, testDispatcherProvider)
-            }
-        )
-    }
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        AndroidTestConfig(
-            appModule = appModule,
-            securityModule = securityModule,
-            viewModelModule = viewModelModule
-        )
-            .initComponent().testAppComponent.inject(this)
 
 
         Intents.init()

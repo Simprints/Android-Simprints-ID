@@ -8,24 +8,28 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
-import com.simprints.face.controllers.core.events.FaceSessionEventsManager
-import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.utils.mockFaceDetectionList
 import dagger.hilt.android.testing.BindValue
+import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.CoreMatchers.allOf
+import org.junit.Rule
 import org.junit.Test
-import org.robolectric.annotation.Config
+import org.junit.runner.RunWith
 
 @HiltAndroidTest
-@Config(application = HiltTestApplication::class)
+@RunWith(AndroidJUnit4::class)
 class ConfirmationFragmentTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     @BindValue
     @JvmField
@@ -37,11 +41,7 @@ class ConfirmationFragmentTest {
 
     @BindValue
     @JvmField
-    val faceTimeHelper: FaceTimeHelper = mockk(relaxed = true)
-
-    @BindValue
-    @JvmField
-    val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxed = true)
+    val flowProvider = mockk<FlowProvider>()
 
 
     @Test
