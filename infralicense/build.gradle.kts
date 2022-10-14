@@ -15,6 +15,9 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
 }
 
 dependencies {

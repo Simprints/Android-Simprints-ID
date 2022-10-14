@@ -22,8 +22,10 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
+    implementation(project(":infralogin"))
     api(project(":infranetwork"))
     implementation(project(":infrarealm"))
+    implementation(project(":moduleapi"))
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)

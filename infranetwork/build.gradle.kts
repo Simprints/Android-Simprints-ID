@@ -49,6 +49,8 @@ dependencies {
     api(libs.retrofit.logging)
     api(libs.retrofit.okhttp)
 
+    // This implementation is to fix the issue with duplicated class on the view model
+    implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 

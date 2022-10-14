@@ -12,6 +12,9 @@ android {
         consumerProguardFiles("proguard-rules.pro")
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
 }
 
 //Required to make the mock-android library to work in a no android module.
@@ -20,24 +23,21 @@ System.setProperty("org.mockito.mock.android", "true")
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
-    implementation(project(":infralogging"))
 
+    implementation(libs.androidX.lifecycle.livedata.ktx)
     implementation(libs.testing.androidX.core)
-    api(libs.testing.espresso.core)
-    implementation(libs.testing.espresso.barista) {
-        exclude("com.android.support")
-        exclude("com.google.code.findbugs")
-        exclude("org.jetbrains.kotlin")
-        exclude("com.google.guava")
-    }
+    implementation(libs.testing.androidX.core.testing)
+    implementation(libs.androidX.multidex)
+    implementation(libs.androidX.appcompat)
 
+    implementation(libs.testing.junit)
     implementation(libs.testing.mockito.inline)
     implementation(libs.testing.mockito.kotlin)
 
     implementation(libs.testing.robolectric.core)
     implementation(libs.rxJava2.android)
-    api(libs.rxJava2.core)
-    api(libs.testing.coroutines.test)
+    implementation(libs.rxJava2.core)
+    implementation(libs.testing.coroutines.test)
     implementation(libs.testing.mockk.core)
 
 }

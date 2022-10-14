@@ -19,16 +19,14 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    api(project(":infralogin"))
-    api(project(":infralogging"))
+    implementation(project(":infralogin"))
+    implementation(project(":infralogging"))
     implementation(project(":infrasecurity"))
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
     // Unit Tests
-    testImplementation(project(":testtools"))
-
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)

@@ -69,6 +69,7 @@ dependencies {
     implementation(project(":infraresources"))
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))
+    implementation(project(":moduleapi"))
 
     implementation(libs.cameraView){
         exclude("androidx.exifinterface")

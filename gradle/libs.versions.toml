@@ -46,11 +46,9 @@ androidX-Room-core = { module = "androidx.room:room-runtime", version.ref = "and
 androidX-Room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx_room_version" }
 androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx_room_version" }
 #Lifecycle
-androidX-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-scope = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx_lifecycle_version" }
-androidX-lifecycle-java8 = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx_lifecycle_version" }
 
 #UI
 androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"

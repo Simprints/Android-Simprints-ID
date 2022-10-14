@@ -88,6 +88,7 @@ dependencies {
     implementation(project(":infraimages"))
     implementation(project(":infraresources"))
     implementation(project(":infrarecentuseractivity"))
+    implementation(project(":moduleapi"))
 
     // Kotlin
     implementation(libs.kotlin.reflect)
@@ -97,7 +98,7 @@ dependencies {
     implementation(libs.androidX.core)
     implementation(libs.androidX.appcompat)
     implementation(libs.androidX.lifecycle.viewmodel)
-    implementation(libs.androidX.lifecycle.livedata)
+    implementation(libs.androidX.lifecycle.livedata.ktx)
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.ui.cardview)
     implementation(libs.androidX.ui.viewpager2)
