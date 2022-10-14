@@ -38,10 +38,21 @@ class ScannerHardwareRevisionsSerializerTest {
     }
 
     @Test
-    fun `test build ScannerHardwareRevisions failure`() {
+    fun `test build ScannerHardwareRevisions failure with empty string`() {
         //Given
         every { jsonHelper.fromJson<ScannerHardwareRevisions>(any()) } throws Exception("Malformed json")
-        val jsonString =""
+        val jsonString = ""
+        // When
+        val scannerHardwareRevisions = serializer.build(jsonString)
+        // Then
+        Truth.assertThat(scannerHardwareRevisions.isEmpty()).isEqualTo(true)
+    }
+
+    @Test
+    fun `test build ScannerHardwareRevisions failure with invalid JSON`() {
+        //Given
+        every { jsonHelper.fromJson<ScannerHardwareRevisions>(any()) } throws Exception("Malformed json")
+        val jsonString = "I am an invalid JSON"
         // When
         val scannerHardwareRevisions = serializer.build(jsonString)
         // Then
