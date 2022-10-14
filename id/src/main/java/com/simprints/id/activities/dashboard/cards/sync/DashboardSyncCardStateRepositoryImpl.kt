@@ -157,7 +157,7 @@ class DashboardSyncCardStateRepositoryImpl @Inject constructor(
 
     private fun updateDashboardCardState(newState: DashboardSyncCardState) {
         Simber.tag(SYNC_LOG_TAG).d("[ACTIVITY]\n New dashboard state: $newState")
-        syncCardStateLiveData.value = newState
+        syncCardStateLiveData.postValue(newState)
     }
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =

@@ -22,12 +22,15 @@ class PreparationFragment : Fragment(R.layout.fragment_preparation) {
 
     @Inject
     lateinit var faceSessionEventsManager: FaceSessionEventsManager
+
     @Inject
     lateinit var faceTimeHelper: FaceTimeHelper
-    private val startTime = faceTimeHelper.now()
+
+    private var startTime: Long = 0
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        startTime = faceTimeHelper.now()
         setTextInLayout()
 
         binding.detectionOnboardingFrame.setOnClickListener {

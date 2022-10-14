@@ -3,6 +3,7 @@ package com.simprints.face.configuration
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
-    private val mainVm: FaceOrchestratorViewModel by viewModels()
+    private val mainVm: FaceOrchestratorViewModel by activityViewModels()
     private val viewModel: ConfigurationViewModel by viewModels()
     private val binding by viewBinding(FragmentConfigurationBinding::bind)
 

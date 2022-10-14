@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
@@ -24,11 +24,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
 
-    private val mainVM: FaceCaptureViewModel by viewModels()
+    private val mainVM: FaceCaptureViewModel by activityViewModels()
     private val binding by viewBinding(FragmentConfirmationBinding::bind)
 
     @Inject
     lateinit var faceSessionEventsManager: FaceSessionEventsManager
+
     @Inject
     lateinit var faceTimeHelper: FaceTimeHelper
     private val startTime = faceTimeHelper.now()
