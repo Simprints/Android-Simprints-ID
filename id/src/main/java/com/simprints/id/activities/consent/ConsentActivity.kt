@@ -78,14 +78,11 @@ class ConsentActivity : BaseSplitActivity() {
     }
 
     private fun fetchData() {
-        viewModel.consentConfiguration.observe(this) {
-            consentConfiguration = it
+        viewModel.configuration.observe(this) {
+            consentConfiguration = it.consent
+            modalities = it.general.modalities
             showLogoIfNecessary()
             setupTextInUi()
-            setupTabs()
-        }
-        viewModel.modalities.observe(this) {
-            modalities = it
             setupTabs()
         }
     }

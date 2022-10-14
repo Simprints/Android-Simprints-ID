@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":moduleapi"))
 
     implementation(libs.hilt)
+    implementation(libs.hilt.work)
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
 

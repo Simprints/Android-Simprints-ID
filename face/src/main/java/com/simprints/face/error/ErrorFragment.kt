@@ -5,7 +5,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -20,11 +20,12 @@ import javax.inject.Inject
 
 class ErrorFragment : Fragment(R.layout.fragment_error) {
     private val args: ErrorFragmentArgs by navArgs()
-    private val mainVm: FaceOrchestratorViewModel by viewModels()
+    private val mainVm: FaceOrchestratorViewModel by activityViewModels()
     private val binding by viewBinding(FragmentErrorBinding::bind)
 
     @Inject
     lateinit var faceSessionEventsManager: FaceSessionEventsManager
+
     @Inject
     lateinit var faceTimeHelper: FaceTimeHelper
     private val startTime = faceTimeHelper.now()

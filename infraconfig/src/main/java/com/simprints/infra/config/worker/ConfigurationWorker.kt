@@ -1,6 +1,7 @@
 package com.simprints.infra.config.worker
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.infra.config.domain.ConfigService
@@ -13,8 +14,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-// TODO add back when using hilt
-//@HiltWorker
+@HiltWorker
 class ConfigurationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,

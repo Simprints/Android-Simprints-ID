@@ -10,6 +10,7 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRe
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -22,6 +23,9 @@ class DashboardViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     private val dailyActivity = mockk<DashboardDailyActivityState>()
     private val projectState = mockk<DashboardProjectState>()

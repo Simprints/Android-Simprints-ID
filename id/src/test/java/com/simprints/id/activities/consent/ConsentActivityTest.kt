@@ -17,6 +17,7 @@ import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
@@ -35,18 +36,19 @@ class ConsentActivityTest {
     private var modalities = emptyList<GeneralConfiguration.Modality>()
 
     private val consentConfiguration = mockk<ConsentConfiguration>()
+    private val configuration = mockk<ProjectConfiguration> {
+        every { general } returns mockk {
+            every { modalities } returns modalities
+        }
+        every { consentConfiguration } returns consentConfiguration
+    }
     private val viewModel = mockk<ConsentViewModel>()
 
     @Before
     fun setUp() {
-        every { viewModel.modalities } returns mockk {
+        every { viewModel.configuration } returns mockk {
             every { observe(any(), any()) } answers {
-                secondArg<Observer<List<GeneralConfiguration.Modality>>>().onChanged(modalities)
-            }
-        }
-        every { viewModel.consentConfiguration } returns mockk {
-            every { observe(any(), any()) } answers {
-                secondArg<Observer<ConsentConfiguration>>().onChanged(consentConfiguration)
+                secondArg<Observer<ProjectConfiguration>>().onChanged(configuration)
             }
         }
     }

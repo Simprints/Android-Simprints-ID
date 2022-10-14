@@ -38,7 +38,7 @@ class DashboardViewModel @Inject constructor(
     }
 
     fun syncIfRequired() {
-        viewModelScope.launch(dispatcher) { syncCardStateRepository.syncIfRequired() }
+        viewModelScope.launch { syncCardStateRepository.syncIfRequired() }
     }
 
     private fun load() {
