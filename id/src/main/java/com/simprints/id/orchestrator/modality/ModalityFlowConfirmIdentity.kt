@@ -6,8 +6,9 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollo
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import javax.inject.Inject
 
-class ModalityFlowConfirmIdentity(private val coreStepProcessor: CoreStepProcessor) :
+class ModalityFlowConfirmIdentity @Inject constructor(private val coreStepProcessor: CoreStepProcessor) :
     ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()

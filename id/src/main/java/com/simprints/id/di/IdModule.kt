@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.simprints.core.DeviceID
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.id.activities.alert.AlertContract
@@ -107,8 +106,6 @@ import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Binds
@@ -290,6 +287,26 @@ abstract class IdOrchestratorModule {
     @Binds
     abstract fun provideConnectivityHelper(impl: ConnectivityHelperImpl): ConnectivityHelper
 
+    @ModalityFlowEnrolment
+    @Binds
+    abstract fun provideFlowModalityEnrolment(impl: ModalityFlowEnrol): ModalityFlow
+
+    @ModalityFlowConfirmation
+    @Binds
+    abstract fun provideModalityFlowConfirmation(impl: ModalityFlowConfirmIdentity): ModalityFlow
+
+    @ModalityFlowEnrolmentLastBiometrics
+    @Binds
+    abstract fun provideModalityFlowEnrolmentLastBiometrics(impl: ModalityFlowEnrolLastBiometrics): ModalityFlow
+
+    @ModalityFlowIdentification
+    @Binds
+    abstract fun provideFlowModalityIdentification(impl: ModalityFlowIdentify): ModalityFlow
+
+    @ModalityFlowVerification
+    @Binds
+    abstract fun provideFlowModalityVerification(impl: ModalityFlowVerify): ModalityFlow
+
 }
 
 @Module
@@ -377,6 +394,7 @@ abstract class IdDataModule {
 
     @Binds
     abstract fun provideLongConsentRemoteDataSource(impl: LongConsentRemoteDataSourceImpl): LongConsentRemoteDataSource
+
 }
 
 @Module
@@ -386,7 +404,8 @@ object IdDependenciesModule {
     @AbsolutePath
     @Provides
     @Singleton
-    fun provideAbsolutePath(@ApplicationContext context: Context): String = context.filesDir.absolutePath
+    fun provideAbsolutePath(@ApplicationContext context: Context): String =
+        context.filesDir.absolutePath
 
     @EncryptedSharedPreferences
     @Provides
@@ -394,88 +413,9 @@ object IdDependenciesModule {
     fun provideEncryptedSharedPreferences(securityManager: SecurityManager): SharedPreferences =
         securityManager.buildEncryptedSharedPreferences(GLOBAL_SHARED_PREFS_FILENAME)
 
-    @ModalityFlowConfirmation
     @Provides
     @Singleton
-    fun provideModalityFlowConfirmation(coreStepProcessor: CoreStepProcessor): ModalityFlow =
-        ModalityFlowConfirmIdentity(
-            coreStepProcessor
-        )
-
-    @ModalityFlowEnrolment
-    @Provides
-    @Singleton
-    fun provideFlowModalityEnrolment(
-        fingerprintStepProcessor: FingerprintStepProcessor,
-        faceStepProcessor: FaceStepProcessor,
-        coreStepProcessor: CoreStepProcessor,
-        configManager: ConfigManager,
-        loginManager: LoginManager,
-        @DeviceID deviceId: String,
-    ): ModalityFlow =
-        ModalityFlowEnrol(
-            fingerprintStepProcessor,
-            faceStepProcessor,
-            coreStepProcessor,
-            configManager,
-            loginManager,
-            deviceId
-        )
-
-    @ModalityFlowEnrolmentLastBiometrics
-    @Provides
-    @Singleton
-    fun provideModalityFlowEnrolmentLastBiometrics(
-        coreStepProcessor: CoreStepProcessor,
-        hotCache: HotCache
-    ): ModalityFlow =
-        ModalityFlowEnrolLastBiometrics(
-            coreStepProcessor,
-            hotCache
-        )
-
-    @ModalityFlowIdentification
-    @Provides
-    @Singleton
-    fun provideFlowModalityIdentification(
-        fingerprintStepProcessor: FingerprintStepProcessor,
-        faceStepProcessor: FaceStepProcessor,
-        coreStepProcessor: CoreStepProcessor,
-        configManager: ConfigManager,
-        loginManager: LoginManager,
-        @DeviceID deviceId: String,
-    ): ModalityFlow =
-        ModalityFlowIdentify(
-            fingerprintStepProcessor,
-            faceStepProcessor,
-            coreStepProcessor,
-            configManager,
-            loginManager,
-            deviceId
-        )
-
-    @ModalityFlowVerification
-    @Provides
-    @Singleton
-    fun provideFlowModalityVerification(
-        fingerprintStepProcessor: FingerprintStepProcessor,
-        faceStepProcessor: FaceStepProcessor,
-        coreStepProcessor: CoreStepProcessor,
-        configManager: ConfigManager,
-        loginManager: LoginManager,
-        @DeviceID deviceId: String,
-    ): ModalityFlow =
-        ModalityFlowVerify(
-            fingerprintStepProcessor,
-            faceStepProcessor,
-            coreStepProcessor,
-            configManager,
-            loginManager,
-            deviceId
-        )
-
-    @Provides
-    @Singleton
-    fun provideDomainToModuleApiAppResponse(): DomainToModuleApiAppResponse = DomainToModuleApiAppResponse
+    fun provideDomainToModuleApiAppResponse(): DomainToModuleApiAppResponse =
+        DomainToModuleApiAppResponse
 
 }
