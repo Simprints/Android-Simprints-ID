@@ -14,26 +14,20 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.R
-import com.simprints.id.activities.BaseUnitTest
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.moduleApi.AppConfirmationConfirmIdentityRequestModuleApi
 import com.simprints.id.testtools.moduleApi.AppEnrolRequestModuleApi
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class CheckLoginFromIntentActivityTest : BaseUnitTest() {
+class CheckLoginFromIntentActivityTest {
 
-    @Before
-    override fun setUp() {
-        super.setUp()
-    }
 
     @Test
     fun `confirmationText should be visible in AppConfirmIdentity Requests`() {

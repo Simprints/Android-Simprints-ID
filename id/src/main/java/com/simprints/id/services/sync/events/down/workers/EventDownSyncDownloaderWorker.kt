@@ -5,7 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -22,6 +22,7 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 @HiltWorker
@@ -31,8 +32,9 @@ class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private val downSyncHelper: EventDownSyncHelper,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val syncCache: EventSyncCache,
+    private val eventDownSyncDownloaderTask: EventDownSyncDownloaderTask,
     private val jsonHelper: JsonHelper,
-    private val dispatcher: DispatcherProvider,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     companion object {
@@ -42,9 +44,6 @@ class EventDownSyncDownloaderWorker @AssistedInject constructor(
     }
 
     override val tag: String = EventDownSyncDownloaderWorker::class.java.simpleName
-
-    internal var eventDownSyncDownloaderTask: EventDownSyncDownloaderTask =
-        EventDownSyncDownloaderTaskImpl()
 
     private val downSyncOperationInput by lazy {
         val jsonInput = inputData.getString(INPUT_DOWN_SYNC_OPS)
@@ -58,7 +57,7 @@ class EventDownSyncDownloaderWorker @AssistedInject constructor(
         eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
     override suspend fun doWork(): Result =
-        withContext(dispatcher.io()) {
+        withContext(dispatcher) {
             try {
                 Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 

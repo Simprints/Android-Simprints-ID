@@ -4,13 +4,10 @@ import android.content.Context
 import androidx.fragment.app.testing.launchFragment
 import androidx.lifecycle.Observer
 import androidx.preference.Preference
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -18,7 +15,6 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
-import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -38,36 +34,16 @@ class SettingsAboutFragmentTest {
         private const val SCANNER_VERSION = "SCANNER_VERSION"
     }
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
-
     private val projectConfiguration = mockk<ProjectConfiguration>()
     private val viewModel = mockk<SettingsAboutViewModel>()
-    private val settingsAboutViewModelFactory = mockk<SettingsAboutViewModelFactory>()
-
-    private val viewModelModule by lazy {
-        TestViewModelModule(
-            settingAboutModelFactoryRule = DependencyRule.ReplaceRule {
-                settingsAboutViewModelFactory
-            }
-        )
-    }
-
-    private val module by lazy { TestAppModule(app) }
 
     @Before
     fun setup() {
-        UnitTestConfig(module, viewModelModule = viewModelModule).fullSetup()
 
         mockkStatic("com.simprints.id.tools.extensions.Context_extKt")
         every { any<Context>().packageVersionName } returns VERSION
         every { any<Context>().deviceId } returns DEVICE_ID
 
-        every {
-            settingsAboutViewModelFactory.create<SettingsAboutViewModel>(
-                any(),
-                any()
-            )
-        } returns viewModel
         every { viewModel.configuration } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<ProjectConfiguration>>().onChanged(projectConfiguration)

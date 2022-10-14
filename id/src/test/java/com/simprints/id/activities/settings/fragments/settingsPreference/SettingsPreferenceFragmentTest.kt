@@ -4,15 +4,11 @@ import androidx.fragment.app.testing.launchFragment
 import androidx.lifecycle.Observer
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
@@ -30,32 +26,11 @@ class SettingsPreferenceFragmentTest {
         private const val LANGUAGE_2 = "en"
     }
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
-
     private val generalConfiguration = mockk<GeneralConfiguration>()
     private val viewModel = mockk<SettingsPreferenceViewModel>()
-    private val settingsPreferenceViewModelFactory = mockk<SettingsPreferenceViewModelFactory>()
-
-    private val viewModelModule by lazy {
-        TestViewModelModule(
-            settingsPreferenceViewModelFactoryRule = DependencyRule.ReplaceRule {
-                settingsPreferenceViewModelFactory
-            }
-        )
-    }
-
-    private val module by lazy { TestAppModule(app) }
 
     @Before
     fun setup() {
-        UnitTestConfig(module, viewModelModule = viewModelModule).fullSetup()
-
-        every {
-            settingsPreferenceViewModelFactory.create<SettingsPreferenceViewModel>(
-                any(),
-                any()
-            )
-        } returns viewModel
 
         every { generalConfiguration.languageOptions } returns listOf(LANGUAGE_1, LANGUAGE_2)
         every { viewModel.generalConfiguration } returns mockk {

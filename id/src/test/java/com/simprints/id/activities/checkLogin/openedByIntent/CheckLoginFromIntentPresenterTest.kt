@@ -3,8 +3,6 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.os.Build
 import android.os.Build.VERSION
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.callout.*
@@ -27,9 +25,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
-import com.simprints.id.secure.models.SecurityState.Status.RUNNING
-import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
@@ -60,9 +55,6 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var view: CheckLoginFromIntentContract.View
 
     @MockK
-    lateinit var appComponent: AppComponent
-
-    @MockK
     lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
@@ -70,12 +62,6 @@ class CheckLoginFromIntentPresenterTest {
 
     @MockK
     lateinit var eventRepositoryMock: EventRepository
-
-    @MockK
-    lateinit var securityStateRepositoryMock: SecurityStateRepository
-
-    @MockK
-    lateinit var timeHelperMock: TimeHelper
 
     @MockK
     lateinit var simNetworkUtilsMock: SimNetworkUtils
@@ -89,43 +75,26 @@ class CheckLoginFromIntentPresenterTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        UnitTestConfig().coroutinesMainThread()
+
+        coEvery { enrolmentRecordManager.count(any()) } returns 0
+        every { simNetworkUtilsMock.connectionsStates } returns emptyList()
+        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        coEvery { configManager.getProjectConfiguration() } returns mockk(relaxed = true) {
+            every { general } returns generalConfiguration
+        }
+        coEvery { configManager.getDeviceConfiguration() } returns mockk(relaxed = true)
+        coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
+        coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
 
         presenter = CheckLoginFromIntentPresenter(
             view,
             DEFAULT_DEVICE_ID,
-            appComponent,
+            recentUserActivityManager,
+            eventRepositoryMock,
+            enrolmentRecordManager,
+            simNetworkUtilsMock,
             testCoroutineRule.testCoroutineDispatcher
         ).apply {
-            enrolmentRecordManager = this@CheckLoginFromIntentPresenterTest.enrolmentRecordManager
-            coEvery { enrolmentRecordManager.count(any()) } returns 0
-
-            recentUserActivityManager =
-                this@CheckLoginFromIntentPresenterTest.recentUserActivityManager
-
-            simNetworkUtils = simNetworkUtilsMock
-            every { simNetworkUtils.connectionsStates } returns emptyList()
-
-            loginManager = loginManagerMock.apply {
-                every { getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-            }
-            LanguageHelper.prefs = mockk(relaxed = true)
-            configManager = this@CheckLoginFromIntentPresenterTest.configManager.apply {
-                coEvery { getProjectConfiguration() } returns mockk(relaxed = true) {
-                    every { general } returns generalConfiguration
-                }
-                coEvery { getDeviceConfiguration() } returns mockk(relaxed = true)
-            }
-            eventRepository = eventRepositoryMock
-            timeHelper = timeHelperMock
-            coEvery { timeHelper.now() } returns CREATED_AT
-
-            coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-            coEvery { eventRepository.getEventsFromSession(any()) } returns emptyFlow()
-
-            securityStateRepository = securityStateRepositoryMock
-            coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns RUNNING
-
             appRequest = AppVerifyRequest(
                 DEFAULT_PROJECT_ID,
                 DEFAULT_USER_ID,

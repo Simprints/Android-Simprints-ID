@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import android.os.Bundle
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
@@ -12,21 +11,16 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
-import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,28 +38,6 @@ class LoginActivityTest {
 
     private val authenticationHelper: AuthenticationHelper = mockk(relaxed = true)
     private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
-
-    private val viewModelModule by lazy {
-        TestViewModelModule(
-            loginViewModelFactoryRule = DependencyRule.ReplaceRule {
-                LoginViewModelFactory(authenticationHelper, dispatcherProvider)
-            }
-        )
-    }
-
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
-
-    private val module by lazy {
-        TestAppModule(
-            app,
-            sessionEventsLocalDbManagerRule = DependencyRule.MockkRule
-        )
-    }
-
-    @Before
-    fun setUp() {
-        UnitTestConfig(module, viewModelModule = viewModelModule).fullSetup().inject(this)
-    }
 
     @Test
     fun withSuccessConfirmViews() {

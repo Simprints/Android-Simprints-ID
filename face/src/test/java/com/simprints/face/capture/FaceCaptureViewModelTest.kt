@@ -9,6 +9,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -47,7 +48,7 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `save face detections should not be called when image saving strategy set to NEVER`() {
-        testCoroutineRule.runBlockingTest {
+        runTest {
             val vm = buildViewModel(ImageSavingStrategy.NEVER)
             vm.captureFinished(faceDetections)
             vm.flowFinished()
@@ -57,7 +58,7 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `save face detections should be called when image saving strategy set to ONLY_GOO_SCAN`() {
-        testCoroutineRule.runBlockingTest {
+        runTest {
             val vm = buildViewModel(ImageSavingStrategy.ONLY_GOOD_SCAN)
             vm.captureFinished(faceDetections)
             vm.flowFinished()

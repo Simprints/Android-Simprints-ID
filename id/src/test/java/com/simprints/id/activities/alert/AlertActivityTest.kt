@@ -15,6 +15,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
@@ -28,13 +29,10 @@ import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivi
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.testtools.android.hasImage
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import io.mockk.coEvery
@@ -51,7 +49,7 @@ import javax.inject.Inject
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class AlertActivityTest {
 
-    private val app = ApplicationProvider.getApplicationContext<Application>()
+    private val app = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
     @Inject
     lateinit var configManager: ConfigManager
@@ -59,18 +57,8 @@ class AlertActivityTest {
     private val generalConfiguration = mockk<GeneralConfiguration>()
     private val eventRepository = mockk<EventRepository>(relaxed = true)
 
-    private val module by lazy {
-        TestAppModule(
-            app,
-            eventRepositoryRule = DependencyRule.ReplaceRule {
-                eventRepository
-            },
-        )
-    }
-
     @Before
     fun setUp() {
-        UnitTestConfig(module, viewModelModule = TestViewModelModule()).initComponent().inject(this)
         Intents.init()
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
@@ -129,7 +117,10 @@ class AlertActivityTest {
 
     @Test
     fun bothModalitiesEnrolLastBiometricsFailed_theRightAlertShouldAppear() {
-        every { generalConfiguration.modalities } returns listOf(Modality.FACE, Modality.FINGERPRINT)
+        every { generalConfiguration.modalities } returns listOf(
+            Modality.FACE,
+            Modality.FINGERPRINT
+        )
         launchAlertActivity(AlertActRequest(AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED))
         ensureAlertScreenLaunched(
             AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED,
@@ -218,7 +209,10 @@ class AlertActivityTest {
 
     @Test
     fun bothModalitiesGuidNotFoundOffline_userClicksBack_shouldStartExitForm() {
-        every { generalConfiguration.modalities } returns listOf(Modality.FACE, Modality.FINGERPRINT)
+        every { generalConfiguration.modalities } returns listOf(
+            Modality.FACE,
+            Modality.FINGERPRINT
+        )
         val scenario = launchAlertActivity(AlertActRequest(AlertType.GUID_NOT_FOUND_OFFLINE))
         ensureAlertScreenLaunched(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE)
         pressBackUnconditionally()

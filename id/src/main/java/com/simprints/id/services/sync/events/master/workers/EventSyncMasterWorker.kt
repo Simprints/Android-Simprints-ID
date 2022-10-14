@@ -3,7 +3,7 @@ package com.simprints.id.services.sync.events.master.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
@@ -16,6 +16,7 @@ import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.*
 
@@ -29,7 +30,7 @@ open class EventSyncMasterWorker @AssistedInject constructor(
     private val eventSyncCache: EventSyncCache,
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
     private val timeHelper: TimeHelper,
-    private val dispatcher: DispatcherProvider,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
 
     companion object {
@@ -44,8 +45,7 @@ open class EventSyncMasterWorker @AssistedInject constructor(
 
     override val tag: String = EventSyncMasterWorker::class.java.simpleName
 
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(appContext)
+    private val wm = WorkManager.getInstance(appContext)
 
     private val syncWorkers
         get() = wm.getAllSubjectsSyncWorkersInfo().get().apply {
@@ -59,7 +59,7 @@ open class EventSyncMasterWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result =
-        withContext(dispatcher.io()) {
+        withContext(dispatcher) {
             try {
                 crashlyticsLog("Start")
                 val configuration = configManager.getProjectConfiguration()

@@ -19,6 +19,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import java.io.Serializable
@@ -106,7 +107,7 @@ class FaceMatchViewModelTest {
     }
 
     @Test
-    fun `Send events with correct values for identification`() = testCoroutineRule.runBlockingTest {
+    fun `Send events with correct values for identification`() = runTest {
         viewModel = newFaceMatchViewModel()
         every { masterFlowManager.getCurrentAction() } returns Action.IDENTIFY
         // Doing this way so I can compare later
@@ -165,7 +166,7 @@ class FaceMatchViewModelTest {
     }
 
     @Test
-    fun `Send events with correct values for verification`() = testCoroutineRule.runBlockingTest {
+    fun `Send events with correct values for verification`() = runTest {
         viewModel = newFaceMatchViewModel()
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         // Doing this way so I can compare later

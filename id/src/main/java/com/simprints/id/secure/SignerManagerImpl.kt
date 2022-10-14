@@ -37,7 +37,6 @@ class SignerManagerImpl @Inject constructor(
         loginManager.signOut()
         syncManager.cancelBackgroundSyncs()
         eventSyncManager.deleteSyncInfo()
-        configManager.clearData()
         longConsentRepository.deleteLongConsents()
         simNetwork.resetApiBaseUrl()
         configManager.clearData()

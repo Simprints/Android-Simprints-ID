@@ -1,7 +1,6 @@
 package com.simprints.id.activities.longConsent
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -10,19 +9,15 @@ import com.simprints.id.R
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,28 +41,6 @@ class PrivacyNoticeActivityUnitTest {
             listOf(),
             ""
         )
-    }
-
-    private val viewModelModule by lazy {
-        TestViewModelModule(
-            privacyViewModelFactoryRule = DependencyRule.ReplaceRule {
-                PrivacyNoticeViewModelFactory(
-                    longConsentRepository,
-                    configManager,
-                    testCoroutineRule.testCoroutineDispatcher
-                )
-            }
-        )
-    }
-
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
-    private val module by lazy {
-        TestAppModule(app)
-    }
-
-    @Before
-    fun setUp() {
-        UnitTestConfig(module, viewModelModule = viewModelModule).fullSetup().inject(this)
     }
 
     @Test
