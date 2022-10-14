@@ -2,19 +2,14 @@ package com.simprints.id.activities.longConsent
 
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_MESSAGE
 import com.simprints.id.activities.login.SYNC_CARD_FAILED_BACKEND_MAINTENANCE_STATE_TIMED_MESSAGE
-import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.di.TestAppModule
 import com.simprints.id.tools.device.DeviceManager
-import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -28,35 +23,15 @@ class PrivacyNoticeActivityTest {
     private val language = "en"
 
     @MockK
-    lateinit var viewModelFactory: PrivacyNoticeViewModelFactory
-
-    @MockK
     lateinit var deviceManager: DeviceManager
 
     @MockK
     lateinit var viewModel: PrivacyNoticeViewModel
 
-    private val app = ApplicationProvider.getApplicationContext<Application>()
-
-    private val testViewModelModule = TestViewModelModule(
-        privacyViewModelFactoryRule = DependencyRule.ReplaceRule {
-            viewModelFactory
-        }
-    )
-    private val appModule by lazy {
-        TestAppModule(app, deviceManagerRule = DependencyRule.ReplaceRule { deviceManager })
-    }
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
-        every { viewModelFactory.create<PrivacyNoticeViewModel>(any(), any()) } returns viewModel
-
-        AndroidTestConfig(
-            appModule = appModule,
-            viewModelModule = testViewModelModule
-        ).initComponent().testAppComponent.inject(this)
 
     }
 

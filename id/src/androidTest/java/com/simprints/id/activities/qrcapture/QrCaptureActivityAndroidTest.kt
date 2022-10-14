@@ -7,12 +7,8 @@ import com.simprints.id.Application
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.activities.qrcapture.tools.QrPreviewBuilder
-import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.testtools.common.di.DependencyRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
 import org.junit.Before
@@ -26,36 +22,21 @@ class QrCaptureActivityAndroidTest {
 
     @MockK
     lateinit var mockCameraHelper: CameraHelper
+
     @MockK
     lateinit var mockQrPreviewBuilder: QrPreviewBuilder
+
     @MockK
     lateinit var mockQrCodeProducer: QrCodeProducer
+
     @MockK
     lateinit var mockChannel: Channel<String>
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    private val appModule by lazy {
-        TestAppModule(
-            app,
-            cameraHelperRule = DependencyRule.ReplaceRule {
-                mockCameraHelper
-            },
-            qrPreviewBuilderRule = DependencyRule.ReplaceRule {
-                mockQrPreviewBuilder
-            },
-            qrCodeProducerRule = DependencyRule.ReplaceRule {
-                mockQrCodeProducer.apply {
-                    every { qrCodeChannel } returns mockChannel
-                }
-            }
-        )
-    }
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        AndroidTestConfig(appModule).initComponent().testAppComponent.inject(this)
     }
 
     @Test

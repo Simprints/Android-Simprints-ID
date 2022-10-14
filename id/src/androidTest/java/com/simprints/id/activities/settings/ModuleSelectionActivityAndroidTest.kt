@@ -1,35 +1,25 @@
 package com.simprints.id.activities.settings
 
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaListInteractions.clickListItem
-import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.infra.config.ConfigManager
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Before
 import org.junit.Test
 
 class ModuleSelectionActivityAndroidTest {
 
-    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     lateinit var configManager: ConfigManager
 
     private val moduleIdsOptions = listOf("a", "b", "c", "d", "e")
     private val selectedModuleIds = listOf("b")
 
-    @Before
-    fun setUp() {
-        AndroidTestConfig().fullSetup().inject(this)
-        configManager = app.component.getConfigManager()
-    }
 
     @Test
     fun shouldLoadOnlyUnselectedModules() {

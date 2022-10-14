@@ -23,6 +23,7 @@ configurations {
 }
 android {
     defaultConfig {
+        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner = "com.simprints.fingerprint.CustomTestRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
