@@ -6,7 +6,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
@@ -26,6 +26,7 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
 
@@ -35,7 +36,7 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val upSyncHelper: EventUpSyncHelper,
     private val eventSyncCache: EventSyncCache,
-    private val dispatcher: DispatcherProvider,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
@@ -52,7 +53,7 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result =
-        withContext(dispatcher.io()) {
+        withContext(dispatcher) {
             try {
                 Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
 
@@ -99,9 +100,7 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
     }
 
     override suspend fun reportCount(count: Int) {
-        setProgress(
-            workDataOf(PROGRESS_UP_SYNC to count)
-        )
+        setProgress(workDataOf(PROGRESS_UP_SYNC to count))
     }
 
     companion object {

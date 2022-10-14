@@ -49,7 +49,13 @@ class FetchGuidViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        viewModel = FetchGuidViewModel(fetchGuidHelper, deviceManager, eventRepository, timeHelper, testDispatcherProvider)
+        viewModel = FetchGuidViewModel(
+            fetchGuidHelper,
+            deviceManager,
+            eventRepository,
+            timeHelper,
+            testDispatcherProvider
+        )
 
         configureMocks()
     }

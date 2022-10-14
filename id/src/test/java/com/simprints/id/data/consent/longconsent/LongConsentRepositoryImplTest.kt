@@ -8,7 +8,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -19,7 +18,6 @@ import java.net.SocketTimeoutException
 import java.nio.charset.Charset
 import kotlin.random.Random
 
-@ExperimentalCoroutinesApi
 class LongConsentRepositoryImplTest {
 
     companion object {
@@ -122,7 +120,9 @@ class LongConsentRepositoryImplTest {
     @Test
     fun `return error on failed network connection`() = runTest(StandardTestDispatcher()) {
         every { longConsentLocalDataSourceMock.getLongConsentText(any()) } returns ""
-        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws Exception(SocketTimeoutException())
+        coEvery { longConsentRemoteDataSourceMock.downloadLongConsent(any()) } throws Exception(
+            SocketTimeoutException()
+        )
 
         val states = mutableListOf<LongConsentFetchResult>()
         longConsentRepository.getLongConsentResultForLanguage(DEFAULT_LANGUAGE).toCollection(states)

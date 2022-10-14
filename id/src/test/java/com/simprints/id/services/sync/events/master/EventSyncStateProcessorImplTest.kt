@@ -1,9 +1,7 @@
 package com.simprints.id.services.sync.events.master
 
-import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.FAILED
@@ -19,10 +17,7 @@ import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.START_SYNC_REPORTER
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
-import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
@@ -33,11 +28,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventSyncStateProcessorImplTest {
 
     companion object {
@@ -63,7 +56,6 @@ class EventSyncStateProcessorImplTest {
     private val failedMasterWorkers: List<WorkInfo> =
         listOf(createWorkInfo(FAILED))
 
-    private val ctx: Context = ApplicationProvider.getApplicationContext()
 
     private var startSyncReporterWorker = MutableLiveData<List<WorkInfo>>()
     private var syncWorkersLiveData = MutableLiveData<List<WorkInfo>>()
@@ -78,10 +70,9 @@ class EventSyncStateProcessorImplTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig().setupWorkManager()
         MockKAnnotations.init(this)
         eventSyncStateProcessor =
-            EventSyncStateProcessorImpl(ctx, eventSyncCache, syncWorkersLiveDataProvider)
+            EventSyncStateProcessorImpl(eventSyncCache, syncWorkersLiveDataProvider)
         mockDependencies()
     }
 

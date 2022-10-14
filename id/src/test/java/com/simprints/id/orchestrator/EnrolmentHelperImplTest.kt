@@ -15,6 +15,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -50,39 +51,35 @@ class EnrolmentHelperImplTest {
     }
 
     @Test
-    fun enrol_shouldRegisterEnrolmentEvents() {
-        testCoroutineRule.runBlockingTest {
+    fun enrol_shouldRegisterEnrolmentEvents() = runTest {
 
-            enrolmentHelper.enrol(defaultSubject)
+        enrolmentHelper.enrol(defaultSubject)
 
-            val expectedEnrolmentEvent = EnrolmentEventV2(
-                CREATED_AT,
-                defaultSubject.subjectId,
-                defaultSubject.projectId,
-                defaultSubject.moduleId,
-                defaultSubject.attendantId,
-                personCreationEvent.id
-            )
+        val expectedEnrolmentEvent = EnrolmentEventV2(
+            CREATED_AT,
+            defaultSubject.subjectId,
+            defaultSubject.projectId,
+            defaultSubject.moduleId,
+            defaultSubject.attendantId,
+            personCreationEvent.id
+        )
 
-            coVerify {
-                eventRepository.addOrUpdateEvent(expectedEnrolmentEvent)
-            }
+        coVerify {
+            eventRepository.addOrUpdateEvent(expectedEnrolmentEvent)
         }
     }
 
     @Test
-    fun enrol_shouldEnrolANewSubject() {
-        testCoroutineRule.runBlockingTest {
-            enrolmentHelper.enrol(defaultSubject)
+    fun enrol_shouldEnrolANewSubject() = runTest {
+        enrolmentHelper.enrol(defaultSubject)
 
-            coVerify(exactly = 1) {
-                enrolmentRecordManager.performActions(listOf(SubjectAction.Creation(defaultSubject)))
-            }
+        coVerify(exactly = 1) {
+            enrolmentRecordManager.performActions(listOf(SubjectAction.Creation(defaultSubject)))
         }
     }
 
     @Test
-    fun `enrol should run correct actions`() = testCoroutineRule.runBlockingTest {
+    fun `enrol should run correct actions`() = runTest {
 
         enrolmentHelper.enrol(defaultSubject)
 

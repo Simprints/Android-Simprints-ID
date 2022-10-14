@@ -9,7 +9,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -31,6 +31,7 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 @HiltWorker
@@ -40,7 +41,7 @@ class EventDownSyncCountWorker @AssistedInject constructor(
     private val eventDownSyncHelper: EventDownSyncHelper,
     private val jsonHelper: JsonHelper,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-    private val dispatcher: DispatcherProvider,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
 
     companion object {
@@ -64,7 +65,7 @@ class EventDownSyncCountWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result =
-        withContext(dispatcher.io()) {
+        withContext(dispatcher) {
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
             try {
                 crashlyticsLog("Start - Params: $downSyncScope")

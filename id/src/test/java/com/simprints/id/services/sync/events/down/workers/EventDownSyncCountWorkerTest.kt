@@ -1,118 +1,132 @@
 package com.simprints.id.services.sync.events.down.workers
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.ListenableWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
+import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
+import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.*
-import kotlinx.coroutines.runBlocking
-import org.junit.Before
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventDownSyncCountWorkerTest {
 
     private val syncId = UUID.randomUUID().toString()
     private val tagForMasterSyncId = "${TAG_MASTER_SYNC_ID}$syncId"
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
-    private lateinit var countWorker: EventDownSyncCountWorker
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
-    @Before
-    fun setUp() {
-        countWorker = TestListenableWorkerBuilder<EventDownSyncCountWorker>(app)
-            .setTags(listOf(tagForMasterSyncId))
-            .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(projectDownSyncScope)))
-            .build()
+    private val eventDownSyncHelper = mockk<EventDownSyncHelper>()
+    private val eventDownSyncScopeRepository = mockk<EventDownSyncScopeRepository>()
 
-        app.component = mockk(relaxed = true)
-        with(countWorker) {
-            resultSetter = mockk(relaxed = true)
-            eventDownSyncHelper = mockk(relaxed = true)
-            jsonHelper = JsonHelper
-            eventDownSyncScopeRepository = mockk(relaxed = true)
-            dispatcher = testDispatcherProvider
-        }
-
-        coEvery { countWorker.eventDownSyncScopeRepository.refreshState(any()) } coAnswers { args.first() as com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation }
-    }
+    private val countWorker = EventDownSyncCountWorker(
+        mockk(relaxed = true),
+        mockk(relaxed = true) {
+            every { inputData } returns workDataOf(
+                INPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(
+                    projectDownSyncScope
+                )
+            )
+            every { tags } returns setOf(tagForMasterSyncId)
+        },
+        eventDownSyncHelper,
+        JsonHelper,
+        eventDownSyncScopeRepository,
+        testCoroutineRule.testCoroutineDispatcher
+    )
 
     @Test
     fun countWorker_shouldExtractTheDownSyncScopeFromTheRepo() {
-        runBlocking {
+        runTest {
             countWorker.doWork()
 
-            coVerify { countWorker.eventDownSyncScopeRepository.refreshState(any()) }
+            coVerify { eventDownSyncScopeRepository.refreshState(any()) }
         }
     }
 
     @Test
     fun countWorker_shouldExecuteTheTaskSuccessfully() {
-        runBlocking {
+        runTest {
             val counts = EventCount(SESSION_CAPTURE, 1)
             mockDependenciesToSucceed(counts)
 
-            countWorker.doWork()
+            val result = countWorker.doWork()
 
             val output = JsonHelper.toJson(listOf(counts))
             val expectedSuccessfulOutput = workDataOf(OUTPUT_COUNT_WORKER_DOWN to output)
-            verify { countWorker.resultSetter.success(expectedSuccessfulOutput) }
+            assertThat(result).isEqualTo(ListenableWorker.Result.success(expectedSuccessfulOutput))
         }
     }
 
     @Test
     fun countWorkerFailed_syncStillRunning_shouldRetry() {
-        runBlocking {
-            coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
-            coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns projectDownSyncScope
+        runTest {
+            coEvery { eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
+            coEvery {
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns projectDownSyncScope
             mockDependenciesToHaveSyncStillRunning()
 
-            countWorker.doWork()
+            val result = countWorker.doWork()
 
-            verify { countWorker.resultSetter.retry() }
+            assertThat(result).isEqualTo(ListenableWorker.Result.retry())
         }
     }
 
     @Test
     fun countWorkerFailed_syncIsNotRunning_shouldSucceed() {
-        runBlocking {
-            coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
-            coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns projectDownSyncScope
+        runTest {
+            coEvery { eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
+            coEvery {
+                eventDownSyncScopeRepository.getDownSyncScope(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns projectDownSyncScope
             mockDependenciesToHaveSyncNotRunning()
 
-            countWorker.doWork()
+            val result = countWorker.doWork()
 
-            verify { countWorker.resultSetter.success() }
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
     }
 
     private fun mockDependenciesToSucceed(counts: EventCount) {
-        coEvery { countWorker.eventDownSyncHelper.countForDownSync(any()) } returns listOf(counts)
-        coEvery { countWorker.eventDownSyncScopeRepository.getDownSyncScope(any(), any(), any()) } returns projectDownSyncScope
+        coEvery { eventDownSyncHelper.countForDownSync(any()) } returns listOf(counts)
+        coEvery {
+            eventDownSyncScopeRepository.getDownSyncScope(
+                any(),
+                any(),
+                any()
+            )
+        } returns projectDownSyncScope
     }
 
     private fun mockDependenciesToHaveSyncStillRunning() {
@@ -126,7 +140,16 @@ class EventDownSyncCountWorkerTest {
     private fun mockWorkManagerToReturnDownloaderWorkInfo(state: WorkInfo.State) {
         val mockWm = mockk<WorkManager>(relaxed = true)
         val mockWorkInfo = mockk<ListenableFuture<List<WorkInfo>>>()
-        every { mockWorkInfo.get() } returns listOf(WorkInfo(UUID.randomUUID(), state, workDataOf(), listOf(tagForMasterSyncId, tagForType(EventSyncWorkerType.DOWNLOADER)), workDataOf(), 2))
+        every { mockWorkInfo.get() } returns listOf(
+            WorkInfo(
+                UUID.randomUUID(),
+                state,
+                workDataOf(),
+                listOf(tagForMasterSyncId, tagForType(EventSyncWorkerType.DOWNLOADER)),
+                workDataOf(),
+                2
+            )
+        )
         every { mockWm.getWorkInfosByTag(any()) } returns mockWorkInfo
         countWorker.wm = mockWm
     }

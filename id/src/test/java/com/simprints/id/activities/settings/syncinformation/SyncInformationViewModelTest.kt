@@ -18,7 +18,6 @@ import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
@@ -76,7 +75,6 @@ class SyncInformationViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        UnitTestConfig().coroutinesMainThread()
 
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization } returns synchronizationConfiguration

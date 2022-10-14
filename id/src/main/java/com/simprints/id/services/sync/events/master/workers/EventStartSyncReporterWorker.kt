@@ -3,10 +3,11 @@ package com.simprints.id.services.sync.events.master.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 /**
@@ -21,13 +22,13 @@ import kotlinx.coroutines.withContext
 class EventStartSyncReporterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
-    private val dispatcher: DispatcherProvider,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
 
     override val tag: String = EventStartSyncReporterWorker::class.java.simpleName
 
     override suspend fun doWork(): Result =
-        withContext(dispatcher.io()) {
+        withContext(dispatcher) {
             try {
                 val syncId = inputData.getString(SYNC_ID_STARTED)
                 crashlyticsLog("Start - Params: $syncId")

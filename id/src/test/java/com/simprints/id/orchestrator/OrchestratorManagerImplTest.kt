@@ -25,8 +25,6 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
-import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
@@ -41,11 +39,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import splitties.init.appCtx
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class)
 class OrchestratorManagerImplTest {
 
 
@@ -90,10 +86,6 @@ class OrchestratorManagerImplTest {
         every { appCtx } returns mockk()
 
         every { WorkManager.getInstance(any()) } returns workManagerMock
-
-        UnitTestConfig()
-            .coroutinesMainThread()
-            .rescheduleRxMainThread()
 
         Intents.init()
 

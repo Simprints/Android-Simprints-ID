@@ -27,6 +27,7 @@ import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
@@ -96,7 +97,7 @@ class CollectFingerprintsViewModelTest {
             FingerPriorityDeterminer(),
             StartingStateDeterminer(),
             EncodingUtilsImplForTests,
-            testCoroutineRule.testCoroutineScope,
+            TestScope(),
             mockDispatcher
         )
     }

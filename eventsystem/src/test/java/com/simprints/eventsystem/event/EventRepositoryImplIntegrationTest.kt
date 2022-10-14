@@ -28,6 +28,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -68,7 +69,11 @@ class EventRepositoryImplIntegrationTest {
         db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java)
             .allowMainThreadQueries().build()
         eventDao = db.eventDao
-        eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory)
+        eventLocalDataSource = EventLocalDataSourceImpl(
+            eventDatabaseFactory,
+            UnconfinedTestDispatcher(),
+            UnconfinedTestDispatcher()
+        )
         eventRepo = EventRepositoryImpl(
             "",
             "",

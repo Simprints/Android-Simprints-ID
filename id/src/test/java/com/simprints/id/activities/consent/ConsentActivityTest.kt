@@ -4,7 +4,6 @@ import android.content.Intent
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.material.tabs.TabLayout
 import com.google.common.truth.Truth.assertThat
@@ -32,8 +31,6 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ConsentActivityTest {
-
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private var modalities = emptyList<GeneralConfiguration.Modality>()
 

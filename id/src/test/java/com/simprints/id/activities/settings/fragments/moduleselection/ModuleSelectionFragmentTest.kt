@@ -9,7 +9,6 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
-import com.simprints.id.activities.BaseUnitTest
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -17,7 +16,6 @@ import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.verify
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -28,12 +26,7 @@ import org.robolectric.annotation.Config
     application = TestApplication::class,
     shadows = [ShadowAndroidXMultiDex::class]
 )
-class ModuleSelectionFragmentTest : BaseUnitTest() {
-
-    @Before
-    override fun setUp() {
-        super.setUp()
-    }
+class ModuleSelectionFragmentTest {
 
     @Test
     fun onLaunchModuleSelectionFragmentConfirmSearchViewIsVisible() {

@@ -22,7 +22,6 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -163,7 +162,12 @@ class SyncInformationViewModel @Inject constructor(
         configManager.getDeviceConfiguration().selectedModules.map {
             ModuleCount(
                 it,
-                enrolmentRecordManager.count(SubjectQuery(projectId = loginManager.getSignedInProjectIdOrEmpty(), moduleId = it))
+                enrolmentRecordManager.count(
+                    SubjectQuery(
+                        projectId = loginManager.getSignedInProjectIdOrEmpty(),
+                        moduleId = it
+                    )
+                )
             )
         }
 

@@ -4,7 +4,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
@@ -27,8 +26,10 @@ class GuidSelectionManagerImplTest {
 
     @MockK
     private lateinit var loginManager: LoginManager
+
     @MockK
     private lateinit var timerHelper: TimeHelper
+
     @MockK
     private lateinit var eventRepository: EventRepository
 
@@ -36,7 +37,7 @@ class GuidSelectionManagerImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         guidSelectionManager =
-            GuidSelectionManagerImpl(DEFAULT_DEVICE_ID, loginManager, timerHelper, eventRepository)
+            GuidSelectionManagerImpl(loginManager, timerHelper, eventRepository)
         every { timerHelper.now() } returns CREATED_AT
         every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }

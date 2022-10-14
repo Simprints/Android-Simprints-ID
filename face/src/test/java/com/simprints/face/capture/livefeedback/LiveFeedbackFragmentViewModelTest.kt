@@ -7,7 +7,6 @@ import com.google.common.truth.Truth.assertThat
 import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.FixtureGenerator.getFace
-import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.Event
@@ -25,6 +24,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,10 +45,6 @@ class LiveFeedbackFragmentViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val mainVM: FaceCaptureViewModel = mockk(relaxUnitFun = true) {
-        every { attemptNumber } returns 0
-        every { samplesToCapture } returns 2
-    }
     private val configManager: ConfigManager = mockk {
         coEvery { getProjectConfiguration() } returns mockk {
             every { face } returns mockk {
@@ -63,7 +59,6 @@ class LiveFeedbackFragmentViewModelTest {
         every { now() } returns 0
     }
     private val viewModel = LiveFeedbackFragmentViewModel(
-        mainVM,
         faceDetector,
         frameProcessor,
         configManager,
@@ -82,7 +77,7 @@ class LiveFeedbackFragmentViewModelTest {
     }
 
     @Test
-    fun `process valid face correctly`() = testCoroutineRule.runBlockingTest {
+    fun `process valid face correctly`() = runTest {
         val previewFrameMock: PreviewFrame = mockk()
         val validFace: Face = getFace()
         every {
@@ -100,7 +95,7 @@ class LiveFeedbackFragmentViewModelTest {
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
 
-        viewModel.process(frame, rectF, size)
+        viewModel.process(frame, rectF, size, 2, 0)
 
         currentDetectionObserver.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -116,7 +111,7 @@ class LiveFeedbackFragmentViewModelTest {
     }
 
     @Test
-    fun `process invalid faces correctly`() = testCoroutineRule.runBlockingTest {
+    fun `process invalid faces correctly`() = runTest {
         val previewFrameMock: PreviewFrame = mockk()
         val smallFace: Face = getFace(Rect(0, 0, 30, 30))
         val bigFace: Face = getFace(Rect(0, 0, 80, 80))
@@ -138,9 +133,9 @@ class LiveFeedbackFragmentViewModelTest {
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
 
-        viewModel.process(frame, rectF, size)
-        viewModel.process(frame, rectF, size)
-        viewModel.process(frame, rectF, size)
+        viewModel.process(frame, rectF, size, 2, 0)
+        viewModel.process(frame, rectF, size, 2, 0)
+        viewModel.process(frame, rectF, size, 2, 0)
 
         currentDetectionObserver.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.TOOFAR)
@@ -152,7 +147,7 @@ class LiveFeedbackFragmentViewModelTest {
     }
 
     @Test
-    fun `save all valid captures without fallback image`() = testCoroutineRule.runBlockingTest {
+    fun `save all valid captures without fallback image`() = runTest {
         val faceDetectionId1 = "24d5d5da-c950-4da5-bfc6-99419a22bb08"
         val faceFallbackId1 = "76784a2b-7128-4cc6-8f15-b157e2000d8b"
         val faceCaptureId1 = "f0339487-5878-4ceb-8f33-fdbfaadcafe8"
@@ -175,8 +170,6 @@ class LiveFeedbackFragmentViewModelTest {
             )
         } returns previewFrameMock
         coEvery { faceDetector.analyze(previewFrameMock) } returns validFace
-        val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
-        every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
         every { faceTimeHelper.now() } returnsMany (0..100L).toList()
         every { UUID.randomUUID() } returnsMany listOf(
             UUID.fromString(faceDetectionId1),
@@ -194,10 +187,10 @@ class LiveFeedbackFragmentViewModelTest {
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
 
-        viewModel.process(frame, rectF, size)
+        viewModel.process(frame, rectF, size, 2, 0)
         viewModel.startCapture()
-        viewModel.process(frame, rectF, size)
-        viewModel.process(frame, rectF, size)
+        viewModel.process(frame, rectF, size, 2, 0)
+        viewModel.process(frame, rectF, size, 2, 0)
 
         currentDetectionObserver.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -224,7 +217,7 @@ class LiveFeedbackFragmentViewModelTest {
             assertThat(it[1].isFallback).isEqualTo(false)
         }
 
-        with(mainCapturedDetections.captured) {
+        with(viewModel.sortedQualifyingCaptures) {
             assertThat(size).isEqualTo(2)
             assertThat(get(0).face).isEqualTo(validFace)
             assertThat(get(0).isFallback).isEqualTo(false)
@@ -344,7 +337,7 @@ class LiveFeedbackFragmentViewModelTest {
 
     @Test
     fun `save at least one valid captures without fallback image`() =
-        testCoroutineRule.runBlockingTest {
+        runTest {
             val previewFrameMock: PreviewFrame = mockk()
             val validFace: Face = getFace()
             val noFace = null
@@ -361,17 +354,15 @@ class LiveFeedbackFragmentViewModelTest {
                 validFace,
                 noFace
             )
-            val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
-            every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
             every { faceTimeHelper.now() } returnsMany (0..100L).toList()
 
             val currentDetectionObserver = viewModel.currentDetection.testObserver()
             val capturingStateObserver = viewModel.capturingState.testObserver()
 
-            viewModel.process(frame, rectF, size)
+            viewModel.process(frame, rectF, size, 2, 0)
             viewModel.startCapture()
-            viewModel.process(frame, rectF, size)
-            viewModel.process(frame, rectF, size)
+            viewModel.process(frame, rectF, size, 2, 0)
+            viewModel.process(frame, rectF, size, 2, 0)
 
             currentDetectionObserver.observedValues.let {
                 assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -401,7 +392,7 @@ class LiveFeedbackFragmentViewModelTest {
                 }
             }
 
-            with(mainCapturedDetections.captured) {
+            with(viewModel.sortedQualifyingCaptures) {
                 assertThat(size).isEqualTo(1)
                 assertThat(get(0).face).isEqualTo(validFace)
                 assertThat(get(0).isFallback).isEqualTo(false)
@@ -416,7 +407,7 @@ class LiveFeedbackFragmentViewModelTest {
      * but then moved the phone very fast and didn't capture anything
      */
     @Test
-    fun `use fallback image if all captures are invalid`() = testCoroutineRule.runBlockingTest {
+    fun `use fallback image if all captures are invalid`() = runTest {
         val previewFrameMock: PreviewFrame = mockk()
         val validFace: Face = getFace()
         val tooFarFace = getFace(Rect(0, 0, 30, 30))
@@ -434,18 +425,16 @@ class LiveFeedbackFragmentViewModelTest {
             tooFarFace,
             noFace
         )
-        val mainCapturedDetections: CapturingSlot<List<FaceDetection>> = slot()
-        every { mainVM.captureFinished(capture(mainCapturedDetections)) } just Runs
         every { faceTimeHelper.now() } returnsMany (0..100L).toList()
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
 
         // This means the button turned green, the user clicked and then moved the camera away
-        viewModel.process(frame, rectF, size)
+        viewModel.process(frame, rectF, size, 2, 0)
         viewModel.startCapture()
-        viewModel.process(frame, rectF, size)
-        viewModel.process(frame, rectF, size)
+        viewModel.process(frame, rectF, size, 2, 0)
+        viewModel.process(frame, rectF, size, 2, 0)
 
         currentDetectionObserver.observedValues.let {
             assertThat(it[0]?.status).isEqualTo(FaceDetection.Status.VALID)
@@ -465,7 +454,7 @@ class LiveFeedbackFragmentViewModelTest {
             assertThat(face).isEqualTo(tooFarFace)
         }
 
-        with(mainCapturedDetections.captured[0]) {
+        with(viewModel.sortedQualifyingCaptures[0]) {
             assertThat(face).isEqualTo(validFace)
             assertThat(isFallback).isEqualTo(true)
         }

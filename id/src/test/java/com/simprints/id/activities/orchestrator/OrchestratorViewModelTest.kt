@@ -17,12 +17,12 @@ import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.ENROL
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,6 +31,9 @@ class OrchestratorViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
     private lateinit var eventRepositoryMock: EventRepository
@@ -58,10 +61,6 @@ class OrchestratorViewModelTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig()
-            .rescheduleRxMainThread()
-            .coroutinesMainThread()
-
         MockKAnnotations.init(this, relaxed = true)
 
         liveDataAppResponse = MutableLiveData()
@@ -74,7 +73,8 @@ class OrchestratorViewModelTest {
             orchestratorEventsHelperMock,
             configManager,
             eventRepositoryMock,
-            domainToModuleApiConverter
+            domainToModuleApiConverter,
+            testCoroutineRule.testCoroutineDispatcher
         )
     }
 
@@ -92,7 +92,7 @@ class OrchestratorViewModelTest {
 
     @Test
     fun viewModelStart_shouldStartOrchestrator() {
-        runBlocking {
+        runTest {
             vm.startModalityFlow(enrolAppRequest)
             coVerify(exactly = 1) {
                 orchestratorManagerMock.initialise(
@@ -106,7 +106,7 @@ class OrchestratorViewModelTest {
 
     @Test
     fun viewModelStart_shouldForwardResultToOrchestrator() {
-        runBlocking {
+        runTest {
             vm.onModalStepRequestDone(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
             coVerify(exactly = 1) {
                 orchestratorManagerMock.handleIntentResult(
@@ -121,7 +121,7 @@ class OrchestratorViewModelTest {
 
     @Test
     fun orchestratorCreatesAppResponse_viewModelShouldAddACallbackEvent() {
-        runBlocking {
+        runTest {
             vm.appResponse.observeForever {}
 
             liveDataAppResponse.postFakeAppResponse<AppEnrolResponse>(ENROL)

@@ -1,17 +1,12 @@
 package com.simprints.id.activities.settings.syncinformation
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.di.TestAppModule
-import com.simprints.id.testtools.di.TestDataModule
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
@@ -20,7 +15,6 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.coVerify
 import io.mockk.mockk
-import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -32,15 +26,6 @@ import org.robolectric.fakes.RoboMenuItem
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class SyncInformationActivityTest {
 
-    private val app = ApplicationProvider.getApplicationContext<Application>()
-    private val appModule by lazy {
-        TestAppModule(app)
-    }
-
-    private val dataModule by lazy {
-        TestDataModule()
-    }
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -51,14 +36,6 @@ class SyncInformationActivityTest {
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
     private val imageRepository: ImageRepository = mockk(relaxed = true)
     private val configManager = mockk<ConfigManager>()
-
-    @Before
-    fun setUp() {
-        UnitTestConfig(
-            appModule,
-            dataModule = dataModule,
-        ).fullSetup().inject(this)
-    }
 
     @Test
     @Ignore("We are ignoring some robo tests until we finish the update to hilt")
