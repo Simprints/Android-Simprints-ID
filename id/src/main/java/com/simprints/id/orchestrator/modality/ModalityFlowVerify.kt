@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
+import com.simprints.core.DeviceID
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -20,14 +21,15 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.login.LoginManager
+import javax.inject.Inject
 
-class ModalityFlowVerify(
+class ModalityFlowVerify @Inject constructor(
     private val fingerprintStepProcessor: FingerprintStepProcessor,
     private val faceStepProcessor: FaceStepProcessor,
     private val coreStepProcessor: CoreStepProcessor,
     configManager: ConfigManager,
     loginManager: LoginManager,
-    deviceId: String
+    @DeviceID deviceId: String
 ) :
     ModalityFlowBaseImpl(
         coreStepProcessor,
