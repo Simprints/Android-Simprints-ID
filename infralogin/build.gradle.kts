@@ -40,9 +40,6 @@ dependencies {
 
     implementation(libs.androidX.core)
 
-    implementation(libs.dagger.core)
-    kapt(libs.dagger.compiler)
-
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 

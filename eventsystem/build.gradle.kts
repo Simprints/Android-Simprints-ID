@@ -36,28 +36,26 @@ android {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
 }
 
 dependencies {
     api(project(":core"))
-    api(project(":moduleapi"))
+    implementation(project(":moduleapi"))
     implementation(project(":infraconfig"))
     implementation(project(":infralogging"))
     implementation(project(":infralogin"))
     api(project(":infranetwork"))
     implementation(project(":infrasecurity"))
 
-    api(libs.androidX.room.core)
     implementation(libs.androidX.room.ktx)
     kapt(libs.androidX.room.compiler)
 
-    implementation(libs.androidX.core)
     implementation(libs.kotlin.coroutinesAndroid)
-    implementation(libs.jackson.core)
 
-    api(libs.retrofit.okhttp)
-    api(libs.retrofit.core)
-    api(libs.sqlCipher.core)
+    implementation(libs.sqlCipher.core)
 
     // DI
     implementation(libs.hilt)
@@ -79,3 +77,4 @@ dependencies {
 
     androidTestImplementation(project(":infraenrolmentrecords"))
 }
+

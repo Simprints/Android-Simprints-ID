@@ -3,7 +3,13 @@ package com.simprints.id.activities.alert
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.provider.Settings
+import android.view.View
+import android.widget.ImageView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
@@ -12,6 +18,7 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
+import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -28,22 +35,20 @@ import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
-import com.simprints.testtools.android.hasImage
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import org.hamcrest.Description
+import org.hamcrest.Matcher
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -278,3 +283,32 @@ class AlertActivityTest {
     }
 }
 
+fun hasImage(drawableId: Int): Matcher<View> {
+    return object : BoundedMatcher<View, ImageView>(ImageView::class.java) {
+
+        override fun describeTo(description: Description) {
+            description.appendText("has image with drawable ID: $drawableId")
+        }
+
+        override fun matchesSafely(view: ImageView): Boolean {
+            return assertDrawable(view.drawable, drawableId, view)
+        }
+    }
+}
+
+private fun assertDrawable(actual: Drawable, expectedId: Int, v: View): Boolean {
+    if (actual !is BitmapDrawable) {
+        return false
+    }
+
+    var expectedBitmap: Bitmap? = null
+    return try {
+        expectedBitmap = BitmapFactory.decodeResource(v.context.resources, expectedId)
+        actual.bitmap.sameAs(expectedBitmap)
+    } catch (error: OutOfMemoryError) {
+        return false
+
+    } finally {
+        expectedBitmap?.recycle()
+    }
+}

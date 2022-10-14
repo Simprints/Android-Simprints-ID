@@ -10,10 +10,10 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState
-import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -24,6 +24,7 @@ import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.TimeUnit
 
 class DashboardActivityAndroidTest {
 
@@ -60,7 +61,7 @@ class DashboardActivityAndroidTest {
 
         ActivityScenario.launch(DashboardActivity::class.java)
 
-        waitOnUi(1000)
+        sleep(1000, TimeUnit.MILLISECONDS)
 
         coVerify(exactly = 0) { mockViewModel.syncIfRequired() }
 
@@ -82,7 +83,7 @@ class DashboardActivityAndroidTest {
 
         ActivityScenario.launch(DashboardActivity::class.java)
 
-        waitOnUi(1000)
+        sleep(1000, TimeUnit.MILLISECONDS)
 
         coVerify(exactly = 1) { mockViewModel.syncIfRequired() }
 

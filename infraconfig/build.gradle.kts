@@ -38,7 +38,7 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":infranetwork"))
+    api(project(":infranetwork"))
     implementation(project(":infralogging"))
     implementation(project(":infralogin"))
     implementation(project(":infrasecurity"))
@@ -54,10 +54,6 @@ dependencies {
     implementation(libs.hilt.work)
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
-
-    implementation(libs.jackson.core)
-
-    implementation(libs.retrofit.core)
 
     // Unit Tests
     testImplementation(project(":testtools"))
