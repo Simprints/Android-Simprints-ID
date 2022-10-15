@@ -202,6 +202,7 @@ class DashboardActivity : BaseSplitActivity() {
     override fun onResume() {
         super.onResume()
         loadDailyActivity()
+
     }
 
     @ObsoleteCoroutinesApi

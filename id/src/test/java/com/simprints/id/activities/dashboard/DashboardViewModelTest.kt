@@ -103,6 +103,7 @@ class DashboardViewModelTest {
             syncCardStateRepository,
             dailyActivityRepository,
             configManager,
+            testCoroutineRule.testCoroutineDispatcher
         )
     }
 }

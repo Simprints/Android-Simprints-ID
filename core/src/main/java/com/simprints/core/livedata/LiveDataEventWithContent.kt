@@ -30,5 +30,5 @@ open class LiveDataEventWithContent<out T>(private val content: T) {
 }
 
 fun <T> MutableLiveData<LiveDataEventWithContent<T>>.send(content: T) {
-    this.value = LiveDataEventWithContent(content)
+    this.postValue(LiveDataEventWithContent(content))
 }
