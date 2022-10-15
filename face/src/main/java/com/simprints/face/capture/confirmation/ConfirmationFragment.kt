@@ -32,9 +32,11 @@ class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
 
     @Inject
     lateinit var faceTimeHelper: FaceTimeHelper
-    private val startTime = faceTimeHelper.now()
+
+    private var startTime: Long = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        startTime = faceTimeHelper.now()
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 
