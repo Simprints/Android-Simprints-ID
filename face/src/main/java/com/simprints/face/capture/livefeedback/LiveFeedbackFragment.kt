@@ -5,6 +5,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.otaliastudios.cameraview.frame.Frame
@@ -27,7 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FrameProcessor {
-    private val mainVm: FaceCaptureViewModel by viewModels()
+    private val mainVm: FaceCaptureViewModel by activityViewModels()
     private val vm: LiveFeedbackFragmentViewModel by viewModels()
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 

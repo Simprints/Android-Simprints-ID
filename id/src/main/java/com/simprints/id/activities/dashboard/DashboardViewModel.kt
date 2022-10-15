@@ -3,6 +3,7 @@ package com.simprints.id.activities.dashboard
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
 import com.simprints.id.activities.dashboard.cards.daily_activity.model.DashboardDailyActivityState
 import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
@@ -13,7 +14,6 @@ import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +23,7 @@ class DashboardViewModel @Inject constructor(
     private val syncCardStateRepository: DashboardSyncCardStateRepository,
     private val dailyActivityRepository: DashboardDailyActivityRepository,
     private val configManager: ConfigManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val consentRequiredLiveData = MutableLiveData<Boolean>()
