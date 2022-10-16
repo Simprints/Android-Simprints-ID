@@ -22,8 +22,6 @@ interface ComponentBluetoothAdapter {
 
     fun getBondedDevices(): Set<ComponentBluetoothDevice>
 
-    fun enable(): Boolean
-
     companion object {
         const val ACTION_STATE_CHANGED = "android.bluetooth.adapter.action.STATE_CHANGED"
         const val EXTRA_STATE = "android.bluetooth.adapter.extra.STATE"
