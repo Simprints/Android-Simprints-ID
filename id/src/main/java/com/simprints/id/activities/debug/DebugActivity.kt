@@ -18,7 +18,7 @@ import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
-import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
+import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.services.config.RemoteConfigScheduler
 import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.securitystate.SecurityStateScheduler
@@ -46,7 +46,7 @@ class DebugActivity : BaseSplitActivity() {
     lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
 
     @Inject
-    lateinit var securityStateRepository: SecurityStateRepository
+    lateinit var securityStateRepository: SecurityStateLocalDataSource
 
     @Inject
     lateinit var securityStateProcessor: SecurityStateProcessor
@@ -185,14 +185,10 @@ class DebugActivity : BaseSplitActivity() {
 
     private fun setSecurityStatus(status: SecurityState.Status) {
         lifecycleScope.launch {
-            with(securityStateRepository.securityStatusChannel) {
-                if (!isClosedForSend) {
-                    send(status)
-                    securityStateProcessor.processSecurityState(
-                        SecurityState("device-id", status)
-                    )
-                }
-            }
+            securityStateRepository.securityStatus=status
+            securityStateProcessor.processSecurityState(
+                SecurityState("device-id", status)
+            )
         }
     }
 

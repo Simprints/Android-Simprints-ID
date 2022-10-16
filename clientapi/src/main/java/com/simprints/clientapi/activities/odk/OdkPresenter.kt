@@ -17,13 +17,15 @@ import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class OdkPresenter(
-    private val view: OdkContract.View,
-    private val action: OdkAction,
+class OdkPresenter @AssistedInject constructor(
+    @Assisted private val view: OdkContract.View,
+    @Assisted private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
     rootManager: SecurityManager,
     sharedPreferencesManager: SharedPreferencesManager

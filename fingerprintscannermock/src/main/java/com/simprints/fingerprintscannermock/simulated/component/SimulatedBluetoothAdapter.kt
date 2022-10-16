@@ -17,8 +17,4 @@ class SimulatedBluetoothAdapter(private val simulatedScannerManager: SimulatedSc
 
     override fun getBondedDevices(): Set<ComponentBluetoothDevice> = simulatedScannerManager.pairedScanners
 
-    override fun enable(): Boolean {
-        simulatedScannerManager.isAdapterEnabled = true
-        return true
-    }
 }

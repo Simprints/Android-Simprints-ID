@@ -28,6 +28,4 @@ class AndroidRecordBluetoothAdapter(private val adapter: BluetoothAdapter?,
             adapter!!.bondedDevices
                     .map { AndroidRecordBluetoothDevice(it, fileWithFakeBytes) }
                     .toSet()
-
-    override fun enable(): Boolean = adapter!!.enable()
 }

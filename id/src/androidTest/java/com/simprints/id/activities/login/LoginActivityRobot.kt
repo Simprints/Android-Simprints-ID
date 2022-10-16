@@ -89,10 +89,6 @@ class LoginActivityRobot(
         shouldMatchSuppliedProjectIdAndIntentProjectId(false)
     }
 
-    fun withSecurityStatusRunning() {
-        every { mockLoginActivityHelper.isSecurityStatusRunning() } returns true
-    }
-
     fun receiveValidQrCodeResponse() {
         every {
             mockLoginActivityHelper.tryParseQrCodeResponse(any())
