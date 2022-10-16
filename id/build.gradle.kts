@@ -9,6 +9,7 @@ plugins {
     id("com.google.firebase.appdistribution")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("dagger.hilt.android.plugin")
 }
 
 apply {
@@ -134,8 +135,15 @@ dependencies {
 
     implementation(libs.rxJava2.core)
     kapt(libs.androidX.room.compiler)
-    kapt(libs.dagger.compiler)
+
+
+    // Service Location & DI
+    implementation(libs.koin.core)
     implementation(libs.koin.android)
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
+    kapt(libs.dagger.compiler)
+
     implementation(libs.fuzzywuzzy.core)
     implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)
@@ -188,7 +196,7 @@ dependencies {
     testImplementation(libs.testing.espresso.core)
     testImplementation(libs.testing.espresso.intents)
     testImplementation(libs.testing.truth)
-    testImplementation(libs.testing.koTest.kotlin)
+    testImplementation(libs.testing.koTest.kotlin.assert)
 
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.koin)

@@ -9,20 +9,26 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
+import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.core.module.Module
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-open class Application : CoreApplication() {
+@HiltAndroidApp
+open class Application: CoreApplication() {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
+    private lateinit var applicationScope: CoroutineScope
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
@@ -50,6 +56,13 @@ open class Application : CoreApplication() {
             .build()
     }
 
+    open fun createApplicationCoroutineScope() {
+        // For operations that shouldn’t be cancelled,
+        // call them from a coroutine created by an
+        // application CoroutineScope
+        applicationScope = CoroutineScope(SupervisorJob())
+    }
+
     override fun onCreate() {
         super.onCreate()
         initApplication()
@@ -58,6 +71,7 @@ open class Application : CoreApplication() {
     open fun initApplication() {
         createComponent()
         handleUndeliverableExceptionInRxJava()
+        createApplicationCoroutineScope()
         initKoin()
         SimberBuilder.initialize(this)
         Simber.tag(DEVICE_ID, true).i(deviceId)
@@ -87,6 +101,9 @@ open class Application : CoreApplication() {
             androidContext(this@Application)
             loadKoinModules(listOf(module(override = true) {
                 this.defineBuildersForCoreManagers()
+                single(qualifier = named(APPLICATION_COROUTINE_SCOPE)) {
+                    applicationScope
+                }
             }))
         }
     }
@@ -113,4 +130,7 @@ open class Application : CoreApplication() {
         stopKoin()
     }
 
+    companion object {
+        const val APPLICATION_COROUTINE_SCOPE = "application_coroutine_scope"
+    }
 }

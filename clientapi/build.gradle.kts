@@ -53,11 +53,13 @@ dependencies {
     implementation(project(":moduleapi"))
     implementation(project(":infralogging"))
     implementation(project(":infrasecurity"))
+    implementation(project(":infrarealm"))
+    implementation(project(":infranetwork"))
     implementation(libs.libsimprints)
 
-    // Service Location
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
+    // DI
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
 
     // Support
     implementation(libs.androidX.appcompat)
@@ -84,11 +86,10 @@ dependencies {
     testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.koTest.kotlin)
+    testImplementation(libs.testing.koTest.kotlin.assert)
 
 
     testImplementation(libs.testing.espresso.intents)
-    testImplementation(libs.testing.koin)
 
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.core)
@@ -102,9 +103,7 @@ dependencies {
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
 
-    androidTestImplementation(libs.testing.koin)
     androidTestImplementation(libs.testing.truth)
-
 }
 
 configurations {

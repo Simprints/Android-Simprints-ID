@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -22,7 +23,6 @@ import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchingAlgorithm
 import com.simprints.fingerprintmatcher.domain.TemplateFormat
 import com.simprints.infra.logging.Simber
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -39,8 +39,9 @@ class MatchingViewModel(
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
     private val masterFlowManager: MasterFlowManager,
-    private val fingerprintPreferencesManager: FingerprintPreferencesManager
-) : ViewModel() {
+    private val fingerprintPreferencesManager: FingerprintPreferencesManager,
+    private val dispatcherProvider: DispatcherProvider) : ViewModel() {
+
 
     val result = MutableLiveData<FinishResult>()
     val progress = MutableLiveData(0)
@@ -77,7 +78,7 @@ class MatchingViewModel(
     }
 
     private fun runMatchTask(matchTask: MatchTask, isCrossFingerMatchingEnabled: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatcherProvider.io()) {
             try {
                 with(matchTask) {
                     onBeginLoadCandidates()

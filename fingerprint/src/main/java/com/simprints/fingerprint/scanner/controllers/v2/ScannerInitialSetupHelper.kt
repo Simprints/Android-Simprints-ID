@@ -11,13 +11,8 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.tools.BatteryLevelChecker
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import io.reactivex.Completable
-import io.reactivex.Scheduler
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.rxSingle
-import java.util.concurrent.TimeUnit
 
 /**
  * For handling the initial setup to the scanner upon connection, such as retrieving and checking
@@ -27,53 +22,66 @@ class ScannerInitialSetupHelper(
     private val connectionHelper: ConnectionHelper,
     private val batteryLevelChecker: BatteryLevelChecker,
     private val fingerprintPreferenceManager: FingerprintPreferencesManager,
-    private val firmwareLocalDataSource: FirmwareLocalDataSource,
-    private val timeScheduler: Scheduler = Schedulers.io()
+    private val firmwareLocalDataSource: FirmwareLocalDataSource
 ) {
 
     private lateinit var scannerVersion: ScannerVersion
 
+
     /**
+     * This method is responsible for checking if any firmware updates are available, the current
+     * scanner firmware version [ScannerVersion] and the current battery information [BatteryInfo].
+     *
+     * @param scanner  the scanner object to read battery and version info from
+     * @param macAddress  the mac address of the scanner, for establishing connection if disconnected
+     * @param withBatteryInfo  the callback that receives the retrieved [BatteryInfo] to the calling function
+     * @param withScannerVersion  the callback that receives the retrieved [ScannerVersion] to the calling function
+     *
      * @throws OtaAvailableException If an OTA update is available and the battery is sufficiently charged.
      */
-    fun setupScannerWithOtaCheck(
+    suspend fun setupScannerWithOtaCheck(
         scanner: Scanner,
         macAddress: String,
         withScannerVersion: (ScannerVersion) -> Unit,
         withBatteryInfo: (BatteryInfo) -> Unit
-    ): Completable =
-        Completable.complete()
-            .delay(100, TimeUnit.MILLISECONDS, timeScheduler) // Speculatively needed
-            .andThen(scanner.getVersionInformation().doOnSuccess { scannerVersionInfo ->
-                scannerVersionInfo.toScannerVersion().also {
-                    withScannerVersion(it)
-                    scannerVersion = it
-                }
-            })
-            .flatMapCompletable { scanner.enterMainMode() }
-            .delay(100, TimeUnit.MILLISECONDS, timeScheduler) // Speculatively needed
-            .andThen(getBatteryInfo(scanner, withBatteryInfo))
-            .flatMapCompletable { ifAvailableOtasPrepareScannerThenThrow(scannerVersion.hardwareVersion, scanner, macAddress, it) }
+    ) {
+        delay(100) // Speculatively needed
+        val unifiedVersionInfo = scanner.getVersionInformation().await()
 
-    private fun getBatteryInfo(scanner: Scanner, withBatteryInfo: (BatteryInfo) -> Unit): Single<BatteryInfo> {
-        return rxSingle {
-            val charge = scanner.getBatteryPercentCharge().await()
-            val voltage = scanner.getBatteryVoltageMilliVolts().await()
-            val current = scanner.getBatteryCurrentMilliAmps().await()
-            val temperature = scanner.getBatteryTemperatureDeciKelvin().await()
+        unifiedVersionInfo.toScannerVersion().also {
+            withScannerVersion(it)
+            scannerVersion = it
+        }
 
-            BatteryInfo(charge, voltage, current, temperature).also { withBatteryInfo(it) }
+        scanner.enterMainMode().await()
+        delay(100) // Speculatively needed
+        val batteryInfo = getBatteryInfo(scanner, withBatteryInfo)
+        ifAvailableOtasPrepareScannerThenThrow(scannerVersion.hardwareVersion, scanner, macAddress, batteryInfo)
+    }
+
+
+
+    private suspend fun getBatteryInfo(scanner: Scanner, withBatteryInfo: (BatteryInfo) -> Unit): BatteryInfo {
+        val batteryPercent = scanner.getBatteryPercentCharge().await()
+        val batteryVoltage = scanner.getBatteryVoltageMilliVolts().await()
+        val batteryMilliAmps = scanner.getBatteryCurrentMilliAmps().await()
+        val batteryTemperature = scanner.getBatteryTemperatureDeciKelvin().await()
+
+        return BatteryInfo(batteryPercent, batteryVoltage, batteryMilliAmps, batteryTemperature).also {
+            withBatteryInfo(it)
         }
     }
 
-    private fun ifAvailableOtasPrepareScannerThenThrow(hardwareVersion: String, scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo): Completable {
+    private suspend fun ifAvailableOtasPrepareScannerThenThrow(hardwareVersion: String, scanner: Scanner, macAddress: String, batteryInfo: BatteryInfo) {
         val availableVersions = fingerprintPreferenceManager.scannerHardwareRevisions[hardwareVersion]
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
-        return if (availableOtas.isEmpty() || batteryInfo.isLowBattery() || batteryLevelChecker.isLowBattery()) {
-            Completable.complete()
-        } else {
+        val requiresOtaUpdate = availableOtas.isNotEmpty()
+                && !batteryInfo.isLowBattery()
+                && !batteryLevelChecker.isLowBattery()
+
+        if (requiresOtaUpdate) {
             connectionHelper.reconnect(scanner, macAddress)
-                .andThen(Completable.error(OtaAvailableException(availableOtas)))
+            throw OtaAvailableException(availableOtas)
         }
     }
 

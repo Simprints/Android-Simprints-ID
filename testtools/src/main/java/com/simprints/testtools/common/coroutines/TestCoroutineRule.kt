@@ -8,7 +8,7 @@ import org.junit.runners.model.Statement
 
 class TestCoroutineRule : TestRule {
     val testCoroutineDispatcher = TestCoroutineDispatcher()
-    private val testCoroutineScope = TestCoroutineScope(testCoroutineDispatcher)
+    val testCoroutineScope = TestCoroutineScope(testCoroutineDispatcher)
 
     override fun apply(base: Statement, description: Description) = object : Statement() {
 

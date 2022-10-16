@@ -63,11 +63,14 @@ import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
+// TODO: Remove after hilt migration
+@DisableInstallInCheck
 @Module
 open class AppModule {
 
@@ -103,7 +106,7 @@ open class AppModule {
     @Provides
     @Singleton
     // https://github.com/lyft/Kronos-Android
-    fun provideTimeHelper(app: Application): TimeHelper = KronosTimeHelperImpl(
+    fun provideTimeHelper(app: Context): TimeHelper = KronosTimeHelperImpl(
         AndroidClockFactory.createKronosClock(
             app,
             requestTimeoutMs = TimeUnit.SECONDS.toMillis(60),

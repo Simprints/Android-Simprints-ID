@@ -24,17 +24,16 @@ buildscript {
 
         classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
 
-        classpath("org.ow2.asm:asm:9.3")
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.13.1")
         classpath("org.gradle:test-retry-gradle-plugin:1.4.0")
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.14")
-        classpath("com.google.firebase:perf-plugin:1.4.1")
+        classpath("com.google.firebase:perf-plugin:1.4.2")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.2")
 
         // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.11.1")
+        classpath("io.realm:realm-gradle-plugin:10.12.0")
 
         // Android X Navigation components
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
@@ -44,7 +43,7 @@ buildscript {
         classpath("com.google.firebase:firebase-appdistribution-gradle:3.0.3")
 
         // Hilt
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.43.2")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.44")
     }
 
 }
