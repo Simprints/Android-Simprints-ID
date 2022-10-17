@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -30,11 +31,12 @@ class OtaFragment : FingerprintFragment() {
 
     @Inject
     lateinit var timeHelper: FingerprintTimeHelper
+
     @Inject
     lateinit var sessionManager: FingerprintSessionEventsManager
 
     private val viewModel: OtaViewModel by viewModels()
-    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
+    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentOtaBinding::bind)
 
     private val args: OtaFragmentArgs by navArgs()

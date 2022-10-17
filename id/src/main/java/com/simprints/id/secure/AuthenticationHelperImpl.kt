@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
@@ -88,7 +87,7 @@ class AuthenticationHelperImpl @Inject constructor(
         Simber.tag(CrashReportTag.LOGIN.name).i(message)
     }
 
-    private fun addEventAndUpdateProjectIdIfRequired(
+    private suspend fun addEventAndUpdateProjectIdIfRequired(
         result: Result,
         projectId: String,
         userId: String
@@ -99,6 +98,6 @@ class AuthenticationHelperImpl @Inject constructor(
             UserInfo(projectId, userId),
             result
         )
-        inBackground { eventRepository.addOrUpdateEvent(event) }
+        eventRepository.addOrUpdateEvent(event)
     }
 }

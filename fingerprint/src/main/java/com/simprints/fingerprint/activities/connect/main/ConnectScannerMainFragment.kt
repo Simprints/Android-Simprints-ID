@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -14,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ConnectScannerMainFragment : FingerprintFragment() {
 
-    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
+    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,

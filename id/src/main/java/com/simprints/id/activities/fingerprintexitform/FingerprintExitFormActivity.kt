@@ -21,10 +21,12 @@ import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDL
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.AndroidEntryPoint
 import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class FingerprintExitFormActivity : BaseSplitActivity() {
 
     private val viewModel: FingerprintExitFormViewModel by viewModels()

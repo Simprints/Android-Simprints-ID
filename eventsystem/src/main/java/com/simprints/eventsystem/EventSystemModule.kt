@@ -89,5 +89,4 @@ internal class EventSystemProvider {
     @Singleton
     fun provideEventsSyncStatusDatabase(@ApplicationContext ctx: Context): EventSyncStatusDatabase =
         EventSyncStatusDatabase.getDatabase(ctx)
-
 }

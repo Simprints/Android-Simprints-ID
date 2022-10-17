@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -39,19 +40,24 @@ import javax.inject.Inject
 class NfcPairFragment : FingerprintFragment() {
 
     private val viewModel: NfcPairViewModel by viewModels()
-    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
+    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentNfcPairBinding::bind)
 
     @Inject
     lateinit var nfcManager: NfcManager
+
     @Inject
     lateinit var scannerPairingManager: ScannerPairingManager
+
     @Inject
     lateinit var serialNumberConverter: SerialNumberConverter
+
     @Inject
     lateinit var sessionManager: FingerprintSessionEventsManager
+
     @Inject
     lateinit var recentUserActivityManager: RecentUserActivityManager
+
     @Inject
     lateinit var timeHelper: FingerprintTimeHelper
 

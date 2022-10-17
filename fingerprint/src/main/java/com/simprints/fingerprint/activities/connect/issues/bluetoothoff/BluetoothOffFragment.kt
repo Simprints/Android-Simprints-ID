@@ -9,7 +9,7 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
@@ -29,11 +29,14 @@ import com.simprints.infra.resources.R as CR
 @AndroidEntryPoint
 class BluetoothOffFragment : FingerprintFragment() {
 
-    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
+    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
+
     @Inject
     lateinit var bluetoothAdapter: ComponentBluetoothAdapter
+
     @Inject
     lateinit var sessionManager: FingerprintSessionEventsManager
+
     @Inject
     lateinit var timeHelper: FingerprintTimeHelper
     private val binding by viewBinding(FragmentBluetoothOffBinding::bind)

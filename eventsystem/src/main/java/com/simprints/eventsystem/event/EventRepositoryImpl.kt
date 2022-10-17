@@ -40,7 +40,9 @@ import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal open class EventRepositoryImpl @Inject constructor(
     @DeviceID private val deviceId: String,
     @PackageVersionName private val appVersionName: String,
