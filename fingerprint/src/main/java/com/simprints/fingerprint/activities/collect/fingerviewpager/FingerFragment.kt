@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
@@ -25,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class FingerFragment : FingerprintFragment() {
 
-    private val vm: CollectFingerprintsViewModel by viewModels()
+    private val vm: CollectFingerprintsViewModel by activityViewModels()
     private val binding by viewBinding(FragmentFingerBinding::bind)
 
     private lateinit var fingerId: FingerIdentifier

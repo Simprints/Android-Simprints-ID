@@ -8,7 +8,9 @@ import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class ScannerManagerImpl @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val scannerFactory: ScannerFactory,

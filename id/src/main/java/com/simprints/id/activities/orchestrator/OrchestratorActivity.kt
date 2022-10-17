@@ -6,7 +6,6 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.domain.alert.AlertType
@@ -33,9 +32,6 @@ class OrchestratorActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
-
-    @Inject
-    lateinit var timeHelper: TimeHelper
 
     lateinit var appRequest: AppRequest
 

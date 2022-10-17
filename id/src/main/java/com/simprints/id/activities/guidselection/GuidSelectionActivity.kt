@@ -5,9 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
@@ -27,9 +25,6 @@ class GuidSelectionActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var eventRepository: EventRepository
-
-    @Inject
-    lateinit var timeHelper: TimeHelper
 
     @Inject
     lateinit var guidSelectionManager: GuidSelectionManager

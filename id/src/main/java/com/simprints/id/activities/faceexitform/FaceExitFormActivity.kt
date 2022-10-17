@@ -6,12 +6,11 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
-import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.onLayoutChange
 import com.simprints.core.tools.extentions.textWatcherOnChange
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Action
@@ -19,7 +18,6 @@ import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResul
 import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.databinding.ActivityFaceExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.core.tools.extentions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -60,7 +58,8 @@ class FaceExitFormActivity : BaseSplitActivity() {
             whySkipFaceText.text = getString(IDR.string.why_did_you_skip_face_capture)
             faceRbReligiousConcerns.text = getString(IDR.string.refusal_religious_concerns)
             faceRbDataConcerns.text = getString(IDR.string.refusal_data_concerns)
-            faceRbDoesNotHavePermission.text = getString(IDR.string.refusal_does_not_have_permission)
+            faceRbDoesNotHavePermission.text =
+                getString(IDR.string.refusal_does_not_have_permission)
             faceRbAppNotWorking.text = getString(IDR.string.refusal_app_not_working)
             faceRbPersonNotPresent.text = getString(IDR.string.refusal_person_not_present)
             faceRbTooYoung.text = getString(IDR.string.refusal_too_young)
@@ -160,7 +159,12 @@ class FaceExitFormActivity : BaseSplitActivity() {
     }
 
     fun handleSubmitClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText(), faceExitFormReason)
+        viewModel.addExitFormEvent(
+            exitFormStartTime,
+            timeHelper.now(),
+            getExitFormText(),
+            faceExitFormReason
+        )
         setResultAndFinish(Action.SUBMIT)
     }
 
@@ -174,7 +178,10 @@ class FaceExitFormActivity : BaseSplitActivity() {
     }
 
     private fun buildExitFormResult(exitFormActivityAction: Action) =
-        FaceExitFormActivityResult(exitFormActivityAction, Answer(faceExitFormReason, getExitFormText()))
+        FaceExitFormActivityResult(
+            exitFormActivityAction,
+            Answer(faceExitFormReason, getExitFormText())
+        )
 
 
     override fun onBackPressed() {

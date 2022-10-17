@@ -6,7 +6,7 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
@@ -24,11 +24,12 @@ import com.simprints.infra.resources.R as CR
 @AndroidEntryPoint
 class ScannerOffFragment : FingerprintFragment() {
 
-    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
+    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentScannerOffBinding::bind)
 
     @Inject
     lateinit var timeHelper: FingerprintTimeHelper
+
     @Inject
     lateinit var sessionManager: FingerprintSessionEventsManager
 

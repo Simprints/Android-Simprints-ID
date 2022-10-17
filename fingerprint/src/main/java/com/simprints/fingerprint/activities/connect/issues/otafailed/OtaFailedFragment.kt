@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -31,11 +31,12 @@ import com.simprints.infra.resources.R as IDR
 class OtaFailedFragment : FingerprintFragment() {
 
     private val args by navArgs<OtaFailedFragmentArgs>()
-    private val connectScannerViewModel: ConnectScannerViewModel by viewModels()
+    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentOtaFailedBinding::bind)
 
     @Inject
     lateinit var timeHelper: FingerprintTimeHelper
+
     @Inject
     lateinit var sessionManager: FingerprintSessionEventsManager
 
