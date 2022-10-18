@@ -3,12 +3,19 @@ package com.simprints.infra.config.local.migrations
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.FINGERS_TO_COLLECT_KEY
+import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.FINGERS_TO_COLLECT_OVERRIDDEN_KEY
+import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.LANGUAGE_KEY
+import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.LANGUAGE_OVERRIDDEN_KEY
+import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.LAST_INSTRUCTION_ID_KEY
+import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.SELECTED_MODULES_KEY
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.config.local.models.ProtoFinger
 import com.simprints.infra.config.testtools.protoDeviceConfiguration
 import com.simprints.infra.login.LoginManager
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -16,7 +23,10 @@ import org.junit.Test
 class DeviceConfigSharedPrefsMigrationTest {
 
     private val ctx = mockk<Context>()
-    private val preferences = mockk<SharedPreferences>(relaxed = true)
+    private val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+    private val preferences = mockk<SharedPreferences>(relaxed = true) {
+        every { edit() } returns editor
+    }
     private val loginManager = mockk<LoginManager>()
     private lateinit var deviceConfigSharedPrefsMigration: DeviceConfigSharedPrefsMigration
 
@@ -61,13 +71,13 @@ class DeviceConfigSharedPrefsMigrationTest {
     fun `should migrate the language when it exists`() = runTest {
         every {
             preferences.getString(
-                DeviceConfigSharedPrefsMigration.LANGUAGE_KEY,
+                LANGUAGE_KEY,
                 ""
             )
         } returns LANGUAGE
         every {
             preferences.getBoolean(
-                DeviceConfigSharedPrefsMigration.LANGUAGE_OVERRIDDEN_KEY,
+                LANGUAGE_OVERRIDDEN_KEY,
                 false
             )
         } returns true
@@ -89,13 +99,13 @@ class DeviceConfigSharedPrefsMigrationTest {
     fun `should migrate the fingersToCollect when it exists`() = runTest {
         every {
             preferences.getString(
-                DeviceConfigSharedPrefsMigration.FINGERS_TO_COLLECT_KEY,
+                FINGERS_TO_COLLECT_KEY,
                 ""
             )
         } returns "LEFT_THUMB,LEFT_THUMB,LEFT_INDEX_FINGER"
         every {
             preferences.getBoolean(
-                DeviceConfigSharedPrefsMigration.FINGERS_TO_COLLECT_OVERRIDDEN_KEY,
+                FINGERS_TO_COLLECT_OVERRIDDEN_KEY,
                 false
             )
         } returns true
@@ -124,7 +134,7 @@ class DeviceConfigSharedPrefsMigrationTest {
     fun `should migrate the selectedModules when it exists`() = runTest {
         every {
             preferences.getString(
-                DeviceConfigSharedPrefsMigration.SELECTED_MODULES_KEY,
+                SELECTED_MODULES_KEY,
                 ""
             )
         } returns "module1|module2"
@@ -143,7 +153,7 @@ class DeviceConfigSharedPrefsMigrationTest {
     fun `should migrate the lastInstructionId`() = runTest {
         every {
             preferences.getString(
-                DeviceConfigSharedPrefsMigration.LAST_INSTRUCTION_ID_KEY,
+                LAST_INSTRUCTION_ID_KEY,
                 ""
             )
         } returns "instruction"
@@ -155,6 +165,21 @@ class DeviceConfigSharedPrefsMigrationTest {
             .setLastInstructionId("instruction")
             .build()
         assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+    }
+
+    @Test
+    fun `cleanUp should do remove all the keys`() = runTest {
+        every { editor.remove(any()) } returns editor
+
+        deviceConfigSharedPrefsMigration.cleanUp()
+
+        verify(exactly = 1) { editor.remove(LANGUAGE_KEY) }
+        verify(exactly = 1) { editor.remove(LANGUAGE_OVERRIDDEN_KEY) }
+        verify(exactly = 1) { editor.remove(FINGERS_TO_COLLECT_KEY) }
+        verify(exactly = 1) { editor.remove(FINGERS_TO_COLLECT_OVERRIDDEN_KEY) }
+        verify(exactly = 1) { editor.remove(LAST_INSTRUCTION_ID_KEY) }
+        verify(exactly = 1) { editor.remove(SELECTED_MODULES_KEY) }
+        verify(exactly = 1) { editor.apply() }
     }
 
     companion object {

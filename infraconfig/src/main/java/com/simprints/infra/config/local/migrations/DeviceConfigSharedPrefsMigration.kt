@@ -22,6 +22,14 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
     override suspend fun cleanUp() {
+        prefs.edit()
+            .remove(LANGUAGE_KEY)
+            .remove(LANGUAGE_OVERRIDDEN_KEY)
+            .remove(FINGERS_TO_COLLECT_KEY)
+            .remove(FINGERS_TO_COLLECT_OVERRIDDEN_KEY)
+            .remove(SELECTED_MODULES_KEY)
+            .remove(LAST_INSTRUCTION_ID_KEY)
+            .apply()
         Simber.i("Migration of device configuration to Datastore done")
     }
 

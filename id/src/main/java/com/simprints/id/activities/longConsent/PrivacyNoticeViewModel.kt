@@ -36,7 +36,7 @@ class PrivacyNoticeViewModel @Inject constructor(
                 it.printStackTrace()
                 PrivacyNoticeViewState.ConsentNotAvailable(deviceConfiguration.language)
             }
-            .collect { privacyNoticeViewState.value = it }
+            .collect { privacyNoticeViewState.postValue(it) }
     }
 
 

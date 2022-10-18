@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 
 @Deprecated(message = "We need to keep this worker until all the devices have updated to" +
-    "the version 2022.3.0, otherwise the app will crash as the work manager will not find the class" +
+    "the version 2022.4.0, otherwise the app will crash as the work manager will not find the class" +
     "to run the previous work to fetch the configuration.")
 class RemoteConfigWorker(context: Context, params: WorkerParameters) :
     SimCoroutineWorker(context, params) {
