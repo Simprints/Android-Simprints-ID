@@ -3,14 +3,14 @@ package com.simprints.infra.config.local.serializer
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
+import com.simprints.infra.config.local.ConfigLocalDataSourceImpl.Companion.defaultDeviceConfiguration
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
 import java.io.InputStream
 import java.io.OutputStream
 
 @Suppress("BlockingMethodInNonBlockingContext")
 internal object DeviceConfigurationSerializer : Serializer<ProtoDeviceConfiguration> {
-    override val defaultValue: ProtoDeviceConfiguration =
-        ProtoDeviceConfiguration.getDefaultInstance()
+    override val defaultValue: ProtoDeviceConfiguration = defaultDeviceConfiguration
 
     override suspend fun readFrom(input: InputStream): ProtoDeviceConfiguration {
         try {

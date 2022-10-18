@@ -71,7 +71,7 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
     }
 
     override suspend fun shouldMigrate(currentData: ProtoDeviceConfiguration): Boolean =
-        loginManager.signedInProjectId.isNotEmpty() && currentData.language.language.isEmpty()
+        loginManager.signedInProjectId.isNotEmpty() && prefs.getString(LANGUAGE_KEY, "") != ""
 
     companion object {
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"

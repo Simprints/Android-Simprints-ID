@@ -1,7 +1,6 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
@@ -12,9 +11,6 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 abstract class CheckLoginPresenter(
@@ -62,16 +58,7 @@ abstract class CheckLoginPresenter(
     }
 
     open suspend fun handleSignedInUser() {
-        CoroutineScope(Dispatchers.Main).launch {
-            setLanguageInHelper()
-            checkStatusForDeviceAndProject()
-        }
-    }
-
-    /*We need to override the language in LanguageHelper as it uses the SharedPreferences directly
-      rather than using PreferencesManager.*/
-    private suspend fun setLanguageInHelper() {
-        LanguageHelper.language = configManager.getDeviceConfiguration().language
+        checkStatusForDeviceAndProject()
     }
 
     private fun checkStatusForDeviceAndProject() {
