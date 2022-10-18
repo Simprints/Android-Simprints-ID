@@ -47,6 +47,7 @@ internal data class OldProjectConfig(
     @JsonProperty("SyncGroup") private val syncGroup: String,
     @JsonProperty("NbOfIdsInt") private val nbOfIdsInt: String,
     @JsonProperty("Modality") private val modality: String,
+    @JsonProperty("Custom") private val custom: Any?
 ) {
     fun toDomain(projectId: String): ProjectConfiguration =
         ProjectConfiguration(

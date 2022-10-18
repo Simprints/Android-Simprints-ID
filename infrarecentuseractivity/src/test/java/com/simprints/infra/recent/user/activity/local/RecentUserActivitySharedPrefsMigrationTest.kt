@@ -13,6 +13,7 @@ import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPr
 import com.simprints.infra.recent.user.activity.local.RecentUserActivitySharedPrefsMigration.Companion.VERIFICATIONS_KEY
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -20,7 +21,10 @@ import org.junit.Test
 class RecentUserActivitySharedPrefsMigrationTest {
 
     private val ctx = mockk<Context>()
-    private val preferences = mockk<SharedPreferences>(relaxed = true)
+    private val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+    private val preferences = mockk<SharedPreferences>(relaxed = true) {
+        every { edit() } returns editor
+    }
     private lateinit var recentUserActivitySharedPrefsMigration: RecentUserActivitySharedPrefsMigration
 
     @Before
@@ -71,7 +75,18 @@ class RecentUserActivitySharedPrefsMigrationTest {
     }
 
     @Test
-    fun `cleanUp should do nothing`() = runTest {
+    fun `cleanUp should do remove all the keys`() = runTest {
+        every { editor.remove(any()) } returns editor
+
         recentUserActivitySharedPrefsMigration.cleanUp()
+
+        verify(exactly = 1) { editor.remove(LAST_USER_KEY) }
+        verify(exactly = 1) { editor.remove(LAST_SCANNER_USED_KEY) }
+        verify(exactly = 1) { editor.remove(LAST_MAC_ADDRESS_KEY) }
+        verify(exactly = 1) { editor.remove(LAST_ACTIVITY_DATE_KEY) }
+        verify(exactly = 1) { editor.remove(ENROLMENTS_KEY) }
+        verify(exactly = 1) { editor.remove(IDENTIFICATIONS_KEY) }
+        verify(exactly = 1) { editor.remove(VERIFICATIONS_KEY) }
+        verify(exactly = 1) { editor.apply() }
     }
 }

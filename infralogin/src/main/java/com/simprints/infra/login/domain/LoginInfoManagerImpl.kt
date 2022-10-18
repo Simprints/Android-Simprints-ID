@@ -93,6 +93,7 @@ internal class LoginInfoManagerImpl @Inject constructor(@ApplicationContext ctx:
     override fun cleanCredentials() {
         signedInProjectId = ""
         signedInUserId = ""
+        encryptedProjectSecret = ""
         clearCachedTokenClaims()
     }
 

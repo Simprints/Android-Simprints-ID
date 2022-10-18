@@ -48,9 +48,9 @@ class DashboardViewModelTest {
     private lateinit var viewModel: DashboardViewModel
 
     @Test
-    fun `should init the consentRequiredLiveData live data correctly`() {
+    fun `should init the consentRequired live data correctly`() {
         init()
-        assertThat(viewModel.consentRequiredLiveData.getOrAwaitValue()).isEqualTo(true)
+        assertThat(viewModel.consentRequired).isEqualTo(true)
     }
 
     @Test

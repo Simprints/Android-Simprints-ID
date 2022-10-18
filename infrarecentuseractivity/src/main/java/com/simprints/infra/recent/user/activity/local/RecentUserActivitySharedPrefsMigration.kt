@@ -17,6 +17,15 @@ internal class RecentUserActivitySharedPrefsMigration @Inject constructor(@Appli
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
     override suspend fun cleanUp() {
+        prefs.edit()
+            .remove(ENROLMENTS_KEY)
+            .remove(IDENTIFICATIONS_KEY)
+            .remove(VERIFICATIONS_KEY)
+            .remove(LAST_ACTIVITY_DATE_KEY)
+            .remove(LAST_USER_KEY)
+            .remove(LAST_SCANNER_USED_KEY)
+            .remove(LAST_MAC_ADDRESS_KEY)
+            .apply()
         Simber.i("Migration of recent user activity to Datastore done")
     }
 

@@ -108,14 +108,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
     private fun getPreferenceForGeneralCategory(): Preference? =
         findPreference(getString(IDR.string.preferences_general_key))
 
-    private fun getKeyForGeneralPreferenceCategory() =
-        getString(IDR.string.preferences_general_key)
-
     private fun getPreferenceForAppDetailsCategory(): Preference? =
         findPreference(getString(IDR.string.preferences_app_details_key))
-
-    private fun getKeyForAppDetailsPreferenceCategory() =
-        getString(IDR.string.preferences_app_details_key)
 
     private fun getPreferenceForLanguage(): ListPreference? =
         findPreference(getString(R.string.preference_select_language_key))

@@ -98,7 +98,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 general = GeneralConfiguration(
                     modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
                     languageOptions = listOf(),
-                    defaultLanguage = "",
+                    defaultLanguage = "en",
                     collectLocation = true,
                     duplicateBiometricEnrolmentCheck = false,
                 ),

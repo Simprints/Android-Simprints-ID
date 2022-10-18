@@ -59,7 +59,6 @@ class DashboardActivity : BaseSplitActivity() {
     // set bindings for included layouts
     private val projectDetailsBinding: ActivityDashboardCardProjectDetailsBinding by lazy { binding.dashboardProjectDetails }
     private val dailyActivityBinding: ActivityDashboardCardDailyActivityBinding by lazy { binding.dashboardDailyActivity }
-    private var menu: Menu? = null
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -128,7 +127,15 @@ class DashboardActivity : BaseSplitActivity() {
             }
         }
 
-        this.menu = menu
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        menu.run {
+            with(findItem(R.id.menuPrivacyNotice)) {
+                isVisible = viewModel.consentRequired
+            }
+        }
         return true
     }
 
@@ -144,9 +151,6 @@ class DashboardActivity : BaseSplitActivity() {
                 syncCardDisplayer.initRoot(binding.dashboardSyncCard)
                 startTickerToCheckIfSyncIsRequired()
             }
-        }
-        viewModel.consentRequiredLiveData.observe(this) {
-            this.menu?.findItem(R.id.menuPrivacyNotice)?.isVisible = it
         }
     }
 

@@ -6,11 +6,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigration.Companion.ALL_KEYS
+import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
 import com.simprints.infra.config.local.models.*
 import com.simprints.infra.config.testtools.protoProjectConfiguration
 import com.simprints.infra.login.LoginManager
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -20,7 +23,10 @@ import org.junit.runner.RunWith
 class ProjectConfigSharedPrefsMigrationTest {
 
     private val ctx = mockk<Context>()
-    private val preferences = mockk<SharedPreferences>()
+    private val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+    private val preferences = mockk<SharedPreferences>(relaxed = true) {
+        every { edit() } returns editor
+    }
     private val loginManager = mockk<LoginManager>()
     private lateinit var projectConfigSharedPrefsMigration: ProjectConfigSharedPrefsMigration
 
@@ -201,6 +207,19 @@ class ProjectConfigSharedPrefsMigrationTest {
 
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
         assertThat(proto).isEqualTo(expectedProto)
+    }
+
+    @Test
+    fun `cleanUp should do remove all the keys`() = runTest {
+        every { editor.remove(any()) } returns editor
+
+        projectConfigSharedPrefsMigration.cleanUp()
+
+        ALL_KEYS.forEach {
+            verify(exactly = 1) { editor.remove(it) }
+        }
+        verify(exactly = 1) { editor.remove(PROJECT_SETTINGS_JSON_STRING_KEY) }
+        verify(exactly = 1) { editor.apply() }
     }
 
     private fun concatMapsAsString(vararg maps: Map<String, String>): String {

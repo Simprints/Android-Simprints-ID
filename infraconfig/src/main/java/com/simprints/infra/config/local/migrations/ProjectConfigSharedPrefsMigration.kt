@@ -1,6 +1,7 @@
 package com.simprints.infra.config.local.migrations
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.simprints.infra.config.local.migrations.models.OldProjectConfig
@@ -22,6 +23,10 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
     override suspend fun cleanUp() {
+        val editor = prefs.edit()
+        ALL_KEYS.forEach { editor.remove(it) }
+        editor.remove(PROJECT_SETTINGS_JSON_STRING_KEY)
+        editor.apply()
         Simber.i("Migration of project configuration to Datastore done")
     }
 
@@ -42,8 +47,45 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
             ?.isNotEmpty() == true && currentData.projectId.isEmpty()
 
     companion object {
-        private const val PROJECT_SETTINGS_JSON_STRING_KEY = "ProjectSettingsJsonString"
+        @VisibleForTesting
+        const val PROJECT_SETTINGS_JSON_STRING_KEY = "ProjectSettingsJsonString"
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
         private const val PREF_MODE = Context.MODE_PRIVATE
+
+        @VisibleForTesting
+        val ALL_KEYS = listOf(
+            "NbOfIdsInt",
+            "ProjectLanguages",
+            "ModuleIdOptions",
+            "MaxNbOfModules",
+            "SyncGroup",
+            "MatchGroup",
+            "ProgramName",
+            "OrganizationName",
+            "ConsentParentalExists",
+            "ConsentGeneralOptions",
+            "ConsentParentalOptions",
+            "LogoExists",
+            "ConsentRequired",
+            "LocationRequired",
+            "EnrolmentPlus",
+            "DownSyncSetting",
+            "SimprintsSync",
+            "CoSync",
+            "Modality",
+            "FingerImagesExist",
+            "CaptureFingerprintStrategy",
+            "FingerComparisonStrategyForVerification",
+            "SaveFingerprintImagesStrategy",
+            "ScannerGenerations",
+            "FingerprintLiveFeedbackOn",
+            "SaveFaceImages",
+            "FingerprintQualityThreshold",
+            "FaceQualityThreshold",
+            "FaceNbOfFramesCaptured",
+            "FingerprintConfidenceThresholds",
+            "FaceConfidenceThresholds",
+            "Vero2FirmwareVersions",
+        )
     }
 }

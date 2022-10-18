@@ -26,7 +26,7 @@ class DashboardViewModel @Inject constructor(
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-    val consentRequiredLiveData = MutableLiveData<Boolean>()
+    var consentRequired: Boolean = false
     val syncToBFSIDAllowed = MutableLiveData<Boolean>()
     val dailyActivity = MutableLiveData<DashboardDailyActivityState>()
     var syncCardStateLiveData = syncCardStateRepository.syncCardStateLiveData
@@ -47,7 +47,7 @@ class DashboardViewModel @Inject constructor(
             val configuration = configManager.getProjectConfiguration()
             dailyActivity.postValue(dailyActivityRepository.getDailyActivity())
             projectCardStateLiveData.postValue(projectDetails)
-            consentRequiredLiveData.postValue(configuration.consent.collectConsent)
+            consentRequired = configuration.consent.collectConsent
             syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
         }
     }
