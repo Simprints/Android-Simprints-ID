@@ -201,7 +201,6 @@ class ProjectAuthenticatorImplTest {
             mockk(),
         )
         every { loginManager.requestAttestation(any()) } returns "google_attestation"
-        LanguageHelper.prefs = mockk(relaxed = true)
     }
 
     private companion object {

@@ -79,15 +79,15 @@ class SyncInformationViewModel @Inject constructor(
 
     fun fetchSyncInformation() {
         viewModelScope.launch(dispatcher) {
-            recordsInLocal.value = fetchLocalRecordCount()
-            recordsToUpSync.value = fetchAndUpdateRecordsToUpSyncCount()
+            recordsInLocal.postValue(fetchLocalRecordCount())
+            recordsToUpSync.postValue(fetchAndUpdateRecordsToUpSyncCount())
             fetchRecordsToCreateAndDeleteCountOrNull().let {
-                recordsToDownSync.value = it?.toCreate ?: 0
-                recordsToDelete.value = it?.toDelete ?: 0
+                recordsToDownSync.postValue(it?.toCreate ?: 0)
+                recordsToDelete.postValue(it?.toDelete ?: 0)
             }
             // Move walking the file system to the IO thread
             imagesToUpload.postValue(fetchAndUpdateImagesToUploadCount())
-            moduleCounts.value = fetchAndUpdateSelectedModulesCount()
+            moduleCounts.postValue(fetchAndUpdateSelectedModulesCount())
         }
     }
 

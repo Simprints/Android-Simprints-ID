@@ -4,11 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.face.OrchestratorGraphDirections
 import com.simprints.face.R
+import com.simprints.face.base.FaceActivity
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchActivity
@@ -17,7 +17,7 @@ import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FaceOrchestratorActivity : AppCompatActivity() {
+class FaceOrchestratorActivity : FaceActivity() {
     private val viewModel: FaceOrchestratorViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

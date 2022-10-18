@@ -9,12 +9,12 @@ import android.os.Handler
 import android.os.Looper
 import android.view.WindowManager
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
+import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.databinding.ActivityFaceMatchBinding
 import com.simprints.face.exceptions.InvalidFaceRequestException
@@ -24,7 +24,7 @@ import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FaceMatchActivity : AppCompatActivity() {
+class FaceMatchActivity : FaceActivity() {
     private val vm: FaceMatchViewModel by viewModels()
     private val binding by viewBinding(ActivityFaceMatchBinding::inflate)
 

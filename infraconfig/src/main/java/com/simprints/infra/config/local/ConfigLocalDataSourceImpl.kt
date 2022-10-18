@@ -1,6 +1,7 @@
 package com.simprints.infra.config.local
 
 import androidx.datastore.core.DataStore
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.local.models.*
@@ -39,6 +40,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         .setLanguage(
                             it.language.toBuilder().setLanguage(config.general.defaultLanguage)
                         ).build()
+                    LanguageHelper.language = it.language.language
                 }
                 if (!protoDeviceConfiguration.fingersToCollect.isOverwritten) {
                     proto.setFingersToCollect(
@@ -76,6 +78,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     val proto = it.toBuilder()
                     if (updatedProto.language.language != currentData.language.language) {
                         proto.setLanguage(it.language.toBuilder().setIsOverwritten(true))
+                        LanguageHelper.language = it.language.language
                     }
                     if (updatedProto.fingersToCollect.fingersToCollectList != currentData.fingersToCollect.fingersToCollectList) {
                         proto.setFingersToCollect(
@@ -151,7 +154,12 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     ),
                 ),
             ).toProto()
-
+        val defaultDeviceConfiguration: ProtoDeviceConfiguration = DeviceConfiguration(
+            language = "",
+            selectedModules = listOf(),
+            fingersToCollect = listOf(),
+            lastInstructionId = ""
+        ).toProto()
     }
 
 }
