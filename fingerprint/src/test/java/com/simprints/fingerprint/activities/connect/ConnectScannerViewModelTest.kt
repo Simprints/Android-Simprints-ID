@@ -8,6 +8,9 @@ import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Comp
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
@@ -141,26 +144,26 @@ class ConnectScannerViewModelTest {
     fun startVero1_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() =
         runTest {
             setupBluetooth(numberOfPairedScanners = 1)
-            coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
-            val updateActivityFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
-            coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateActivityFn)) } returns mockk()
-
+            every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
+            var scannerConnectionEvent: ScannerConnectionEvent? = null
+            every { sessionEventsManager.addEventInBackground(any()) } answers {
+                scannerConnectionEvent = args[0] as ScannerConnectionEvent
+            }
             val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
             val scannerProgressObserver = viewModel.progress.testObserver()
 
             viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
             viewModel.start()
 
+            assertThat(scannerConnectionEvent?.scannerInfo?.hardwareVersion).isEqualTo(
+                VERO_1_VERSION.firmware.stm
+            )
             scannerConnectedObserver.assertEventReceivedWithContent(true)
             assertThat(scannerProgressObserver.observedValues.size).isEqualTo(
                 ConnectScannerViewModel.NUMBER_OF_STEPS + 1
             ) // 1 at the start
             verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
-            verify(exactly = 1) {
-                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
-                    any()
-                )
-            }
+            verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
             val updatedActivity =
                 updateActivityFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
             assertThat(updatedActivity.lastScannerUsed).isNotEmpty()
@@ -186,11 +189,7 @@ class ConnectScannerViewModelTest {
                 ConnectScannerViewModel.NUMBER_OF_STEPS + 1
             ) // 1 at the start
             verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }    // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
-            verify(exactly = 0) {
-                sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(
-                    any()
-                )
-            }
+            assertThat(scannerConnectionEvent?.scannerInfo?.hardwareVersion).isEqualTo(VERO_2_VERSION.hardwareVersion)
             val updatedActivity =
                 updateActivityFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
             assertThat(updatedActivity.lastScannerUsed).isNotEmpty()

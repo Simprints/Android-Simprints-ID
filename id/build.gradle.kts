@@ -194,7 +194,7 @@ dependencies {
     testImplementation(libs.testing.espresso.core)
     testImplementation(libs.testing.espresso.intents)
     testImplementation(libs.testing.truth)
-    testImplementation(libs.testing.koTest.kotlin)
+    testImplementation(libs.testing.koTest.kotlin.assert)
 
     testImplementation(libs.testing.mockk.core)
 

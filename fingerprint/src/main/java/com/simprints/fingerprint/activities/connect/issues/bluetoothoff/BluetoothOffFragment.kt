@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.activities.connect.issues.bluetoothoff
 
+import android.app.Activity.RESULT_OK
+import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,6 +11,7 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -99,16 +102,13 @@ class BluetoothOffFragment : FingerprintFragment() {
         activity?.unregisterReceiver(bluetoothOnReceiver)
     }
 
-    private fun tryEnableBluetooth() {
-        if (bluetoothAdapter.enable()) {
-            binding.apply {
-                turnOnBluetoothProgressBar.visibility = View.VISIBLE
-                turnOnBluetoothButton.visibility = View.INVISIBLE
-                turnOnBluetoothButton.isEnabled = false
-            }
-        } else {
+    private val enableBluetoothLauncher =registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode != RESULT_OK) {
             handleCouldNotEnable()
         }
+    }
+    private fun tryEnableBluetooth() {
+        enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
     }
 
     private fun handleCouldNotEnable() {

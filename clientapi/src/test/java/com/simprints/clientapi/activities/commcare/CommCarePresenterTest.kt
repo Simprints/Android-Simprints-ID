@@ -19,7 +19,7 @@ import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.C
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
