@@ -1,5 +1,6 @@
 package com.simprints.face.exitform
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.controllers.core.events.FaceSessionEventsManagerImpl
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
@@ -10,12 +11,16 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class ExitFormViewModelTest {
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
 
     private val faceSessionEventsMgr = mockk<FaceSessionEventsManagerImpl>(relaxed = true)
     private lateinit var viewModel: ExitFormViewModel

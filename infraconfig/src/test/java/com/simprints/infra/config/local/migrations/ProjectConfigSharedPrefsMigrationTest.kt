@@ -37,9 +37,9 @@ class ProjectConfigSharedPrefsMigrationTest {
     }
 
     @Test
-    fun `shouldMigrate should return true only if the project is signed in and the current data empty`() =
+    fun `shouldMigrate should return true only if the current data is empty and the shared pref is not empty`() =
         runTest {
-            every { loginManager.signedInProjectId } returns "project_id"
+            every { preferences.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "") } returns "{}"
 
             val shouldMigrate =
                 projectConfigSharedPrefsMigration.shouldMigrate(ProtoProjectConfiguration.getDefaultInstance())
@@ -47,22 +47,22 @@ class ProjectConfigSharedPrefsMigrationTest {
         }
 
     @Test
-    fun `shouldMigrate should return false if the project is not signed in`() =
+    fun `shouldMigrate should return false if the current data is not empty`() =
         runTest {
-            every { loginManager.signedInProjectId } returns ""
+            every { preferences.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "") } returns "{}"
 
             val shouldMigrate =
-                projectConfigSharedPrefsMigration.shouldMigrate(ProtoProjectConfiguration.getDefaultInstance())
+                projectConfigSharedPrefsMigration.shouldMigrate(protoProjectConfiguration)
             assertThat(shouldMigrate).isFalse()
         }
 
     @Test
-    fun `shouldMigrate should return false if the current data is not empty`() =
+    fun `shouldMigrate should return false if the current data is empty`() =
         runTest {
-            every { loginManager.signedInProjectId } returns "project_id"
+            every { preferences.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "") } returns ""
 
             val shouldMigrate = projectConfigSharedPrefsMigration.shouldMigrate(
-                protoProjectConfiguration
+                ProtoProjectConfiguration.getDefaultInstance()
             )
             assertThat(shouldMigrate).isFalse()
         }
