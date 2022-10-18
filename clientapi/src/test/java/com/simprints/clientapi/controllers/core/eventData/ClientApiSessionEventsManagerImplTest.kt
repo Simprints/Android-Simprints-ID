@@ -7,6 +7,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -22,7 +23,7 @@ class ClientApiSessionEventsManagerImplTest {
     fun setup() {
         coreEventRepository = mockk()
         clientApiSessionEventsManager = ClientApiSessionEventsManagerImpl(
-            coreEventRepository, mockk(), mockk(), mockk()
+            coreEventRepository, mockk(), mockk(), mockk(), StandardTestDispatcher()
         )
     }
 
