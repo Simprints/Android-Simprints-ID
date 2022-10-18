@@ -71,7 +71,7 @@ object CoreModule {
     @LibSimprintsVersionName
     @Provides
     fun provideLibSimprintsVersionName(): String =
-        com.simprints.libsimprints.BuildConfig.LIBRARY_PACKAGE_NAME
+        com.simprints.libsimprints.BuildConfig.LIBRARY_PACKAGE_VERSION
 
     @DispatcherIO
     @Provides
