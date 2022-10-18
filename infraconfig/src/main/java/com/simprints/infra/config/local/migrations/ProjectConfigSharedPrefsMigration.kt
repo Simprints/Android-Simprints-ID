@@ -12,7 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
- * Can be removed once all the devices have been updated to 2022.3.0
+ * Can be removed once all the devices have been updated to 2022.4.0
  */
 internal class ProjectConfigSharedPrefsMigration @Inject constructor(
     @ApplicationContext ctx: Context,
@@ -38,7 +38,8 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
     }
 
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration): Boolean =
-        loginManager.signedInProjectId.isNotEmpty() && currentData.projectId.isEmpty()
+        prefs.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "")
+            ?.isNotEmpty() == true && currentData.projectId.isEmpty()
 
     companion object {
         private const val PROJECT_SETTINGS_JSON_STRING_KEY = "ProjectSettingsJsonString"
