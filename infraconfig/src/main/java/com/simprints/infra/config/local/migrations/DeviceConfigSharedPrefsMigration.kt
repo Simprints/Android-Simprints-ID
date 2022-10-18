@@ -12,7 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
- * Can be removed once all the devices have been updated to 2022.3.0
+ * Can be removed once all the devices have been updated to 2022.4.0
  */
 internal class DeviceConfigSharedPrefsMigration @Inject constructor(
     @ApplicationContext ctx: Context,
