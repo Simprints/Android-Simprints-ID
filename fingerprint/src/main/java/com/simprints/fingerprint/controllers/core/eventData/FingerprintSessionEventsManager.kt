@@ -6,6 +6,4 @@ interface FingerprintSessionEventsManager {
 
     fun addEventInBackground(event: Event)
     suspend fun addEvent(event: Event)
-
-    fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
 }

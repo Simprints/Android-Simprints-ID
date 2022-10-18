@@ -77,7 +77,7 @@ dependencies {
     testImplementation(libs.testing.coroutines.test)
     testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.koTest.kotlin)
+    testImplementation(libs.testing.koTest.kotlin.assert)
 
     testImplementation(libs.testing.espresso.intents)
 

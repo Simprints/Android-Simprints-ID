@@ -37,20 +37,6 @@ class FingerprintSessionEventsManagerImpl(
         }
     }
 
-    override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
-        runBlocking {
-            ignoreException {
-                val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-                val scannerConnectivityEvents =
-                    eventRepository.getEventsFromSession(currentSession.id)
-                        .filterIsInstance<ScannerConnectionEvent>()
-                scannerConnectivityEvents.collect {
-                    it.scannerInfo.hardwareVersion = hardwareVersion
-                }
-            }
-        }
-    }
-
     private fun fromDomainToCore(event: Event): CoreEvent =
         when (event.type) {
             REFUSAL_RESPONSE -> (event as RefusalEvent).fromDomainToCore()
