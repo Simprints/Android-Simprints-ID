@@ -9,8 +9,6 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
@@ -36,8 +34,8 @@ import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.*
 import kotlinx.coroutines.test.runTest
+import io.mockk.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -144,7 +142,9 @@ class ConnectScannerViewModelTest {
     fun startVero1_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() =
         runTest {
             setupBluetooth(numberOfPairedScanners = 1)
-            every { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
+            coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
+            val updateActivityFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
+            coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateActivityFn)) } returns mockk()
             var scannerConnectionEvent: ScannerConnectionEvent? = null
             every { sessionEventsManager.addEventInBackground(any()) } answers {
                 scannerConnectionEvent = args[0] as ScannerConnectionEvent
@@ -177,7 +177,12 @@ class ConnectScannerViewModelTest {
             coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
             val updateActivityFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
             coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateActivityFn)) } returns mockk()
-
+            var scannerConnectionEvent: ScannerConnectionEvent? = null
+            every { sessionEventsManager.addEventInBackground(any()) } answers {
+                if(args[0] is ScannerConnectionEvent) {
+                    scannerConnectionEvent = args[0] as ScannerConnectionEvent
+                }
+            }
             val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
             val scannerProgressObserver = viewModel.progress.testObserver()
 

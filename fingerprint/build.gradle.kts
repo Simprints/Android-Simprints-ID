@@ -130,6 +130,7 @@ dependencies {
     testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.core.testing)
     testImplementation(libs.testing.androidX.rules)
+    testImplementation(libs.testing.coroutines.test)
 
     // Espresso
     testImplementation(libs.testing.espresso.core)
