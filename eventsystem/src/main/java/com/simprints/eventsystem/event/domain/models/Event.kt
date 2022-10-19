@@ -47,11 +47,7 @@ import com.simprints.eventsystem.event.domain.models.EventType.Companion.SUSPICI
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
 import com.simprints.eventsystem.event.domain.models.callback.*
 import com.simprints.eventsystem.event.domain.models.callout.*
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceFallbackCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent
+import com.simprints.eventsystem.event.domain.models.face.*
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent

@@ -6,9 +6,6 @@ import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
 import com.simprints.infra.config.domain.models.Finger
-import kotlin.Int
-import kotlin.Long
-import kotlin.String
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore

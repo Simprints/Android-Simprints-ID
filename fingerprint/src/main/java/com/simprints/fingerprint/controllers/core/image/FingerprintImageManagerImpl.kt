@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.controllers.core.image
 
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
 import com.simprints.infra.images.ImageRepository
