@@ -212,6 +212,8 @@ dependencies {
     androidTestImplementation(project(":fingerprintscannermock")) {
         exclude("org.robolectric")
     }
+    androidTestImplementation(libs.testing.robolectric.core)
+    androidTestImplementation(libs.testing.robolectric.multidex)
     androidTestImplementation(libs.testing.retrofit)
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.core)

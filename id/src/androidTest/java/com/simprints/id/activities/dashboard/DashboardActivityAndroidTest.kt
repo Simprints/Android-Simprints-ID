@@ -48,7 +48,7 @@ class DashboardActivityAndroidTest {
     fun withConsentRequiredEnabled_shouldShowPrivacyNoticeMenuItem() {
         ActivityScenario.launch(DashboardActivity::class.java)
 
-        every { mockViewModel.consentRequiredLiveData } returns MutableLiveData<Boolean>(true)
+        every { mockViewModel.consentRequired } returns true
 
         openActionBarOverflowOrOptionsMenu(app.applicationContext)
 
