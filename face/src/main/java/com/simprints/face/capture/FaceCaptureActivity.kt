@@ -5,13 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
+import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.exitform.ExitFormViewModel
@@ -20,7 +20,7 @@ import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FaceCaptureActivity : AppCompatActivity() {
+class FaceCaptureActivity : FaceActivity() {
     private val vm: FaceCaptureViewModel by viewModels()
     private val exitVm: ExitFormViewModel by viewModels()
 
