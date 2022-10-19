@@ -37,9 +37,10 @@ class DeviceConfigSharedPrefsMigrationTest {
     }
 
     @Test
-    fun `shouldMigrate should return true only if the project is signed in and the current data empty`() =
+    fun `shouldMigrate should return true only if the project is signed in and the language preference is not empty`() =
         runTest {
             every { loginManager.signedInProjectId } returns "project_id"
+            every { preferences.getString(LANGUAGE_KEY, "") } returns "en"
 
             val shouldMigrate =
                 deviceConfigSharedPrefsMigration.shouldMigrate(ProtoDeviceConfiguration.getDefaultInstance())
@@ -50,6 +51,7 @@ class DeviceConfigSharedPrefsMigrationTest {
     fun `shouldMigrate should return false if the project is not signed in`() =
         runTest {
             every { loginManager.signedInProjectId } returns ""
+            every { preferences.getString(LANGUAGE_KEY, "") } returns "en"
 
             val shouldMigrate =
                 deviceConfigSharedPrefsMigration.shouldMigrate(ProtoDeviceConfiguration.getDefaultInstance())
@@ -57,9 +59,10 @@ class DeviceConfigSharedPrefsMigrationTest {
         }
 
     @Test
-    fun `shouldMigrate should return false if the current data is not empty`() =
+    fun `shouldMigrate should return false if the preference language is empty`() =
         runTest {
             every { loginManager.signedInProjectId } returns "project_id"
+            every { preferences.getString(LANGUAGE_KEY, "") } returns ""
 
             val shouldMigrate = deviceConfigSharedPrefsMigration.shouldMigrate(
                 protoDeviceConfiguration
@@ -144,7 +147,7 @@ class DeviceConfigSharedPrefsMigrationTest {
 
         val expectedDeviceConfiguration = ProtoDeviceConfiguration
             .newBuilder()
-            .addAllModuleSelected(listOf("module1","module2"))
+            .addAllModuleSelected(listOf("module1", "module2"))
             .build()
         assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
     }

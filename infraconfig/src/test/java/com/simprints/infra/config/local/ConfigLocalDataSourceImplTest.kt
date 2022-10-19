@@ -5,6 +5,7 @@ import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.domain.models.ProjectConfiguration
@@ -14,8 +15,10 @@ import com.simprints.infra.config.local.serializer.ProjectConfigurationSerialize
 import com.simprints.infra.config.local.serializer.ProjectSerializer
 import com.simprints.infra.config.testtools.*
 import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.mockk
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -47,6 +50,11 @@ class ConfigLocalDataSourceImplTest {
             testProjectConfigDataStore,
             testDeviceConfigDataStore
         )
+
+    @Before
+    fun setup() {
+        LanguageHelper.init(mockk(relaxed = true))
+    }
 
     @Test
     fun `should throw a NoSuchElementException when there is no project`() = runTest(

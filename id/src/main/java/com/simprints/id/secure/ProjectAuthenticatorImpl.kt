@@ -1,10 +1,8 @@
 package com.simprints.id.secure
 
-import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthRequest
@@ -37,7 +35,7 @@ class ProjectAuthenticatorImpl @Inject constructor(
 
         val config = configManager.refreshProjectConfiguration(nonceScope.projectId)
 
-        updateLanguageAndReturnProjectLanguages(config).fetchProjectLongConsentTexts()
+        config.general.languageOptions.fetchProjectLongConsentTexts()
     }
 
     private suspend fun prepareAuthRequestParameters(
@@ -92,15 +90,6 @@ class ProjectAuthenticatorImpl @Inject constructor(
 
     private fun createLocalDbKeyForProject(projectId: String) {
         secureDataManager.createLocalDatabaseKeyIfMissing(projectId)
-    }
-
-    private fun updateLanguageAndReturnProjectLanguages(config: ProjectConfiguration): List<String> {
-        /*We need to override the language in the helper as the language context is initialised in Application
-         in attachBaseContext() which is  called before initialising dagger component.
-         Thus we cannot use preferences manager to get the language.*/
-        LanguageHelper.language = config.general.defaultLanguage
-
-        return config.general.languageOptions
     }
 
     private suspend fun List<String>.fetchProjectLongConsentTexts() {

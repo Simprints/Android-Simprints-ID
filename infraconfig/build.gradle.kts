@@ -38,6 +38,7 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(project(":core"))
     api(project(":infranetwork"))
     implementation(project(":infralogging"))
     implementation(project(":infralogin"))
