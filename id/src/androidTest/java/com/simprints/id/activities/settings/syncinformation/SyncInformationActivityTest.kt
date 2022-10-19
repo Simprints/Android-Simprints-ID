@@ -6,7 +6,6 @@ import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.id.R
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
@@ -23,7 +22,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.fakes.RoboMenuItem
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(shadows = [ShadowAndroidXMultiDex::class])
 class SyncInformationActivityTest {
 
     @get:Rule
@@ -39,7 +38,7 @@ class SyncInformationActivityTest {
 
     @Test
     @Ignore("We are ignoring some robo tests until we finish the update to hilt")
-    fun `check activity fetches info only after resume`() {
+    fun check_activity_fetches_info_only_after_resume() {
 
         val controller = createActivity<SyncInformationActivity>()
 
@@ -52,7 +51,7 @@ class SyncInformationActivityTest {
 
     @Test
     @Ignore("We are ignoring some robo tests until we finish the update to hilt")
-    fun `check activity fetches info after each resume`() {
+    fun check_activity_fetches_info_after_each_resume() {
 
         val controller = createActivity<SyncInformationActivity>()
 
@@ -69,7 +68,7 @@ class SyncInformationActivityTest {
 
     @Test
     @Ignore("We are ignoring some robo tests until we finish the update to hilt")
-    fun `check refresh button fetches info`() {
+    fun check_refresh_button_fetches_info() {
 
         val controller = createActivity<SyncInformationActivity>()
 

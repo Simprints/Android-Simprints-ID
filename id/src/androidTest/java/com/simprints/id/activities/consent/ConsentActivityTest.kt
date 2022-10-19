@@ -14,7 +14,6 @@ import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivi
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
@@ -30,7 +29,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(shadows = [ShadowAndroidXMultiDex::class])
 class ConsentActivityTest {
 
     private var modalities = emptyList<GeneralConfiguration.Modality>()
@@ -90,7 +89,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `declining on parental tab should still exit correctly`() {
+    fun declining_on_parental_tab_should_still_exit_correctly() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.allowParentalConsent } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
@@ -103,7 +102,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `declining on un-known tab should throw error`() {
+    fun declining_on_un_known_tab_should_throw_error() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.allowParentalConsent } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
@@ -115,7 +114,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `general consent text should show first`() {
+    fun general_consent_text_should_show_first() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.programName } returns "this program"
         every { consentConfiguration.generalPrompt } returns ConsentConfiguration.ConsentPromptConfiguration(
@@ -133,7 +132,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `parental tab click should select correct tab`() {
+    fun parental_tab_click_should_select_correct_tab() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.allowParentalConsent } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
@@ -152,7 +151,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `general tab click should select correct tab`() {
+    fun general_tab_click_should_select_correct_tab() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.allowParentalConsent } returns true
         val controller = createRoboConsentActivity(getIntentForConsentAct())
@@ -173,7 +172,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `selecting parental consent should set correct text`() {
+    fun selecting_parental_consent_should_set_correct_text() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.allowParentalConsent } returns true
         every { consentConfiguration.parentalPrompt } returns ConsentConfiguration.ConsentPromptConfiguration(
@@ -193,7 +192,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `re-selecting a tab shouldn't change the text`() {
+    fun re_selecting_a_tab_should_not_change_the_text() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.allowParentalConsent } returns true
         every { consentConfiguration.parentalPrompt } returns ConsentConfiguration.ConsentPromptConfiguration(
@@ -214,7 +213,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `no parental consent should remove tab`() {
+    fun no_parental_consent_should_remove_tab() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.allowParentalConsent } returns false
 
@@ -225,7 +224,7 @@ class ConsentActivityTest {
     }
 
     @Test
-    fun `existing parental consent should leave tab`() {
+    fun existing_parental_consent_should_leave_tab() {
         modalities = listOf(GeneralConfiguration.Modality.FACE)
         every { consentConfiguration.allowParentalConsent } returns true
 

@@ -1,24 +1,22 @@
-package com.simprints.id.activities.checkLogin.openedByMainLauncher
+package com.simprints.id.activities.checklogin.openedbymainlauncher
 
 import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
+import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherPresenter
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.SecurityManager
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class CheckLoginFromMainLauncherActivityTest {
 
     @Inject
