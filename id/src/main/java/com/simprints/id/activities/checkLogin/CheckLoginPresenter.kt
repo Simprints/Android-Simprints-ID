@@ -34,6 +34,7 @@ abstract class CheckLoginPresenter(
 
     @Inject
     lateinit var securityStateRepository: SecurityStateRepository
+
     protected suspend fun checkSignedInStateAndMoveOn() {
         try {
             checkSignedInOrThrow()

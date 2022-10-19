@@ -1,4 +1,4 @@
-package com.simprints.id.activities.checkLogin.openedByIntent
+package com.simprints.id.activities.checklogin.openedbyintent
 
 import android.os.Bundle
 import androidx.test.espresso.Espresso.onView
@@ -14,6 +14,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.R
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.moduleApi.AppConfirmationConfirmIdentityRequestModuleApi
 import com.simprints.id.testtools.moduleApi.AppEnrolRequestModuleApi
