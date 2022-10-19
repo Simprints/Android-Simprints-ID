@@ -8,7 +8,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.data.consent.longconsent.LongConsentFetchResult
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -24,7 +23,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(shadows = [ShadowAndroidXMultiDex::class])
 class PrivacyNoticeActivityUnitTest {
 
     @get:Rule

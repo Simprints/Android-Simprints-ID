@@ -10,7 +10,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
-import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.every
@@ -23,7 +22,6 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(
     instrumentedPackages = ["androidx.loader.content"],
-    application = TestApplication::class,
     shadows = [ShadowAndroidXMultiDex::class]
 )
 class ModuleSelectionFragmentTest {

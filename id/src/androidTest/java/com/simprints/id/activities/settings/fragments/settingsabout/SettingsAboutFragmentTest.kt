@@ -9,7 +9,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutViewModel
-import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -27,7 +26,7 @@ import org.robolectric.annotation.Config
 import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class)
+@Config()
 class SettingsAboutFragmentTest {
 
     companion object {
@@ -69,7 +68,7 @@ class SettingsAboutFragmentTest {
     }
 
     @Test
-    fun `should display the correct preferences`() {
+    fun should_display_the_correct_preferences() {
         every { projectConfiguration.identification } returns mockk {
             every { poolType } returns IdentificationConfiguration.PoolType.PROJECT
         }
@@ -102,7 +101,7 @@ class SettingsAboutFragmentTest {
     }
 
     @Test
-    fun `should display the scanner preference for Fingerprint`() {
+    fun should_display_the_scanner_preference_for_Fingerprint() {
         every { projectConfiguration.general } returns mockk {
             every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
         }
@@ -117,7 +116,7 @@ class SettingsAboutFragmentTest {
     }
 
     @Test
-    fun `should not display the scanner preference for Face`() {
+    fun should_not_display_the_scanner_preference_for_Face() {
         every { projectConfiguration.general } returns mockk {
             every { modalities } returns listOf(GeneralConfiguration.Modality.FACE)
         }
