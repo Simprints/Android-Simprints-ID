@@ -1,8 +1,5 @@
 package com.simprints.id.secure
 
-import android.content.Context
-import android.content.SharedPreferences
-import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.config.ConfigManager
@@ -130,14 +127,6 @@ class ProjectAuthenticatorImplTest {
     @Test
     fun `authenticate should fetch the correct long consents`() =
         runTest(StandardTestDispatcher()) {
-
-            val spMockk = mockk<SharedPreferences>(relaxed = true)
-            val ctxMockk = mockk<Context>(relaxed = true) {
-                every { getSharedPreferences(any(), any()) } returns spMockk
-            }
-
-            LanguageHelper.init(ctxMockk)
-
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
             coVerify(exactly = 1) { longConsentRepositoryMock.deleteLongConsents() }
