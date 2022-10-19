@@ -1,4 +1,4 @@
-package com.simprints.id.activities.settings.fragments.settingsPreference
+package com.simprints.id.activities.settings.fragments.settingspreference
 
 import androidx.fragment.app.testing.launchFragment
 import androidx.lifecycle.Observer
@@ -7,6 +7,8 @@ import androidx.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceViewModel
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import io.mockk.every

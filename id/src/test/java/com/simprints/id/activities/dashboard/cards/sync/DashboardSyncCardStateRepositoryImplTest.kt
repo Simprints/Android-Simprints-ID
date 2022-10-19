@@ -1,5 +1,6 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -28,6 +29,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -37,7 +39,11 @@ import java.util.*
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DashboardSyncCardStateRepositoryImplTest {
 
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
     private lateinit var dashboardSyncCardStateRepository: DashboardSyncCardStateRepositoryImpl
+
     private val syncCardTestLiveData
         get() = dashboardSyncCardStateRepository.syncCardStateLiveData
 
