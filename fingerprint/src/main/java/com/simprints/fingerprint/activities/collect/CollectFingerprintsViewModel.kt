@@ -286,8 +286,7 @@ class CollectFingerprintsViewModel(
 
         imageTransferTask = viewModelScope.launch(dispatcherProvider.io()) {
             try {
-                val acquiredImage = scannerManager.scanner.
-                acquireImage(
+                val acquiredImage = scannerManager.scanner.acquireImage(
                     fingerprintPreferencesManager.saveFingerprintImagesStrategy
 
                 )
@@ -338,17 +337,20 @@ class CollectFingerprintsViewModel(
                 payloadId = payloadId
             )
             val fingerprintCaptureBiometricsEvent =
-                if (captureEvent.result == FingerprintCaptureEvent.Result.GOOD_SCAN) FingerprintCaptureBiometricsEvent(
-                    createdAt = lastCaptureStartedAt,
-                    fingerprint = (currentCapture() as CaptureState.Collected).scanResult.let {
-                        FingerprintCaptureBiometricsEvent.Fingerprint(
-                            finger = id,
-                            quality = it.qualityScore,
-                            template = encoder.byteArrayToBase64(it.template)
-                        )
-                    },
-                    payloadId = payloadId
-                ) else null
+                if (captureEvent.result == FingerprintCaptureEvent.Result.GOOD_SCAN ||
+                    tooManyBadScans(currentCapture(), plusBadScan = false)
+                )
+                    FingerprintCaptureBiometricsEvent(
+                        createdAt = lastCaptureStartedAt,
+                        fingerprint = (currentCapture() as CaptureState.Collected).scanResult.let {
+                            FingerprintCaptureBiometricsEvent.Fingerprint(
+                                finger = id,
+                                quality = it.qualityScore,
+                                template = encoder.byteArrayToBase64(it.template)
+                            )
+                        },
+                        payloadId = payloadId
+                    ) else null
 
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
 
