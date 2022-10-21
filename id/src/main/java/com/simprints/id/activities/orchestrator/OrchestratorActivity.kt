@@ -22,7 +22,6 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 
@@ -86,16 +85,12 @@ class OrchestratorActivity : BaseSplitActivity() {
             ?: throw InvalidAppRequest()
 
         if (savedInstanceState == null) {
-            runBlocking {
-                vm.initializeModalityFlow(appRequest)
-                vm.startModalityFlow()
-            }
+            vm.initializeModalityFlow(appRequest)
+            vm.startModalityFlow()
             scheduleAndStartSyncIfNecessary()
         } else {
-            runBlocking {
-                vm.initializeModalityFlow(appRequest)
-                vm.restoreState()
-            }
+            vm.initializeModalityFlow(appRequest)
+            vm.restoreState()
         }
     }
 
