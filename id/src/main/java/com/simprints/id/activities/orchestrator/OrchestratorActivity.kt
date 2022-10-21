@@ -85,10 +85,18 @@ class OrchestratorActivity : BaseSplitActivity() {
         appRequest = this.intent.extras?.getParcelable(APP_REQUEST_BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
-        runBlocking {
-            vm.startModalityFlow(appRequest)
+        if (savedInstanceState == null) {
+            runBlocking {
+                vm.initializeModalityFlow(appRequest)
+                vm.startModalityFlow()
+            }
+            scheduleAndStartSyncIfNecessary()
+        } else {
+            runBlocking {
+                vm.initializeModalityFlow(appRequest)
+                vm.restoreState()
+            }
         }
-        scheduleAndStartSyncIfNecessary()
     }
 
     private fun scheduleAndStartSyncIfNecessary() {
@@ -103,27 +111,15 @@ class OrchestratorActivity : BaseSplitActivity() {
         vm.saveState()
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        vm.restoreState()
-    }
-
     override fun onResume() {
         super.onResume()
 
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         vm.onModalStepRequestDone(appRequest, requestCode, resultCode, data)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        vm.saveState()
-    }
-
 }

@@ -29,11 +29,15 @@ class OrchestratorViewModel(
         }
     }
 
-    suspend fun startModalityFlow(appRequest: AppRequest) {
+    suspend fun initializeModalityFlow(appRequest: AppRequest) {
         orchestratorManager.initialise(
             modalities,
             appRequest,
             getCurrentSessionId())
+    }
+
+    suspend fun startModalityFlow() {
+        orchestratorManager.startModalityFlow()
     }
 
     private suspend fun getCurrentSessionId(): String =
@@ -51,7 +55,6 @@ class OrchestratorViewModel(
             orchestratorManager.restoreState()
         }
     }
-
 
     fun saveState() {
         orchestratorManager.saveState()
