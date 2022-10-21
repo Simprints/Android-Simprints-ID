@@ -29,15 +29,20 @@ class OrchestratorViewModel(
         }
     }
 
-    suspend fun initializeModalityFlow(appRequest: AppRequest) {
-        orchestratorManager.initialise(
-            modalities,
-            appRequest,
-            getCurrentSessionId())
+    fun initializeModalityFlow(appRequest: AppRequest) {
+        viewModelScope.launch {
+            orchestratorManager.initialise(
+                modalities,
+                appRequest,
+                getCurrentSessionId()
+            )
+        }
     }
 
-    suspend fun startModalityFlow() {
-        orchestratorManager.startModalityFlow()
+    fun startModalityFlow() {
+        viewModelScope.launch {
+            orchestratorManager.startModalityFlow()
+        }
     }
 
     private suspend fun getCurrentSessionId(): String =
