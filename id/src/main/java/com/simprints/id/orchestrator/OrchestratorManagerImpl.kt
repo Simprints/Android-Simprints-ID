@@ -47,7 +47,9 @@ open class OrchestratorManagerImpl(
         this.modalities = modalities
         modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
         resetInternalState()
+    }
 
+    override suspend fun startModalityFlow() {
         proceedToNextStepOrAppResponse()
     }
 
