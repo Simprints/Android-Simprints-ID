@@ -150,7 +150,7 @@ commonsIO-commons_io = { module = "commons-io:commons-io", version.ref = "common
 #Kronos
 kronos-kronos = { module = "com.lyft.kronos:kronos-android", version.ref = "kronos_version" }
 #libsimprints
-libsimprints = "com.simprints:libsimprints:2022.2.0"
+libsimprints = "com.simprints:libsimprints:2022.3.0"
 #simmatcher
 simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher_version" }
 
