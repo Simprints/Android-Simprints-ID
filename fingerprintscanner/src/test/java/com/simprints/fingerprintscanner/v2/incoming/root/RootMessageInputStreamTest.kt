@@ -2,14 +2,12 @@ package com.simprints.fingerprintscanner.v2.incoming.root
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
-import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper
 import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.observers.BaseTestConsumer.TestWaitStrategy
-import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.util.concurrent.TimeUnit

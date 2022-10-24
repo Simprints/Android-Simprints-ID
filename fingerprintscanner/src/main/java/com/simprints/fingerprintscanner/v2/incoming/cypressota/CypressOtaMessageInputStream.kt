@@ -4,11 +4,9 @@ import com.simprints.fingerprintscanner.v2.domain.cypressota.CypressOtaResponse
 import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublish
-import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import java.io.InputStream
 
 /**
  * Takes an InputStream and transforms it into a Flowable<CypressOtaResponse> for use while the Vero
@@ -20,17 +18,16 @@ class CypressOtaMessageInputStream(private val cypressOtaResponseParser: Cypress
 
     private var cypressOtaResponseStreamDisposable: Disposable? = null
 
-    override fun connect(inputStream: InputStream) {
-        cypressOtaResponseStream = transformToCypressOtaResponseStream(inputStream)
+    override fun connect(flowable: Flowable<ByteArray>) {
+        cypressOtaResponseStream = transformToCypressOtaResponseStream(flowable)
             .subscribeOnIoAndPublish()
             .also {
                 cypressOtaResponseStreamDisposable = it.connect()
             }
     }
 
-    private fun transformToCypressOtaResponseStream(inputStream: InputStream) =
-        inputStream
-            .toFlowable()
+    private fun transformToCypressOtaResponseStream(flowable: Flowable<ByteArray>) =
+        flowable
             .map { cypressOtaResponseParser.parse(it) }
 
     override fun disconnect() {

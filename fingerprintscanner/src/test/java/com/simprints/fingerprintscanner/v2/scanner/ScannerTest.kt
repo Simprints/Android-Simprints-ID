@@ -61,8 +61,6 @@ import io.reactivex.observers.TestObserver
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.rx2.rxSingle
 import org.junit.Test
 import java.io.InputStream
 import java.io.OutputStream

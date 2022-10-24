@@ -4,11 +4,9 @@ import com.simprints.fingerprintscanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprintscanner.v2.domain.main.packet.Route
 import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
 import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublish
-import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.flowables.ConnectableFlowable
-import java.io.InputStream
 
 /**
  * The PacketRouter takes an InputStream of bytes, converting it into a single stream of
@@ -25,8 +23,8 @@ class PacketRouter(private val routes: List<Route>,
     private lateinit var incomingPacketsDisposable: Disposable
     private lateinit var incomingPacketRoutesDisposable: Map<Route, Disposable>
 
-    override fun connect(inputStream: InputStream) {
-        val rawPacketStream = transformToPacketStream(inputStream)
+    override fun connect(flowable: Flowable<ByteArray>) {
+        val rawPacketStream = transformToPacketStream(flowable)
         val incomingPackets = rawPacketStream.subscribeOnIoAndPublish()
         incomingPacketRoutes = routes.associateWith {
             incomingPackets.filterRoute(it).subscribeOnIoAndPublish()
@@ -35,9 +33,8 @@ class PacketRouter(private val routes: List<Route>,
         incomingPacketRoutesDisposable = incomingPacketRoutes.mapValues { it.value.connect() }
     }
 
-    private fun transformToPacketStream(inputStream: InputStream): Flowable<Packet> =
-        inputStream
-            .toFlowable()
+    private fun transformToPacketStream(flowable: Flowable<ByteArray>): Flowable<Packet> =
+        flowable
             .toPacketStream(byteArrayToPacketAccumulator)
 
     override fun disconnect() {
