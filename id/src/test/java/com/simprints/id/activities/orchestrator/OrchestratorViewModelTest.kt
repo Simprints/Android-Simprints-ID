@@ -75,15 +75,25 @@ class OrchestratorViewModelTest {
     }
 
     @Test
-    fun viewModelStart_shouldStartOrchestrator() {
+    fun viewModelInitialize_shouldInitializeOrchestrator() {
         runBlocking {
-            vm.startModalityFlow(enrolAppRequest)
+            vm.initializeModalityFlow(enrolAppRequest)
             coVerify(exactly = 1) {
                 orchestratorManagerMock.initialise(
                     listOf(FACE),
                     enrolAppRequest,
                     fakeSession.id
                 )
+            }
+        }
+    }
+
+    @Test
+    fun viewModelStart_shouldStartOrchestrator() {
+        runBlocking {
+            vm.startModalityFlow()
+            coVerify(exactly = 1) {
+                orchestratorManagerMock.startModalityFlow()
             }
         }
     }
@@ -127,7 +137,6 @@ class OrchestratorViewModelTest {
     }
 
     companion object {
-        const val SOME_SESSION_ID = "some_session_id"
         const val REQUEST_CODE = 0
     }
 }
