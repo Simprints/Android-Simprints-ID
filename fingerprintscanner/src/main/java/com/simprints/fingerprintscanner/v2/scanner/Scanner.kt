@@ -1,5 +1,6 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
+import android.util.Log
 import com.simprints.fingerprintscanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
@@ -62,6 +63,7 @@ class Scanner(
     private val un20OtaController: Un20OtaController,
     private val responseErrorHandler: ResponseErrorHandler
 ) {
+    private lateinit var flowableDisposable: Disposable
 
     private lateinit var inputStream: InputStream
     private lateinit var outputStream: OutputStream
@@ -74,7 +76,7 @@ class Scanner(
 
     fun connect(inputStream: InputStream, outputStream: OutputStream): Completable = completable {
         this.inputStream = inputStream
-        this.flowable = inputStream.toFlowable()
+        this.flowable = inputStream.toFlowable().subscribeOnIoAndPublish().also { this.flowableDisposable = it.connect() }
         this.outputStream = outputStream
         state.connected = true
         state.mode = ROOT
@@ -177,6 +179,7 @@ class Scanner(
     private fun handleMainModeEntered() = completable {
         rootMessageChannel.disconnect()
         mainMessageChannel.connect(flowable, outputStream)
+
         state.triggerButtonActive = true
         state.mode = MAIN
         scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
