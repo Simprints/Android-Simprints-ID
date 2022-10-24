@@ -84,12 +84,11 @@ class OrchestratorActivity : BaseSplitActivity() {
         appRequest = this.intent.extras?.getParcelable(APP_REQUEST_BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
+        vm.initializeModalityFlow(appRequest)
         if (savedInstanceState == null) {
-            vm.initializeModalityFlow(appRequest)
             vm.startModalityFlow()
             scheduleAndStartSyncIfNecessary()
         } else {
-            vm.initializeModalityFlow(appRequest)
             vm.restoreState()
         }
     }
