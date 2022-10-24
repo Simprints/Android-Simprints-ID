@@ -1,5 +1,6 @@
 package com.simprints.id.activities.dashboard
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,10 +28,19 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel() {
 
     var consentRequired: Boolean = false
-    val syncToBFSIDAllowed = MutableLiveData<Boolean>()
-    val dailyActivity = MutableLiveData<DashboardDailyActivityState>()
     var syncCardStateLiveData = syncCardStateRepository.syncCardStateLiveData
-    val projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
+
+    val syncToBFSIDAllowed: LiveData<Boolean>
+        get() = _syncToBFSIDAllowed
+    private val _syncToBFSIDAllowed = MutableLiveData<Boolean>()
+
+    val dailyActivity: LiveData<DashboardDailyActivityState>
+        get() = _dailyActivity
+    private val _dailyActivity = MutableLiveData<DashboardDailyActivityState>()
+
+    val projectCardStateLiveData: LiveData<DashboardProjectState>
+        get() = _projectCardStateLiveData
+    private val _projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
 
 
     init {
@@ -45,10 +55,10 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch(dispatcher) {
             val projectDetails = projectDetailsRepository.getProjectDetails()
             val configuration = configManager.getProjectConfiguration()
-            dailyActivity.postValue(dailyActivityRepository.getDailyActivity())
-            projectCardStateLiveData.postValue(projectDetails)
+            _dailyActivity.postValue(dailyActivityRepository.getDailyActivity())
+            _projectCardStateLiveData.postValue(projectDetails)
             consentRequired = configuration.consent.collectConsent
-            syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
+            _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
         }
     }
 
