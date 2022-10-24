@@ -17,7 +17,6 @@ import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublis
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import java.io.InputStream
 
 /**
  * Transforms each of the Flowable<Packet> streams exposed by [PacketRouter] into a
@@ -41,8 +40,8 @@ class MainMessageInputStream(
     private var veroEventsDisposable: Disposable? = null
     private var un20ResponsesDisposable: Disposable? = null
 
-    override fun connect(inputStream: InputStream) {
-        packetRouter.connect(inputStream)
+    override fun connect(flowable: Flowable<ByteArray>) {
+        packetRouter.connect(flowable)
         with(packetRouter.incomingPacketRoutes) {
             veroResponses = getValue(Route.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
                 .subscribeOnIoAndPublish().also { veroResponsesDisposable = it.connect() }

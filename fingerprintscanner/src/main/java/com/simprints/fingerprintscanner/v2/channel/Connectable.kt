@@ -2,7 +2,7 @@ package com.simprints.fingerprintscanner.v2.channel
 
 import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
 import com.simprints.fingerprintscanner.v2.outgoing.OutgoingConnectable
-import java.io.InputStream
+import io.reactivex.Flowable
 import java.io.OutputStream
 
 /**
@@ -10,6 +10,6 @@ import java.io.OutputStream
  */
 interface Connectable {
 
-    fun connect(inputStream: InputStream, outputStream: OutputStream)
+    fun connect(flowable: Flowable<ByteArray>, outputStream: OutputStream)
     fun disconnect()
 }

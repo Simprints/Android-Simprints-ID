@@ -18,13 +18,9 @@ import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHan
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.*
-import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
-import io.reactivex.Single
-import io.reactivex.observers.TestObserver
 import io.reactivex.subjects.PublishSubject
-import kotlinx.coroutines.rx2.rxSingle
 import org.junit.Rule
 import org.junit.Test
 

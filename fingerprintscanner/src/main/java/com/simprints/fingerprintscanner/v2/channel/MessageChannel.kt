@@ -2,7 +2,7 @@ package com.simprints.fingerprintscanner.v2.channel
 
 import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.common.MessageOutputStream
-import java.io.InputStream
+import io.reactivex.Flowable
 import java.io.OutputStream
 
 /**
@@ -17,8 +17,8 @@ abstract class MessageChannel<I : MessageInputStream, O : MessageOutputStream<*>
     val outgoing: O
 ) : Connectable {
 
-    override fun connect(inputStream: InputStream, outputStream: OutputStream) {
-        incoming.connect(inputStream)
+    override fun connect(flowable: Flowable<ByteArray>, outputStream: OutputStream) {
+        incoming.connect(flowable)
         outgoing.connect(outputStream)
     }
 

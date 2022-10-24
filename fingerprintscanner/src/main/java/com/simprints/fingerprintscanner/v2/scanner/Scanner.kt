@@ -65,7 +65,7 @@ class Scanner(
 
     private lateinit var inputStream: InputStream
     private lateinit var outputStream: OutputStream
-
+    private lateinit var  flowable:Flowable<ByteArray>
     var state = disconnectedScannerState()
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
@@ -74,11 +74,12 @@ class Scanner(
 
     fun connect(inputStream: InputStream, outputStream: OutputStream): Completable = completable {
         this.inputStream = inputStream
+        this.flowable = inputStream.toFlowable()
         this.outputStream = outputStream
         state.connected = true
         state.mode = ROOT
 
-        rootMessageChannel.connect(inputStream, outputStream)
+        rootMessageChannel.connect(flowable, outputStream)
     }
 
     fun disconnect(): Completable = completable {
@@ -175,7 +176,7 @@ class Scanner(
 
     private fun handleMainModeEntered() = completable {
         rootMessageChannel.disconnect()
-        mainMessageChannel.connect(inputStream, outputStream)
+        mainMessageChannel.connect(flowable, outputStream)
         state.triggerButtonActive = true
         state.mode = MAIN
         scannerTriggerListenerDisposable = subscribeTriggerButtonListeners()
@@ -190,13 +191,13 @@ class Scanner(
 
     private fun handleCypressOtaModeEntered() = completable {
         rootMessageChannel.disconnect()
-        cypressOtaMessageChannel.connect(inputStream, outputStream)
+        cypressOtaMessageChannel.connect(flowable, outputStream)
         state.mode = CYPRESS_OTA
     }
 
     private fun handleStmOtaModeEntered() = completable {
         rootMessageChannel.disconnect()
-        stmOtaMessageChannel.connect(inputStream, outputStream)
+        stmOtaMessageChannel.connect(flowable, outputStream)
         state.mode = STM_OTA
     }
 
