@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknowledgement
 import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.reactive.testSubscribe
 import java.io.PipedInputStream
@@ -26,7 +27,7 @@ class StmOtaMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        stmOtaMessageInputStream.connect(inputStream)
+        stmOtaMessageInputStream.connect(inputStream.toFlowable())
 
         val testSubscriber = stmOtaMessageInputStream.receiveResponse<CommandAcknowledgement>()
             .timeout(SchedulerHelper.TIMEOUT, TimeUnit.SECONDS).testSubscribe()
