@@ -26,9 +26,8 @@ class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAc
             }
     }
 
-    private fun transformToRootResponseStream(flowable: Flowable<ByteArray>) =
-        flowable
-            .toRootMessageStream(rootResponseAccumulator)
+    private fun transformToRootResponseStream(flowableInputStream: Flowable<ByteArray>) =
+        flowableInputStream.toRootMessageStream(rootResponseAccumulator)
 
     override fun disconnect() {
         rootResponseStreamDisposable?.dispose()
