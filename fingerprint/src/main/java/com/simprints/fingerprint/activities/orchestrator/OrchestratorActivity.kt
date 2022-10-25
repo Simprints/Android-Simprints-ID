@@ -26,11 +26,17 @@ class OrchestratorActivity : FingerprintActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
-            ?: throw InvalidRequestForFingerprintException("No IFingerprintRequest found for OrchestratorActivity")
-        val fingerprintRequest = FingerprintToDomainRequest.fromFingerprintToDomainRequest(iFingerprintRequest)
+        if (savedInstanceState == null) {
+            val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
+                ?: throw InvalidRequestForFingerprintException("No IFingerprintRequest found for OrchestratorActivity")
+            val fingerprintRequest = FingerprintToDomainRequest.fromFingerprintToDomainRequest(iFingerprintRequest)
 
-        viewModel.start(fingerprintRequest)
+            viewModel.start(fingerprintRequest)
+        } else {
+            savedInstanceState.getParcelable<OrchestratorState>(RESTORE_STATE_KEY)?.let {
+                viewModel.restoreState(it)
+            }
+        }
     }
 
     override fun onResume() {
@@ -42,13 +48,6 @@ class OrchestratorActivity : FingerprintActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         viewModel.handleActivityResult(OrchestratorViewModel.ActivityResult(resultCode, data))
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        savedInstanceState.getParcelable<OrchestratorState>(RESTORE_STATE_KEY)?.let {
-            viewModel.restoreState(it)
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

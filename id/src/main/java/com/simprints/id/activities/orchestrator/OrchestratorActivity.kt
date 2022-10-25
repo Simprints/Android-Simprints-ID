@@ -22,7 +22,6 @@ import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 
@@ -85,10 +84,13 @@ class OrchestratorActivity : BaseSplitActivity() {
         appRequest = this.intent.extras?.getParcelable(APP_REQUEST_BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
-        runBlocking {
-            vm.startModalityFlow(appRequest)
+        vm.initializeModalityFlow(appRequest)
+        if (savedInstanceState == null) {
+            vm.startModalityFlow()
+            scheduleAndStartSyncIfNecessary()
+        } else {
+            vm.restoreState()
         }
-        scheduleAndStartSyncIfNecessary()
     }
 
     private fun scheduleAndStartSyncIfNecessary() {
@@ -103,27 +105,15 @@ class OrchestratorActivity : BaseSplitActivity() {
         vm.saveState()
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        vm.restoreState()
-    }
-
     override fun onResume() {
         super.onResume()
 
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         vm.onModalStepRequestDone(appRequest, requestCode, resultCode, data)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        vm.saveState()
-    }
-
 }
