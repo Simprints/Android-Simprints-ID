@@ -1,6 +1,5 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
-import android.util.Log
 import com.simprints.fingerprintscanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.RootMessageChannel
@@ -67,7 +66,7 @@ class Scanner(
 
     private lateinit var inputStream: InputStream
     private lateinit var outputStream: OutputStream
-    private lateinit var  flowable:Flowable<ByteArray>
+    private lateinit var  flowableStream:Flowable<ByteArray>
     var state = disconnectedScannerState()
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
@@ -76,12 +75,13 @@ class Scanner(
 
     fun connect(inputStream: InputStream, outputStream: OutputStream): Completable = completable {
         this.inputStream = inputStream
-        this.flowable = inputStream.toFlowable().subscribeOnIoAndPublish().also { this.flowableDisposable = it.connect() }
+        this.flowableStream = inputStream.toFlowable().subscribeOnIoAndPublish()
+            .also { this.flowableDisposable = it.connect() }
         this.outputStream = outputStream
         state.connected = true
         state.mode = ROOT
 
-        rootMessageChannel.connect(flowable, outputStream)
+        rootMessageChannel.connect(flowableStream, outputStream)
     }
 
     fun disconnect(): Completable = completable {
@@ -96,6 +96,7 @@ class Scanner(
             null -> {/* Do nothing */
             }
         }
+        flowableDisposable.dispose()
         state = disconnectedScannerState()
     }
 
@@ -178,7 +179,7 @@ class Scanner(
 
     private fun handleMainModeEntered() = completable {
         rootMessageChannel.disconnect()
-        mainMessageChannel.connect(flowable, outputStream)
+        mainMessageChannel.connect(flowableStream, outputStream)
 
         state.triggerButtonActive = true
         state.mode = MAIN
@@ -194,13 +195,13 @@ class Scanner(
 
     private fun handleCypressOtaModeEntered() = completable {
         rootMessageChannel.disconnect()
-        cypressOtaMessageChannel.connect(flowable, outputStream)
+        cypressOtaMessageChannel.connect(flowableStream, outputStream)
         state.mode = CYPRESS_OTA
     }
 
     private fun handleStmOtaModeEntered() = completable {
         rootMessageChannel.disconnect()
-        stmOtaMessageChannel.connect(flowable, outputStream)
+        stmOtaMessageChannel.connect(flowableStream, outputStream)
         state.mode = STM_OTA
     }
 

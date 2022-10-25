@@ -1,6 +1,7 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.isA
 import com.simprints.fingerprintscanner.v2.channel.CypressOtaMessageChannel
 import com.simprints.fingerprintscanner.v2.channel.MainMessageChannel
@@ -93,7 +94,7 @@ class ScannerTest {
         val scanner = Scanner(mock(), RootMessageChannel(mockMessageInputStream, mockMessageOutputStream), mock(), mock(), mock(), mock(), mock(), mock(), responseErrorHandler)
         scanner.connect(mockInputStream, mockOutputStream).blockingAwait()
 
-        verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
+        verifyOnce(mockMessageInputStream) { connect(any()) }
         verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
     }
 
@@ -120,7 +121,7 @@ class ScannerTest {
 
         scanner.enterMainMode().blockingAwait()
 
-        verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
+        verifyOnce(mockMessageInputStream) { connect(any()) }
         verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
     }
 
@@ -153,7 +154,7 @@ class ScannerTest {
 
         scanner.enterCypressOtaMode().blockingAwait()
 
-        verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
+        verifyOnce(mockMessageInputStream) { connect(any()) }
         verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
     }
 
@@ -210,7 +211,7 @@ class ScannerTest {
 
         scanner.enterStmOtaMode().blockingAwait()
 
-        verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
+        verifyOnce(mockMessageInputStream) { connect(any()) }
         verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
     }
 
