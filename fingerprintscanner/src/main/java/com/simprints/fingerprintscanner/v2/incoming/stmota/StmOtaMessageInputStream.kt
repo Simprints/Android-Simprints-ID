@@ -26,8 +26,8 @@ class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseP
             }
     }
 
-    private fun transformToStmOtaResponseStream(flowable: Flowable<ByteArray>) =
-        flowable.map { stmOtaResponseParser.parse(it) }
+    private fun transformToStmOtaResponseStream(flowableInputStream: Flowable<ByteArray>) =
+        flowableInputStream.map { stmOtaResponseParser.parse(it) }
 
     override fun disconnect() {
         stmOtaResponseStreamDisposable?.dispose()

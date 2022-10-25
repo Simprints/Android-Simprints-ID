@@ -33,9 +33,8 @@ class PacketRouter(private val routes: List<Route>,
         incomingPacketRoutesDisposable = incomingPacketRoutes.mapValues { it.value.connect() }
     }
 
-    private fun transformToPacketStream(flowable: Flowable<ByteArray>): Flowable<Packet> =
-        flowable
-            .toPacketStream(byteArrayToPacketAccumulator)
+    private fun transformToPacketStream(flowableInputStream: Flowable<ByteArray>): Flowable<Packet> =
+        flowableInputStream.toPacketStream(byteArrayToPacketAccumulator)
 
     override fun disconnect() {
         incomingPacketsDisposable.dispose()
