@@ -18,8 +18,8 @@ class CypressOtaMessageInputStream(private val cypressOtaResponseParser: Cypress
 
     private var cypressOtaResponseStreamDisposable: Disposable? = null
 
-    override fun connect(flowable: Flowable<ByteArray>) {
-        cypressOtaResponseStream = transformToCypressOtaResponseStream(flowable)
+    override fun connect(flowableInputStream: Flowable<ByteArray>) {
+        cypressOtaResponseStream = transformToCypressOtaResponseStream(flowableInputStream)
             .subscribeOnIoAndPublish()
             .also {
                 cypressOtaResponseStreamDisposable = it.connect()

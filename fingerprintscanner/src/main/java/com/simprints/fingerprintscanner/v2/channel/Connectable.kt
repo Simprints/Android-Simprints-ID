@@ -10,6 +10,6 @@ import java.io.OutputStream
  */
 interface Connectable {
 
-    fun connect(flowable: Flowable<ByteArray>, outputStream: OutputStream)
+    fun connect(flowableInputStream: Flowable<ByteArray>, outputStream: OutputStream)
     fun disconnect()
 }

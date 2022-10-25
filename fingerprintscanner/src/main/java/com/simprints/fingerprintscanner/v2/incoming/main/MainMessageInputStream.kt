@@ -40,8 +40,8 @@ class MainMessageInputStream(
     private var veroEventsDisposable: Disposable? = null
     private var un20ResponsesDisposable: Disposable? = null
 
-    override fun connect(flowable: Flowable<ByteArray>) {
-        packetRouter.connect(flowable)
+    override fun connect(flowableInputStream: Flowable<ByteArray>) {
+        packetRouter.connect(flowableInputStream)
         with(packetRouter.incomingPacketRoutes) {
             veroResponses = getValue(Route.Remote.VeroServer).toMainMessageStream(veroResponseAccumulator)
                 .subscribeOnIoAndPublish().also { veroResponsesDisposable = it.connect() }
