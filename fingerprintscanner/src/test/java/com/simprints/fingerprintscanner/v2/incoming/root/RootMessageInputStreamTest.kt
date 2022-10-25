@@ -5,6 +5,7 @@ import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeRe
 import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.observers.BaseTestConsumer.TestWaitStrategy
@@ -29,7 +30,7 @@ class RootMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        rootMessageInputStream.connect(inputStream)
+        rootMessageInputStream.connect(inputStream.toFlowable())
 
         val testSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
             .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
@@ -52,7 +53,7 @@ class RootMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        rootMessageInputStream.connect(inputStream)
+        rootMessageInputStream.connect(inputStream.toFlowable())
 
         val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
             .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
@@ -79,7 +80,7 @@ class RootMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        rootMessageInputStream.connect(inputStream)
+        rootMessageInputStream.connect(inputStream.toFlowable())
 
         val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
             .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
