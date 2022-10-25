@@ -55,9 +55,12 @@ import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHan
 import com.simprints.fingerprintscanner.v2.scanner.ota.cypress.CypressOtaController
 import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.*
 import io.reactivex.*
+import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.PublishSubject
@@ -512,6 +515,27 @@ class ScannerTest {
         assertThat(scanner.state).isEqualTo(disconnectedScannerState())
     }
 
+    @Test
+    fun `test scanner disconnect disposes flowableInputStream`() {
+        //Given
+        val scanner = Scanner(mockk(),mockk(relaxed = true),mockk(),mockk(),mockk(),mockk(),mockk(),mockk(),mockk())
+        val flowableDisposable = mockk<Disposable>(relaxed = true)
+        val flowable: Flowable<ByteArray> = mockk {
+            every { subscribeOn(any()) } returns this
+            every { publish() } returns mockk {
+                every { connect() } returns flowableDisposable
+            }
+        }
+        mockkStatic("com.simprints.fingerprintscanner.v2.tools.reactive.RxInputStreamKt")
+        val inputStream: InputStream = mockk {
+            every { toFlowable() } returns flowable
+        }
+        //When
+        scanner.connect(inputStream, mockk(relaxed = true)).blockingAwait()
+        scanner.disconnect().blockingAwait()
+        //Then
+        verify { flowableDisposable.dispose() }
+    }
 
     @Test
     fun scanner_getStmVersion_shouldReturnStmExtendedVersion() {
