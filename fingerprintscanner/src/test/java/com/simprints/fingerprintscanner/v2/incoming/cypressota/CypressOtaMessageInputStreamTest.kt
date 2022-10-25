@@ -5,6 +5,7 @@ import com.simprints.fingerprintscanner.v2.domain.cypressota.CypressOtaResponse
 import com.simprints.fingerprintscanner.v2.domain.cypressota.responses.ContinueResponse
 import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.reactive.testSubscribe
 import java.io.PipedInputStream
@@ -27,7 +28,7 @@ class CypressOtaMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        cypressOtaMessageInputStream.connect(inputStream)
+        cypressOtaMessageInputStream.connect(inputStream.toFlowable())
 
         val testSubscriber = cypressOtaMessageInputStream.receiveResponse<CypressOtaResponse>()
             .timeout(SchedulerHelper.TIMEOUT, TimeUnit.SECONDS).testSubscribe()
