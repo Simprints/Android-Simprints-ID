@@ -17,8 +17,8 @@ abstract class MessageChannel<I : MessageInputStream, O : MessageOutputStream<*>
     val outgoing: O
 ) : Connectable {
 
-    override fun connect(flowable: Flowable<ByteArray>, outputStream: OutputStream) {
-        incoming.connect(flowable)
+    override fun connect(flowableInputStream: Flowable<ByteArray>, outputStream: OutputStream) {
+        incoming.connect(flowableInputStream)
         outgoing.connect(outputStream)
     }
 

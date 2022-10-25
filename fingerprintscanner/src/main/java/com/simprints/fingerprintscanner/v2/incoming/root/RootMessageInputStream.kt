@@ -18,8 +18,8 @@ class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAc
 
     private var rootResponseStreamDisposable: Disposable? = null
 
-    override fun connect(flowable: Flowable<ByteArray>) {
-        rootResponseStream = transformToRootResponseStream(flowable)
+    override fun connect(flowableInputStream: Flowable<ByteArray>) {
+        rootResponseStream = transformToRootResponseStream(flowableInputStream)
             .subscribeOnIoAndPublish()
             .also {
                 rootResponseStreamDisposable = it.connect()

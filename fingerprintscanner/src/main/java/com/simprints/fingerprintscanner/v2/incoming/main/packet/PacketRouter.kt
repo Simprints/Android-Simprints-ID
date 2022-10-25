@@ -23,8 +23,8 @@ class PacketRouter(private val routes: List<Route>,
     private lateinit var incomingPacketsDisposable: Disposable
     private lateinit var incomingPacketRoutesDisposable: Map<Route, Disposable>
 
-    override fun connect(flowable: Flowable<ByteArray>) {
-        val rawPacketStream = transformToPacketStream(flowable)
+    override fun connect(flowableInputStream: Flowable<ByteArray>) {
+        val rawPacketStream = transformToPacketStream(flowableInputStream)
         val incomingPackets = rawPacketStream.subscribeOnIoAndPublish()
         incomingPacketRoutes = routes.associateWith {
             incomingPackets.filterRoute(it).subscribeOnIoAndPublish()

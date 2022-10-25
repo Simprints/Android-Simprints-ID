@@ -18,8 +18,8 @@ class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseP
 
     private var stmOtaResponseStreamDisposable: Disposable? = null
 
-    override fun connect(flowable: Flowable<ByteArray>) {
-        stmOtaResponseStream = transformToStmOtaResponseStream(flowable)
+    override fun connect(flowableInputStream: Flowable<ByteArray>) {
+        stmOtaResponseStream = transformToStmOtaResponseStream(flowableInputStream)
             .subscribeOnIoAndPublish()
             .also {
                 stmOtaResponseStreamDisposable = it.connect()
