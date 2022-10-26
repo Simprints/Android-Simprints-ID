@@ -8,7 +8,6 @@ import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
 import java.io.InputStream
 import java.io.OutputStream
 
-@Suppress("BlockingMethodInNonBlockingContext")
 internal object DeviceConfigurationSerializer : Serializer<ProtoDeviceConfiguration> {
     override val defaultValue: ProtoDeviceConfiguration = defaultDeviceConfiguration
 

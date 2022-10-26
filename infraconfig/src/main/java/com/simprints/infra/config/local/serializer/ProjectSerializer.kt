@@ -7,7 +7,6 @@ import com.simprints.infra.config.local.models.ProtoProject
 import java.io.InputStream
 import java.io.OutputStream
 
-@Suppress("BlockingMethodInNonBlockingContext")
 internal object ProjectSerializer : Serializer<ProtoProject> {
     override val defaultValue: ProtoProject = ProtoProject.getDefaultInstance()
 
