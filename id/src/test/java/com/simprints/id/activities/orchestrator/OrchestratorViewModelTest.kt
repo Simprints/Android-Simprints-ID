@@ -91,7 +91,7 @@ class OrchestratorViewModelTest {
     }
 
     @Test
-    fun viewModelStart_shouldStartOrchestrator() {
+    fun viewModelInitialize_shouldInitializeOrchestrator() {
         runTest {
             vm.initializeModalityFlow(enrolAppRequest)
             coVerify(exactly = 1) {
