@@ -62,10 +62,10 @@ class Scanner(
     private val un20OtaController: Un20OtaController,
     private val responseErrorHandler: ResponseErrorHandler
 ) {
-    private var flowableDisposable: Disposable? = null
-    private var flowableInputStream: Flowable<ByteArray>? = null
+    private lateinit var flowableDisposable: Disposable
 
     private lateinit var outputStream: OutputStream
+    private lateinit var flowableInputStream: Flowable<ByteArray>
     var state = disconnectedScannerState()
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
@@ -78,7 +78,8 @@ class Scanner(
         this.outputStream = outputStream
         state.connected = true
         state.mode = ROOT
-        flowableInputStream?.let { rootMessageChannel.connect(it, outputStream) }
+
+        rootMessageChannel.connect(flowableInputStream, outputStream)
     }
 
     fun disconnect(): Completable = completable {
@@ -93,7 +94,7 @@ class Scanner(
             null -> {/* Do nothing */
             }
         }
-        flowableDisposable?.dispose()
+        flowableDisposable.dispose()
         state = disconnectedScannerState()
     }
 
@@ -176,7 +177,7 @@ class Scanner(
 
     private fun handleMainModeEntered() = completable {
         rootMessageChannel.disconnect()
-        flowableInputStream?.let { mainMessageChannel.connect(it, outputStream)}
+        mainMessageChannel.connect(flowableInputStream, outputStream)
 
         state.triggerButtonActive = true
         state.mode = MAIN
@@ -192,13 +193,13 @@ class Scanner(
 
     private fun handleCypressOtaModeEntered() = completable {
         rootMessageChannel.disconnect()
-        flowableInputStream?.let { cypressOtaMessageChannel.connect(it, outputStream)}
+        cypressOtaMessageChannel.connect(flowableInputStream, outputStream)
         state.mode = CYPRESS_OTA
     }
 
     private fun handleStmOtaModeEntered() = completable {
         rootMessageChannel.disconnect()
-        flowableInputStream?.let { stmOtaMessageChannel.connect(it, outputStream)}
+        stmOtaMessageChannel.connect(flowableInputStream, outputStream)
         state.mode = STM_OTA
     }
 
