@@ -353,6 +353,7 @@ class OrchestratorManagerImplTest {
         sessionId: String = ""
     ) = runTest {
         initialise(modalities, appEnrolRequest, sessionId)
+        startModalityFlow()
     }
 
     private suspend fun OrchestratorManager.progressWitFaceCapture(

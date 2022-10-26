@@ -22,6 +22,8 @@ interface OrchestratorManager {
         sessionId: String
     )
 
+    suspend fun startModalityFlow()
+
     suspend fun handleIntentResult(
         appRequest: AppRequest,
         requestCode: Int,

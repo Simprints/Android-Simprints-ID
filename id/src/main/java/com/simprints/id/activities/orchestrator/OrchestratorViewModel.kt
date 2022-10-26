@@ -47,13 +47,20 @@ class OrchestratorViewModel @Inject constructor(
         }
     }
 
-    suspend fun startModalityFlow(appRequest: AppRequest) {
-        val projectConfiguration = configManager.getProjectConfiguration()
-        orchestratorManager.initialise(
-            projectConfiguration.general.modalities,
-            appRequest,
-            getCurrentSessionId()
-        )
+    fun initializeModalityFlow(appRequest: AppRequest) {
+        viewModelScope.launch {
+            orchestratorManager.initialise(
+                modalities,
+                appRequest,
+                getCurrentSessionId()
+            )
+        }
+    }
+
+    fun startModalityFlow() {
+        viewModelScope.launch {
+            orchestratorManager.startModalityFlow()
+        }
     }
 
     private suspend fun getCurrentSessionId(): String =
@@ -76,7 +83,6 @@ class OrchestratorViewModel @Inject constructor(
             orchestratorManager.restoreState()
         }
     }
-
 
     fun saveState() {
         orchestratorManager.saveState()

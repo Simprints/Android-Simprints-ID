@@ -19,7 +19,7 @@ okttp_version = "4.10.0"
 fuzzywuzzy_version = "1.4.0"
 jackson_version = "2.13.4"
 rootbeer_version = "0.1.0"
-mockito_version = "4.8.0"
+mockito_version = "4.8.1"
 robolectric_version = "4.8.2"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
@@ -84,7 +84,7 @@ dagger-javax = "javax.inject:javax.inject:1"
 sqlCipher-core = "net.zetetic:android-database-sqlcipher:4.5.2"
 
 #Support
-support-material = "com.google.android.material:material:1.6.1"
+support-material = "com.google.android.material:material:1.7.0"
 
 #WorkManager
 workManager-work = { module = "androidx.work:work-runtime-ktx", version.ref = "work_version" }

@@ -93,13 +93,23 @@ class OrchestratorViewModelTest {
     @Test
     fun viewModelStart_shouldStartOrchestrator() {
         runTest {
-            vm.startModalityFlow(enrolAppRequest)
+            vm.initializeModalityFlow(enrolAppRequest)
             coVerify(exactly = 1) {
                 orchestratorManagerMock.initialise(
                     listOf(GeneralConfiguration.Modality.FACE),
                     enrolAppRequest,
                     fakeSession.id
                 )
+            }
+        }
+    }
+
+    @Test
+    fun viewModelStart_shouldStartOrchestrator() {
+        runTest {
+            vm.startModalityFlow()
+            coVerify(exactly = 1) {
+                orchestratorManagerMock.startModalityFlow()
             }
         }
     }
