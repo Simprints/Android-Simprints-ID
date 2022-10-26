@@ -49,8 +49,9 @@ class OrchestratorViewModel @Inject constructor(
 
     fun initializeModalityFlow(appRequest: AppRequest) {
         viewModelScope.launch {
+            val projectConfiguration = configManager.getProjectConfiguration()
             orchestratorManager.initialise(
-                modalities,
+                projectConfiguration.general.modalities,
                 appRequest,
                 getCurrentSessionId()
             )
