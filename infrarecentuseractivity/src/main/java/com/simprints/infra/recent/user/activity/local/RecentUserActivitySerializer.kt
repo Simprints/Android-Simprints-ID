@@ -7,7 +7,6 @@ import com.simprints.infra.recent.user.activity.ProtoRecentUserActivity
 import java.io.InputStream
 import java.io.OutputStream
 
-@Suppress("BlockingMethodInNonBlockingContext")
 internal object RecentUserActivitySerializer : Serializer<ProtoRecentUserActivity> {
     override val defaultValue: ProtoRecentUserActivity =
         ProtoRecentUserActivity.getDefaultInstance()

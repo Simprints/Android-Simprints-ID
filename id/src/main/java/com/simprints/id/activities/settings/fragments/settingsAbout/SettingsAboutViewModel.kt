@@ -33,6 +33,6 @@ class SettingsAboutViewModel @Inject constructor(
     }
 
     fun logout() {
-        viewModelScope.launch(dispatcher) { signerManager.signOut() }
+        viewModelScope.launch { signerManager.signOut() }
     }
 }

@@ -8,7 +8,6 @@ import com.simprints.infra.config.local.models.ProtoProjectConfiguration
 import java.io.InputStream
 import java.io.OutputStream
 
-@Suppress("BlockingMethodInNonBlockingContext")
 internal object ProjectConfigurationSerializer : Serializer<ProtoProjectConfiguration> {
     override val defaultValue: ProtoProjectConfiguration = defaultProjectConfiguration
 

@@ -7,11 +7,11 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,6 +20,9 @@ class SettingsAboutViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     private val projectConfiguration = mockk<ProjectConfiguration>()
     private val recentUserActivity = mockk<RecentUserActivity>()
@@ -38,7 +41,7 @@ class SettingsAboutViewModelTest {
             configManager,
             signerManager,
             recentUserActivityManager,
-            UnconfinedTestDispatcher()
+            testCoroutineRule.testCoroutineDispatcher
         )
     }
 

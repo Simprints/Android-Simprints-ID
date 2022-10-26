@@ -30,7 +30,6 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         Simber.i("Migration of project configuration to Datastore done")
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun migrate(currentData: ProtoProjectConfiguration): ProtoProjectConfiguration {
         Simber.i("Start migration of project configuration to Datastore")
         val projectSettingsJson = prefs.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "")
