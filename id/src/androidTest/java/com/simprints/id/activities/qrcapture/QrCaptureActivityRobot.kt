@@ -6,8 +6,8 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.activities.qrcapture.QrCaptureActivity.Companion.QR_RESULT_KEY
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
+import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_RESULT_KEY
 import io.mockk.coVerify
 
 const val VALID_QR_SCAN_RESULT = "mock_qr_code"
@@ -58,8 +58,8 @@ class QrCaptureActivityAssertions(
 
     fun qrScanResultIsSent() {
         with(activityScenario.result.resultData) {
-            assertThat(hasExtra(QR_RESULT_KEY)).isTrue()
-            assertThat(getStringExtra(QR_RESULT_KEY)).isEqualTo(VALID_QR_SCAN_RESULT)
+            assertThat(hasExtra(QR_SCAN_RESULT_KEY)).isTrue()
+            assertThat(getStringExtra(QR_SCAN_RESULT_KEY)).isEqualTo(VALID_QR_SCAN_RESULT)
         }
     }
 

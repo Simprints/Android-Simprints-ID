@@ -3,6 +3,9 @@ package com.simprints.id.activities.login.tools
 import android.content.Intent
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.response.QrCodeResponse
+import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_ERROR_KEY
+import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError
+import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_RESULT_KEY
 
 class LoginActivityHelperImpl(
     private val jsonHelper: JsonHelper
@@ -26,12 +29,16 @@ class LoginActivityHelperImpl(
     }
 
     override fun tryParseQrCodeResponse(response: Intent): QrCodeResponse {
-        val qrValue = response.getStringExtra(EXTRA_SCAN_RESULT)
+        val qrValue = response.getStringExtra(QR_SCAN_RESULT_KEY)
         return qrValue?.let { jsonHelper.fromJson<QrCodeResponse>(it) } ?: throw Throwable("qrValue null")
     }
 
-    private companion object {
-        const val EXTRA_SCAN_RESULT = "SCAN_RESULT"
+    override fun tryParseQrCodeError(response: Intent): QrCaptureError {
+        val error = response.getSerializableExtra(QR_SCAN_ERROR_KEY)
+        return if (error is QrCaptureError) {
+            error
+        } else {
+            QrCaptureError.GENERAL_ERROR
+        }
     }
-
 }
