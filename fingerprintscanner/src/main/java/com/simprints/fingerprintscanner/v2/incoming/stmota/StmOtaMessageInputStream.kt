@@ -4,11 +4,9 @@ import com.simprints.fingerprintscanner.v2.domain.stmota.StmOtaResponse
 import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublish
-import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import java.io.InputStream
 
 /**
  * Takes an InputStream and transforms it into a Flowable<StmOtaResponse> for use while the Vero is
@@ -20,18 +18,16 @@ class StmOtaMessageInputStream(private val stmOtaResponseParser: StmOtaResponseP
 
     private var stmOtaResponseStreamDisposable: Disposable? = null
 
-    override fun connect(inputStream: InputStream) {
-        stmOtaResponseStream = transformToStmOtaResponseStream(inputStream)
+    override fun connect(flowableInputStream: Flowable<ByteArray>) {
+        stmOtaResponseStream = transformToStmOtaResponseStream(flowableInputStream)
             .subscribeOnIoAndPublish()
             .also {
                 stmOtaResponseStreamDisposable = it.connect()
             }
     }
 
-    private fun transformToStmOtaResponseStream(inputStream: InputStream) =
-        inputStream
-            .toFlowable()
-            .map { stmOtaResponseParser.parse(it) }
+    private fun transformToStmOtaResponseStream(flowableInputStream: Flowable<ByteArray>) =
+        flowableInputStream.map { stmOtaResponseParser.parse(it) }
 
     override fun disconnect() {
         stmOtaResponseStreamDisposable?.dispose()

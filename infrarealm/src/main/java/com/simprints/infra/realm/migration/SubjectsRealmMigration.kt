@@ -43,7 +43,7 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
                 8 -> migrateTo9(realm.schema)
                 9 -> migrateTo10(realm.schema)
                 10 -> migrateTo11(realm.schema)
-                11 -> migrateTo12(realm.schema)
+                11 -> migrateTo12(realm)
                 12 -> migrateTo13(realm.schema)
             }
         }
@@ -215,12 +215,69 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
             }
     }
 
-    private fun migrateTo12(schema: RealmSchema) {
-        schema.get(PeopleSchemaV7.FINGERPRINT_TABLE)
-            ?.addPrimaryKey(PeopleSchemaV7.FINGERPRINT_FIELD_ID)
+    /* Because of a previous bug in Realm the @PrimaryKey annotation in DbFaceSample and
+       DbFingerprintSample wasn't taken into account and the tables effectively didn't have primary
+       keys. This leads to duplication of rows in some cases. To fix first we need to deduplicate
+       the tables and then set ID fields as primary keys.
+     */
+    private fun migrateTo12(realm: DynamicRealm) {
+        // Add a temp column to track which samples have a parent subject
+        realm.schema.get(PeopleSchemaV7.FACE_TABLE)
+            ?.addField(SubjectsSchemaV12.TMP_HAS_PARENT, Boolean::class.java)
+        realm.schema.get(PeopleSchemaV7.FINGERPRINT_TABLE)
+            ?.addField(SubjectsSchemaV12.TMP_HAS_PARENT, Boolean::class.java)
 
-        schema.get(PeopleSchemaV7.FACE_TABLE)
+        // Through the subjects table mark all samples which have a parent
+        realm.where(SubjectsSchemaV10.SUBJECT_TABLE)
+            .findAll().forEach { subject ->
+                subject.getList(PeopleSchemaV7.PERSON_FIELD_FACE_SAMPLES)
+                    .forEach { faceSample ->
+                        faceSample.setBoolean(SubjectsSchemaV12.TMP_HAS_PARENT, true)
+                    }
+                subject.getList(PeopleSchemaV7.PERSON_FIELD_FINGERPRINT_SAMPLES)
+                    .forEach { fingerprintSample ->
+                        fingerprintSample.setBoolean(SubjectsSchemaV12.TMP_HAS_PARENT, true)
+                    }
+            }
+
+        // Delete all orphans (kind of mean thing to do but needed nonetheless :) )
+        realm.where(PeopleSchemaV7.FACE_TABLE)
+            .notEqualTo(SubjectsSchemaV12.TMP_HAS_PARENT, true)
+            .findAll()
+            .deleteAllFromRealm()
+        realm.where(PeopleSchemaV7.FINGERPRINT_TABLE)
+            .notEqualTo(SubjectsSchemaV12.TMP_HAS_PARENT, true)
+            .findAll()
+            .deleteAllFromRealm()
+
+        // In some projects there are duplicate records that are not orphans. Reason is still unclear
+        // but probably two subjects point to the same sample id which is inserted twice in the table
+        // For such cases we scan the two tables for duplicate ids and change them before making id
+        // the primary key
+        realm.where(PeopleSchemaV7.FINGERPRINT_TABLE).findAll().forEach { sample ->
+            val count = realm.where(PeopleSchemaV7.FINGERPRINT_TABLE)
+                .equalTo(PeopleSchemaV7.FINGERPRINT_FIELD_ID, sample.getString(PeopleSchemaV7.FINGERPRINT_FIELD_ID))
+                .count()
+            if (count > 1) {
+                sample.setString(PeopleSchemaV7.FINGERPRINT_FIELD_ID, UUID.randomUUID().toString())
+            }
+        }
+        realm.where(PeopleSchemaV7.FACE_TABLE).findAll().forEach { sample ->
+            val count = realm.where(PeopleSchemaV7.FACE_TABLE)
+                .equalTo(PeopleSchemaV7.FACE_FIELD_ID, sample.getString(PeopleSchemaV7.FACE_FIELD_ID))
+                .count()
+            if (count > 1) {
+                sample.setString(PeopleSchemaV7.FACE_FIELD_ID, UUID.randomUUID().toString())
+            }
+        }
+
+        // Remove temp column and set primary key on deduplicated tables
+        realm.schema.get(PeopleSchemaV7.FACE_TABLE)
+            ?.removeField(SubjectsSchemaV12.TMP_HAS_PARENT)
             ?.addPrimaryKey(PeopleSchemaV7.FACE_FIELD_ID)
+        realm.schema.get(PeopleSchemaV7.FINGERPRINT_TABLE)
+            ?.removeField(SubjectsSchemaV12.TMP_HAS_PARENT)
+            ?.addPrimaryKey(PeopleSchemaV7.FINGERPRINT_FIELD_ID)
     }
 
     private fun migrateTo13(schema: RealmSchema) {

@@ -45,7 +45,7 @@ class SimulatedCommandInputStream {
             listOf(Route.Remote.VeroServer, Route.Remote.Un20Server),
             { destination },
             ByteArrayToPacketAccumulator(PacketParser())
-        ).also { it.connect(mainInputStream) }
+        ).also { it.connect(mainInputStream.toFlowable()) }
 
     val rootCommands: Flowable<RootCommand> =
         rootInputStream

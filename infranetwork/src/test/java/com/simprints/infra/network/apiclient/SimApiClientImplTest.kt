@@ -3,10 +3,7 @@ package com.simprints.infra.network.apiclient
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.network.FakeRetrofitInterface
-import com.simprints.infra.network.exceptions.ApiError
-import com.simprints.infra.network.exceptions.BackendMaintenanceException
-import com.simprints.infra.network.exceptions.NetworkConnectionException
-import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.network.exceptions.*
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -60,7 +57,6 @@ class SimApiClientImplTest {
             response.setBody(backendMaintenanceErrorBody)
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
-
 
             val exception = assertThrows<BackendMaintenanceException> {
                 simApiClientImpl.executeCall { it.get() }
