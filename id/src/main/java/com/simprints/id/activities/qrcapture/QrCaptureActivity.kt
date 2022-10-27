@@ -17,6 +17,10 @@ import com.simprints.id.R
 import com.simprints.id.activities.qrcapture.tools.CameraHelper
 import com.simprints.id.activities.qrcapture.tools.QrCodeProducer
 import com.simprints.id.databinding.ActivityQrCaptureBinding
+import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.PERMISSION_NOT_GRANTED
+import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.CAMERA_NOT_AVAILABLE
+import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_ERROR_KEY
+import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_RESULT_KEY
 import com.simprints.id.tools.extensions.hasPermission
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.launch
@@ -53,7 +57,8 @@ class QrCaptureActivity : BaseSplitActivity() {
         if (requestCode == REQUEST_CODE_CAMERA && grantResults.all { it == PERMISSION_GRANTED }) {
             startCamera()
         } else {
-            setResult(Activity.RESULT_CANCELED)
+            val data = Intent().putExtra(QR_SCAN_ERROR_KEY, PERMISSION_NOT_GRANTED)
+            setResult(Activity.RESULT_CANCELED, data)
             finish()
         }
     }
@@ -74,7 +79,8 @@ class QrCaptureActivity : BaseSplitActivity() {
             } catch (e: Exception) {
                 if (!isFinishing) {
                     Simber.e(e)
-                    setResult(Activity.RESULT_CANCELED)
+                    val data = Intent().putExtra(QR_SCAN_ERROR_KEY, CAMERA_NOT_AVAILABLE)
+                    setResult(Activity.RESULT_CANCELED, data)
                     finish()
                 }
             }
@@ -97,18 +103,15 @@ class QrCaptureActivity : BaseSplitActivity() {
 
     private fun sendQrCodeInResultIfNotEmpty(qrCodeValue: String) {
         if (qrCodeValue.isNotEmpty()) {
-            val data = Intent().putExtra(QR_RESULT_KEY, qrCodeValue)
+            val data = Intent().putExtra(QR_SCAN_RESULT_KEY, qrCodeValue)
             setResult(Activity.RESULT_OK, data)
             finish()
         }
     }
 
     companion object {
-        const val QR_RESULT_KEY = "SCAN_RESULT"
-
         private const val REQUEST_CODE_CAMERA = 100
 
         fun getIntent(context: Context) = Intent(context, QrCaptureActivity::class.java)
     }
-
 }

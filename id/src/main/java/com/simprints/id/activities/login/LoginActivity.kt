@@ -23,6 +23,8 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.secure.models.AuthenticateDataResult
+import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.PERMISSION_NOT_GRANTED
+import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.CAMERA_NOT_AVAILABLE
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
@@ -137,7 +139,7 @@ class LoginActivity : BaseSplitActivity() {
         if (resultCode == Activity.RESULT_OK)
             processQrScanResponse(data)
         else
-            showErrorForQRCodeFailed()
+            processQrScanError(data)
     }
 
     private fun processQrScanResponse(response: Intent) {
@@ -161,8 +163,24 @@ class LoginActivity : BaseSplitActivity() {
         binding.loginEditTextProjectSecret.setText(projectSecret)
     }
 
+    private fun processQrScanError(response: Intent) {
+        when (loginActivityHelper.tryParseQrCodeError(response)) {
+            PERMISSION_NOT_GRANTED -> showErrorForCameraPermission()
+            CAMERA_NOT_AVAILABLE -> showErrorForCameraNotAvailable()
+            else -> showErrorForQRCodeFailed()
+        }
+    }
+
     private fun showErrorForInvalidQRCode() {
         showToast(R.string.login_invalid_qr_code)
+    }
+
+    private fun showErrorForCameraPermission() {
+        showToast(R.string.login_qr_code_scanning_camera_permission_error)
+    }
+
+    private fun showErrorForCameraNotAvailable() {
+        showToast(R.string.login_qr_code_scanning_camera_unavailable_error)
     }
 
     private fun showErrorForQRCodeFailed() {

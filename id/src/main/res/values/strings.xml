@@ -168,6 +168,8 @@
     <string name="login">Login</string>
     <!-- QR code scanning messages -->
     <string name="login_qr_code_scanning_problem">A problem occurred while scanning the QR code</string>
+    <string name="login_qr_code_scanning_camera_permission_error">Cannot scan the QR code without permission to use the camera</string>
+    <string name="login_qr_code_scanning_camera_unavailable_error">A problem occurred while trying to access the camera, please contact your system administrator</string>
     <string name="login_invalid_qr_code">The scanned QR code is invalid.</string>
     <!-- sign-in toast messages -->
     <string name="login_missing_credentials">Missing credentials. Please check the User ID, Project ID, and key, and try again.</string>
