@@ -16,7 +16,7 @@ buildscript {
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:7.3.0")
+        classpath("com.android.tools.build:gradle:7.3.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.version.get()}")
 
         // CI Scanning & Retry
@@ -29,7 +29,7 @@ buildscript {
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.14")
-        classpath("com.google.firebase:perf-plugin:1.4.1")
+        classpath("com.google.firebase:perf-plugin:1.4.2")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.2")
 
         // Realm Database

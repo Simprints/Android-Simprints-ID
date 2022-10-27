@@ -4,11 +4,9 @@ import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.incoming.common.MessageInputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import com.simprints.fingerprintscanner.v2.tools.reactive.subscribeOnIoAndPublish
-import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import java.io.InputStream
 
 /**
  * Takes an InputStream and transforms it into a Flowable<RootResponse> for use while the Vero is in
@@ -20,18 +18,16 @@ class RootMessageInputStream(private val rootResponseAccumulator: RootResponseAc
 
     private var rootResponseStreamDisposable: Disposable? = null
 
-    override fun connect(inputStream: InputStream) {
-        rootResponseStream = transformToRootResponseStream(inputStream)
+    override fun connect(flowableInputStream: Flowable<ByteArray>) {
+        rootResponseStream = transformToRootResponseStream(flowableInputStream)
             .subscribeOnIoAndPublish()
             .also {
                 rootResponseStreamDisposable = it.connect()
             }
     }
 
-    private fun transformToRootResponseStream(inputStream: InputStream) =
-        inputStream
-            .toFlowable()
-            .toRootMessageStream(rootResponseAccumulator)
+    private fun transformToRootResponseStream(flowableInputStream: Flowable<ByteArray>) =
+        flowableInputStream.toRootMessageStream(rootResponseAccumulator)
 
     override fun disconnect() {
         rootResponseStreamDisposable?.dispose()
