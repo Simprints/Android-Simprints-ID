@@ -5,8 +5,15 @@ import com.simprints.fingerprintscanner.v2.domain.cypressota.CypressOtaResponse
 import com.simprints.fingerprintscanner.v2.domain.cypressota.responses.ContinueResponse
 import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import io.reactivex.Flowable
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Function
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -16,6 +23,30 @@ class CypressOtaMessageInputStreamTest {
 
     private val cypressOtaResponseParser = CypressOtaResponseParser()
     private val cypressOtaMessageInputStream = CypressOtaMessageInputStream(cypressOtaResponseParser)
+
+    @Test
+    fun `test disconnect disposes the flowable stream`(){
+        //Given
+        val flowableDisposable = mockk<Disposable>(relaxed = true)
+
+        val cypressResponseFlowable: Flowable<CypressOtaResponse> = mockk {
+            every { subscribeOn(any()) } returns this
+            every { publish() } returns mockk {
+                every { connect() } returns flowableDisposable
+            }
+        }
+
+        val flowable: Flowable<ByteArray> = mockk{
+            every { map(any<Function<ByteArray,CypressOtaResponse>>()) } returns cypressResponseFlowable
+        }
+
+        //When
+        cypressOtaMessageInputStream.connect(flowable)
+        cypressOtaMessageInputStream.disconnect()
+
+        //Then
+        verify { flowableDisposable.dispose() }
+    }
 
     @Suppress("Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
         " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
@@ -28,7 +59,7 @@ class CypressOtaMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        cypressOtaMessageInputStream.connect(inputStream)
+        cypressOtaMessageInputStream.connect(inputStream.toFlowable())
 
         val testSubscriber = cypressOtaMessageInputStream.receiveResponse<CypressOtaResponse>()
             .timeout(SchedulerHelper.TIMEOUT, TimeUnit.SECONDS).testSubscribe()
