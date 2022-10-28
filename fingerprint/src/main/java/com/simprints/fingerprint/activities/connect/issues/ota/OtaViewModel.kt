@@ -11,7 +11,6 @@ import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecove
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
@@ -19,21 +18,27 @@ import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
 import com.simprints.fingerprint.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.concurrent.schedule
 
-class OtaViewModel(
+@HiltViewModel
+class OtaViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
     private val dispatcherProvider: DispatcherProvider,
-    private val fingerprintPreferenceManager: FingerprintPreferencesManager
+    private val recentUserActivityManager: RecentUserActivityManager,
+    private val configManager: ConfigManager
 ) : ViewModel() {
 
     val progress = MutableLiveData(0f)
@@ -63,33 +68,34 @@ class OtaViewModel(
                             otaComplete.postEvent()
                         }
                     }
-            .collect { otaStep ->
-                Simber.d(otaStep.toString())
-                currentStep = otaStep
-                progress.postValue(
-                    otaStep.totalProgress.mapToTotalProgress(
-                        remainingOtas.size,
-                        availableOtas.size
-                    )
-                )
-            }
+                    .collect { otaStep ->
+                        Simber.d(otaStep.toString())
+                        currentStep = otaStep
+                        progress.postValue(
+                            otaStep.totalProgress.mapToTotalProgress(
+                                remainingOtas.size,
+                                availableOtas.size
+                            )
+                        )
+                    }
             } catch (ex: Throwable) {
                 handleScannerError(ex, currentRetryAttempt)
-        }
+            }
         }
     }
 
-    private fun targetVersions(availableOta: AvailableOta): String {
-        val scannerVersion = fingerprintPreferenceManager.lastScannerVersion
-        val availableFirmwareVersions = fingerprintPreferenceManager.scannerHardwareRevisions
+    private suspend fun targetVersions(availableOta: AvailableOta): String {
+        val scannerVersion = recentUserActivityManager.getRecentUserActivity().lastScannerVersion
+        val availableFirmwareVersions =
+            configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions
         return when (availableOta) {
-            AvailableOta.CYPRESS -> availableFirmwareVersions[scannerVersion]?.cypress ?: ""
-            AvailableOta.STM -> availableFirmwareVersions[scannerVersion]?.stm ?: ""
-            AvailableOta.UN20 -> availableFirmwareVersions[scannerVersion]?.un20 ?: ""
+            AvailableOta.CYPRESS -> availableFirmwareVersions?.get(scannerVersion)?.cypress ?: ""
+            AvailableOta.STM -> availableFirmwareVersions?.get(scannerVersion)?.stm ?: ""
+            AvailableOta.UN20 -> availableFirmwareVersions?.get(scannerVersion)?.un20 ?: ""
         }
     }
 
-    private fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> {
+    private suspend fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> {
         val otaStartedTime = timeHelper.now()
         return when (this) {
             AvailableOta.CYPRESS ->
@@ -144,7 +150,7 @@ class OtaViewModel(
         }
     }
 
-    private fun saveOtaEventInSession(
+    private suspend fun saveOtaEventInSession(
         availableOta: AvailableOta,
         startTime: Long,
         e: Throwable? = null

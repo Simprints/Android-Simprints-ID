@@ -10,14 +10,12 @@ import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class ConfigurationViewModelTest {
 
     @get:Rule
@@ -60,7 +58,9 @@ class ConfigurationViewModelTest {
         val state = viewModel.configurationState.getOrAwaitValue()
 
         assertThat(state.peekContent()).isInstanceOf(ConfigurationState.FinishedWithSuccess::class.java)
-        assertThat((state.peekContent() as ConfigurationState.FinishedWithSuccess).license).isEqualTo("some license here")
+        assertThat((state.peekContent() as ConfigurationState.FinishedWithSuccess).license).isEqualTo(
+            "some license here"
+        )
     }
 
     @Test
@@ -79,7 +79,9 @@ class ConfigurationViewModelTest {
         val state = viewModel.configurationState.getOrAwaitValue()
 
         assertThat(state.peekContent()).isInstanceOf(ConfigurationState.FinishedWithBackendMaintenanceError::class.java)
-        assertThat((state.peekContent() as ConfigurationState.FinishedWithBackendMaintenanceError).estimatedOutage).isEqualTo(600L)
+        assertThat((state.peekContent() as ConfigurationState.FinishedWithBackendMaintenanceError).estimatedOutage).isEqualTo(
+            600L
+        )
     }
 
     private fun mockLicenseResult(projectId: String, data: Flow<LicenseState>) {

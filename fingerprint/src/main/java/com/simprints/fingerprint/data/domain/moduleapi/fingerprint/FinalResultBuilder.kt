@@ -15,8 +15,9 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFinge
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
+import javax.inject.Inject
 
-class FinalResultBuilder {
+class FinalResultBuilder @Inject constructor(){
 
     fun createCancelledResult() =
         FinalResult(Activity.RESULT_CANCELED, null)

@@ -51,11 +51,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.eventsystem.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.eventsystem.event.remote.models.callout.ApiCalloutPayload
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCaptureBiometricsPayload
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceFallbackCapturePayload
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceOnboardingCompletePayload
+import com.simprints.eventsystem.event.remote.models.face.*
 import com.simprints.eventsystem.event.remote.models.session.ApiSessionCapturePayload
 import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload

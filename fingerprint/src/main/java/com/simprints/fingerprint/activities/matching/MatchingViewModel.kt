@@ -11,7 +11,6 @@ import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
@@ -22,25 +21,30 @@ import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchingAlgorithm
 import com.simprints.fingerprintmatcher.domain.TemplateFormat
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import com.simprints.fingerprintmatcher.domain.FingerIdentifier as MatcherFingerIdentifier
 import com.simprints.fingerprintmatcher.domain.Fingerprint as MatcherFingerprint
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 import com.simprints.fingerprintmatcher.domain.MatchResult as MatcherMatchResult
 
-
-class MatchingViewModel(
+@HiltViewModel
+class MatchingViewModel @Inject constructor(
     private val fingerprintMatcher: FingerprintMatcher,
     private val dbManager: FingerprintDbManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
     private val masterFlowManager: MasterFlowManager,
-    private val fingerprintPreferencesManager: FingerprintPreferencesManager,
-    private val dispatcherProvider: DispatcherProvider) : ViewModel() {
+    private val configManager: ConfigManager,
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModel() {
 
 
     val result = MutableLiveData<FinishResult>()
@@ -50,8 +54,6 @@ class MatchingViewModel(
     val matchBeginningSummary = MutableLiveData<IdentificationBeginningSummary>()
     val matchFinishedSummary = MutableLiveData<IdentificationFinishedSummary>()
     val hasMatchFailed = MutableLiveData<Boolean>()
-    private val isCrossFingerMatchingEnabledInVerification:Boolean
-        get() = fingerprintPreferencesManager.isCrossFingerComparisonEnabledInVerification
     private lateinit var matchingRequest: MatchingTaskRequest
 
     @SuppressLint("CheckResult")
@@ -60,25 +62,31 @@ class MatchingViewModel(
 
         //Will be deprecated. The matching will have to run irrespective of the action from the calling app.
         when (masterFlowManager.getCurrentAction()) {
-            Action.ENROL, Action.IDENTIFY -> runMatchTask(IdentificationTask(
-                this,
-                matchingRequest,
-                sessionEventsManager,
-                timeHelper
-            ),false)
+            Action.ENROL, Action.IDENTIFY -> runMatchTask(
+                IdentificationTask(
+                    this,
+                    matchingRequest,
+                    sessionEventsManager,
+                    timeHelper
+                )
+            )
             Action.VERIFY -> runMatchTask(
                 VerificationTask(
                     this,
                     matchingRequest,
                     sessionEventsManager,
                     timeHelper
-                ),isCrossFingerMatchingEnabledInVerification
+                )
             )
         }
     }
 
-    private fun runMatchTask(matchTask: MatchTask, isCrossFingerMatchingEnabled: Boolean) {
+    private fun runMatchTask(matchTask: MatchTask) {
         viewModelScope.launch(dispatcherProvider.io()) {
+            val configuration = configManager.getProjectConfiguration()
+            val isCrossFingerMatchingEnabled =
+                matchTask is VerificationTask &&
+                    configuration.fingerprint!!.comparisonStrategyForVerification == FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
             try {
                 with(matchTask) {
                     onBeginLoadCandidates()
@@ -110,7 +118,7 @@ class MatchingViewModel(
         fingerprintMatcher.match(
             probeFingerprints.toFingerprintIdentity().fromDomainToMatcher(),
             candidates.map { it.fromDomainToMatcher() },
-            DEFAULT_MATCHING_ALGORITHM, isCrossFingerMatchingEnabled ,
+            DEFAULT_MATCHING_ALGORITHM, isCrossFingerMatchingEnabled,
         ).map { it.fromMatcherToDomain() }
 
     private fun handleMatchFailed(e: Throwable) {

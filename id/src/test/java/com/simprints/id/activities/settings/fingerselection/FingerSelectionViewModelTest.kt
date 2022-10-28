@@ -2,13 +2,16 @@ package com.simprints.id.activities.settings.fingerselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
-import com.simprints.id.data.prefs.IdPreferencesManager
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.Finger.*
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import io.mockk.verify
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -17,16 +20,23 @@ class FingerSelectionViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    private val prefsMock: IdPreferencesManager = mockk()
-    private val viewModel = FingerSelectionViewModel(prefsMock)
+    private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
+    private val deviceConfiguration = mockk<DeviceConfiguration>()
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { fingerprint } returns fingerprintConfiguration
+        }
+        coEvery { getDeviceConfiguration() } returns deviceConfiguration
+    }
+    private val viewModel = FingerSelectionViewModel(configManager, UnconfinedTestDispatcher())
 
     @Test
     fun start_loadsStartingFingerStateCorrectly() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -40,11 +50,11 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun addFinger_correctlyUpdatesState() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -61,12 +71,12 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun removeItem_correctlyUpdatesState() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB,
             LEFT_INDEX_FINGER
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -82,12 +92,12 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun moveItem_correctlyUpdatesState() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB,
             LEFT_INDEX_FINGER
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -104,31 +114,31 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun changeFingerSelection_correctlyUpdatesState() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
-        viewModel.changeFingerSelection(1, FingerIdentifier.RIGHT_INDEX_FINGER)
+        viewModel.changeFingerSelection(1, RIGHT_INDEX_FINGER)
 
         assertThat(viewModel.items.value).containsExactlyElementsIn(
             listOf(
                 FingerSelectionItem(LEFT_THUMB, 2, false),
-                FingerSelectionItem(FingerIdentifier.RIGHT_INDEX_FINGER, 2, true)
+                FingerSelectionItem(RIGHT_INDEX_FINGER, 2, true)
             )
         ).inOrder()
     }
 
     @Test
     fun changeQuantitySelection_correctlyUpdatesState() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -144,12 +154,12 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun resetFingerItems_correctlyUpdatesState() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB,
             LEFT_INDEX_FINGER
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -164,11 +174,11 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun haveSettingsChanged_determinesCorrectValue() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -181,17 +191,23 @@ class FingerSelectionViewModelTest {
         viewModel.removeItem(2)
 
         assertThat(viewModel.haveSettingsChanged()).isFalse()
+
+        viewModel.addNewFinger()
+
+        viewModel.savePreference()
+
+        assertThat(viewModel.haveSettingsChanged()).isFalse()
     }
 
     @Test
     fun canSavePreference_withinLimit_returnsTrue() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB,
             LEFT_THUMB, LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -200,7 +216,7 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun canSavePreference_overLimit_returnsFalse() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB,
             LEFT_THUMB,
             LEFT_THUMB,
@@ -214,7 +230,7 @@ class FingerSelectionViewModelTest {
             RIGHT_THUMB,
             RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
 
@@ -222,27 +238,29 @@ class FingerSelectionViewModelTest {
     }
 
     @Test
-    fun savePreference_savesPreference() {
-        every { prefsMock.fingerprintsToCollect } returns listOf(
+    fun savePreference_savesPreference() = runTest {
+        val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
+        coEvery { configManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
         )
-        every { prefsMock.getRemoteConfigFingerprintsToCollect() } returns listOf(LEFT_THUMB)
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
 
         viewModel.start()
         viewModel.addNewFinger()
 
         viewModel.savePreference()
 
-        val prefSlot = slot<List<FingerIdentifier>>()
-        verify { prefsMock.fingerprintsToCollect = capture(prefSlot) }
 
-        assertThat(prefSlot.captured).containsExactlyElementsIn(
-            listOf(
-                LEFT_THUMB, LEFT_THUMB,
-                RIGHT_THUMB, RIGHT_THUMB,
-                LEFT_INDEX_FINGER
-            )
-        ).inOrder()
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(),""))
+        val expectedFingersToCollect = listOf(
+            LEFT_THUMB, LEFT_THUMB,
+            RIGHT_THUMB, RIGHT_THUMB,
+            LEFT_INDEX_FINGER
+        )
+        // Comparing string representation as when executing the lambda captured in the mock it will
+        // not return an ArrayList but a LinkedHashMap.
+        assertThat(updatedConfig.fingersToCollect.toString()).isEqualTo(expectedFingersToCollect.toString())
     }
 }

@@ -3,6 +3,8 @@ package com.simprints.face.configuration
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -10,17 +12,18 @@ import com.simprints.face.R
 import com.simprints.face.databinding.FragmentConfigurationBinding
 import com.simprints.face.initializers.SdkInitializer
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
-    private val mainVm: FaceOrchestratorViewModel by sharedViewModel()
-    private val viewModel: ConfigurationViewModel by viewModel()
+    private val mainVm: FaceOrchestratorViewModel by activityViewModels()
+    private val viewModel: ConfigurationViewModel by viewModels()
     private val binding by viewBinding(FragmentConfigurationBinding::bind)
 
     private val args: ConfigurationFragmentArgs by navArgs()
-    private val sdkInitializer: SdkInitializer by inject()
+    @Inject
+    lateinit var sdkInitializer: SdkInitializer
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,7 +39,9 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
                 ConfigurationState.Downloading -> renderDownloading()
                 is ConfigurationState.FinishedWithSuccess -> renderFinishedWithSuccess(it.license)
                 is ConfigurationState.FinishedWithError -> renderFinishedWithError(it.errorCode)
-                is ConfigurationState.FinishedWithBackendMaintenanceError -> renderFinishedWithBackendMaitenanceError(it.estimatedOutage)
+                is ConfigurationState.FinishedWithBackendMaintenanceError -> renderFinishedWithBackendMaitenanceError(
+                    it.estimatedOutage
+                )
             }
         })
     }

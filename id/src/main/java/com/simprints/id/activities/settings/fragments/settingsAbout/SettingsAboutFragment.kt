@@ -7,53 +7,54 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.simprints.core.domain.common.GROUP
-import com.simprints.core.domain.modality.Modality
-import com.simprints.core.sharedpreferences.RecentEventsPreferencesManager
+import com.simprints.core.DeviceID
+import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.extentions.showToast
-import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.enablePreference
-import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
+
+@AndroidEntryPoint
 class SettingsAboutFragment : PreferenceFragmentCompat() {
 
-    private lateinit var packageVersionName: String
-    private lateinit var deviceId: String
+    @Inject
+    @PackageVersionName
+    lateinit var packageVersionName: String
+
+    @Inject
+    @DeviceID
+    lateinit var deviceId: String
+
     private val confirmationDialogForLogout: AlertDialog by lazy {
         AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.confirmation_logout_title))
-            .setMessage(getString(R.string.confirmation_logout_message))
+            .setTitle(getString(IDR.string.confirmation_logout_title))
+            .setMessage(getString(IDR.string.confirmation_logout_message))
             .setPositiveButton(
-                getString(R.string.logout)
+                getString(IDR.string.logout)
             ) { _, _ ->
                 settingsAboutViewModel.logout()
                 finishSettings()
             }
             .setNegativeButton(
-                getString(R.string.confirmation_logout_cancel), null
+                getString(IDR.string.confirmation_logout_cancel), null
             ).create()
     }
 
-    @Inject
-    lateinit var recentEventsManager: RecentEventsPreferencesManager
-
-    @Inject
-    lateinit var preferencesManager: IdPreferencesManager
-
-    @Inject
-    lateinit var settingsAboutViewModelFactory: SettingsAboutViewModelFactory
-    lateinit var settingsAboutViewModel: SettingsAboutViewModel
+    private val settingsAboutViewModel: SettingsAboutViewModel by viewModels()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_app_details)
@@ -62,30 +63,27 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-
-        val component = (requireActivity().application as Application).component
-        component.inject(this)
-
-        settingsAboutViewModel = ViewModelProvider(
-            this,
-            settingsAboutViewModelFactory
-        ).get(SettingsAboutViewModel::class.java)
         setTextInLayout()
         setPreferenceListeners()
 
-        packageVersionName = requireActivity().packageVersionName
-        deviceId = requireActivity().deviceId
-
         loadPreferenceValuesAndBindThemToChangeListeners()
-        enableSettingsBasedOnModalities(getScannerVersionPreference())
+
+        settingsAboutViewModel.configuration.observe(this) {
+            loadSyncAndSearchConfigurationPreference(it, getSyncAndSearchConfigurationPreference())
+            enableSettingsBasedOnModalities(it, getScannerVersionPreference())
+        }
+        settingsAboutViewModel.recentUserActivity.observe(this) {
+            loadScannerVersionInPreference(getScannerVersionPreference(), it)
+        }
     }
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
-        loadValueAndBindChangeListener(getSyncAndSearchConfigurationPreference())
-        loadValueAndBindChangeListener(getAppVersionPreference())
-        loadValueAndBindChangeListener(getScannerVersionPreference())
-        loadValueAndBindChangeListener(getDeviceIdPreference())
-        loadValueAndBindChangeListener(getLogoutPreference())
+        loadAppVersionInPreference(getAppVersionPreference(), packageVersionName)
+        loadDeviceIdInPreference(getDeviceIdPreference(), deviceId)
+        getLogoutPreference()?.setOnPreferenceClickListener {
+            showConfirmationDialogForLogout()
+            true
+        }
     }
 
     private fun setPreferenceListeners() {
@@ -104,12 +102,13 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     }
 
     private fun setTextInLayout() {
-        getAppVersionPreference()?.title = getString(R.string.preference_app_version_title)
-        getDeviceIdPreference()?.title = getString(R.string.preference_device_id_title)
-        getScannerVersionPreference()?.title = getString(R.string.preference_scanner_version_title)
+        getAppVersionPreference()?.title = getString(IDR.string.preference_app_version_title)
+        getDeviceIdPreference()?.title = getString(IDR.string.preference_device_id_title)
+        getScannerVersionPreference()?.title =
+            getString(IDR.string.preference_scanner_version_title)
         getSyncAndSearchConfigurationPreference()?.title =
-            getString(R.string.preference_sync_and_search_title)
-        getLogoutPreference()?.title = getString(R.string.preference_logout_title)
+            getString(IDR.string.preference_sync_and_search_title)
+        getLogoutPreference()?.title = getString(IDR.string.preference_logout_title)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -122,34 +121,19 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
     }
 
     private fun getSyncAndSearchConfigurationPreference(): Preference? =
-        findPreference(getKeyForSyncAndSearchConfigurationPreference())
+        findPreference(getString(R.string.preference_sync_and_search_key))
 
     private fun getAppVersionPreference(): Preference? =
-        findPreference(getKeyForAppVersionPreference())
+        findPreference(getString(R.string.preference_app_version_key))
 
     private fun getScannerVersionPreference(): Preference? =
-        findPreference(getKeyForScannerVersionPreference())
+        findPreference(getString(R.string.preference_scanner_version_key))
 
     private fun getDeviceIdPreference(): Preference? =
-        findPreference(getKeyForDeviceIdPreference())
+        findPreference(getString(R.string.preference_device_id_key))
 
     private fun getLogoutPreference(): Preference? =
-        findPreference(getKeyForLogoutPreference())
-
-    private fun getKeyForLogoutPreference(): String =
-        getString(R.string.preference_logout_key)
-
-    private fun getKeyForSyncAndSearchConfigurationPreference(): String =
-        getString(R.string.preference_sync_and_search_key)
-
-    private fun getKeyForAppVersionPreference(): String =
-        getString(R.string.preference_app_version_key)
-
-    private fun getKeyForScannerVersionPreference(): String =
-        getString(R.string.preference_scanner_version_key)
-
-    private fun getKeyForDeviceIdPreference(): String =
-        getString(R.string.preference_device_id_key)
+        findPreference(getString(R.string.preference_logout_key))
 
     private fun showConfirmationDialogForLogout() {
         activity?.runOnUiThreadIfStillRunning {
@@ -157,34 +141,16 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun loadValueAndBindChangeListener(preference: Preference?) {
-        when (preference?.key) {
-            getKeyForSyncAndSearchConfigurationPreference() -> {
-                loadSyncAndSearchConfigurationPreference(preference)
-            }
-            getKeyForAppVersionPreference() -> {
-                loadAppVersionInPreference(preference, packageVersionName)
-            }
-            getKeyForScannerVersionPreference() -> {
-                loadScannerVersionInPreference(preference)
-            }
-            getKeyForDeviceIdPreference() -> {
-                loadDeviceIdInPreference(preference, deviceId)
-            }
-            getKeyForLogoutPreference() -> {
-                preference.setOnPreferenceClickListener {
-                    showConfirmationDialogForLogout()
-                    true
-                }
-            }
-        }
-    }
-
-    private fun enableSettingsBasedOnModalities(scannerVersionPref: Preference?) {
-        preferencesManager.modalities.forEach {
+    private fun enableSettingsBasedOnModalities(
+        config: ProjectConfiguration,
+        scannerVersionPref: Preference?
+    ) {
+        config.general.modalities.forEach {
             when (it) {
-                Modality.FINGER -> enableFingerprintSettings(scannerVersionPref)
-                Modality.FACE -> enableFaceSettings()
+                GeneralConfiguration.Modality.FINGERPRINT -> enableFingerprintSettings(
+                    scannerVersionPref
+                )
+                GeneralConfiguration.Modality.FACE -> enableFaceSettings()
             }
         }
     }
@@ -197,23 +163,31 @@ class SettingsAboutFragment : PreferenceFragmentCompat() {
         // No face-specific settings yet
     }
 
-    private fun loadSyncAndSearchConfigurationPreference(preference: Preference?) {
-        preference?.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
-            " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
+    private fun loadSyncAndSearchConfigurationPreference(
+        config: ProjectConfiguration,
+        preference: Preference?
+    ) {
+        preference?.summary =
+            "${config.synchronization.down.partitionType.name.lowerCaseCapitalized()} Sync" +
+                " - ${config.identification.poolType.name.lowerCaseCapitalized()} Search"
     }
 
-    private fun GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
+    private fun String.lowerCaseCapitalized() =
+        lowercase(Locale.getDefault()).replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
-    private fun loadAppVersionInPreference(preference: Preference, packageVersionName: String) {
-        preference.summary = packageVersionName
+    private fun loadAppVersionInPreference(preference: Preference?, packageVersionName: String) {
+        preference?.summary = packageVersionName
     }
 
-    private fun loadScannerVersionInPreference(preference: Preference) {
-        preference.summary = recentEventsManager.lastScannerVersion
+    private fun loadScannerVersionInPreference(
+        preference: Preference?,
+        recentUserActivity: RecentUserActivity
+    ) {
+        preference?.summary = recentUserActivity.lastScannerVersion
     }
 
-    private fun loadDeviceIdInPreference(preference: Preference, deviceId: String) {
-        preference.summary = deviceId
+    private fun loadDeviceIdInPreference(preference: Preference?, deviceId: String) {
+        preference?.summary = deviceId
     }
 
     private fun finishSettings() {

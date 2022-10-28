@@ -2,6 +2,7 @@ package com.simprints.id.services.sync.events.up
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
@@ -10,20 +11,30 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
-                                    private val jsonHelper: JsonHelper) : EventUpSyncWorkersBuilder {
+class EventUpSyncWorkersBuilderImpl @Inject constructor(
+    private val upSyncScopeRepository: EventUpSyncScopeRepository,
+    private val jsonHelper: JsonHelper
+) : EventUpSyncWorkersBuilder {
 
 
     override suspend fun buildUpSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
         val uniqueUpSyncId = UUID.randomUUID().toString()
         val upSyncScope = upSyncScopeRepository.getUpSyncScope()
-        return listOf(buildUpSyncWorkers(uniqueSyncId, uniqueUpSyncId, upSyncScope)) + buildCountWorker(uniqueSyncId, uniqueUpSyncId, upSyncScope)
+        return listOf(
+            buildUpSyncWorkers(
+                uniqueSyncId,
+                uniqueUpSyncId,
+                upSyncScope
+            )
+        ) + buildCountWorker(uniqueSyncId, uniqueUpSyncId, upSyncScope)
     }
 
-    private fun buildUpSyncWorkers(uniqueSyncID: String?,
-                                   uniqueUpSyncId: String,
-                                   upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
+    private fun buildUpSyncWorkers(
+        uniqueSyncID: String?,
+        uniqueUpSyncId: String,
+        upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
     ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventUpSyncUploaderWorker::class.java)
             .setInputData(workDataOf(INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope)))
@@ -32,9 +43,10 @@ class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: com.simpr
             .build() as OneTimeWorkRequest
 
 
-    private fun buildCountWorker(uniqueSyncID: String?,
-                                 uniqueUpSyncID: String,
-                                 upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
+    private fun buildCountWorker(
+        uniqueSyncID: String?,
+        uniqueUpSyncID: String,
+        upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
     ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventUpSyncCountWorker::class.java)
             .setInputData(workDataOf(INPUT_COUNT_WORKER_UP to jsonHelper.toJson(upSyncScope)))
@@ -47,9 +59,11 @@ class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: com.simpr
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-    private fun WorkRequest.Builder<*, *>.upSyncWorker(uniqueMasterSyncId: String?,
-                                                       uniqueUpMasterSyncId: String,
-                                                       constraints: Constraints = Constraints.Builder().build()) =
+    private fun WorkRequest.Builder<*, *>.upSyncWorker(
+        uniqueMasterSyncId: String?,
+        uniqueUpMasterSyncId: String,
+        constraints: Constraints = Constraints.Builder().build()
+    ) =
         this.setConstraints(constraints)
             .addTagForMasterSyncId(uniqueMasterSyncId)
             .addTagFoUpSyncId(uniqueUpMasterSyncId)
@@ -58,7 +72,11 @@ class EventUpSyncWorkersBuilderImpl(private val upSyncScopeRepository: com.simpr
             .addCommonTagForAllSyncWorkers()
             .also { builder ->
                 uniqueMasterSyncId?.let {
-                    builder.setBackoffCriteria(BackoffPolicy.LINEAR, EventSyncMasterWorker.MIN_BACKOFF_SECS, TimeUnit.SECONDS)
+                    builder.setBackoffCriteria(
+                        BackoffPolicy.LINEAR,
+                        EventSyncMasterWorker.MIN_BACKOFF_SECS,
+                        TimeUnit.SECONDS
+                    )
                 }
             }
 }

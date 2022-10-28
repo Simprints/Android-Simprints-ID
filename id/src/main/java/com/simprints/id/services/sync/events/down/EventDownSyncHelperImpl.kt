@@ -15,24 +15,25 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.domain.SubjectAction
-import com.simprints.id.data.db.subject.domain.SubjectAction.Creation
-import com.simprints.id.data.db.subject.domain.SubjectAction.Deletion
 import com.simprints.id.data.db.subject.domain.SubjectFactory
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
+import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class EventDownSyncHelperImpl(
-    val subjectRepository: SubjectRepository,
-    val eventRepository: EventRepository,
+class EventDownSyncHelperImpl @Inject constructor(
+    private val subjectRepository: EnrolmentRecordManager,
+    private val eventRepository: EventRepository,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
-    private val preferencesManager: IdPreferencesManager,
+    private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val dispatcher: DispatcherProvider
 ) : EventDownSyncHelper {
@@ -150,7 +151,7 @@ class EventDownSyncHelperImpl(
         }
     }
 
-    fun handleSubjectMoveEvent(
+    private suspend fun handleSubjectMoveEvent(
         operation: EventDownSyncOperation,
         event: EnrolmentRecordMoveEvent
     ): List<SubjectAction> {
@@ -236,12 +237,14 @@ class EventDownSyncHelperImpl(
     private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
         op.queryEvent.moduleIds?.let { moduleId.partOf(it) } ?: false
 
-    private fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
-        moduleId.partOf(preferencesManager.selectedModules.toList())
+    private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
+        withContext(dispatcher.io()) {
+            moduleId.partOf(configManager.getDeviceConfiguration().selectedModules)
+        }
 
     private fun String.partOf(modules: List<String>) = modules.contains(this)
 
-    fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
+    private fun handleSubjectDeletionEvent(event: EnrolmentRecordDeletionEvent): List<SubjectAction> =
         listOf(Deletion(event.payload.subjectId))
 
     companion object {

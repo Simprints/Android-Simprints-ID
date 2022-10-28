@@ -2,8 +2,9 @@ package com.simprints.id.secure
 
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.security.cryptography.ProjectSecretEncrypter
+import javax.inject.Inject
 
-class ProjectSecretManager(private val loginManager: LoginManager) {
+class ProjectSecretManager @Inject constructor(private val loginManager: LoginManager) {
 
     fun encryptAndStoreAndReturnProjectSecret(
         projectSecret: String,

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.simprints.infra.config.local.models";
+option java_multiple_files = true;
+
+message ProtoProject {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string creator = 4;
+    string imageBucket = 5;
+}

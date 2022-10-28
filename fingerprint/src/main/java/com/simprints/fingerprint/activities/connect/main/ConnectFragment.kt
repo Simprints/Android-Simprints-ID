@@ -6,16 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 abstract class ConnectFragment(@LayoutRes private val layout: Int) : FingerprintFragment() {
 
-    protected val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    protected val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 

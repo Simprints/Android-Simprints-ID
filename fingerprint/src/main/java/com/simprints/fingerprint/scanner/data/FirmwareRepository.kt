@@ -1,21 +1,22 @@
 package com.simprints.fingerprint.scanner.data
 
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
+import javax.inject.Inject
 
 
-class FirmwareRepository(
+class FirmwareRepository @Inject constructor(
     private val firmwareRemoteDataSource: FirmwareRemoteDataSource,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
-    private val fingerprintPreferencesManager: FingerprintPreferencesManager
+    private val configManager: ConfigManager
 ) {
 
     suspend fun updateStoredFirmwareFilesWithLatest() {
-        fingerprintPreferencesManager.scannerHardwareRevisions.keys.forEach { hardwareVersion ->
+        configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions?.keys?.forEach { hardwareVersion ->
             updateStoredFirmwareFilesWithLatest(hardwareVersion)
         }
     }
@@ -65,21 +66,24 @@ class FirmwareRepository(
      * Clean up old firmware files
      *
      */
-     fun cleanUpOldFirmwareFiles() {
+    suspend fun cleanUpOldFirmwareFiles() {
         Simber.d("Starting local Firmware files cleanup")
 
         val locallySavedFiles = firmwareLocalDataSource.getAvailableScannerFirmwareVersions()
         val cypressOfficialVersions = mutableSetOf<String>()
         val stmOfficialVersions = mutableSetOf<String>()
         val un20OfficialVersions = mutableSetOf<String>()
-        fingerprintPreferencesManager.scannerHardwareRevisions.entries.forEach {
+        configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions?.entries?.forEach {
             cypressOfficialVersions.add(it.value.cypress)
             stmOfficialVersions.add(it.value.stm)
             un20OfficialVersions.add(it.value.un20)
         }
         locallySavedFiles.entries.forEach {
             when (it.key) {
-                Chip.CYPRESS -> obsoleteItems(it.value, cypressOfficialVersions).forEach { firmwareFile ->
+                Chip.CYPRESS -> obsoleteItems(
+                    it.value,
+                    cypressOfficialVersions
+                ).forEach { firmwareFile ->
                     firmwareLocalDataSource.deleteCypressFirmware(firmwareFile)
                 }
                 Chip.STM -> obsoleteItems(it.value, stmOfficialVersions).forEach { firmwareFile ->
@@ -92,7 +96,7 @@ class FirmwareRepository(
         }
     }
 
-    private fun obsoleteItems(localVersions: Set<String>, officialVersions: Set<String>)=
+    private fun obsoleteItems(localVersions: Set<String>, officialVersions: Set<String>) =
         localVersions.filter { !officialVersions.contains(it) }
 
 }

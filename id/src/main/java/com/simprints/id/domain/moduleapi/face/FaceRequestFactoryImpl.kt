@@ -5,8 +5,9 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import java.io.Serializable
+import javax.inject.Inject
 
-class FaceRequestFactoryImpl(): FaceRequestFactory {
+class FaceRequestFactoryImpl @Inject constructor() : FaceRequestFactory {
 
     override fun buildCaptureRequest(
         nFaceSamplesToCapture: Int

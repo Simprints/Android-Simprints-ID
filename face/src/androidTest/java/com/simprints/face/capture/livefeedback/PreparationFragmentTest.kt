@@ -14,25 +14,14 @@ import com.simprints.face.R
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import io.mockk.mockk
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
 
 @RunWith(AndroidJUnit4::class)
 class PreparationFragmentTest {
 
     private val faceTimeHelper: FaceTimeHelper = mockk(relaxed = true)
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxed = true)
-
-    @Before
-    fun setUp() {
-        loadKoinModules(module(override = true) {
-            single { faceTimeHelper }
-            single { faceSessionEventsManager }
-        })
-    }
 
     @Test
     fun testNavigationFromPreparationToLiveFeedBackFragment() {

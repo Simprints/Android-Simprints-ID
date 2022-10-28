@@ -1,7 +1,6 @@
 package com.simprints.id.exitformhandler
 
 import android.content.Intent
-import com.simprints.core.domain.modality.Modality
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
@@ -14,22 +13,25 @@ import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import javax.inject.Inject
 
-class ExitFormHelperImpl : ExitFormHelper {
+class ExitFormHelperImpl @Inject constructor(): ExitFormHelper {
 
-    override fun getExitFormActivityClassFromModalities(modalities: List<Modality>): String? =
+    override fun getExitFormActivityClassFromModalities(modalities: List<GeneralConfiguration.Modality>): String? =
         if (isSingleModality(modalities)) {
             getModalitySpecificExitFormClass(modalities)
         } else {
             getCoreExitFormClass()
         }
 
-    private fun isSingleModality(modalities: List<Modality>) = modalities.size == 1
+    private fun isSingleModality(modalities: List<GeneralConfiguration.Modality>) =
+        modalities.size == 1
 
-    private fun getModalitySpecificExitFormClass(modalities: List<Modality>) =
+    private fun getModalitySpecificExitFormClass(modalities: List<GeneralConfiguration.Modality>) =
         when (modalities.first()) {
-            Modality.FACE -> FaceExitFormActivity::class.java.canonicalName
-            Modality.FINGER -> FingerprintExitFormActivity::class.java.canonicalName
+            GeneralConfiguration.Modality.FACE -> FaceExitFormActivity::class.java.canonicalName
+            GeneralConfiguration.Modality.FINGERPRINT -> FingerprintExitFormActivity::class.java.canonicalName
         }
 
     private fun getCoreExitFormClass() = CoreExitFormActivity::class.java.canonicalName

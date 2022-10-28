@@ -7,20 +7,22 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.simprints.clientapi.ClientApiComponent
+import com.simprints.clientapi.ClientApiModule
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.databinding.ActivityErrorBinding
 import com.simprints.core.tools.activity.BaseSplitActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import splitties.views.backgroundColor
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
 
     @Inject
-    lateinit var presenterFactory: ClientApiComponent.ErrorPresenterFactory
+    lateinit var presenterFactory: ClientApiModule.ErrorPresenterFactory
 
     override val presenter: ErrorContract.Presenter by lazy { presenterFactory.create(this) }
 

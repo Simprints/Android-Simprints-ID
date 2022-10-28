@@ -1,26 +1,27 @@
 package com.simprints.fingerprint.scanner.tools
 
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import javax.inject.Inject
 
 /**
  * Helper class for determining which Vero generation a particular MAC address corresponds to.
  */
-class ScannerGenerationDeterminer {
+class ScannerGenerationDeterminer @Inject constructor(){
 
     /**
      * Vero 2 serial numbers are taken from the range 000000 - 099999. Some Vero 1 serial numbers
      * are known to be in this range as well, so these should be taken into account.
      * @param serialNumber The serial number in "SPXXXXXX" format
      */
-    fun determineScannerGenerationFromSerialNumber(serialNumber: String): ScannerGeneration {
+    fun determineScannerGenerationFromSerialNumber(serialNumber: String): FingerprintConfiguration.VeroGeneration {
         val serialInt = serialNumber.substring(serialIntIndices).toInt()
         return if (
             serialInt < VERO_2_CUT_OFF &&
             !VERO_1_SERIAL_NUMBERS_BELOW_CUT_OFF.contains(serialNumber)
         ) {
-            ScannerGeneration.VERO_2
+            FingerprintConfiguration.VeroGeneration.VERO_2
         } else {
-            ScannerGeneration.VERO_1
+            FingerprintConfiguration.VeroGeneration.VERO_1
         }
     }
 

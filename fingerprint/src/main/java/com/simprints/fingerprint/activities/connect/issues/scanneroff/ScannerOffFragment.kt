@@ -6,9 +6,9 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.core.R as CR
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -17,24 +17,39 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentScannerOffBinding
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import com.simprints.infra.resources.R as CR
 
+@AndroidEntryPoint
 class ScannerOffFragment : FingerprintFragment() {
 
-    private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentScannerOffBinding::bind)
-    private val timeHelper: FingerprintTimeHelper by inject()
-    private val sessionManager: FingerprintSessionEventsManager by inject()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    @Inject
+    lateinit var timeHelper: FingerprintTimeHelper
+
+    @Inject
+    lateinit var sessionManager: FingerprintSessionEventsManager
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_scanner_off, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 
-        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.ScannerOff))
+        sessionManager.addEventInBackground(
+            AlertScreenEventWithScannerIssue(
+                timeHelper.now(),
+                ConnectScannerIssue.ScannerOff
+            )
+        )
 
         initTryAgainButton()
         initCouldNotConnectTextView()
@@ -56,8 +71,10 @@ class ScannerOffFragment : FingerprintFragment() {
 
     private fun initCouldNotConnectTextView() {
         connectScannerViewModel.showScannerErrorDialogWithScannerId.value?.let { scannerIdEvent ->
-            binding.couldNotConnectTextView.paintFlags = binding.couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-            binding.couldNotConnectTextView.text = String.format(getString(R.string.not_my_scanner), scannerIdEvent.peekContent())
+            binding.couldNotConnectTextView.paintFlags =
+                binding.couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+            binding.couldNotConnectTextView.text =
+                String.format(getString(R.string.not_my_scanner), scannerIdEvent.peekContent())
             binding.couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
             binding.couldNotConnectTextView.visibility = View.VISIBLE
         }
@@ -100,7 +117,10 @@ class ScannerOffFragment : FingerprintFragment() {
             tryAgainButton.setBackgroundColor(resources.getColor(CR.color.simprints_green, null))
         }
 
-        Handler().postDelayed({ connectScannerViewModel.finishConnectActivity() }, FINISHED_TIME_DELAY_MS)
+        Handler().postDelayed(
+            { connectScannerViewModel.finishConnectActivity() },
+            FINISHED_TIME_DELAY_MS
+        )
     }
 
     private fun setupConnectingMode() {

@@ -3,11 +3,13 @@ package com.simprints.face.capture
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.models.FaceDetection
+import com.simprints.infra.config.domain.models.FaceConfiguration.ImageSavingStrategy
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -32,15 +34,22 @@ class FaceCaptureViewModelTest {
         }
     )
 
-    private fun buildViewModel(shouldSaveFaceImages: Boolean) = FaceCaptureViewModel(
-        shouldSaveFaceImages = shouldSaveFaceImages,
-        faceImageManager = faceImageManager
-    )
+    private fun buildViewModel(savingStrategy: ImageSavingStrategy) =
+        FaceCaptureViewModel(
+            configManager = mockk {
+                coEvery { getProjectConfiguration() } returns mockk {
+                    every { face } returns mockk {
+                        every { imageSavingStrategy } returns savingStrategy
+                    }
+                }
+            },
+            faceImageManager = faceImageManager
+        )
 
     @Test
-    fun `save face detections should not be called when save flag set to false`() {
-        testCoroutineRule.runBlockingTest {
-            val vm = buildViewModel(false)
+    fun `save face detections should not be called when image saving strategy set to NEVER`() {
+        runTest {
+            val vm = buildViewModel(ImageSavingStrategy.NEVER)
             vm.captureFinished(faceDetections)
             vm.flowFinished()
             coVerify(exactly = 0) { faceImageManager.save(any(), any()) }
@@ -48,9 +57,9 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
-    fun `save face detections should be called when save flag set to true`() {
-        testCoroutineRule.runBlockingTest {
-            val vm = buildViewModel(true)
+    fun `save face detections should be called when image saving strategy set to ONLY_GOO_SCAN`() {
+        runTest {
+            val vm = buildViewModel(ImageSavingStrategy.ONLY_GOOD_SCAN)
             vm.captureFinished(faceDetections)
             vm.flowFinished()
             coVerify(atLeast = 1) { faceImageManager.save(any(), any()) }

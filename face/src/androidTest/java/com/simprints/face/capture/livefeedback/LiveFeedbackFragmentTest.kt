@@ -22,13 +22,9 @@ import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
-import org.koin.test.KoinTest
 
 @RunWith(AndroidJUnit4::class)
-class LiveFeedbackFragmentTest : KoinTest {
+class LiveFeedbackFragmentTest {
 
     private lateinit var device: UiDevice
     private val faceCaptureViewModel: FaceCaptureViewModel = mockk(relaxed = true)
@@ -37,11 +33,6 @@ class LiveFeedbackFragmentTest : KoinTest {
     @Before
     fun setUp() {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        loadKoinModules(
-            module(override = true) {
-                viewModel { faceCaptureViewModel }
-                viewModel { liveFeedBackVm }
-            })
     }
 
     @Test

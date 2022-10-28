@@ -5,7 +5,6 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType
@@ -27,14 +26,14 @@ import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import io.mockk.mockk
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class EventRepositoryImplIntegrationTest {
 
@@ -44,7 +43,7 @@ class EventRepositoryImplIntegrationTest {
     lateinit var loginManager: LoginManager
 
     @MockK
-    lateinit var eventRemoteDataSource: EventRemoteDataSource
+    private lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -70,8 +69,13 @@ class EventRepositoryImplIntegrationTest {
         db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java)
             .allowMainThreadQueries().build()
         eventDao = db.eventDao
-        eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory)
+        eventLocalDataSource = EventLocalDataSourceImpl(
+            eventDatabaseFactory,
+            UnconfinedTestDispatcher(),
+            UnconfinedTestDispatcher()
+        )
         eventRepo = EventRepositoryImpl(
+            "",
             "",
             "",
             loginManager,
@@ -79,10 +83,8 @@ class EventRepositoryImplIntegrationTest {
             eventRemoteDataSource,
             timeHelper,
             sessionEventValidatorsFactory,
-            "",
             sessionDataCache,
-            "",
-            listOf(Modes.FACE, Modes.FINGERPRINT)
+            mockk()
         )
 
         every { timeHelper.now() } returns TIME1

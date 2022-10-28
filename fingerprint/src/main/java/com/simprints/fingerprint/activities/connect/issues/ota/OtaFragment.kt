@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -15,9 +17,8 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentOtaBinding
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.concurrent.schedule
 
 /**
@@ -25,25 +26,38 @@ import kotlin.concurrent.schedule
  * Over The Air updates to the fingerprint scanner, have a look at the
  * readme for more details - /connect/README.md
  */
+@AndroidEntryPoint
 class OtaFragment : FingerprintFragment() {
 
-    private val timeHelper: FingerprintTimeHelper by inject()
-    private val sessionManager: FingerprintSessionEventsManager by inject()
+    @Inject
+    lateinit var timeHelper: FingerprintTimeHelper
 
-    private val viewModel: OtaViewModel by viewModel()
-    private val connectScannerViewModel: ConnectScannerViewModel by sharedViewModel()
+    @Inject
+    lateinit var sessionManager: FingerprintSessionEventsManager
+
+    private val viewModel: OtaViewModel by viewModels()
+    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentOtaBinding::bind)
 
     private val args: OtaFragmentArgs by navArgs()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(R.layout.fragment_ota, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 
-        sessionManager.addEventInBackground(AlertScreenEventWithScannerIssue(timeHelper.now(), ConnectScannerIssue.Ota(args.otaFragmentRequest)))
+        sessionManager.addEventInBackground(
+            AlertScreenEventWithScannerIssue(
+                timeHelper.now(),
+                ConnectScannerIssue.Ota(args.otaFragmentRequest)
+            )
+        )
 
         listenForProgress()
         listenForCompleteEvent()
@@ -76,17 +90,23 @@ class OtaFragment : FingerprintFragment() {
         binding.apply {
             otaProgressBar.visibility = View.VISIBLE
             otaStatusTextView.visibility = View.VISIBLE
-            otaStatusTextView.text = when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
-                0 -> getString(R.string.updating)
-                else -> String.format(requireActivity().getString(R.string.updating_attempt),
-                    "${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}")
-            }
+            otaStatusTextView.text =
+                when (val retry = args.otaFragmentRequest.currentRetryAttempt) {
+                    0 -> getString(R.string.updating)
+                    else -> String.format(
+                        requireActivity().getString(R.string.updating_attempt),
+                        "${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}"
+                    )
+                }
             startUpdateButton.visibility = View.INVISIBLE
             startUpdateButton.isEnabled = false
         }
 
         connectScannerViewModel.disableBackButton()
-        viewModel.startOta(args.otaFragmentRequest.availableOtas, args.otaFragmentRequest.currentRetryAttempt)
+        viewModel.startOta(
+            args.otaFragmentRequest.availableOtas,
+            args.otaFragmentRequest.currentRetryAttempt
+        )
     }
 
     private fun listenForProgress() {
@@ -97,13 +117,21 @@ class OtaFragment : FingerprintFragment() {
 
     private fun listenForRecoveryEvent() {
         viewModel.otaRecovery.fragmentObserveEventWith {
-            findNavController().navigate(OtaFragmentDirections.actionOtaFragmentToOtaRecoveryFragment(it))
+            findNavController().navigate(
+                OtaFragmentDirections.actionOtaFragmentToOtaRecoveryFragment(
+                    it
+                )
+            )
         }
     }
 
     private fun listenForFailedEvent() {
         viewModel.otaFailed.fragmentObserveEventWith {
-            findNavController().navigate(OtaFragmentDirections.actionOtaFragmentToOtaFailedFragment(it))
+            findNavController().navigate(
+                OtaFragmentDirections.actionOtaFragmentToOtaFailedFragment(
+                    it
+                )
+            )
         }
     }
 

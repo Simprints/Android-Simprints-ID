@@ -223,12 +223,13 @@ class LoginInfoManagerImplTest {
 
         verify(exactly = 1) { editor.putString("PROJECT_ID", "") }
         verify(exactly = 1) { editor.putString("USER_ID", "") }
+        verify(exactly = 1) { editor.putString("ENCRYPTED_PROJECT_SECRET", "") }
         verify(exactly = 1) { editor.putString("PROJECT_ID_CLAIM", "") }
         verify(exactly = 1) { editor.putString("USER_ID_CLAIM", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_PROJECT_ID", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_APPLICATION_ID", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_API_KEY", "") }
-        verify(exactly = 7) { editor.apply() }
+        verify(exactly = 8) { editor.apply() }
     }
 
     @Test

@@ -8,8 +8,9 @@ import com.simprints.eventsystem.events_sync.up.local.DbEventUpSyncOperationStat
 import com.simprints.eventsystem.events_sync.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
 import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class EventUpSyncScopeRepositoryImpl(
+internal class EventUpSyncScopeRepositoryImpl @Inject constructor(
     val loginManager: LoginManager,
     private val dbEventUpSyncOperationStateDao: DbEventUpSyncOperationStateDao,
     private val dispatcher: DispatcherProvider

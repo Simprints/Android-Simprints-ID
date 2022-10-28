@@ -7,30 +7,27 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.simprints.core.domain.common.GROUP
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canDownSyncEvents
-import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.databinding.ActivitySyncInformationBinding
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class SyncInformationActivity : BaseSplitActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: SyncInformationViewModelFactory
-
-    @Inject
-    lateinit var preferencesManager: IdPreferencesManager
+    private val viewModel: SyncInformationViewModel by viewModels()
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
@@ -39,24 +36,17 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
 
-    private lateinit var viewModel: SyncInformationViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
 
-        title = getString(R.string.title_activity_sync_information)
+        title = getString(IDR.string.title_activity_sync_information)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this, viewModelFactory)[SyncInformationViewModel::class.java]
-
         setTextInLayout()
-        enableModuleSelectionButtonAndTabsIfNecessary()
         setupAdapters()
         setupToolbar()
         setupClickListeners()
         observeUi()
-        setupRecordsCountCards()
     }
 
     override fun onResume() {
@@ -67,16 +57,16 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private fun setTextInLayout() {
         binding.moduleSelectionButton.text =
-            getString(R.string.select_modules_button_title)
+            getString(IDR.string.select_modules_button_title)
         binding.recordsToUploadText.text =
-            getString(R.string.sync_info_records_to_upload)
+            getString(IDR.string.sync_info_records_to_upload)
         binding.recordsToDownloadText.text =
-            getString(R.string.sync_info_records_to_download)
+            getString(IDR.string.sync_info_records_to_download)
         binding.recordsToDeleteText.text =
-            getString(R.string.sync_info_records_to_delete)
+            getString(IDR.string.sync_info_records_to_delete)
         binding.totalRecordsOnDeviceText.text =
-            getString(R.string.sync_info_total_records_on_device)
-        binding.imagesToUploadText.text = getString(R.string.sync_info_images_to_upload)
+            getString(IDR.string.sync_info_total_records_on_device)
+        binding.imagesToUploadText.text = getString(IDR.string.sync_info_images_to_upload)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -103,8 +93,8 @@ class SyncInformationActivity : BaseSplitActivity() {
         viewModel.fetchSyncInformation()
     }
 
-    private fun enableModuleSelectionButtonAndTabsIfNecessary() {
-        if (isModuleSyncAndModuleIdOptionsNotEmpty()) {
+    private fun enableModuleSelectionButtonAndTabsIfNecessary(synchronizationConfiguration: SynchronizationConfiguration) {
+        if (isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
             binding.moduleSelectionButton.visibility = View.VISIBLE
             binding.modulesTabHost.visibility = View.VISIBLE
         } else {
@@ -120,8 +110,9 @@ class SyncInformationActivity : BaseSplitActivity() {
         }
     }
 
-    private fun isModuleSyncAndModuleIdOptionsNotEmpty() =
-        preferencesManager.moduleIdOptions.isNotEmpty() && preferencesManager.syncGroup == GROUP.MODULE
+    private fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
+        synchronizationConfiguration.down.moduleOptions.isNotEmpty() &&
+            synchronizationConfiguration.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun setupToolbar() {
         setSupportActionBar(binding.syncInfoToolbar)
@@ -135,6 +126,11 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
+        viewModel.synchronizationConfiguration.observe(this) {
+            enableModuleSelectionButtonAndTabsIfNecessary(it)
+            setupRecordsCountCards(it)
+        }
+
         viewModel.recordsInLocal.observe(this) {
             binding.totalRecordsCount.text = it?.toString() ?: ""
             setProgressBar(it, binding.totalRecordsCount, binding.totalRecordsProgress)
@@ -190,24 +186,30 @@ class SyncInformationActivity : BaseSplitActivity() {
         }
 
         val totalRecordsEntry =
-            ModuleCount(getString(R.string.sync_info_total_records),
+            ModuleCount(getString(IDR.string.sync_info_total_records),
                 moduleCounts.sumOf { it.count })
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 
         moduleCountAdapter.submitList(moduleCountsArray)
     }
 
-    private fun setupRecordsCountCards() {
-        if (!preferencesManager.canDownSyncEvents()) {
+    private fun setupRecordsCountCards(synchronizationConfiguration: SynchronizationConfiguration) {
+        if (!synchronizationConfiguration.canDownSyncEvents()) {
             binding.recordsToDownloadCardView.visibility = View.GONE
             binding.recordsToDeleteCardView.visibility = View.GONE
         }
 
-        if (!preferencesManager.canSyncDataToSimprints()) {
+        if (!synchronizationConfiguration.canSyncDataToSimprints()) {
             binding.recordsToUploadCardView.visibility = View.GONE
             binding.imagesToUploadCardView.visibility = View.GONE
         }
     }
+
+    private fun SynchronizationConfiguration.canDownSyncEvents(): Boolean =
+        frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+
+    private fun SynchronizationConfiguration.canSyncDataToSimprints(): Boolean =
+        up.simprints.kind != UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 
     companion object {
         private const val TOTAL_RECORDS_INDEX = 0

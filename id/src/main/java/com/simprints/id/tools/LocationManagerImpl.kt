@@ -7,11 +7,13 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.Task
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import javax.inject.Inject
 
-class LocationManagerImpl(val ctx: Context) : LocationManager {
+class LocationManagerImpl @Inject constructor(@ApplicationContext val ctx: Context) : LocationManager {
 
     private val locationClient = LocationServices.getFusedLocationProviderClient(ctx)
 

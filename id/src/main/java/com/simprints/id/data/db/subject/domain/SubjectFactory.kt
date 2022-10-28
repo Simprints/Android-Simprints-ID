@@ -8,6 +8,8 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemp
 import com.simprints.eventsystem.event.domain.models.subject.*
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.infra.enrolment.records.domain.models.Subject
+import javax.inject.Inject
 
 interface SubjectFactory {
 
@@ -15,34 +17,44 @@ interface SubjectFactory {
     fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove): Subject
 }
 
-class SubjectFactoryImpl(private val encodingUtils: EncodingUtils) : SubjectFactory {
+class SubjectFactoryImpl @Inject constructor(private val encodingUtils: EncodingUtils) :
+    SubjectFactory {
 
-    override fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) = with(payload) {
-        Subject(
-            subjectId = subjectId,
-            projectId = projectId,
-            attendantId = attendantId,
-            moduleId = moduleId,
-            fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
-            faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
-        )
-    }
+    override fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
+        with(payload) {
+            Subject(
+                subjectId = subjectId,
+                projectId = projectId,
+                attendantId = attendantId,
+                moduleId = moduleId,
+                fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
+                faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
+            )
+        }
 
-    override fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) = with(payload) {
-        Subject(
-            subjectId = subjectId,
-            projectId = projectId,
-            attendantId = attendantId,
-            moduleId = moduleId,
-            fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
-            faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
-        )
-    }
+    override fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) =
+        with(payload) {
+            Subject(
+                subjectId = subjectId,
+                projectId = projectId,
+                attendantId = attendantId,
+                moduleId = moduleId,
+                fingerprintSamples = extractFingerprintSamplesFromBiometricReferences(this.biometricReferences),
+                faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
+            )
+        }
 
     private fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
         biometricReferences?.filterIsInstance<FingerprintReference>()
             ?.firstOrNull()
-            ?.let { reference -> reference.templates.map { buildFingerprintSample(it, reference.format) } }
+            ?.let { reference ->
+                reference.templates.map {
+                    buildFingerprintSample(
+                        it,
+                        reference.format
+                    )
+                }
+            }
             ?: emptyList()
 
     private fun buildFingerprintSample(

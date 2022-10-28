@@ -1,10 +1,10 @@
 package com.simprints.id
 
 import android.content.Context
-import com.google.android.play.core.splitcompat.SplitCompat
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.simprints.core.CoreApplication
 import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.di.*
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
@@ -12,55 +12,18 @@ import com.simprints.infra.logging.SimberBuilder
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.loadKoinModules
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
-import org.koin.core.module.Module
-import org.koin.core.qualifier.named
-import org.koin.dsl.module
+import javax.inject.Inject
 
 @HiltAndroidApp
-open class Application: CoreApplication() {
+open class Application : CoreApplication(), Configuration.Provider {
 
-    lateinit var component: AppComponent
-    lateinit var orchestratorComponent: OrchestratorComponent
-    private lateinit var applicationScope: CoroutineScope
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
 
     override fun attachBaseContext(base: Context) {
         LanguageHelper.init(base)
         val ctx = LanguageHelper.getLanguageConfigurationContext(base)
         super.attachBaseContext(ctx)
-        SplitCompat.install(this)
-    }
-
-    open fun createComponent() {
-        component = DaggerAppComponent
-            .builder()
-            .application(this)
-            .appModule(AppModule())
-            .preferencesModule(PreferencesModule())
-            .serializerModule(SerializerModule())
-            .syncModule(SyncModule())
-            .viewModelModule(ViewModelModule())
-            .build()
-
-    }
-
-    open fun createOrchestratorComponent() {
-        orchestratorComponent = component
-            .getOrchestratorComponent().orchestratorModule(OrchestratorModule())
-            .build()
-    }
-
-    open fun createApplicationCoroutineScope() {
-        // For operations that shouldn’t be cancelled,
-        // call them from a coroutine created by an
-        // application CoroutineScope
-        applicationScope = CoroutineScope(SupervisorJob())
     }
 
     override fun onCreate() {
@@ -68,11 +31,14 @@ open class Application: CoreApplication() {
         initApplication()
     }
 
+    override fun getWorkManagerConfiguration() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
+
+
     open fun initApplication() {
-        createComponent()
         handleUndeliverableExceptionInRxJava()
-        createApplicationCoroutineScope()
-        initKoin()
         SimberBuilder.initialize(this)
         Simber.tag(DEVICE_ID, true).i(deviceId)
     }
@@ -93,44 +59,5 @@ open class Application: CoreApplication() {
             Simber.d("Undeliverable exception received", exceptionToPrint)
             exceptionToPrint.printStackTrace()
         }
-    }
-
-    private fun initKoin() {
-        startKoin {
-            androidLogger()
-            androidContext(this@Application)
-            loadKoinModules(listOf(module(override = true) {
-                this.defineBuildersForCoreManagers()
-                single(qualifier = named(APPLICATION_COROUTINE_SCOPE)) {
-                    applicationScope
-                }
-            }))
-        }
-    }
-
-    private fun Module.defineBuildersForCoreManagers() {
-        factory { component.getPreferencesManager() }
-        factory { component.getSessionEventsManager() }
-        factory { component.getTimeHelper() }
-        factory { component.getFingerprintRecordLocalDataSource() }
-        factory { component.getFaceIdentityLocalDataSource() }
-        factory { component.getImprovedSharedPreferences() }
-        factory { component.getRemoteConfigWrapper() }
-        factory { orchestratorComponent.getFlowManager() }
-        factory { component.getPersonRepository() }
-        factory { component.getImageRepository() }
-        factory { component.getLoginManager() }
-        factory { component.getLicenseRepository() }
-        factory { component.getIdPreferencesManager() }
-        factory { component.getSecurityManager() }
-    }
-
-    override fun onTerminate() {
-        super.onTerminate()
-        stopKoin()
-    }
-
-    companion object {
-        const val APPLICATION_COROUTINE_SCOPE = "application_coroutine_scope"
     }
 }

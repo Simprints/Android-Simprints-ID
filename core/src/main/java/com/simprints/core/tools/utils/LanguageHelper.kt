@@ -3,14 +3,14 @@ package com.simprints.core.tools.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_FILE_NAME
-import com.simprints.core.tools.constants.SharedPrefsConstants.PREF_MODE
 import java.util.*
 
 object LanguageHelper {
 
-    const val SHARED_PREFS_LANGUAGE_KEY = "SelectedLanguage"
-    const val SHARED_PREFS_LANGUAGE_DEFAULT = "en"
+    private const val SHARED_PREFS_LANGUAGE_KEY = "SelectedLanguage"
+    private const val SHARED_PREFS_LANGUAGE_DEFAULT = "en"
+    private const val PREF_FILE_NAME = "language"
+    private const val PREF_MODE = Context.MODE_PRIVATE
 
     lateinit var prefs: SharedPreferences
     var language: String
@@ -21,7 +21,7 @@ object LanguageHelper {
             prefs.edit().putString(SHARED_PREFS_LANGUAGE_KEY, value).apply()
         }
 
-    fun init(ctx: Context){
+    fun init(ctx: Context) {
         prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
     }
 

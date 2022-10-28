@@ -5,11 +5,12 @@ import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -18,11 +19,12 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 
-@ExperimentalCoroutinesApi
 class SecurityStateRepositoryImplTest {
 
-    @MockK lateinit var mockRemoteDataSource: SecurityStateRemoteDataSource
-    @MockK lateinit var mockLocalDataSource: SecurityStateLocalDataSource
+    @MockK
+    lateinit var mockRemoteDataSource: SecurityStateRemoteDataSource
+    @MockK
+    lateinit var mockLocalDataSource: SecurityStateLocalDataSource
 
     private lateinit var repository: SecurityStateRepositoryImpl
 
@@ -80,9 +82,10 @@ class SecurityStateRepositoryImplTest {
         val securityState = SecurityState(DEVICE_ID, SecurityState.Status.PROJECT_ENDED)
         coEvery { mockRemoteDataSource.getSecurityState() } returns securityState
 
-       val remoteState = repository.getSecurityStatusFromRemote()
+        val remoteState = repository.getSecurityStatusFromRemote()
 
-        assertThat(securityState).isEqualTo(remoteState
+        assertThat(securityState).isEqualTo(
+            remoteState
         )
     }
 

@@ -6,9 +6,11 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.await
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class CameraHelperImpl(
-    private val context: Context,
+class CameraHelperImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val previewBuilder: QrPreviewBuilder,
     private val cameraFocusManager: CameraFocusManager
 ) : CameraHelper {

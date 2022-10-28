@@ -1,24 +1,36 @@
 package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.*
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canDownSyncEvents
-import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.canSyncDataToSimprints
+import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import com.simprints.infra.logging.Simber
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.*
-import javax.inject.Inject
 
-open class EventSyncMasterWorker(
-    private val appContext: Context,
-    params: WorkerParameters
+@HiltWorker
+open class EventSyncMasterWorker @AssistedInject constructor(
+    @Assisted private val appContext: Context,
+    @Assisted params: WorkerParameters,
+    private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,
+    private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
+    private val configManager: ConfigManager,
+    private val eventSyncCache: EventSyncCache,
+    private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
+    private val timeHelper: TimeHelper,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
 
     companion object {
@@ -33,29 +45,7 @@ open class EventSyncMasterWorker(
 
     override val tag: String = EventSyncMasterWorker::class.java.simpleName
 
-    @Inject
-    lateinit var downSyncWorkerBuilder: EventDownSyncWorkersBuilder
-
-    @Inject
-    lateinit var upSyncWorkerBuilder: EventUpSyncWorkersBuilder
-
-    @Inject
-    lateinit var preferenceManager: IdPreferencesManager
-
-    @Inject
-    lateinit var eventSyncCache: EventSyncCache
-
-    @Inject
-    lateinit var eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder
-
-    @Inject
-    lateinit var timeHelper: TimeHelper
-
-    @Inject
-    lateinit var dispatcher: DispatcherProvider
-
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(appContext)
+    private val wm = WorkManager.getInstance(appContext)
 
     private val syncWorkers
         get() = wm.getAllSubjectsSyncWorkersInfo().get().apply {
@@ -68,17 +58,15 @@ open class EventSyncMasterWorker(
         UUID.randomUUID().toString()
     }
 
-    override suspend fun doWork(): Result {
-        getComponent<EventSyncMasterWorker> { it.inject(this@EventSyncMasterWorker) }
-
-        return withContext(dispatcher.io()) {
+    override suspend fun doWork(): Result =
+        withContext(dispatcher) {
             try {
                 crashlyticsLog("Start")
+                val configuration = configManager.getProjectConfiguration()
 
-                if (!preferenceManager.canSyncDataToSimprints() && !preferenceManager.canDownSyncEvents())
-                    return@withContext success(
-                        message = "Can't sync to SimprintsID, skip"
-                    )
+                if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed()) return@withContext success(
+                    message = "Can't sync to SimprintsID, skip"
+                )
 
                 //Requests timestamp now as device is surely ONLINE,
                 //so if needed, the NTP has a chance to get refreshed.
@@ -88,19 +76,22 @@ open class EventSyncMasterWorker(
                     val startSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(uniqueSyncId)
                     val workerChain = mutableListOf<OneTimeWorkRequest>()
-                    if (preferenceManager.canSyncDataToSimprints())
-                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId).also {
-                            Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
-                        }
+                    if (configuration.canSyncDataToSimprints())
+                        workerChain += upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncId)
+                            .also {
+                                Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} up workers")
+                            }
 
-                    if (preferenceManager.canDownSyncEvents())
-                        workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId).also {
-                            Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
-                        }
+                    if (configuration.isEventDownSyncAllowed())
+                        workerChain += downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncId)
+                            .also {
+                                Simber.tag(SYNC_LOG_TAG).d("Scheduled ${it.size} down workers")
+                            }
 
                     val endSyncReporterWorker =
                         eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(uniqueSyncId)
-                    wm.beginWith(startSyncReporterWorker).then(workerChain).then(endSyncReporterWorker)
+                    wm.beginWith(startSyncReporterWorker).then(workerChain)
+                        .then(endSyncReporterWorker)
                         .enqueue()
 
                     eventSyncCache.clearProgresses()
@@ -121,7 +112,11 @@ open class EventSyncMasterWorker(
                 fail(t)
             }
         }
-    }
+
+    private suspend fun isEventDownSyncAllowed() =
+        with(configManager.getProjectConfiguration().synchronization) {
+            frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+        }
 
     private fun getLastSyncId(): String? {
         return syncWorkers.last()?.getUniqueSyncId()

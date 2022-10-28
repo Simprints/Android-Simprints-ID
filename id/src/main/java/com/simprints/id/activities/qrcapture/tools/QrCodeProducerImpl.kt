@@ -6,15 +6,13 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.simprints.id.activities.qrcapture.model.RawImage
 import com.simprints.infra.logging.Simber
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-class QrCodeProducerImpl(
-    private val qrCodeDetector: QrCodeDetector
-) : QrCodeProducer, ImageAnalysis.Analyzer {
+class QrCodeProducerImpl @Inject constructor(private val qrCodeDetector: QrCodeDetector) :
+    QrCodeProducer, ImageAnalysis.Analyzer {
 
     override val useCase by lazy {
         ImageAnalysis.Builder()

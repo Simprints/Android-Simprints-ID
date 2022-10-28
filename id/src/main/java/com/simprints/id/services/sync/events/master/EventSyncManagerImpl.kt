@@ -3,7 +3,9 @@ package com.simprints.id.services.sync.events.master
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.BuildConfig
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
@@ -13,16 +15,19 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class EventSyncManagerImpl(
-    private val ctx: Context,
+class EventSyncManagerImpl @Inject constructor(
+    @ApplicationContext private val ctx: Context,
     private val eventSyncStateProcessor: EventSyncStateProcessor,
-    private val downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
-    private val upSyncScopeRepo: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository,
+    private val downSyncScopeRepository: EventDownSyncScopeRepository,
+    private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
-    private val dispatcher: DispatcherProvider
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : EventSyncManager {
 
     companion object {
@@ -30,8 +35,7 @@ class EventSyncManagerImpl(
         val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(ctx)
+    private val wm = WorkManager.getInstance(ctx)
 
     override fun getLastSyncState(): LiveData<EventSyncState> =
         eventSyncStateProcessor.getLastSyncState()
@@ -55,7 +59,8 @@ class EventSyncManagerImpl(
         wm.enqueueUniquePeriodicWork(
             MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
             ExistingPeriodicWorkPolicy.KEEP,
-            buildPeriodicRequest())
+            buildPeriodicRequest()
+        )
 
     }
 
@@ -80,7 +85,11 @@ class EventSyncManagerImpl(
             .build() as OneTimeWorkRequest
 
     private fun buildPeriodicRequest(): PeriodicWorkRequest =
-        PeriodicWorkRequest.Builder(EventSyncMasterWorker::class.java, SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+        PeriodicWorkRequest.Builder(
+            EventSyncMasterWorker::class.java,
+            SYNC_REPEAT_INTERVAL,
+            SYNC_REPEAT_UNIT
+        )
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTagForSyncMasterWorkers()
             .addTagForBackgroundSyncMasterWorker()
@@ -93,7 +102,7 @@ class EventSyncManagerImpl(
             .build()
 
     override suspend fun deleteSyncInfo() {
-        withContext(dispatcher.io()) {
+        withContext(dispatcher) {
             downSyncScopeRepository.deleteAll()
             upSyncScopeRepo.deleteAll()
             eventSyncCache.clearProgresses()

@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.os.Parcel
 import android.os.Parcelable
 import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.id.di.EncryptedSharedPreferences
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.cache.HotCacheImpl.AppRequestWrapper.Companion.CREATOR
 import com.simprints.id.orchestrator.steps.Step
@@ -13,9 +14,12 @@ import com.simprints.id.tools.extensions.getMap
 import com.simprints.id.tools.extensions.putMap
 import com.simprints.id.tools.extensions.save
 import kotlinx.parcelize.Parcelize
+import javax.inject.Inject
 
-class HotCacheImpl(private val sharedPrefs: SharedPreferences,
-                   private val stepEncoder: StepEncoder) : HotCache {
+class HotCacheImpl @Inject constructor(
+    @EncryptedSharedPreferences private val sharedPrefs: SharedPreferences,
+    private val stepEncoder: StepEncoder
+) : HotCache {
 
     override var appRequest: AppRequest
         set(value) {
@@ -75,7 +79,8 @@ class HotCacheImpl(private val sharedPrefs: SharedPreferences,
         companion object {
             val CREATOR = object : Parcelable.Creator<AppRequestWrapper> {
                 override fun createFromParcel(source: Parcel): AppRequestWrapper {
-                    val appRequest = source.readParcelable<AppRequest>(AppRequest::class.java.classLoader)!!
+                    val appRequest =
+                        source.readParcelable<AppRequest>(AppRequest::class.java.classLoader)!!
                     return AppRequestWrapper(appRequest)
                 }
 

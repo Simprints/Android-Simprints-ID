@@ -86,7 +86,6 @@ android {
 
     buildFeatures.viewBinding = true
 
-    dynamicFeatures.addAll(mutableSetOf(":fingerprint", ":face", ":clientapi"))
     lint {
         warning += setOf("InvalidPackage")
     }
@@ -109,12 +108,19 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":eventsystem"))
     api(project(":infralogin"))
+    implementation(project(":clientapi"))
+    implementation(project(":face"))
+    implementation(project(":fingerprint"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
     implementation(project(":infrarealm"))
+    implementation(project(":infrarecentuseractivity"))
     implementation(project(":infrasecurity"))
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))
+    implementation(project(":infraresources"))
     implementation(libs.libsimprints)
 
     implementation(libs.dagger.core)
@@ -138,14 +144,12 @@ dependencies {
 
 
     // Service Location & DI
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
     implementation(libs.hilt)
+    implementation(libs.hilt.work)
     kapt(libs.hilt.kapt)
-    kapt(libs.dagger.compiler)
+    kapt(libs.hilt.compiler)
 
     implementation(libs.fuzzywuzzy.core)
-    implementation(libs.kronos.kronos)
     implementation(libs.jackson.core)
 
     // Firebase
@@ -156,18 +160,12 @@ dependencies {
     implementation(libs.androidX.core)
     implementation(libs.androidX.multidex)
     implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.lifecycle.ktx)
-    implementation(libs.androidX.lifecycle.livedata)
+    implementation(libs.androidX.lifecycle.livedata.ktx)
     implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.androidX.lifecycle.scope)
     implementation(libs.androidX.ui.constraintlayout)
-    api(libs.androidX.navigation.dynamicfeatures)
     implementation(libs.kotlin.coroutinesAndroid)
     implementation(libs.androidX.cameraX.core)
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
-    implementation(libs.playcore.core)
-    implementation(libs.playcore.core.ktx)
     implementation(libs.androidX.sqlite)
     implementation(libs.sqlCipher.core)
 
@@ -199,8 +197,6 @@ dependencies {
     testImplementation(libs.testing.koTest.kotlin.assert)
 
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.koin)
-    testImplementation(libs.testing.koin.junit4)
 
     testImplementation(libs.testing.mockwebserver)
     testImplementation(libs.testing.work)
@@ -216,6 +212,8 @@ dependencies {
     androidTestImplementation(project(":fingerprintscannermock")) {
         exclude("org.robolectric")
     }
+    androidTestImplementation(libs.testing.robolectric.core)
+    androidTestImplementation(libs.testing.robolectric.multidex)
     androidTestImplementation(libs.testing.retrofit)
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.core)
@@ -228,6 +226,9 @@ dependencies {
     androidTestImplementation(libs.testing.truth)
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
+
+    androidTestImplementation(libs.testing.hilt)
+    kaptAndroidTest(libs.testing.hilt.kapt)
 
     androidTestImplementation(libs.testing.mockwebserver)
     androidTestImplementation(libs.testing.coroutines.test)

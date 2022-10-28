@@ -1,16 +1,23 @@
 package com.simprints.fingerprint.scanner.data.local
 
 import android.content.Context
+import com.simprints.core.tools.utils.FileUtil
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion.Chip
-import com.simprints.id.tools.utils.FileUtil
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import javax.inject.Inject
 
 /**
  * Handles reading and writing to local firmware files on the phone.
  * Files are saved at the path /firmware/(chipName)/(chipVersion)
  */
-class FirmwareLocalDataSource(private val context: Context,private val fileUtil: FileUtil = FileUtil) {
+class FirmwareLocalDataSource(
+    private val context: Context,
+    private val fileUtil: FileUtil = FileUtil
+) {
+    @Inject
+    constructor(@ApplicationContext context: Context) : this(context, FileUtil)
 
     fun getAvailableScannerFirmwareVersions() =
         mapOf(
@@ -87,7 +94,7 @@ class FirmwareLocalDataSource(private val context: Context,private val fileUtil:
      */
     private fun saveFirmwareBytes(chipDirName: String, version: String, bytes: ByteArray) {
         Simber.d("Saving firmware file of ${bytes.size} bytes at $FIRMWARE_DIR/$version")
-        fileUtil.writeBytes(getFile(chipDirName, version),bytes)
+        fileUtil.writeBytes(getFile(chipDirName, version), bytes)
     }
 
     private fun getFirmwareVersionsInDir(chipDirName: String): Set<String> =

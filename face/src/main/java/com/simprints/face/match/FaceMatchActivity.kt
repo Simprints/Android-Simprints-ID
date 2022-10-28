@@ -8,9 +8,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.WindowManager
+import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
@@ -21,11 +21,11 @@ import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchViewModel.MatchState.*
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-@Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
+@AndroidEntryPoint
 class FaceMatchActivity : FaceActivity() {
-    private val vm: FaceMatchViewModel by viewModel()
+    private val vm: FaceMatchViewModel by viewModels()
     private val binding by viewBinding(ActivityFaceMatchBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,9 +66,12 @@ class FaceMatchActivity : FaceActivity() {
             val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
             setResult(Activity.RESULT_OK, intent)
             // wait a bit for the user to see the results
-            Handler(Looper.getMainLooper()).postDelayed({ finish() }, FaceMatchViewModel.matchingEndWaitTimeInMillis)
+            Handler(Looper.getMainLooper()).postDelayed(
+                { finish() },
+                FaceMatchViewModel.matchingEndWaitTimeInMillis
+            )
         })
-        vm.matchState.observe(this, Observer { matchState ->
+        vm.matchState.observe(this) { matchState ->
             when (matchState) {
                 NotStarted -> renderNotStarted()
                 Error -> TODO()
@@ -76,7 +79,7 @@ class FaceMatchActivity : FaceActivity() {
                 is Matching -> renderMatching()
                 is Finished -> renderFinished(matchState)
             }
-        })
+        }
     }
 
     private fun renderNotStarted() {

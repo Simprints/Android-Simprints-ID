@@ -3,12 +3,11 @@ package com.simprints.id.activities.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
@@ -16,30 +15,28 @@ import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.activities.login.tools.LoginActivityHelper
 import com.simprints.id.activities.login.viewmodel.LoginViewModel
-import com.simprints.id.activities.login.viewmodel.LoginViewModelFactory
 import com.simprints.id.activities.qrcapture.QrCaptureActivity
 import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.secure.models.AuthenticateDataResult
-import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.PERMISSION_NOT_GRANTED
 import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.CAMERA_NOT_AVAILABLE
+import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.PERMISSION_NOT_GRANTED
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
-import com.simprints.id.tools.utils.getFormattedEstimatedOutage
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class LoginActivity : BaseSplitActivity() {
 
     private val binding by viewBinding(ActivityLoginBinding::inflate)
-
-    @Inject
-    lateinit var viewModelFactory: LoginViewModelFactory
 
     @Inject
     lateinit var loginActivityHelper: LoginActivityHelper
@@ -53,16 +50,14 @@ class LoginActivity : BaseSplitActivity() {
     }
 
     private lateinit var progressDialog: SimProgressDialog
-    private lateinit var viewModel: LoginViewModel
+    private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
 
         setContentView(binding.root)
 
         simNetwork.resetApiBaseUrl()
-        viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
         initUI()
         observeSignInResult()
     }
@@ -76,12 +71,12 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun setUpTexts() {
         binding.apply {
-            loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
-            loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
-            loginButtonScanQr.text = getString(R.string.scan_qr)
-            loginButtonSignIn.text = getString(R.string.login)
-            loginEditTextProjectId.hint = getString(R.string.login_id_hint)
-            loginImageViewLogo.contentDescription = getString(R.string.simprints_logo)
+            loginEditTextUserId.hint = getString(IDR.string.login_user_id_hint)
+            loginEditTextProjectSecret.hint = getString(IDR.string.login_secret_hint)
+            loginButtonScanQr.text = getString(IDR.string.scan_qr)
+            loginButtonSignIn.text = getString(IDR.string.login)
+            loginEditTextProjectId.hint = getString(IDR.string.login_id_hint)
+            loginImageViewLogo.contentDescription = getString(IDR.string.simprints_logo)
         }
     }
 
@@ -106,7 +101,9 @@ class LoginActivity : BaseSplitActivity() {
     private fun handleSignInResult(result: AuthenticateDataResult) {
         when (result) {
             AuthenticateDataResult.Authenticated -> handleSignInSuccess()
-            is AuthenticateDataResult.BackendMaintenanceError -> handleSignInFailedBackendMaintenanceError(result.estimatedOutage)
+            is AuthenticateDataResult.BackendMaintenanceError -> handleSignInFailedBackendMaintenanceError(
+                result.estimatedOutage
+            )
             AuthenticateDataResult.BadCredentials -> handleSignInFailedInvalidCredentials()
             AuthenticateDataResult.Offline -> handleSignInFailedNoConnection()
             AuthenticateDataResult.SafetyNetInvalidClaim,
@@ -172,19 +169,19 @@ class LoginActivity : BaseSplitActivity() {
     }
 
     private fun showErrorForInvalidQRCode() {
-        showToast(R.string.login_invalid_qr_code)
+        showToast(IDR.string.login_invalid_qr_code)
     }
 
     private fun showErrorForCameraPermission() {
-        showToast(R.string.login_qr_code_scanning_camera_permission_error)
+        showToast(IDR.string.login_qr_code_scanning_camera_permission_error)
     }
 
     private fun showErrorForCameraNotAvailable() {
-        showToast(R.string.login_qr_code_scanning_camera_unavailable_error)
+        showToast(IDR.string.login_qr_code_scanning_camera_unavailable_error)
     }
 
     private fun showErrorForQRCodeFailed() {
-        showToast(R.string.login_qr_code_scanning_problem)
+        showToast(IDR.string.login_qr_code_scanning_problem)
     }
 
     private fun logMessageForCrashReport(message: String) {
@@ -217,12 +214,12 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun handleMissingCredentials() {
         progressDialog.dismiss()
-        showToast(R.string.login_missing_credentials)
+        showToast(IDR.string.login_missing_credentials)
     }
 
     private fun handleProjectIdMismatch() {
         progressDialog.dismiss()
-        showToast(R.string.login_project_id_intent_mismatch)
+        showToast(IDR.string.login_project_id_intent_mismatch)
     }
 
     private fun handleSignInSuccess() {
@@ -233,18 +230,18 @@ class LoginActivity : BaseSplitActivity() {
 
     private fun handleSignInFailedNoConnection() {
         progressDialog.dismiss()
-        showToast(R.string.login_no_network)
+        showToast(IDR.string.login_no_network)
     }
 
     private fun handleSignInFailedInvalidCredentials() {
         progressDialog.dismiss()
-        showToast(R.string.login_invalid_credentials)
+        showToast(IDR.string.login_invalid_credentials)
     }
 
     private fun handleSignInFailedServerError() {
         progressDialog.dismiss()
         binding.errorCard.isVisible = false
-        showToast(R.string.login_server_error)
+        showToast(IDR.string.login_server_error)
     }
 
     private fun handleSignInFailedBackendMaintenanceError(estimatedOutage: Long?) {
@@ -252,10 +249,10 @@ class LoginActivity : BaseSplitActivity() {
         binding.apply {
             errorCard.isVisible = true
             errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) getString(
-                R.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
+                IDR.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
                     estimatedOutage
                 )
-            ) else getString(R.string.error_backend_maintenance_message)
+            ) else getString(IDR.string.error_backend_maintenance_message)
         }
     }
 

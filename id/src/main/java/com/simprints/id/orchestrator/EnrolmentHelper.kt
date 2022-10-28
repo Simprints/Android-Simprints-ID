@@ -1,9 +1,9 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.data.db.subject.domain.Subject
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.infra.enrolment.records.domain.models.Subject
 
 interface EnrolmentHelper {
 

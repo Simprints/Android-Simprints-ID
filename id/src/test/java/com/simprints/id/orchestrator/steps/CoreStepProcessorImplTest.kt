@@ -16,15 +16,13 @@ import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.testtools.TestApplication
-import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class)
-class CoreStepProcessorImplTest: BaseStepProcessorTest() {
+class CoreStepProcessorImplTest : BaseStepProcessorTest() {
 
     private val coreStepProcessor = CoreStepProcessorImpl()
 
@@ -91,7 +89,10 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     @Test
     fun stepProcessor_shouldProcessCoreExitFormResult() {
         val exitFormData = Intent().apply {
-            putExtra(CORE_STEP_BUNDLE, CoreExitFormResponse(CoreExitFormReason.OTHER, "optional_text"))
+            putExtra(
+                CORE_STEP_BUNDLE,
+                CoreExitFormResponse(CoreExitFormReason.OTHER, "optional_text")
+            )
         }
         val result = coreStepProcessor.processResult(exitFormData)
 
@@ -101,8 +102,13 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     @Test
     fun stepProcessor_shouldProcessFingerprintExitFormResult() {
         val fingerprintExitFormData = Intent().apply {
-            putExtra(CORE_STEP_BUNDLE,
-                CoreFingerprintExitFormResponse(FingerprintExitFormReason.OTHER, "fingerprint_optional_text"))
+            putExtra(
+                CORE_STEP_BUNDLE,
+                CoreFingerprintExitFormResponse(
+                    FingerprintExitFormReason.OTHER,
+                    "fingerprint_optional_text"
+                )
+            )
         }
         val result = coreStepProcessor
             .processResult(fingerprintExitFormData)
@@ -113,8 +119,12 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     @Test
     fun stepProcessor_shouldProcessFaceExitFormResult() {
         val faceExitFormData = Intent().apply {
-            putExtra(CORE_STEP_BUNDLE, CoreFaceExitFormResponse(FaceExitFormReason.OTHER,
-                "face_optional_text"))
+            putExtra(
+                CORE_STEP_BUNDLE, CoreFaceExitFormResponse(
+                    FaceExitFormReason.OTHER,
+                    "face_optional_text"
+                )
+            )
         }
         val result = coreStepProcessor.processResult(faceExitFormData)
 
@@ -132,13 +142,9 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
         assertThat(result).isInstanceOf(SetupResponse::class.java)
     }
 
-    @After
-    fun tearDown() {
-        stopKoin()
-    }
-
     companion object {
-        const val GUID_SELECTION_ACTIVITY_NAME = "com.simprints.id.activities.guidselection.GuidSelectionActivity"
+        const val GUID_SELECTION_ACTIVITY_NAME =
+            "com.simprints.id.activities.guidselection.GuidSelectionActivity"
         const val GUID_SELECTION_REQUEST_CODE = 304
         const val CORE_STEP_BUNDLE = "core_step_bundle"
     }

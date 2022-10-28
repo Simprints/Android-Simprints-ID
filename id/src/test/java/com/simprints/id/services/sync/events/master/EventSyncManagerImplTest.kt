@@ -1,181 +1,125 @@
 package com.simprints.id.services.sync.events.master
 
 import android.content.Context
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.*
-import androidx.work.WorkInfo.State.CANCELLED
-import androidx.work.WorkInfo.State.ENQUEUED
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
+import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
-import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
-import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
-import com.simprints.id.testtools.TestApplication
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.MockKAnnotations
-import io.mockk.coVerify
-import io.mockk.impl.annotations.MockK
-import io.mockk.verify
-import kotlinx.coroutines.runBlocking
+import io.mockk.*
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventSyncManagerImplTest {
-
-    private lateinit var subjectsSyncManager: EventSyncManagerImpl
-    @MockK
-    lateinit var eventSyncStateProcessor: EventSyncStateProcessor
-    @MockK
-    lateinit var eventUpSyncScopeRepository: com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
-    @MockK
-    lateinit var eventDownSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-    @MockK
-    lateinit var eventSyncCache: EventSyncCache
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
-    private val ctx: Context = ApplicationProvider.getApplicationContext()
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(ctx)
 
-    private val masterSyncWorkers
-        get() = wm.getWorkInfosByTag(MASTER_SYNC_SCHEDULERS).get()
-
-    private val syncWorkers
-        get() = wm.getWorkInfosByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS).get()
+    private val ctx = mockk<Context>()
+    private val workManager = mockk<WorkManager>(relaxed = true)
+    private val eventSyncStateProcessor = mockk<EventSyncStateProcessor>(relaxed = true)
+    private val eventUpSyncScopeRepository = mockk<EventUpSyncScopeRepository>(relaxed = true)
+    private val eventDownSyncScopeRepository = mockk<EventDownSyncScopeRepository>(relaxed = true)
+    private val eventSyncCache = mockk<EventSyncCache>(relaxed = true)
+    private lateinit var eventSyncManagerImpl: EventSyncManagerImpl
 
     @Before
-    fun setUp() {
-        UnitTestConfig().setupWorkManager()
-        MockKAnnotations.init(this, relaxed = true)
-        subjectsSyncManager = EventSyncManagerImpl(
+    fun setup() {
+        mockkStatic(WorkManager::class)
+        every { WorkManager.getInstance(ctx) } returns workManager
+
+        eventSyncManagerImpl = EventSyncManagerImpl(
             ctx,
             eventSyncStateProcessor,
             eventDownSyncScopeRepository,
             eventUpSyncScopeRepository,
             eventSyncCache,
-            testDispatcherProvider
+            testCoroutineRule.testCoroutineDispatcher
         )
     }
 
     @Test
     fun getLastSyncState_shouldUseProcessor() {
-        subjectsSyncManager.getLastSyncState()
+        eventSyncManagerImpl.getLastSyncState()
         verify { eventSyncStateProcessor.getLastSyncState() }
     }
 
     @Test
     fun sync_shouldEnqueueAOneTimeSyncMasterWorker() {
-        subjectsSyncManager.sync()
+        eventSyncManagerImpl.sync()
 
-        assertThat(masterSyncWorkers).hasSize(1)
-        masterSyncWorkers.first().verifyOneTimeMasterWorker()
+        verify(exactly = 1) {
+            workManager.beginUniqueWork(
+                MASTER_SYNC_SCHEDULER_ONE_TIME,
+                ExistingWorkPolicy.KEEP,
+                match<OneTimeWorkRequest> { req ->
+                    assertThat(req.tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
+                    assertThat(req.tags).contains(MASTER_SYNC_SCHEDULER_ONE_TIME)
+                    assertThat(req.tags).contains(MASTER_SYNC_SCHEDULERS)
+                    true
+                }
+            )
+        }
     }
 
     @Test
     fun sync_shouldEnqueuePeriodicSyncMasterWorker() {
-        subjectsSyncManager.scheduleSync()
+        eventSyncManagerImpl.scheduleSync()
 
-        assertThat(masterSyncWorkers).hasSize(1)
-        masterSyncWorkers.first().verifyPeriodicMasterWorker()
+        verify(exactly = 1) {
+            workManager.enqueueUniquePeriodicWork(
+                MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
+                ExistingPeriodicWorkPolicy.KEEP,
+                match { req ->
+                    assertThat(req.tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
+                    assertThat(req.tags).contains(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
+                    assertThat(req.tags).contains(MASTER_SYNC_SCHEDULERS)
+                    true
+                }
+            )
+        }
     }
 
     @Test
     fun cancelScheduledSync_shouldClearPeriodicMasterWorkers() {
-        subjectsSyncManager.scheduleSync()
-        assertThat(masterSyncWorkers.first().state).isEqualTo(ENQUEUED)
+        eventSyncManagerImpl.cancelScheduledSync()
 
-        subjectsSyncManager.cancelScheduledSync()
-
-        assertThat(masterSyncWorkers.first().state).isEqualTo(CANCELLED)
-        assertThat(masterSyncWorkers).hasSize(1)
+        verify(exactly = 1) { workManager.cancelAllWorkByTag(MASTER_SYNC_SCHEDULERS) }
     }
 
     @Test
     fun stop_shouldStopAllWorkers() {
-        enqueueDownSyncWorkers()
+        eventSyncManagerImpl.stop()
 
-        subjectsSyncManager.stop()
-
-        syncWorkers.forEach {
-            assertThat(it.state).isEqualTo(CANCELLED)
-        }
+        verify(exactly = 1) { workManager.cancelAllWorkByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS) }
     }
 
     @Test
     fun deleteSyncInfo_shouldDeleteAnyInfoRelatedToSync() {
-        runBlocking {
-            subjectsSyncManager.deleteSyncInfo()
+        runTest {
+            eventSyncManagerImpl.deleteSyncInfo()
 
-            coVerify { eventUpSyncScopeRepository.deleteAll() }
-            coVerify { eventDownSyncScopeRepository.deleteAll() }
-            verify { eventSyncCache.clearProgresses() }
-            verify { eventSyncCache.storeLastSuccessfulSyncTime(null) }
+            coVerify(exactly = 1) { eventUpSyncScopeRepository.deleteAll() }
+            coVerify(exactly = 1) { eventDownSyncScopeRepository.deleteAll() }
+            verify(exactly = 1) { eventSyncCache.clearProgresses() }
+            verify(exactly = 1) { eventSyncCache.storeLastSuccessfulSyncTime(null) }
+            verify(exactly = 1) { workManager.pruneWork() }
         }
     }
-
-    private fun enqueueDownSyncWorkers() {
-        val counterWorkerRequest =
-            OneTimeWorkRequestBuilder<EventDownSyncCountWorker>()
-                .setConstraints(constraintsForWorkers())
-                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
-                .build()
-
-        val downSyncWorkerRequest =
-            OneTimeWorkRequestBuilder<EventDownSyncDownloaderWorker>()
-                .addTag(TAG_SUBJECTS_SYNC_ALL_WORKERS)
-                .setConstraints(constraintsForWorkers())
-                .build()
-
-        wm.enqueue(counterWorkerRequest)
-        wm.enqueue(downSyncWorkerRequest)
-        assertThat(syncWorkers.first().state).isEqualTo(ENQUEUED)
-        assertThat(syncWorkers[1].state).isEqualTo(ENQUEUED)
-    }
-
-
-    private fun WorkInfo.verifyPeriodicMasterWorker() {
-        assertCommonMasterTag()
-        assertPeriodicTimeMasterTag()
-        assertScheduleAtTag()
-    }
-
-    private fun WorkInfo.verifyOneTimeMasterWorker() {
-        assertCommonMasterTag()
-        assertOneTimeMasterTag()
-        assertScheduleAtTag()
-    }
-
-    private fun constraintsForWorkers() =
-        Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
 }
 
-private fun WorkInfo.assertCommonMasterTag() =
-    assertThat(tags).contains(MASTER_SYNC_SCHEDULERS)
-
-private fun WorkInfo.assertOneTimeMasterTag() =
-    assertThat(tags).contains(MASTER_SYNC_SCHEDULER_ONE_TIME)
-
-private fun WorkInfo.assertPeriodicTimeMasterTag() =
-    assertThat(tags).contains(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
-
-
-private fun WorkInfo.assertScheduleAtTag() =
-    assertThat(tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()

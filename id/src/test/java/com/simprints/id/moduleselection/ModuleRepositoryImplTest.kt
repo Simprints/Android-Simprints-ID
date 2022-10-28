@@ -1,44 +1,50 @@
 package com.simprints.id.moduleselection
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.id.testtools.TestApplication
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class)
-@ExperimentalCoroutinesApi
 class ModuleRepositoryImplTest {
 
-    private val mockPreferencesManager: IdPreferencesManager = mockk(relaxed = true)
-    private val mockSubjectRepository: SubjectRepository = mockk(relaxed = true)
+    private val downSynchronizationConfiguration = mockk<DownSynchronizationConfiguration>()
+    private val projectConfiguration = mockk<ProjectConfiguration> {
+        every { synchronization } returns mockk {
+            every { down } returns downSynchronizationConfiguration
+        }
+    }
+    private val mockConfigManager: ConfigManager = mockk(relaxed = true)
+    private val enrolmentRecordManager: EnrolmentRecordManager = mockk(relaxed = true)
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
 
     private var repository = ModuleRepositoryImpl(
-        mockPreferencesManager,
-        mockSubjectRepository,
+        mockConfigManager,
+        enrolmentRecordManager,
         eventDownSyncScopeRepository
     )
 
     @Before
     fun setUp() {
-        configureMock()
+        coEvery { mockConfigManager.getProjectConfiguration() } returns projectConfiguration
+
+        every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d")
+        coEvery {
+            mockConfigManager.getDeviceConfiguration()
+        } returns DeviceConfiguration("", listOf("b", "c"), listOf(), "")
     }
 
     @Test
     fun saveModules_shouldSaveSelectedModules() = runTest {
+        val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
+        coEvery { mockConfigManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
         val modules = listOf(
             Module("1", true),
             Module("2", true),
@@ -51,9 +57,10 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        coVerify {
-            mockPreferencesManager.selectedModules = selectedModuleNames
-        }
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(),""))
+        // Comparing string representation as when executing the lambda captured in the mock it will
+        // not return an ArrayList but a LinkedHashMap.
+        assertThat(updatedConfig.selectedModules.toString()).isEqualTo(selectedModuleNames.toString())
     }
 
     @Test
@@ -68,7 +75,7 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        coVerify { mockSubjectRepository.delete(any()) }
+        coVerify { enrolmentRecordManager.delete(any()) }
     }
 
     @Test
@@ -90,7 +97,7 @@ class ModuleRepositoryImplTest {
     }
 
     @Test
-    fun shouldReturnAllModules() {
+    fun shouldReturnAllModules() = runTest {
         val expected = listOf(
             Module("a", false),
             Module("b", true),
@@ -105,21 +112,8 @@ class ModuleRepositoryImplTest {
 
     @Test
     fun shouldFetchMaxNumberOfModulesFromRemoteConfig() = runTest {
-        every {
-            mockPreferencesManager.maxNumberOfModules
-        } returns 10
+        every { downSynchronizationConfiguration.maxNbOfModules } returns 10
 
         assertThat(repository.getMaxNumberOfModules()).isEqualTo(10)
     }
-
-    private fun configureMock() {
-        every {
-            mockPreferencesManager.moduleIdOptions
-        } returns setOf("a", "b", "c", "d")
-
-        every {
-            mockPreferencesManager.selectedModules
-        } returns setOf("b", "c")
-    }
-
 }

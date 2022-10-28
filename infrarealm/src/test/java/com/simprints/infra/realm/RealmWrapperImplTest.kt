@@ -12,7 +12,6 @@ import io.mockk.*
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.internal.RealmCore
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -61,7 +60,7 @@ class RealmWrapperImplTest {
 
     @Test
     fun `test useRealmInstance creates realm instance and returns correct values`() =
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
 
             val anyNumber = realmWrapper.useRealmInstance { 10 }
             verify { Realm.getInstance(any()) }
@@ -70,7 +69,7 @@ class RealmWrapperImplTest {
 
     @Test(expected = RealmUninitialisedException::class)
     fun `test useRealmInstance creates realm instance should throw if no signed in project is null`() =
-        runTest(UnconfinedTestDispatcher()) {
+        runTest {
             every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
             realmWrapper.useRealmInstance { }
             // Then should throw RealmUninitialisedException

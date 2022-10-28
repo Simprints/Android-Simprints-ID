@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
+import javax.inject.Inject
 
 
 private typealias CypressStep = FlowCollector<CypressOtaStep>
@@ -27,8 +28,10 @@ private typealias CypressStep = FlowCollector<CypressOtaStep>
  * @param connectionHelper  for connection operations on the scanner
  * @param firmwareLocalDataSource  for retrieving firmware bytes to be transferred for update
  */
-class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
-                       private val firmwareLocalDataSource: FirmwareLocalDataSource) {
+class CypressOtaHelper @Inject constructor(
+    private val connectionHelper: ConnectionHelper,
+    private val firmwareLocalDataSource: FirmwareLocalDataSource
+) {
 
     private var newFirmwareVersion: CypressExtendedFirmwareVersion? = null
 
@@ -43,11 +46,15 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
      *
      * @return  a flow of [CypressOtaStep] which represents the sequence of update steps being taken
      */
-    fun performOtaSteps(scanner: Scanner, macAddress: String, firmwareVersion: String): Flow<CypressOtaStep> = flow {
+    fun performOtaSteps(
+        scanner: Scanner,
+        macAddress: String,
+        firmwareVersion: String
+    ): Flow<CypressOtaStep> = flow {
         enterCypressOtaMode(scanner)
-        transferFirmwareBytes(scanner,firmwareVersion)
+        transferFirmwareBytes(scanner, firmwareVersion)
         reconnectAfterTransfer(scanner, macAddress)
-        validateRunningFirmwareVersion(scanner,firmwareVersion)
+        validateRunningFirmwareVersion(scanner, firmwareVersion)
         updateFirmwareVersionInfo(scanner)
     }
 
@@ -57,7 +64,10 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
         delayForOneSecond()
     }
 
-    private suspend fun CypressStep.transferFirmwareBytes(scanner: Scanner, firmwareVersion: String) {
+    private suspend fun CypressStep.transferFirmwareBytes(
+        scanner: Scanner,
+        firmwareVersion: String
+    ) {
         emit(CypressOtaStep.CommencingTransfer)
         scanner.startCypressOta(firmwareLocalDataSource.loadCypressFirmwareBytes(firmwareVersion))
             .map { CypressOtaStep.TransferInProgress(it) }
@@ -71,9 +81,12 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
         delayForOneSecond()
     }
 
-    private suspend fun CypressStep.validateRunningFirmwareVersion(scanner: Scanner,firmwareVersion: String) {
+    private suspend fun CypressStep.validateRunningFirmwareVersion(
+        scanner: Scanner,
+        firmwareVersion: String
+    ) {
         emit(CypressOtaStep.ValidatingNewFirmwareVersion)
-        validateCypressFirmwareVersion(scanner,firmwareVersion)
+        validateCypressFirmwareVersion(scanner, firmwareVersion)
     }
 
     private suspend fun CypressStep.updateFirmwareVersionInfo(scanner: Scanner) {
@@ -99,7 +112,8 @@ class CypressOtaHelper(private val connectionHelper: ConnectionHelper,
                 val newVersion = oldVersion.updatedWithCypressVersion(newFirmwareVersion)
 
                 scanner.setVersionInformation(newVersion.toExtendedVersionInformation())
-            } ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
+            }
+                ?: Completable.error(OtaFailedException("Was not able to determine the appropriate new unified version"))
         }.await()
 
     private fun ScannerVersion.updatedWithCypressVersion(cypressFirmware: CypressExtendedFirmwareVersion) =

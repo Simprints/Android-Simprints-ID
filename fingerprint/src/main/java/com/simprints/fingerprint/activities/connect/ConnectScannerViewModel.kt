@@ -18,7 +18,6 @@ import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.Vero2InfoSnapshotEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
@@ -28,23 +27,37 @@ import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class ConnectScannerViewModel(
+@HiltViewModel
+class ConnectScannerViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val preferencesManager: FingerprintPreferencesManager,
+    private val recentUserActivityManager: RecentUserActivityManager,
+    private val configManager: ConfigManager,
     private val nfcManager: NfcManager,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
+    lateinit var configuration: FingerprintConfiguration
     lateinit var connectMode: ConnectScannerTaskRequest.ConnectMode
+
+    init {
+        viewModelScope.launch {
+            configuration = configManager.getProjectConfiguration().fingerprint!!
+        }
+    }
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
@@ -67,9 +80,10 @@ class ConnectScannerViewModel(
         this.connectMode = connectMode
     }
 
-    fun start(){
+    fun start() {
         viewModelScope.launch { startSetup() }
-     }
+    }
+
     fun retryConnect() {
         viewModelScope.launch { startSetup() }
     }
@@ -78,6 +92,7 @@ class ConnectScannerViewModel(
         remainingConnectionAttempts = MAX_RETRY_COUNT - 1
         retryConnect()
     }
+
     @SuppressLint("CheckResult")
     private suspend fun startSetup() {
         _isConnecting.postValue(true)
@@ -94,7 +109,7 @@ class ConnectScannerViewModel(
                 wakeUpVero()
                 _isConnecting.postValue(false)
                 handleSetupFinished()
-            } catch (ex : Throwable) {
+            } catch (ex: Throwable) {
                 _isConnecting.postValue(false)
                 manageVeroErrors(ex)
             }
@@ -103,8 +118,8 @@ class ConnectScannerViewModel(
 
     fun stopConnectingAndResetState() {
         progress.postValue(0)
-        message.postValue( R.string.connect_scanner_bt_connect)
-        backButtonBehaviour.postValue( BackButtonBehaviour.EXIT_FORM)
+        message.postValue(R.string.connect_scanner_bt_connect)
+        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_FORM)
     }
 
     private suspend fun disconnectVero() {
@@ -162,7 +177,7 @@ class ConnectScannerViewModel(
     }
 
 
-    private fun manageVeroErrors(e: Throwable) {
+    private suspend fun manageVeroErrors(e: Throwable) {
         Simber.d(e)
         scannerConnected.postEvent(false)
         launchAlertOrScannerIssueOrShowDialog(e)
@@ -175,7 +190,7 @@ class ConnectScannerViewModel(
         }
     }
 
-    private fun launchAlertOrScannerIssueOrShowDialog(e: Throwable) {
+    private suspend fun launchAlertOrScannerIssueOrShowDialog(e: Throwable) {
         when (e) {
             is BluetoothNotEnabledException ->
                 connectScannerIssue.postEvent(ConnectScannerIssue.BluetoothOff)
@@ -200,7 +215,7 @@ class ConnectScannerViewModel(
 
     private fun determineAppropriateScannerIssueForPairing(): ConnectScannerIssue {
         val couldNotBeVero1 =
-            !preferencesManager.scannerGenerations.contains(ScannerGeneration.VERO_1)
+            !configuration.allowedVeroGenerations.contains(FingerprintConfiguration.VeroGeneration.VERO_1)
 
         return if (couldNotBeVero1 && nfcManager.doesDeviceHaveNfcCapability()) {
             if (nfcManager.isNfcEnabled()) {
@@ -213,10 +228,13 @@ class ConnectScannerViewModel(
         }
     }
 
-    private fun setLastConnectedScannerInfo() {
-        preferencesManager.lastScannerUsed = scannerManager.currentScannerId ?: ""
-        preferencesManager.lastScannerVersion =
-            scannerManager.scanner.versionInformation().hardwareVersion
+    private suspend fun setLastConnectedScannerInfo() {
+        recentUserActivityManager.updateRecentUserActivity {
+            it.apply {
+                it.lastScannerUsed = scannerManager.currentScannerId ?: ""
+                it.lastScannerVersion = scannerManager.scanner.versionInformation().hardwareVersion
+            }
+        }
     }
 
     private fun handleSetupFinished() {

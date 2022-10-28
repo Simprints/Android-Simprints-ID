@@ -1,11 +1,12 @@
 package com.simprints.id.services.sync.events.up.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
@@ -23,28 +24,22 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 import com.simprints.id.data.db.events_sync.up.domain.old.EventUpSyncScope as OldEventUpSyncScope
 
-class EventUpSyncUploaderWorker(
-    context: Context,
-    params: WorkerParameters,
+@HiltWorker
+class EventUpSyncUploaderWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val upSyncHelper: EventUpSyncHelper,
+    private val eventSyncCache: EventSyncCache,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
-
-    @Inject
-    lateinit var upSyncHelper: EventUpSyncHelper
-
-    @Inject
-    lateinit var eventSyncCache: EventSyncCache
-
-    @Inject
-    lateinit var jsonHelper: JsonHelper
-
-    @Inject
-    lateinit var dispatcher: DispatcherProvider
 
     private val upSyncScope by lazy {
         try {
@@ -57,10 +52,8 @@ class EventUpSyncUploaderWorker(
         }
     }
 
-    override suspend fun doWork(): Result {
-        getComponent<EventUpSyncUploaderWorker> { it.inject(this@EventUpSyncUploaderWorker) }
-
-        return withContext(dispatcher.io()) {
+    override suspend fun doWork(): Result =
+        withContext(dispatcher) {
             try {
                 Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
 
@@ -84,7 +77,6 @@ class EventUpSyncUploaderWorker(
                 retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
             }
         }
-    }
 
     private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable): Result {
         return when (t) {
@@ -108,9 +100,7 @@ class EventUpSyncUploaderWorker(
     }
 
     override suspend fun reportCount(count: Int) {
-        setProgress(
-            workDataOf(PROGRESS_UP_SYNC to count)
-        )
+        setProgress(workDataOf(PROGRESS_UP_SYNC to count))
     }
 
     companion object {

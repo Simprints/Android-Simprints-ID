@@ -1,18 +1,23 @@
 package com.simprints.fingerprint.controllers.core.image
 
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.Path
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.logging.Simber
+import javax.inject.Inject
 import com.simprints.infra.images.model.Path as CorePath
 
-class FingerprintImageManagerImpl(private val coreImageRepository: ImageRepository,
-                                  private val coreEventRepository: EventRepository
+class FingerprintImageManagerImpl @Inject constructor(
+    private val coreImageRepository: ImageRepository,
+    private val coreEventRepository: EventRepository
 ) : FingerprintImageManager {
 
-    override suspend fun save(imageBytes: ByteArray, captureEventId: String, fileExtension: String): FingerprintImageRef? =
+    override suspend fun save(
+        imageBytes: ByteArray,
+        captureEventId: String,
+        fileExtension: String
+    ): FingerprintImageRef? =
         determinePath(captureEventId, fileExtension)?.let { path ->
             Simber.d("Saving fingerprint image ${path.compose()}")
             val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
@@ -29,11 +34,18 @@ class FingerprintImageManagerImpl(private val coreImageRepository: ImageReposito
         try {
             val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
 
-            val projectId = (currentSession.payload as SessionCapturePayload).projectId
+            val projectId = currentSession.payload.projectId
             val sessionId = currentSession.id
-            CorePath(arrayOf(
-                PROJECTS_PATH, projectId, SESSIONS_PATH, sessionId, FINGERPRINTS_PATH, "$captureEventId.$fileExtension"
-            ))
+            CorePath(
+                arrayOf(
+                    PROJECTS_PATH,
+                    projectId,
+                    SESSIONS_PATH,
+                    sessionId,
+                    FINGERPRINTS_PATH,
+                    "$captureEventId.$fileExtension"
+                )
+            )
         } catch (t: Throwable) {
             Simber.e(t)
             null

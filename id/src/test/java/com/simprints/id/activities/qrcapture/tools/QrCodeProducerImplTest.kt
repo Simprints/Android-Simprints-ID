@@ -3,17 +3,18 @@ package com.simprints.id.activities.qrcapture.tools
 import androidx.camera.core.ImageProxy
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import org.junit.Before
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class QrCodeProducerImplTest {
 
-    @MockK lateinit var mockQrCodeDetector: QrCodeDetector
-    @MockK lateinit var mockImageProxy: ImageProxy
-    @MockK lateinit var mockQrCodeChannel: Channel<String>
+    @MockK
+    lateinit var mockQrCodeDetector: QrCodeDetector
+    @MockK
+    lateinit var mockImageProxy: ImageProxy
+    @MockK
+    lateinit var mockQrCodeChannel: Channel<String>
 
     private lateinit var qrCodeProducer: QrCodeProducerImpl
 

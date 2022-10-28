@@ -7,28 +7,22 @@ import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.tools.extensions.enablePreference
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.id.tools.extensions.setChangeListener
-import javax.inject.Inject
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import dagger.hilt.android.AndroidEntryPoint
+import com.simprints.infra.resources.R as IDR
 
- class SettingsPreferenceFragment : PreferenceFragmentCompat() {
+@AndroidEntryPoint
+class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
-     @Inject
-     lateinit var preferencesManager: IdPreferencesManager
+    private val settingsPreferenceViewModel: SettingsPreferenceViewModel by viewModels()
 
-     @Inject
-     lateinit var settingsPreferenceViewModelFactory: SettingsPreferenceViewModelFactory
-
-     val settingsPreferenceViewModel by viewModels<SettingsPreferenceViewModel> { settingsPreferenceViewModelFactory }
-
-     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.pref_general)
     }
 
@@ -36,42 +30,64 @@ import javax.inject.Inject
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
-        val component = (requireActivity().application as Application).component
-        component.inject(this)
-
         setTextInLayout()
-
         initTextInLayout()
-        configureAvailableLanguageEntriesFromProjectLanguages(getPreferenceForLanguage(), getLanguageCodeAndNamePairs())
-        loadPreferenceValuesAndBindThemToChangeListeners()
-        enableSettingsBasedOnModalities(getPreferenceForDefaultFingers())
+
+        settingsPreferenceViewModel.generalConfiguration.observe(this) {
+            configureAvailableLanguageEntriesFromProjectLanguages(
+                it,
+                getPreferenceForLanguage(),
+                getLanguageCodeAndNamePairs()
+            )
+            enableSettingsBasedOnModalities(it, getPreferenceForDefaultFingers())
+        }
+        settingsPreferenceViewModel.languagePreference.observe(this) {
+            loadPreferenceValuesAndBindThemToChangeListeners(it)
+        }
     }
 
-    private fun loadPreferenceValuesAndBindThemToChangeListeners() {
-        loadValueAndBindChangeListener(getPreferenceForLanguage())
-        loadValueAndBindChangeListener(getPreferenceForDefaultFingers())
-        loadValueAndBindChangeListener(getPreferenceForAbout())
-        loadValueAndBindChangeListener(getPreferenceForSyncInformation())
+    private fun loadPreferenceValuesAndBindThemToChangeListeners(language: String) {
+        getPreferenceForLanguage()?.apply {
+            loadLanguagePreference(language, this)
+            this.setChangeListener { value: String ->
+                handleLanguagePreferenceChanged(this, value)
+                clearActivityStackAndRelaunchApp()
+            }
+        }
+        getPreferenceForDefaultFingers()?.setOnPreferenceClickListener {
+            openFingerSelectionActivity()
+            true
+        }
+
+        getPreferenceForSyncInformation()?.setOnPreferenceClickListener {
+            openSyncInfoActivity()
+            true
+        }
+
+        getPreferenceForAbout()?.setOnPreferenceClickListener {
+            openSettingAboutActivity()
+            true
+        }
     }
 
     private fun setTextInLayout() {
-        getPreferenceForGeneralCategory()?.title = getString(R.string.settings_general)
-        getPreferenceForAppDetailsCategory()?.title = getString(R.string.settings_app_details)
+        getPreferenceForGeneralCategory()?.title = getString(IDR.string.settings_general)
+        getPreferenceForAppDetailsCategory()?.title = getString(IDR.string.settings_app_details)
     }
 
     private fun initTextInLayout() {
-        getPreferenceForLanguage()?.title = getString(R.string.preference_select_language_title)
+        getPreferenceForLanguage()?.title = getString(IDR.string.preference_select_language_title)
         getPreferenceForDefaultFingers()?.apply {
-            title = getString(R.string.preference_select_fingers_title)
-            summary = getString(R.string.preference_summary_settings_fingers)
+            title = getString(IDR.string.preference_select_fingers_title)
+            summary = getString(IDR.string.preference_summary_settings_fingers)
         }
 
         getPreferenceForSyncInformation()?.apply {
-            title = getString(R.string.preference_sync_information_title)
-            summary = getString(R.string.preference_summary_sync_information)
+            title = getString(IDR.string.preference_sync_information_title)
+            summary = getString(IDR.string.preference_summary_sync_information)
         }
 
-        getPreferenceForAbout()?.title = getString(R.string.preference_app_details_title)
+        getPreferenceForAbout()?.title = getString(IDR.string.preference_app_details_title)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -83,36 +99,6 @@ import javax.inject.Inject
         return super.onOptionsItemSelected(item)
     }
 
-     fun loadValueAndBindChangeListener(preference: Preference?) {
-         when (preference?.key) {
-             getKeyForLanguagePreference() -> {
-                 loadLanguagePreference(preference as ListPreference)
-                 preference.setChangeListener { value: String ->
-                     handleLanguagePreferenceChanged(preference, value)
-                     clearActivityStackAndRelaunchApp()
-                 }
-             }
-             getKeyForDefaultFingersPreference() -> {
-                 preference.setOnPreferenceClickListener {
-                     openFingerSelectionActivity()
-                     true
-                 }
-             }
-            getKeyForSyncInfoPreference() -> {
-                preference.setOnPreferenceClickListener {
-                    openSyncInfoActivity()
-                    true
-                }
-            }
-            getKeyForAboutPreference() -> {
-                preference.setOnPreferenceClickListener {
-                    openSettingAboutActivity()
-                    true
-                }
-            }
-        }
-    }
-
     private fun getLanguageCodeAndNamePairs(): Map<String, String> {
         val languageCodes = requireActivity().resources.getStringArray(R.array.language_values)
         val languageNames = requireActivity().resources.getStringArray(R.array.language_array)
@@ -120,56 +106,46 @@ import javax.inject.Inject
     }
 
     private fun getPreferenceForGeneralCategory(): Preference? =
-        findPreference(getKeyForGeneralPreferenceCategory())
-
-    private fun getKeyForGeneralPreferenceCategory() =
-        getString(R.string.preferences_general_key)
+        findPreference(getString(IDR.string.preferences_general_key))
 
     private fun getPreferenceForAppDetailsCategory(): Preference? =
-        findPreference(getKeyForAppDetailsPreferenceCategory())
+        findPreference(getString(IDR.string.preferences_app_details_key))
 
-    private fun getKeyForAppDetailsPreferenceCategory() =
-        getString(R.string.preferences_app_details_key)
-
-     fun getPreferenceForLanguage(): Preference? =
-         findPreference(getKeyForLanguagePreference())
+    private fun getPreferenceForLanguage(): ListPreference? =
+        findPreference(getString(R.string.preference_select_language_key))
 
     private fun getPreferenceForDefaultFingers(): Preference? =
-        findPreference(getKeyForDefaultFingersPreference())
+        findPreference(getString(R.string.preference_select_fingers_key))
 
-     fun getKeyForLanguagePreference(): String =
-         getString(R.string.preference_select_language_key)
-
-    private fun getKeyForDefaultFingersPreference(): String =
-        getString(R.string.preference_select_fingers_key)
-
-     fun getPreferenceForAbout(): Preference? =
-         findPreference(getKeyForAboutPreference())
+    private fun getPreferenceForAbout(): Preference? =
+        findPreference(getString(R.string.preference_app_details_key))
 
     private fun getPreferenceForSyncInformation(): Preference? =
-        findPreference(getKeyForSyncInfoPreference())
+        findPreference(getString(R.string.preference_sync_info_key))
 
-     fun getKeyForAboutPreference(): String =
-         getString(R.string.preference_app_details_key)
+    private fun loadLanguagePreference(
+        language: String,
+        preference: ListPreference
+    ) {
+        preference.value = language
+        val index = preference.findIndexOfValue(preference.value)
+        preference.summary = if (index >= 0) {
+            preference.entries[index]
+        } else {
+            null
+        }
+    }
 
-    private fun getKeyForSyncInfoPreference(): String =
-        getString(R.string.preference_sync_info_key)
-
-     fun loadLanguagePreference(preference: ListPreference) {
-         preference.value = preferencesManager.language
-         val index = preference.findIndexOfValue(preference.value)
-         preference.summary = if (index >= 0) {
-             preference.entries[index]
-         } else {
-             null
-         }
-     }
-
-    private fun enableSettingsBasedOnModalities(defaultFingersPref: Preference?) {
-        preferencesManager.modalities.forEach {
+    private fun enableSettingsBasedOnModalities(
+        generalConfiguration: GeneralConfiguration,
+        defaultFingersPref: Preference?
+    ) {
+        generalConfiguration.modalities.forEach {
             when (it) {
-                Modality.FINGER -> enableFingerprintSettings(defaultFingersPref)
-                Modality.FACE -> enableFaceSettings()
+                GeneralConfiguration.Modality.FINGERPRINT -> enableFingerprintSettings(
+                    defaultFingersPref
+                )
+                GeneralConfiguration.Modality.FACE -> enableFaceSettings()
             }
         }
     }
@@ -182,20 +158,29 @@ import javax.inject.Inject
         // No face-specific settings yet
     }
 
-    private fun configureAvailableLanguageEntriesFromProjectLanguages(prefForLanguage: Preference?, languageCodeToName: Map<String, String>) {
-        val availableLanguages = preferencesManager.projectLanguages
+    private fun configureAvailableLanguageEntriesFromProjectLanguages(
+        generalConfiguration: GeneralConfiguration,
+        prefForLanguage: Preference?,
+        languageCodeToName: Map<String, String>
+    ) {
+        val availableLanguages = generalConfiguration.languageOptions
 
-        val (availableLanguageNames, availableLanguageCodes) = computeAvailableLanguageNamesAndCodes(availableLanguages, languageCodeToName)
+        val (availableLanguageNames, availableLanguageCodes) = computeAvailableLanguageNamesAndCodes(
+            availableLanguages,
+            languageCodeToName
+        )
 
         val preference = prefForLanguage as ListPreference
         preference.entries = availableLanguageNames.toTypedArray()
         preference.entryValues = availableLanguageCodes.toTypedArray()
     }
 
-    private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
+    private fun handleLanguagePreferenceChanged(
+        listPreference: ListPreference,
+        stringValue: String
+    ): Boolean {
         val index = listPreference.findIndexOfValue(stringValue)
-        preferencesManager.language = stringValue
-        settingsPreferenceViewModel.logMessageForCrashReport("Language set to ${preferencesManager.language}")
+        settingsPreferenceViewModel.updateLanguagePreference(stringValue)
 
         listPreference.summary = if (index >= 0) {
             listPreference.entries[index]
@@ -205,7 +190,10 @@ import javax.inject.Inject
         return true
     }
 
-    private fun computeAvailableLanguageNamesAndCodes(availableLanguages: Array<String>, languageCodeToName: Map<String, String>): Pair<MutableList<String>, MutableList<String>> {
+    private fun computeAvailableLanguageNamesAndCodes(
+        availableLanguages: List<String>,
+        languageCodeToName: Map<String, String>
+    ): Pair<MutableList<String>, MutableList<String>> {
         val availableLanguageNames = mutableListOf<String>()
         val availableLanguageCodes = mutableListOf<String>()
         availableLanguages.forEach { code ->
@@ -229,7 +217,7 @@ import javax.inject.Inject
         }
     }
 
-    fun openSettingAboutActivity() {
+    private fun openSettingAboutActivity() {
         activity?.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openSettingAboutActivity()
         }

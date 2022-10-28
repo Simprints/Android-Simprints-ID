@@ -5,11 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.lifecycle.ViewModelProvider
+import androidx.activity.viewModels
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.extentions.onLayoutChange
+import com.simprints.core.tools.extentions.textWatcherOnChange
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Action
@@ -17,23 +18,22 @@ import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResul
 import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.databinding.ActivityFaceExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
-import com.simprints.id.tools.extensions.onLayoutChange
 import com.simprints.id.tools.extensions.showToast
-import com.simprints.id.tools.textWatcherOnChange
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.AndroidEntryPoint
 import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class FaceExitFormActivity : BaseSplitActivity() {
 
-    private lateinit var viewModel: FaceExitFormViewModel
+    private val viewModel: FaceExitFormViewModel by viewModels()
     private val binding by viewBinding(ActivityFaceExitFormBinding::inflate)
 
     @Inject
     lateinit var timeHelper: TimeHelper
-    @Inject
-    lateinit var faceExitFormViewModelFactory: FaceExitFormViewModelFactory
 
     private var exitFormStartTime: Long = 0
     private var faceExitFormReason = OTHER
@@ -45,37 +45,28 @@ class FaceExitFormActivity : BaseSplitActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        injectDependencies()
-
         setTextInLayout()
 
-        viewModel = ViewModelProvider(this, faceExitFormViewModelFactory).get(FaceExitFormViewModel::class.java)
         exitFormStartTime = timeHelper.now()
 
         setRadioGroupListener()
         setLayoutChangeListener()
     }
 
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
-    }
-
     private fun setTextInLayout() {
         binding.apply {
-            whySkipFaceText.text = getString(R.string.why_did_you_skip_face_capture)
-            faceRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
-            faceRbDataConcerns.text = getString(R.string.refusal_data_concerns)
-            faceRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
-            faceRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
-            faceRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
-            faceRbTooYoung.text = getString(R.string.refusal_too_young)
-            faceRbOther.text = getString(R.string.refusal_other)
-            faceExitFormText.hint = getString(R.string.hint_other_reason)
-            faceBtSubmitExitForm.text = getString(R.string.button_submit)
-            faceBtGoBack.text = getString(R.string.exit_form_capture_face)
-
+            whySkipFaceText.text = getString(IDR.string.why_did_you_skip_face_capture)
+            faceRbReligiousConcerns.text = getString(IDR.string.refusal_religious_concerns)
+            faceRbDataConcerns.text = getString(IDR.string.refusal_data_concerns)
+            faceRbDoesNotHavePermission.text =
+                getString(IDR.string.refusal_does_not_have_permission)
+            faceRbAppNotWorking.text = getString(IDR.string.refusal_app_not_working)
+            faceRbPersonNotPresent.text = getString(IDR.string.refusal_person_not_present)
+            faceRbTooYoung.text = getString(IDR.string.refusal_too_young)
+            faceRbOther.text = getString(IDR.string.refusal_other)
+            faceExitFormText.hint = getString(IDR.string.hint_other_reason)
+            faceBtSubmitExitForm.text = getString(IDR.string.button_submit)
+            faceBtGoBack.text = getString(IDR.string.exit_form_capture_face)
         }
     }
 
@@ -168,7 +159,12 @@ class FaceExitFormActivity : BaseSplitActivity() {
     }
 
     fun handleSubmitClick(@Suppress("UNUSED_PARAMETER") view: View) {
-        viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText(), faceExitFormReason)
+        viewModel.addExitFormEvent(
+            exitFormStartTime,
+            timeHelper.now(),
+            getExitFormText(),
+            faceExitFormReason
+        )
         setResultAndFinish(Action.SUBMIT)
     }
 
@@ -182,14 +178,17 @@ class FaceExitFormActivity : BaseSplitActivity() {
     }
 
     private fun buildExitFormResult(exitFormActivityAction: Action) =
-        FaceExitFormActivityResult(exitFormActivityAction, Answer(faceExitFormReason, getExitFormText()))
+        FaceExitFormActivityResult(
+            exitFormActivityAction,
+            Answer(faceExitFormReason, getExitFormText())
+        )
 
 
     override fun onBackPressed() {
         if (binding.faceBtSubmitExitForm.isEnabled) {
-            showToast(R.string.refusal_toast_submit)
+            showToast(IDR.string.refusal_toast_submit)
         } else {
-            showToast(R.string.refusal_toast_select_option_submit)
+            showToast(IDR.string.refusal_toast_select_option_submit)
         }
     }
 

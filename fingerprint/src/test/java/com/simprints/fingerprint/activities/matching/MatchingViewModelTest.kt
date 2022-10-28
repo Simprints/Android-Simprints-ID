@@ -11,44 +11,43 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparis
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.FingerprintGenerator
-import com.simprints.fingerprint.testtools.FullUnitTestConfigRule
 import com.simprints.fingerprintmatcher.FingerprintMatcher
 import com.simprints.fingerprintmatcher.domain.MatchResult
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import kotlinx.coroutines.flow.asFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
-import org.koin.test.KoinTest
-import org.koin.test.get
 import java.io.Serializable
 import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 
 @RunWith(AndroidJUnit4::class)
-class MatchingViewModelTest : KoinTest {
-
-
-    @get:Rule
-    var unitTestConfigRule = FullUnitTestConfigRule()
+class MatchingViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
     private val mockMatcher: FingerprintMatcher = mockk()
-    private val mockPreferencesManager: FingerprintPreferencesManager = mockk(relaxed = true)
+    private val fingerprintConfiguration = mockk<FingerprintConfiguration>(relaxed = true)
+    private val mockConfigManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { fingerprint } returns fingerprintConfiguration
+        }
+    }
     private val mockFingerprintSessionEventsManager: FingerprintSessionEventsManager =
         mockk(relaxed = true)
 
@@ -80,22 +79,17 @@ class MatchingViewModelTest : KoinTest {
         } throws Exception("Oops! Match failed")
     }
 
-    private lateinit var viewModel: MatchingViewModel
-
-    @Before
-    fun setUp() {
-        val mockModule = module {
-            factory { mockk<FingerprintTimeHelper>(relaxed = true) }
-            factory { dbManagerMock }
-            factory { masterFlowManager }
-            factory { mockPreferencesManager }
-            factory { mockFingerprintSessionEventsManager }
-            factory { mockMatcher }
+    private val viewModel = MatchingViewModel(
+        mockMatcher,
+        dbManagerMock,
+        mockFingerprintSessionEventsManager,
+        mockk(relaxed = true),
+        masterFlowManager,
+        mockConfigManager,
+        mockk {
+            every { io() } returns testCoroutineRule.testCoroutineDispatcher
         }
-        loadKoinModules(mockModule)
-        viewModel = get()
-    }
-
+    )
 
     @Test
     fun identifyRequest_startedAndAwaitedWithSuccessfulMatch_finishesWithProbeInMatchResult() {
@@ -140,7 +134,7 @@ class MatchingViewModelTest : KoinTest {
     @Test
     fun verifyRequest_startedSameFingerComparisonAndAwaited_finishesWithCorrectResult() {
         mockSuccessfulMatcher()
-        every { mockPreferencesManager.isCrossFingerComparisonEnabledInVerification } returns false
+        every { fingerprintConfiguration.comparisonStrategyForVerification } returns FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
@@ -164,7 +158,7 @@ class MatchingViewModelTest : KoinTest {
     @Test
     fun verifyRequest_startedCrossFingerMatchAndAwaited_finishesWithCorrectResult() {
         mockSuccessfulMatcher()
-        every { mockPreferencesManager.isCrossFingerComparisonEnabledInVerification } returns true
+        every { fingerprintConfiguration.comparisonStrategyForVerification } returns FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
         every { masterFlowManager.getCurrentAction() } returns Action.VERIFY
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 

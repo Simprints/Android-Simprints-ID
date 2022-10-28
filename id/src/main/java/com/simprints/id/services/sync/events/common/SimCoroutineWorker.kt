@@ -4,9 +4,6 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.simprints.id.Application
-import com.simprints.id.di.AppComponent
-import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -19,13 +16,6 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) :
 
     abstract val tag: String
     var resultSetter: WorkerResultSetter = WorkerResultSetterImpl()
-
-    protected inline fun <reified T> getComponent(block: (component: AppComponent) -> Unit) {
-        val context = applicationContext
-        if (context is Application) {
-            block(context.component)
-        } else throw WorkerInjectionFailedException.forWorker<T>()
-    }
 
     protected fun retry(t: Throwable? = null, message: String = t?.message ?: ""): Result {
         crashlyticsLog("$tag - Retry] $message")

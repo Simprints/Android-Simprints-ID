@@ -1,17 +1,38 @@
 package com.simprints.id.activities.coreexitform
 
 import androidx.lifecycle.ViewModel
-import com.simprints.core.tools.extentions.inBackground
+import androidx.lifecycle.viewModelScope
+import com.simprints.core.DispatcherIO
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.RefusalEvent
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.data.exitform.toRefusalEventAnswer
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CoreExitFormViewModel(private val eventRepository: com.simprints.eventsystem.event.EventRepository) : ViewModel() {
+@HiltViewModel
+class CoreExitFormViewModel @Inject constructor(
+    private val eventRepository: EventRepository,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
+) :
+    ViewModel() {
 
-    fun addExitFormEvent(startTime: Long, endTime: Long, otherText: String, coreExitFormReason: CoreExitFormReason) {
-        inBackground {
+    fun addExitFormEvent(
+        startTime: Long,
+        endTime: Long,
+        otherText: String,
+        coreExitFormReason: CoreExitFormReason
+    ) {
+        viewModelScope.launch(dispatcher) {
             eventRepository.addOrUpdateEvent(
-                RefusalEvent(startTime, endTime, coreExitFormReason.toRefusalEventAnswer(), otherText)
+                RefusalEvent(
+                    startTime,
+                    endTime,
+                    coreExitFormReason.toRefusalEventAnswer(),
+                    otherText
+                )
             )
         }
     }

@@ -10,30 +10,33 @@ import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchConfidence
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
-import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import io.mockk.verify
-import org.junit.Before
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class DashboardDailyActivityRepositoryImplTest {
 
-    @MockK lateinit var mockLocalDataSource: DailyActivityLocalDataSource
-    @MockK lateinit var mockTimeHelper: TimeHelper
-
-    private lateinit var repository: DashboardDailyActivityRepositoryImpl
-
-    @Before
-    fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
-        configureMocks()
-        repository = DashboardDailyActivityRepositoryImpl(mockLocalDataSource, mockTimeHelper)
+    private val mockLocalDataSource = mockk<DailyActivityLocalDataSource> {
+        coEvery { getEnrolmentsMadeToday() } returns ENROLMENTS_COUNT
+        coEvery { getIdentificationsMadeToday() } returns IDENTIFICATIONS_COUNT
+        coEvery { getVerificationsMadeToday() } returns VERIFICATIONS_COUNT
     }
 
+    private val mockTimeHelper = mockk<TimeHelper> {
+        every { now() } returns NOW_MILLIS
+        every { todayInMillis() } returns TODAY_MILLIS
+        every { tomorrowInMillis() } returns TOMORROW_MILLIS
+    }
+
+    private val repository =
+        DashboardDailyActivityRepositoryImpl(mockLocalDataSource, mockTimeHelper)
+
     @Test
-    fun shouldGetDailyActivity() {
-        every { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
+    fun shouldGetDailyActivity() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
         val expected = DashboardDailyActivityState(
             ENROLMENTS_COUNT,
             IDENTIFICATIONS_COUNT,
@@ -47,112 +50,96 @@ class DashboardDailyActivityRepositoryImplTest {
     }
 
     @Test
-    fun shouldUpdateEnrolments() {
-        every { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
+    fun shouldUpdateEnrolments() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
         val enrolmentResponse = AppEnrolResponse("some_guid")
 
         repository.updateDailyActivity(enrolmentResponse)
 
-        verify { mockLocalDataSource.computeNewEnrolmentAndGet() }
+        coVerify { mockLocalDataSource.computeNewEnrolmentAndGet() }
     }
 
     @Test
-    fun shouldUpdateIdentifications() {
-        every { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
+    fun shouldUpdateIdentifications() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
         val identificationResponse = AppIdentifyResponse(emptyList(), "some_session_id")
 
         repository.updateDailyActivity(identificationResponse)
 
-        verify { mockLocalDataSource.computeNewIdentificationAndGet() }
+        coVerify { mockLocalDataSource.computeNewIdentificationAndGet() }
     }
 
     @Test
-    fun shouldUpdateVerifications() {
-        every { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
-        val matchResult = MatchResult("some_guid", confidence = 100, tier = Tier.TIER_1, matchConfidence = MatchConfidence.HIGH)
+    fun shouldUpdateVerifications() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
+        val matchResult = MatchResult(
+            "some_guid",
+            confidence = 100,
+            tier = Tier.TIER_1,
+            matchConfidence = MatchConfidence.HIGH
+        )
         val verificationResponse = AppVerifyResponse(matchResult)
 
         repository.updateDailyActivity(verificationResponse)
 
-        verify { mockLocalDataSource.computeNewVerificationAndGet() }
+        coVerify { mockLocalDataSource.computeNewVerificationAndGet() }
     }
 
     @Test
-    fun whenLastActivityTimeIsBeforeToday_shouldClearBeforeGettingDailyActivity() {
-        every { mockLocalDataSource.getLastActivityTime() } returns TODAY_MILLIS - 100
+    fun whenLastActivityTimeIsBeforeToday_shouldClearBeforeGettingDailyActivity() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns TODAY_MILLIS - 100
 
         repository.getDailyActivity()
 
-        verify { mockLocalDataSource.clearActivity() }
+        coVerify { mockLocalDataSource.clearActivity() }
     }
 
     @Test
-    fun whenLastActivityTimeIsBeforeToday_shouldClearBeforeUpdatingDailyActivity() {
-        every { mockLocalDataSource.getLastActivityTime() } returns TODAY_MILLIS - 100
+    fun whenLastActivityTimeIsBeforeToday_shouldClearBeforeUpdatingDailyActivity() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns TODAY_MILLIS - 100
         val enrolmentResponse = AppEnrolResponse("some_guid")
 
         repository.updateDailyActivity(enrolmentResponse)
 
-        verify { mockLocalDataSource.clearActivity() }
+        coVerify { mockLocalDataSource.clearActivity() }
     }
 
     @Test
-    fun whenLastActivityTimeIsAfterToday_shouldClearBeforeGettingDailyActivity() {
-        every { mockLocalDataSource.getLastActivityTime() } returns TOMORROW_MILLIS
+    fun whenLastActivityTimeIsAfterToday_shouldClearBeforeGettingDailyActivity() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns TOMORROW_MILLIS
 
         repository.getDailyActivity()
 
-        verify { mockLocalDataSource.clearActivity() }
+        coVerify { mockLocalDataSource.clearActivity() }
     }
 
     @Test
-    fun whenLastActivityTimeIsAfterToday_shouldClearBeforeUpdatingDailyActivity() {
-        every { mockLocalDataSource.getLastActivityTime() } returns TOMORROW_MILLIS
+    fun whenLastActivityTimeIsAfterToday_shouldClearBeforeUpdatingDailyActivity() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns TOMORROW_MILLIS
         val enrolmentResponse = AppEnrolResponse("some_guid")
 
         repository.updateDailyActivity(enrolmentResponse)
 
-        verify { mockLocalDataSource.clearActivity() }
+        coVerify { mockLocalDataSource.clearActivity() }
     }
 
     @Test
-    fun whenLastActivityTimeIsValid_shouldNotClearBeforeGettingDailyActivity() {
-        every { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
+    fun whenLastActivityTimeIsValid_shouldNotClearBeforeGettingDailyActivity() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
 
         repository.getDailyActivity()
 
-        verify(exactly = 0) { mockLocalDataSource.clearActivity() }
+        coVerify(exactly = 0) { mockLocalDataSource.clearActivity() }
     }
 
     @Test
-    fun whenLastActivityTimeIsValid_shouldNotClearBeforeUpdatingDailyActivity() {
-        every { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
+    fun whenLastActivityTimeIsValid_shouldNotClearBeforeUpdatingDailyActivity() = runTest {
+        coEvery { mockLocalDataSource.getLastActivityTime() } returns NOW_MILLIS
         val enrolmentResponse = AppEnrolResponse("some_guid")
 
         repository.updateDailyActivity(enrolmentResponse)
 
-        verify(exactly = 0) { mockLocalDataSource.clearActivity() }
-    }
-
-    private fun configureMocks() {
-        configureMockLocalDataSource()
-        configureMockTimeHelper()
-    }
-
-    private fun configureMockTimeHelper() {
-        with(mockTimeHelper) {
-            every { now() } returns NOW_MILLIS
-            every { todayInMillis() } returns TODAY_MILLIS
-            every { tomorrowInMillis() } returns TOMORROW_MILLIS
-        }
-    }
-
-    private fun configureMockLocalDataSource() {
-        with(mockLocalDataSource) {
-            every { getEnrolmentsMadeToday() } returns ENROLMENTS_COUNT
-            every { getIdentificationsMadeToday() } returns IDENTIFICATIONS_COUNT
-            every { getVerificationsMadeToday() } returns VERIFICATIONS_COUNT
-        }
+        coVerify(exactly = 0) { mockLocalDataSource.clearActivity() }
     }
 
     private companion object {

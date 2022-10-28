@@ -5,12 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View.VISIBLE
 import androidx.lifecycle.lifecycleScope
-import com.simprints.core.sharedpreferences.PreferencesManager
+import com.simprints.clientapi.Constants.RequestIntents.LOGIN_ACTIVITY_REQUEST
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.LoginActivity
@@ -18,33 +16,34 @@ import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
+import com.simprints.id.di.IdAppModule
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
-import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
-import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 // App launched when user open SimprintsID using a client app (by intent)
+@AndroidEntryPoint
 open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromIntentContract.View {
-
-    @Inject lateinit var preferencesManager: PreferencesManager
 
     private val binding by viewBinding(CheckLoginFromIntentScreenBinding::inflate)
 
-    override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
+    @Inject
+    lateinit var presenterFactory: IdAppModule.CheckLoginFromIntentPresenterFactory
+
+    override val viewPresenter: CheckLoginFromIntentContract.Presenter by lazy {
+        presenterFactory.create(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        val component = (application as Application).component
-        component.inject(this)
-        title = getString(R.string.title_activity_front)
-        viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
+        title = getString(IDR.string.title_activity_front)
 
         lifecycleScope.launchWhenCreated {
             viewPresenter.setup()
@@ -59,8 +58,12 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
         val appErrorResponseForLoginScreen = extractAppErrorResponseForLoginScreen(data)
 
         when {
-            potentialAlertScreenResponse != null -> viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
-            appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(appErrorResponseForLoginScreen)
+            potentialAlertScreenResponse != null -> viewPresenter.onAlertScreenReturn(
+                potentialAlertScreenResponse
+            )
+            appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(
+                appErrorResponseForLoginScreen
+            )
             else -> lifecycleScope.launchWhenCreated {
                 viewPresenter.checkSignedInStateIfPossible()
             }
@@ -87,6 +90,7 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
         binding.confirmationSent.visibility = VISIBLE
         binding.redirectingBack.visibility = VISIBLE
     }
+
     open fun getCallingPackageName(): String {
         return callingPackage ?: ""
     }
@@ -97,7 +101,10 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
 
     override fun openLoginActivity(appRequest: AppRequest) {
         val loginIntent = Intent(this, LoginActivity::class.java)
-        loginIntent.putExtra(LoginActivityRequest.BUNDLE_KEY, LoginActivityRequest(appRequest.projectId, appRequest.userId))
+        loginIntent.putExtra(
+            LoginActivityRequest.BUNDLE_KEY,
+            LoginActivityRequest(appRequest.projectId, appRequest.userId)
+        )
         startActivityForResult(loginIntent, LOGIN_ACTIVITY_REQUEST)
     }
 

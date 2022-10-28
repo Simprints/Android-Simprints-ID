@@ -9,10 +9,9 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.integration.createFingerprintCaptureRequestIntent
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -23,41 +22,64 @@ import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
+import dagger.hilt.android.testing.BindValue
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.context.loadKoinModules
-import org.koin.dsl.module
-import org.koin.test.KoinTest
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-class OrchestratorActivityAndroidTest : KoinTest {
+class OrchestratorActivityAndroidTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
     private val mockCoroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private val firmwareFileUpdateSchedulerMock = mockk<FirmwareFileUpdateScheduler>(relaxed = true)
-    private val scannerManagerMock = spyk<ScannerManager>(ScannerManagerImpl(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true)))
-    private val orchestratorViewModel = spyk(OrchestratorViewModel(orchestratorMock, mockk(relaxed = true), scannerManagerMock, firmwareFileUpdateSchedulerMock, mockCoroutineScope))
+    private val scannerManagerMock = spyk<ScannerManager>(
+        ScannerManagerImpl(
+            mockk(relaxed = true),
+            mockk(relaxed = true),
+            mockk(relaxed = true),
+            mockk(relaxed = true)
+        )
+    )
+
+    @BindValue @JvmField
+    val orchestratorViewModel = spyk(
+        OrchestratorViewModel(
+            orchestratorMock,
+            mockk(relaxed = true),
+            scannerManagerMock,
+            firmwareFileUpdateSchedulerMock,
+            mockCoroutineScope,
+            UnconfinedTestDispatcher(),
+        )
+    )
+
+    @BindValue @JvmField
+    val flowProvider = mockk<FlowProvider>()
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
     @Before
     fun setUp() {
-        acquireFingerprintKoinModules()
         Intents.init()
-
-        loadKoinModules(module(override = true) {
-            factory { orchestratorMock }
-            viewModel { orchestratorViewModel }
-        })
     }
 
     @Test
@@ -70,12 +92,19 @@ class OrchestratorActivityAndroidTest : KoinTest {
             FinalResult(Activity.RESULT_OK, Intent().putExtra("test_key", 42))
 
         intending(hasExtraWithKey(ConnectScannerTaskRequest.BUNDLE_KEY))
-            .respondWith(Instrumentation.ActivityResult(ResultCode.OK.value,
-                Intent().putExtra(ConnectScannerTaskResult.BUNDLE_KEY, ConnectScannerTaskResult())))
+            .respondWith(
+                Instrumentation.ActivityResult(
+                    ResultCode.OK.value,
+                    Intent().putExtra(
+                        ConnectScannerTaskResult.BUNDLE_KEY,
+                        ConnectScannerTaskResult()
+                    )
+                )
+            )
 
         scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
-        verify { firmwareFileUpdateSchedulerMock.scheduleOrCancelWorkIfNecessary() }
+        coVerify { firmwareFileUpdateSchedulerMock.scheduleOrCancelWorkIfNecessary() }
 
         every { orchestratorMock.isFinished() } returns true
 
@@ -99,11 +128,13 @@ class OrchestratorActivityAndroidTest : KoinTest {
 
     @Test
     fun orchestratorActivity_destroyedBeneathActivity_resumesProperly() {
-        val orchestratorState = OrchestratorState(FingerprintTaskFlowState(
-            mockk(relaxed = true),
-            2,
-            mutableMapOf("connect" to mockk(relaxed = true), "collect" to mockk(relaxed = true))
-        ))
+        val orchestratorState = OrchestratorState(
+            FingerprintTaskFlowState(
+                mockk(relaxed = true),
+                2,
+                mutableMapOf("connect" to mockk(relaxed = true), "collect" to mockk(relaxed = true))
+            )
+        )
 
         every { orchestratorMock.getState() } returns orchestratorState
 
@@ -115,16 +146,17 @@ class OrchestratorActivityAndroidTest : KoinTest {
         scenario.recreate()
 
         verify { orchestratorMock.getState() }
-        verify { orchestratorMock.restoreState(eq(orchestratorState)) } }
+        verify { orchestratorMock.restoreState(eq(orchestratorState)) }
+    }
 
     @After
     fun tearDown() {
         Intents.release()
         if (::scenario.isInitialized) scenario.close()
-        releaseFingerprintKoinModules()
     }
 
     companion object {
-        private fun launchTaskRequest() = ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+        private fun launchTaskRequest() =
+            ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
     }
 }

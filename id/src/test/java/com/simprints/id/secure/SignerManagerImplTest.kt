@@ -1,15 +1,13 @@
 package com.simprints.id.secure
 
-import com.simprints.core.sharedpreferences.PreferencesManager
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.SimNetwork
@@ -24,13 +22,10 @@ import org.junit.Test
 class SignerManagerImplTest {
 
     @MockK
-    lateinit var mockProjectRepository: ProjectRepository
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var mockLoginManager: LoginManager
-
-    @MockK
-    lateinit var mockPreferencesManager: PreferencesManager
 
     @MockK
     lateinit var mockSyncManager: SyncManager
@@ -47,9 +42,6 @@ class SignerManagerImplTest {
     @MockK
     lateinit var mockSimNetwork: SimNetwork
 
-    @MockK
-    lateinit var mockRemoteConfigWrapper: RemoteConfigWrapper
-
     private lateinit var signerManager: SignerManagerImpl
 
     private val token = Token(
@@ -64,15 +56,13 @@ class SignerManagerImplTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         signerManager = SignerManagerImpl(
-            mockProjectRepository,
+            configManager,
             mockLoginManager,
-            mockPreferencesManager,
             mockEventSyncManager,
             mockSyncManager,
             mockSecurityStateScheduler,
             mockLongConsentRepository,
             mockSimNetwork,
-            mockRemoteConfigWrapper
         )
     }
 
@@ -120,7 +110,7 @@ class SignerManagerImplTest {
 
         signIn()
 
-        coVerify { mockProjectRepository.loadFromRemoteAndRefreshCache(DEFAULT_PROJECT_ID) }
+        coVerify { configManager.refreshProject(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -162,7 +152,7 @@ class SignerManagerImplTest {
         verifyStoredCredentialsGotCleaned()
         verifyRemoteManagerGotSignedOut()
         verifyLastSyncInfoGotDeleted()
-        verifyAllSharedPreferencesExceptRealmKeysGotCleared()
+        coVerify(exactly = 1) { configManager.clearData() }
     }
 
     @Test
@@ -194,10 +184,10 @@ class SignerManagerImplTest {
     }
 
     @Test
-    fun signOut_clearRemoteConfig() = runTest(UnconfinedTestDispatcher()) {
+    fun signOut_clearConfiguration() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        coVerify { mockRemoteConfigWrapper.clearRemoteConfig() }
+        coVerify { configManager.clearData() }
     }
 
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)
@@ -221,7 +211,7 @@ class SignerManagerImplTest {
         }
 
     private fun mockFetchingProjectInfo(error: Boolean = false) =
-        coEvery { mockProjectRepository.loadFromRemoteAndRefreshCache(any()) }.apply {
+        coEvery { configManager.refreshProject(any()) }.apply {
             if (!error) {
                 this.returns(
                     Project(
@@ -252,6 +242,4 @@ class SignerManagerImplTest {
 
     private fun verifyRemoteManagerGotSignedOut() = verify { mockLoginManager.signOut() }
     private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
-    private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() =
-        verify { mockPreferencesManager.clearAllSharedPreferences() }
 }
