@@ -5,17 +5,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.response.QrCodeResponse
 import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_ERROR_KEY
-import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.GENERAL_ERROR
-import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.PERMISSION_NOT_GRANTED
-import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.CAMERA_NOT_AVAILABLE
 import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_RESULT_KEY
+import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.*
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.test.assertEquals
 
 @RunWith(AndroidJUnit4::class)
 class LoginActivityHelperImplTest {
