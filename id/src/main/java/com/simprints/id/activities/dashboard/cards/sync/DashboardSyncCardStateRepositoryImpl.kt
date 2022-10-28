@@ -1,31 +1,30 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
 import androidx.lifecycle.MediatorLiveData
-import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canDownSyncEvents
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 import kotlin.coroutines.coroutineContext
 
-class DashboardSyncCardStateRepositoryImpl(
-    val eventSyncManager: EventSyncManager,
-    val deviceManager: DeviceManager,
-    private val preferencesManager: IdPreferencesManager,
-    private val downSyncScopeRepository: com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository,
+class DashboardSyncCardStateRepositoryImpl @Inject constructor(
+    private val eventSyncManager: EventSyncManager,
+    deviceManager: DeviceManager,
+    private val configManager: ConfigManager,
     private val cacheSync: EventSyncCache,
     private val timeHelper: TimeHelper
 ) : DashboardSyncCardStateRepository {
@@ -89,7 +88,9 @@ class DashboardSyncCardStateRepositoryImpl(
                 syncState.progress,
                 syncState.total
             )
-            isSyncFailedBecauseTooManyRequests(allSyncStates) -> SyncTooManyRequests(lastTimeSyncSucceed)
+            isSyncFailedBecauseTooManyRequests(allSyncStates) -> SyncTooManyRequests(
+                lastTimeSyncSucceed
+            )
             isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed)
             isSyncFailedBecauseBackendMaintenance(allSyncStates) -> SyncFailedBackendMaintenance(
                 lastTimeSyncSucceed,
@@ -156,7 +157,7 @@ class DashboardSyncCardStateRepositoryImpl(
 
     private fun updateDashboardCardState(newState: DashboardSyncCardState) {
         Simber.tag(SYNC_LOG_TAG).d("[ACTIVITY]\n New dashboard state: $newState")
-        syncCardStateLiveData.value = newState
+        syncCardStateLiveData.postValue(newState)
     }
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
@@ -200,16 +201,14 @@ class DashboardSyncCardStateRepositoryImpl(
     private suspend fun isModuleSelectionRequired() =
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
-    private fun isDownSyncAllowed() = preferencesManager.canDownSyncEvents()
+    private suspend fun isDownSyncAllowed() =
+        configManager.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 
-    private fun isSelectedModulesEmpty() = preferencesManager.selectedModules.isEmpty()
+    private suspend fun isSelectedModulesEmpty() =
+        configManager.getDeviceConfiguration().selectedModules.isEmpty()
 
     private suspend fun isModuleSync() =
-        downSyncScopeRepository.getDownSyncScope(
-            preferencesManager.modalities.map { it.toMode() },
-            preferencesManager.moduleIdOptions.toList(),
-            preferencesManager.syncGroup
-        ) is SubjectModuleScope
+        configManager.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = isConnectedLiveData.value ?: true
 

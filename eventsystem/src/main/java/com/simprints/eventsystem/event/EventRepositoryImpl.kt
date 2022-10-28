@@ -4,8 +4,9 @@ import android.os.Build
 import android.os.Build.VERSION
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
-import com.simprints.core.domain.modality.Modes
+import com.simprints.core.DeviceID
+import com.simprints.core.LibSimprintsVersionName
+import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.*
@@ -25,6 +26,8 @@ import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -36,19 +39,21 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-open class EventRepositoryImpl(
-    private val deviceId: String,
-    private val appVersionName: String,
+@Singleton
+internal open class EventRepositoryImpl @Inject constructor(
+    @DeviceID private val deviceId: String,
+    @PackageVersionName private val appVersionName: String,
+    @LibSimprintsVersionName override val libSimprintsVersionName: String,
     private val loginManager: LoginManager,
     private val eventLocalDataSource: EventLocalDataSource,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
-    override val libSimprintsVersionName: String,
     private val sessionDataCache: SessionDataCache,
-    private val language: String,
-    private val modalities: List<Modes>
+    private val configManager: ConfigManager
 ) : EventRepository {
 
     companion object {
@@ -67,15 +72,17 @@ open class EventRepositoryImpl(
         closeAllSessions(NEW_SESSION)
 
         return reportException {
+            val projectConfiguration = configManager.getProjectConfiguration()
+            val deviceConfiguration = configManager.getDeviceConfiguration()
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
             val sessionCaptureEvent = SessionCaptureEvent(
                 id = UUID.randomUUID().toString(),
                 projectId = currentProject,
                 createdAt = timeHelper.now(),
-                modalities = modalities,
+                modalities = projectConfiguration.general.modalities,
                 appVersionName = appVersionName,
                 libVersionName = libSimprintsVersionName,
-                language = language,
+                language = deviceConfiguration.language,
                 device = Device(
                     VERSION.SDK_INT.toString(),
                     Build.MANUFACTURER + "_" + Build.MODEL,
@@ -356,6 +363,7 @@ open class EventRepositoryImpl(
             addOrUpdateEvent(currentCaptureSession)
         }
     }
+
     private fun handleUploadException(t: Throwable) {
         when (t) {
             is NetworkConnectionException -> Simber.i(t)

@@ -3,10 +3,6 @@ package com.simprints.clientapi.controllers.core.eventData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncAllData
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncAnalyticsData
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncBiometricData
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_PROJECT_ID
@@ -15,6 +11,9 @@ import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -22,14 +21,13 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.*
 import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo as CoreIntegrationInfo
 
-@ExperimentalCoroutinesApi
 class ClientApiEventRepositoryImplTest {
 
     @get:Rule
@@ -38,8 +36,16 @@ class ClientApiEventRepositoryImplTest {
     @MockK(relaxed = true)
     lateinit var coreEventEventsMgrMock: EventRepository
 
-    @MockK(relaxed = true)
-    lateinit var sharedPreferencesManager: SharedPreferencesManager
+    private val coSyncConfiguration = mockk<CoSyncUpSynchronizationConfiguration>()
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { synchronization } returns mockk {
+                every { up } returns mockk {
+                    every { coSync } returns coSyncConfiguration
+                }
+            }
+        }
+    }
     private lateinit var clientSessionEventsMgr: ClientApiSessionEventsManager
 
     @Before
@@ -49,15 +55,14 @@ class ClientApiEventRepositoryImplTest {
             coreEventEventsMgrMock,
             mockk(relaxed = true),
             mockk(relaxed = true),
-            sharedPreferencesManager,
+            configManager,
             testCoroutineRule.testCoroutineDispatcher
         )
-        mockkStatic("com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImplKt")
     }
 
     @Test
     fun createSession_shouldInvokeCreateSessionAndAddIntentParsingEventInCoreLib() {
-        runBlocking {
+        runTest {
             val session = mockk<SessionCaptureEvent>()
             every { session.id } returns UUID.randomUUID().toString()
             coEvery { coreEventEventsMgrMock.getCurrentCaptureSessionEvent() } returns session
@@ -74,7 +79,7 @@ class ClientApiEventRepositoryImplTest {
 
     @Test
     fun addAlertScreenEvent_shouldAddCoreLibEvent() {
-        runBlocking {
+        runTest {
             val clientApiAlert = ClientApiAlert.INVALID_PROJECT_ID
             clientSessionEventsMgr.addAlertScreenEvent(clientApiAlert)
 
@@ -89,7 +94,7 @@ class ClientApiEventRepositoryImplTest {
 
     @Test
     fun addSuspiciousIntentEvent_shouldAddCoreLibEvent() {
-        runBlocking {
+        runTest {
             val unexpectedKey = mapOf("some_key" to "some_extra_value")
             clientSessionEventsMgr.addSuspiciousIntentEvent(unexpectedKey)
 
@@ -103,7 +108,7 @@ class ClientApiEventRepositoryImplTest {
 
     @Test
     fun addInvalidIntentEvent_shouldAddCoreLibEvent() {
-        runBlocking {
+        runTest {
             val wrongKey = mapOf("some_wrong_key" to "some_wrong_value")
             val action = "action"
             clientSessionEventsMgr.addInvalidIntentEvent(action, wrongKey)
@@ -120,8 +125,8 @@ class ClientApiEventRepositoryImplTest {
 
     @Test
     fun `get all events in session returns all data when can sync all data`(): Unit =
-        runBlocking {
-            every { sharedPreferencesManager.canCoSyncAllData() } returns true
+        runTest {
+            every { coSyncConfiguration.kind } returns ALL
             coEvery { clientSessionEventsMgr.getCurrentSessionId() } returns "sessionId"
 
             coEvery { coreEventEventsMgrMock.getEventsFromSession("sessionId") } returns allEventsFlow
@@ -132,8 +137,8 @@ class ClientApiEventRepositoryImplTest {
 
     @Test
     fun `get all events in session returns correct data when can sync all only biometric`(): Unit =
-        runBlocking {
-            every { sharedPreferencesManager.canCoSyncBiometricData() } returns true
+        runTest {
+            every { coSyncConfiguration.kind } returns ONLY_BIOMETRICS
             coEvery { clientSessionEventsMgr.getCurrentSessionId() } returns "sessionId"
 
             coEvery { coreEventEventsMgrMock.getEventsFromSession("sessionId") } returns allEventsFlow
@@ -145,8 +150,8 @@ class ClientApiEventRepositoryImplTest {
 
     @Test
     fun `get all events in session returns correct data when can sync all only analytics`(): Unit =
-        runBlocking {
-            every { sharedPreferencesManager.canCoSyncAnalyticsData() } returns true
+        runTest {
+            every { coSyncConfiguration.kind } returns ONLY_ANALYTICS
             coEvery { clientSessionEventsMgr.getCurrentSessionId() } returns "sessionId"
 
             coEvery { coreEventEventsMgrMock.getEventsFromSession("sessionId") } returns allEventsFlow
@@ -158,10 +163,8 @@ class ClientApiEventRepositoryImplTest {
 
     @Test
     fun `get all events in session returns empty when cannot sync any data`(): Unit =
-        runBlocking {
-            every { sharedPreferencesManager.canCoSyncAllData() } returns false
-            every { sharedPreferencesManager.canCoSyncBiometricData() } returns false
-            every { sharedPreferencesManager.canCoSyncAnalyticsData() } returns false
+        runTest {
+            every { coSyncConfiguration.kind } returns NONE
             coEvery { clientSessionEventsMgr.getCurrentSessionId() } returns "sessionId"
 
             coEvery { coreEventEventsMgrMock.getEventsFromSession("sessionId") } returns allEventsFlow

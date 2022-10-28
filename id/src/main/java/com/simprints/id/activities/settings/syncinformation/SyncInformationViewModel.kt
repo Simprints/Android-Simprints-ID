@@ -3,32 +3,39 @@ package com.simprints.id.activities.settings.syncinformation
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.domain.modality.toMode
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canDownSyncEvents
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
-import com.simprints.infra.logging.Simber
+import com.simprints.id.tools.extensions.toGroup
+import com.simprints.id.tools.extensions.toMode
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.LoginManager
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SyncInformationViewModel(
-    private val downSyncHelper: EventDownSyncHelper,
-    private val eventRepository: com.simprints.eventsystem.event.EventRepository,
-    private val subjectRepository: SubjectRepository,
-    private val preferencesManager: IdPreferencesManager,
-    private val projectId: String,
+@HiltViewModel
+class SyncInformationViewModel @Inject constructor(
+    private val downySyncHelper: EventDownSyncHelper,
+    private val eventRepository: EventRepository,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val loginManager: LoginManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
-    private val dispatchers: DispatcherProvider
+    private val configManager: ConfigManager,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val recordsInLocal = MutableLiveData<Int?>(null)
@@ -37,8 +44,15 @@ class SyncInformationViewModel(
     val recordsToDownSync = MutableLiveData<Int?>(null)
     val recordsToDelete = MutableLiveData<Int?>(null)
     val moduleCounts = MutableLiveData<List<ModuleCount>?>(null)
+    val synchronizationConfiguration = MutableLiveData<SynchronizationConfiguration>()
 
     private var lastKnownEventSyncState: EventSyncState? = null
+
+    init {
+        viewModelScope.launch(dispatcher) {
+            synchronizationConfiguration.postValue(configManager.getProjectConfiguration().synchronization)
+        }
+    }
 
     /**
      * Calls fetchSyncInformation() when all workers are done.
@@ -64,19 +78,17 @@ class SyncInformationViewModel(
     }
 
     fun fetchSyncInformation() {
-        viewModelScope.launch { recordsInLocal.value = fetchLocalRecordCount() }
-        viewModelScope.launch { recordsToUpSync.value = fetchAndUpdateRecordsToUpSyncCount() }
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
+            recordsInLocal.postValue(fetchLocalRecordCount())
+            recordsToUpSync.postValue(fetchAndUpdateRecordsToUpSyncCount())
             fetchRecordsToCreateAndDeleteCountOrNull().let {
-                recordsToDownSync.value = it?.toCreate ?: 0
-                recordsToDelete.value = it?.toDelete ?: 0
+                recordsToDownSync.postValue(it?.toCreate ?: 0)
+                recordsToDelete.postValue(it?.toDelete ?: 0)
             }
-        }
-        // Move walking the file system to the IO thread
-        viewModelScope.launch(dispatchers.io()) {
+            // Move walking the file system to the IO thread
             imagesToUpload.postValue(fetchAndUpdateImagesToUploadCount())
+            moduleCounts.postValue(fetchAndUpdateSelectedModulesCount())
         }
-        viewModelScope.launch { moduleCounts.value = fetchAndUpdateSelectedModulesCount() }
     }
 
     /**
@@ -94,14 +106,20 @@ class SyncInformationViewModel(
     }
 
     private suspend fun fetchLocalRecordCount() =
-        subjectRepository.count(SubjectQuery(projectId = projectId))
+        enrolmentRecordManager.count(SubjectQuery(projectId = loginManager.getSignedInProjectIdOrEmpty()))
 
     private fun fetchAndUpdateImagesToUploadCount() = imageRepository.getNumberOfImagesToUpload()
 
     private suspend fun fetchAndUpdateRecordsToUpSyncCount() =
-        eventRepository.localCount(projectId = projectId, type = ENROLMENT_V2) +
-            // this is needed because of events created before 2021.1. Once all users update to 2021.1+ we can remove it
-            eventRepository.localCount(projectId = projectId, type = ENROLMENT_RECORD_CREATION)
+        eventRepository.localCount(
+            projectId = loginManager.getSignedInProjectIdOrEmpty(),
+            type = ENROLMENT_V2
+        ) +
+            // TODO remove. This is needed because of events created before 2021.1. Once all users update to 2021.1+ we can remove it
+            eventRepository.localCount(
+                projectId = loginManager.getSignedInProjectIdOrEmpty(),
+                type = ENROLMENT_RECORD_CREATION
+            )
 
     private suspend fun fetchRecordsToCreateAndDeleteCountOrNull(): DownSyncCounts? =
         if (isDownSyncAllowed()) {
@@ -110,20 +128,23 @@ class SyncInformationViewModel(
             null
         }
 
-    private fun isDownSyncAllowed() = preferencesManager.canDownSyncEvents()
+    private suspend fun isDownSyncAllowed() =
+        configManager.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts? =
         try {
+            val projectConfig = configManager.getProjectConfiguration()
+            val deviceConfig = configManager.getDeviceConfiguration()
             val downSyncScope = eventDownSyncScopeRepository.getDownSyncScope(
-                preferencesManager.modalities.map { it.toMode() },
-                preferencesManager.selectedModules.toList(),
-                preferencesManager.syncGroup
+                projectConfig.general.modalities.map { it.toMode() },
+                deviceConfig.selectedModules,
+                projectConfig.synchronization.down.partitionType.toGroup()
             )
             var creationsToDownload = 0
             var deletionsToDownload = 0
 
             downSyncScope.operations.forEach { syncOperation ->
-                val counts = downSyncHelper.countForDownSync(syncOperation)
+                val counts = downySyncHelper.countForDownSync(syncOperation)
                 creationsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_CREATION }
                     ?.count ?: 0
                 deletionsToDownload += counts.firstOrNull { it.type == ENROLMENT_RECORD_DELETION }
@@ -138,10 +159,15 @@ class SyncInformationViewModel(
         }
 
     private suspend fun fetchAndUpdateSelectedModulesCount() =
-        preferencesManager.selectedModules.map {
+        configManager.getDeviceConfiguration().selectedModules.map {
             ModuleCount(
                 it,
-                subjectRepository.count(SubjectQuery(projectId = projectId, moduleId = it))
+                enrolmentRecordManager.count(
+                    SubjectQuery(
+                        projectId = loginManager.getSignedInProjectIdOrEmpty(),
+                        moduleId = it
+                    )
+                )
             )
         }
 

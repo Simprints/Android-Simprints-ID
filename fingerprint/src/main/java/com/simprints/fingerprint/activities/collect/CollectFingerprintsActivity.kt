@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
@@ -34,14 +35,17 @@ import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.fingerprint.tools.extensions.showToast
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.android.ext.android.inject
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class CollectFingerprintsActivity : FingerprintActivity() {
 
-    private val masterFlowManager: MasterFlowManager by inject()
+    @Inject
+    lateinit var masterFlowManager: MasterFlowManager
 
-    private val vm: CollectFingerprintsViewModel by viewModel()
+    private val vm: CollectFingerprintsViewModel by viewModels()
+
     private val binding by viewBinding(ActivityCollectFingerprintsBinding::inflate)
     private lateinit var mainContentBinding: ContentMainBinding
 
@@ -96,7 +100,8 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun initMissingFingerButton() {
         mainContentBinding.missingFingerText.text = getString(R.string.missing_finger)
-        mainContentBinding.missingFingerText.paintFlags = mainContentBinding.missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        mainContentBinding.missingFingerText.paintFlags =
+            mainContentBinding.missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         mainContentBinding.missingFingerText.setOnClickListener {
             vm.logUiMessageForCrashReport("Missing finger text clicked")
             vm.handleMissingFingerButtonPressed()
@@ -133,7 +138,12 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         with(currentCaptureState()) {
             mainContentBinding.scanButton.text = getString(buttonTextId(isAskingRescan))
             mainContentBinding.scanButton.setTextColor(resources.getColor(buttonTextColour(), null))
-            mainContentBinding.scanButton.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
+            mainContentBinding.scanButton.setBackgroundColor(
+                resources.getColor(
+                    buttonBackgroundColour(),
+                    null
+                )
+            )
         }
     }
 
@@ -167,7 +177,12 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun CollectFingerprintsState.listenForSplashScreen() {
         if (isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             if (!hasSplashScreenBeenTriggered) {
-                startActivity(Intent(this@CollectFingerprintsActivity, SplashScreenActivity::class.java))
+                startActivity(
+                    Intent(
+                        this@CollectFingerprintsActivity,
+                        SplashScreenActivity::class.java
+                    )
+                )
                 overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
                 hasSplashScreenBeenTriggered = true
             }
@@ -178,14 +193,20 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun launchConnectScannerActivityForReconnect() {
         val intent = Intent(this, ConnectScannerActivity::class.java).apply {
-            putExtra(ConnectScannerTaskRequest.BUNDLE_KEY, ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.RECONNECT))
+            putExtra(
+                ConnectScannerTaskRequest.BUNDLE_KEY,
+                ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.RECONNECT)
+            )
         }
         startActivityForResult(intent, RequestCode.CONNECT.value)
     }
 
     private fun setResultAndFinishSuccess(fingerprints: List<Fingerprint>) {
         setResultAndFinish(ResultCode.OK, Intent().apply {
-            putExtra(CollectFingerprintsTaskResult.BUNDLE_KEY, CollectFingerprintsTaskResult(fingerprints))
+            putExtra(
+                CollectFingerprintsTaskResult.BUNDLE_KEY,
+                CollectFingerprintsTaskResult(fingerprints)
+            )
         })
     }
 

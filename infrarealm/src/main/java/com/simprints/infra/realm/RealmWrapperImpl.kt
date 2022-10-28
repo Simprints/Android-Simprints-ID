@@ -8,6 +8,7 @@ import com.simprints.infra.realm.config.RealmConfig
 import com.simprints.infra.realm.exceptions.RealmUninitialisedException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RealmWrapperImpl @Inject constructor(
-    private val appContext: Context,
+    @ApplicationContext private val appContext: Context,
     private val secureDataManager: SecurityManager,
     private val loginManager: LoginManager,
 ) :

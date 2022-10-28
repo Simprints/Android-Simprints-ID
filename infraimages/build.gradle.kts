@@ -16,6 +16,10 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
+
 }
 
 dependencies {
@@ -24,6 +28,7 @@ dependencies {
     implementation(project(":infralogin"))
     implementation(project(":core"))
     implementation(project(":infrasecurity"))
+    implementation(project(":infraconfig"))
 
     implementation(libs.androidX.core)
 

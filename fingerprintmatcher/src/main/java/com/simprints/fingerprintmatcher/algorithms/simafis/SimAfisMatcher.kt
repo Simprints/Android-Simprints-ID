@@ -5,6 +5,7 @@ import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisFingerp
 import com.simprints.fingerprintmatcher.algorithms.simafis.models.SimAfisPerson
 import com.simprints.fingerprintmatcher.domain.*
 import com.simprints.fingerprintmatcher.domain.FingerIdentifier.*
+import javax.inject.Inject
 
 /**
  * SimAFIS is Simprints' improvement over SourceAFIS, an open source fingerprint matching algorithm
@@ -15,7 +16,10 @@ import com.simprints.fingerprintmatcher.domain.FingerIdentifier.*
  * list. It does not currently support progress indication and matching results are only available
  * when all matching is completed.
  */
-internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface = JNILibAfis) {
+internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
+
+    @Inject
+    constructor() : this(JNILibAfis)
 
     fun match(
         probe: FingerprintIdentity,

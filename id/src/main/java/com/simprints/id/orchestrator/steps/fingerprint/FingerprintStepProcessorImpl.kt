@@ -1,8 +1,6 @@
 package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectQuery
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
@@ -12,24 +10,35 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
+import javax.inject.Inject
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY as RESPONSE_BUNDLE_KEY
 
-class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: FingerprintRequestFactory,
-                                   private val prefs: IdPreferencesManager
+class FingerprintStepProcessorImpl @Inject constructor(
+    private val fingerprintRequestFactory: FingerprintRequestFactory,
+    private val configManager: ConfigManager,
 ) : FingerprintStepProcessor {
 
     companion object {
-        const val ACTIVITY_CLASS_NAME = "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
+        const val ACTIVITY_CLASS_NAME =
+            "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
     }
 
-    override fun buildStepToCapture(): Step =
-        fingerprintRequestFactory.buildFingerprintCaptureRequest(prefs).run {
-            buildStep(CAPTURE, this)
-        }
+    override suspend fun buildStepToCapture(): Step {
+        val config = configManager.getProjectConfiguration()
+        return fingerprintRequestFactory.buildFingerprintCaptureRequest(config.fingerprint!!.fingersToCapture)
+            .run {
+                buildStep(CAPTURE, this)
+            }
+    }
 
-    override fun buildStepToMatch(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery): Step =
+    override fun buildStepToMatch(
+        probeSamples: List<FingerprintCaptureSample>,
+        query: SubjectQuery
+    ): Step =
         fingerprintRequestFactory.buildFingerprintMatchRequest(probeSamples, query).run {
             buildStep(MATCH, this)
         }
@@ -44,9 +53,14 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
         )
     }
 
-    override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): FingerprintResponse? =
+    override fun processResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): FingerprintResponse? =
         if (isFingerprintResult(requestCode)) {
-            data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)?.fromModuleApiToDomain()
+            data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)
+                ?.fromModuleApiToDomain()
         } else {
             null
         }

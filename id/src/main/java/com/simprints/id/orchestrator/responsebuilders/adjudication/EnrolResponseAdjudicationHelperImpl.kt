@@ -2,32 +2,33 @@ package com.simprints.id.orchestrator.responsebuilders.adjudication
 
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
-import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
-import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import javax.inject.Inject
 
-class EnrolResponseAdjudicationHelperImpl(
-    private val fingerprintThresholds: Map<FingerprintConfidenceThresholds, Int>,
-    private val faceThresholds: Map<FaceConfidenceThresholds, Int>
-) : EnrolResponseAdjudicationHelper {
-    override fun getAdjudicationAction(isEnrolmentPlus: Boolean, steps: List<Step>): EnrolAdjudicationAction {
-        if (isEnrolmentPlus) {
+class EnrolResponseAdjudicationHelperImpl @Inject constructor(): EnrolResponseAdjudicationHelper {
+
+    override fun getAdjudicationAction(
+        projectConfiguration: ProjectConfiguration,
+        steps: List<Step>
+    ): EnrolAdjudicationAction {
+        if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
             val results = steps.map { it.getResult() }
             val faceResponse = getFaceMatchResponseFromResultsOrNull(results)
             val fingerResponse = getFingerMatchResponseFromResultsOrNull(results)
 
-           return when {
+            return when {
                 fingerResponse != null && faceResponse != null -> {
-                    performAdjudicationForFingerprint(fingerResponse)
+                    performAdjudicationForFingerprint(projectConfiguration, fingerResponse)
                 }
                 fingerResponse != null -> {
-                    performAdjudicationForFingerprint(fingerResponse)
+                    performAdjudicationForFingerprint(projectConfiguration, fingerResponse)
                 }
                 faceResponse != null -> {
-                    performAdjudicationForFace(faceResponse)
+                    performAdjudicationForFace(projectConfiguration, faceResponse)
                 }
-               else -> EnrolAdjudicationAction.ENROL
-           }
+                else -> EnrolAdjudicationAction.ENROL
+            }
 
         } else {
             return EnrolAdjudicationAction.ENROL
@@ -40,28 +41,44 @@ class EnrolResponseAdjudicationHelperImpl(
     private fun getFaceMatchResponseFromResultsOrNull(results: List<Step.Result?>) =
         results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
 
-    private fun performAdjudicationForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
-        if (allFingerprintConfidenceScoresAreBelowMediumThreshold(fingerprintResponse)) {
+    private fun performAdjudicationForFingerprint(
+        projectConfiguration: ProjectConfiguration,
+        fingerprintResponse: FingerprintMatchResponse
+    ) =
+        if (allFingerprintConfidenceScoresAreBelowMediumThreshold(
+                projectConfiguration,
+                fingerprintResponse
+            )
+        ) {
             EnrolAdjudicationAction.ENROL
         } else {
             EnrolAdjudicationAction.IDENTIFY
         }
 
-    private fun allFingerprintConfidenceScoresAreBelowMediumThreshold(fingerprintResponse: FingerprintMatchResponse) =
+    private fun allFingerprintConfidenceScoresAreBelowMediumThreshold(
+        projectConfiguration: ProjectConfiguration,
+        fingerprintResponse: FingerprintMatchResponse
+    ) =
         fingerprintResponse.result.all {
-            it.confidenceScore < fingerprintThresholds.getValue(FingerprintConfidenceThresholds.MEDIUM)
+            it.confidenceScore < projectConfiguration.fingerprint!!.decisionPolicy.medium
         }
 
-    private fun performAdjudicationForFace(faceResponse: FaceMatchResponse) =
-        if (allFaceConfidenceScoresAreBelowMediumThreshold(faceResponse)) {
+    private fun performAdjudicationForFace(
+        projectConfiguration: ProjectConfiguration,
+        faceResponse: FaceMatchResponse
+    ) =
+        if (allFaceConfidenceScoresAreBelowMediumThreshold(projectConfiguration, faceResponse)) {
             EnrolAdjudicationAction.ENROL
         } else {
             EnrolAdjudicationAction.IDENTIFY
         }
 
-    private fun allFaceConfidenceScoresAreBelowMediumThreshold(faceResponse: FaceMatchResponse) =
+    private fun allFaceConfidenceScoresAreBelowMediumThreshold(
+        projectConfiguration: ProjectConfiguration,
+        faceResponse: FaceMatchResponse
+    ) =
         faceResponse.result.all {
-            it.confidence < faceThresholds.getValue(FaceConfidenceThresholds.MEDIUM)
+            it.confidence < projectConfiguration.face!!.decisionPolicy.medium
         }
 
 }

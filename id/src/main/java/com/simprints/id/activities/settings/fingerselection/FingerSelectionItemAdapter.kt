@@ -13,21 +13,25 @@ import android.widget.ImageView
 import android.widget.Spinner
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.simprints.id.R
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.FingerIdentifier.*
 import com.simprints.id.databinding.ItemFingerSelectionBinding
 import com.simprints.id.tools.extensions.disableLongPress
 import com.simprints.id.tools.extensions.onItemSelectedWithPosition
+import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.resources.R as IDR
 
-class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
-                                 private val getItems: () -> List<FingerSelectionItem>,
-                                 private val onFingerSelectionChanged: (itemIndex: Int, finger: FingerIdentifier) -> Unit,
-                                 private val onQuantitySelectionChanged: (itemIndex: Int, quantity: Int) -> Unit,
-                                 private val removeItem: (itemIndex: Int) -> Unit) :
+class FingerSelectionItemAdapter(
+    private val itemTouchHelper: ItemTouchHelper,
+    private val getItems: () -> List<FingerSelectionItem>,
+    private val onFingerSelectionChanged: (itemIndex: Int, finger: Finger) -> Unit,
+    private val onQuantitySelectionChanged: (itemIndex: Int, quantity: Int) -> Unit,
+    private val removeItem: (itemIndex: Int) -> Unit
+) :
     RecyclerView.Adapter<FingerSelectionItemAdapter.FingerSelectionItemViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FingerSelectionItemViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): FingerSelectionItemViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemFingerSelectionBinding.inflate(inflater, parent, false)
         return FingerSelectionItemViewHolder(
@@ -51,7 +55,7 @@ class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
         val context: Context,
         private val itemTouchHelper: ItemTouchHelper,
         private val getItems: () -> List<FingerSelectionItem>,
-        private val onFingerSelectionChanged: (itemIndex: Int, finger: FingerIdentifier) -> Unit,
+        private val onFingerSelectionChanged: (itemIndex: Int, finger: Finger) -> Unit,
         private val onQuantitySelectionChanged: (itemIndex: Int, quantity: Int) -> Unit,
         private val removeItem: (itemIndex: Int) -> Unit,
         binding: ItemFingerSelectionBinding
@@ -63,24 +67,27 @@ class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
         private val deleteButton: ImageView = binding.deleteFingerSelectionImageView
 
         private val fingerIdAdapter = FingerIdAdapter(context, getItems)
-        private val quantityAdapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
+        private val quantityAdapter =
+            ArrayAdapter(context, android.R.layout.simple_list_item_1, QUANTITY_OPTIONS)
 
         @SuppressLint("ClickableViewAccessibility")
         fun bind() {
             fingerSpinner.adapter = fingerIdAdapter
             quantitySpinner.adapter = quantityAdapter
 
-            fingerSpinner.setSelection(ORDERED_FINGERS.indexOf(getItems().get(adapterPosition).finger))
-            quantitySpinner.setSelection(QUANTITY_OPTIONS.indexOf(getItems().get(adapterPosition).quantity))
+            fingerSpinner.setSelection(ORDERED_FINGERS.indexOf(getItems()[adapterPosition].finger))
+            quantitySpinner.setSelection(QUANTITY_OPTIONS.indexOf(getItems()[adapterPosition].quantity))
 
             fingerSpinner.disableLongPress()
             quantitySpinner.disableLongPress()
 
             fingerSpinner.onItemSelectedWithPosition { position ->
-                fingerIdAdapter.getItem(position)?.let { onFingerSelectionChanged(adapterPosition, it) }
+                fingerIdAdapter.getItem(position)
+                    ?.let { onFingerSelectionChanged(adapterPosition, it) }
             }
             quantitySpinner.onItemSelectedWithPosition { position ->
-                quantityAdapter.getItem(position)?.let { onQuantitySelectionChanged(adapterPosition, it) }
+                quantityAdapter.getItem(position)
+                    ?.let { onQuantitySelectionChanged(adapterPosition, it) }
             }
 
             if (getItems().get(adapterPosition).removable) {
@@ -102,18 +109,27 @@ class FingerSelectionItemAdapter(private val itemTouchHelper: ItemTouchHelper,
     }
 }
 
-class FingerIdAdapter(context: Context, private val getItems: () -> List<FingerSelectionItem>) : ArrayAdapter<FingerIdentifier>(context, 0, ORDERED_FINGERS) {
+class FingerIdAdapter(context: Context, private val getItems: () -> List<FingerSelectionItem>) :
+    ArrayAdapter<Finger>(context, 0, ORDERED_FINGERS) {
 
     override fun isEnabled(position: Int): Boolean = isFingerAvailable(position)
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
         (convertView as? CheckedTextView? ?: LayoutInflater.from(context)
-            .inflate(android.R.layout.simple_spinner_dropdown_item, parent, false) as CheckedTextView)
+            .inflate(
+                android.R.layout.simple_spinner_dropdown_item,
+                parent,
+                false
+            ) as CheckedTextView)
             .apply { text = getItem(position)?.toString(context) }
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View =
         (convertView as? CheckedTextView? ?: LayoutInflater.from(context)
-            .inflate(android.R.layout.simple_spinner_dropdown_item, parent, false) as CheckedTextView)
+            .inflate(
+                android.R.layout.simple_spinner_dropdown_item,
+                parent,
+                false
+            ) as CheckedTextView)
             .apply {
                 text = getItem(position)?.toString(context)
                 setTextColor(if (isFingerAvailable(position)) Color.BLACK else Color.LTGRAY)
@@ -123,16 +139,18 @@ class FingerIdAdapter(context: Context, private val getItems: () -> List<FingerS
         !getItems().map { it.finger }.contains(getItem(position))
 }
 
-fun FingerIdentifier.toString(context: Context) =
-    context.getString(when (this) {
-        LEFT_THUMB -> R.string.l_1_finger_name
-        LEFT_INDEX_FINGER -> R.string.l_2_finger_name
-        LEFT_3RD_FINGER -> R.string.l_3_finger_name
-        LEFT_4TH_FINGER -> R.string.l_4_finger_name
-        LEFT_5TH_FINGER -> R.string.l_5_finger_name
-        RIGHT_THUMB -> R.string.r_1_finger_name
-        RIGHT_INDEX_FINGER -> R.string.r_2_finger_name
-        RIGHT_3RD_FINGER -> R.string.r_3_finger_name
-        RIGHT_4TH_FINGER -> R.string.r_4_finger_name
-        RIGHT_5TH_FINGER -> R.string.r_5_finger_name
-    })
+fun Finger.toString(context: Context) =
+    context.getString(
+        when (this) {
+            Finger.LEFT_THUMB -> IDR.string.l_1_finger_name
+            Finger.LEFT_INDEX_FINGER -> IDR.string.l_2_finger_name
+            Finger.LEFT_3RD_FINGER -> IDR.string.l_3_finger_name
+            Finger.LEFT_4TH_FINGER -> IDR.string.l_4_finger_name
+            Finger.LEFT_5TH_FINGER -> IDR.string.l_5_finger_name
+            Finger.RIGHT_THUMB -> IDR.string.r_1_finger_name
+            Finger.RIGHT_INDEX_FINGER -> IDR.string.r_2_finger_name
+            Finger.RIGHT_3RD_FINGER -> IDR.string.r_3_finger_name
+            Finger.RIGHT_4TH_FINGER -> IDR.string.r_4_finger_name
+            Finger.RIGHT_5TH_FINGER -> IDR.string.r_5_finger_name
+        }
+    )

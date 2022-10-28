@@ -2,8 +2,12 @@ package com.simprints.fingerprint.activities.collect.domain
 
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier.*
+import javax.inject.Inject
 
-class FingerPriorityDeterminer(private val priorityScheme: PriorityScheme = PriorityScheme.DEFAULT) {
+class FingerPriorityDeterminer(private val priorityScheme: PriorityScheme) {
+
+    @Inject
+    constructor(): this(PriorityScheme.DEFAULT)
 
     fun determineNextPriorityFinger(existingFingers: List<FingerIdentifier>): FingerIdentifier? =
         priorityScheme.priorities.toMutableList().apply { removeAll(existingFingers) }.firstOrNull()

@@ -41,9 +41,9 @@ interface ScannerWrapper {
     /** @throws UnavailableVero2FeatureException - if UN20 API version is less then 1.1 or if using Vero 1 */
     suspend fun stopLiveFeedback()
 
-    suspend fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy, timeOutMs: Int, qualityThreshold: Int): CaptureFingerprintResponse
+    suspend fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy?, timeOutMs: Int, qualityThreshold: Int): CaptureFingerprintResponse
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy): AcquireImageResponse
+    suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy?): AcquireImageResponse
 
     suspend fun setUiIdle()
 

@@ -1,6 +1,9 @@
 package com.simprints.fingerprint.orchestrator.taskflow
 
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintConfigurationRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 
 fun FingerprintRequest.toFingerprintTaskFlow(): FingerprintTaskFlow =

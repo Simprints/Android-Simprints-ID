@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.domain.ota
 
+import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep.AwaitingCacheCommit
 import com.simprints.fingerprint.scanner.tools.mapProgress
 
 sealed class OtaStep(val totalProgress: Float, val recoveryStrategy: OtaRecoveryStrategy)

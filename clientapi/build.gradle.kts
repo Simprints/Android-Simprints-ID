@@ -1,8 +1,9 @@
 plugins {
-    id("com.android.dynamic-feature")
+    id("com.android.library")
     id("kotlin-android")
     id("kotlin-kapt")
     id("kotlin-parcelize")
+    id("dagger.hilt.android.plugin")
 }
 
 apply {
@@ -34,27 +35,19 @@ android {
 }
 
 dependencies {
-    // https://issuetracker.google.com/issues/132906456
-    // When Unit tests are launched in CL, the classes.jar for the base module is not included in the final testing classes.jar file.
-    // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
-    // The following line includes the base module classes.jar into the final one.
-    // To run unit tests from CL: ./gradlew fingerprint:test
-    testRuntimeOnly(
-        fileTree(
-            mapOf(
-                "include" to listOf("**/*.jar"),
-                "dir" to "../id/build/intermediates/app_classes/"
-            )
-        )
-    )
-
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":id"))
+
     implementation(project(":moduleapi"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
     implementation(project(":infrasecurity"))
     implementation(project(":infrarealm"))
     implementation(project(":infranetwork"))
+    implementation(project(":core"))
+    implementation(project(":eventsystem"))
+    implementation(project(":infraresources"))
+
     implementation(libs.libsimprints)
 
     // DI
@@ -66,6 +59,7 @@ dependencies {
     implementation(libs.androidX.security)
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.lifecycle.scope)
+    implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.support.material)
 
     // Splitties
@@ -76,28 +70,21 @@ dependencies {
 
     // Unit Tests
     testImplementation(project(":testtools"))
-    testImplementation(libs.libsimprints)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.androidX.core.testing)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.coroutines.test)
-    testImplementation(libs.testing.androidX.core.testing)
     testImplementation(libs.testing.androidX.core)
-    testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.koTest.kotlin.assert)
-
 
     testImplementation(libs.testing.espresso.intents)
 
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestImplementation(libs.testing.androidX.runner)
-    androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
-    androidTestImplementation(libs.testing.androidX.orchestrator)
 
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestImplementation(libs.testing.espresso.core)

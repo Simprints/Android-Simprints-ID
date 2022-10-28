@@ -1,8 +1,12 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.core.DeviceID
+import com.simprints.core.DispatcherIO
+import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
@@ -10,8 +14,6 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.callout.*
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.db.subject.local.SubjectLocalDataSource
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -23,7 +25,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.tools.ignoreException
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
@@ -32,37 +34,29 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SES
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SUBJECTS_DOWN_SYNC_TRIGGERS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.USER_ID
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload.Companion.buildEvent as buildConnectivitySnapshotEvent
 
-class CheckLoginFromIntentPresenter(
-    val view: CheckLoginFromIntentContract.View,
-    val deviceId: String,
-    component: AppComponent,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+class CheckLoginFromIntentPresenter @AssistedInject constructor(
+    @Assisted private val view: CheckLoginFromIntentContract.View,
+    @DeviceID private val deviceId: String,
+    private val recentUserActivityManager: RecentUserActivityManager,
+    private val eventRepository: EventRepository,
+    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val simNetworkUtils: SimNetworkUtils,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) :
-    CheckLoginPresenter(view, component),
+    CheckLoginPresenter(view),
     CheckLoginFromIntentContract.Presenter {
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var setupFailed: Boolean = false
 
-    @Inject
-    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
-
-    @Inject
-    lateinit var subjectLocalDataSource: SubjectLocalDataSource
-
-    @Inject
-    lateinit var simNetworkUtils: SimNetworkUtils
-
     internal lateinit var appRequest: AppRequest
-
-    init {
-        component.inject(this)
-    }
 
     override suspend fun setup() {
         try {
@@ -81,7 +75,7 @@ class CheckLoginFromIntentPresenter(
     }
 
     private fun showConfirmationTextIfPossible() {
-        if (appRequest is AppConfirmIdentityRequest){
+        if (appRequest is AppConfirmIdentityRequest) {
             view.showConfirmationText()
         }
     }
@@ -168,8 +162,12 @@ class CheckLoginFromIntentPresenter(
             )
         }
 
-    private fun setLastUser() {
-        preferencesManager.lastUserUsed = appRequest.userId
+    private suspend fun setLastUser() {
+        recentUserActivityManager.updateRecentUserActivity {
+            it.apply {
+                it.lastUserUsed = appRequest.userId
+            }
+        }
     }
 
     override suspend fun start() {
@@ -195,7 +193,7 @@ class CheckLoginFromIntentPresenter(
     private fun extractSessionParametersForAnalyticsManager() =
         with(appRequest) {
             if (this is AppRequestFlow) {
-                Simber.tag(AnalyticsUserProperties.USER_ID,true).i(userId)
+                Simber.tag(AnalyticsUserProperties.USER_ID, true).i(userId)
                 Simber.tag(AnalyticsUserProperties.PROJECT_ID).i(projectId)
                 Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId)
                 Simber.tag(AnalyticsUserProperties.DEVICE_ID).i(deviceId)
@@ -230,7 +228,9 @@ class CheckLoginFromIntentPresenter(
             )
 
     private fun matchProjectIdsOrThrow(storedProjectId: String, intentProjectId: String): Boolean =
-        storedProjectId == intentProjectId ||
+        if (storedProjectId == intentProjectId)
+            true
+        else
             throw DifferentProjectIdSignedInException()
 
     /** @throws DifferentUserIdSignedInException */
@@ -283,8 +283,9 @@ class CheckLoginFromIntentPresenter(
 
         val signedProjectId = loginManager.getSignedInProjectIdOrEmpty()
         if (signedProjectId != currentSessionEvent.payload.projectId) {
+            val projectConfiguration = configManager.getProjectConfiguration()
             currentSessionEvent.updateProjectId(signedProjectId)
-            currentSessionEvent.updateModalities(preferencesManager.modalities)
+            currentSessionEvent.updateModalities(projectConfiguration.general.modalities)
             eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
         val associatedEvents = eventRepository.getEventsFromSession(currentSessionEvent.id)
@@ -300,20 +301,22 @@ class CheckLoginFromIntentPresenter(
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
         val payload = currentSessionEvent.payload
-        payload.databaseInfo.recordCount = subjectLocalDataSource.count()
+        payload.databaseInfo.recordCount = enrolmentRecordManager.count()
 
         eventRepository.addOrUpdateEvent(currentSessionEvent)
         Simber.d("[CHECK_LOGIN] Updated Database count in current session")
     }
 
-    private fun initAnalyticsKeyInCrashManager() {
-        Simber.tag(USER_ID, true).i(loginManager.getSignedInUserIdOrEmpty())
+    private suspend fun initAnalyticsKeyInCrashManager() {
+        val projectConfiguration = configManager.getProjectConfiguration()
+        val deviceConfiguration = configManager.getDeviceConfiguration()
         Simber.tag(PROJECT_ID, true).i(loginManager.getSignedInProjectIdOrEmpty())
-        Simber.tag(MODULE_IDS, true).i(preferencesManager.selectedModules.toString())
+        Simber.tag(USER_ID, true).i(loginManager.getSignedInUserIdOrEmpty())
+        Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
-            .i(preferencesManager.eventDownSyncSetting.toString())
+            .i(projectConfiguration.synchronization.frequency.toString())
         Simber.tag(FINGERS_SELECTED, true)
-            .i(preferencesManager.fingerprintsToCollect.map { it.toString() }.toString())
+            .i(deviceConfiguration.fingersToCollect.map { it.toString() }.toString())
         Simber.d("[CHECK_LOGIN] Added keys in CrashManager")
     }
 

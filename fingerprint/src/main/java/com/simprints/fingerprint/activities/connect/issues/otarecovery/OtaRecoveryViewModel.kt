@@ -7,9 +7,13 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.Simber
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class OtaRecoveryViewModel(private val scannerManager: ScannerManager) : ViewModel() {
+@HiltViewModel
+class OtaRecoveryViewModel @Inject constructor(private val scannerManager: ScannerManager) :
+    ViewModel() {
 
     val isConnectionSuccess = MutableLiveData<LiveDataEventWithContent<Boolean>>()
 

@@ -1,33 +1,39 @@
 package com.simprints.id.services.sync.events.down
 
 import androidx.work.*
-import com.simprints.core.domain.modality.toMode
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MIN_BACKOFF_SECS
+import com.simprints.id.tools.extensions.toGroup
+import com.simprints.id.tools.extensions.toMode
+import com.simprints.infra.config.ConfigManager
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class EventDownSyncWorkersBuilderImpl(
+class EventDownSyncWorkersBuilderImpl @Inject constructor(
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val jsonHelper: JsonHelper,
-    private val preferencesManager: IdPreferencesManager
+    private val configManager: ConfigManager,
 ) : EventDownSyncWorkersBuilder {
 
     override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
+        val projectConfiguration = configManager.getProjectConfiguration()
+        val deviceConfiguration = configManager.getDeviceConfiguration()
+
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            preferencesManager.modalities.map { it.toMode() },
-            preferencesManager.selectedModules.toList(),
-            preferencesManager.syncGroup
+            projectConfiguration.general.modalities.map { it.toMode() },
+            deviceConfiguration.selectedModules,
+            projectConfiguration.synchronization.down.partitionType.toGroup()
         )
+        println(projectConfiguration.general.modalities)
         val uniqueDownSyncId = UUID.randomUUID().toString()
         return downSyncScope.operations.map {
             buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it)

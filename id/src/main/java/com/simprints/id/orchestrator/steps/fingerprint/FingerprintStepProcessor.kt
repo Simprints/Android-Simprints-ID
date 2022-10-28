@@ -1,9 +1,10 @@
 package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
-import com.simprints.id.data.db.subject.local.SubjectQuery
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+
 /**
  * It creates a Step to launch (used to launch a specific Activity) to execute
  * a particular task in the FingerprintModule
@@ -11,7 +12,7 @@ import com.simprints.id.orchestrator.steps.Step
 interface FingerprintStepProcessor {
 
 
-    fun buildStepToCapture(): Step
+    suspend fun buildStepToCapture(): Step
 
     fun buildStepToMatch(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery): Step
 

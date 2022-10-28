@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
@@ -13,23 +14,29 @@ import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationE
 import com.simprints.face.controllers.core.events.model.FaceCaptureConfirmationEvent.Result.RECAPTURE
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentConfirmationBinding
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * This class represents the screen the user is presented with once they have made a succesful capture
  * of a face
  */
-class ConfirmationFragment: Fragment(R.layout.fragment_confirmation) {
+@AndroidEntryPoint
+class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
 
-    private val mainVM: FaceCaptureViewModel by sharedViewModel()
+    private val mainVM: FaceCaptureViewModel by activityViewModels()
     private val binding by viewBinding(FragmentConfirmationBinding::bind)
 
-    private val faceSessionEventsManager: FaceSessionEventsManager by inject()
-    private val faceTimeHelper: FaceTimeHelper by inject()
-    private val startTime = faceTimeHelper.now()
+    @Inject
+    lateinit var faceSessionEventsManager: FaceSessionEventsManager
+
+    @Inject
+    lateinit var faceTimeHelper: FaceTimeHelper
+
+    private var startTime: Long = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        startTime = faceTimeHelper.now()
         super.onViewCreated(view, savedInstanceState)
         setTextInLayout()
 

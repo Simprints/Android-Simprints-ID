@@ -15,19 +15,21 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(project(":core"))
     implementation(project(":infralogging"))
     implementation(project(":infralogin"))
-    implementation(project(":core"))
+    api(project(":infranetwork"))
     implementation(project(":infrasecurity"))
 
     implementation(libs.androidX.core)
     implementation(libs.androidX.security)
-    implementation(libs.retrofit.core)
-    implementation(libs.retrofit.jackson)
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)

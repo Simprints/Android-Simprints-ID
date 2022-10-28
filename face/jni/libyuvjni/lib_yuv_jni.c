@@ -74,7 +74,7 @@ static void crop_rotate_yuv_nv21(
 }
 
 
-JNIEXPORT jbyteArray JNICALL Java_com_simprints_uicomponents_imageTools_LibYuvJni_cropRotateYuvNV21(
+JNIEXPORT jbyteArray JNICALL Java_com_simprints_face_imageTools_LibYuvJni_cropRotateYuvNV21(
         JNIEnv *env,
         jobject obj,
         jint srcWidth, jint srcHeight, jbyteArray srcByteArray,

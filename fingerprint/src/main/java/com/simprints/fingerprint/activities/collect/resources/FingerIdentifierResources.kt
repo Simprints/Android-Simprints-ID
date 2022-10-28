@@ -3,7 +3,7 @@ package com.simprints.fingerprint.activities.collect.resources
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.simprints.core.R as CR
+import com.simprints.infra.resources.R as CR
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 

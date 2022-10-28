@@ -1,30 +1,30 @@
 package com.simprints.id.services.securitystate
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
-import com.simprints.core.tools.coroutines.DispatcherProvider
-import com.simprints.id.Application
+import com.simprints.core.DispatcherIO
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class SecurityStateWorker(
-    context: Context,
-    workerParams: WorkerParameters,
+@HiltWorker
+class SecurityStateWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val repository: SecurityStateRepository,
+    private val securityStateProcessor: SecurityStateProcessor,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, workerParams) {
 
     override val tag: String = SecurityStateWorker::class.java.simpleName
 
-    @Inject lateinit var repository: SecurityStateRepository
-    @Inject lateinit var securityStateProcessor: SecurityStateProcessor
-    @Inject lateinit var dispatcher: DispatcherProvider
-
-    override suspend fun doWork(): Result {
-        (applicationContext as Application).component.inject(this@SecurityStateWorker)
-
-        return withContext(dispatcher.io()) {
+    override suspend fun doWork(): Result =
+        withContext(dispatcher) {
             crashlyticsLog("Fetching security state")
 
             try {
@@ -35,6 +35,4 @@ class SecurityStateWorker(
                 fail(t)
             }
         }
-    }
-
 }

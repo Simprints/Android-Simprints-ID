@@ -7,8 +7,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.project.model.DashboardProjectState
+import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
-class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDisplayer {
+class DashboardProjectDetailsCardDisplayerImpl @Inject constructor(): DashboardProjectDetailsCardDisplayer {
 
     private lateinit var root: LinearLayout
 
@@ -32,7 +34,7 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
         findViewById<TextView>(
             R.id.dashboard_project_details_card_current_user
         ).text = String.format(context.getString(
-            R.string.dashboard_card_current_user), currentUser)
+            IDR.string.dashboard_card_current_user), currentUser)
     }
 
     private fun View.setScannerUsed(scannerUsed: String) {
@@ -44,7 +46,7 @@ class DashboardProjectDetailsCardDisplayerImpl: DashboardProjectDetailsCardDispl
             } else {
                 this.visibility = VISIBLE
                 text = String.format(context.getString(
-                    R.string.dashboard_card_scanner_used), scannerUsed)
+                    IDR.string.dashboard_card_scanner_used), scannerUsed)
             }
         }
     }

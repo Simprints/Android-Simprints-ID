@@ -10,7 +10,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fasterxml.jackson.core.type.TypeReference
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
@@ -24,6 +23,7 @@ import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.eventsystem.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Rule
 import org.junit.Test
@@ -53,7 +53,8 @@ class EventMigration1to2Test {
         var db = helper.createDatabase(TEST_DB, 1).apply {
             val enrolmentEvent = createEnrolmentEvent(enrolmentEventId)
             val openSessionCaptureEvent = createSessionCaptureEvent(openSessionCaptureEventId, 0)
-            val closedSessionCaptureEvent = createSessionCaptureEvent(closedSessionCaptureEventId, 16115)
+            val closedSessionCaptureEvent =
+                createSessionCaptureEvent(closedSessionCaptureEventId, 16115)
 
             this.insert("DbEvent", CONFLICT_NONE, enrolmentEvent)
             this.insert("DbEvent", CONFLICT_NONE, openSessionCaptureEvent)
@@ -84,7 +85,7 @@ class EventMigration1to2Test {
             id = id,
             projectId = "TEST6Oai41ps1pBNrzBL",
             createdAt = 1611584017198,
-            modalities = listOf(Modes.FINGERPRINT),
+            modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
             appVersionName = "appVersionName",
             libVersionName = "libSimprintsVersionName",
             language = "en",
@@ -109,7 +110,11 @@ class EventMigration1to2Test {
         assertThat(enrolmentEventV2).isInstanceOf(EnrolmentEventV1::class.java)
     }
 
-    private fun validateSessionCaptureMigration(db: SupportSQLiteDatabase, openId: String, closedId: String) {
+    private fun validateSessionCaptureMigration(
+        db: SupportSQLiteDatabase,
+        openId: String,
+        closedId: String
+    ) {
         val openCursor = retrieveCursorWithEventById(db, openId)
         val closedCursor = retrieveCursorWithEventById(db, closedId)
         assertThat(openCursor.getStringWithColumnName("type")).isEqualTo(EventType.SESSION_CAPTURE.toString())

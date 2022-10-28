@@ -3,10 +3,9 @@ package com.simprints.id.secure.securitystate.repository
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-class SecurityStateRepositoryImpl(
+class SecurityStateRepositoryImpl @Inject constructor(
     private val remoteDataSource: SecurityStateRemoteDataSource,
     private val localDataSource: SecurityStateLocalDataSource
 ) : SecurityStateRepository {

@@ -6,8 +6,6 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSim
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.STANDARD
-import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.data.sharedpreferences.canCoSyncData
 import com.simprints.clientapi.domain.responses.EnrolResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
@@ -18,6 +16,9 @@ import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.requestFactories.*
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -41,6 +42,16 @@ class LibSimprintsPresenterTest {
     @MockK
     lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
 
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { synchronization } returns mockk {
+                every { up } returns mockk {
+                    every { coSync } returns CoSyncUpSynchronizationConfiguration(NONE)
+                }
+            }
+        }
+    }
+
     @Before
     fun setup() {
         BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
@@ -48,7 +59,6 @@ class LibSimprintsPresenterTest {
         coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
         coEvery { clientApiSessionEventsManager.createSession(any()) } returns "session_id"
-        mockkStatic("com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImplKt")
     }
 
     @Test
@@ -214,9 +224,9 @@ class LibSimprintsPresenterTest {
             sessionEventsManager = clientApiSessionEventsManager,
             rootManager = mockk(),
             timeHelper = mockk(),
-            subjectRepository = mockk(),
+            enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            sharedPreferencesManager = mockSharedPrefs()
+            configManager
         ).handleEnrolResponse(EnrolResponse(registerId))
 
         verify(exactly = 1) {
@@ -226,7 +236,8 @@ class LibSimprintsPresenterTest {
                 },
                 sessionId,
                 RETURN_FOR_FLOW_COMPLETED_CHECK,
-                eventsJson = null, subjectActions = null
+                eventsJson = null,
+                subjectActions = null
             )
         }
         verifyCompletionCheckEventWasAdded()
@@ -246,9 +257,9 @@ class LibSimprintsPresenterTest {
             sessionEventsManager = clientApiSessionEventsManager,
             rootManager = mockk(),
             timeHelper = mockk(),
-            subjectRepository = mockk(),
+            enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            sharedPreferencesManager = mockSharedPrefs()
+            configManager
         ).handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
         verify(exactly = 1) {
@@ -293,9 +304,9 @@ class LibSimprintsPresenterTest {
             sessionEventsManager = clientApiSessionEventsManager,
             rootManager = mockk(),
             timeHelper = mockk(),
-            subjectRepository = mockk(),
+            enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            sharedPreferencesManager = mockSharedPrefs()
+            configManager
         ).apply {
             handleVerifyResponse(verification)
         }
@@ -333,9 +344,9 @@ class LibSimprintsPresenterTest {
             sessionEventsManager = clientApiSessionEventsManager,
             rootManager = mockk(),
             timeHelper = mockk(),
-            subjectRepository = mockk(),
+            enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            sharedPreferencesManager = mockSharedPrefs()
+            configManager
         ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
 
         verify(exactly = 1) {
@@ -412,9 +423,4 @@ class LibSimprintsPresenterTest {
             coVerify(exactly = 1) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
         }
     }
-
-    private fun mockSharedPrefs(canCosync: Boolean = false) =
-        mockk<SharedPreferencesManager>().apply {
-            coEvery { this@apply.canCoSyncData() } returns canCosync
-        }
 }

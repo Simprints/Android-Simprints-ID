@@ -1,6 +1,7 @@
 package com.simprints.id.services.sync.events.up.workers
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -11,10 +12,18 @@ import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.infra.logging.Simber
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
+@HiltWorker
+class EventUpSyncCountWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val eventUpSyncHelper: EventUpSyncHelper,
+    private val jsonHelper: JsonHelper,
+    private val dispatcher: DispatcherProvider
+) : SimCoroutineWorker(context, params) {
 
     companion object {
         const val INPUT_COUNT_WORKER_UP = "INPUT_COUNT_WORKER_UP"
@@ -23,21 +32,17 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
 
     override val tag: String = EventUpSyncCountWorker::class.java.simpleName
 
-    @Inject lateinit var eventUpSyncHelper: EventUpSyncHelper
-    @Inject lateinit var jsonHelper: JsonHelper
-    @Inject lateinit var dispatcher: DispatcherProvider
-
     private val upSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_UP)
             ?: throw IllegalArgumentException("input required")
         Simber.d("Received $jsonInput")
-        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(jsonInput)
+        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(
+            jsonInput
+        )
     }
 
-    override suspend fun doWork(): Result {
-        getComponent<EventUpSyncCountWorker> { it.inject(this@EventUpSyncCountWorker) }
-
-        return withContext(dispatcher.io()) {
+    override suspend fun doWork(): Result =
+        withContext(dispatcher.io()) {
             try {
                 Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
 
@@ -50,14 +55,16 @@ class EventUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCo
                 fail(t)
             }
         }
-    }
 
     private suspend fun execute(upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope): Result {
         val upCount = getUpCount(upSyncScope)
         Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Done $upCount")
 
-        return success(workDataOf(
-            OUTPUT_COUNT_WORKER_UP to upCount), "Total to upload: $upCount")
+        return success(
+            workDataOf(
+                OUTPUT_COUNT_WORKER_UP to upCount
+            ), "Total to upload: $upCount"
+        )
 
     }
 

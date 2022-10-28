@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -13,12 +14,15 @@ import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
+import com.simprints.face.exitform.ExitFormViewModel
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FaceCaptureActivity : FaceActivity() {
-    private val vm: FaceCaptureViewModel by viewModel()
+    private val vm: FaceCaptureViewModel by viewModels()
+    private val exitVm: ExitFormViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +51,7 @@ class FaceCaptureActivity : FaceActivity() {
             findNavController(R.id.capture_host_fragment).navigate(R.id.action_global_refusalFragment)
         })
 
-        vm.finishFlowWithExitFormEvent.observe(this, LiveDataEventWithContentObserver {
+        exitVm.finishFlowWithExitFormEvent.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
             setResult(Activity.RESULT_OK, intent)
             finish()

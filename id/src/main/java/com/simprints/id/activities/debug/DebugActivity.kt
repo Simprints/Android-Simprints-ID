@@ -13,34 +13,36 @@ import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.id.Application
-import com.simprints.id.data.db.subject.SubjectRepository
 import com.simprints.id.databinding.ActivityDebugBinding
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
-import com.simprints.id.services.config.RemoteConfigScheduler
-import com.simprints.id.services.config.RemoteConfigSchedulerImpl
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.login.LoginManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class DebugActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
-    lateinit var remoteConfigScheduler: RemoteConfigScheduler
+    lateinit var configManager: ConfigManager
 
     @Inject
-    lateinit var securityStateScheduler: SecurityStateScheduler
+    lateinit var loginManager: LoginManager
+    private lateinit var securityStateScheduler: SecurityStateScheduler
 
     @Inject
     lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
@@ -55,7 +57,7 @@ class DebugActivity : BaseSplitActivity() {
     lateinit var eventLocalDataSource: EventLocalDataSource
 
     @Inject
-    lateinit var subjectRepository: SubjectRepository
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @Inject
     lateinit var dispatcher: DispatcherProvider
@@ -67,18 +69,15 @@ class DebugActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val component = (application as Application).component
-        component.inject(this)
-
         setContentView(binding.root)
 
-        eventSyncManager.getLastSyncState().observe(this) {
+        eventSyncManager.getLastSyncState().observe(this) { state ->
             val states =
-                (it.downSyncWorkersInfo.map { it.state } + it.upSyncWorkersInfo.map { it.state })
+                (state.downSyncWorkersInfo.map { it.state } + state.upSyncWorkersInfo.map { it.state })
             val message =
-                "${it.syncId.takeLast(5)} - " +
+                "${state.syncId.takeLast(5)} - " +
                     "${states.toDebugActivitySyncState().name} - " +
-                    "${it.progress}/${it.total}"
+                    "${state.progress}/${state.total}"
 
             val ssb = SpannableStringBuilder(
                 coloredText(
@@ -113,7 +112,7 @@ class DebugActivity : BaseSplitActivity() {
                     eventSyncManager.stop()
                     eventLocalDataSource.deleteAll()
                     dbEventDownSyncOperationStateDao.deleteAll()
-                    subjectRepository.deleteAll()
+                    enrolmentRecordManager.deleteAll()
                     wm.pruneWork()
                 }
             }
@@ -132,7 +131,7 @@ class DebugActivity : BaseSplitActivity() {
             lifecycleScope.launch {
                 withContext(dispatcher.main()) {
                     val logStringBuilder = StringBuilder()
-                    logStringBuilder.append("\nSubjects ${subjectRepository.count()}")
+                    logStringBuilder.append("\nSubjects ${enrolmentRecordManager.count()}")
 
                     val events = eventLocalDataSource.loadAll().toList().groupBy { it.type }
                     events.forEach {
@@ -145,11 +144,14 @@ class DebugActivity : BaseSplitActivity() {
         }
 
         binding.syncConfig.setOnClickListener {
-            remoteConfigScheduler.syncNow()
             binding.logs.append("\nGetting Configs from BFSID")
+            runBlocking {
+                configManager.refreshProjectConfiguration(loginManager.signedInProjectId)
+            }
+            binding.logs.append("\nGot Configs from BFSID")
         }
 
-        wm.getWorkInfosForUniqueWorkLiveData(RemoteConfigSchedulerImpl.WORK_NAME_ONE_TIME)
+        wm.getWorkInfosForUniqueWorkLiveData("project-configuration-work")
             .observe(this) { workInfos ->
                 binding.logs.append(
                     workInfos.joinToString("", "\n") { workInfo ->
@@ -164,13 +166,10 @@ class DebugActivity : BaseSplitActivity() {
 
     private fun coloredText(text: String, color: Int): SpannableString {
         val spannableString = SpannableString(text)
-        try {
-            spannableString.setSpan(
-                ForegroundColorSpan(color), 0,
-                text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        } catch (e: Exception) {
-        }
+        spannableString.setSpan(
+            ForegroundColorSpan(color), 0,
+            text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
         return spannableString
     }
 
@@ -185,7 +184,7 @@ class DebugActivity : BaseSplitActivity() {
 
     private fun setSecurityStatus(status: SecurityState.Status) {
         lifecycleScope.launch {
-            securityStateRepository.securityStatus=status
+            securityStateRepository.securityStatus = status
             securityStateProcessor.processSecurityState(
                 SecurityState("device-id", status)
             )

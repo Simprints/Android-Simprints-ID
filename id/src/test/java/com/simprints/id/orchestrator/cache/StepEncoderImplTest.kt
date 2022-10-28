@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
@@ -15,14 +14,13 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.config.domain.models.Finger
 import com.simprints.testtools.common.mock.mockTemplate
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
-import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -69,10 +67,15 @@ class StepEncoderImplTest {
             MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
             MatcherAssert.assertThat(request, CoreMatchers.`is`(fingerprintCaptureRequest))
             MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
-            MatcherAssert.assertThat(getResult(), CoreMatchers.instanceOf(FingerprintCaptureResponse::class.java))
+            MatcherAssert.assertThat(
+                getResult(),
+                CoreMatchers.instanceOf(FingerprintCaptureResponse::class.java)
+            )
             require(getResult() is FingerprintCaptureResponse)
-            validateFingerprintCaptureResponse(getResult() as FingerprintCaptureResponse,
-                fingerprintCaptureResponse as FingerprintCaptureResponse)
+            validateFingerprintCaptureResponse(
+                getResult() as FingerprintCaptureResponse,
+                fingerprintCaptureResponse as FingerprintCaptureResponse
+            )
         }
     }
 
@@ -90,15 +93,15 @@ class StepEncoderImplTest {
             MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
             MatcherAssert.assertThat(request, CoreMatchers.`is`(faceCaptureRequest))
             MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
-            MatcherAssert.assertThat(getResult(), CoreMatchers.instanceOf(FaceCaptureResponse::class.java))
-            validateFaceCaptureResponse(getResult() as FaceCaptureResponse,
-                faceCaptureResponse as FaceCaptureResponse)
+            MatcherAssert.assertThat(
+                getResult(),
+                CoreMatchers.instanceOf(FaceCaptureResponse::class.java)
+            )
+            validateFaceCaptureResponse(
+                getResult() as FaceCaptureResponse,
+                faceCaptureResponse as FaceCaptureResponse
+            )
         }
-    }
-
-    @After
-    fun tearDown() {
-        stopKoin()
     }
 
     private fun buildStep(request: Step.Request, result: Step.Result): Step = Step(
@@ -111,7 +114,7 @@ class StepEncoderImplTest {
     )
 
     private fun mockFingerprintCaptureRequest(): Step.Request = FingerprintCaptureRequest(
-        fingerprintsToCapture = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
+        fingerprintsToCapture = listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER)
     )
 
     private fun mockFaceCaptureRequest(): Step.Request = FaceCaptureRequest(
@@ -121,9 +124,9 @@ class StepEncoderImplTest {
     private fun mockFingerprintCaptureResponse(): Step.Result {
         val captureResult = listOf(
             FingerprintCaptureResult(
-                FingerIdentifier.RIGHT_THUMB,
+                Finger.RIGHT_THUMB,
                 FingerprintCaptureSample(
-                    FingerIdentifier.RIGHT_THUMB,
+                    Finger.RIGHT_THUMB,
                     fakeSample.template,
                     fakeSample.templateQualityScore,
                     FingerprintTemplateFormat.ISO_19794_2,
@@ -135,42 +138,69 @@ class StepEncoderImplTest {
     }
 
     private fun mockFaceCaptureResponse(): Step.Result {
-        return FaceCaptureResponse(listOf(
-            FaceCaptureResult(
-                index = 1,
-                result = FaceCaptureSample(
-                    "face_id",
-                    mockTemplate(),
-                    null,
-                    FaceTemplateFormat.RANK_ONE_1_23
+        return FaceCaptureResponse(
+            listOf(
+                FaceCaptureResult(
+                    index = 1,
+                    result = FaceCaptureSample(
+                        "face_id",
+                        mockTemplate(),
+                        null,
+                        FaceTemplateFormat.RANK_ONE_1_23
+                    )
                 )
             )
-        ))
+        )
     }
 
 
-    private fun validateFingerprintCaptureResponse(actual: FingerprintCaptureResponse,
-                                                   expected: FingerprintCaptureResponse) {
+    private fun validateFingerprintCaptureResponse(
+        actual: FingerprintCaptureResponse,
+        expected: FingerprintCaptureResponse
+    ) {
         with(actual) {
             captureResult.forEachIndexed { index, actualResult ->
                 val expectedResult = expected.captureResult[index]
-                MatcherAssert.assertThat(actualResult.identifier, CoreMatchers.`is`(expectedResult.identifier))
+                MatcherAssert.assertThat(
+                    actualResult.identifier,
+                    CoreMatchers.`is`(expectedResult.identifier)
+                )
                 actualResult.sample?.let { actualSample ->
                     expectedResult.sample?.let { expectedSample ->
-                        MatcherAssert.assertThat(actualSample.fingerIdentifier, CoreMatchers.`is`(expectedSample.fingerIdentifier))
-                        MatcherAssert.assertThat(actualSample.id, CoreMatchers.`is`(expectedSample.id))
-                        MatcherAssert.assertThat(actualSample.imageRef, CoreMatchers.`is`(expectedSample.imageRef))
-                        MatcherAssert.assertThat(actualSample.templateQualityScore, CoreMatchers.`is`(expectedSample.templateQualityScore))
-                        MatcherAssert.assertThat(actualSample.template.contentEquals(expectedSample.template), CoreMatchers.`is`(true))
-                        MatcherAssert.assertThat(actualSample.format, CoreMatchers.`is`(FingerprintTemplateFormat.ISO_19794_2))
+                        MatcherAssert.assertThat(
+                            actualSample.fingerIdentifier,
+                            CoreMatchers.`is`(expectedSample.fingerIdentifier)
+                        )
+                        MatcherAssert.assertThat(
+                            actualSample.id,
+                            CoreMatchers.`is`(expectedSample.id)
+                        )
+                        MatcherAssert.assertThat(
+                            actualSample.imageRef,
+                            CoreMatchers.`is`(expectedSample.imageRef)
+                        )
+                        MatcherAssert.assertThat(
+                            actualSample.templateQualityScore,
+                            CoreMatchers.`is`(expectedSample.templateQualityScore)
+                        )
+                        MatcherAssert.assertThat(
+                            actualSample.template.contentEquals(expectedSample.template),
+                            CoreMatchers.`is`(true)
+                        )
+                        MatcherAssert.assertThat(
+                            actualSample.format,
+                            CoreMatchers.`is`(FingerprintTemplateFormat.ISO_19794_2)
+                        )
                     }
                 }
             }
         }
     }
 
-    private fun validateFaceCaptureResponse(actual: FaceCaptureResponse,
-                                            expected: FaceCaptureResponse) {
+    private fun validateFaceCaptureResponse(
+        actual: FaceCaptureResponse,
+        expected: FaceCaptureResponse
+    ) {
         with(actual) {
             capturingResult.forEachIndexed { index, item ->
                 val expectedItem = expected.capturingResult[index]
@@ -178,12 +208,24 @@ class StepEncoderImplTest {
 
                 item.result?.let { sample ->
                     val expectedSample = expectedItem.result
-                    MatcherAssert.assertThat(sample.faceId, CoreMatchers.`is`(expectedSample?.faceId))
-                    MatcherAssert.assertThat(sample.imageRef, CoreMatchers.`is`(expectedSample?.imageRef))
+                    MatcherAssert.assertThat(
+                        sample.faceId,
+                        CoreMatchers.`is`(expectedSample?.faceId)
+                    )
+                    MatcherAssert.assertThat(
+                        sample.imageRef,
+                        CoreMatchers.`is`(expectedSample?.imageRef)
+                    )
                     expectedSample?.template?.let { expectedTemplate ->
-                        MatcherAssert.assertThat(sample.template.contentEquals(expectedTemplate), CoreMatchers.`is`(true))
+                        MatcherAssert.assertThat(
+                            sample.template.contentEquals(expectedTemplate),
+                            CoreMatchers.`is`(true)
+                        )
                     }
-                    MatcherAssert.assertThat(sample.format, CoreMatchers.`is`(FaceTemplateFormat.RANK_ONE_1_23))
+                    MatcherAssert.assertThat(
+                        sample.format,
+                        CoreMatchers.`is`(FaceTemplateFormat.RANK_ONE_1_23)
+                    )
                 }
             }
         }

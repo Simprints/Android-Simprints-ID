@@ -5,7 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.simprints.face.R
-import com.simprints.core.R as CR
+import com.simprints.infra.resources.R as CR
 
 @Keep
 enum class ErrorType(

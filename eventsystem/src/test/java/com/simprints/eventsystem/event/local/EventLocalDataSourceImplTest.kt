@@ -10,8 +10,8 @@ import com.simprints.eventsystem.event.local.models.fromDbToDomain
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -19,7 +19,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 
-@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class EventLocalDataSourceImplTest {
 
@@ -35,7 +34,8 @@ class EventLocalDataSourceImplTest {
         MockKAnnotations.init(this)
 
         val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java).allowMainThreadQueries().build()
+        db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java)
+            .allowMainThreadQueries().build()
 
         eventDao = db.eventDao
         every { eventDatabaseFactory.build() } returns db
@@ -54,15 +54,15 @@ class EventLocalDataSourceImplTest {
     @Test
     fun loadOpenedSessions() = runTest {
         mockkStatic("com.simprints.eventsystem.event.local.models.DbEventKt")
-        val dbSessionCaptureEvent = mockk<DbEvent>{
-            every { type } returns  SESSION_CAPTURE
+        val dbSessionCaptureEvent = mockk<DbEvent> {
+            every { type } returns SESSION_CAPTURE
             every { fromDbToDomain() } returns mockk()
         }
         coEvery { eventDao.loadOpenedSessions() } returns listOf(dbSessionCaptureEvent)
         eventLocalDataSource.loadOpenedSessions()
 
         coVerify { eventDao.loadOpenedSessions() }
-        verify { dbSessionCaptureEvent.fromDbToDomain()  }
+        verify { dbSessionCaptureEvent.fromDbToDomain() }
 
     }
 
@@ -110,7 +110,11 @@ class EventLocalDataSourceImplTest {
         coEvery { eventDao.countFromProjectByType(any(), any()) } returns 0
         every { db.eventDao } returns eventDao
         every { eventDatabaseFactory.build() } returns db
-        eventLocalDataSource = EventLocalDataSourceImpl(eventDatabaseFactory)
+        eventLocalDataSource = EventLocalDataSourceImpl(
+            eventDatabaseFactory,
+            UnconfinedTestDispatcher(),
+            UnconfinedTestDispatcher()
+        )
     }
 
     @After

@@ -8,13 +8,13 @@ import com.simprints.eventsystem.sampledata.createFaceCaptureBiometricsEvent
 import com.simprints.eventsystem.sampledata.createFingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.sampledata.createPersonCreationEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
+import com.simprints.infra.config.domain.models.Finger
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -37,7 +37,7 @@ class PersonCreationEventHelperImplTest {
         createFaceCaptureBiometricsEvent().let { it.copy(labels = it.labels.copy(sessionId = currentSession.id)) }
 
     private val fingerprintSample = FingerprintCaptureSample(
-        FingerIdentifier.LEFT_THUMB,
+        Finger.LEFT_THUMB,
         templateQualityScore = 10,
         template = EncodingUtilsImplForTests.base64ToBytes(
             "sometemplate"
@@ -55,7 +55,7 @@ class PersonCreationEventHelperImplTest {
     private val fingerprintCaptureResponse = FingerprintCaptureResponse(
         captureResult = listOf(
             FingerprintCaptureResult(
-                FingerIdentifier.LEFT_THUMB,
+                Finger.LEFT_THUMB,
                 fingerprintSample
             )
         )
@@ -76,7 +76,7 @@ class PersonCreationEventHelperImplTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
-    lateinit var personCreationEventHelper: PersonCreationEventHelper
+    private lateinit var personCreationEventHelper: PersonCreationEventHelper
 
     @Before
     fun setup() {
@@ -87,7 +87,8 @@ class PersonCreationEventHelperImplTest {
         coEvery { timeHelper.now() } returns CREATED_AT
 
 
-        personCreationEventHelper = PersonCreationEventHelperImpl(eventRepository, timeHelper, EncodingUtilsImplForTests)
+        personCreationEventHelper =
+            PersonCreationEventHelperImpl(eventRepository, timeHelper, EncodingUtilsImplForTests)
     }
 
     @Test

@@ -8,7 +8,6 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
-import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.extentions.getIntWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
@@ -18,6 +17,7 @@ import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.eventsystem.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Rule
 import org.junit.Test
@@ -69,7 +69,7 @@ class EventMigration2to3Test {
             id = id,
             projectId = "TEST6Oai41ps1pBNrzBL",
             createdAt = 1611584017198,
-            modalities = listOf(Modes.FINGERPRINT),
+            modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
             appVersionName = "appVersionName",
             libVersionName = "libSimprintsVersionName",
             language = "en",

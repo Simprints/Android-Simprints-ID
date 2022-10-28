@@ -36,11 +36,9 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":infralogging"))
     implementation(project(":infranetwork"))
+    implementation(project(":core"))
 
     implementation(libs.androidX.core)
-
-    implementation(libs.dagger.core)
-    kapt(libs.dagger.compiler)
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)

@@ -12,23 +12,33 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
+import com.simprints.fingerprint.FingerprintModule
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.databinding.ActivityFingerprintAlertBinding as AlertBinding
-import com.simprints.fingerprint.databinding.ActivityFingerprintBluetoothAlertBinding as BluetoothAlertBinding
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import com.simprints.fingerprint.databinding.ActivityFingerprintAlertBinding as AlertBinding
+import com.simprints.fingerprint.databinding.ActivityFingerprintBluetoothAlertBinding as BluetoothAlertBinding
 
+@AndroidEntryPoint
 class AlertActivity : FingerprintActivity(), AlertContract.View {
 
     private lateinit var alertType: FingerprintAlert
-    override val viewPresenter: AlertContract.Presenter by inject { parametersOf(this, alertType) }
 
+    @Inject
+    lateinit var presenterFactory: FingerprintModule.AlertPresenterFactory
+
+    override val viewPresenter: AlertContract.Presenter by lazy {
+        presenterFactory.create(
+            this,
+            alertType
+        )
+    }
 
     private lateinit var alertLeftButton: TextView
     private lateinit var alertLayout: LinearLayout
@@ -43,8 +53,9 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
 
         window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        alertType = intent.extras?.getParcelable<AlertTaskRequest>(AlertTaskRequest.BUNDLE_KEY)?.alert
-            ?: UNEXPECTED_ERROR
+        alertType =
+            intent.extras?.getParcelable<AlertTaskRequest>(AlertTaskRequest.BUNDLE_KEY)?.alert
+                ?: UNEXPECTED_ERROR
 
         if (isNewBluetoothAlert(alertType)) {
             BluetoothAlertBinding.inflate(layoutInflater).let {
@@ -88,8 +99,12 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
     private fun isNewBluetoothAlert(alertType: FingerprintAlert) =
         (alertType == DISCONNECTED || alertType == NOT_PAIRED)
 
-    override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
-    override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
+    override fun getColorForColorRes(@ColorRes colorRes: Int) =
+        ResourcesCompat.getColor(resources, colorRes, null)
+
+    override fun setLayoutBackgroundColor(@ColorInt color: Int) =
+        alertLayout.setBackgroundColor(color)
+
     override fun setLeftButtonBackgroundColor(@ColorInt color: Int) {
         alertLeftButton.setBackgroundColor(color)
     }
@@ -102,7 +117,9 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
         alertTitle.text = getString(stringRes)
     }
 
-    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alertImage.setImageResource(drawableId)
+    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) =
+        alertImage.setImageResource(drawableId)
+
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
             hintGraphic?.setImageResource(alertHintDrawableId)
@@ -136,8 +153,10 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
     }
 
     override fun startRefusalActivity() {
-        startActivityForResult(Intent(this, RefusalActivity::class.java),
-            RequestCode.REFUSAL.value)
+        startActivityForResult(
+            Intent(this, RefusalActivity::class.java),
+            RequestCode.REFUSAL.value
+        )
     }
 
     override fun openBluetoothSettings() {

@@ -1,14 +1,19 @@
 package com.simprints.id.services.sync.events.master.internal
 
 import android.annotation.SuppressLint
-import android.content.SharedPreferences
+import com.google.android.gms.common.util.VisibleForTesting
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.SecurityManager
 import java.util.*
+import javax.inject.Inject
 
 @SuppressLint("ApplySharedPref")
-class EventSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
-                         private val sharedForLastSyncTime: SharedPreferences) : EventSyncCache {
+class EventSyncCacheImpl @Inject constructor(securityManager: SecurityManager) : EventSyncCache {
 
+    private val sharedForProgresses =
+        securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_PROGRESSES_SHARED_PREFS)
+    private val sharedForLastSyncTime =
+        securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS)
 
     override fun readLastSuccessfulSyncTime(): Date? {
         val dateLong = sharedForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1)
@@ -16,11 +21,12 @@ class EventSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
     }
 
     override fun storeLastSuccessfulSyncTime(lastSyncTime: Date?) {
-        sharedForLastSyncTime.edit().putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.time ?: -1).apply()
+        sharedForLastSyncTime.edit()
+            .putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, lastSyncTime?.time ?: -1).apply()
     }
 
     override fun readProgress(workerId: String): Int =
-        (sharedForProgresses.getInt(workerId, 0))
+        sharedForProgresses.getInt(workerId, 0)
 
     override fun saveProgress(workerId: String, progress: Int) {
         sharedForProgresses.edit().putInt(workerId, progress).commit()
@@ -40,6 +46,7 @@ class EventSyncCacheImpl(private val sharedForProgresses: SharedPreferences,
 
 
     companion object {
+        @VisibleForTesting
         const val PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY"
     }
 }

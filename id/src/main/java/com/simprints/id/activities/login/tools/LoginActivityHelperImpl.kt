@@ -4,12 +4,12 @@ import android.content.Intent
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.activities.login.response.QrCodeResponse
 import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_ERROR_KEY
-import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError
 import com.simprints.id.tools.InternalConstants.QrCapture.Companion.QR_SCAN_RESULT_KEY
+import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError
+import javax.inject.Inject
 
-class LoginActivityHelperImpl(
-    private val jsonHelper: JsonHelper
-) : LoginActivityHelper {
+class LoginActivityHelperImpl @Inject constructor(private val jsonHelper: JsonHelper) :
+    LoginActivityHelper {
 
     override fun areMandatoryCredentialsPresent(
         projectId: String,

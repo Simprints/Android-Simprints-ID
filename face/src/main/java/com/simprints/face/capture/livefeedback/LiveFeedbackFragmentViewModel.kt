@@ -3,9 +3,10 @@ package com.simprints.face.capture.livefeedback
 import android.graphics.RectF
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.otaliastudios.cameraview.frame.Frame
+import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.extentions.area
-import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
@@ -14,20 +15,22 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
+import com.simprints.infra.config.ConfigManager
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
-class LiveFeedbackFragmentViewModel(
-    private val mainVM: FaceCaptureViewModel,
+@HiltViewModel
+class LiveFeedbackFragmentViewModel @Inject constructor(
     private val faceDetector: FaceDetector,
     private val frameProcessor: FrameProcessor,
-    private val qualityThreshold: Float,
+    private val configManager: ConfigManager,
     private val faceSessionEventsManager: FaceSessionEventsManager,
-    private val faceTimeHelper: FaceTimeHelper
+    private val faceTimeHelper: FaceTimeHelper,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
+
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
         SymmetricTarget(VALID_ROLL_DELTA),
@@ -38,6 +41,7 @@ class LiveFeedbackFragmentViewModel(
 
     lateinit var fallbackCapture: FaceDetection
     val userCaptures = mutableListOf<FaceDetection>()
+    var sortedQualifyingCaptures = listOf<FaceDetection>()
     val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
@@ -48,7 +52,13 @@ class LiveFeedbackFragmentViewModel(
      * @param faceRectF is the box on the screen
      * @param size is the screen size
      */
-    fun process(frame: Frame, faceRectF: RectF, size: Size) {
+    fun process(
+        frame: Frame,
+        faceRectF: RectF,
+        size: Size,
+        samplesToCapture: Int,
+        attemptNumber: Int
+    ) {
         val captureStartTime = faceTimeHelper.now()
         val previewFrame = frameProcessor.previewFrameFrom(frame, faceRectF, size, false)
 
@@ -64,8 +74,8 @@ class LiveFeedbackFragmentViewModel(
             CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
             CapturingState.CAPTURING -> {
                 userCaptures += faceDetection
-                if (userCaptures.size == mainVM.samplesToCapture) {
-                    finishCapture()
+                if (userCaptures.size == samplesToCapture) {
+                    finishCapture(attemptNumber)
                 }
             }
             else -> {//no-op
@@ -80,16 +90,18 @@ class LiveFeedbackFragmentViewModel(
     /**
      * If any of the user captures are good, use them. If not, use the fallback capture.
      */
-    private fun finishCapture() {
-        val sortedQualifyingCaptures = userCaptures
-            .filter { it.hasValidStatus() && it.isAboveQualityThreshold(qualityThreshold) }
-            .sortedByDescending { it.face?.quality }
-            .ifEmpty { listOf(fallbackCapture) }
+    private fun finishCapture(attemptNumber: Int) {
+        viewModelScope.launch(dispatcher) {
+            val projectConfiguration = configManager.getProjectConfiguration()
+            sortedQualifyingCaptures = userCaptures
+                .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
+                .sortedByDescending { it.face?.quality }
+                .ifEmpty { listOf(fallbackCapture) }
 
-        sendAllCaptureEvents()
+            sendAllCaptureEvents(attemptNumber)
 
-        capturingState.postValue(CapturingState.FINISHED)
-        mainVM.captureFinished(sortedQualifyingCaptures)
+            capturingState.postValue(CapturingState.FINISHED)
+        }
     }
 
     private fun getFaceDetectionFromPotentialFace(
@@ -97,7 +109,7 @@ class LiveFeedbackFragmentViewModel(
         previewFrame: PreviewFrame
     ): FaceDetection {
         return if (potentialFace == null) {
-            FaceDetection(previewFrame, potentialFace, FaceDetection.Status.NOFACE)
+            FaceDetection(previewFrame, null, FaceDetection.Status.NOFACE)
         } else {
             getFaceDetection(potentialFace, previewFrame)
         }
@@ -159,18 +171,23 @@ class LiveFeedbackFragmentViewModel(
         }
     }
 
-    private fun sendCaptureEvent(faceDetection: FaceDetection) {
-        val faceCaptureEvent =
-            faceDetection.toFaceCaptureEvent(mainVM.attemptNumber, qualityThreshold)
+    private fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
+        viewModelScope.launch(dispatcher) {
+            val projectConfiguration = configManager.getProjectConfiguration()
+            // The payloads of these two events need to have the same ids
+            val faceCaptureEvent =
+                faceDetection.toFaceCaptureEvent(
+                    attemptNumber,
+                    projectConfiguration.face!!.qualityThreshold.toFloat(),
+                )
 
-        val faceCaptureBiometricsEvent =
+            faceSessionEventsManager.addEvent(faceCaptureEvent)
+
             if (faceCaptureEvent.result == FaceCaptureEvent.Result.VALID)
-                faceDetection.toFaceCaptureBiometricsEvent()
-            else
-                null
+                faceSessionEventsManager.addEvent(faceDetection.toFaceCaptureBiometricsEvent())
 
-        faceSessionEventsManager.addEvent(faceCaptureEvent)
-        faceCaptureBiometricsEvent?.let { faceSessionEventsManager.addEvent(it) }
+            faceDetection.id = faceCaptureEvent.id
+        }
     }
 
     /**
@@ -180,10 +197,10 @@ class LiveFeedbackFragmentViewModel(
      *
      * This is already running in a background Thread because of CameraView, don't worry about the runBlocking.
      */
-    private fun sendAllCaptureEvents() = runBlocking {
+    private fun sendAllCaptureEvents(attemptNumber: Int) = runBlocking {
         val allDeferredEvents = mutableListOf<Deferred<Unit>>()
-        allDeferredEvents += userCaptures.map { async { sendCaptureEvent(it) } }
-        allDeferredEvents += async { sendCaptureEvent(fallbackCapture) }
+        allDeferredEvents += userCaptures.map { async { sendCaptureEvent(it, attemptNumber) } }
+        allDeferredEvents += async { sendCaptureEvent(fallbackCapture, attemptNumber) }
         allDeferredEvents.awaitAll()
     }
 

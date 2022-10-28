@@ -1,6 +1,5 @@
 package com.simprints.id.services.sync.events.master
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
@@ -21,13 +20,11 @@ import com.simprints.id.services.sync.events.master.workers.EventStartSyncReport
 import com.simprints.id.services.sync.events.up.workers.extractUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
 import com.simprints.infra.logging.Simber
+import javax.inject.Inject
 
-class EventSyncStateProcessorImpl(
-    val ctx: Context,
+class EventSyncStateProcessorImpl @Inject constructor(
     private val eventSyncCache: EventSyncCache,
-    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(
-        ctx
-    )
+    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider
 ) : EventSyncStateProcessor {
 
     override fun getLastSyncState(): LiveData<EventSyncState> =

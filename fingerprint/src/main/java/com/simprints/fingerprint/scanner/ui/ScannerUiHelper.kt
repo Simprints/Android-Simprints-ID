@@ -3,11 +3,12 @@ package com.simprints.fingerprint.scanner.ui
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.LedState
 import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.SmileLedState
+import javax.inject.Inject
 
 /**
  * Helper class for determining LED colours for Vero 2
  */
-class ScannerUiHelper {
+class ScannerUiHelper @Inject constructor() {
 
     fun goodScanLedState() = SmileLedState(G, G, G, G, G)
 
@@ -26,7 +27,7 @@ class ScannerUiHelper {
         }
 
     companion object {
-        val QUALITY = listOf<IntRange>(
+        val QUALITY = listOf(
             0 until 40,
             40 until 60,
             60 until 75,

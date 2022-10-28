@@ -1,94 +1,96 @@
 package com.simprints.id.services.sync.events.master.internal
 
-import android.content.Context
 import android.content.SharedPreferences
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.services.sync.events.master.internal.EventSyncCacheImpl.Companion.PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.MockKAnnotations
-import org.junit.Before
+import com.simprints.infra.security.SecurityManager
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.util.*
 
-@RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventSyncCacheImplTest {
 
-    private val workId = UUID.randomUUID().toString()
-    private val ctx: Context = ApplicationProvider.getApplicationContext()
-    private lateinit var eventSyncCache: EventSyncCache
-    private lateinit var sharedPrefsForProgresses: SharedPreferences
-    private lateinit var sharedPrefsForLastSyncTime: SharedPreferences
+    companion object {
+        private const val WORK_ID = "workID"
+    }
 
-    @Before
-    fun setup() {
-        MockKAnnotations.init(this)
-        sharedPrefsForProgresses = ctx.getSharedPreferences("progress_cache", Context.MODE_PRIVATE)
-        sharedPrefsForLastSyncTime = ctx.getSharedPreferences("lastSyncTime_cache", Context.MODE_PRIVATE)
+    private val sharedPrefsForProgresses = mockk<SharedPreferences>()
+    private val sharedPrefsForLastSyncTime = mockk<SharedPreferences>()
+    private val securityManager = mockk<SecurityManager> {
+        every { buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_PROGRESSES_SHARED_PREFS) } returns sharedPrefsForProgresses
+        every { buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS) } returns sharedPrefsForLastSyncTime
+    }
+    private val eventSyncCache = EventSyncCacheImpl(securityManager)
 
-        eventSyncCache = EventSyncCacheImpl(sharedPrefsForProgresses, sharedPrefsForLastSyncTime)
+    @Test
+    fun `readLastSuccessfulSyncTime should return the date if it's greater than -1`() {
+        every {
+            sharedPrefsForLastSyncTime.getLong(
+                PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY,
+                -1
+            )
+        } returns 30
+
+        val date = eventSyncCache.readLastSuccessfulSyncTime()
+        assertThat(date).isEqualTo(Date(30))
     }
 
     @Test
-    fun cache_shouldStoreADownSyncWorkerProgress() {
-        val progress = 1
-        eventSyncCache.saveProgress(workId, progress)
-        assertThat(sharedPrefsForProgresses.getInt(workId, 0)).isEqualTo(1)
+    fun `readLastSuccessfulSyncTime should return the date if it's equal to -1`() {
+        every {
+            sharedPrefsForLastSyncTime.getLong(
+                PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY,
+                -1
+            )
+        } returns -1
+
+        val date = eventSyncCache.readLastSuccessfulSyncTime()
+        assertThat(date).isEqualTo(null)
     }
 
     @Test
-    fun cache_shouldReadDownSyncWorkerProgress() {
-        val progress = 1
-        storeProgresses(workId, progress)
-        val progressRead = eventSyncCache.readProgress(workId)
-        assertThat(progressRead).isEqualTo(progress)
+    fun `storeLastSuccessfulSyncTime should store the date if it's not null`() {
+        val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+        every { sharedPrefsForLastSyncTime.edit() } returns editor
+
+        eventSyncCache.storeLastSuccessfulSyncTime(Date(30))
+        verify(exactly = 1) { editor.putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, 30) }
     }
 
     @Test
-    fun cache_shouldClearProgress() {
-        storeProgresses(workId, 1)
-        eventSyncCache.clearProgresses()
-        assertThat(sharedPrefsForProgresses.all.size).isEqualTo(0)
-    }
-
-    @Test
-    fun cache_shouldStoreLastTimeDoesNothingIfLastSyncTimeIsNull() {
+    fun `storeLastSuccessfulSyncTime should store -1 if the date is null`() {
+        val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+        every { sharedPrefsForLastSyncTime.edit() } returns editor
 
         eventSyncCache.storeLastSuccessfulSyncTime(null)
-        val stored = sharedPrefsForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, 0)
-        assertThat(stored).isEqualTo(-1)
-    }
-    @Test
-    fun cache_shouldStoreLastTime() {
-        val now = Date()
-        eventSyncCache.storeLastSuccessfulSyncTime(now)
-        val stored = sharedPrefsForLastSyncTime.getLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, 0)
-        assertThat(stored).isEqualTo(now.time)
+        verify(exactly = 1) { editor.putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, -1) }
     }
 
     @Test
-    fun cache_shouldReadLastTime() {
-        val now = Date()
-        sharedPrefsForLastSyncTime.edit().putLong(PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY, now.time).apply()
+    fun `readProgress should read the progress for the worker`() {
+        every { sharedPrefsForProgresses.getInt(WORK_ID, 0) } returns 10
 
-        val stored = eventSyncCache.readLastSuccessfulSyncTime()
-
-        assertThat(stored?.time).isEqualTo(now.time)
+        val progress = eventSyncCache.readProgress(WORK_ID)
+        assertThat(progress).isEqualTo(10)
     }
 
     @Test
-    fun cache_shouldReadLastTimeShouldBeNullifPrefsEmpty() {
+    fun `saveProgress should save the progress for the worker`() {
+        val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+        every { sharedPrefsForProgresses.edit() } returns editor
 
-        val stored = eventSyncCache.readLastSuccessfulSyncTime()
-
-        assertThat(stored).isNull()
+        eventSyncCache.saveProgress(WORK_ID, 10)
+        verify(exactly = 1) { editor.putInt(WORK_ID, 10) }
     }
 
-    private fun storeProgresses(workInfo: String, progress: Int) =
-        sharedPrefsForProgresses.edit().putInt(workInfo, progress).commit()
+    @Test
+    fun `clearProgresses should clear all the progresses for the workers`() {
+        val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+        every { sharedPrefsForProgresses.edit() } returns editor
+
+        eventSyncCache.clearProgresses()
+        verify(exactly = 1) { editor.clear() }
+    }
 }

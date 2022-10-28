@@ -6,8 +6,9 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.consumeEach
+import javax.inject.Inject
 
-class EventDownSyncDownloaderTaskImpl : EventDownSyncDownloaderTask {
+class EventDownSyncDownloaderTaskImpl @Inject constructor(): EventDownSyncDownloaderTask {
 
     override suspend fun execute(
         workerId: String,

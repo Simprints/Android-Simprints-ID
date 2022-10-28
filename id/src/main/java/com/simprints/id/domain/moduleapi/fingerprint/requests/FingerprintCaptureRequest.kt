@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.requests
 
-import com.simprints.id.data.db.subject.domain.FingerIdentifier
-import com.simprints.id.data.db.subject.domain.fromDomainToModuleApi
+import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
+import com.simprints.infra.config.domain.models.Finger
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
 import kotlinx.parcelize.Parcelize
@@ -10,14 +10,13 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class FingerprintCaptureRequest(
     override val type: FingerprintRequestType = FingerprintRequestType.CAPTURE,
-    val fingerprintsToCapture: List<FingerIdentifier>
+    val fingerprintsToCapture: List<Finger>
 ) : FingerprintRequest
 
 fun FingerprintCaptureRequest.fromDomainToModuleApi(): IFingerprintCaptureRequest =
     FingerprintCaptureRequestImpl(
         fingerprintsToCapture.map { it.fromDomainToModuleApi() }
     )
-
 
 @Parcelize
 private data class FingerprintCaptureRequestImpl(

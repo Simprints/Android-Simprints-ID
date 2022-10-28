@@ -11,26 +11,25 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
-import com.simprints.id.data.db.subject.SubjectRepository
-import com.simprints.id.data.prefs.IdPreferencesManager
-import com.simprints.id.data.prefs.settings.canSyncDataToSimprints
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.OFF
-import com.simprints.id.services.sync.events.master.models.EventDownSyncSetting.ON
 import com.simprints.id.services.sync.events.master.models.EventSyncState
 import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
 import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
-import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration.Frequency.PERIODICALLY
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,7 +42,9 @@ class SyncInformationViewModelTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
+
+    @MockK
+    lateinit var configManager: ConfigManager
 
     @MockK
     lateinit var downSyncHelper: EventDownSyncHelper
@@ -52,10 +53,7 @@ class SyncInformationViewModelTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var subjectRepository: SubjectRepository
-
-    @MockK
-    lateinit var preferencesManager: IdPreferencesManager
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -66,24 +64,40 @@ class SyncInformationViewModelTest {
     @MockK
     lateinit var eventSyncManager: EventSyncManager
 
+    @MockK
+    lateinit var loginManager: LoginManager
+
+    private val synchronizationConfiguration = mockk<SynchronizationConfiguration>()
+    private val deviceConfiguration = mockk<DeviceConfiguration>()
     private val projectId = DEFAULT_PROJECT_ID
     private lateinit var viewModel: SyncInformationViewModel
 
-    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        UnitTestConfig().coroutinesMainThread()
-        mockkStatic("com.simprints.id.data.prefs.settings.SettingsPreferencesManagerKt")
+
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns synchronizationConfiguration
+        }
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns projectId
+
         viewModel = SyncInformationViewModel(
             downSyncHelper,
             eventRepository,
-            subjectRepository,
-            preferencesManager,
-            projectId,
+            enrolmentRecordManager,
+            loginManager,
             eventDownSyncScopeRepository,
             imageRepository,
-            testDispatcherProvider
+            configManager,
+            testCoroutineRule.testCoroutineDispatcher
+        )
+    }
+
+    @Test
+    fun `should initialize the synchronization live data`() {
+        assertThat(viewModel.synchronizationConfiguration.getOrAwaitValue()).isEqualTo(
+            synchronizationConfiguration
         )
     }
 
@@ -111,8 +125,7 @@ class SyncInformationViewModelTest {
         val moduleName = DEFAULT_MODULE_ID
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        every { preferencesManager.eventDownSyncSetting } returns ON
-        every { preferencesManager.canSyncDataToSimprints() } returns true
+        every { synchronizationConfiguration.frequency } returns PERIODICALLY
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildSubjectsSyncState(
                 Succeeded
@@ -125,11 +138,11 @@ class SyncInformationViewModelTest {
                 any()
             )
         } returns projectDownSyncScope
-        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        every { deviceConfiguration.selectedModules } returns listOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
-        coEvery { subjectRepository.count(any()) } returns localCount
+        coEvery { enrolmentRecordManager.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
         coEvery { downSyncHelper.countForDownSync(any()) } returns listOf(
             EventCount(ENROLMENT_RECORD_CREATION, countInRemoteForCreate),
@@ -157,18 +170,17 @@ class SyncInformationViewModelTest {
         val moduleName = DEFAULT_MODULE_ID
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        every { preferencesManager.eventDownSyncSetting } returns OFF
-        every { preferencesManager.canSyncDataToSimprints() } returns true
+        every { synchronizationConfiguration.frequency } returns ONLY_PERIODICALLY_UP_SYNC
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildSubjectsSyncState(
                 Succeeded
             )
         )
-        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        every { deviceConfiguration.selectedModules } returns listOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
-        coEvery { subjectRepository.count(any()) } returns localCount
+        coEvery { enrolmentRecordManager.count(any()) } returns localCount
         every { imageRepository.getNumberOfImagesToUpload() } returns imagesToUpload
 
         viewModel.fetchSyncInformation()
@@ -191,18 +203,17 @@ class SyncInformationViewModelTest {
         val moduleName = "module1"
         val moduleCount = listOf(ModuleCount(moduleName, localCount))
 
-        every { preferencesManager.eventDownSyncSetting } returns ON
-        every { preferencesManager.canSyncDataToSimprints() } returns true
+        every { synchronizationConfiguration.frequency } returns PERIODICALLY
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildSubjectsSyncState(
                 Succeeded
             )
         )
-        every { preferencesManager.selectedModules } returns setOf(moduleName)
+        every { deviceConfiguration.selectedModules } returns listOf(moduleName)
         coEvery { eventRepository.localCount(any()) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns localCount
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
-        coEvery { subjectRepository.count(any()) } returns localCount
+        coEvery { enrolmentRecordManager.count(any()) } returns localCount
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
                 any(),
@@ -229,12 +240,11 @@ class SyncInformationViewModelTest {
         coEvery { eventRepository.localCount(any()) } returns 0
         coEvery { eventRepository.localCount(any(), ENROLMENT_V2) } returns 0
         coEvery { eventRepository.localCount(any(), ENROLMENT_RECORD_CREATION) } returns 0
-        coEvery { subjectRepository.count(any()) } returns 0
+        coEvery { enrolmentRecordManager.count(any()) } returns 0
         every { imageRepository.getNumberOfImagesToUpload() } returns 0
 
         viewModel.fetchSyncInformation()
-        verify(exactly = 2) { preferencesManager.selectedModules }
-        verify(exactly = 0) { preferencesManager.moduleIdOptions }
+        verify(exactly = 2) { deviceConfiguration.selectedModules }
     }
 
     @Test
@@ -242,10 +252,10 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildSubjectsSyncState(Succeeded)
         )
-        every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
+        every { deviceConfiguration.selectedModules } returns listOf(DEFAULT_MODULE_ID)
 
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
-        coVerify(exactly = 2) { subjectRepository.count(any()) }
+        coVerify(exactly = 2) { enrolmentRecordManager.count(any()) }
     }
 
     @Test
@@ -253,10 +263,10 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildInProgressSyncState()
         )
-        every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
+        every { deviceConfiguration.selectedModules } returns listOf(DEFAULT_MODULE_ID)
 
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
-        coVerify(exactly = 0) { subjectRepository.count(any()) }
+        coVerify(exactly = 0) { enrolmentRecordManager.count(any()) }
     }
 
     @Test
@@ -264,12 +274,12 @@ class SyncInformationViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns MutableLiveData(
             buildSubjectsSyncState(Succeeded)
         )
-        every { preferencesManager.selectedModules } returns setOf(DEFAULT_MODULE_ID)
+        every { deviceConfiguration.selectedModules } returns listOf(DEFAULT_MODULE_ID)
 
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
         viewModel.fetchSyncInformationIfNeeded(eventSyncManager.getLastSyncState().value!!)
-        coVerify(exactly = 2) { subjectRepository.count(any()) }
+        coVerify(exactly = 2) { enrolmentRecordManager.count(any()) }
     }
 
     private fun buildSubjectsSyncState(syncWorkerState: EventSyncWorkerState) =

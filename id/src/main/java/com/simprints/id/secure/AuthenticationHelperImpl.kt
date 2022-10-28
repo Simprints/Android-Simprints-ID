@@ -1,6 +1,5 @@
 package com.simprints.id.secure
 
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
@@ -18,8 +17,9 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import java.io.IOException
+import javax.inject.Inject
 
-class AuthenticationHelperImpl(
+class AuthenticationHelperImpl @Inject constructor(
     private val loginManager: LoginManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
@@ -87,7 +87,7 @@ class AuthenticationHelperImpl(
         Simber.tag(CrashReportTag.LOGIN.name).i(message)
     }
 
-    private fun addEventAndUpdateProjectIdIfRequired(
+    private suspend fun addEventAndUpdateProjectIdIfRequired(
         result: Result,
         projectId: String,
         userId: String
@@ -98,6 +98,6 @@ class AuthenticationHelperImpl(
             UserInfo(projectId, userId),
             result
         )
-        inBackground { eventRepository.addOrUpdateEvent(event) }
+        eventRepository.addOrUpdateEvent(event)
     }
 }

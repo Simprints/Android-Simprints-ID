@@ -3,7 +3,7 @@ package com.simprints.eventsystem.event.remote
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 
 
-data class ApiRemoteEventQuery(val projectId: String,
+internal data class ApiRemoteEventQuery(val projectId: String,
                                val userId: String? = null,
                                val moduleIds: List<String>? = null,
                                val subjectId: String? = null,

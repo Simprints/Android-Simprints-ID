@@ -5,16 +5,20 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ota.*
-import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.domain.versions.ScannerHardwareRevisions
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprint.testtools.*
+import com.simprints.fingerprint.testtools.assertEventReceived
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
+import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.testObserver
@@ -27,9 +31,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class OtaViewModelTest {
-
-    @get:Rule
-    var unitTestConfigRule = FullUnitTestConfigRule()
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -49,9 +50,31 @@ class OtaViewModelTest {
 
     private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
-    private val fingerprintManager: FingerprintPreferencesManager = mockk(relaxed = true) {
-        every { lastScannerVersion } returns HARDWARE_VERSION
-        every { scannerHardwareRevisions } returns newScannerHardwareRevisions
+    private val recentUserActivityManager = mockk<RecentUserActivityManager> {
+        coEvery { getRecentUserActivity() } returns RecentUserActivity(
+            HARDWARE_VERSION,
+            "",
+            "",
+            0,
+            0,
+            0,
+            0
+        )
+    }
+    private val configManager = mockk<ConfigManager> {
+        coEvery { getProjectConfiguration() } returns mockk {
+            every { fingerprint } returns mockk {
+                every { vero2 } returns mockk {
+                    every { firmwareVersions } returns mapOf(
+                        HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                            NEW_CYPRESS_VERSION,
+                            NEW_STM_VERSION,
+                            NEW_UN20_VERSION
+                        )
+                    )
+                }
+            }
+        }
     }
 
     private val otaViewModel = OtaViewModel(
@@ -59,15 +82,16 @@ class OtaViewModelTest {
         sessionEventsManagerMock,
         timeHelperMock,
         dispatcherProvider,
-       fingerprintManager
+        recentUserActivityManager,
+        configManager
     )
 
     @Before
     fun setup() {
-
         every { scannerMock.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
         every { scannerMock.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
-        every { scannerMock.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()    }
+        every { scannerMock.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()
+    }
 
     @Test
     fun oneOta_updatesStateCorrectlyAndSavesEvent() {
@@ -222,16 +246,6 @@ class OtaViewModelTest {
         private const val NEW_STM_VERSION = "4.E-1.7"
         private const val NEW_UN20_VERSION = "8.E-1.0"
 
-        private val newScannerHardwareRevisions = ScannerHardwareRevisions().apply {
-            put(
-                HARDWARE_VERSION,
-                ScannerFirmwareVersions(
-                    cypress = NEW_CYPRESS_VERSION,
-                    stm = NEW_STM_VERSION,
-                    un20 = NEW_UN20_VERSION
-                )
-            )
-        }
         private val OTA_PROGRESS_VALUES = listOf(0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
 
         private val CYPRESS_OTA_STEPS =

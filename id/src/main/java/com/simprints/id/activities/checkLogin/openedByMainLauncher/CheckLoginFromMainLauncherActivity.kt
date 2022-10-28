@@ -4,30 +4,34 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.di.IdAppModule
 import com.simprints.id.domain.alert.AlertType
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 // App launched when user open SimprintsID using the Home button
-open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginFromMainLauncherContract.View {
+@AndroidEntryPoint
+class CheckLoginFromMainLauncherActivity : BaseSplitActivity(),
+    CheckLoginFromMainLauncherContract.View {
 
-    override lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
+    @Inject
+    lateinit var presenterFactory: IdAppModule.CheckLoginFromMainLauncherPresenterFactory
+
+    override val viewPresenter: CheckLoginFromMainLauncherContract.Presenter by lazy {
+        presenterFactory.create(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (application as Application).component.inject(this)
         setContentView(R.layout.splash_screen)
-        title = getString(R.string.title_activity_front)
-
-        val component = (application as Application).component
-        component.inject(this)
-
-        viewPresenter = CheckLoginFromMainLauncherPresenter(this, component)
+        title = getString(IDR.string.title_activity_front)
     }
 
 
@@ -44,7 +48,8 @@ open class CheckLoginFromMainLauncherActivity : BaseSplitActivity(), CheckLoginF
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(data)
+        val potentialAlertScreenResponse =
+            AlertActivityHelper.extractPotentialAlertScreenResponse(data)
         if (potentialAlertScreenResponse != null) {
             finish()
         }

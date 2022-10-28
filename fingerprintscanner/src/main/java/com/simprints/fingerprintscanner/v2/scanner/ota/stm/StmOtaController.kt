@@ -9,6 +9,8 @@ import com.simprints.fingerprintscanner.v2.domain.stmota.responses.CommandAcknow
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprintscanner.v2.scanner.errorhandler.handleErrorsWith
+import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController.Companion.GO_ADDRESS
+import com.simprints.fingerprintscanner.v2.scanner.ota.stm.StmOtaController.Companion.START_ADDRESS
 import com.simprints.fingerprintscanner.v2.tools.primitives.byteArrayOf
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.toByteArray

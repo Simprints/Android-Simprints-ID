@@ -17,7 +17,7 @@ data class RemoteEventQuery(val projectId: String,
                             val modes: List<Modes>,
                             val types: List<EventType>)
 
-fun RemoteEventQuery.fromDomainToApi() =
+internal fun RemoteEventQuery.fromDomainToApi() =
     ApiRemoteEventQuery(
         projectId = projectId,
         userId = attendantId,

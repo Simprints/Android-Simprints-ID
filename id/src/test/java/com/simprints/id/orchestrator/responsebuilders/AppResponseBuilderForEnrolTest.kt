@@ -1,17 +1,15 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.core.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class AppResponseBuilderForEnrolTest {
 
     private val responseBuilder = AppResponseBuilderForEnrol(
@@ -21,8 +19,8 @@ class AppResponseBuilderForEnrolTest {
 
     @Test
     fun withFingerprintOnlySteps_shouldBuildAppEnrolResponse() {
-        runBlockingTest {
-            val modalities = listOf(Modality.FINGER)
+        runTest {
+            val modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT)
             val steps = mockSteps(modalities)
 
             val response = responseBuilder.buildAppResponse(
@@ -35,8 +33,8 @@ class AppResponseBuilderForEnrolTest {
 
     @Test
     fun withFaceOnlySteps_shouldBuildAppEnrolResponse() {
-        runBlockingTest {
-            val modalities = listOf(Modality.FACE)
+        runTest {
+            val modalities = listOf(GeneralConfiguration.Modality.FACE)
             val steps = mockSteps(modalities)
 
             val response = responseBuilder.buildAppResponse(
@@ -49,8 +47,11 @@ class AppResponseBuilderForEnrolTest {
 
     @Test
     fun withFingerprintAndFaceSteps_shouldBuildAppEnrolResponse() {
-        runBlockingTest {
-            val modalities = listOf(Modality.FINGER, Modality.FACE)
+        runTest {
+            val modalities = listOf(
+                GeneralConfiguration.Modality.FINGERPRINT,
+                GeneralConfiguration.Modality.FACE
+            )
             val steps = mockSteps(modalities)
 
             val response = responseBuilder.buildAppResponse(
@@ -65,13 +66,13 @@ class AppResponseBuilderForEnrolTest {
         "projectId", "userId", "moduleId", "metadata"
     )
 
-    private fun mockSteps(modalities: List<Modality>): List<Step> {
+    private fun mockSteps(modalities: List<GeneralConfiguration.Modality>): List<Step> {
         val steps = arrayListOf<Step>()
 
-        if (modalities.contains(Modality.FINGER))
+        if (modalities.contains(GeneralConfiguration.Modality.FINGERPRINT))
             steps.add(mockFingerprintCaptureStep())
 
-        if (modalities.contains(Modality.FACE))
+        if (modalities.contains(GeneralConfiguration.Modality.FACE))
             steps.add(mockFaceCaptureStep())
 
         return steps

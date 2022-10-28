@@ -1,13 +1,15 @@
 package com.simprints.id.data.consent.longconsent.local
 
 import androidx.annotation.VisibleForTesting
-import com.simprints.id.tools.utils.FileUtil
+import com.simprints.core.tools.utils.FileUtil
+import com.simprints.id.di.AbsolutePath
 import com.simprints.infra.login.LoginManager
 import java.io.BufferedReader
 import java.io.File
+import javax.inject.Inject
 
-class LongConsentLocalDataSourceImpl(
-    absolutePath: String,
+class LongConsentLocalDataSourceImpl @Inject constructor(
+    @AbsolutePath absolutePath: String,
     private val loginManager: LoginManager,
 ) : LongConsentLocalDataSource {
 

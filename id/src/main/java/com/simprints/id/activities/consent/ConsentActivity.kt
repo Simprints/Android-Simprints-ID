@@ -6,13 +6,11 @@ import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayout
-import com.simprints.core.domain.modality.Modality
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.inBackground
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.eventsystem.event.EventRepository
@@ -21,10 +19,7 @@ import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type
-import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
-import com.simprints.id.data.prefs.IdPreferencesManager
 import com.simprints.id.databinding.ActivityConsentBinding
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -35,57 +30,65 @@ import com.simprints.id.orchestrator.steps.core.response.AskConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.tools.LocationManager
+import com.simprints.infra.config.domain.models.ConsentConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.resources.R
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class ConsentActivity : BaseSplitActivity() {
 
-    private lateinit var viewModel: ConsentViewModel
+    private val viewModel: ConsentViewModel by viewModels()
     private val binding by viewBinding(ActivityConsentBinding::inflate)
 
     private lateinit var askConsentRequestReceived: AskConsentRequest
 
-    @Inject lateinit var viewModelFactory: ConsentViewModelFactory
+    @Inject
+    lateinit var timeHelper: TimeHelper
 
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject
+    lateinit var exitFormHelper: ExitFormHelper
 
-    @Inject lateinit var preferencesManager: IdPreferencesManager
-
-    @Inject lateinit var exitFormHelper: ExitFormHelper
-
-    @Inject lateinit var eventRepository: EventRepository
-
-    @Inject lateinit var locationManager: LocationManager
-
-    @Inject lateinit var jsonHelper: JsonHelper
+    @Inject
+    lateinit var eventRepository: EventRepository
 
     private var startConsentEventTime: Long = 0
+    private var consentConfiguration: ConsentConfiguration = ConsentConfiguration(
+        programName = "",
+        organizationName = "",
+        collectConsent = false,
+        displaySimprintsLogo = false,
+        allowParentalConsent = false,
+        generalPrompt = null,
+        parentalPrompt = null
+    )
+    private var modalities: List<GeneralConfiguration.Modality> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-        injectDependencies()
 
         startConsentEventTime = timeHelper.now()
 
         askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE)
             ?: throw InvalidAppRequest()
 
-        viewModel = ViewModelProvider(this, viewModelFactory).get(ConsentViewModel::class.java)
-
-        showLogoIfNecessary()
-        setupTextInUi()
-        setupTabs()
+        fetchData()
     }
 
-    private fun injectDependencies() {
-        val component = (application as Application).component
-        component.inject(this)
+    private fun fetchData() {
+        viewModel.configuration.observe(this) {
+            consentConfiguration = it.consent
+            modalities = it.general.modalities
+            showLogoIfNecessary()
+            setupTextInUi()
+            setupTabs()
+        }
     }
 
     private fun showLogoIfNecessary() {
-        binding.simprintsLogoWithTagLine.isVisible = preferencesManager.logoExists
+        binding.simprintsLogoWithTagLine.isVisible = consentConfiguration.displaySimprintsLogo
     }
 
     private fun setupTextInUi() {
@@ -98,43 +101,38 @@ class ConsentActivity : BaseSplitActivity() {
     }
 
     private fun buildGeneralConsentText(
-        generalConsentOptionsJson: String,
+        prompt: ConsentConfiguration.ConsentPromptConfiguration,
         programName: String,
         organizationName: String,
-        modalities: List<Modality>,
-        jsonHelper: JsonHelper
+        modalities: List<GeneralConfiguration.Modality>,
     ) =
-        GeneralConsentTextHelper(
-            generalConsentOptionsJson,
-            programName, organizationName, modalities,
-            jsonHelper
-        ).assembleText(askConsentRequestReceived, this)
+        GeneralConsentTextHelper(prompt, programName, organizationName, modalities).assembleText(
+            askConsentRequestReceived,
+            this
+        )
 
     private fun buildParentalConsentText(
-        parentalConsentOptionsJson: String,
+        prompt: ConsentConfiguration.ConsentPromptConfiguration,
         programName: String,
         organizationName: String,
-        modalities: List<Modality>,
-        jsonHelper: JsonHelper
+        modalities: List<GeneralConfiguration.Modality>,
     ) =
-        ParentalConsentTextHelper(
-            parentalConsentOptionsJson,
-            programName, organizationName, modalities,
-            jsonHelper
-        ).assembleText(askConsentRequestReceived, this)
+        ParentalConsentTextHelper(prompt, programName, organizationName, modalities).assembleText(
+            askConsentRequestReceived,
+            this
+        )
 
     private fun setupTabs() {
         val generalConsentText = buildGeneralConsentText(
-            preferencesManager.generalConsentOptionsJson,
-            preferencesManager.programName,
-            preferencesManager.organizationName,
-            preferencesManager.modalities,
-            jsonHelper
+            consentConfiguration.generalPrompt!!,
+            consentConfiguration.programName,
+            consentConfiguration.organizationName,
+            modalities,
         )
 
         binding.consentTextHolderView.text = generalConsentText
 
-        if (!preferencesManager.parentalConsentExists) {
+        if (!consentConfiguration.allowParentalConsent && binding.tabHost.tabCount >= 2) { // The tab may already be removed.
             binding.tabHost.removeTabAt(1)
         }
 
@@ -144,17 +142,17 @@ class ConsentActivity : BaseSplitActivity() {
                     binding.consentTextHolderView.text = generalConsentText
                 else if (tab.position == PARENTAL_CONSENT_TAB_TAG)
                     binding.consentTextHolderView.text = buildParentalConsentText(
-                        preferencesManager.parentalConsentOptionsJson,
-                        preferencesManager.programName,
-                        preferencesManager.organizationName,
-                        preferencesManager.modalities,
-                        jsonHelper
+                        consentConfiguration.parentalPrompt!!,
+                        consentConfiguration.programName,
+                        consentConfiguration.organizationName,
+                        modalities,
                     )
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {
                 // We do not need to change the text when a tab is unselected
             }
+
             override fun onTabReselected(tab: TabLayout.Tab) {
                 // We do not need to refresh the text when a tab is reselected
             }
@@ -196,7 +194,7 @@ class ConsentActivity : BaseSplitActivity() {
 
     private fun startExitFormActivity() {
         val exitFormActivityClass =
-            exitFormHelper.getExitFormActivityClassFromModalities(preferencesManager.modalities)
+            exitFormHelper.getExitFormActivityClassFromModalities(modalities)
 
         exitFormActivityClass?.let {
             startActivityForResult(

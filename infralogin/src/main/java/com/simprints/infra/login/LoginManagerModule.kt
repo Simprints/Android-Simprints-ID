@@ -3,14 +3,14 @@ package com.simprints.infra.login
 import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.android.gms.safetynet.SafetyNetClient
+import com.simprints.core.DeviceID
+import com.simprints.core.PackageVersionName
 import com.simprints.infra.login.db.FirebaseManagerImpl
 import com.simprints.infra.login.db.RemoteDbManager
 import com.simprints.infra.login.domain.AttestationManager
 import com.simprints.infra.login.domain.AttestationManagerImpl
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.domain.LoginInfoManagerImpl
-import com.simprints.infra.login.extensions.deviceId
-import com.simprints.infra.login.extensions.packageVersionName
 import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.network.SimApiClientFactoryImpl
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
@@ -20,10 +20,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class LoginManagerModule {
 
     @Binds
@@ -44,22 +45,24 @@ abstract class LoginManagerModule {
 }
 
 @Module
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 object SafetyNetModule {
 
     @Provides
-    fun provideSafetyNetClient(context: Context): SafetyNetClient = SafetyNet.getClient(context)
+    fun provideSafetyNetClient(@ApplicationContext context: Context): SafetyNetClient = SafetyNet.getClient(context)
 
     @Provides
     internal fun provideSimApiClientFactory(
-        ctx: Context,
+        @ApplicationContext ctx: Context,
+        @DeviceID deviceID: String,
+        @PackageVersionName packageVersionName: String,
         remoteDbManager: RemoteDbManager,
         simNetwork: SimNetwork
     ): SimApiClientFactory = SimApiClientFactoryImpl(
         simNetwork,
-        ctx.deviceId,
+        deviceID,
         ctx,
-        ctx.packageVersionName,
+        packageVersionName,
         remoteDbManager
     )
 

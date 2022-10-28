@@ -1,12 +1,10 @@
 package com.simprints.id.activities.settings
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
@@ -14,7 +12,10 @@ import com.simprints.id.activities.settings.fingerselection.FingerSelectionActiv
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.databinding.SettingsToolbarBinding
+import dagger.hilt.android.AndroidEntryPoint
+import com.simprints.infra.resources.R as IDR
 
+@AndroidEntryPoint
 class SettingsActivity : BaseSplitActivity() {
 
     private val binding by viewBinding(SettingsToolbarBinding::inflate)
@@ -24,15 +25,10 @@ class SettingsActivity : BaseSplitActivity() {
         private const val LOGOUT_RESULT_CODE = 1
     }
 
-    override fun attachBaseContext(newBase: Context) {
-        val languageCtx = LanguageHelper.getLanguageConfigurationContext(newBase)
-        super.attachBaseContext(languageCtx)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        title = getString(R.string.title_activity_settings)
+        title = getString(IDR.string.title_activity_settings)
 
         setupActionBar()
 
@@ -42,7 +38,7 @@ class SettingsActivity : BaseSplitActivity() {
     }
 
     private fun setupActionBar() {
-        binding.settingsToolbar.title = getString(R.string.settings_title)
+        binding.settingsToolbar.title = getString(IDR.string.settings_title)
         setSupportActionBar(binding.settingsToolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
@@ -70,7 +66,10 @@ class SettingsActivity : BaseSplitActivity() {
     }
 
     fun openSettingAboutActivity() {
-        startActivityForResult(Intent(this, SettingsAboutActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
+        startActivityForResult(
+            Intent(this, SettingsAboutActivity::class.java),
+            SETTINGS_ACTIVITY_REQUEST_CODE
+        )
     }
 
     fun openSyncInformationActivity() {

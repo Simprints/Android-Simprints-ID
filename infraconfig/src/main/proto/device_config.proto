@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "project_config.proto";
+
+option java_package = "com.simprints.infra.config.local.models";
+option java_multiple_files = true;
+
+message ProtoDeviceConfiguration {
+    Language language = 1;
+    repeated string module_selected = 2;
+    FingersToCollect fingers_to_collect = 3;
+    string last_instruction_id = 4;
+
+    message Language {
+        string language = 1;
+        bool is_overwritten = 2;
+    }
+
+    message FingersToCollect {
+        repeated ProtoFinger fingers_to_collect = 1;
+        bool is_overwritten = 2;
+    }
+}

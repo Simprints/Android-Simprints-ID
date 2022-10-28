@@ -8,12 +8,7 @@ import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.remote.models.ApiEventPayload
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.FaceCapture
 import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiFace
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.INVALID
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.OFF_ROLL
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.OFF_YAW
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.TOO_CLOSE
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.TOO_FAR
-import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.VALID
+import com.simprints.eventsystem.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
 
 @Keep
 @JsonInclude(Include.NON_NULL)

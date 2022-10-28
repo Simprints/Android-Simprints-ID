@@ -8,26 +8,37 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import com.simprints.core.tools.extentions.hideKeyboard
+import com.simprints.core.tools.extentions.onLayoutChange
 import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.fingerprint.FingerprintModule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.databinding.ActivityRefusalBinding
 import com.simprints.fingerprint.tools.extensions.showToast
-import com.simprints.id.tools.extensions.onLayoutChange
-import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
+import dagger.hilt.android.AndroidEntryPoint
 import splitties.systemservices.inputMethodManager
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     private val binding by viewBinding(ActivityRefusalBinding::inflate)
-    override val viewPresenter: RefusalContract.Presenter by inject{ parametersOf(this) }
+
+    @Inject
+    lateinit var presenterFactory: FingerprintModule.RefusalPresenterFactory
+
+    override val viewPresenter: RefusalContract.Presenter by lazy { presenterFactory.create(this) }
 
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
-        override fun onTextChanged(refusalTextCharSequence: CharSequence, start: Int, before: Int, count: Int) {
+        override fun onTextChanged(
+            refusalTextCharSequence: CharSequence,
+            start: Int,
+            before: Int,
+            count: Int
+        ) {
             viewPresenter.handleChangesInRefusalText(refusalTextCharSequence.toString())
         }
 
@@ -66,7 +77,11 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
     }
 
     private fun setButtonClickListeners() {
-        binding.btSubmitRefusalForm.setOnClickListener { viewPresenter.handleSubmitButtonClick(getRefusalText()) }
+        binding.btSubmitRefusalForm.setOnClickListener {
+            viewPresenter.handleSubmitButtonClick(
+                getRefusalText()
+            )
+        }
         binding.btScanFingerprints.setOnClickListener { viewPresenter.handleScanFingerprintsClick() }
     }
 
@@ -134,7 +149,8 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
     private fun getIntentForResultData(refusalResult: RefusalTaskResult) =
         Intent().putExtra(
             RefusalTaskResult.BUNDLE_KEY,
-            refusalResult)
+            refusalResult
+        )
 
     private fun getRefusalText() = binding.refusalText.text.toString()
 
