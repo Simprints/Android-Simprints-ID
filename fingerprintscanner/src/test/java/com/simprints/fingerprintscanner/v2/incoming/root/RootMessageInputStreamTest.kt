@@ -1,13 +1,20 @@
 package com.simprints.fingerprintscanner.v2.incoming.root
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprintscanner.v2.domain.root.RootResponse
 import com.simprints.fingerprintscanner.v2.domain.root.responses.EnterMainModeResponse
-import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper
 import com.simprints.fingerprintscanner.v2.tools.helpers.SchedulerHelper.TIMEOUT
 import com.simprints.fingerprintscanner.v2.tools.primitives.chunked
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.verify
+import io.reactivex.Flowable
+import io.reactivex.disposables.Disposable
 import io.reactivex.observers.BaseTestConsumer.TestWaitStrategy
 import org.junit.Test
 import java.io.PipedInputStream
@@ -18,6 +25,31 @@ class RootMessageInputStreamTest {
 
     private val rootMessageAccumulator = RootResponseAccumulator(RootResponseParser())
     private val rootMessageInputStream = RootMessageInputStream(rootMessageAccumulator)
+
+    @Test
+    fun `test disconnect disposes the flowable stream`(){
+        //Given
+        mockkStatic("com.simprints.fingerprintscanner.v2.incoming.root.RootMessageStreamKt")
+        val flowableDisposable = mockk<Disposable>(relaxed = true)
+
+        val rootResponseFlowable: Flowable<RootResponse> = mockk {
+            every { subscribeOn(any()) } returns this
+            every { publish() } returns mockk {
+                every { connect() } returns flowableDisposable
+            }
+        }
+
+        val flowable:Flowable<ByteArray> = mockk{
+            every { toRootMessageStream(rootMessageAccumulator) } returns rootResponseFlowable
+        }
+
+        //When
+        rootMessageInputStream.connect(flowable)
+        rootMessageInputStream.disconnect()
+
+        //Then
+        verify { flowableDisposable.dispose() }
+    }
 
     @Suppress("Ignoring flaky tests introduced by Ridwan. These tests do not follow proper" +
         " RxJava testing methodology and fail frequently on the CI machines. They need to be " +
@@ -31,7 +63,7 @@ class RootMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        rootMessageInputStream.connect(inputStream)
+        rootMessageInputStream.connect(inputStream.toFlowable())
 
         val testSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
             .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
@@ -54,7 +86,7 @@ class RootMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        rootMessageInputStream.connect(inputStream)
+        rootMessageInputStream.connect(inputStream.toFlowable())
 
         val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
             .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()
@@ -81,7 +113,7 @@ class RootMessageInputStreamTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        rootMessageInputStream.connect(inputStream)
+        rootMessageInputStream.connect(inputStream.toFlowable())
 
         val testResponseSubscriber = rootMessageInputStream.receiveResponse<EnterMainModeResponse>()
             .timeout(TIMEOUT, TimeUnit.SECONDS).testSubscribe()

@@ -53,6 +53,7 @@ dependencies {
     testImplementation(libs.testing.junit)
 
     // Mockito
+    testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.mockito.kotlin)
     testImplementation(libs.testing.mockito.core)
     testImplementation(libs.testing.mockito.inline)
