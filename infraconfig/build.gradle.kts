@@ -8,7 +8,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("realm-android")
-    id("com.google.protobuf") version "0.8.17"
+    id("com.google.protobuf") version "0.8.19"
 }
 
 apply {
@@ -68,7 +68,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.19.6"
+        artifact = "com.google.protobuf:protoc:3.21.9"
     }
 
     generateProtoTasks {
