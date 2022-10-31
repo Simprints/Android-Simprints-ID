@@ -10,10 +10,8 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.google.android.material.tabs.TabLayout
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
@@ -49,9 +47,6 @@ class ConsentActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var exitFormHelper: ExitFormHelper
-
-    @Inject
-    lateinit var eventRepository: EventRepository
 
     private var startConsentEventTime: Long = 0
     private var consentConfiguration: ConsentConfiguration = ConsentConfiguration(
@@ -207,16 +202,8 @@ class ConsentActivity : BaseSplitActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         exitFormHelper.buildExitFormResponseForCore(data)?.let {
-            deleteLocationInfoFromSession()
+            viewModel.deleteLocationInfoFromSession()
             setResultAndFinish(it)
-        }
-    }
-
-    private fun deleteLocationInfoFromSession() {
-        inBackground {
-            val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-            currentSessionEvent.payload.location = null
-            eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
     }
 

@@ -1,20 +1,24 @@
 package com.simprints.face.controllers.core.events
 
+import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.EventType.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
 
-class FaceSessionEventsManagerImpl @Inject constructor(private val eventRepository: EventRepository) :
-    FaceSessionEventsManager {
+class FaceSessionEventsManagerImpl @Inject constructor(
+    private val eventRepository: EventRepository,
+    @ExternalScope private val externalScope: CoroutineScope
+) : FaceSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
         fromDomainToCore(event).let {
-            inBackground {
+            externalScope.launch {
                 eventRepository.addOrUpdateEvent(it)
             }
         }
