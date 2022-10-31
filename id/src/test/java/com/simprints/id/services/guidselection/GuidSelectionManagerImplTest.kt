@@ -9,13 +9,16 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.infra.login.LoginManager
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class GuidSelectionManagerImplTest {
@@ -33,11 +36,15 @@ class GuidSelectionManagerImplTest {
     @MockK
     private lateinit var eventRepository: EventRepository
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        val scope = CoroutineScope(testCoroutineRule. testCoroutineDispatcher)
         guidSelectionManager =
-            GuidSelectionManagerImpl(loginManager, timerHelper, eventRepository)
+            GuidSelectionManagerImpl(loginManager, timerHelper, eventRepository, scope)
         every { timerHelper.now() } returns CREATED_AT
         every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
