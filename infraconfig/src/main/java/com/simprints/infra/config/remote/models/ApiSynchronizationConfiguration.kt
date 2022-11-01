@@ -82,7 +82,7 @@ internal data class ApiSynchronizationConfiguration(
             DownSynchronizationConfiguration(
                 partitionType.toDomain(),
                 maxNbOfModules,
-                moduleOptions
+                moduleOptions?: emptyList()
             )
 
         @Keep
