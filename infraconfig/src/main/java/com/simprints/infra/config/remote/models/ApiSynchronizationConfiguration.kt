@@ -75,7 +75,7 @@ internal data class ApiSynchronizationConfiguration(
     data class ApiDownSynchronizationConfiguration(
         val partitionType: PartitionType,
         val maxNbOfModules: Int,
-        val moduleOptions: List<String>
+        val moduleOptions: List<String>?
     ) {
 
         fun toDomain(): DownSynchronizationConfiguration =
