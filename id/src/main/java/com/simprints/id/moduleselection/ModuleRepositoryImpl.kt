@@ -18,9 +18,9 @@ class ModuleRepositoryImpl @Inject constructor(
 ) : ModuleRepository {
 
     override suspend fun getModules(): List<Module> =
-        configManager.getProjectConfiguration().synchronization.down.moduleOptions?.map {
+        configManager.getProjectConfiguration().synchronization.down.moduleOptions.map {
             Module(it, isModuleSelected(it))
-        } ?: emptyList()
+        }
 
     override suspend fun saveModules(modules: List<Module>) {
         setSelectedModules(modules.filter { it.isSelected })

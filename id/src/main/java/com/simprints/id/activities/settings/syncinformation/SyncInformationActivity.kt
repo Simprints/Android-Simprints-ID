@@ -112,7 +112,7 @@ class SyncInformationActivity : BaseSplitActivity() {
 
     private fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
         with(synchronizationConfiguration.down) {
-            moduleOptions?.isNotEmpty() == true &&
+            moduleOptions.isNotEmpty() &&
                 partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
         }
 
