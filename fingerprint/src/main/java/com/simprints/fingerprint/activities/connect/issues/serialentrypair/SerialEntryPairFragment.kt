@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.activities.connect.issues.serialentrypair
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
@@ -54,11 +55,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
     @Inject
     lateinit var recentUserActivityManager: RecentUserActivityManager
 
-    private val bluetoothPairStateChangeReceiver =
-        scannerPairingManager.bluetoothPairStateChangeReceiver(
-            onPairSuccess = ::checkIfNowBondedToChosenScannerThenProceed,
-            onPairFailed = ::handlePairingAttemptFailed
-        )
+    private lateinit var bluetoothPairStateChangeReceiver: BroadcastReceiver
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
     private val handler = Handler()
@@ -117,6 +114,10 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
     override fun onStart() {
         super.onStart()
+        bluetoothPairStateChangeReceiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
+            onPairSuccess = ::checkIfNowBondedToChosenScannerThenProceed,
+            onPairFailed = ::handlePairingAttemptFailed
+        )
         activity?.registerReceiver(
             bluetoothPairStateChangeReceiver,
             IntentFilter(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED)
@@ -157,7 +158,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
     }
 
     private fun checkIfNowBondedToChosenScannerThenProceed() {
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.Main ) {
             val macAddress = viewModel.awaitingToPairToMacAddress.value?.peekContent()
             if (macAddress != null && scannerPairingManager.isAddressPaired(macAddress)) {
                 recentUserActivityManager.updateRecentUserActivity {
