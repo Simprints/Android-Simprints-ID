@@ -31,7 +31,7 @@ class FingerSelectionViewModel @Inject constructor(
     private fun postUpdatedItems(block: suspend MutableList<FingerSelectionItem>.() -> Unit) {
         viewModelScope.launch(dispatcher) {
             _items.block()
-            items.value = _items
+            items.postValue(_items)
         }
     }
 
