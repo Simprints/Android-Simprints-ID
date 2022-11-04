@@ -4,11 +4,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,6 +18,7 @@ import javax.inject.Inject
 class ModuleSelectionViewModel @Inject constructor(
     private val repository: ModuleRepository,
     private val eventSyncManager: EventSyncManager,
+    @ExternalScope private val externalScope: CoroutineScope,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -34,7 +37,7 @@ class ModuleSelectionViewModel @Inject constructor(
     }
 
     fun saveModules(modules: List<Module>) {
-        viewModelScope.launch(dispatcher) {
+        externalScope.launch {
             repository.saveModules(modules)
             syncNewModules()
         }

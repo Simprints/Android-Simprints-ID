@@ -40,10 +40,8 @@ class OrchestratorViewModel @Inject constructor(
     }
 
     init {
-        viewModelScope.launch {
-            withContext(dispatcher) {
-                syncFrequency.postValue(configManager.getProjectConfiguration().synchronization.frequency)
-            }
+        viewModelScope.launch(dispatcher) {
+            syncFrequency.postValue(configManager.getProjectConfiguration().synchronization.frequency)
         }
     }
 

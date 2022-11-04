@@ -9,7 +9,6 @@ import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,16 +22,14 @@ class LoginViewModel @Inject constructor(
     fun getSignInResult(): LiveData<AuthenticateDataResult> = signInResultLiveData
 
     fun signIn(userId: String, projectId: String, projectSecret: String, deviceId: String) {
-        viewModelScope.launch {
-            withContext(dispatcher.io()) {
-                val result = authenticationHelper.authenticateSafely(
-                    userId,
-                    projectId,
-                    projectSecret,
-                    deviceId
-                )
-                signInResultLiveData.postValue(result)
-            }
+        viewModelScope.launch(dispatcher.io()) {
+            val result = authenticationHelper.authenticateSafely(
+                userId,
+                projectId,
+                projectSecret,
+                deviceId
+            )
+            signInResultLiveData.postValue(result)
         }
     }
 }
