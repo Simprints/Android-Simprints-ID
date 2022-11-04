@@ -6,11 +6,12 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.CoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,6 +23,9 @@ class ModuleSelectionViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     private val repository: ModuleRepository = mockk()
     private val eventSyncManager: EventSyncManager = mockk()
     private lateinit var viewModel: ModuleSelectionViewModel
@@ -29,7 +33,12 @@ class ModuleSelectionViewModelTest {
     @Before
     fun setUp() {
         configureMockRepository()
-        viewModel = ModuleSelectionViewModel(repository, eventSyncManager, UnconfinedTestDispatcher())
+        viewModel = ModuleSelectionViewModel(
+            repository,
+            eventSyncManager,
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+            testCoroutineRule.testCoroutineDispatcher
+        )
     }
 
     @Test
