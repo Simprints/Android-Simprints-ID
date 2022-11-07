@@ -12,7 +12,7 @@ androidx_room_version = "2.4.3"
 androidx_camerax_version = "1.2.0-rc01"
 dagger_version = "2.44"
 work_version = "2.7.1"
-location_services_version = "21.0.0"
+location_services_version = "21.0.1"
 safetynet_services_version = "18.0.1"
 retrofit_version = "2.9.0"
 okttp_version = "4.10.0"
@@ -176,7 +176,7 @@ testing-fragment_testing = { module = "androidx.fragment:fragment-testing", vers
 testing-navigation_testing = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation_version" }
 
 #Testing-KoTest
-testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.5.3"
+testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.5.4"
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
 testing-Robolectric-multidex = "org.robolectric:multidex:3.4.2"
