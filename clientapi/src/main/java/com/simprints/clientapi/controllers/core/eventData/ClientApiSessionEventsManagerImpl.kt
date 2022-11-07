@@ -4,9 +4,8 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
@@ -18,8 +17,9 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.canCoSyncAllData
 import com.simprints.infra.config.domain.models.canCoSyncAnalyticsData
 import com.simprints.infra.config.domain.models.canCoSyncBiometricData
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
@@ -28,7 +28,7 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
     private val timeHelper: ClientApiTimeHelper,
     private val workflowCacheClearer: WorkflowCacheClearer,
     private val configManager: ConfigManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher
+    @ExternalScope private val externalScope: CoroutineScope
 ) : ClientApiSessionEventsManager {
 
     override suspend fun createSession(integration: IntegrationInfo): String {
@@ -36,7 +36,7 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
         workflowCacheClearer.clearSteps()
         coreEventRepository.createSession()
 
-        inBackground(dispatcher) {
+        externalScope.launch {
             coreEventRepository.addOrUpdateEvent(
                 IntentParsingEvent(
                     timeHelper.now(),
@@ -49,7 +49,7 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
     }
 
     override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
-        inBackground(dispatcher) {
+        externalScope.launch {
             coreEventRepository.addOrUpdateEvent(
                 AlertScreenEvent(
                     timeHelper.now(),
@@ -75,7 +75,7 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
     }
 
     override suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>) {
-        inBackground(dispatcher) {
+        externalScope.launch {
             coreEventRepository.addOrUpdateEvent(
                 SuspiciousIntentEvent(
                     timeHelper.now(),
@@ -86,7 +86,7 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
     }
 
     override suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>) {
-        inBackground(dispatcher) {
+        externalScope.launch {
             coreEventRepository.addOrUpdateEvent(
                 InvalidIntentEvent(
                     timeHelper.now(),
@@ -135,7 +135,7 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
         }
 
     override suspend fun deleteSessionEvents(sessionId: String) {
-        inBackground(dispatcher) {
+        externalScope.launch {
             coreEventRepository.deleteSessionEvents(sessionId)
         }
     }

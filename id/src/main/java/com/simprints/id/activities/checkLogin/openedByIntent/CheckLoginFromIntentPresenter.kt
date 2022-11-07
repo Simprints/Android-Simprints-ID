@@ -3,8 +3,8 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.annotation.SuppressLint
 import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
@@ -48,6 +48,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private val eventRepository: EventRepository,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val simNetworkUtils: SimNetworkUtils,
+    @ExternalScope private val externalScope: CoroutineScope,
     @DispatcherIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) :
     CheckLoginPresenter(view),
@@ -204,7 +205,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
         if (!loginAlreadyTried.get() && appRequest !is AppConfirmIdentityRequest && appRequest !is AppEnrolLastBiometricsRequest) {
-            inBackground {
+            externalScope.launch {
                 eventRepository.addOrUpdateEvent(
                     buildAuthorizationEvent(
                         AuthorizationResult.NOT_AUTHORIZED
