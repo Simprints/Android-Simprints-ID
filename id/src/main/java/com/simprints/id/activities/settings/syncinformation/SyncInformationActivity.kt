@@ -111,8 +111,10 @@ class SyncInformationActivity : BaseSplitActivity() {
     }
 
     private fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
-        synchronizationConfiguration.down.moduleOptions.isNotEmpty() &&
-            synchronizationConfiguration.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        with(synchronizationConfiguration.down) {
+            moduleOptions.isNotEmpty() &&
+                partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        }
 
     private fun setupToolbar() {
         setSupportActionBar(binding.syncInfoToolbar)
