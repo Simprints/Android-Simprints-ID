@@ -207,6 +207,39 @@ class ConfigLocalDataSourceImplTest {
     }
 
     @Test
+    fun `should update the fingers to collect in the device configuration correctly`() =
+        runTest(UnconfinedTestDispatcher()) {
+            configLocalDataSourceImpl.updateDeviceConfiguration {
+                it.apply {
+                    it.language = "fr"
+                    it.fingersToCollect = listOf(Finger.LEFT_THUMB)
+                }
+            }
+            var savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+            var expectedDeviceConfiguration =
+                DeviceConfiguration("fr", listOf(), listOf(Finger.LEFT_THUMB), "")
+
+            assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+
+            configLocalDataSourceImpl.updateDeviceConfiguration {
+                it.apply {
+                    it.language = "fr"
+                    it.fingersToCollect = listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER)
+                }
+            }
+            savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
+            expectedDeviceConfiguration =
+                DeviceConfiguration(
+                    "fr",
+                    listOf(),
+                    listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER),
+                    ""
+                )
+
+            assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
+        }
+
+    @Test
     fun `should clear the device configuration correctly`() = runTest(UnconfinedTestDispatcher()) {
         configLocalDataSourceImpl.updateDeviceConfiguration { it.apply { it.language = "fr" } }
         configLocalDataSourceImpl.clearDeviceConfiguration()
