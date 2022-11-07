@@ -4,6 +4,7 @@ import android.content.Context
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
 import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
 import com.simprints.core.tools.extentions.deviceId
 import com.simprints.core.tools.extentions.packageVersionName
 import com.simprints.core.tools.json.JsonHelper
@@ -85,7 +86,11 @@ object CoreModule {
 
     @ExternalScope
     @Provides
-    fun provideExternalScope(): CoroutineScope = CoroutineScope(SupervisorJob())
+    fun provideExternalScope(
+        @DispatcherIO dispatcherIO: CoroutineDispatcher
+    ): CoroutineScope = CoroutineScope(
+        SupervisorJob() + dispatcherIO + AppCoroutineExceptionHandler()
+    )
 }
 
 @Qualifier

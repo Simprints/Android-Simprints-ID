@@ -1,6 +1,6 @@
 package com.simprints.id.activities.orchestrator
 
-import com.simprints.core.tools.extentions.inBackground
+import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.callback.*
@@ -8,11 +8,14 @@ import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.moduleapi.app.responses.IAppResponseTier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class OrchestratorEventsHelperImpl @Inject constructor(
     private val eventRepository: EventRepository,
-    private val timeHelper: TimeHelper
+    private val timeHelper: TimeHelper,
+    @ExternalScope private val externalScope: CoroutineScope
 ) : OrchestratorEventsHelper {
 
     override fun addCallbackEventInSessions(appResponse: AppResponse) {
@@ -26,7 +29,7 @@ class OrchestratorEventsHelperImpl @Inject constructor(
         }
 
         callbackEvent.let {
-            inBackground {
+            externalScope.launch {
                 eventRepository.addOrUpdateEvent(it)
             }
         }
