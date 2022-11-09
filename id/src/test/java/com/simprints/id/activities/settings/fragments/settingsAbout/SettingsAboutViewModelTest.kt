@@ -12,6 +12,7 @@ import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.CoroutineScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,6 +42,7 @@ class SettingsAboutViewModelTest {
             configManager,
             signerManager,
             recentUserActivityManager,
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
             testCoroutineRule.testCoroutineDispatcher
         )
     }
