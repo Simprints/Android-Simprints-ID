@@ -11,6 +11,11 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 
+/**
+ * This class represents any Fingerprint activity within the fingerprint module. It handles common
+ * or shared functionality like loading/releasing koin DI for fingerprint and logging activity
+ * creation and destruction.
+ */
 abstract class FingerprintActivity : BaseSplitActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

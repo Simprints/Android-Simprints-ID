@@ -5,12 +5,21 @@ import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.eventsystem.event.domain.models.RefusalEvent as CoreRefusalEvent
 import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer as CoreRefusalAnswer
 
+/**
+ * This class represents a event from submission of a Refusal form.
+ *
+ * @property reason  the reason for refusing a fingerprint capture
+ * @property otherText  other written information, submitted with the form
+ */
 @Keep
 class RefusalEvent(startTime: Long,
                    endTime: Long,
                    val reason: RefusalAnswer,
                    val otherText: String) : Event(EventType.REFUSAL, startTime, endTime)
 
+/**
+ * This enum class represents the different reasons for refusing a fingerprint capture
+ */
 @Keep
 enum class RefusalAnswer {
     REFUSED_RELIGION,

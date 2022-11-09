@@ -1,7 +1,7 @@
 package com.simprints.id.activities.alert
 
 import com.simprints.core.DispatcherIO
-import com.simprints.core.tools.extentions.inBackground
+import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
@@ -21,6 +21,8 @@ import com.simprints.infra.resources.R
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 // TODO refactor to use ViewModel in order to remove the runBlocking
@@ -31,6 +33,7 @@ class AlertPresenter @AssistedInject constructor(
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val exitFormHelper: ExitFormHelper,
+    @ExternalScope private val externalScope: CoroutineScope,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : AlertContract.Presenter {
 
@@ -44,7 +47,7 @@ class AlertPresenter @AssistedInject constructor(
         initTextAndDrawables()
 
         alertType.fromAlertToAlertTypeEvent().let {
-            inBackground {
+            externalScope.launch {
                 eventRepository.addOrUpdateEvent(
                     AlertScreenEvent(
                         timeHelper.now(),

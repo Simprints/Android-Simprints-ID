@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.activities.alert
 
-import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.*
+import com.simprints.fingerprint.activities.alert.AlertError.ButtonAction.*
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.LOW_BATTERY
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.*
@@ -13,6 +13,14 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * This class implements the presenter for Alert Screen, providing business logic for updating the
+ * view.
+ *
+ * @property view  the view to be updated based on business rules
+ * @property sessionManager  the manager for fingerprint session events
+ * @property timeHelper  time helper instance for computing time events occur
+ */
 class AlertPresenter @AssistedInject constructor(
     @Assisted private val view: AlertContract.View,
     @Assisted private val alertType: FingerprintAlert,
@@ -20,7 +28,7 @@ class AlertPresenter @AssistedInject constructor(
     private val timeHelper: FingerprintTimeHelper,
 ) : AlertContract.Presenter {
 
-    private val alertViewModel = AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
+    private val alertError =  AlertError.fromAlertToAlertError(alertType)
 
     private val settingsOpenedForPairing = AtomicBoolean(false)
 
@@ -35,25 +43,25 @@ class AlertPresenter @AssistedInject constructor(
     }
 
     private fun initButtons() {
-        view.initLeftButton(alertViewModel.leftButton)
-        view.initRightButton(alertViewModel.rightButton)
+        view.initLeftButton(alertError.leftButton)
+        view.initRightButton(alertError.rightButton)
     }
 
     private fun initColours() {
-        val color = view.getColorForColorRes(alertViewModel.backgroundColor)
+        val color = view.getColorForColorRes(alertError.type.backgroundColor)
         view.setLayoutBackgroundColor(color)
         view.setLeftButtonBackgroundColor(color)
         view.setRightButtonBackgroundColor(color)
     }
 
     private fun initTextAndDrawables() {
-        view.setAlertTitleWithStringRes(alertViewModel.title)
-        view.setAlertImageWithDrawableId(alertViewModel.mainDrawable)
-        view.setAlertHintImageWithDrawableId(alertViewModel.hintDrawable)
-        view.setAlertMessageWithStringRes(alertViewModel.message)
+        view.setAlertTitleWithStringRes(alertError.type.title)
+        view.setAlertImageWithDrawableId(alertError.type.mainDrawable)
+        view.setAlertHintImageWithDrawableId(alertError.type.hintDrawable)
+        view.setAlertMessageWithStringRes(alertError.message)
     }
 
-    override fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction) {
+    override fun handleButtonClick(buttonAction: AlertError.ButtonAction) {
         when (buttonAction) {
             is None -> Unit
             is WifiSettings -> view.openWifiSettings()
@@ -90,6 +98,6 @@ class AlertPresenter @AssistedInject constructor(
     }
 
     private fun logToCrashReport() {
-        Simber.tag(CrashReportTag.ALERT.name).i(alertViewModel.name)
+        Simber.tag(CrashReportTag.ALERT.name).i(alertError.name)
     }
 }

@@ -9,12 +9,21 @@ import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 
+/**
+ * This class represents the firmware repository combining both local and remote data sources of
+ * the firmware versions.
+ */
 class FirmwareRepository @Inject constructor(
     private val firmwareRemoteDataSource: FirmwareRemoteDataSource,
-    private val firmwareLocalDataSource: FirmwareLocalDataSource,
+    private val firmwareLocalDataSource: FirmwareLocalDataSource
+,
     private val configManager: ConfigManager
 ) {
 
+    /**
+     * This method responsible for updating the firmware versions stored locally on the phone. It
+     * first checks the local version and matches that against the remote versions, then subsequently updating the rlocal versios that need to be updated.
+     */
     suspend fun updateStoredFirmwareFilesWithLatest() {
         configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions?.keys?.forEach { hardwareVersion ->
             updateStoredFirmwareFilesWithLatest(hardwareVersion)

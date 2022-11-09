@@ -1,23 +1,23 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
-import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
-import com.simprints.core.tools.extentions.inBackground
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
 
 class FingerprintSessionEventsManagerImpl @Inject constructor(
     private val eventRepository: EventRepository,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @ExternalScope private val externalScope: CoroutineScope
 ) :
     FingerprintSessionEventsManager {
 
     override fun addEventInBackground(event: Event) {
-        inBackground(dispatcher) {
+        externalScope.launch {
             fromDomainToCore(event).let {
                 eventRepository.addOrUpdateEvent(it)
             }

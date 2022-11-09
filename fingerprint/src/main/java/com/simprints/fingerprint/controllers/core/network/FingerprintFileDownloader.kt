@@ -8,6 +8,10 @@ import java.io.IOException
 import java.net.URL
 import javax.inject.Inject
 
+
+/**
+ * This class is responsible for downloading the firmware updates.
+ */
 class FingerprintFileDownloader @Inject constructor(
     private val fingerprintApiClientFactory: FingerprintApiClientFactory,
     private val loginManager: LoginManager,
@@ -19,7 +23,14 @@ class FingerprintFileDownloader @Inject constructor(
         loginManager.getSignedInProjectIdOrEmpty()
     }
 
-    /** @throws IOException */
+    /**
+     * This method downloads the firmware bytes using the provided url
+     *
+     * @param url  the url location for the file to be downloaded
+     * @return  the bytes of the downloaded file
+     *
+     * @throws IOException
+     */
     suspend fun download(url: String): ByteArray = withContext(dispatcherProvider.io()) {
         // issue with timber logging URLs when interpolated in kotlin, check out this article
         // https://proandroiddev.com/be-careful-what-you-log-it-could-crash-your-app-5fc67a44c842

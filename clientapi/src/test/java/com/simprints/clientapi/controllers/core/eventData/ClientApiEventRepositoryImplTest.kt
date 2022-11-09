@@ -18,7 +18,7 @@ import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
@@ -51,12 +51,13 @@ class ClientApiEventRepositoryImplTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
+        val scope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         clientSessionEventsMgr = ClientApiSessionEventsManagerImpl(
             coreEventEventsMgrMock,
             mockk(relaxed = true),
             mockk(relaxed = true),
             configManager,
-            testCoroutineRule.testCoroutineDispatcher
+            scope
         )
     }
 

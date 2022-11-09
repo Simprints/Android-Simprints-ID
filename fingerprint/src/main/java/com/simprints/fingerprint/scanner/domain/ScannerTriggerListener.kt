@@ -1,5 +1,9 @@
 package com.simprints.fingerprint.scanner.domain
 
+/**
+ * This interface represents a callback that will be triggered when the scan button is clicked on
+ * either the vero 1 or 2 scanners.
+ */
 interface ScannerTriggerListener {
 
     fun onTrigger()

@@ -107,9 +107,9 @@ class MatchingViewModelTest {
         result?.let { matchingResult ->
             assertEquals(DEFAULT_NUMBER_OF_ID_RETURNS, matchingResult.results.size)
             val highestScoreCandidate = matchingResult.results.maxByOrNull { it.confidence }?.guid
-            assertThat(highestScoreCandidate).isEqualTo(probeFingerprintRecord.personId)
+            assertThat(highestScoreCandidate).isEqualTo(probeFingerprintRecord.subjectId)
         }
-        coVerify { dbManagerMock.loadPeople(query) }
+        coVerify { dbManagerMock.loadSubjects(query) }
     }
 
     @Test
@@ -126,9 +126,9 @@ class MatchingViewModelTest {
 
         assertNotNull(result)
         result?.let { matchingResult ->
-            assertThat(matchingResult.results).doesNotContain(probeFingerprintRecord.personId)
+            assertThat(matchingResult.results).doesNotContain(probeFingerprintRecord.subjectId)
         }
-        coVerify { dbManagerMock.loadPeople(query) }
+        coVerify { dbManagerMock.loadSubjects(query) }
     }
 
     @Test
@@ -149,7 +149,7 @@ class MatchingViewModelTest {
             assertEquals(ResultCode.OK, resultCode)
             assertNotNull(
                 data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)?.let {
-                    assertEquals(probeFingerprintRecord.personId, it.results.first().guid)
+                    assertEquals(probeFingerprintRecord.subjectId, it.results.first().guid)
                 }
             )
         }
@@ -173,7 +173,7 @@ class MatchingViewModelTest {
             assertEquals(ResultCode.OK, resultCode)
             assertNotNull(
                 data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)?.let {
-                    assertEquals(probeFingerprintRecord.personId, it.results.first().guid)
+                    assertEquals(probeFingerprintRecord.subjectId, it.results.first().guid)
                 }
             )
         }
@@ -246,7 +246,7 @@ class MatchingViewModelTest {
 
 
     private fun setupDbManagerLoadCandidates(candidates: List<FingerprintIdentity>) {
-        coEvery { dbManagerMock.loadPeople(any()) } returns candidates.asFlow()
+        coEvery { dbManagerMock.loadSubjects(any()) } returns candidates.asFlow()
     }
 
     private fun doFingerprintsMatch(

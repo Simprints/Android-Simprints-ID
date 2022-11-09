@@ -16,9 +16,3 @@ fun <T> CancellableContinuation<T>.resumeWithExceptionSafely(t: Throwable) {
         this.resumeWithException(t)
     }
 }
-
-fun inBackground(context: CoroutineDispatcher = Dispatchers.IO, block: suspend () -> Unit) {
-    CoroutineScope(context).launch {
-        block()
-    }
-}
