@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Finger
@@ -11,12 +12,14 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FIN
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FingerSelectionViewModel @Inject constructor(
     private val configManager: ConfigManager,
+    @ExternalScope private val externalScope: CoroutineScope,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -90,7 +93,7 @@ class FingerSelectionViewModel @Inject constructor(
     }
 
     fun savePreference() {
-        viewModelScope.launch(dispatcher) {
+        externalScope.launch {
             val fingerprintsToCollect = _items.toFingerIdentifiers()
             configManager.updateDeviceConfiguration {
                 it.apply {

@@ -6,11 +6,12 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.Finger.*
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -20,6 +21,9 @@ class FingerSelectionViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
     private val deviceConfiguration = mockk<DeviceConfiguration>()
     private val configManager = mockk<ConfigManager> {
@@ -28,7 +32,11 @@ class FingerSelectionViewModelTest {
         }
         coEvery { getDeviceConfiguration() } returns deviceConfiguration
     }
-    private val viewModel = FingerSelectionViewModel(configManager, UnconfinedTestDispatcher())
+    private val viewModel = FingerSelectionViewModel(
+        configManager,
+        CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+        testCoroutineRule.testCoroutineDispatcher
+    )
 
     @Test
     fun start_loadsStartingFingerStateCorrectly() {
