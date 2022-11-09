@@ -10,7 +10,11 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
- * Schedules the [FirmwareFileUpdateWorker] as necessary.
+ * This class is responsible for scheduling the worker [FirmwareFileUpdateWorker] that updates the
+ * firmware version, if any updates available, on the device.
+ *
+ * @property context  the application context used for scheduling the worker
+ * @property configManager the configuration manager for checking the version of the connected Vero scanner
  */
 class FirmwareFileUpdateScheduler @Inject constructor(
     @ApplicationContext private val context: Context,

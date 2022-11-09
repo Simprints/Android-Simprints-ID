@@ -4,6 +4,12 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
+
+/**
+ * This class represents an error that can occur when processing a fingerprint request
+ *
+ * @param reason the reason why the error occurred
+ */
 @Parcelize
 data class FingerprintErrorResponse(val reason: FingerprintErrorReason) : FingerprintResponse {
 

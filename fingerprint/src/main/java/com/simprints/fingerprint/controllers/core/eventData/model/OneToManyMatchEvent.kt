@@ -7,6 +7,15 @@ import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent as Core
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool as CoreMatchPool
 import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType as CoreMatchPoolType
 
+/**
+ * This class represents a fingerprint identification event (i.e. one-to-many match event).
+ *
+ * @property query  the query for extracting the matching candidates, see [SubjectQuery]
+ * @property count  the number of matching candidates pulled from the query
+ * @property matcher  the matching algorithm used in filtering the candidates
+ * @property result  the filtered list of top matching candidates
+ *
+ */
 @Keep
 class OneToManyMatchEvent(
     startTime: Long,

@@ -1,5 +1,8 @@
 package com.simprints.fingerprint.scanner.domain.versions
 
+/**
+ * This class represents the version of the firmware that is running on the vero scanner
+ */
 @Deprecated(message = "Firmware versions are no longer represented in this form")
 data class ChipFirmwareVersion(val major: Int, val minor: Int) : Comparable<ChipFirmwareVersion> {
 

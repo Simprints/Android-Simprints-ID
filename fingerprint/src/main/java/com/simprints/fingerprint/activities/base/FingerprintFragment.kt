@@ -8,6 +8,10 @@ import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 
+/**
+ * This class represents any Fingerprint Fragment within the fingerprint module. It contains mainly
+ * utility extension functions for observing livedata.
+ */
 abstract class FingerprintFragment : Fragment() {
 
     private fun <T, O : Observer<T>> MutableLiveData<T>.fragmentObserve(observer: O) =

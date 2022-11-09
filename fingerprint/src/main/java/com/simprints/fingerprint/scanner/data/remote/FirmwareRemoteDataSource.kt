@@ -7,8 +7,16 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
+/**
+ * This class serves as the remote data provider of the Firmware versions.
+ *
+ * @property fingerprintApiClientFactory  the factory that builds the remote api class to make network calls
+ * @property fingerprintFileDownloader  the file downloader responsible for downloading the updated firmware
+ */
 class FirmwareRemoteDataSource @Inject constructor(
-    private val fingerprintFileDownloader: FingerprintFileDownloader,
+
+    private val fingerprintFileDownloader: FingerprintFileDownloader
+,
     private val configManager: ConfigManager,
 ) {
 

@@ -10,6 +10,11 @@ import com.simprints.fingerprint.orchestrator.state.FingerprintTaskFlowState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 
+/**
+ * This class represents a series of tasks required to complete a certain fingerprint request
+ *
+ * @property fingerprintRequest  the fingerprint request handled by executing a series of tasks
+ */
 abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRequest) {
 
     protected var taskResults: MutableMap<String, TaskResult> = mutableMapOf()
@@ -24,6 +29,13 @@ abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRe
     private fun isFlowFinishedPrematurely() = lastResultCode != ResultCode.OK
     private fun isPastFinalTask() = currentTaskIndex >= fingerprintTasks.size
 
+
+    /**
+     * This method handles the result from an [FingerprintTask.ActivityTask]
+     *
+     * @param resultCode the resulting code from the executed activity task
+     * @param getTaskResult  the closure that uses a provided bundle-key to read a [TaskResult]
+     */
     fun handleActivityTaskResult(resultCode: ResultCode, getTaskResult: (bundleKey: String) -> TaskResult) {
         (getCurrentTask() as FingerprintTask.ActivityTask).apply {
             lastResultCode = resultCode
@@ -56,6 +68,11 @@ abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRe
         }
     }
 
+    /**
+     * This method generates the final result of executing the fingerprint request
+     *
+     * @param finalResultBuilder  a builder for generating the final result based on the result-code
+     */
     fun getFinalResult(finalResultBuilder: FinalResultBuilder) =
         when (lastResultCode) {
             ResultCode.OK -> getFinalOkResult(finalResultBuilder)

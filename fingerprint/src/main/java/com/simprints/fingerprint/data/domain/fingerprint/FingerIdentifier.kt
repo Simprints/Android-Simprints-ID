@@ -2,6 +2,9 @@ package com.simprints.fingerprint.data.domain.fingerprint
 
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
+/**
+ * enum class to represent a subject's fingers
+ */
 enum class FingerIdentifier {
     RIGHT_5TH_FINGER,
     RIGHT_4TH_FINGER,
@@ -15,6 +18,10 @@ enum class FingerIdentifier {
     LEFT_5TH_FINGER;
 }
 
+/**
+ * an extension function to help convert moduleapi's IFingerprintIdentifier to fingerprint's
+ * FingerprintIdentifier
+ */
 fun IFingerIdentifier.fromModuleApiToDomain(): FingerIdentifier =
     when (this) {
         IFingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
@@ -29,6 +36,11 @@ fun IFingerIdentifier.fromModuleApiToDomain(): FingerIdentifier =
         IFingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
     }
 
+
+/**
+ * an extension function to help convert fingerprint's FingerprintIdentifier to moduleapi's
+ * IFingerprintIdentifier
+ */
 fun FingerIdentifier.fromDomainToModuleApi(): IFingerIdentifier =
     when (this) {
         FingerIdentifier.RIGHT_5TH_FINGER -> IFingerIdentifier.RIGHT_5TH_FINGER

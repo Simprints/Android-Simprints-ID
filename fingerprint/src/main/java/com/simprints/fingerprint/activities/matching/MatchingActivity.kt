@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -58,7 +59,7 @@ class MatchingActivity : FingerprintActivity() {
     private fun observeResult() {
         viewModel.result.observe(this) {
             setResult(it.resultCode.value, it.data)
-            Handler().postDelayed({ finish() }, it.finishDelayMillis.toLong())
+            Handler(Looper.getMainLooper()).postDelayed({ finish() }, it.finishDelayMillis.toLong())
         }
     }
 

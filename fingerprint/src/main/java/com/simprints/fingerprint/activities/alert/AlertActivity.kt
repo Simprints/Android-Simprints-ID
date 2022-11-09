@@ -25,6 +25,11 @@ import javax.inject.Inject
 import com.simprints.fingerprint.databinding.ActivityFingerprintAlertBinding as AlertBinding
 import com.simprints.fingerprint.databinding.ActivityFingerprintBluetoothAlertBinding as BluetoothAlertBinding
 
+/**
+ * This class represents the view for the [AlertContract], providing the user with the ability to
+ * handle errors that occurred while processing a fingerprint request triggering functions like:
+ * [openWifiSettings] and [finishWithAction].
+ */
 @AndroidEntryPoint
 class AlertActivity : FingerprintActivity(), AlertContract.View {
 
@@ -132,16 +137,16 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
         message.text = getString(stringRes)
     }
 
-    override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
-        if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
+    override fun initLeftButton(leftButtonAction: AlertError.ButtonAction) {
+        if (leftButtonAction !is AlertError.ButtonAction.None) {
             alertLeftButton.visibility = View.VISIBLE
             alertLeftButton.text = getString(leftButtonAction.buttonText)
             alertLeftButton.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         }
     }
 
-    override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
-        if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
+    override fun initRightButton(rightButtonAction: AlertError.ButtonAction) {
+        if (rightButtonAction !is AlertError.ButtonAction.None) {
             alertRightButton?.visibility = View.VISIBLE
             alertRightButton?.text = getString(rightButtonAction.buttonText)
             alertRightButton?.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }

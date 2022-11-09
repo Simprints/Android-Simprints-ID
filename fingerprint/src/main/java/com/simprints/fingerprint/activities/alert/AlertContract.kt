@@ -3,10 +3,15 @@ package com.simprints.fingerprint.activities.alert
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import com.simprints.fingerprint.activities.alert.AlertContract.Presenter
+import com.simprints.fingerprint.activities.alert.AlertContract.View
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.BasePresenter
 import com.simprints.fingerprint.activities.base.BaseView
-import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 
+/**
+ * This interface represents the contract between Alert screen [View] and business logic [Presenter].
+ */
 interface AlertContract {
 
     interface View : BaseView<Presenter> {
@@ -17,8 +22,8 @@ interface AlertContract {
         fun setAlertTitleWithStringRes(@StringRes stringRes: Int)
         fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int)
         fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?)
-        fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction)
-        fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction)
+        fun initLeftButton(leftButtonAction: AlertError.ButtonAction)
+        fun initRightButton(rightButtonAction: AlertError.ButtonAction)
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()
@@ -27,7 +32,7 @@ interface AlertContract {
     }
 
     interface Presenter : BasePresenter {
-        fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction)
+        fun handleButtonClick(buttonAction: AlertError.ButtonAction)
         fun handleBackPressed()
         fun handleOnResume()
     }

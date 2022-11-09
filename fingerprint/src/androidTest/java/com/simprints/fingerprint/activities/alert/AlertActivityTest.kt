@@ -55,7 +55,7 @@ class AlertActivityTest {
     @Test
     fun noParamForAlertActivity_theRightAlertShouldAppear() {
         launchAlertActivity()
-        ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
+        ensureAlertScreenLaunched(UNEXPECTED_ERROR)
 
         verify { sessionEventManagerMock.addEventInBackground(any<AlertScreenEvent>()) }
     }
@@ -63,7 +63,7 @@ class AlertActivityTest {
     @Test
     fun bluetoothNotEnabled_theRightAlertShouldAppear() {
         launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
-        ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED)
+        ensureAlertScreenLaunched(BLUETOOTH_NOT_ENABLED)
     }
 
     @Test
@@ -79,7 +79,7 @@ class AlertActivityTest {
     @Test
     fun bluetoothNotEnabled_userClicksTryAgain_alertShouldFinishWithTheRightResult() {
         val scenario = launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
-        ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED)
+        ensureAlertScreenLaunched(BLUETOOTH_NOT_ENABLED)
 
         onView(withId(R.id.alertLeftButton)).perform(click())
 
@@ -92,7 +92,7 @@ class AlertActivityTest {
     @Test
     fun scannerNotPaired_userClicksPairScanner_bluetoothSettingsShouldAppear() {
         launchAlertActivity(AlertTaskRequest(NOT_PAIRED))
-        ensureAlertScreenLaunched(AlertActivityViewModel.NOT_PAIRED)
+        ensureAlertScreenLaunched(NOT_PAIRED)
         mockBluetoothSettingsIntent()
 
         onView(withId(R.id.alertLeftButton)).perform(click())
@@ -103,7 +103,7 @@ class AlertActivityTest {
     @Test
     fun unexpectedAlert_userClicksClose_alertShouldFinishWithTheRightResult() {
         val scenario = launchAlertActivity(AlertTaskRequest(UNEXPECTED_ERROR))
-        ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
+        ensureAlertScreenLaunched(UNEXPECTED_ERROR)
 
         onView(withId(R.id.alertLeftButton)).perform(click())
 
@@ -116,31 +116,31 @@ class AlertActivityTest {
     @Test
     fun lowBattery_theRightAlertShouldAppear() {
         launchAlertActivity(AlertTaskRequest(LOW_BATTERY))
-        ensureAlertScreenLaunched(AlertActivityViewModel.LOW_BATTERY)
+        ensureAlertScreenLaunched(LOW_BATTERY)
     }
 
     @Test
     fun bluetoothNotSupported_theRightAlertShouldAppear() {
         launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_SUPPORTED))
-        ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_SUPPORTED)
+        ensureAlertScreenLaunched(BLUETOOTH_NOT_SUPPORTED)
     }
 
     @Test
     fun disconnected_theRightAlertShouldAppear() {
         launchAlertActivity(AlertTaskRequest(DISCONNECTED))
-        ensureAlertScreenLaunched(AlertActivityViewModel.DISCONNECTED)
+        ensureAlertScreenLaunched(DISCONNECTED)
     }
 
     @Test
     fun notPaired_theRightAlertShouldAppear() {
         launchAlertActivity(AlertTaskRequest(NOT_PAIRED))
-        ensureAlertScreenLaunched(AlertActivityViewModel.NOT_PAIRED)
+        ensureAlertScreenLaunched(NOT_PAIRED)
     }
 
     @Test
     fun multiPairedScanners_theRightAlertShouldAppear() {
         launchAlertActivity(AlertTaskRequest(MULTIPLE_PAIRED_SCANNERS))
-        ensureAlertScreenLaunched(AlertActivityViewModel.MULTIPLE_PAIRED_SCANNERS)
+        ensureAlertScreenLaunched(MULTIPLE_PAIRED_SCANNERS)
     }
 
     @Test
@@ -186,9 +186,8 @@ class AlertActivityTest {
         })
 
 
-    private fun ensureAlertScreenLaunched(alertActivityViewModel: AlertActivityViewModel) {
-        onView(withId(R.id.alertTitle))
-            .check(matches(withText(alertActivityViewModel.title)))
+    private fun ensureAlertScreenLaunched(alert: FingerprintAlert) {
+       val alertActivityViewModel= AlertError.fromAlertToAlertError(alert)
 
         onView(withId(R.id.message))
             .check(matches(withText(alertActivityViewModel.message)))

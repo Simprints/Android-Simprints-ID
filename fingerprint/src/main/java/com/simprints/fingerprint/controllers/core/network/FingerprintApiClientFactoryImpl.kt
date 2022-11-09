@@ -5,6 +5,10 @@ import com.simprints.infra.network.SimRemoteInterface
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
+/**
+ * This class provides an implementation of FingerprintApiClient factory
+ * @see FingerprintApiClientFactory
+ */
 class FingerprintApiClientFactoryImpl @Inject constructor(
     private val loginManager: LoginManager,
 ) : FingerprintApiClientFactory {
