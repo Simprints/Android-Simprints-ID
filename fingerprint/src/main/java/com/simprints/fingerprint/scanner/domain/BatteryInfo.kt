@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.scanner.domain
 
 /**
+ * This class represents the information of the current state of the scanner's battery.
+ *
  * @param charge Percentage of full charge (0 - 100)
  * @param voltage Measured voltage in mV
  * @param current Measured current in mA (negative if discharging, positive if charging)

@@ -2,13 +2,22 @@ package com.simprints.fingerprint.data.domain.fingerprint
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+
+/**
+ * This class represents the data from a captured fingerprint biometrics
+ *
+ * @property fingerId  the identifier of the captured fingerprint
+ * @property template  the generated biometric template representing the fingerprint signature
+ * @property imageRef  the fingerprint image that was captured to generate the template
+ * @property format  the format for the template (i.e. the format used to generate the template which will determine the format used to match fingerprints)
+ */
 @Parcelize
 class Fingerprint(
     val fingerId: FingerIdentifier,

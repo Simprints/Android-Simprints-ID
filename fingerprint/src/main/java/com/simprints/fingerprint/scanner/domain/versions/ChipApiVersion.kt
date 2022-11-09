@@ -1,6 +1,10 @@
 package com.simprints.fingerprint.scanner.domain.versions
 
 
+/**
+ * This class represents the version of the api that SID communicates with, i.e. the version of the
+ * api that the android app uses to communicate with the scanner.
+ */
 @Deprecated(message = "The firmware api version is no longer being used")
 data class ChipApiVersion(val major: Int, val minor: Int) {
 

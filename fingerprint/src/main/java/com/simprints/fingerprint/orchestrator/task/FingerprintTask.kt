@@ -12,11 +12,22 @@ import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.controllers.fingerprint.config.ConfigurationTaskRequest
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 
+/**
+ * This class represents a fingerprint task to be executed within a flow of tasks to complete a
+ * fingerprint request.
+ *
+ * @property taskResultKey  the string value representing the unique name of the task being run
+ * @property createTaskRequest  the closure that generates the task request
+ */
 sealed class FingerprintTask(
     val taskResultKey: String,
     val createTaskRequest: () -> TaskRequest
 ) {
 
+    /**
+     * This class represents a runnable task that can be executed without the use of the UI, hence
+     * no activity or fragments used.
+     */
     abstract class RunnableTask(
         taskResultKey: String,
         createTaskRequest: () -> TaskRequest
@@ -25,6 +36,15 @@ sealed class FingerprintTask(
     class Configuration(taskResultKey: String, createConfigurationTaskRequest: () -> ConfigurationTaskRequest) :
         RunnableTask(taskResultKey, createConfigurationTaskRequest)
 
+    /**
+     * This class represents tasks that require user input, hence the need for activities or
+     * fragments to execute these ActivityTasks.
+     *
+     * @property targetActivity  the java class of the activity to be launched for this task
+     * @property requestCode  the request-code used in launching the activity
+     * @property requestBundleKey  the bundle-key used in retrieving the task's request value
+     * @property resultBundleKey  the bundle-key used in retrieving the task's result value
+     */
     abstract class ActivityTask(
         taskResultKey: String,
         createTaskRequest: () -> TaskRequest,

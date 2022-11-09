@@ -91,7 +91,7 @@ class MatchingViewModel @Inject constructor(
                 with(matchTask) {
                     onBeginLoadCandidates()
 
-                    val candidates = dbManager.loadPeople(matchingRequest.queryForCandidates)
+                    val candidates = dbManager.loadSubjects(matchingRequest.queryForCandidates)
                     onCandidatesLoaded(candidates.count())
 
                     val result = runMatch(
@@ -132,7 +132,7 @@ class MatchingViewModel @Inject constructor(
     ): FingerprintIdentity = FingerprintIdentity(id, this)
 
     private fun FingerprintIdentity.fromDomainToMatcher(): MatcherFingerprintIdentity =
-        MatcherFingerprintIdentity(personId, fingerprints.map { it.fromDomainToMatcher() })
+        MatcherFingerprintIdentity(subjectId, fingerprints.map { it.fromDomainToMatcher() })
 
     private fun Fingerprint.fromDomainToMatcher(): MatcherFingerprint =
         MatcherFingerprint(fingerId.fromDomainToMatcher(), templateBytes, SAVED_TEMPLATE_FORMAT)

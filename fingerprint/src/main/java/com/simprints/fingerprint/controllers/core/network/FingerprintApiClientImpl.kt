@@ -3,6 +3,11 @@ package com.simprints.fingerprint.controllers.core.network
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 
+
+/**
+ * This class provides an implementation of FingerprintApiClient
+ * @see FingerprintApiClient
+ */
 class FingerprintApiClientImpl<T : SimRemoteInterface>(
     private val simApiClient: SimNetwork.SimApiClient<T>
 ) : FingerprintApiClient<T> {

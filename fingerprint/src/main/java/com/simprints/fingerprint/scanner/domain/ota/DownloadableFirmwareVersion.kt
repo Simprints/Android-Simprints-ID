@@ -2,10 +2,19 @@ package com.simprints.fingerprint.scanner.domain.ota
 
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions.Companion.UNKNOWN_VERSION
 
+/**
+ * This class represents a new firmware version that is to be downloaded from the remote source.
+ *
+ * @property chip  the firmware chip this version is for
+ * @property version  the firmware version to be downloaded
+ */
 data class DownloadableFirmwareVersion(
     val chip: Chip,
     val version: String
 ) {
+    /**
+     * This enum class represent the different chips on the scanner
+     */
     enum class Chip(val chipName: String) {
         CYPRESS("cypress"),
         STM("stm"),
