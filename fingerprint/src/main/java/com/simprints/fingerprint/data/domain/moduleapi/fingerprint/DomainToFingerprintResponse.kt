@@ -17,6 +17,10 @@ import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintMatchR
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
+/**
+ * This class is a singleton helper that helps convert Fingerprint's module response objects into
+ * ModuleApi's equivalent.
+ */
 object DomainToFingerprintResponse {
 
     fun fromDomainToFingerprintErrorResponse(error: FingerprintErrorResponse): IFingerprintErrorResponse =
@@ -71,6 +75,8 @@ object DomainToFingerprintResponse {
         IFingerprintConfigurationResponseImpl()
 
 }
+
+// The following classes represent the corresponding implementation of ModuleApi response interfaces.
 
 @Parcelize
 private class IFingerprintErrorResponseImpl(override val error: IFingerprintErrorReason) : IFingerprintErrorResponse {

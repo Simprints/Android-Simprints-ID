@@ -8,6 +8,12 @@ import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
+/**
+ * This class is responsible for dispatching fingerprint's runnable tasks requests.
+ * @see FingerprintTask
+ *
+ * @property configurationController  controller that handles configuration of the scanner
+ */
 class RunnableTaskDispatcher @Inject constructor(
     private val configurationController: ConfigurationController
 ) {

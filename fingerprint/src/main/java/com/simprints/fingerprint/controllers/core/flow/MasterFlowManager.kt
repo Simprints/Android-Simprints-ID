@@ -1,5 +1,11 @@
 package com.simprints.fingerprint.controllers.core.flow
 
+/**
+ * This interface represents a Master flow manager that determines which flow is currently being
+ * executed.
+ *
+ * @see Action
+ */
 interface MasterFlowManager {
 
     /**

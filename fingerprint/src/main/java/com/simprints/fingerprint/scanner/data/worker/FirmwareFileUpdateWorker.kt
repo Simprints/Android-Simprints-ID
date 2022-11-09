@@ -14,7 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Downloads the latest firmware binaries, ensuring that the latest versions are always on the phone.
+ * This class is responsible for regularly downloading the latest versions of the firmware binaries,
+ * if any update are available, ensuring that the latest versions are always on the phone.
  */
 @HiltWorker
 class FirmwareFileUpdateWorker @AssistedInject constructor(

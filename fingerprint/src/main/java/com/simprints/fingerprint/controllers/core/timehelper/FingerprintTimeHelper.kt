@@ -3,6 +3,9 @@ package com.simprints.fingerprint.controllers.core.timehelper
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * This interface represents a  time helper for fingerprint module
+ */
 interface FingerprintTimeHelper {
 
     fun now(): Long

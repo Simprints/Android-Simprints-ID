@@ -1,11 +1,14 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration as DomainScannerGeneration
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent as ScannerConnectionEventCore
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration as ScannerGenerationCore
 import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo as ScannerInfoCore
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration as DomainScannerGeneration
 
+/**
+ * This class represents the event from connecting to a scanner
+ */
 @Keep
 class ScannerConnectionEvent(startTime: Long,
                              val scannerInfo: ScannerInfo) : Event(EventType.SCANNER_CONNECTION, startTime) {

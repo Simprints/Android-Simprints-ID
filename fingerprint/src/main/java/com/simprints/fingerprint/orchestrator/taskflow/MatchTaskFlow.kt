@@ -7,6 +7,9 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 
+/**
+ * This class represents the flow of tasks for handling a fingerprint match request
+ */
 class MatchTaskFlow(matchRequest: FingerprintMatchRequest) : FingerprintTaskFlow(matchRequest) {
 
     init {

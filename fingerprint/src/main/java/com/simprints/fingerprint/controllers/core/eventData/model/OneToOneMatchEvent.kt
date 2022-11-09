@@ -6,6 +6,13 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import java.io.Serializable
 import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
+/**
+ * This class represents a verification match event (i.e. a one-to-one match event).
+ *
+ * @property query  the query for extracting the matching candidates, see [SubjectQuery]
+ * @property matcher  the matching algorithm used in filtering the candidates
+ * @property result  the matching candidate
+ */
 @Keep
 class OneToOneMatchEvent(
     startTime: Long,

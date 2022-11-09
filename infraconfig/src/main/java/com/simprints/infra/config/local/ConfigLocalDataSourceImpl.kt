@@ -5,6 +5,7 @@ import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.local.models.*
+import com.simprints.infra.config.local.models.ProtoDeviceConfiguration.FingersToCollect
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -44,8 +45,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 }
                 if (!protoDeviceConfiguration.fingersToCollect.isOverwritten) {
                     proto.setFingersToCollect(
-                        it.fingersToCollect
-                            .toBuilder()
+                        FingersToCollect.newBuilder()
                             .addAllFingersToCollect(config.fingerprint?.fingersToCapture?.map { finger -> finger.toProto() }
                                 ?: listOf())
                     ).build()
@@ -68,25 +68,17 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) {
         deviceConfigDataStore.updateData { currentData ->
             val updatedProto = update(currentData.toDomain()).toProto()
-            currentData
-                .toBuilder()
-                .mergeFrom(updatedProto)
-                .build()
-                .let {
-                    // We need to mark the fields that have been updated has overwritten to not
-                    // change them next time we refresh the project configuration.
-                    val proto = it.toBuilder()
-                    if (updatedProto.language.language != currentData.language.language) {
-                        proto.setLanguage(it.language.toBuilder().setIsOverwritten(true))
-                        LanguageHelper.language = it.language.language
-                    }
-                    if (updatedProto.fingersToCollect.fingersToCollectList != currentData.fingersToCollect.fingersToCollectList) {
-                        proto.setFingersToCollect(
-                            it.fingersToCollect.toBuilder().setIsOverwritten(true)
-                        )
-                    }
-                    proto.build()
-                }
+            val updatedProtoBuilder = updatedProto.toBuilder()
+            if (updatedProto.language.language != currentData.language.language) {
+                updatedProtoBuilder.language =
+                    updatedProto.language.toBuilder().setIsOverwritten(true).build()
+                LanguageHelper.language = updatedProto.language.language
+            }
+            if (updatedProto.fingersToCollect.fingersToCollectList != currentData.fingersToCollect.fingersToCollectList) {
+                updatedProtoBuilder.fingersToCollect =
+                    updatedProto.fingersToCollect.toBuilder().setIsOverwritten(true).build()
+            }
+            updatedProtoBuilder.build()
         }
     }
 

@@ -6,6 +6,12 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent as CoreAlertScreenEvent
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
+/**
+ * This class represents an event that occurs as a result of an alert screen being presented to the
+ * user.
+ *
+ * @property alertType  the type of fingerprint alert that was shown
+ */
 @Keep
 class AlertScreenEvent(startTime: Long,
                        val alertType: FingerprintAlert) : Event(EventType.ALERT_SCREEN, startTime)
@@ -24,6 +30,12 @@ fun FingerprintAlert.fromFingerprintAlertToAlertTypeEvent(): CoreAlertScreenEven
         FingerprintAlert.UNEXPECTED_ERROR -> CoreAlertScreenEventType.UNEXPECTED_ERROR
     }
 
+/**
+ * This class represents an event that occurs as a result of an alert shown for an issue connecting
+ * to the vero scanner.
+ *
+ * @property scannerIssue  the connection issue that occurred
+ */
 @Keep
 class AlertScreenEventWithScannerIssue(startTime: Long,
                                        val scannerIssue: ConnectScannerIssue) : Event(EventType.ALERT_SCREEN_WITH_SCANNER_ISSUE, startTime)
