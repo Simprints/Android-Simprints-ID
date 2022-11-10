@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
@@ -37,7 +36,6 @@ import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.fingerprint.tools.extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -66,7 +64,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
             CollectFingerprintsTaskRequest.BUNDLE_KEY
         ) ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
-        lifecycleScope.launch { vm.start(fingerprintRequest.fingerprintsToCapture) }
+        vm.start(fingerprintRequest.fingerprintsToCapture)
 
         initUiComponents()
         observeStateChanges()
