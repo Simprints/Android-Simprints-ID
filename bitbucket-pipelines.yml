@@ -51,7 +51,7 @@ definitions:
         # Run the infrastructure unit tests with coverage and upload report to
         # artifacts.
         ######################################################################
-        -   step: &run-module-unit-tests
+        -   step: &run-infra-unit-tests
                 name: "Run the infrastructure unit tests"
                 size: 2x
                 max-time: 30
@@ -88,6 +88,24 @@ definitions:
                     - infralicense/build/reports/**
                     - infraimages/build/reports/**
                     - infraresources/build/reports/**
+
+        ######################################################################
+        # Run the feature unit tests with coverage and upload report to
+        # artifacts.
+        ######################################################################
+        -   step: &run-feature-unit-tests
+                name: "Run the feature unit tests"
+                size: 2x
+                max-time: 30
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - source ci/pipeline/setup
+                    - bash ./ci/scanning/code_coverage_setup
+                    - ./gradlew featuredashboard:jacocoTestReport
+                artifacts:
+                    - featuredashboard/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -148,7 +166,7 @@ definitions:
         ######################################################################
         # Get all of the test and coverage reports from artifacts, upload
         # them to sonarcloud.io, and check that they pass the quality gateway.
-        # Sonarcloud requires Java 11 for the analysis. 
+        # Sonarcloud requires Java 11 for the analysis.
         ######################################################################
         -   step: &upload-sonar-scan-and-check-quality-gate
                 max-time: 30
@@ -357,7 +375,8 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-module-unit-tests
+                    -   step: *run-infra-unit-tests
+                    -   step: *run-feature-unit-tests
                     -   step: *build-and-sign-universal-apk
             -   step: *upload-sonar-scan-and-check-quality-gate
     -   flow: &release_flow
@@ -367,7 +386,8 @@ flows:
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
                     -   step: *run-fingerprintscanner-unit-tests
-                    -   step: *run-module-unit-tests
+                    -   step: *run-infra-unit-tests
+                    -   step: *run-feature-unit-tests
                     -   step: *build-and-sign-universal-apk
             -   step: *upload-sonar-scan-and-check-quality-gate
             -   step: *sign-and-deploy-to-staging
