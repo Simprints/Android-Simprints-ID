@@ -138,11 +138,13 @@ class CollectFingerprintsViewModel(
         }
     }
 
-   suspend fun start(fingerprintsToCapture: List<FingerIdentifier>) {
-        configuration = configManager.getProjectConfiguration().fingerprint!!
-        this.originalFingerprintsToCapture = fingerprintsToCapture
-        setStartingState()
-        startObserverForLiveFeedback()
+    fun start(fingerprintsToCapture: List<FingerIdentifier>) {
+        viewModelScope.launch {
+            configuration = configManager.getProjectConfiguration().fingerprint!!
+            originalFingerprintsToCapture = fingerprintsToCapture
+            setStartingState()
+            startObserverForLiveFeedback()
+        }
     }
 
     private fun startObserverForLiveFeedback() {

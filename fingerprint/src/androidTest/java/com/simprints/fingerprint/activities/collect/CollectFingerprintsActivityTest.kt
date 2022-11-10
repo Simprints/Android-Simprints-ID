@@ -116,7 +116,7 @@ class CollectFingerprintsActivityTest {
         every { launchReconnect } returns this@CollectFingerprintsActivityTest.launchReconnect
         every { finishWithFingerprints } returns this@CollectFingerprintsActivityTest.finishWithFingerprints
 
-        coEvery { start(any()) } answers {
+        every { start(any()) } answers {
             @Suppress("UNCHECKED_CAST")
             val fingers = (args.first() as List<FingerIdentifier>)
             this@CollectFingerprintsActivityTest.state.value = startingState(fingers)
