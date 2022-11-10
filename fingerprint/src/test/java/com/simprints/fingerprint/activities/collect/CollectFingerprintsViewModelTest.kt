@@ -108,7 +108,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun viewModel_start_beginsWithCorrectState() {
+    fun viewModel_start_beginsWithCorrectState()= runTest{
         vm.start(TWO_FINGERS_IDS)
 
         assertThat(vm.state()).isEqualTo(
@@ -129,7 +129,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun shouldNot_launchAlertScreen_whenOngoingFingerScan_isCancelled() {
+    fun shouldNot_launchAlertScreen_whenOngoingFingerScan_isCancelled()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(NEVER_RETURNS)
 
@@ -144,7 +144,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun scanPressed_noImageTransfer_updatesStateToScanningDuringScan() {
+    fun scanPressed_noImageTransfer_updatesStateToScanningDuringScan()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(NEVER_RETURNS)
         noImageTransfer()
@@ -156,24 +156,24 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun `test scanner supports imagetransfer then isImageTransferRequired should be true`() {
+    fun `test scanner supports imagetransfer then isImageTransferRequired should be true`() =  runTest {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns true
-
+        vm.start(TWO_FINGERS_IDS)
         assertThat(vm.isImageTransferRequired()).isTrue()
     }
 
     @Test
-    fun `test scanner doesn't support imageTransfer then isImageTransferRequired should be false`() {
+    fun `test scanner doesn't support imageTransfer then isImageTransferRequired should be false`()= runTest{
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns false
-
+        vm.start(TWO_FINGERS_IDS)
         assertThat(vm.isImageTransferRequired()).isFalse()
     }
 
     @Test
     @ExperimentalTime
-    fun scanPressed_withImageTransfer_updatesStateToTransferringImageAfterScan() {
+    fun scanPressed_withImageTransfer_updatesStateToTransferringImageAfterScan()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
@@ -196,7 +196,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun scanPressed_noImageTransfer_goodScan_updatesStatesCorrectlyAndCreatesEvent() {
+    fun scanPressed_noImageTransfer_goodScan_updatesStatesCorrectlyAndCreatesEvent()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
@@ -224,7 +224,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun scanPressed_withImageTransfer_goodScan_updatesStatesCorrectlyAndCreatesEvent() {
+    fun scanPressed_withImageTransfer_goodScan_updatesStatesCorrectlyAndCreatesEvent()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(OK)
@@ -252,7 +252,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun scanPressed_noImageTransfer_badScan_updatesStatesCorrectlyAndCreatesEvent() {
+    fun scanPressed_noImageTransfer_badScan_updatesStatesCorrectlyAndCreatesEvent()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(BAD_SCAN)
         noImageTransfer()
@@ -276,7 +276,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun scanPressed_withImageTransfer_badScan_doesNotTransferImage_updatesStatesCorrectlyAndCreatesEvent() {
+    fun scanPressed_withImageTransfer_badScan_doesNotTransferImage_updatesStatesCorrectlyAndCreatesEvent()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(BAD_SCAN)
         withImageTransfer()
@@ -300,7 +300,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun scanPressed_noFingerDetected_updatesStatesCorrectlyAndCreatesEvent() {
+    fun scanPressed_noFingerDetected_updatesStatesCorrectlyAndCreatesEvent()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(NO_FINGER_DETECTED)
         withImageTransfer()
@@ -314,7 +314,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects() {
+    fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects()= runTest{
         mockScannerSetUiIdle()
         coEvery {
             scanner.captureFingerprint(
@@ -334,7 +334,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun scanPressed_scannerDisconnectedDuringTransfer_updatesStateCorrectlyAndReconnects() {
+    fun scanPressed_scannerDisconnectedDuringTransfer_updatesStateCorrectlyAndReconnects()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(MockAcquireImageResult.DISCONNECTED)
@@ -403,7 +403,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun receivesOnlyBadScansThenConfirm_performsImageTransferEventually_resultsInCorrectStateAndSavesFingersCorrectly() {
+    fun receivesOnlyBadScansThenConfirm_performsImageTransferEventually_resultsInCorrectStateAndSavesFingersCorrectly()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(BAD_SCAN)
         acquireImageResponses(OK)
@@ -453,7 +453,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun receivesOnlyGoodScansThenConfirm_withImageTransfer_resultsInCorrectStateAndSavesFingersCorrectly() {
+    fun receivesOnlyGoodScansThenConfirm_withImageTransfer_resultsInCorrectStateAndSavesFingersCorrectly()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(OK)
@@ -507,7 +507,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun receivesOnlyGoodScansThenConfirm_noImageTransfer_resultsInCorrectStateAndReturnsFingersCorrectly() {
+    fun receivesOnlyGoodScansThenConfirm_noImageTransfer_resultsInCorrectStateAndReturnsFingersCorrectly()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
@@ -551,7 +551,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun goodScan_swipeBackThenRescan_updatesStateCorrectly() {
+    fun goodScan_swipeBackThenRescan_updatesStateCorrectly()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN, DIFFERENT_GOOD_SCAN)
         noImageTransfer()
@@ -584,7 +584,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun missingFinger_updatesStateCorrectly() {
+    fun missingFinger_updatesStateCorrectly()= runTest{
         mockScannerSetUiIdle()
 
         vm.start(TWO_FINGERS_IDS)
@@ -601,7 +601,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun receivesOnlyMissingFingersThenConfirm_showsToastAndResetsState() {
+    fun receivesOnlyMissingFingersThenConfirm_showsToastAndResetsState()= runTest{
         mockScannerSetUiIdle()
 
         vm.start(TWO_FINGERS_IDS)
@@ -647,7 +647,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun receivesMixOfScanResults_withImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() {
+    fun receivesMixOfScanResults_withImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(
             BAD_SCAN, NO_FINGER_DETECTED, BAD_SCAN, GOOD_SCAN,
@@ -744,7 +744,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun receivesMixOfScanResults_withEagerImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() {
+    fun receivesMixOfScanResults_withEagerImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(
             BAD_SCAN, NO_FINGER_DETECTED, BAD_SCAN, GOOD_SCAN,
@@ -843,7 +843,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun pressingCancel_duringScan_cancelsProperly() {
+    fun pressingCancel_duringScan_cancelsProperly()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(NEVER_RETURNS)
         withImageTransfer()
@@ -857,7 +857,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun pressingCancel_duringImageTransfer_doesNothing() {
+    fun pressingCancel_duringImageTransfer_doesNothing()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
@@ -890,7 +890,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun restartAfterScans_resetsStateCorrectly() {
+    fun restartAfterScans_resetsStateCorrectly()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(OK)
@@ -926,7 +926,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun backPressed_whileScanning_cancelsScanning() {
+    fun backPressed_whileScanning_cancelsScanning()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(NEVER_RETURNS)
         withImageTransfer()
@@ -939,7 +939,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun shouldLaunch_reconnectActivity_whenScanner_isNotAvailable() {
+    fun shouldLaunch_reconnectActivity_whenScanner_isNotAvailable()= runTest{
         every { scannerManager.isScannerAvailable } returns false
 
         vm.start(TWO_FINGERS_IDS)
@@ -951,7 +951,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun backPressed_whileTransferringImage_cancelsTransfer() {
+    fun backPressed_whileTransferringImage_cancelsTransfer()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
@@ -975,7 +975,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun backPressed_whileIdle_doesNothing() {
+    fun backPressed_whileIdle_doesNothing()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
@@ -997,7 +997,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun unexpectedErrorWhileScanning_launchesAlert() {
+    fun unexpectedErrorWhileScanning_launchesAlert()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(UNKNOWN_ERROR)
         noImageTransfer()
@@ -1010,7 +1010,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun onResumeCalled_registersScannerTrigger() {
+    fun onResumeCalled_registersScannerTrigger()= runTest{
         vm.start(TWO_FINGERS_IDS)
         vm.handleOnResume()
 
@@ -1018,7 +1018,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun onPauseCalled_unregistersScannerTrigger() {
+    fun onPauseCalled_unregistersScannerTrigger()= runTest{
         vm.start(TWO_FINGERS_IDS)
         vm.handleOnPause()
 
@@ -1026,7 +1026,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun whenStart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+    fun whenStart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted()= runTest{
         setupLiveFeedbackOn()
 
         vm.start(TWO_FINGERS_IDS)
@@ -1036,7 +1036,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun whenStart_AndLiveFeedbackIsNotEnabled_liveFeedbackIsNotStarted() {
+    fun whenStart_AndLiveFeedbackIsNotEnabled_liveFeedbackIsNotStarted()= runTest{
         vm.start(TWO_FINGERS_IDS)
 
         coVerify(exactly = 0) { scanner.startLiveFeedback() }
@@ -1044,7 +1044,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun whenScanButtonPressed_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() {
+    fun whenScanButtonPressed_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(NEVER_RETURNS)
         setupLiveFeedbackOn()
@@ -1057,7 +1057,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun whenGoodScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+    fun whenGoodScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN)
         setupLiveFeedbackOn()
@@ -1071,7 +1071,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun whenBadScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+    fun whenBadScan_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(BAD_SCAN)
         setupLiveFeedbackOn()
@@ -1085,7 +1085,7 @@ class CollectFingerprintsViewModelTest {
 
     @Test
     @ExperimentalTime
-    fun whenSecondScan_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() {
+    fun whenSecondScan_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused()= runTest{
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(GOOD_SCAN, NEVER_RETURNS)
         setupLiveFeedbackOn()
@@ -1111,7 +1111,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun whenRestart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() {
+    fun whenRestart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted()= runTest{
         mockScannerSetUiIdle()
         setupLiveFeedbackOn()
 
@@ -1123,7 +1123,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun whenPause_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped() {
+    fun whenPause_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped()= runTest{
         setupLiveFeedbackOn()
 
         vm.start(TWO_FINGERS_IDS)
@@ -1134,7 +1134,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun whenResume_AndLiveFeedbackWasStarted_liveFeedbackIsStarted() {
+    fun whenResume_AndLiveFeedbackWasStarted_liveFeedbackIsStarted()= runTest{
         setupLiveFeedbackOn()
 
         vm.start(TWO_FINGERS_IDS)
@@ -1160,7 +1160,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @ExperimentalTime
-    private fun getToEndOfWorkflow() {
+    private fun getToEndOfWorkflow()= runTest{
         setupCaptureFingerprintResponses(GOOD_SCAN)
         vm.start(TWO_FINGERS_IDS)
         repeat(2) {

@@ -84,12 +84,6 @@ class CollectFingerprintsViewModel(
 
     lateinit var configuration: FingerprintConfiguration
 
-    init {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            configuration = configManager.getProjectConfiguration().fingerprint!!
-        }
-    }
-
     val state = MutableLiveData<CollectFingerprintsState>()
     fun state() = state.value
         ?: throw IllegalStateException("No state available in CollectFingerprintsViewModel")
@@ -144,7 +138,8 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    fun start(fingerprintsToCapture: List<FingerIdentifier>) {
+   suspend fun start(fingerprintsToCapture: List<FingerIdentifier>) {
+        configuration = configManager.getProjectConfiguration().fingerprint!!
         this.originalFingerprintsToCapture = fingerprintsToCapture
         setStartingState()
         startObserverForLiveFeedback()
