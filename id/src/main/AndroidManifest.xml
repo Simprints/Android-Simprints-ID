@@ -41,7 +41,7 @@
             android:name=".activities.consent.ConsentActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
+            android:name="com.simprints.feature.dashboard.DashboardActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
