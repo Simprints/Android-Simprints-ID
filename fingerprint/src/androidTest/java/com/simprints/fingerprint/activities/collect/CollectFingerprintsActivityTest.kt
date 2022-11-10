@@ -109,7 +109,6 @@ class CollectFingerprintsActivityTest {
             mockCoroutineScope, mockDispatcher
         )
     ) {
-        every { start(any()) } just Runs
         every { state } returns this@CollectFingerprintsActivityTest.state
         every { vibrate } returns this@CollectFingerprintsActivityTest.vibrate
         every { noFingersScannedToast } returns this@CollectFingerprintsActivityTest.noFingersScannedToast
@@ -117,7 +116,7 @@ class CollectFingerprintsActivityTest {
         every { launchReconnect } returns this@CollectFingerprintsActivityTest.launchReconnect
         every { finishWithFingerprints } returns this@CollectFingerprintsActivityTest.finishWithFingerprints
 
-        every { start(any()) } answers {
+        coEvery { start(any()) } answers {
             @Suppress("UNCHECKED_CAST")
             val fingers = (args.first() as List<FingerIdentifier>)
             this@CollectFingerprintsActivityTest.state.value = startingState(fingers)
