@@ -45,7 +45,7 @@ dependencies {
     // We specifically don't include Crashlytics, Analytics, Performance monitoring and Timber in
     // the central buildSrc module because we do not want or expect these dependencies to be used in
     // multiple modules
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.3.1")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.3.2")
     implementation("com.google.firebase:firebase-analytics-ktx:21.2.0")
     implementation("com.google.firebase:firebase-perf:20.2.0")
 
