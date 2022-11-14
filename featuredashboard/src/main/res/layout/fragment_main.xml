@@ -1,26 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/simprints_blue"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".DashboardActivity">
+    android:fitsSystemWindows="true"
+    android:theme="@style/AppTheme">
 
-    <ImageView
-        android:id="@+id/loginImageViewLogo"
-        android:layout_width="55dp"
-        android:layout_height="75dp"
-        android:layout_centerInParent="true"
-        android:src="@drawable/simprints_logo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/dashboardToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:menu="@menu/app_menu"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:background="?attr/colorPrimary">
+
+        <LinearLayout
+            android:id="@+id/dashboard_cards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/vertical_spacing_dashboard_cards"
+            android:paddingBottom="@dimen/vertical_spacing_dashboard_cards">
+
+            <fragment
+                android:id="@+id/dashboard_project_details"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.simprints.feature.dashboard.projectdetails.ProjectDetailsFragment"
+                tools:layout="@layout/fragment_dashboard_card_project_details" />
+
+            <LinearLayout
+                android:id="@+id/dashboard_sync_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_spacing_dashboard_cards"
+                android:layout_marginBottom="@dimen/vertical_spacing_dashboard_cards"
+                android:orientation="vertical" />
+
+            <include
+                android:id="@+id/dashboard_daily_activity"
+                layout="@layout/fragment_dashboard_card_daily_activity" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

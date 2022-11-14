@@ -13,7 +13,7 @@ import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class RequestLoginFragment : Fragment(R.layout.fragment_request_login) {
+internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) {
 
     private val binding by viewBinding(FragmentRequestLoginBinding::bind)
 

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dashboard_navigation"
-    app:startDestination="@id/mainFragment">
+    app:startDestination="@id/baseFragment">
 
     <fragment
         android:id="@+id/requestLoginFragment"
@@ -11,12 +11,20 @@
         android:label="RequestLoginFragment"
         tools:layout="@layout/fragment_request_login"/>
     <fragment
+        android:id="@+id/baseFragment"
+        android:name="com.simprints.feature.dashboard.base.BaseFragment"
+        android:label="BaseFragment"
+        tools:layout="@layout/fragment_base">
+        <action
+            android:id="@+id/action_baseFragment_to_requestLoginFragment"
+            app:destination="@id/requestLoginFragment" />
+        <action
+            android:id="@+id/action_baseFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/mainFragment"
         android:name="com.simprints.feature.dashboard.main.MainFragment"
         android:label="MainFragment"
-        tools:layout="@layout/fragment_main">
-        <action
-            android:id="@+id/action_mainFragment_to_requestLoginFragment"
-            app:destination="@id/requestLoginFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_main" />
 </navigation>
