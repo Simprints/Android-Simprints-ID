@@ -11,6 +11,7 @@ import com.simprints.infra.security.keyprovider.LocalDbKey
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.exceptions.RealmFileException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -29,7 +30,12 @@ class RealmWrapperImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             Simber.tag(LoggingConstants.CrashReportTag.REALM_DB.name)
                 .d("[RealmWrapperImpl] getting new realm instance")
-            Realm.getInstance(config).use(block)
+            try {
+                Realm.getInstance(config).use(block)
+            } catch (ex: RealmFileException) {
+                Realm.deleteRealm(config)
+                useRealmInstance(block)
+            }
         }
 
     private val config: RealmConfiguration by lazy {
