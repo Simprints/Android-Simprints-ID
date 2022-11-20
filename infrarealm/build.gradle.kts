@@ -28,6 +28,7 @@ dependencies {
 
     // Unit Tests
 
+    implementation(libs.testing.robolectric.core)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)
