@@ -27,7 +27,6 @@ dependencies {
     kapt(libs.hilt.kapt)
 
     // Unit Tests
-    testImplementation(project(":testtools"))
 
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.junit)
