@@ -24,7 +24,7 @@ buildscript {
 
         classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
 
-        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.13.1")
+        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.14.1")
         classpath("org.gradle:test-retry-gradle-plugin:1.4.1")
 
         // Firebase
@@ -40,10 +40,10 @@ buildscript {
 
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.7.0")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:3.1.0")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:3.1.1")
 
         // Hilt
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.44.1")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.44.2")
     }
 
 }
