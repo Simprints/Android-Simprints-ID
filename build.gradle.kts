@@ -22,7 +22,7 @@ buildscript {
         // CI Scanning & Retry
         classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.5.0.2730")
 
-        classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
+        classpath("org.jacoco:org.jacoco.core:${libs.versions.jacoco.version.get()}")
 
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.14.1")
         classpath("org.gradle:test-retry-gradle-plugin:1.4.1")
