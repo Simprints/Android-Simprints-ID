@@ -9,7 +9,13 @@
         android:id="@+id/requestLoginFragment"
         android:name="com.simprints.feature.dashboard.requestlogin.RequestLoginFragment"
         android:label="RequestLoginFragment"
-        tools:layout="@layout/fragment_request_login"/>
+        tools:layout="@layout/fragment_request_login">
+        <action
+            android:id="@+id/action_requestLoginFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true" />
+    </fragment>
     <fragment
         android:id="@+id/baseFragment"
         android:name="com.simprints.feature.dashboard.base.BaseFragment"
@@ -17,10 +23,14 @@
         tools:layout="@layout/fragment_base">
         <action
             android:id="@+id/action_baseFragment_to_requestLoginFragment"
-            app:destination="@id/requestLoginFragment" />
+            app:destination="@id/requestLoginFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_baseFragment_to_mainFragment"
-            app:destination="@id/mainFragment" />
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/mainFragment"

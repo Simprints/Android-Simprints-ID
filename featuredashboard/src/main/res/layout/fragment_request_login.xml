@@ -33,9 +33,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="43dp"
+            android:text="@string/libsimprints_label"
             android:textColor="@color/simprints_white"
-            android:textSize="15sp"
-            tools:text="LibSimprints" />
+            android:textSize="15sp" />
 
 
         <TextView
@@ -45,7 +45,7 @@
             android:layout_marginTop="5dp"
             android:textColor="@color/simprints_white"
             android:textSize="15sp"
-            tools:text="Simprints ID: 0.0.0-dev+1"/>
+            tools:text="Simprints ID: 0.0.0-dev+1" />
 
         <TextView
             android:id="@+id/requestLogin"
@@ -53,9 +53,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:gravity="center"
+            android:text="@string/requestLogin_message"
             android:textColor="@color/simprints_white"
-            android:textSize="20sp"
-            tools:text="You need to login. Please use your client app to open Simprints ID and log in."/>
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/tv_device_id"

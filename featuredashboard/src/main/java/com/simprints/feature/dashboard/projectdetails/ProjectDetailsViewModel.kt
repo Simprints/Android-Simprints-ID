@@ -26,12 +26,10 @@ internal class ProjectDetailsViewModel @Inject constructor(
     private val _projectCardStateLiveData = MutableLiveData<DashboardProjectState>()
 
     init {
-        viewModelScope.launch(dispatcher) {
-            load()
-        }
+        load()
     }
 
-    private suspend fun load() {
+    fun load() = viewModelScope.launch(dispatcher) {
         val projectId = loginManager.getSignedInProjectIdOrEmpty()
         val cachedProject = configManager.getProject(projectId)
         val recentUserActivity = recentUserActivityManager.getRecentUserActivity()

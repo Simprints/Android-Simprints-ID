@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.master.models
+package com.simprints.eventsystem.events_sync.models
 
 import androidx.annotation.Keep
 
@@ -10,6 +10,7 @@ data class EventSyncState(val syncId: String,
                           val downSyncWorkersInfo: List<SyncWorkerInfo>) {
 
     data class SyncWorkerInfo(val type: EventSyncWorkerType,
-                              val state: EventSyncWorkerState)
+                              val state: EventSyncWorkerState
+    )
 
 }

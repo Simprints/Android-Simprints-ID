@@ -9,8 +9,8 @@ import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.models.EventSyncState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
+import com.simprints.eventsystem.events_sync.models.EventSyncState
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.id.tools.extensions.toGroup
 import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager

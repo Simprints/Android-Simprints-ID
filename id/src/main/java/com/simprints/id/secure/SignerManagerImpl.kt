@@ -10,6 +10,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.SimNetwork
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import javax.inject.Inject
 
 class SignerManagerImpl @Inject constructor(
@@ -19,6 +20,7 @@ class SignerManagerImpl @Inject constructor(
     private val syncManager: SyncManager,
     private val securityStateScheduler: SecurityStateScheduler,
     private val longConsentRepository: LongConsentRepository,
+    private val recentUserActivityManager: RecentUserActivityManager,
     private val simNetwork: SimNetwork,
 ) : SignerManager {
 
@@ -40,6 +42,7 @@ class SignerManagerImpl @Inject constructor(
         longConsentRepository.deleteLongConsents()
         simNetwork.resetApiBaseUrl()
         configManager.clearData()
+        recentUserActivityManager.clearRecentActivity()
 
         Simber.tag(LoggingConstants.CrashReportTag.LOGOUT.name).i("Signed out")
     }

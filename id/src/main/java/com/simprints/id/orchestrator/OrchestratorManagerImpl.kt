@@ -5,12 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.WorkManager
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.common.FlowProvider.FlowType.*
-import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
@@ -22,6 +23,7 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import splitties.init.appCtx
 import javax.inject.Inject
 
@@ -29,7 +31,8 @@ class OrchestratorManagerImpl @Inject constructor(
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
     private val hotCache: HotCache,
-    private val dashboardDailyActivityRepository: DashboardDailyActivityRepository,
+    private val recentUserActivityManager: RecentUserActivityManager,
+    private val timeHelper: TimeHelper,
     private val personCreationEventHelper: PersonCreationEventHelper
 ) : OrchestratorManager, FlowProvider {
 
@@ -136,10 +139,39 @@ class OrchestratorManagerImpl @Inject constructor(
             modalities, hotCache.appRequest, steps, sessionId
         )
 
-        dashboardDailyActivityRepository.updateDailyActivity(appResponseToReturn)
+        updateDailyActivity(appResponseToReturn)
         ongoingStep.value = null
         appResponse.value = appResponseToReturn
     }
+
+    private suspend fun updateDailyActivity(appResponse: AppResponse) {
+        when (appResponse.type) {
+            AppResponseType.ENROL -> recentUserActivityManager.updateRecentUserActivity {
+                it.apply {
+                    it.enrolmentsToday++
+                    it.lastActivityTime = timeHelper.now()
+                }
+            }
+            AppResponseType.IDENTIFY -> recentUserActivityManager.updateRecentUserActivity {
+                it.apply {
+                    it.identificationsToday++
+                    it.lastActivityTime = timeHelper.now()
+                }
+            }
+            AppResponseType.VERIFY -> recentUserActivityManager.updateRecentUserActivity {
+                it.apply {
+                    it.verificationsToday++
+                    it.lastActivityTime = timeHelper.now()
+                }
+            }
+            AppResponseType.REFUSAL,
+            AppResponseType.CONFIRMATION,
+            AppResponseType.ERROR -> {
+                //Other cases are ignore and we don't show info in dashboard for it
+            }
+        }
+    }
+
 
     private fun resetInternalState() {
         appResponse.value = null

@@ -419,3 +419,17 @@ object IdDependenciesModule {
         DomainToModuleApiAppResponse
 
 }
+
+// TODO remove when the event sync manager has been moved into its one module
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class TemporaryFeatureDashboardModule {
+    @Binds
+    abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): com.simprints.feature.dashboard.sync.EventSyncManager
+
+    @Binds
+    abstract fun provideEventSyncCache(impl: EventSyncCacheImpl): com.simprints.feature.dashboard.sync.EventSyncCache
+
+    @Binds
+    abstract fun provideDeviceManager(impl: DeviceManagerImpl): com.simprints.feature.dashboard.sync.DeviceManager
+}

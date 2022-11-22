@@ -13,11 +13,11 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.models.EventSyncState
-import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
+import com.simprints.eventsystem.events_sync.models.EventSyncState
+import com.simprints.eventsystem.events_sync.models.EventSyncState.SyncWorkerInfo
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState.*
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.*
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration

@@ -6,8 +6,8 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.EventSyncState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
+import com.simprints.eventsystem.events_sync.models.EventSyncState
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -161,17 +161,17 @@ class DashboardSyncCardStateRepositoryImpl @Inject constructor(
     }
 
     private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
+        allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseCloudIntegration }
 
     private fun isSyncFailedBecauseTooManyRequests(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseTooManyRequest }
+        allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseTooManyRequest }
 
     private fun isSyncFailedBecauseBackendMaintenance(allSyncStates: List<EventSyncState.SyncWorkerInfo>): Boolean {
         val isBackendMaintenance =
-            allSyncStates.any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseBackendMaintenance }
+            allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseBackendMaintenance }
         if (isBackendMaintenance) {
             val syncWorkerInfo =
-                allSyncStates.find { it.state is EventSyncWorkerState.Failed && it.state.estimatedOutage != 0L }
+                allSyncStates.find { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).estimatedOutage != 0L }
             val failedWorkerState = syncWorkerInfo?.state as EventSyncWorkerState.Failed?
             estimatedOutage = failedWorkerState?.estimatedOutage
         }

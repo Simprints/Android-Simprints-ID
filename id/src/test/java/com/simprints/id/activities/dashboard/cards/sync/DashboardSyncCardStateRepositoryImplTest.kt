@@ -10,11 +10,11 @@ import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl.Companion.MAX_TIME_BEFORE_SYNC_AGAIN
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.EventSyncState
-import com.simprints.id.services.sync.events.master.models.EventSyncState.SyncWorkerInfo
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UP_COUNTER
+import com.simprints.eventsystem.events_sync.models.EventSyncState
+import com.simprints.eventsystem.events_sync.models.EventSyncState.SyncWorkerInfo
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState.*
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.DOWN_COUNTER
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.UP_COUNTER
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.TestTimeHelperImpl
 import com.simprints.id.tools.device.DeviceManager

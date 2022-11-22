@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.master.models
+package com.simprints.eventsystem.events_sync.models
 
 
 enum class EventSyncWorkerType {
