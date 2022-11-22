@@ -21,7 +21,7 @@ internal class ProjectDetailsFragment : Fragment(R.layout.fragment_dashboard_car
         viewModel.projectCardStateLiveData.observe(viewLifecycleOwner) {
             binding.dashboardProjectDetailsCardTitle.text = it.title
             binding.dashboardProjectDetailsCardCurrentUser.text = String.format(
-                view.context.getString(IDR.string.dashboard_card_current_user),
+                getString(IDR.string.dashboard_card_current_user),
                 it.lastUser
             )
             with(binding.dashboardProjectDetailsCardScannerUsed) {
@@ -36,5 +36,10 @@ internal class ProjectDetailsFragment : Fragment(R.layout.fragment_dashboard_car
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.load()
     }
 }

@@ -57,6 +57,8 @@ dependencies {
 
     implementation(libs.sqlCipher.core)
 
+    implementation(libs.workManager.work)
+
     // DI
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)

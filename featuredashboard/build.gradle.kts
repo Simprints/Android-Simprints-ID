@@ -18,12 +18,15 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
+    implementation(project(":eventsystem"))
     implementation(project(":infraconfig"))
     implementation(project(":infralogin"))
     implementation(project(":infralogging"))
     implementation(project(":infrarecentuseractivity"))
     implementation(project(":infraresources"))
 
+    implementation(libs.androidX.appcompat)
+    implementation(libs.androidX.appcompat.resource)
     implementation(libs.androidX.ui.constraintlayout)
 
     // DI
@@ -35,6 +38,7 @@ dependencies {
     implementation(libs.androidX.navigation.ui)
 
     // Fragment
+    implementation(libs.androidX.activity)
     implementation(libs.androidX.ui.fragment.kotlin)
 
     // Unit Tests

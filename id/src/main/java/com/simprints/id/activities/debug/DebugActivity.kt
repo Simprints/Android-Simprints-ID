@@ -19,8 +19,8 @@ import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState.*
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.login.LoginManager

@@ -11,28 +11,30 @@ import com.simprints.feature.dashboard.tools.FRAGMENT_TAG
 import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
 import com.simprints.feature.dashboard.tools.moveToState
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.login.LoginManagerModule
 import dagger.hilt.android.testing.*
 import io.mockk.every
-import io.mockk.mockk
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 @Config(application = HiltTestApplication::class)
-@UninstallModules(LoginManagerModule::class)
 class BaseFragmentTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
-    @BindValue
-    @JvmField
-    val loginManager = mockk<LoginManager>()
+    @Inject
+    lateinit var loginManager: LoginManager
 
+    @Before
+    fun setup() {
+        hiltRule.inject()
+    }
 
     @Test
     fun `should redirect to the request login fragment if the user is not logged in`() {

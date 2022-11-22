@@ -1,7 +1,7 @@
 package com.simprints.feature.dashboard
 
-import androidx.appcompat.app.AppCompatActivity
+import com.simprints.core.tools.activity.BaseSplitActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DashboardActivity : AppCompatActivity(R.layout.activity_dashboard_main)
+class DashboardActivity : BaseSplitActivity(R.layout.activity_dashboard_main)

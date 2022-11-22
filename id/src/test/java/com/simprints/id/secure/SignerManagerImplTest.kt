@@ -11,6 +11,7 @@ import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.SimNetwork
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -40,6 +41,9 @@ class SignerManagerImplTest {
     lateinit var mockLongConsentRepository: LongConsentRepository
 
     @MockK
+    lateinit var mockRecentUserActivityManager: RecentUserActivityManager
+
+    @MockK
     lateinit var mockSimNetwork: SimNetwork
 
     private lateinit var signerManager: SignerManagerImpl
@@ -62,6 +66,7 @@ class SignerManagerImplTest {
             mockSyncManager,
             mockSecurityStateScheduler,
             mockLongConsentRepository,
+            mockRecentUserActivityManager,
             mockSimNetwork,
         )
     }
@@ -181,6 +186,13 @@ class SignerManagerImplTest {
         signerManager.signOut()
 
         verify { mockSimNetwork.resetApiBaseUrl() }
+    }
+
+    @Test
+    fun signOut_recentActivityIsCleared() = runTest(UnconfinedTestDispatcher()) {
+        signerManager.signOut()
+
+        coVerify { mockRecentUserActivityManager.clearRecentActivity() }
     }
 
     @Test
