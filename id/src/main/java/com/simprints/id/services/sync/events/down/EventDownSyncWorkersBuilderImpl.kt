@@ -33,7 +33,7 @@ class EventDownSyncWorkersBuilderImpl @Inject constructor(
             deviceConfiguration.selectedModules,
             projectConfiguration.synchronization.down.partitionType.toGroup()
         )
-        println(projectConfiguration.general.modalities)
+
         val uniqueDownSyncId = UUID.randomUUID().toString()
         return downSyncScope.operations.map {
             buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it)
