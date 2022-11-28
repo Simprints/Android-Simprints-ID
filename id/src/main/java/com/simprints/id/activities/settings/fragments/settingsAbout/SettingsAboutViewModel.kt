@@ -30,8 +30,9 @@ class SettingsAboutViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatcher) {
-            configuration.postValue(configManager.getProjectConfiguration())
-            recentUserActivity.postValue(recentUserActivityManager.getRecentUserActivity())
+            //Adding "this" in front of livedata to fix NullSafeMutableLiveData lint issues
+            this@SettingsAboutViewModel.configuration.postValue(configManager.getProjectConfiguration())
+            this@SettingsAboutViewModel.recentUserActivity.postValue(recentUserActivityManager.getRecentUserActivity())
         }
     }
 
