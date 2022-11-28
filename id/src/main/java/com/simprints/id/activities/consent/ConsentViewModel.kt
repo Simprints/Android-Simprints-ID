@@ -26,9 +26,11 @@ class ConsentViewModel @Inject constructor(
 
     val configuration = MutableLiveData<ProjectConfiguration>()
 
+
     init {
         viewModelScope.launch(dispatcher) {
-            configuration.postValue(configManager.getProjectConfiguration())
+            //Adding "this" in front of livedata to fix NullSafeMutableLiveData lint issues
+            this@ConsentViewModel.configuration.postValue(configManager.getProjectConfiguration())
         }
     }
 
