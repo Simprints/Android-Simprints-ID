@@ -17,6 +17,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
+//Livedata is throwing NullSafeMutableLiveData which is unreal problem
+//For more information, please check this issue https://issuetracker.google.com/issues/214428166
+@Suppress("NullSafeMutableLiveData")
 class ConsentViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val eventRepository: EventRepository,
@@ -29,8 +32,7 @@ class ConsentViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatcher) {
-            //Adding "this" in front of livedata to fix NullSafeMutableLiveData lint issues
-            this@ConsentViewModel.configuration.postValue(configManager.getProjectConfiguration())
+            configuration.postValue(configManager.getProjectConfiguration())
         }
     }
 
