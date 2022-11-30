@@ -17,6 +17,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
+//Livedata is throwing NullSafeMutableLiveData which is unreal problem
+//For more information, please check this issue https://issuetracker.google.com/issues/214428166
+@Suppress("NullSafeMutableLiveData")
 class SettingsAboutViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val signerManager: SignerManager,
@@ -30,9 +33,8 @@ class SettingsAboutViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatcher) {
-            //Adding "this" in front of livedata to fix NullSafeMutableLiveData lint issues
-            this@SettingsAboutViewModel.configuration.postValue(configManager.getProjectConfiguration())
-            this@SettingsAboutViewModel.recentUserActivity.postValue(recentUserActivityManager.getRecentUserActivity())
+            configuration.postValue(configManager.getProjectConfiguration())
+            recentUserActivity.postValue(recentUserActivityManager.getRecentUserActivity())
         }
     }
 
