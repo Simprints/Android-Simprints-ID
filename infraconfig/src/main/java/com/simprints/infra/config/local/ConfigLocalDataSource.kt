@@ -23,4 +23,12 @@ internal interface ConfigLocalDataSource {
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
 
     suspend fun clearDeviceConfiguration()
+
+    fun hasPrivacyNoticeFor(projectId: String, language: String): Boolean
+
+    fun storePrivacyNotice(projectId: String,language: String, content: String)
+
+    fun getPrivacyNotice(projectId: String, language: String): String
+
+    fun deletePrivacyNotices()
 }

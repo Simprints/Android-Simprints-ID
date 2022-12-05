@@ -29,7 +29,7 @@ class EventSyncManagerImpl @Inject constructor(
     private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
     @DispatcherIO private val dispatcher: CoroutineDispatcher
-) : EventSyncManager, com.simprints.feature.dashboard.sync.EventSyncManager {
+) : EventSyncManager, com.simprints.feature.dashboard.main.sync.EventSyncManager {
 
     companion object {
         private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES

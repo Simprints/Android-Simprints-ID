@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/txtModuleName"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingStart="@dimen/padding_large"
+    android:paddingTop="@dimen/padding_default"
+    android:paddingEnd="@dimen/padding_large"
+    android:paddingBottom="@dimen/padding_default"
+    tools:text="Module A" />

@@ -63,19 +63,19 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        viewModel.getPrivacyNoticeViewStateLiveData().observe(this, Observer {
+        viewModel.getPrivacyNoticeViewStateLiveData().observe(this) {
             when (it) {
-                is PrivacyNoticeViewState.ConsentAvailable -> setConsentAvailable(it)
-                is PrivacyNoticeViewState.ConsentNotAvailable -> setConsentNotAvailable()
-                is PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(
+                is PrivacyNoticeState.ConsentAvailable -> setConsentAvailable(it)
+                is PrivacyNoticeState.ConsentNotAvailable -> setConsentNotAvailable()
+                is PrivacyNoticeState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(
                     it.estimatedOutage
                 )
-                is PrivacyNoticeViewState.DownloadInProgress -> setDownloadProgress()
+                is PrivacyNoticeState.DownloadInProgress -> setDownloadProgress()
             }
-        })
+        }
     }
 
-    private fun setConsentAvailable(consentAvailableState: PrivacyNoticeViewState.ConsentAvailable) {
+    private fun setConsentAvailable(consentAvailableState: PrivacyNoticeState.ConsentAvailable) {
         val consent = consentAvailableState.consent
         if (consent.isEmpty()) {
             setNoPrivacyNoticeFound()

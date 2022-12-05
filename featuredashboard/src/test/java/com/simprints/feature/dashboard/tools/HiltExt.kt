@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import com.simprints.feature.dashboard.HiltTestActivity
@@ -28,6 +30,7 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     fragmentArgs: Bundle? = null,
     initialState: Lifecycle.State = Lifecycle.State.RESUMED,
     @StyleRes themeResId: Int = androidx.appcompat.R.style.Theme_AppCompat,
+    navController: NavController? = null,
     crossinline action: Fragment.() -> Unit = {}
 ) {
     val startActivityIntent = Intent.makeMainActivity(
@@ -51,6 +54,10 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
             .add(android.R.id.content, fragment, FRAGMENT_TAG)
             .setMaxLifecycle(fragment, initialState)
             .commitNow()
+
+        navController?.also {
+            Navigation.setViewNavController(fragment.requireView(), it)
+        }
 
         fragment.action()
     }
