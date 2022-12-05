@@ -1,10 +1,12 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import io.mockk.*
@@ -16,6 +18,9 @@ class ModuleRepositoryImplTest {
 
     private val downSynchronizationConfiguration = mockk<DownSynchronizationConfiguration>()
     private val projectConfiguration = mockk<ProjectConfiguration> {
+        every { general } returns mockk {
+            every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        }
         every { synchronization } returns mockk {
             every { down } returns downSynchronizationConfiguration
         }
@@ -91,7 +96,7 @@ class ModuleRepositoryImplTest {
         repository.saveModules(modules)
 
         coVerify(exactly = 1) {
-            eventDownSyncScopeRepository.deleteOperations(unselectedModules, any())
+            eventDownSyncScopeRepository.deleteOperations(unselectedModules, listOf(Modes.FINGERPRINT))
         }
     }
 
