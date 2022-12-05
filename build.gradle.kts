@@ -20,12 +20,12 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.version.get()}")
 
         // CI Scanning & Retry
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3")
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.5.0.2730")
 
-        classpath("org.jacoco:org.jacoco.core:${Plugins.jacoco}")
+        classpath("org.jacoco:org.jacoco.core:${libs.versions.jacoco.version.get()}")
 
-        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.13.1")
-        classpath("org.gradle:test-retry-gradle-plugin:1.4.1")
+        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.17.0")
+        classpath("org.gradle:test-retry-gradle-plugin:1.5.0")
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.14")
@@ -40,10 +40,10 @@ buildscript {
 
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.7.0")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:3.1.0")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:3.1.1")
 
         // Hilt
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.44")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.44.2")
     }
 
 }
@@ -84,7 +84,7 @@ tasks.register("runAllJacocoTests", GradleBuild::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.4.1"
+    id("org.gradle.test-retry") version "1.5.0"
 }
 
 /*
