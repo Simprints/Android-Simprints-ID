@@ -30,7 +30,6 @@ hilt_version = "2.44"
 hilt_androidx_version = "1.0.0"
 datastore_version = "1.0.0"
 protobuf_version = "3.21.9"
-activity_version = "1.6.1"
 
 
 [libraries]
@@ -40,7 +39,6 @@ kotlin-coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-
 kotlin-coroutinesPlayServices = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlin_coroutine_version" }
 kotlin-coroutine_rx2_adapter = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.4"
 #AndroidX
-androidX-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity_version" }
 androidX-core = "androidx.core:core-ktx:1.9.0"
 androidX-multidex = "androidx.multidex:multidex:2.0.1"
 androidX-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "app_compat_version" }
@@ -195,6 +193,7 @@ testing-Mockk-core = "io.mockk:mockk:1.13.2"
 testing-Mockk-android = "io.mockk:mockk-android:1.13.2"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
+testing-Espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso_version" }
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
 testing-Espresso-barista = "com.adevinta.android:barista:4.2.0" #Used to grant permissions in AndroidTests
 #Testing-AndroidX

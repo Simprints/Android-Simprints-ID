@@ -15,10 +15,11 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/dashboardToolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="@color/colorPrimary"
             app:menu="@menu/app_menu"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:title="@string/dashboard_label" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -33,27 +34,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingHorizontal="12dp"
             android:paddingTop="@dimen/vertical_spacing_dashboard_cards"
             android:paddingBottom="@dimen/vertical_spacing_dashboard_cards">
 
-            <fragment
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/dashboard_project_details"
-                android:name="com.simprints.feature.dashboard.projectdetails.ProjectDetailsFragment"
+                android:name="com.simprints.feature.dashboard.main.projectdetails.ProjectDetailsFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_dashboard_card_project_details" />
 
-            <fragment
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/dashboard_sync"
-                android:name="com.simprints.feature.dashboard.sync.SyncFragment"
+                android:name="com.simprints.feature.dashboard.main.sync.SyncFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/vertical_spacing_dashboard_cards"
                 tools:layout="@layout/fragment_dashboard_card_sync" />
 
-            <fragment
+            <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/dashboard_daily_activity"
-                android:name="com.simprints.feature.dashboard.dailyactivity.DailyActivityFragment"
+                android:name="com.simprints.feature.dashboard.main.dailyactivity.DailyActivityFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/vertical_spacing_dashboard_cards"

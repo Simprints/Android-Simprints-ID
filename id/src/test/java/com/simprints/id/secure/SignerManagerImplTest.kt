@@ -2,7 +2,6 @@ package com.simprints.id.secure
 
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -38,9 +37,6 @@ class SignerManagerImplTest {
     lateinit var mockSecurityStateScheduler: SecurityStateScheduler
 
     @MockK
-    lateinit var mockLongConsentRepository: LongConsentRepository
-
-    @MockK
     lateinit var mockRecentUserActivityManager: RecentUserActivityManager
 
     @MockK
@@ -65,7 +61,6 @@ class SignerManagerImplTest {
             mockEventSyncManager,
             mockSyncManager,
             mockSecurityStateScheduler,
-            mockLongConsentRepository,
             mockRecentUserActivityManager,
             mockSimNetwork,
         )
@@ -172,13 +167,6 @@ class SignerManagerImplTest {
         signerManager.signOut()
 
         coVerify { mockSyncManager.cancelBackgroundSyncs() }
-    }
-
-    @Test
-    fun signOut_longConsentsAreDeleted() = runTest(UnconfinedTestDispatcher()) {
-        signerManager.signOut()
-
-        verify(exactly = 1) { mockLongConsentRepository.deleteLongConsents() }
     }
 
     @Test

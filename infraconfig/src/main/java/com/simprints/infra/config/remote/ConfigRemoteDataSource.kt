@@ -8,4 +8,6 @@ internal interface ConfigRemoteDataSource {
     suspend fun getConfiguration(projectId: String): ProjectConfiguration
 
     suspend fun getProject(projectId: String): Project
+
+    suspend fun getPrivacyNotice(projectId: String, fileId: String): String
 }

@@ -18,9 +18,11 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class ConfigLocalDataSourceImplTest {
@@ -29,6 +31,10 @@ class ConfigLocalDataSourceImplTest {
         private const val TEST_PROJECT_DATASTORE_NAME: String = "test_project_datastore"
         private const val TEST_CONFIG_DATASTORE_NAME: String = "test_config_datastore"
         private const val TEST_DEVICE_CONFIG_DATASTORE_NAME: String = "test_device_config_datastore"
+        private const val ABSOLUTE_PATH = "test"
+        private const val PROJECT_ID = "projectId"
+        private const val LANGUAGE = "en"
+        private const val PRIVACY_NOTICE = "privacy"
     }
 
     private val testContext = InstrumentationRegistry.getInstrumentation().targetContext
@@ -46,6 +52,7 @@ class ConfigLocalDataSourceImplTest {
     )
     private val configLocalDataSourceImpl =
         ConfigLocalDataSourceImpl(
+            ABSOLUTE_PATH,
             testProjectDataStore,
             testProjectConfigDataStore,
             testDeviceConfigDataStore
@@ -54,6 +61,11 @@ class ConfigLocalDataSourceImplTest {
     @Before
     fun setup() {
         LanguageHelper.init(mockk(relaxed = true))
+    }
+
+    @After
+    fun teardown() {
+        File(ABSOLUTE_PATH).deleteRecursively()
     }
 
     @Test
@@ -246,5 +258,39 @@ class ConfigLocalDataSourceImplTest {
 
         val savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
         assertThat(savedDeviceConfiguration.language).isEqualTo("")
+    }
+
+    @Test
+    fun `should store the privacy notice correctly`() {
+        configLocalDataSourceImpl.storePrivacyNotice(PROJECT_ID, LANGUAGE, PRIVACY_NOTICE)
+
+        val privacyNotice = configLocalDataSourceImpl.getPrivacyNotice(PROJECT_ID, LANGUAGE)
+        assertThat(privacyNotice).isEqualTo(PRIVACY_NOTICE)
+    }
+
+    @Test
+    fun `hasPrivacyNoticeFor should return false if the privacy notice doesn't exist`() {
+        val exist = configLocalDataSourceImpl.hasPrivacyNoticeFor(PROJECT_ID, LANGUAGE)
+        assertThat(exist).isEqualTo(false)
+    }
+
+    @Test
+    fun `hasPrivacyNoticeFor should return true if the privacy notice exists`() {
+        configLocalDataSourceImpl.storePrivacyNotice(PROJECT_ID, LANGUAGE, PRIVACY_NOTICE)
+
+        val exist = configLocalDataSourceImpl.hasPrivacyNoticeFor(PROJECT_ID, LANGUAGE)
+        assertThat(exist).isEqualTo(true)
+    }
+
+    @Test
+    fun `deletePrivacyNotices should delete all the privacy notices`() {
+        configLocalDataSourceImpl.storePrivacyNotice(PROJECT_ID, LANGUAGE, PRIVACY_NOTICE)
+        var exist = configLocalDataSourceImpl.hasPrivacyNoticeFor(PROJECT_ID, LANGUAGE)
+        assertThat(exist).isEqualTo(true)
+
+        configLocalDataSourceImpl.deletePrivacyNotices()
+
+        exist = configLocalDataSourceImpl.hasPrivacyNoticeFor(PROJECT_ID, LANGUAGE)
+        assertThat(exist).isEqualTo(false)
     }
 }

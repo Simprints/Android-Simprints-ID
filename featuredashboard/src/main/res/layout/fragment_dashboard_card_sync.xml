@@ -6,7 +6,7 @@
     style="@style/DashboardCardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".sync.SyncFragment">
+    tools:context=".main.sync.SyncFragment">
 
     <LinearLayout
         style="@style/DashboardCardStyleRoot"
@@ -94,6 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/sync_no_connection"
+                android:contentDescription="@string/dashboard_sync_card_offline_message"
                 app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_offline_message"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_offline_message" />

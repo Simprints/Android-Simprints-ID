@@ -20,6 +20,8 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":eventsystem"))
     implementation(project(":infraconfig"))
+    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infraimages"))
     implementation(project(":infralogin"))
     implementation(project(":infralogging"))
     implementation(project(":infrarecentuseractivity"))
@@ -28,6 +30,8 @@ dependencies {
     implementation(libs.androidX.appcompat)
     implementation(libs.androidX.appcompat.resource)
     implementation(libs.androidX.ui.constraintlayout)
+
+    implementation(libs.fuzzywuzzy.core)
 
     // DI
     implementation(libs.hilt)
@@ -38,8 +42,11 @@ dependencies {
     implementation(libs.androidX.navigation.ui)
 
     // Fragment
-    implementation(libs.androidX.activity)
     implementation(libs.androidX.ui.fragment.kotlin)
+
+    implementation(libs.androidX.ui.preference)
+
+    implementation(libs.workManager.work)
 
     // Unit Tests
     testImplementation(project(":testtools"))
@@ -61,4 +68,5 @@ dependencies {
     }
 
     testImplementation(libs.testing.espresso.core)
+    testImplementation(libs.testing.espresso.contrib)
 }

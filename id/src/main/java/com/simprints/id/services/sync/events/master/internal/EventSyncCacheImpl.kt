@@ -10,7 +10,7 @@ import javax.inject.Inject
 // TODO move into its own module
 @SuppressLint("ApplySharedPref")
 class EventSyncCacheImpl @Inject constructor(securityManager: SecurityManager) : EventSyncCache,
-    com.simprints.feature.dashboard.sync.EventSyncCache {
+    com.simprints.feature.dashboard.main.sync.EventSyncCache {
 
     private val sharedForProgresses =
         securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_PROGRESSES_SHARED_PREFS)
