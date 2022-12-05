@@ -177,7 +177,7 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew sonarqube -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
+                    - ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
 
         ######################################################################
         # Scan all of the projects dependencies and report back if there are

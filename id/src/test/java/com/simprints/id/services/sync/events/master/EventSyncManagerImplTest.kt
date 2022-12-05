@@ -100,6 +100,7 @@ class EventSyncManagerImplTest {
         eventSyncManagerImpl.cancelScheduledSync()
 
         verify(exactly = 1) { workManager.cancelAllWorkByTag(MASTER_SYNC_SCHEDULERS) }
+        verify(exactly = 1) { workManager.cancelAllWorkByTag(TAG_SUBJECTS_SYNC_ALL_WORKERS) }
     }
 
     @Test

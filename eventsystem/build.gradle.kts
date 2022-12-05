@@ -2,7 +2,6 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version Plugins.kotlinxSerializationVersion
 }
 
 apply {

@@ -16,8 +16,10 @@ import com.simprints.face.controllers.core.events.model.FaceAlertType
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentErrorBinding
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class ErrorFragment : Fragment(R.layout.fragment_error) {
     private val args: ErrorFragmentArgs by navArgs()
     private val mainVm: FaceOrchestratorViewModel by activityViewModels()
@@ -28,11 +30,12 @@ class ErrorFragment : Fragment(R.layout.fragment_error) {
 
     @Inject
     lateinit var faceTimeHelper: FaceTimeHelper
-    private val startTime = faceTimeHelper.now()
+    private var startTime = 0L
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        startTime = faceTimeHelper.now()
         with(args.errorType) {
             binding.errorLayout.setBackgroundColor(
                 ContextCompat.getColor(requireContext(), backgroundColor)

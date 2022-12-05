@@ -27,8 +27,8 @@ dependencies {
     kapt(libs.hilt.kapt)
 
     // Unit Tests
-    testImplementation(project(":testtools"))
 
+    testImplementation(libs.testing.robolectric.core)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)
