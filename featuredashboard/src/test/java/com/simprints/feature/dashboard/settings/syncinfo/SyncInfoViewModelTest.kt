@@ -50,13 +50,23 @@ class SyncInfoViewModelTest {
     private val eventDownSyncScopeRepository = mockk<EventDownSyncScopeRepository>(relaxed = true)
     private val imageRepository = mockk<ImageRepository>(relaxed = true)
     private val eventSyncManager = mockk<EventSyncManager>(relaxed = true)
+    private val viewModel = SyncInfoViewModel(
+        configManager,
+        eventRepository,
+        enrolmentRecordManager,
+        loginManager,
+        eventDownSyncScopeRepository,
+        imageRepository,
+        eventSyncManager,
+        testCoroutineRule.testCoroutineDispatcher
+    )
 
     @Test
     fun `should initialize the configuration live data correctly`() {
         val configuration = mockk<ProjectConfiguration>()
         coEvery { configManager.getProjectConfiguration() } returns configuration
 
-        val viewModel = initViewModel()
+        viewModel.refreshInformation()
 
         assertThat(viewModel.configuration.getOrAwaitValue()).isEqualTo(configuration)
     }
@@ -66,7 +76,7 @@ class SyncInfoViewModelTest {
         val number = 10
         coEvery { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) } returns number
 
-        val viewModel = initViewModel()
+        viewModel.refreshInformation()
 
         assertThat(viewModel.recordsInLocal.getOrAwaitValue()).isEqualTo(number)
     }
@@ -76,7 +86,7 @@ class SyncInfoViewModelTest {
         val number = 10
         coEvery { eventRepository.localCount(PROJECT_ID, EventType.ENROLMENT_V2) } returns number
 
-        val viewModel = initViewModel()
+        viewModel.refreshInformation()
 
         assertThat(viewModel.recordsToUpSync.getOrAwaitValue()).isEqualTo(number)
     }
@@ -86,7 +96,7 @@ class SyncInfoViewModelTest {
         val number = 10
         every { imageRepository.getNumberOfImagesToUpload() } returns number
 
-        val viewModel = initViewModel()
+        viewModel.refreshInformation()
 
         assertThat(viewModel.imagesToUpload.getOrAwaitValue()).isEqualTo(number)
     }
@@ -117,7 +127,7 @@ class SyncInfoViewModelTest {
             )
         } returns numberForModule2
 
-        val viewModel = initViewModel()
+        viewModel.refreshInformation()
 
         assertThat(viewModel.moduleCounts.getOrAwaitValue()).isEqualTo(
             listOf(
@@ -131,7 +141,7 @@ class SyncInfoViewModelTest {
     fun `should initialize the recordsToDownSync and recordsToDelete live data to 0 if an exception is thrown`() {
         coEvery { configManager.getDeviceConfiguration() } throws Exception()
 
-        val viewModel = initViewModel()
+        viewModel.refreshInformation()
 
         assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(0)
         assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isEqualTo(0)
@@ -189,7 +199,7 @@ class SyncInfoViewModelTest {
             EventCount(EventType.ENROLMENT_RECORD_CREATION, creationForModule2),
         )
 
-        val viewModel = initViewModel()
+        viewModel.refreshInformation()
 
         assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(creationForModule1 + creationForModule2)
         assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isEqualTo(deletionForModule1)
@@ -201,7 +211,7 @@ class SyncInfoViewModelTest {
             2,
             4
         )
-        val viewModel = initViewModel()
+        viewModel.refreshInformation()
 
         val records = viewModel.recordsInLocal.getOrAwaitValues(3) {
             viewModel.refreshInformation()
@@ -213,8 +223,6 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `fetchSyncInformationIfNeeded should not fetch the information if there is a non succeeded worker`() {
-        val viewModel = initViewModel()
-
         viewModel.fetchSyncInformationIfNeeded(
             EventSyncState(
                 "", 0, 0, listOf(), listOf(
@@ -226,13 +234,11 @@ class SyncInfoViewModelTest {
             )
         )
 
-        coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
+        coVerify(exactly = 0) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
 
     @Test
     fun `fetchSyncInformationIfNeeded should fetch the information if there is only succeeded worker`() {
-        val viewModel = initViewModel()
-
         viewModel.fetchSyncInformationIfNeeded(
             EventSyncState(
                 "", 0, 0, listOf(), listOf(
@@ -244,7 +250,7 @@ class SyncInfoViewModelTest {
             )
         )
 
-        coVerify(exactly = 2) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
+        coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
 
     @Test
@@ -257,24 +263,11 @@ class SyncInfoViewModelTest {
                 )
             )
         )
-        val viewModel = initViewModel()
 
         viewModel.fetchSyncInformationIfNeeded(state)
         viewModel.fetchSyncInformationIfNeeded(state)
 
-        coVerify(exactly = 2) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
+        coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
-
-    private fun initViewModel(): SyncInfoViewModel =
-        SyncInfoViewModel(
-            configManager,
-            eventRepository,
-            enrolmentRecordManager,
-            loginManager,
-            eventDownSyncScopeRepository,
-            imageRepository,
-            eventSyncManager,
-            testCoroutineRule.testCoroutineDispatcher
-        )
 
 }

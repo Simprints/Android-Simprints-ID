@@ -26,7 +26,7 @@ class FingerSelectionViewModelTest {
 
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
     private val deviceConfiguration = mockk<DeviceConfiguration>()
-    private val configManager = mockk<ConfigManager> {
+    private val configManager = mockk<ConfigManager>(relaxed = true) {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns fingerprintConfiguration
         }
