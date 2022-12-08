@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.core.tools.extentions.onLayoutChange
@@ -17,7 +18,6 @@ import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.databinding.ActivityRefusalBinding
 import com.simprints.fingerprint.tools.extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -134,6 +134,7 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
         binding.btSubmitRefusalForm.isEnabled = false
         binding.refusalText.requestFocus()
         setTextChangeListenerOnRefusalText()
+        val inputMethodManager = (getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
         inputMethodManager.showSoftInput(binding.refusalText, SHOW_IMPLICIT)
     }
 

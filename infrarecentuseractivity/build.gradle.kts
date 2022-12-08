@@ -23,10 +23,9 @@ dependencies {
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
-    kapt(libs.hilt.compiler)
 
     implementation(libs.datastore)
-    implementation(libs.protobuf)
+    api(libs.protobuf)
 
     // Unit Tests
     testImplementation(project(":testtools"))
