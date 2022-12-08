@@ -7,36 +7,54 @@ dependencyAnalysis {
             onUnusedDependencies { severity("fail") }
             onIncorrectConfiguration { severity("fail") }
             ignoreKtx(true)
-        }
-        project(':id') {
             onAny {
-                exclude(
-                    // We exclude these APIs in ID because because multiple modules need
-                    // them, and DFMs can't implement the same lib but autonomousapps does not
-                    // recognize this transitive property
-                    'org.jetbrains.kotlin:kotlin-stdlib',
-                    'androidx.navigation:navigation-dynamic-features-fragment',
-                    'io.realm:realm-android-kotlin-extensions',
-                    'io.realm:realm-annotations',
-                    'io.realm:realm-android-library',
-                    'com.google.firebase:firebase-analytics-ktx',
-                    ':moduleapi',
-                    ':core',
-                    'androidx.fragment:fragment-testing'
+                exclude('com.louiscad.splitties:splitties-fun-pack-android-base-with-views-dsl',
+                    'com.google.dagger:hilt-compiler', 'com.google.dagger:hilt-android'
                 )
             }
         }
         project(':eventsystem') {
             onAny {
                 exclude(
-                    'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+                    'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+                    'com.fasterxml.jackson.module:jackson-module-kotlin'
                 )
+            }
+        }
+        project(':fingerprint') {
+            onAny {
+                exclude('com.louiscad.splitties:splitties-views')
+            }
+        }
+        project(':infranetwork') {
+            onAny {
+                exclude('com.github.chuckerteam.chucker:library-no-op')
+            }
+        }
+        project(':infrarealm') {
+            onAny {
+                exclude('io.realm:realm-android-kotlin-extensions')
+            }
+        }
+        project(':infralicense') {
+            onAny {
+                exclude('com.fasterxml.jackson.module:jackson-module-kotlin')
+            }
+        }
+        project(':infraenrolmentrecords') {
+            onAny {
+                exclude('com.fasterxml.jackson.module:jackson-module-kotlin')
+            }
+        }
+        project(':infraresources') {
+            onAny {
+                exclude('org.jetbrains.kotlin:kotlin-stdlib-jdk8')
             }
         }
         project(':core') {
             onAny {
                 exclude(
-                    ':testtools'
+                    ':testtools', 'com.simprints:libsimprints'
                 )
             }
         }

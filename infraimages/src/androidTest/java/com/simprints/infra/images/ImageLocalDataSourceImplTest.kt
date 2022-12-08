@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.images.local.ImageLocalDataSourceImpl
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -12,6 +11,7 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 import java.io.File
+import java.util.*
 import kotlin.random.Random
 
 @SmallTest
@@ -109,7 +109,7 @@ class ImageLocalDataSourceImplTest {
             val byteArray = Random.nextBytes(SIZE_IMAGE)
             imageLocalDataSource.encryptAndStoreImage(
                 byteArray,
-                Path("test/${randomUUID()}")
+                Path("test/${UUID.randomUUID()}")
             )?.let(createdFiles::add)
         }
 

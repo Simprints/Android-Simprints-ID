@@ -2,7 +2,6 @@ plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("kapt")
-    id("realm-android")
     id("com.google.protobuf") version "0.9.1"
 }
 
@@ -30,24 +29,24 @@ android {
     }
 }
 
-
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
-    api(project(":infranetwork"))
+    implementation(project(":infranetwork"))
     implementation(project(":infralogging"))
-    implementation(project(":infralogin"))
-    implementation(project(":infrasecurity"))
-    implementation(project(":infrarealm"))
+    api(project(":infralogin"))
+    api(project(":infrarealm"))
 
-    implementation(libs.androidX.core)
     implementation(libs.workManager.work)
 
     implementation(libs.datastore)
-    implementation(libs.protobuf)
+    api(libs.protobuf)
+    implementation(libs.retrofit.core)
+    implementation(libs.jackson.core)
+
 
     implementation(libs.hilt)
-    implementation(libs.hilt.work)
+    api(libs.hilt.work)
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
 

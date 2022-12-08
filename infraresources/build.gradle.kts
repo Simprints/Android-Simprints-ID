@@ -18,8 +18,7 @@ dependencies {
     implementation(libs.support.material)
     implementation(libs.androidX.appcompat)
     implementation(libs.androidX.ui.constraintlayout)
-    implementation(libs.androidX.ui.preference)
-
-    // This implementation is to fix the issue with duplicated class on the view model
-    implementation(libs.androidX.lifecycle.viewmodel)
+    implementation(libs.androidX.ui.preference){
+        exclude("androidx.lifecycle","lifecycle-viewmodel-ktx")
+    }
 }

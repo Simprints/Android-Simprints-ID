@@ -32,17 +32,16 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation(project(":moduleapi"))
+    api(project(":moduleapi"))
     implementation(project(":infralogging"))
     implementation(libs.libsimprints)
 
-    implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.lifecycle.livedata.ktx)
+    api(libs.androidX.appcompat)
     api(libs.androidX.multidex)
     api(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.camera2)
 
-    implementation(libs.kotlin.coroutinesAndroid)
+    runtimeOnly(libs.kotlin.coroutinesAndroid)
     implementation(libs.jackson.core)
 
     implementation(libs.kronos.kronos)
