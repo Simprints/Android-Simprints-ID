@@ -38,7 +38,7 @@ dependencies {
 }
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.21.10"
+        artifact = "com.google.protobuf:protoc:3.21.11"
     }
     generateProtoTasks {
         all().forEach { task ->
