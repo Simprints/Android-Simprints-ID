@@ -50,7 +50,7 @@ class RealmWrapperImpl @Inject constructor(
                 //5. Update Realm config with the new key
                 config = createAndSaveRealmConfig()
                 //6. Retry operation with new file and key
-                useRealmInstance(block)
+                Realm.getInstance(config).use(block)
             }
         }
 
