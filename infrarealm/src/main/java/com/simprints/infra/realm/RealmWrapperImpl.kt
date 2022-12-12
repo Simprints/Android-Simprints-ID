@@ -18,10 +18,16 @@ import javax.inject.Inject
 
 class RealmWrapperImpl @Inject constructor(
     @ApplicationContext private val appContext: Context,
-    private val secureDataManager: SecurityManager,
-    private val loginManager: LoginManager,
-) :
-    RealmWrapper {
+    private val securityManager: SecurityManager,
+    private val loginManager: LoginManager
+) : RealmWrapper {
+
+    private var config: RealmConfiguration
+
+    init {
+        Realm.init(appContext)
+        config = createAndSaveRealmConfig()
+    }
     /**
      * Use realm instance in from IO threads
      * throws RealmUninitialisedException
@@ -33,23 +39,39 @@ class RealmWrapperImpl @Inject constructor(
             try {
                 Realm.getInstance(config).use(block)
             } catch (ex: RealmFileException) {
+                //DB corruption detected; either DB file or key is corrupt
+                //1. Delete DB file in order to create a new one at next init
                 Realm.deleteRealm(config)
+                //2. TODO: Delete "last sync" info and start new sync
+                //3. Recreate the DB key
+                recreateLocalDbKey()
+                //4. Log exception after recreating the key so we get extra info
+                Simber.e(ex)
+                //5. Update Realm config with the new key
+                config = createAndSaveRealmConfig()
+                //6. Retry operation with new file and key
                 useRealmInstance(block)
             }
         }
 
-    private val config: RealmConfiguration by lazy {
-        Realm.init(appContext)
-        createAndSaveRealmConfig(getLocalDbKey())
+    private fun createAndSaveRealmConfig(): RealmConfiguration {
+        val localDbKey = getLocalDbKey()
+        return RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
     }
-
-    private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): RealmConfiguration =
-        RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
     private fun getLocalDbKey(): LocalDbKey =
         loginManager.getSignedInProjectIdOrEmpty().let {
             return if (it.isNotEmpty()) {
-                secureDataManager.getLocalDbKeyOrThrow(it)
+                securityManager.getLocalDbKeyOrThrow(it)
+            } else {
+                throw RealmUninitialisedException("No signed in project id found")
+            }
+        }
+
+    private fun recreateLocalDbKey() =
+        loginManager.getSignedInProjectIdOrEmpty().let {
+            if (it.isNotEmpty()) {
+                securityManager.recreateLocalDatabaseKey(it)
             } else {
                 throw RealmUninitialisedException("No signed in project id found")
             }
