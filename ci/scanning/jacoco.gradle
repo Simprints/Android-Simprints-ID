@@ -9,6 +9,9 @@ task jacocoTestReport(type: JacocoReport) {
     dependsOn tasks.withType(Test).matching {
         it.name.toLowerCase().contains("debug")
     }
+    reports {
+        xml.required = true
+    }
     def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*']
     def javaTree = fileTree(dir: "$project.buildDir/intermediates/javac/debug/classes", excludes: fileFilter)
     def kotlinTree = fileTree(dir: "$project.buildDir/tmp/kotlin-classes/debug", excludes: fileFilter)
