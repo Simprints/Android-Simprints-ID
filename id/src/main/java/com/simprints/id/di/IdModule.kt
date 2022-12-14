@@ -8,20 +8,6 @@ import com.simprints.id.activities.alert.AlertContract
 import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentContract
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenter
-import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherContract
-import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherPresenter
-import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSource
-import com.simprints.id.activities.dashboard.cards.daily_activity.data.DailyActivityLocalDataSourceImpl
-import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayer
-import com.simprints.id.activities.dashboard.cards.daily_activity.displayer.DashboardDailyActivityCardDisplayerImpl
-import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
-import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepositoryImpl
-import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayer
-import com.simprints.id.activities.dashboard.cards.project.displayer.DashboardProjectDetailsCardDisplayerImpl
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayer
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardDisplayerImpl
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepository
-import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardStateRepositoryImpl
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.login.tools.LoginActivityHelper
@@ -29,12 +15,6 @@ import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
-import com.simprints.id.data.consent.longconsent.LongConsentRepositoryImpl
-import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSource
-import com.simprints.id.data.consent.longconsent.local.LongConsentLocalDataSourceImpl
-import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSource
-import com.simprints.id.data.consent.longconsent.remote.LongConsentRemoteDataSourceImpl
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.domain.alert.AlertType
@@ -165,13 +145,6 @@ abstract class IdAppModule {
         ): CheckLoginFromIntentPresenter
     }
 
-    @AssistedFactory
-    interface CheckLoginFromMainLauncherPresenterFactory {
-        fun create(
-            view: CheckLoginFromMainLauncherContract.View,
-        ): CheckLoginFromMainLauncherPresenter
-    }
-
     @Binds
     abstract fun provideGuidSelectionManager(impl: GuidSelectionManagerImpl): GuidSelectionManager
 
@@ -216,29 +189,6 @@ abstract class IdAppModule {
 
     @Binds
     abstract fun provideLocationManager(impl: LocationManagerImpl): LocationManager
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class IdDashboardModule {
-
-    @Binds
-    abstract fun provideDashboardDailyActivityRepository(impl: DashboardDailyActivityRepositoryImpl): DashboardDailyActivityRepository
-
-    @Binds
-    abstract fun provideDailyActivityLocalDataSource(impl: DailyActivityLocalDataSourceImpl): DailyActivityLocalDataSource
-
-    @Binds
-    abstract fun provideDashboardSyncCardStateRepository(impl: DashboardSyncCardStateRepositoryImpl): DashboardSyncCardStateRepository
-
-    @Binds
-    abstract fun provideDashboardDailyActivityCardDisplayer(impl: DashboardDailyActivityCardDisplayerImpl): DashboardDailyActivityCardDisplayer
-
-    @Binds
-    abstract fun provideDashboardProjectDetailsCardDisplayer(impl: DashboardProjectDetailsCardDisplayerImpl): DashboardProjectDetailsCardDisplayer
-
-    @Binds
-    abstract fun provideDashboardSyncCardDisplayer(impl: DashboardSyncCardDisplayerImpl): DashboardSyncCardDisplayer
 }
 
 @Module
@@ -384,21 +334,6 @@ abstract class IdSecurityModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class IdDataModule {
-
-    @Binds
-    abstract fun provideLongConsentRepository(impl: LongConsentRepositoryImpl): LongConsentRepository
-
-    @Binds
-    abstract fun provideLongConsentLocalDataSource(impl: LongConsentLocalDataSourceImpl): LongConsentLocalDataSource
-
-    @Binds
-    abstract fun provideLongConsentRemoteDataSource(impl: LongConsentRemoteDataSourceImpl): LongConsentRemoteDataSource
-
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
 object IdDependenciesModule {
 
     @AbsolutePath
@@ -418,4 +353,24 @@ object IdDependenciesModule {
     fun provideDomainToModuleApiAppResponse(): DomainToModuleApiAppResponse =
         DomainToModuleApiAppResponse
 
+}
+
+// TODO remove when the interfaces have been moved into its one module
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class TemporaryFeatureDashboardModule {
+    @Binds
+    abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): com.simprints.feature.dashboard.main.sync.EventSyncManager
+
+    @Binds
+    abstract fun provideEventSyncCache(impl: EventSyncCacheImpl): com.simprints.feature.dashboard.main.sync.EventSyncCache
+
+    @Binds
+    abstract fun provideDeviceManager(impl: DeviceManagerImpl): com.simprints.feature.dashboard.main.sync.DeviceManager
+
+    @Binds
+    abstract fun provideSignerManager(impl: SignerManagerImpl): com.simprints.feature.dashboard.settings.about.SignerManager
+
+    @Binds
+    abstract fun provideSecurityStateScheduler(impl: SecurityStateSchedulerImpl): com.simprints.feature.dashboard.debug.SecurityStateScheduler
 }

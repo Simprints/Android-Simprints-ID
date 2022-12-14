@@ -42,6 +42,8 @@ kotlin-coroutine_rx2_adapter = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6
 androidX-core = "androidx.core:core-ktx:1.9.0"
 androidX-multidex = "androidx.multidex:multidex:2.0.1"
 androidX-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "app_compat_version" }
+androidX-appcompat-resource = { module = "androidx.appcompat:appcompat-resources", version.ref = "app_compat_version" }
+androidX-Room-core = { module = "androidx.room:room-runtime", version.ref = "androidx_room_version" }
 androidX-Room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx_room_version" }
 androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx_room_version" }
 #Lifecycle
@@ -53,6 +55,7 @@ androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4
 androidX-uI-coordinatorlayout = "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
 androidX-uI-cardview = "androidx.cardview:cardview:1.0.0"
 androidX-uI-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment_version" }
+androidX-uI-fragment-kotlin = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment_version" }
 androidX-uI-preference = "androidx.preference:preference:1.2.0"
 androidX-uI-viewpager2 = "androidx.viewpager2:viewpager2:1.0.0"
 #security
@@ -66,6 +69,7 @@ androidX-cameraX-view = { module = "androidx.camera:camera-view", version.ref = 
 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
+androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx_navigation_version" }
 
 #Annotation
 androidX-annotation-annotation = "androidx.annotation:annotation:1.5.0"
@@ -187,6 +191,7 @@ testing-Mockk-core = "io.mockk:mockk:1.13.3"
 testing-Mockk-android = "io.mockk:mockk-android:1.13.3"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
+testing-Espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso_version" }
 testing-Espresso-accessibility = "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:4.0.0"
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
 testing-Espresso-barista = "com.adevinta.android:barista:4.3.0" #Used to grant permissions in AndroidTests

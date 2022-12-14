@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dashboard_sync_card"
+    style="@style/DashboardCardStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".main.sync.SyncFragment">
+
+    <LinearLayout
+        style="@style/DashboardCardStyleRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dashboard_sync_card_title"
+            style="@style/DashboardCardStyleTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard_card_sync_title"
+            tools:ignore="HardcodedText" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/dashboard_sync_card_default_state_sync_button"
+            style="@style/SimprintsOrangeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard_sync_card_sync_button"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/dashboard_sync_card_failed_message"
+            style="@style/SimprintsStyle.TextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:drawablePadding="5dp"
+            android:text="Placeholder"
+            android:textColor="@color/simprints_red_dark"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/sync_failed_icon"
+            tools:ignore="HardcodedText" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dashboard_sync_card_select_no_modules"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/dashboard_sync_card_select_no_modules_message"
+                style="@style/SimprintsStyle.TextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="false"
+                android:text="@string/dashboard_sync_card_no_modules_message"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_select_no_modules_button"
+                app:layout_constraintEnd_toStartOf="@+id/dashboard_sync_card_select_no_modules_button"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_select_no_modules_button"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dashboard_sync_card_select_no_modules_button"
+                style="@style/SimprintsOrangeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/button_rounded_corners_gray"
+                android:elevation="2dp"
+                android:stateListAnimator="@null"
+                android:text="@string/dashboard_sync_card_no_modules_button"
+                android:translationZ="2dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dashboard_sync_card_offline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/dashboard_sync_card_offline_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sync_no_connection"
+                android:contentDescription="@string/dashboard_sync_card_offline_message"
+                app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_offline_message"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_offline_message" />
+
+            <TextView
+                android:id="@+id/dashboard_sync_card_offline_message"
+                style="@style/SimprintsStyle.TextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="@string/dashboard_sync_card_offline_message"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_offline_button"
+                app:layout_constraintEnd_toStartOf="@+id/dashboard_sync_card_offline_button"
+                app:layout_constraintStart_toEndOf="@+id/dashboard_sync_card_offline_icon"
+                app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_offline_button" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dashboard_sync_card_offline_button"
+                style="@style/SimprintsOrangeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
+                android:background="@drawable/button_rounded_corners_gray"
+                android:elevation="2dp"
+                android:text="@string/dashboard_sync_card_offline_button"
+                android:translationZ="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dashboard_sync_card_progress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/dashboard_sync_card_progress_message"
+                style="@style/SimprintsStyle.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
+                android:text="Placeholder - Connecting"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@id/dashboard_sync_card_progress_indeterminate_progress_bar"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="HardcodedText" />
+
+            <ProgressBar
+                android:id="@+id/dashboard_sync_card_progress_indeterminate_progress_bar"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="3dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@android:color/darker_gray"
+                app:layout_constraintBottom_toBottomOf="@+id/dashboard_sync_card_progress_message"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/dashboard_sync_card_progress_message"
+                app:layout_constraintTop_toTopOf="@+id/dashboard_sync_card_progress_message" />
+
+            <ProgressBar
+                android:id="@+id/dashboard_sync_card_progress_sync_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminate="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dashboard_sync_card_progress_message" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/dashboard_sync_card_try_again"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/dashboard_sync_card_try_again_message"
+                style="@style/SimprintsStyle.TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dashboard_sync_card_incomplete"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dashboard_sync_card_try_again_sync_button"
+                style="@style/SimprintsOrangeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_marginBottom="@dimen/activity_dashboard_card_sync_space_above_last_sync"
+                android:text="@string/dashboard_sync_card_try_again_button" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dashboard_sync_card_last_sync"
+            style="@style/DashboardCardStyleLastSync"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="2022-11-15" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
