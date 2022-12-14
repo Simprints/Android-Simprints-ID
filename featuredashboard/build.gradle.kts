@@ -64,7 +64,7 @@ dependencies {
     testImplementation(libs.testing.androidX.runner)
     testImplementation(libs.testing.androidX.navigation)
     testImplementation(libs.testing.androidX.core.testing)
-    debugImplementation(libs.testing.fragment.testing) {
+    testImplementation(libs.testing.fragment.testing) {
         exclude("androidx.test", "core")
     }
 
