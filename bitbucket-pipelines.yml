@@ -192,23 +192,11 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew :eventsystem:projectHealth
-                    - ./gradlew :core:projectHealth
-                    #                    - ./gradlew :clientapi:projectHealth
-                    #                    - ./gradlew :face:projectHealth
-                    #                    - ./gradlew :fingerprint:projectHealth
-                    - ./gradlew :fingerprintscanner:projectHealth
-                    - ./gradlew :fingerprintmatcher:projectHealth
-                    - ./gradlew :fingerprintscannermock:projectHealth
-                    - ./gradlew :moduleapi:projectHealth
-                    - ./gradlew infraconfig:projectHealth
-                    - ./gradlew infraenrolmentrecords:projectHealth
-                    - ./gradlew :infralogging:projectHealth
-                    - ./gradlew :infralogin:projectHealth
-                    - ./gradlew :infranetwork:projectHealth
-                    - ./gradlew :infrarealm:projectHealth
-                    - ./gradlew :infrarecentuseractivity:projectHealth
-                    - ./gradlew :infrasecurity:projectHealth
+                    #  Disabling health check in test variants because there is a compilation issue in finding
+                    # eventsystem/sampledata folder which only  available in debug variants but the health check tool gets executed in all variants.
+                    # Should be fixed in https://simprints.atlassian.net/browse/CORE-2045
+                    - ./gradlew buildHealth  -Ddependency.analysis.test.analysis=false
+
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
@@ -237,7 +225,7 @@ definitions:
                     # - ./gradlew face:assembleDebugAndroidTest
                     # - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
                     # Build Universal APK
-                    - ./gradlew packageDebugUniversalApk --stacktrace
+                    - ./gradlew packageDebugUniversalApk
                     - mv id/build/outputs/universal_apk/debug/id-debug-universal.apk universal.apk
                 artifacts:
                     - universal.apk
@@ -389,6 +377,7 @@ flows:
                     -   step: *run-infra-unit-tests
                     -   step: *run-feature-unit-tests
                     -   step: *build-and-sign-universal-apk
+                    -   step: *dependency-health-check
             -   step: *upload-sonar-scan-and-check-quality-gate
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal

@@ -11,16 +11,6 @@ apply {
     from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
 }
 
-configurations {
-
-    androidTestImplementation {
-        // Espresso 3.4.0 has a dependency conflict issues with "checker" and "protobuf-lite" dependancies
-        // https://github.com/android/android-test/issues/861
-        // and https://github.com/android/android-test/issues/999
-        exclude("org.checkerframework", "checker")
-        exclude("com.google.protobuf", "protobuf-lite")
-    }
-}
 android {
     defaultConfig {
         //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -75,43 +65,40 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     // Simprints
-    implementation(project(":core"))
-    implementation(project(":eventsystem"))
-    implementation(project(":infraenrolmentrecords"))
-    implementation(project(":fingerprintmatcher"))
-    implementation(project(":fingerprintscanner"))
-    implementation(project(":fingerprintscannermock"))
-    implementation(project(":infraconfig"))
-    implementation(project(":infralogin"))
+    api(project(":core"))
+    api(project(":eventsystem"))
+    api(project(":infraenrolmentrecords"))
+    api(project(":fingerprintmatcher"))
+    api(project(":fingerprintscanner"))
+    api(project(":infraconfig"))
+    api(project(":infralogin"))
     implementation(project(":infralogging"))
-    implementation(project(":infranetwork"))
-    implementation(project(":infraimages"))
+    api(project(":infranetwork"))
+    api(project(":infraimages"))
     implementation(project(":infraresources"))
-    implementation(project(":infrarecentuseractivity"))
-    implementation(project(":moduleapi"))
+    api(project(":infrarecentuseractivity"))
+    api(project(":moduleapi"))
+    testImplementation(project(":fingerprintscannermock"))
+
+    api(libs.retrofit.core)
+    runtimeOnly(libs.jackson.core)
 
     // Kotlin
-    implementation(libs.kotlin.reflect)
+    runtimeOnly(libs.kotlin.reflect)
     implementation(libs.kotlin.coroutine.rx2.adapter)
 
     // Android X
     implementation(libs.androidX.core)
-    implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.lifecycle.viewmodel)
-    implementation(libs.androidX.lifecycle.livedata.ktx)
-    implementation(libs.androidX.ui.constraintlayout)
-    implementation(libs.androidX.ui.cardview)
-    implementation(libs.androidX.ui.viewpager2)
+    api(libs.androidX.appcompat)
+    api(libs.androidX.ui.coordinatorlayout)
+    api(libs.androidX.ui.constraintlayout)
+    api(libs.androidX.ui.viewpager2)
     implementation(libs.androidX.navigation.fragment)
-    implementation(libs.androidX.navigation.ui)
     implementation(libs.workManager.work)
-
-    // Splitties
-    implementation(libs.splitties.core)
 
     // DI
     implementation(libs.hilt)
-    implementation(libs.hilt.work)
+    api(libs.hilt.work)
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
 
@@ -134,6 +121,9 @@ dependencies {
 
     // Espresso
     testImplementation(libs.testing.espresso.core)
+    // explicitly depending on accessibility-test-framework to solve this espresso 3.4.0 build issue
+    // https://github.com/android/android-test/issues/861
+    androidTestImplementation(libs.testing.espresso.accessibility)
     testImplementation(libs.testing.espresso.intents)
 
     // Mocking and assertion frameworks
@@ -183,12 +173,4 @@ dependencies {
 
     // Robolectric
     androidTestImplementation(libs.testing.robolectric.core)
-}
-
-configurations {
-    androidTestImplementation {
-        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
-        // the issue is reported here https://github.com/mockk/mockk/issues/722
-        exclude("io.mockk", "mockk-agent-jvm")
-    }
 }

@@ -20,15 +20,6 @@ sonarqube {
     }
 }
 
-configurations {
-    androidTestImplementation {
-        // Espresso 3.4.0 has a dependency conflict issues with "checker" and "protobuf-lite" dependancies
-        // https://github.com/android/android-test/issues/861
-        // and https://github.com/android/android-test/issues/999
-        exclude("org.checkerframework", "checker")
-        exclude("com.google.protobuf", "protobuf-lite")
-    }
-}
 android {
 
     ndkVersion =   gradleLocalProperties(rootDir).getProperty("ndk.Version")
@@ -61,38 +52,32 @@ repositories {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":infraconfig"))
-    implementation(project(":infraenrolmentrecords"))
+    api(project(":infraconfig"))
+    api(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
-    implementation(project(":core"))
-    implementation(project(":eventsystem"))
+    api(project(":core"))
+    api(project(":eventsystem"))
     implementation(project(":infraresources"))
-    implementation(project(":infralicense"))
-    implementation(project(":infraimages"))
-    implementation(project(":moduleapi"))
+    api(project(":infralicense"))
+    api(project(":infraimages"))
+    api(project(":moduleapi"))
 
-    implementation(libs.cameraView){
-        exclude("androidx.exifinterface")
-    }
-    implementation(libs.circleImageView)
-    
-    implementation(libs.androidX.navigation.fragment)
-    implementation(libs.androidX.navigation.ui)
+    api(libs.cameraView)
+    api(libs.circleImageView)
+
+    api(libs.androidX.navigation.fragment)
+    api(libs.androidX.appcompat)
 
     // DI
     implementation(libs.hilt)
-    implementation(libs.hilt.work)
     kapt(libs.hilt.kapt)
-    kapt(libs.hilt.compiler)
 
     // Fragment
-    implementation(libs.androidX.ui.fragment)
+    api(libs.androidX.ui.fragment)
 
     // Android X
-    implementation(libs.androidX.ui.constraintlayout)
-    implementation(libs.androidX.cameraX.core){
-        exclude("androidx.exifinterface")
-    }
+    api(libs.androidX.ui.constraintlayout)
+    runtimeOnly(libs.androidX.cameraX.core)
 
     // Firebase
     //implementation("com.google.firebase:firebase-perf-ktx:20.1.1")
@@ -131,10 +116,7 @@ dependencies {
 
     // Navigation
     androidTestImplementation(libs.testing.navigation.testing)
-    debugImplementation(libs.testing.fragment.testing){
-        exclude( "androidx.test",  "core")
-    }
-
+    androidTestImplementation(libs.testing.fragment.testing)
     // Mockk
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.truth)
@@ -150,12 +132,4 @@ dependencies {
 
     // Roboelectic
     androidTestImplementation(libs.testing.robolectric.core)
-}
-
-configurations {
-    androidTestImplementation {
-        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
-        // the issue is reported here https://github.com/mockk/mockk/issues/722
-        exclude("io.mockk", "mockk-agent-jvm")
-    }
 }

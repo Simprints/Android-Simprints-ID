@@ -35,10 +35,9 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":infralogging"))
-    implementation(project(":infranetwork"))
+    api(project(":infranetwork"))
     implementation(project(":core"))
 
-    implementation(libs.androidX.core)
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
@@ -46,7 +45,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.kotlin.coroutinesPlayServices)
     api(libs.playServices.safetynet)
-
     implementation(libs.retrofit.core)
 
     // Unit Tests

@@ -1,14 +1,8 @@
-import com.google.protobuf.gradle.generateProtoTasks
-import com.google.protobuf.gradle.plugins
-import com.google.protobuf.gradle.protobuf
-import com.google.protobuf.gradle.protoc
-
 plugins {
     id("com.android.library")
     kotlin("android")
     kotlin("kapt")
-    id("realm-android")
-    id("com.google.protobuf") version "0.8.19"
+    id("com.google.protobuf") version "0.9.1"
 }
 
 apply {
@@ -35,24 +29,24 @@ android {
     }
 }
 
-
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
-    api(project(":infranetwork"))
+    implementation(project(":infranetwork"))
     implementation(project(":infralogging"))
-    implementation(project(":infralogin"))
-    implementation(project(":infrasecurity"))
-    implementation(project(":infrarealm"))
+    api(project(":infralogin"))
+    api(project(":infrarealm"))
 
-    implementation(libs.androidX.core)
     implementation(libs.workManager.work)
 
     implementation(libs.datastore)
-    implementation(libs.protobuf)
+    api(libs.protobuf)
+    implementation(libs.retrofit.core)
+    implementation(libs.jackson.core)
+
 
     implementation(libs.hilt)
-    implementation(libs.hilt.work)
+    api(libs.hilt.work)
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
 
@@ -68,12 +62,12 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.21.10"
+        artifact = "com.google.protobuf:protoc:3.21.11"
     }
 
     generateProtoTasks {
         all().forEach { task ->
-            task.plugins {
+            task.builtins {
                 create("java") {
                     option("lite")
                 }
@@ -81,7 +75,6 @@ protobuf {
         }
     }
 }
-
 kapt {
     correctErrorTypes = true
 }
