@@ -78,12 +78,7 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
      * BigInteger(1, Base64.decode(key, Base64.DEFAULT)).toString(16)
      */
     override fun getLocalDbKeyOrThrow(dbName: String): LocalDbKey {
-        val key = readRealmKeyFromSharedPrefs(dbName)
-
-        if (key == null) {
-            Simber.e(MissingLocalDatabaseKeyException())
-            throw MissingLocalDatabaseKeyException()
-        }
+        val key = readRealmKeyFromSharedPrefs(dbName) ?: throw MissingLocalDatabaseKeyException()
 
         saveKeyHashIfMissing(dbName, key)
 
