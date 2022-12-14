@@ -12,5 +12,5 @@ import dagger.hilt.components.SingletonComponent
 abstract class DashboardModule {
 
     @Binds
-    internal abstract fun provideModuleRepository(loginManager: ModuleRepositoryImpl): ModuleRepository
+    internal abstract fun provideModuleRepository(impl: ModuleRepositoryImpl): ModuleRepository
 }
