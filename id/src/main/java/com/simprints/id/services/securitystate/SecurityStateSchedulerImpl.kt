@@ -7,7 +7,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class SecurityStateSchedulerImpl @Inject constructor(@ApplicationContext context: Context) : SecurityStateScheduler {
+// TODO move into its own module
+class SecurityStateSchedulerImpl @Inject constructor(@ApplicationContext context: Context) :
+    SecurityStateScheduler, com.simprints.feature.dashboard.debug.SecurityStateScheduler {
 
     private val workManager = WorkManager.getInstance(context)
 

@@ -16,9 +16,9 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWork
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWN_COUNTER
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.DOWN_COUNTER
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration

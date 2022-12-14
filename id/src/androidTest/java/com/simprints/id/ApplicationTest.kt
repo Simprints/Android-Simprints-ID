@@ -1,8 +1,6 @@
 package com.simprints.id
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.ActivityTestRule
-import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.infra.logging.Simber
 import com.simprints.testtools.android.waitOnSystem
 import io.reactivex.Observable
@@ -10,16 +8,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ApplicationTest {
-
-    @get:Rule
-    val loginTestRule =
-        ActivityTestRule(CheckLoginFromMainLauncherActivity::class.java, false, false)
 
     @Test
     fun rxJavaUndeliverableExceptionHappens_shouldBeHandled() {

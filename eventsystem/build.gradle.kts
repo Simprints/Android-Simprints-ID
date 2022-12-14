@@ -58,6 +58,8 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
 
+    implementation(libs.workManager.work)
+
     // DI
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
