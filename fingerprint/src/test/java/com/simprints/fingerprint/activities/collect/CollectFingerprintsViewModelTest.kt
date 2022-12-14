@@ -159,7 +159,7 @@ class CollectFingerprintsViewModelTest {
     fun `test scanner supports imagetransfer then isImageTransferRequired should be true`() {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns true
-
+        vm.start(TWO_FINGERS_IDS)
         assertThat(vm.isImageTransferRequired()).isTrue()
     }
 
@@ -167,7 +167,7 @@ class CollectFingerprintsViewModelTest {
     fun `test scanner doesn't support imageTransfer then isImageTransferRequired should be false`() {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns false
-
+        vm.start(TWO_FINGERS_IDS)
         assertThat(vm.isImageTransferRequired()).isFalse()
     }
 

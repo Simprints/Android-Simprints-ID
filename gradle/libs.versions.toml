@@ -9,7 +9,7 @@ espresso_version = "3.5.0"
 uiAutomator_version = "2.2.0"
 androidx_lifecycle_version = "2.5.1"
 androidx_room_version = "2.4.3"
-androidx_camerax_version = "1.2.0-rc01"
+androidx_camerax_version = "1.2.0"
 dagger_version = "2.44.2"
 work_version = "2.7.1"
 location_services_version = "21.0.1"
@@ -23,13 +23,13 @@ mockito_version = "4.9.0"
 robolectric_version = "4.8.2"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
-fragment_version = "1.5.4"
+fragment_version = "1.5.5"
 chuck_version = "3.5.2"
 simmatcher_version = "1.0.0"
 hilt_version = "2.44.2"
 hilt_androidx_version = "1.0.0"
 datastore_version = "1.0.0"
-protobuf_version = "3.21.10"
+protobuf_version = "3.21.11"
 jacoco_version = "0.8.8"
 
 [libraries]
@@ -47,12 +47,12 @@ androidX-Room-core = { module = "androidx.room:room-runtime", version.ref = "and
 androidX-Room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx_room_version" }
 androidX-Room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx_room_version" }
 #Lifecycle
-androidX-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-scope = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx_lifecycle_version" }
 androidX-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx_lifecycle_version" }
 
 #UI
 androidX-uI-constraintlayout = "androidx.constraintlayout:constraintlayout:2.1.4"
+androidX-uI-coordinatorlayout = "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
 androidX-uI-cardview = "androidx.cardview:cardview:1.0.0"
 androidX-uI-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment_version" }
 androidX-uI-fragment-kotlin = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment_version" }
@@ -69,7 +69,6 @@ androidX-cameraX-view = { module = "androidx.camera:camera-view", version.ref = 
 
 #Navigation
 androidX-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx_navigation_version" }
-androidX-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx_navigation_version" }
 
 #Annotation
 androidX-annotation-annotation = "androidx.annotation:annotation:1.5.0"
@@ -192,6 +191,7 @@ testing-Mockk-android = "io.mockk:mockk-android:1.13.3"
 #Testing-Espresso
 testing-Espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso_version" }
 testing-Espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso_version" }
+testing-Espresso-accessibility = "com.google.android.apps.common.testing.accessibility.framework:accessibility-test-framework:4.0.0"
 testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso_version" }
 testing-Espresso-barista = "com.adevinta.android:barista:4.3.0" #Used to grant permissions in AndroidTests
 #Testing-AndroidX

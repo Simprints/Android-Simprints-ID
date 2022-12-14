@@ -18,31 +18,31 @@ There are 2 types of modules we can use, a Feature Module and a Infrastructure M
 Feature modules contain the logical boundaries for the user interaction components of a given feature in SID. For example these modules will contain the activities, fragments, views, layouts, and navigation components of a specific feature in SID. They should not contain reusable business logic, or things relating to infrastructure outside of the UX of the feature, those should all be inside of infrastructure modules. You might have two identically themed modules because of this which is fine. For example you could have a Remote Config feature module, which contains the screens and components that interact with the user, and a Remote Config infrastructure module, which contains the infrastructure for fetching, updating and storing the remote configuration. Feature modules will have a couple rules:
 
 Rules:
-- Feature modules can depend on the App Module (if they’re a dynamic feature module) and any number of infrastructure modules, but they cannot depend on other feature modules. 
-  - *Note: The circular dependency between DFMs and the App module is baked into the system for some reason. This is not a logic/design based dependency. Melad is going to explore this on a future learning day.* 
-- Feature modules are accountable for their own internal navigation (they should use a [nested nav graph](https://developer.android.com/guide/navigation/navigation-design-graph#nested-graphs)) and the back stack for their UI. They should have a single point of entry and exit.  
-- Feature modules can be a [dynamic feature module](https://developer.android.com/guide/playcore/feature-delivery/on-demand) or a normal Android module, depending on its delivery needs.  
+- Feature modules can depend on the App Module (if they’re a dynamic feature module) and any number of infrastructure modules, but they cannot depend on other feature modules.
+  - *Note: The circular dependency between DFMs and the App module is baked into the system for some reason. This is not a logic/design based dependency. Melad is going to explore this on a future learning day.*
+- Feature modules are accountable for their own internal navigation (they should use a [nested nav graph](https://developer.android.com/guide/navigation/navigation-design-graph#nested-graphs)) and the back stack for their UI. They should have a single point of entry and exit.
+- Feature modules can be a [dynamic feature module](https://developer.android.com/guide/playcore/feature-delivery/on-demand) or a normal Android module, depending on its delivery needs.
 
 ### Infrastructure Modules
 
 Infrastructure Modules contain business logic that should be logically isolated for cleanliness and re-use. Unlike feature modules they should be completely unaware of any UX components such as UIs or navigation. Their goal is to encapsulate some part of the domain layer of the application and make it re-usable to other components. Infrastructure modules will have a couple rules:
 
-Rules: 
-- Infrastructure modules should have a single access point which is the contract for the behavior of the module. This should be a top level interface file that exposes the functionality of the module. All other files (except those related to building) should be marked internal and not exposed to its users. 
-- Infrastructure modules will depend on the builder pattern. There will be two top level nome inner classes, the interface the exposes the functionality, and the builder object that is able to build the implementation of that interface. Say for the *infralogin* module we have a *LoginManager* interface we'd also have a top level *LoginManagerBuilder* class which is able to build the required implementation of that interface. It doesn't matter what that builder itself uses for DI (such as dagger or koin), and same for the other builders that call it.
-- Infrastructure modules can’t depend on feature modules or the App module, but they can depend on other infrastructure modules (keep in mind the dependencies can’t be circular). 
-- Infrastructure modules preferably are raw Java modules, but they can be Android modules if they need access to certain android components. This is fine for modules that use Jetpack components like Room or Datastore, but they cannot use any components relating to user interactions, such as Activities, Fragments, UI/Layout, or navigation components. 
+Rules:
+- Infrastructure modules should have a single access point which is the contract for the behavior of the module. This should be a top level interface file that exposes the functionality of the module. All other files (except those related to building) should be marked internal and not exposed to its users.
+- Infrastructure modules will depend on the builder pattern. There will be two top level nome inner classes, the interface the exposes the functionality, and the builder object that is able to build the implementation of that interface. Say for the *infralogin* module we have a *LoginManager* interface we'd also have a top level *LoginManagerBuilder* class which is able to build the required implementation of that interface. It doesn't matter what that builder itself uses for DI (such as dagger ), and same for the other builders that call it.
+- Infrastructure modules can’t depend on feature modules or the App module, but they can depend on other infrastructure modules (keep in mind the dependencies can’t be circular).
+- Infrastructure modules preferably are raw Java modules, but they can be Android modules if they need access to certain android components. This is fine for modules that use Jetpack components like Room or Datastore, but they cannot use any components relating to user interactions, such as Activities, Fragments, UI/Layout, or navigation components.
 
-### The App Module 
+### The App Module
 
-In general you don’t have to worry about this section as there can only be one app module (called ID) which is the top level Android Application module. It’s role is to expose the Android manifest, do the initial navigation of the app and house the main Application class. 
+In general you don’t have to worry about this section as there can only be one app module (called ID) which is the top level Android Application module. It’s role is to expose the Android manifest, do the initial navigation of the app and house the main Application class.
 
 Rules:
-- The app module should not contain any major business or domain logic, it should just be a thin layer to handle the app navigation and any Android specific requirements such as declaring the apps min API level, etc. 
+- The app module should not contain any major business or domain logic, it should just be a thin layer to handle the app navigation and any Android specific requirements such as declaring the apps min API level, etc.
 
 ### SID Breakdown
 
-Following the guidelines above the end goal of SID should look roughly like: 
+Following the guidelines above the end goal of SID should look roughly like:
 
 - featureabout (com.simprints.feature.about)
 - featureclientapi (com.simprints.feature.clientapi)
@@ -72,9 +72,26 @@ Following the guidelines above the end goal of SID should look roughly like:
 
 <br>
 
-## Cloning
+## Development setup
 
-`git clone  git@bitbucket.org:simprints/android-simprints-id.git`  
+Clone with `git clone git@bitbucket.org:simprints/android-simprints-id.git`
+
+Ensure the Gradle Offline Mode is disabled:
+
+![Disable Gradle Offline Mode](./img/disable-gradle-offline-mode.jpg)
+
+Generate a new Github token at <https://github.com/settings/tokens/new>, which generates a "Classic" token. The only scope needed is `read:packages`. Then add it to the `local.properties` file:
+
+```properties
+GITHUB_USERNAME=<your-github-username>
+GITHUB_TOKEN=<the-token-you-just-created>
+```
+
+If you are on a Mac with Apple Silicon, and Gradle's built-in NDK doesn't work, then you must also specify as the minimum version of the NDK in the `local.properties` file:
+
+```properties
+ndk.Version=24.0.8215888
+```
 
 <br>
 
@@ -84,7 +101,7 @@ The aim of the `ci` workflow is to run all tests in all modules, assemble produc
 When run, it immediately triggers all the other relevant workflows such that all tests are run.
 In the mean-time, the `ci` build waits for the other workflows to finish and, if they pass, continue to the assemble and deploy steps.
 
-It is triggered upon pull requests and serves as validation of the integrity of the branch for any pull requests into `main`. 
+It is triggered upon pull requests and serves as validation of the integrity of the branch for any pull requests into `main`.
 
 <br>
 
@@ -129,7 +146,7 @@ To use Mockito in DF modules for android tests, a different dexer is required: c
 ### Technical documentation on features
 
 A high level documentation on how each module works can be found in the [project's wiki](https://bitbucket.org/simprints/android-simprints-id/wiki/Home) on bitbucket.
-More details about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md). 
+More details about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md).
 
 <br>
 
@@ -149,7 +166,7 @@ To create apks, use the `assemble` command instead of `bundle`.
 |---------------------------|-----------------|----------------|-------------|-------------------------------------|----------------------------------------|
 | `bundleDebug`             |       ✓         |      x          |     ✓      |                ✓                    |  development  						    |
 | `bundleStaging`           |       ✓         |      x          |     ✓       |               ✓                    |  staging    						     |
-| `bundleRelease`           |       x         |      ✓          |     x       |                x                    |  production (CI only) | 
+| `bundleRelease`           |       x         |      ✓          |     x       |                x                    |  production (CI only) |
 
 <br>
 
@@ -163,28 +180,28 @@ To create an universal apk that can be shared you need to:
 2. Create a universal apk that can be installed in any device (warning: this is a big app)
 `bundletool build-apks --bundle=id/build/outputs/bundle/debug/id-debug.aab --output=id-debug.apks --ks=debug.keystore --ks-pass=pass:android --ks-key-alias=androiddebugkey --mode=universal --overwrite`
 
-To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS). 
+To install [bundletool](https://github.com/google/bundletool) you can download the jar from Github and execute it using `java -jar bundletool` or install using Homebrew (on macOS).
 
 <br>
 
 ## Deploying to a connected device
 
 After creating the universal apk from app bundle, run command to install apk on connected device.
-`bundletool install-apks --apks=/MyApp/my_app.apks` 
+`bundletool install-apks --apks=/MyApp/my_app.apks`
 
 <br>
 
 ## Deploying to the Google Play Store
 
-For a full guide go [here](https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+a+new+version) to get the complete breakdown. 
+For a full guide go [here](https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+a+new+version) to get the complete breakdown.
 
 Deploying to the Google Play Store has several steps:
 
-1. Update the VersionCode and VersionName 
+1. Update the VersionCode and VersionName
 
 2. Building and signing a release bundle
 
-3. Uploading to the Google Play Store. 
+3. Uploading to the Google Play Store.
 
-These steps are done automatically with [Bitbuket Piplines Deployments](https://bitbucket.org/simprints/android-simprints-id/addon/pipelines/deployments). 
-Pipelines in a release branch will have an extra step which can automatically upload the release to the internal test track. 
+These steps are done automatically with [Bitbuket Piplines Deployments](https://bitbucket.org/simprints/android-simprints-id/addon/pipelines/deployments).
+Pipelines in a release branch will have an extra step which can automatically upload the release to the internal test track.

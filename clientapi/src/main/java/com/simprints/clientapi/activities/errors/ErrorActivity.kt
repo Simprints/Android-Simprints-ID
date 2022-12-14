@@ -15,7 +15,6 @@ import com.simprints.clientapi.databinding.ActivityErrorBinding
 import com.simprints.core.tools.activity.BaseSplitActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import splitties.views.backgroundColor
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,8 +68,8 @@ class ErrorActivity : BaseSplitActivity(), ErrorContract.View {
     }
 
     override fun setBackgroundColour(colour: Int) {
-        binding.alertLayout.backgroundColor = colour
-        binding.textViewCloseButton.backgroundColor = colour
+        binding.alertLayout.setBackgroundColor( colour)
+        binding.textViewCloseButton.setBackgroundColor(colour)
     }
 
     override fun setErrorHintVisible(isHintVisible: Boolean) {

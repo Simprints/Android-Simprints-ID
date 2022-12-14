@@ -9,9 +9,7 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven(url = "https://storage.googleapis.com/r8-releases/raw/master")
         maven(url = "https://plugins.gradle.org/m2/")
-        maven(url = "https://kotlin.bintray.com/kotlinx/")
     }
 
     dependencies {
@@ -33,7 +31,7 @@ buildscript {
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.2")
 
         // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.12.0")
+        classpath("io.realm:realm-gradle-plugin:10.13.0")
 
         // Android X Navigation components
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
@@ -72,15 +70,6 @@ allprojects {
 
 tasks.register("clean", Delete::class) {
     delete(rootProject.buildDir)
-}
-
-tasks.register("runAllJacocoTests", GradleBuild::class) {
-    group = "verification"
-    tasks = listOf(
-        "clientapi:jacocoTestReportDebug", "core:jacocoTestReportDebug",
-        "id:jacocoTestReportDebug", "face:jacocoTestReportDebug",
-        "fingerprint:jacocoTestReportDebug", "fingerprintscanner:jacocoTestReportDebug"
-    )
 }
 
 plugins {
