@@ -1,6 +1,8 @@
 package com.simprints.infra.realm
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
@@ -42,13 +44,14 @@ class RealmWrapperImpl @Inject constructor(
                 //DB corruption detected; either DB file or key is corrupt
                 //1. Delete DB file in order to create a new one at next init
                 Realm.deleteRealm(config)
-                //2. TODO: Delete "last sync" info and start new sync
-                //3. Recreate the DB key
+                //2. Recreate the DB key
                 recreateLocalDbKey()
-                //4. Log exception after recreating the key so we get extra info
+                //3. Log exception after recreating the key so we get extra info
                 Simber.e(ex)
-                //5. Update Realm config with the new key
+                //4. Update Realm config with the new key
                 config = createAndSaveRealmConfig()
+                //5. Delete "last sync" info and start new sync
+                resetDownSyncState()
                 //6. Retry operation with new file and key
                 Realm.getInstance(config).use(block)
             }
@@ -76,4 +79,19 @@ class RealmWrapperImpl @Inject constructor(
                 throw RealmUninitialisedException("No signed in project id found")
             }
         }
+
+    private fun resetDownSyncState() {
+        //TODO: This is a temporary workaround to avoid a circular module dependency until we
+        // extract syncing in a separate module
+        val intent = Intent()
+        intent.component = ComponentName(
+            "com.simprints.id",
+            "com.simprints.eventsystem.events_sync.down.temp.ResetDownSyncService"
+        )
+        try {
+            appContext.startService(intent)
+        } catch (ex: Exception) {
+            Simber.e(ex)
+        }
+    }
 }
