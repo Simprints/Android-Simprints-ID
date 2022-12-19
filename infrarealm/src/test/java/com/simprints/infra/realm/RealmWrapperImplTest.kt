@@ -71,6 +71,11 @@ class RealmWrapperImplTest {
     fun `test useRealmInstance creates realm instance should throw if no signed in project is null`() =
         runTest {
             every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
+            realmWrapper = RealmWrapperImpl(
+                ApplicationProvider.getApplicationContext(),
+                secureLocalDbKeyProviderMock,
+                loginManagerMock,
+            )
             realmWrapper.useRealmInstance { }
             // Then should throw RealmUninitialisedException
         }
