@@ -1,18 +1,22 @@
 package com.simprints.eventsystem.event.local
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabaseCorruptException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.local.models.DbEvent
 import com.simprints.eventsystem.event.local.models.fromDbToDomain
+import com.simprints.eventsystem.event.local.models.fromDomainToDb
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import net.sqlcipher.database.SQLiteException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -41,6 +45,66 @@ class EventLocalDataSourceImplTest {
         every { eventDatabaseFactory.build() } returns db
         mockDaoLoadToMakeNothing()
     }
+
+    @Test(expected = SQLiteDatabaseCorruptException::class)
+    fun `test handleDatabaseCorruption gets called on SQLiteDatabaseCorruptExceptions`() =
+        runTest {
+            //Given
+            coEvery { eventDao.loadAll() } throws SQLiteDatabaseCorruptException()
+            // When
+            eventLocalDataSource.loadAll()
+            // Then
+            verify {
+                eventDatabaseFactory.deleteDatabase()
+                eventDatabaseFactory.recreateDatabaseKey()
+                eventDatabaseFactory.build()
+            }
+            coVerify(exactly = 2) { eventDao.loadAll() }
+        }
+
+    @Test(expected = SQLiteException::class)
+    fun `test handleDatabaseCorruption gets called on SQLiteExceptions that contains 'file is not a database'`() =
+        runTest {
+            //Given
+            coEvery { eventDao.loadAll() } throws SQLiteException("file is not a database")
+            // When
+            eventLocalDataSource.loadAll()
+            // Then
+            verify {
+                eventDatabaseFactory.deleteDatabase()
+                eventDatabaseFactory.recreateDatabaseKey()
+                eventDatabaseFactory.build()
+            }
+            coVerify(exactly = 2) { eventDao.loadAll() }
+        }
+
+    @Test(expected = SQLiteException::class)
+    fun `test handleDatabaseCorruption not called on SQLiteExceptions that don't  contain 'file is not a database'`() =
+        runTest {
+            //Given
+            coEvery { eventDao.loadAll() } throws SQLiteException()
+            // When
+            eventLocalDataSource.loadAll()
+            // Then
+            verify(exactly = 0) {
+                eventDatabaseFactory.deleteDatabase()
+            }
+            coVerify(exactly = 1) { eventDao.loadAll() }
+        }
+
+    @Test(expected = Exception::class)
+    fun `test handleDatabaseCorruption not called on other Exceptions`() =
+        runTest {
+            //Given
+            coEvery { eventDao.loadAll() } throws Exception()
+            // When
+            eventLocalDataSource.loadAll()
+            // Then
+            verify(exactly = 0) {
+                eventDatabaseFactory.deleteDatabase()
+            }
+            coVerify(exactly = 1) { eventDao.loadAll() }
+        }
 
     @Test
     fun loadWithAQuery() = runTest {
@@ -77,12 +141,50 @@ class EventLocalDataSourceImplTest {
     }
 
     @Test
-    fun countWithAQuery() {
+    fun countWithATypeQuery() {
         runBlocking {
             eventLocalDataSource.count(SESSION_CAPTURE)
 
             coVerify {
                 eventDao.countFromType(type = SESSION_CAPTURE)
+            }
+        }
+    }
+
+    @Test
+    fun countWithAProjectIdQuery() {
+        runBlocking {
+            eventLocalDataSource.count(projectId = "PROJECT_ID")
+
+            coVerify {
+                eventDao.countFromProject(projectId = "PROJECT_ID")
+            }
+        }
+    }
+
+    @Test
+    fun insertOrUpdate() {
+        runBlocking {
+            mockkStatic("com.simprints.eventsystem.event.local.models.DbEventKt")
+            val dbEvent = mockk<DbEvent>()
+            val event = mockk<Event> {
+                every { fromDomainToDb() } returns dbEvent
+            }
+            eventLocalDataSource.insertOrUpdate(event)
+
+            coVerify {
+                eventDao.insertOrUpdate(dbEvent)
+            }
+        }
+    }
+
+    @Test
+    fun countWithATypeAndProjectIdQuery() {
+        runBlocking {
+            eventLocalDataSource.count(type = SESSION_CAPTURE, projectId = "PROJECT_ID")
+
+            coVerify {
+                eventDao.countFromProjectByType(type = SESSION_CAPTURE, projectId = "PROJECT_ID")
             }
         }
     }
