@@ -35,7 +35,7 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
 
     private fun calculateKeyHash(key: String): String {
         val md = MessageDigest.getInstance("SHA-512")
-        return md.digest(key.toByteArray()).toString()
+        return md.digest(key.toByteArray()).contentToString()
     }
 
     override fun createLocalDatabaseKeyIfMissing(dbName: String) {
