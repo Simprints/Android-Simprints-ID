@@ -24,6 +24,9 @@ internal class SecurityManagerImpl @Inject constructor(
     override fun createLocalDatabaseKeyIfMissing(dbName: String) =
         secureLocalDbKeyProvider.createLocalDatabaseKeyIfMissing(dbName)
 
+    override fun recreateLocalDatabaseKey(dbName: String) =
+        secureLocalDbKeyProvider.recreateLocalDatabaseKey(dbName)
+
     override fun getLocalDbKeyOrThrow(dbName: String): LocalDbKey =
         secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
 

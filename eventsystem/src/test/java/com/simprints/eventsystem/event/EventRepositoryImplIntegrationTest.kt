@@ -69,6 +69,10 @@ class EventRepositoryImplIntegrationTest {
         db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java)
             .allowMainThreadQueries().build()
         eventDao = db.eventDao
+        every { timeHelper.now() } returns TIME1
+        every { eventDatabaseFactory.build() } returns db
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+
         eventLocalDataSource = EventLocalDataSourceImpl(
             eventDatabaseFactory,
             UnconfinedTestDispatcher(),
@@ -87,9 +91,6 @@ class EventRepositoryImplIntegrationTest {
             mockk()
         )
 
-        every { timeHelper.now() } returns TIME1
-        every { eventDatabaseFactory.build() } returns db
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
     }
 
     @Test

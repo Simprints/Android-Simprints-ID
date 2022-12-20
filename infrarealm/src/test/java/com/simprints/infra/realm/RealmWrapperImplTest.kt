@@ -1,5 +1,6 @@
 package com.simprints.infra.realm
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -11,6 +12,7 @@ import com.simprints.infra.security.keyprovider.LocalDbKey
 import io.mockk.*
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.exceptions.RealmFileException
 import io.realm.internal.RealmCore
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -33,8 +35,13 @@ class RealmWrapperImplTest {
             "DatabaseName",
             "DatabaseKey".toByteArray()
         )
+        justRun { recreateLocalDatabaseKey(PROJECT_ID) }
     }
+    private val context:Context = mockk()
     private lateinit var realmWrapper: RealmWrapperImpl
+    private var configuration: RealmConfiguration = mockk {
+        every { path } returns "path"
+    }
 
     @Before
     fun setUp() {
@@ -48,11 +55,12 @@ class RealmWrapperImplTest {
         every { Realm.getInstance(any()) } returns mockk(relaxed = true)
 
         mockkObject(RealmConfig)
-        every { RealmConfig.get(any(), any(), any()) } returns mockk()
+        every { RealmConfig.get(any(), any(), any()) } returns configuration
+
 
 
         realmWrapper = RealmWrapperImpl(
-            ApplicationProvider.getApplicationContext(),
+            context,
             secureLocalDbKeyProviderMock,
             loginManagerMock,
         )
@@ -71,7 +79,36 @@ class RealmWrapperImplTest {
     fun `test useRealmInstance creates realm instance should throw if no signed in project is null`() =
         runTest {
             every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
+            realmWrapper = RealmWrapperImpl(
+                ApplicationProvider.getApplicationContext(),
+                secureLocalDbKeyProviderMock,
+                loginManagerMock,
+            )
             realmWrapper.useRealmInstance { }
             // Then should throw RealmUninitialisedException
         }
+
+    @Test
+    fun `test recreate db if it is corrupted`() {
+        runTest {
+            //Given
+            justRun { secureLocalDbKeyProviderMock.recreateLocalDatabaseKey(PROJECT_ID) }
+            every { Realm.getInstance(configuration) } throws RealmFileException(
+                RealmFileException.Kind.NOT_FOUND,
+                "file not found"
+            ) andThen mockk<Realm>(relaxed = true)
+            every { Realm.deleteRealm(configuration) } returns true
+
+            //When
+            realmWrapper.useRealmInstance { }
+            //Then
+            verify {
+                Realm.deleteRealm(configuration)
+                secureLocalDbKeyProviderMock.recreateLocalDatabaseKey(PROJECT_ID)
+                context.startService(any()) // Start ResetDownSyncService service
+            }
+            verify(exactly = 2) { Realm.getInstance(configuration) }
+        }
+
+    }
 }
