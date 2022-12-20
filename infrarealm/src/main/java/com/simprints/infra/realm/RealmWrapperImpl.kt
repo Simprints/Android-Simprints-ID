@@ -17,7 +17,9 @@ import io.realm.exceptions.RealmFileException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class RealmWrapperImpl @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val securityManager: SecurityManager,
