@@ -1,6 +1,7 @@
 package com.simprints.infra.security.keyprovider
 
 import android.util.Base64.*
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.exceptions.MatchingLocalDatabaseKeyHashesException
 import com.simprints.infra.security.exceptions.MismatchingLocalDatabaseKeyHashesException
@@ -54,22 +55,26 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
     override fun recreateLocalDatabaseKey(dbName: String) {
         val oldKey = readRealmKeyFromSharedPrefs(dbName)
         if (oldKey == null) {
-            Simber.i(MissingLocalDatabaseKeyException())
+            logToCrashReport(MissingLocalDatabaseKeyException())
         } else {
             val savedKeyHash = readKeyHashFromSharedPrefs(dbName)
             if (savedKeyHash != null) {
                 val oldKeyHash = calculateKeyHash(oldKey)
                 if (oldKeyHash != savedKeyHash) {
-                    Simber.i(MismatchingLocalDatabaseKeyHashesException())
+                    logToCrashReport(MismatchingLocalDatabaseKeyHashesException())
                 } else {
-                    Simber.i(MatchingLocalDatabaseKeyHashesException())
+                    logToCrashReport(MatchingLocalDatabaseKeyHashesException())
                 }
             } else {
-                Simber.i(MissingLocalDatabaseKeyHashException())
+                logToCrashReport(MissingLocalDatabaseKeyHashException())
             }
         }
 
         createLocalDatabaseKey(dbName)
+    }
+
+    private fun logToCrashReport(message: Throwable) {
+        Simber.tag(REALM_DB.name).i(message)
     }
 
     /**
