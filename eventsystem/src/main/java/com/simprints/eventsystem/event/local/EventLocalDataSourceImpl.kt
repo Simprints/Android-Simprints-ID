@@ -6,6 +6,7 @@ import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.local.models.fromDbToDomain
 import com.simprints.eventsystem.event.local.models.fromDomainToDb
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ROOM_DB
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +14,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import net.sqlcipher.database.SQLiteDatabaseCorruptException
 import net.sqlcipher.database.SQLiteException
-import java.lang.Exception
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
@@ -48,11 +48,15 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         //2. Recreate the DB key
         eventDatabaseFactory.recreateDatabaseKey()
         //3. Log exception after recreating the key so we get extra info
-        Simber.e(ex)
+        logToCrashReport(ex)
         //4. Rebuild database
         eventDao = eventDatabaseFactory.build().eventDao
         //5. Retry operation with new file and key
         return block()
+    }
+
+    private fun logToCrashReport(message: Throwable) {
+        Simber.tag(ROOM_DB.name).i(message)
     }
 
     override suspend fun loadAll(): Flow<Event> =

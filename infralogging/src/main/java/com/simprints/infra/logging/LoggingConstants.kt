@@ -42,8 +42,8 @@ object LoggingConstants {
         SETTINGS,
         ALERT,
         REFUSAL,
-        ID_SETUP,
-        REALM_DB
+        REALM_DB,
+        ROOM_DB
     }
 
 }
