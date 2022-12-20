@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.exceptions.MatchingLocalDatabaseKeyHashesException
+import com.simprints.infra.security.exceptions.MismatchingLocalDatabaseKeyHashesException
 import com.simprints.infra.security.exceptions.MissingLocalDatabaseKeyException
 import com.simprints.infra.security.exceptions.MissingLocalDatabaseKeyHashException
 import com.simprints.infra.security.random.RandomGenerator
@@ -61,9 +62,10 @@ class SecureLocalDbKeyProviderImplTest {
     fun `get local db key should returns the key`() {
         val key = "aKey".toByteArray()
         every { dbKeySharedPrefs.getString(KEY_NAME, null) } returns encodeToString(key, DEFAULT)
-        every { hashSharedPrefs.getString(KEY_NAME, null) } returns "Hash"
+        every { hashSharedPrefs.getString(KEY_NAME, null) } returns null
 
         val receivedKey = dbKeyProvider.getLocalDbKeyOrThrow(DB_NAME)
+        verify { keyHashEditor.putString(KEY_NAME, any()) }
         assertThat(receivedKey).isEqualTo(LocalDbKey(DB_NAME, key))
     }
 
@@ -98,37 +100,41 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(any<MissingLocalDatabaseKeyHashException>())
+            Simber.i(ofType<MissingLocalDatabaseKeyHashException>())
         }
 
     }
+
     @Test
-    fun `test recreate db key will log MatchingLocalDatabaseKeyHashesException if there is hash stored`() {
-        every { dbKeySharedPrefs.getString(KEY_NAME, null) } returns "aKey"
-        every { hashSharedPrefs.getString(KEY_NAME, null) } returns  "Hash"
+    fun `test recreate db key will log MatchingLocalDatabaseKeyHashesException if the same hash is stored`() {
+        every { dbKeySharedPrefs.getString(KEY_NAME, null) } returns "name"
+        every {
+            hashSharedPrefs.getString(KEY_NAME, null)
+        } returns "b114f311db0e009ca2a88a9b97b1d7b362ddb27dc3dd214c6d20327a1fc3add8cc488cca4cc3565a876f6040f8b73a7b92475be1d0b1bc453f6140fba7183b9a"
 
         dbKeyProvider.recreateLocalDatabaseKey(DB_NAME)
 
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(any<MatchingLocalDatabaseKeyHashesException>())
+            Simber.i(ofType<MatchingLocalDatabaseKeyHashesException>())
         }
     }
 
     @Test
     fun `test recreate db key will log MismatchingLocalDatabaseKeyHashesException if the same hash stored`() {
         every { dbKeySharedPrefs.getString(KEY_NAME, null) } returns "key"
-        every { hashSharedPrefs.getString(KEY_NAME, null) } returns  "8335fa56d487562de248f47befc72743334051ddffcc2c09275f665454990317594745ee17c08f798cd7dce0ba8155dcda14f6398c1d1545116520a133017c09"
+        every { hashSharedPrefs.getString(KEY_NAME, null) } returns "hash"
 
         dbKeyProvider.recreateLocalDatabaseKey(DB_NAME)
 
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(any<MatchingLocalDatabaseKeyHashesException>())
+            Simber.i(ofType<MismatchingLocalDatabaseKeyHashesException>())
         }
     }
+
     @Test
     fun `test recreate db key will log MissingLocalDatabaseKeyException if no key stored`() {
         every { dbKeySharedPrefs.getString(KEY_NAME, null) } returns null
@@ -138,7 +144,7 @@ class SecureLocalDbKeyProviderImplTest {
         verify {
             dbKeyEditor.putString(KEY_NAME, any())
             keyHashEditor.putString(KEY_NAME, any())
-            Simber.i(any<MissingLocalDatabaseKeyException>())
+            Simber.i(ofType<MissingLocalDatabaseKeyException>())
         }
     }
 
