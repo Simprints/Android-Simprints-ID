@@ -119,7 +119,8 @@ class OrchestratorViewModelTest {
 
 
     @Test
-    fun viewModelStart_shouldForwardResultToOrchestrator() = runTest {
+     fun viewModelStart_shouldForwardResultToOrchestrator() = runTest {
+        vm.startOrRestoreModalityFlow(enrolAppRequest,false)
         vm.onModalStepRequestDone(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
         coVerify(exactly = 1) {
             orchestratorManagerMock.handleIntentResult(
