@@ -11,9 +11,11 @@ import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,6 +46,11 @@ class OrchestratorViewModel @Inject constructor(
     }
 
     /**
+     * All modality flow operations should wait for this initialization job to complete
+     */
+    private lateinit var modalityFlowInitJob: Job
+
+    /**
      * Starts or restore a modality flow
      *
      * @param appRequest
@@ -52,22 +59,29 @@ class OrchestratorViewModel @Inject constructor(
     fun startOrRestoreModalityFlow(appRequest: AppRequest, shouldRestoreState: Boolean) =
         viewModelScope.launch {
             val projectConfiguration = configManager.getProjectConfiguration()
-            orchestratorManager.initialise(
-                projectConfiguration.general.modalities,
-                appRequest,
-                getCurrentSessionId()
-            )
+            initModalityFlow(projectConfiguration, appRequest)
             if (shouldRestoreState) {
                 restoreState()
             } else {
                 startModalityFlow()
             }
-        }
+        }.also { modalityFlowInitJob = it }
+
+    private suspend fun initModalityFlow(
+        projectConfiguration: ProjectConfiguration,
+        appRequest: AppRequest
+    ) = orchestratorManager.initialise(
+        projectConfiguration.general.modalities,
+        appRequest,
+        getCurrentSessionId()
+    )
 
 
     private suspend fun startModalityFlow() =
         orchestratorManager.startModalityFlow()
 
+    private suspend fun restoreState() =
+        orchestratorManager.restoreState()
 
     private suspend fun getCurrentSessionId(): String =
         eventRepository.getCurrentCaptureSessionEvent().id
@@ -80,15 +94,14 @@ class OrchestratorViewModel @Inject constructor(
         data: Intent?
     ) {
         viewModelScope.launch {
+            modalityFlowInitJob.join()
             orchestratorManager.handleIntentResult(appRequest, requestCode, resultCode, data)
         }
     }
 
-    private suspend fun restoreState() =
-        orchestratorManager.restoreState()
 
-
-    fun saveState() {
+    fun saveState() = viewModelScope.launch {
+        modalityFlowInitJob.join()
         orchestratorManager.saveState()
     }
 }
