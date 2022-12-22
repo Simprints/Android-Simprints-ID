@@ -95,10 +95,14 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
         binding.syncConfig.setOnClickListener {
             binding.logs.append("\nGetting Configs from BFSID")
-            runBlocking {
-                configManager.refreshProjectConfiguration(loginManager.signedInProjectId)
+            lifecycleScope.launch {
+                try {
+                    configManager.refreshProjectConfiguration(loginManager.signedInProjectId)
+                    binding.logs.append("\nGot Configs from BFSID")
+                } catch (e: Exception) {
+                    binding.logs.append("\nFailed to refresh the project configuration")
+                }
             }
-            binding.logs.append("\nGot Configs from BFSID")
         }
 
         binding.syncDevice.setOnClickListener {
