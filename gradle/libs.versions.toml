@@ -20,7 +20,7 @@ fuzzywuzzy_version = "1.4.0"
 jackson_version = "2.14.1"
 rootbeer_version = "0.1.0"
 mockito_version = "4.10.0"
-robolectric_version = "4.8.2"
+robolectric_version = "4.9.1"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
 fragment_version = "1.5.5"
@@ -175,7 +175,6 @@ testing-navigation_testing = { module = "androidx.navigation:navigation-testing"
 testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.5.4"
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
-testing-Robolectric-multidex = "org.robolectric:multidex:3.4.2"
 testing-Robolectric-annotation = { module = "org.robolectric:annotations", version.ref = "robolectric_version" }
 #Testing-Mockito
 testing-Mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito_version" }
