@@ -175,7 +175,6 @@ dependencies {
         exclude("com.android.support")
     }
     testImplementation(libs.testing.robolectric.core)
-    testImplementation(libs.testing.robolectric.multidex)
     testImplementation(libs.testing.androidX.ext.junit)
     testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.core.testing)
@@ -203,7 +202,6 @@ dependencies {
         exclude("org.robolectric")
     }
     androidTestImplementation(libs.testing.robolectric.core)
-    androidTestImplementation(libs.testing.robolectric.multidex)
     androidTestImplementation(libs.testing.retrofit)
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.core)
