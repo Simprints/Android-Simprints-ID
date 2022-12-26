@@ -26,18 +26,22 @@ class RealmWrapperImpl @Inject constructor(
     private val loginManager: LoginManager
 ) : RealmWrapper {
 
-    private var config: RealmConfiguration
+    private lateinit var config: RealmConfiguration
 
-    init {
-        Realm.init(appContext)
-        config = createAndSaveRealmConfig()
+    private fun initRealm() {
+        if (!this::config.isInitialized) {
+            Realm.init(appContext)
+            config = createAndSaveRealmConfig()
+        }
     }
+
     /**
      * Use realm instance in from IO threads
      * throws RealmUninitialisedException
      */
     override suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(Dispatchers.IO) {
+            initRealm()
             Simber.tag(LoggingConstants.CrashReportTag.REALM_DB.name)
                 .d("[RealmWrapperImpl] getting new realm instance")
             try {
