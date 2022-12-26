@@ -175,7 +175,6 @@ testing-navigation_testing = { module = "androidx.navigation:navigation-testing"
 testing-KoTest-kotlin_assert = "io.kotest:kotest-assertions-core:5.5.4"
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
-testing-Robolectric-multidex = "org.robolectric:multidex:3.4.2"
 testing-Robolectric-annotation = { module = "org.robolectric:annotations", version.ref = "robolectric_version" }
 #Testing-Mockito
 testing-Mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito_version" }
