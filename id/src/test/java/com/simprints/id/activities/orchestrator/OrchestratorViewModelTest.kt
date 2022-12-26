@@ -120,6 +120,7 @@ class OrchestratorViewModelTest {
 
     @Test
     fun viewModelStart_shouldForwardResultToOrchestrator() = runTest {
+        vm.startOrRestoreModalityFlow(enrolAppRequest,false)
         vm.onModalStepRequestDone(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
         coVerify(exactly = 1) {
             orchestratorManagerMock.handleIntentResult(
@@ -128,6 +129,14 @@ class OrchestratorViewModelTest {
                 Activity.RESULT_OK,
                 null
             )
+        }
+    }
+    @Test
+    fun viewModel_saveState_should_CallOrchestratorManager_saveState() = runTest {
+        vm.startOrRestoreModalityFlow(enrolAppRequest,false)
+        vm.saveState()
+        coVerify {
+            orchestratorManagerMock.saveState()
         }
     }
 
