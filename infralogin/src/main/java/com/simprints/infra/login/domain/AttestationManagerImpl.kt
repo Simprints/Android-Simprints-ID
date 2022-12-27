@@ -4,6 +4,7 @@ import android.util.Base64
 import com.google.android.gms.tasks.Tasks
 import com.google.android.play.core.integrity.IntegrityManager
 import com.google.android.play.core.integrity.IntegrityTokenRequest
+import com.simprints.infra.login.BuildConfig
 import com.simprints.infra.login.exceptions.PlayIntegrityException
 import com.simprints.infra.login.exceptions.PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE
 import javax.inject.Inject
@@ -23,7 +24,12 @@ internal class AttestationManagerImpl @Inject constructor(private val playIntegr
         try {
             Tasks.await(
                 playIntegrityManager.requestIntegrityToken(
-                    IntegrityTokenRequest.builder().setNonce(nonce.encodeToBase64()).build()
+                    IntegrityTokenRequest
+                        .builder()
+                        .setNonce(nonce.encodeToBase64())
+                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong()
+                        )
+                        .build()
                 )
             )
         } catch (e: Throwable) {

@@ -144,27 +144,6 @@ class LoginActivityTest {
     }
 
     @Test
-    fun withIntegrityInvalidErrorConfirmViews() {
-        runBlocking {
-            coEvery {
-                authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticateDataResult.PlayIntegrityInvalidClaim
-
-            createAndStartActivity<LoginActivity>(loginBundle)
-
-            onView(withId(R.id.loginEditTextProjectSecret)).perform(typeText("loginEditTextProjectSecret"))
-            onView(withId(R.id.loginEditTextProjectId)).perform(typeText("project_id"))
-            onView(withId(R.id.loginButtonSignIn)).perform(click())
-            onView(withId(R.id.errorCard)).check(
-                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
-            )
-            onView(withId(R.id.errorTextView)).check(
-                matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
-            )
-        }
-    }
-
-    @Test
     fun withIntegrityUnavailableErrorConfirmViews() {
         runBlocking {
             coEvery {
