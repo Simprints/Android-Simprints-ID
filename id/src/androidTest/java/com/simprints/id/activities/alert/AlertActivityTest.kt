@@ -97,8 +97,8 @@ class AlertActivityTest {
 
     @Test
     fun safetyNetError_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
-        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
+        launchAlertActivity(AlertActRequest(AlertType.PLAY_INTEGRITY_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.PLAY_INTEGRITY_ERROR)
     }
 
     @Test
@@ -136,12 +136,12 @@ class AlertActivityTest {
 
     @Test
     fun safetyNetDown_userClicksClose_alertShouldFinishWithRightResult() {
-        val scenario = launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
-        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
+        val scenario = launchAlertActivity(AlertActRequest(AlertType.PLAY_INTEGRITY_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.PLAY_INTEGRITY_ERROR)
 
         onView(withId(R.id.alertLeftButton)).perform(click())
 
-        verifyIntentReturned(scenario.result, AlertType.SAFETYNET_ERROR, ButtonAction.CLOSE)
+        verifyIntentReturned(scenario.result, AlertType.PLAY_INTEGRITY_ERROR, ButtonAction.CLOSE)
     }
 
 

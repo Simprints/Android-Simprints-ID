@@ -137,7 +137,7 @@ class AlertPresenter @AssistedInject constructor(
             AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN,
             AlertType.DIFFERENT_USER_ID_SIGNED_IN,
             AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED,
-            AlertType.SAFETYNET_ERROR -> {
+            AlertType.PLAY_INTEGRITY_ERROR -> {
                 view.closeActivityAfterCloseButton()
             }
             AlertType.GUID_NOT_FOUND_OFFLINE -> {

@@ -72,9 +72,9 @@ class ProjectAuthenticatorImpl @Inject constructor(
 
     private fun buildAuthRequest(
         encryptedProjectSecret: String,
-        googleAttestation: String,
+        playIntegrotyToken: String,
         deviceId: String
-    ): AuthRequest = AuthRequest(encryptedProjectSecret, googleAttestation, deviceId)
+    ): AuthRequest = AuthRequest(encryptedProjectSecret, playIntegrotyToken, deviceId)
 
 
     private suspend fun AuthRequest.makeAuthRequest(nonceScope: NonceScope): Token =

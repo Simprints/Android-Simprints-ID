@@ -65,7 +65,7 @@ internal class LoginManagerImpl @Inject constructor(
         }
 
     override fun requestAttestation(nonce: String): String =
-        attestationManager.requestAttestation(nonce)
+        attestationManager.requestPlayIntegrityToken(nonce)
 
     override suspend fun requestAuthenticationData(
         projectId: String,

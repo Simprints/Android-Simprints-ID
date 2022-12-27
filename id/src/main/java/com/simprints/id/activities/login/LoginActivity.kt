@@ -106,8 +106,7 @@ class LoginActivity : BaseSplitActivity() {
             )
             AuthenticateDataResult.BadCredentials -> handleSignInFailedInvalidCredentials()
             AuthenticateDataResult.Offline -> handleSignInFailedNoConnection()
-            AuthenticateDataResult.SafetyNetInvalidClaim,
-            AuthenticateDataResult.SafetyNetUnavailable -> handleSafetyNetDownError()
+            AuthenticateDataResult.PlayIntegrityUnavailable -> handlePlayIntegrityDownError()
             AuthenticateDataResult.TechnicalFailure -> handleSignInFailedServerError()
             AuthenticateDataResult.Unknown -> handleSignInFailedUnknownReason()
         }
@@ -256,10 +255,10 @@ class LoginActivity : BaseSplitActivity() {
         }
     }
 
-    private fun handleSafetyNetDownError() {
+    private fun handlePlayIntegrityDownError() {
         progressDialog.dismiss()
         binding.errorCard.isVisible = false
-        launchAlert(this, AlertType.SAFETYNET_ERROR)
+        launchAlert(this, AlertType.PLAY_INTEGRITY_ERROR)
     }
 
     private fun handleSignInFailedUnknownReason() {
@@ -268,6 +267,7 @@ class LoginActivity : BaseSplitActivity() {
         launchAlert(this, AlertType.UNEXPECTED_ERROR)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val response = AppErrorResponse(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
         setErrorResponseInActivityResultAndFinish(response)

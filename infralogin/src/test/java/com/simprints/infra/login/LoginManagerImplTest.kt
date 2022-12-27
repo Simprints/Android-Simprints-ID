@@ -167,7 +167,7 @@ class LoginManagerImplTest {
 
     @Test
     fun `requestAttestation should call the correct method`() {
-        every { attestationManager.requestAttestation(NONCE) } returns ATTESTATION
+        every { attestationManager.requestPlayIntegrityToken(NONCE) } returns ATTESTATION
         val receivedAttestation = loginManagerManagerImpl.requestAttestation(NONCE)
 
         assertThat(receivedAttestation).isEqualTo(ATTESTATION)

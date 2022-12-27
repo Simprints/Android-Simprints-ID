@@ -6,7 +6,8 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.login.exceptions.SafetyNetException
+import com.simprints.infra.login.exceptions.PlayIntegrityException
+import com.simprints.infra.login.exceptions.PlayIntegrityException.PlayIntegrityExceptionReason
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -62,20 +63,13 @@ class AuthenticationHelperImplTest {
     }
 
     @Test
-    fun shouldSetSafetyNetUnavailableIfServiceUnavailableException() = runBlocking {
+    fun shouldSetPlayIntegrityUnavailableIfServiceUnavailableException() = runBlocking {
         val result =
-            mockException(SafetyNetException(reason = SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
+            mockException(PlayIntegrityException(reason = PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE))
 
-        assertThat(result).isInstanceOf(AuthenticateDataResult.SafetyNetUnavailable::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.PlayIntegrityUnavailable::class.java)
     }
 
-    @Test
-    fun shouldSetSafetyNetInvalidIfSafetyNextInvalidException() = runBlocking {
-        val result =
-            mockException(SafetyNetException(reason = SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS))
-
-        assertThat(result).isInstanceOf(AuthenticateDataResult.SafetyNetInvalidClaim::class.java)
-    }
 
     @Test
     fun shouldSetUnknownIfGenericException() = runBlocking {

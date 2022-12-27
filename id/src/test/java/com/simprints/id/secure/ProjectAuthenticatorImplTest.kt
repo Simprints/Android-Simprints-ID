@@ -8,7 +8,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
-import com.simprints.infra.login.exceptions.SafetyNetException
+import com.simprints.infra.login.exceptions.PlayIntegrityException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -143,13 +143,13 @@ class ProjectAuthenticatorImplTest {
         }
 
     @Test
-    fun safetyNetFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
-        every { loginManager.requestAttestation(any()) } throws SafetyNetException(
+    fun playIntegrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
+        every { loginManager.requestAttestation(any()) } throws PlayIntegrityException(
             "",
-            SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
+            PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE
         )
 
-        assertThrows<SafetyNetException> {
+        assertThrows<PlayIntegrityException> {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
         }
     }

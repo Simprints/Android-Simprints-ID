@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
-import java.util.UUID
+import java.util.*
 
 @Keep
 data class AuthenticationEvent(
@@ -46,8 +46,7 @@ data class AuthenticationEvent(
             BAD_CREDENTIALS,
             OFFLINE,
             TECHNICAL_FAILURE,
-            SAFETYNET_UNAVAILABLE,
-            SAFETYNET_INVALID_CLAIM,
+            PLAY_INTEGRITY_UNAVAILABLE,
             BACKEND_MAINTENANCE_ERROR,
             UNKNOWN
         }

@@ -1,8 +1,7 @@
 package com.simprints.infra.login
 
 import android.content.Context
-import com.google.android.gms.safetynet.SafetyNet
-import com.google.android.gms.safetynet.SafetyNetClient
+import com.google.android.play.core.integrity.IntegrityManagerFactory
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.infra.login.db.FirebaseManagerImpl
@@ -46,10 +45,10 @@ abstract class LoginManagerModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object SafetyNetModule {
+object IntegrityModule {
 
     @Provides
-    fun provideSafetyNetClient(@ApplicationContext context: Context): SafetyNetClient = SafetyNet.getClient(context)
+    fun providePlayIntegrityManager(@ApplicationContext context: Context) = IntegrityManagerFactory.create(context)
 
     @Provides
     internal fun provideSimApiClientFactory(
