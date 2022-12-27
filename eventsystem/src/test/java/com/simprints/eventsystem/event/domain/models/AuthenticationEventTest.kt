@@ -50,11 +50,6 @@ class AuthenticationEventTest {
         createAuthenticationEvent(AuthenticationPayload.Result.PLAY_INTEGRITY_UNAVAILABLE)
     }
 
-    @Test
-    fun create_AuthenticationEvent_withSafetyInvalidError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.PLAY_INTEGRITY_INVALID_CLAIM)
-    }
-
     private fun createAuthenticationEvent(result: AuthenticationPayload.Result) {
         val labels = EventLabels(sessionId = GUID1)
         val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)

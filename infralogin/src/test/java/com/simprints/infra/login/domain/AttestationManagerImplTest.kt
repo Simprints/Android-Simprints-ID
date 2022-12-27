@@ -67,34 +67,4 @@ class AttestationManagerImplTest {
         }
         assertThat(exception.reason).isEqualTo(PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE)
     }
-
-    @Test
-    fun `should throw a safety net exception with invalid claims when a null attestation`() {
-        every {
-            playIntegrityManager.requestIntegrityToken(
-                IntegrityTokenRequest.builder().setNonce(NONCE).build()
-            )
-        } returns attestationResponseTask
-        every { attestationResponse.token() } returns null
-
-        val exception = assertThrows<PlayIntegrityException> {
-            attestationManagerImpl.requestPlayIntegrityToken(NONCE)
-        }
-        assertThat(exception.reason).isEqualTo(PlayIntegrityException.PlayIntegrityExceptionReason.INVALID_CLAIMS)
-    }
-
-    @Test
-    fun `should throw a safety net exception with invalid claims when an attestation with error claim`() {
-        every {
-            playIntegrityManager.requestIntegrityToken(
-                IntegrityTokenRequest.builder().setNonce(NONCE).build()
-            )
-        } returns attestationResponseTask
-        every { attestationResponse.token() } returns ERROR_JWS_RESULT
-
-        val exception = assertThrows<PlayIntegrityException> {
-            attestationManagerImpl.requestPlayIntegrityToken(NONCE)
-        }
-        assertThat(exception.reason).isEqualTo(PlayIntegrityException.PlayIntegrityExceptionReason.INVALID_CLAIMS)
-    }
 }

@@ -42,13 +42,6 @@ class ApiAuthenticationPayloadKtTest {
     }
 
     @Test
-    fun `should map safety net invalid error correctly`() {
-        val result =
-            AuthenticationEvent.AuthenticationPayload.Result.PLAY_INTEGRITY_INVALID_CLAIM.fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.PLAY_INTEGRITY_INVALID_CLAIM::class.java)
-    }
-
-    @Test
     fun `should map unknown error correctly`() {
         val result =
             AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN.fromDomainToApi()
