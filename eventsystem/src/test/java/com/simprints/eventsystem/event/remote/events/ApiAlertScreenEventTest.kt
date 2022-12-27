@@ -161,7 +161,7 @@ class ApiAlertScreenEventTest {
     }
 
     @Test
-    fun safetynetError_fromDomainToApi() {
+    fun playIntegrityError_fromDomainToApi() {
         val domain = AlertScreenEventType.PLAY_INTEGRITY_ERROR
         val api = ApiAlertScreenEventType.PLAY_INTEGRITY_ERROR
 
