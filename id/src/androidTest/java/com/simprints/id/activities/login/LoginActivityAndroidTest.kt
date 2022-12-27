@@ -164,8 +164,8 @@ class LoginActivityAndroidTest {
     }
 
     @Test
-    fun withInvalidSafetyNetClaims_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(AuthenticateDataResult.SafetyNetInvalidClaim)
+    fun withInvalidIntegrityClaims_clickSignIn_shouldLaunchAlertScreen() {
+        mockAuthenticationResult(AuthenticateDataResult.PlayIntegrityInvalidClaim)
 
         loginActivity {
             withMandatoryCredentialsPresent()
@@ -178,8 +178,8 @@ class LoginActivityAndroidTest {
     }
 
     @Test
-    fun withSafetyNetUnavailable_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(AuthenticateDataResult.SafetyNetUnavailable)
+    fun withIntegrityUnavailable_clickSignIn_shouldLaunchAlertScreen() {
+        mockAuthenticationResult(AuthenticateDataResult.PlayIntegrityUnavailable)
 
         loginActivity {
             withMandatoryCredentialsPresent()

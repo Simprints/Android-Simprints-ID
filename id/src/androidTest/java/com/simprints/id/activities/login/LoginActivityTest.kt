@@ -144,11 +144,11 @@ class LoginActivityTest {
     }
 
     @Test
-    fun withSafetyNetInvalidErrorConfirmViews() {
+    fun withIntegrityInvalidErrorConfirmViews() {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticateDataResult.SafetyNetInvalidClaim
+            } returns AuthenticateDataResult.PlayIntegrityInvalidClaim
 
             createAndStartActivity<LoginActivity>(loginBundle)
 
@@ -165,11 +165,11 @@ class LoginActivityTest {
     }
 
     @Test
-    fun withSafetyNetUnavailableErrorConfirmViews() {
+    fun withIntegrityUnavailableErrorConfirmViews() {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticateDataResult.SafetyNetUnavailable
+            } returns AuthenticateDataResult.PlayIntegrityUnavailable
 
             createAndStartActivity<LoginActivity>(loginBundle)
 

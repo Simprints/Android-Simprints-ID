@@ -162,8 +162,8 @@ class ApiAlertScreenEventTest {
 
     @Test
     fun safetynetError_fromDomainToApi() {
-        val domain = AlertScreenEventType.SAFETYNET_ERROR
-        val api = ApiAlertScreenEventType.SAFETYNET_ERROR
+        val domain = AlertScreenEventType.PLAY_INTEGRITY_ERROR
+        val api = ApiAlertScreenEventType.PLAY_INTEGRITY_ERROR
 
         assertThat(domain.fromDomainToApi()).isEqualTo(api)
     }

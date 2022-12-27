@@ -54,7 +54,7 @@ data class ApiAlertScreenPayload(override val startTime: Long,
         INVALID_SESSION_ID,
         INVALID_USER_ID,
         INVALID_VERIFY_ID,
-        SAFETYNET_ERROR,
+        PLAY_INTEGRITY_ERROR,
         FACE_LICENSE_INVALID,
         BACKEND_MAINTENANCE_ERROR,
         FACE_LICENSE_MISSING;
@@ -89,7 +89,7 @@ fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
         AlertScreenEventType.INVALID_SESSION_ID -> INVALID_SESSION_ID
         AlertScreenEventType.INVALID_USER_ID -> INVALID_USER_ID
         AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
-        AlertScreenEventType.SAFETYNET_ERROR -> SAFETYNET_ERROR
+        AlertScreenEventType.PLAY_INTEGRITY_ERROR -> PLAY_INTEGRITY_ERROR
         AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
         AlertScreenEventType.INVALID_STATE_FOR_INTENT_ACTION -> INVALID_STATE_FOR_INTENT_ACTION
         AlertScreenEventType.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID

@@ -25,8 +25,7 @@ data class ApiAuthenticationPayload(override val startTime: Long,
         OFFLINE,
         BACKEND_MAINTENANCE_ERROR,
         TECHNICAL_FAILURE,
-        SAFETYNET_UNAVAILABLE,
-        SAFETYNET_INVALID_CLAIM
+        PLAY_INTEGRITY_UNAVAILABLE,
     }
 
     constructor(domainPayload: AuthenticationPayload):
@@ -44,8 +43,7 @@ fun AuthenticationPayload.Result.fromDomainToApi() =
         BAD_CREDENTIALS -> ApiResult.BAD_CREDENTIALS
         OFFLINE -> ApiResult.OFFLINE
         TECHNICAL_FAILURE -> ApiResult.TECHNICAL_FAILURE
-        SAFETYNET_UNAVAILABLE -> ApiResult.SAFETYNET_UNAVAILABLE
-        SAFETYNET_INVALID_CLAIM -> ApiResult.SAFETYNET_INVALID_CLAIM
+        PLAY_INTEGRITY_UNAVAILABLE -> ApiResult.PLAY_INTEGRITY_UNAVAILABLE
         BACKEND_MAINTENANCE_ERROR -> ApiResult.BACKEND_MAINTENANCE_ERROR
         UNKNOWN -> ApiResult.TECHNICAL_FAILURE
     }

@@ -1,51 +1,38 @@
 package com.simprints.infra.login.domain
 
 import android.util.Base64
-import com.google.android.gms.safetynet.SafetyNetApi
-import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.android.gms.tasks.Tasks
-import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.BuildConfig
-import com.simprints.infra.login.exceptions.SafetyNetException
+import com.google.android.play.core.integrity.IntegrityManager
+import com.google.android.play.core.integrity.IntegrityTokenRequest
+import com.simprints.infra.login.exceptions.PlayIntegrityException
+import com.simprints.infra.login.exceptions.PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE
 import javax.inject.Inject
 
-internal class AttestationManagerImpl @Inject constructor(private val safetyNetClient: SafetyNetClient) : AttestationManager {
+internal class AttestationManagerImpl @Inject constructor(private val playIntegrityManager: IntegrityManager) :
+    AttestationManager {
 
-    override fun requestAttestation(nonce: String): String {
-        val result = getSafetyNetAttestationResponse(safetyNetClient, nonce)
+    override fun requestPlayIntegrityToken(nonce: String): String {
+        val result = getPlayIntegrityToken(nonce)
 
         return result.let {
-            checkForErrorClaimAndThrow(it.jwsResult)
-            it.jwsResult!!
+            it.token()!!
         }
     }
 
-    private fun getSafetyNetAttestationResponse(
-        safetyNetClient: SafetyNetClient,
-        nonce: String
-    ): SafetyNetApi.AttestationResponse {
-        return try {
+    private fun getPlayIntegrityToken(nonce: String) =
+        try {
             Tasks.await(
-                safetyNetClient.attest(
-                    Base64.decode(nonce, Base64.NO_WRAP),
-                    BuildConfig.SAFETYNET_API_KEY
+                playIntegrityManager.requestIntegrityToken(
+                    IntegrityTokenRequest.builder().setNonce(nonce.encodeToBase64()).build()
                 )
             )
         } catch (e: Throwable) {
-            throw SafetyNetException(reason = SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
+            throw PlayIntegrityException(reason = SERVICE_UNAVAILABLE)
         }
-    }
 
-    private fun checkForErrorClaimAndThrow(jwsResult: String?) {
-        val response = JwtTokenHelper.extractTokenPayloadAsJson(jwsResult)
-
-        if (response == null || response.has(SAFETYNET_TOKEN_ERROR_FILED)) {
-            Simber.tag("SafetyNet Response").i(response.toString())
-            throw SafetyNetException(reason = SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS)
-        }
-    }
-
-    companion object {
-        const val SAFETYNET_TOKEN_ERROR_FILED = "error"
-    }
 }
+
+// Encode nonce to base64 hex string
+private fun String.encodeToBase64(): String =
+    Base64.encodeToString(this.toByteArray(), Base64.NO_WRAP)
+

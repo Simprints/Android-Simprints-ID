@@ -2,9 +2,7 @@ package com.simprints.eventsystem.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
+import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.Companion.EVENT_VERSION
 import com.simprints.eventsystem.event.domain.models.EventType.AUTHENTICATION
@@ -49,12 +47,12 @@ class AuthenticationEventTest {
 
     @Test
     fun create_AuthenticationEvent_withSafetyUnavailableError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE)
+        createAuthenticationEvent(AuthenticationPayload.Result.PLAY_INTEGRITY_UNAVAILABLE)
     }
 
     @Test
     fun create_AuthenticationEvent_withSafetyInvalidError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM)
+        createAuthenticationEvent(AuthenticationPayload.Result.PLAY_INTEGRITY_INVALID_CLAIM)
     }
 
     private fun createAuthenticationEvent(result: AuthenticationPayload.Result) {

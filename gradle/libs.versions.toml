@@ -13,7 +13,7 @@ androidx_camerax_version = "1.2.0"
 dagger_version = "2.44.2"
 work_version = "2.7.1"
 location_services_version = "21.0.1"
-safetynet_services_version = "18.0.1"
+play_integrity_version = "1.0.2"
 retrofit_version = "2.9.0"
 okttp_version = "4.10.0"
 fuzzywuzzy_version = "1.4.0"
@@ -89,7 +89,7 @@ workManager-work = { module = "androidx.work:work-runtime-ktx", version.ref = "w
 
 #PlayServices
 playServices-location = { module = "com.google.android.gms:play-services-location", version.ref = "location_services_version" }
-playServices-safetynet = { module = "com.google.android.gms:play-services-safetynet", version.ref = "safetynet_services_version" }
+playServices-integrity = { module = "com.google.android.play:integrity", version.ref = "play_integrity_version" }
 
 #Firebase
 firebase-auth = "com.google.firebase:firebase-auth-ktx:21.1.0"

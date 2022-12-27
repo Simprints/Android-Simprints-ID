@@ -62,7 +62,7 @@
     <string name="verify_guid_not_found_online_message">A pessoa seleccionada para verificação não está no banco de dados</string>
     <string name="verify_guid_not_found_offline_message">Pessoa não encontrada, verifique se está conectado à internet e tente novamente</string>
     <string name="unforeseen_error_message">Por favor, tente novamente e se o Simprints não funcionar entre em contacto com o administrador do sistema</string>
-    <string name="safetynet_down_alert_message">1. Tente novamente após 5 a 10 minutos 
+    <string name="play_integrity_down_alert_message">1. Tente novamente após 5 a 10 minutos
 \n 2. Toque em fechar</string>
     <string name="modality_installation_offline">Verifique se o Wi-Fi ou os dados móveis estão activados nas configurações para concluir o download</string>
     <string name="feature_not_downloaded">Para usar Simprints, continue e baixe o %1$s</string>
