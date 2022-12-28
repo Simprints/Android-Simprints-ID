@@ -27,8 +27,7 @@ internal class AttestationManagerImpl @Inject constructor(private val playIntegr
                     IntegrityTokenRequest
                         .builder()
                         .setNonce(nonce.encodeToBase64())
-                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong()
-                        )
+                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
                         .build()
                 )
             )
