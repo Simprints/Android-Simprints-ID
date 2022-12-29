@@ -4,8 +4,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
 import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.AttestationManager
 import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.PlayIntegrityTokenRequester
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
@@ -24,14 +24,14 @@ class LoginManagerImplTest {
 
     private val authenticationRemoteDataSource =
         mockk<AuthenticationRemoteDataSource>(relaxed = true)
-    private val attestationManager = mockk<AttestationManager>(relaxed = true)
+    private val playIntegrityTokenRequester = mockk<PlayIntegrityTokenRequester>(relaxed = true)
     private val loginInfoManager = mockk<LoginInfoManager>(relaxed = true)
     private val remoteDbManager = mockk<RemoteDbManager>(relaxed = true)
     private val simApiClientFactory = mockk<SimApiClientFactory>(relaxed = true)
 
     private val loginManagerManagerImpl = LoginManagerImpl(
         authenticationRemoteDataSource,
-        attestationManager,
+        playIntegrityTokenRequester,
         loginInfoManager,
         remoteDbManager,
         simApiClientFactory
@@ -166,11 +166,11 @@ class LoginManagerImplTest {
     }
 
     @Test
-    fun `requestAttestation should call the correct method`() {
-        every { attestationManager.requestPlayIntegrityToken(NONCE) } returns ATTESTATION
-        val receivedAttestation = loginManagerManagerImpl.requestAttestation(NONCE)
+    fun `requestPlayIntegrityToken should call the correct method`() {
+        every { playIntegrityTokenRequester.requestPlayIntegrityToken(NONCE) } returns PLAY_INTEGRITY_TOKEN
+        val receivedToken = loginManagerManagerImpl.requestPlayIntegrityToken(NONCE)
 
-        assertThat(receivedAttestation).isEqualTo(ATTESTATION)
+        assertThat(receivedToken).isEqualTo(PLAY_INTEGRITY_TOKEN)
     }
 
     @Test
@@ -325,7 +325,7 @@ class LoginManagerImplTest {
         }
 
     companion object {
-        private const val ATTESTATION = "attestation"
+        private const val PLAY_INTEGRITY_TOKEN = "token"
         private const val NONCE = "nonce"
         private const val PROJECT_ID = "projectId"
         private const val DEVICE_ID = "deviceId"
@@ -335,7 +335,7 @@ class LoginManagerImplTest {
         private const val API_KEY = "apiKey"
         private const val APPLICATION_ID = "applicationId"
         private val AUTHENTICATION_DATA = AuthenticationData("public_key", "nonce")
-        private val AUTH_REQUEST = AuthRequest("secret", "attestation", "deviceId")
+        private val AUTH_REQUEST = AuthRequest("secret", "token", "deviceId")
         private val TOKEN = Token("token", "projectId", "apiKey", "application")
         private const val TOKEN_STRING = "token"
         private val FIREBASE_APP = mockk<FirebaseApp>()

@@ -9,7 +9,7 @@ import com.simprints.infra.network.SimRemoteInterface
 import kotlin.reflect.KClass
 
 interface LoginManager {
-    fun requestAttestation(nonce: String): String
+    fun requestPlayIntegrityToken(nonce: String): String
 
     suspend fun requestAuthenticationData(
         projectId: String,

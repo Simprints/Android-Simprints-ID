@@ -13,7 +13,7 @@ internal data class ApiAuthRequestBody(
         fun fromDomain(authRequest: AuthRequest): ApiAuthRequestBody =
             ApiAuthRequestBody(
                 authRequest.encryptedProjectSecret,
-                authRequest.integrityAPIVerdict,
+                authRequest.integrityAPIToken,
                 authRequest.deviceId,
             )
     }

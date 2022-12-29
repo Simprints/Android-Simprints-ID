@@ -9,8 +9,8 @@ import com.simprints.infra.login.exceptions.PlayIntegrityException
 import com.simprints.infra.login.exceptions.PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE
 import javax.inject.Inject
 
-internal class AttestationManagerImpl @Inject constructor(private val playIntegrityManager: IntegrityManager) :
-    AttestationManager {
+internal class PlayIntegrityTokenRequesterImpl @Inject constructor(private val playIntegrityManager: IntegrityManager) :
+    PlayIntegrityTokenRequester {
 
     override fun requestPlayIntegrityToken(nonce: String): String {
         val result = getPlayIntegrityToken(nonce)

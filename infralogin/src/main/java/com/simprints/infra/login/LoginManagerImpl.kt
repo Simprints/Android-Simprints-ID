@@ -2,8 +2,8 @@ package com.simprints.infra.login
 
 import com.google.firebase.FirebaseApp
 import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.AttestationManager
 import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.PlayIntegrityTokenRequester
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
@@ -17,7 +17,7 @@ import kotlin.reflect.KClass
 
 internal class LoginManagerImpl @Inject constructor(
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
-    private val attestationManager: AttestationManager,
+    private val playIntegrityTokenRequester: PlayIntegrityTokenRequester,
     private val loginInfoManager: LoginInfoManager,
     private val remoteDbManager: RemoteDbManager,
     private val simApiClientFactory: SimApiClientFactory,
@@ -64,8 +64,8 @@ internal class LoginManagerImpl @Inject constructor(
             loginInfoManager.coreFirebaseApiKey = value
         }
 
-    override fun requestAttestation(nonce: String): String =
-        attestationManager.requestPlayIntegrityToken(nonce)
+    override fun requestPlayIntegrityToken(nonce: String): String =
+        playIntegrityTokenRequester.requestPlayIntegrityToken(nonce)
 
     override suspend fun requestAuthenticationData(
         projectId: String,
