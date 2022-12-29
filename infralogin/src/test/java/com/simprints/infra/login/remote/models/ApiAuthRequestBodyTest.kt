@@ -16,7 +16,7 @@ class ApiAuthRequestBodyTest {
 
         val authRequestBody = AuthRequest(
             encryptedProjectSecret = "encryptedProjectSecret",
-            integrityAPIVerdict = "integrityAPIVerdict",
+            integrityAPIToken = "integrityAPIVerdict",
             deviceId = "deviceId",
         )
         assertThat(ApiAuthRequestBody.fromDomain(authRequestBody)).isEqualTo(apiAuthRequestBody)

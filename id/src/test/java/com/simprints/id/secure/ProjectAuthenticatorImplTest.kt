@@ -144,7 +144,7 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun playIntegrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
-        every { loginManager.requestAttestation(any()) } throws PlayIntegrityException(
+        every { loginManager.requestPlayIntegrityToken(any()) } throws PlayIntegrityException(
             "",
             PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE
         )
@@ -198,7 +198,7 @@ class ProjectAuthenticatorImplTest {
             mockk(),
             mockk(),
         )
-        every { loginManager.requestAttestation(any()) } returns "google_attestation"
+        every { loginManager.requestPlayIntegrityToken(any()) } returns "token"
     }
 
     private companion object {

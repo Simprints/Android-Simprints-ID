@@ -56,7 +56,7 @@ class ProjectAuthenticatorImpl @Inject constructor(
         )
         return buildAuthRequest(
             getEncryptedProjectSecret(projectSecret, authenticationData),
-            loginManager.requestAttestation(authenticationData.nonce),
+            loginManager.requestPlayIntegrityToken(authenticationData.nonce),
             deviceId
         )
     }
@@ -72,9 +72,9 @@ class ProjectAuthenticatorImpl @Inject constructor(
 
     private fun buildAuthRequest(
         encryptedProjectSecret: String,
-        playIntegrotyToken: String,
+        playIntegrityToken: String,
         deviceId: String
-    ): AuthRequest = AuthRequest(encryptedProjectSecret, playIntegrotyToken, deviceId)
+    ): AuthRequest = AuthRequest(encryptedProjectSecret, playIntegrityToken, deviceId)
 
 
     private suspend fun AuthRequest.makeAuthRequest(nonceScope: NonceScope): Token =
