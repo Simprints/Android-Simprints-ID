@@ -2,5 +2,5 @@ package com.simprints.infra.login.domain
 
 internal interface PlayIntegrityTokenRequester {
 
-    fun requestPlayIntegrityToken(nonce: String): String
+    fun getToken(nonce: String): String
 }

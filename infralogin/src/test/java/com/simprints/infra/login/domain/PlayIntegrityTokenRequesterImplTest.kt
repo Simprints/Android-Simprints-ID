@@ -52,7 +52,7 @@ class PlayIntegrityTokenRequesterImplTest {
         every { integrityTokenResponse.token() } returns VALID_INTEGRITY_TOKEN
 
 
-        val token = playIntegrityTokenRequesterImpl.requestPlayIntegrityToken(NONCE)
+        val token = playIntegrityTokenRequesterImpl.getToken(NONCE)
         assertThat(token).isEqualTo(VALID_INTEGRITY_TOKEN)
     }
 
@@ -67,7 +67,7 @@ class PlayIntegrityTokenRequesterImplTest {
         } throws Throwable()
 
         val exception = assertThrows<PlayIntegrityException> {
-            playIntegrityTokenRequesterImpl.requestPlayIntegrityToken(NONCE)
+            playIntegrityTokenRequesterImpl.getToken(NONCE)
         }
         assertThat(exception.reason).isEqualTo(PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE)
     }

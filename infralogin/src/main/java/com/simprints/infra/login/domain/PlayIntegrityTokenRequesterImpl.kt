@@ -12,7 +12,7 @@ import javax.inject.Inject
 internal class PlayIntegrityTokenRequesterImpl @Inject constructor(private val playIntegrityManager: IntegrityManager) :
     PlayIntegrityTokenRequester {
 
-    override fun requestPlayIntegrityToken(nonce: String): String {
+    override fun getToken(nonce: String): String {
         val result = getPlayIntegrityToken(nonce)
 
         return result.let {
