@@ -65,7 +65,7 @@ internal class LoginManagerImpl @Inject constructor(
         }
 
     override fun requestPlayIntegrityToken(nonce: String): String =
-        playIntegrityTokenRequester.requestPlayIntegrityToken(nonce)
+        playIntegrityTokenRequester.getToken(nonce)
 
     override suspend fun requestAuthenticationData(
         projectId: String,

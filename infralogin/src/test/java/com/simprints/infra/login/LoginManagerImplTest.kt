@@ -167,7 +167,7 @@ class LoginManagerImplTest {
 
     @Test
     fun `requestPlayIntegrityToken should call the correct method`() {
-        every { playIntegrityTokenRequester.requestPlayIntegrityToken(NONCE) } returns PLAY_INTEGRITY_TOKEN
+        every { playIntegrityTokenRequester.getToken(NONCE) } returns PLAY_INTEGRITY_TOKEN
         val receivedToken = loginManagerManagerImpl.requestPlayIntegrityToken(NONCE)
 
         assertThat(receivedToken).isEqualTo(PLAY_INTEGRITY_TOKEN)
