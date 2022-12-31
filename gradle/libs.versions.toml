@@ -1,5 +1,5 @@
 [versions]
-kotlin_version = "1.7.22"
+kotlin_version = "1.8.0"
 androidx_navigation_version = "2.5.3"
 kotlin_coroutine_version = "1.6.4"
 app_compat_version = "1.5.1"
