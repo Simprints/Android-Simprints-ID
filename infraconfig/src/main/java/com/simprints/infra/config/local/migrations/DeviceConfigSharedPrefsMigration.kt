@@ -3,6 +3,7 @@ package com.simprints.infra.config.local.migrations
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.config.local.models.toProto
@@ -15,7 +16,7 @@ import javax.inject.Inject
  * Can be removed once all the devices have been updated to 2022.4.0
  */
 internal class DeviceConfigSharedPrefsMigration @Inject constructor(
-    @ApplicationContext ctx: Context,
+    @ApplicationContext private val ctx: Context,
     private val loginManager: LoginManager,
 ) : DataMigration<ProtoDeviceConfiguration> {
 
@@ -45,6 +46,7 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
                     .setLanguage(language)
                     .setIsOverwritten(isOverridden)
                     .build()
+                LanguageHelper.language = language
             }
 
             val fingersToCollect = prefs.getString(FINGERS_TO_COLLECT_KEY, "")
