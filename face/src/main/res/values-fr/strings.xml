@@ -24,13 +24,13 @@
     <string name="error_close_button">Fermez</string>
     <string name="error_configuration_error_message">Une erreur s\'est produite lors de la configuration de la modalité de visage, veuillez contacter votre administrateur système.</string>
     <string name="error_configuration_error_title">Erreur de configuration</string>
-    <string name="error_licence_invalid_message">La licence pour la reconnaissance facile n\'est pas valide, veuillez contacter votre administrateur système</string>
+    <string name="error_licence_invalid_message">La licence pour la reconnaissance faciale n\'est pas valide, veuillez contacter votre administrateur système</string>
     <string name="error_licence_invalid_title">Licence invalide</string>
-    <string name="error_licence_missing_message">La licence pour la reconnaissance facile est manquante, veuillez contacter votre administrateur système</string>
+    <string name="error_licence_missing_message">La licence pour la reconnaissance faciale est manquante, veuillez contacter votre administrateur système</string>
     <string name="error_licence_missing_title">Licence manquante</string>
     <string name="exit_form_return_to_face_capture">Capturer le visage</string>
     <string name="face_configuration_downloading">Téléchargement des fichiers nécessaires</string>
-    <string name="face_configuration_started">Configuration de la modalité de reconnaissance facile</string>
+    <string name="face_configuration_started">Configuration de la modalité de reconnaissance faciale</string>
     <string name="face_match_loading_candidates">Chargement des candidats...</string>
     <string name="face_match_matching_candidates">Comparaison des candidats</string>
     <string name="face_match_please_wait">Veuillez attendre pendant que nous procédons à l\'identification</string>
