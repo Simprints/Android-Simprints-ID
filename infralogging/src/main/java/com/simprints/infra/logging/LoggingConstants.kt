@@ -43,7 +43,8 @@ object LoggingConstants {
         ALERT,
         REFUSAL,
         REALM_DB,
-        ROOM_DB
+        ROOM_DB,
+        DB_CORRUPTION,
     }
 
 }
