@@ -3,7 +3,7 @@ package com.simprints.infra.realm
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.*
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.config.RealmConfig
@@ -42,8 +42,7 @@ class RealmWrapperImpl @Inject constructor(
     override suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(Dispatchers.IO) {
             initRealm()
-            Simber.tag(LoggingConstants.CrashReportTag.REALM_DB.name)
-                .d("[RealmWrapperImpl] getting new realm instance")
+            Simber.tag(REALM_DB.name).d("[RealmWrapperImpl] getting new realm instance")
             try {
                 Realm.getInstance(config).use(block)
             } catch (ex: RealmFileException) {
@@ -53,7 +52,7 @@ class RealmWrapperImpl @Inject constructor(
                 //2. Recreate the DB key
                 recreateLocalDbKey()
                 //3. Log exception after recreating the key so we get extra info
-                Simber.e(ex)
+                Simber.tag(DB_CORRUPTION.name).e(ex)
                 //4. Update Realm config with the new key
                 config = createAndSaveRealmConfig()
                 //5. Delete "last sync" info and start new sync

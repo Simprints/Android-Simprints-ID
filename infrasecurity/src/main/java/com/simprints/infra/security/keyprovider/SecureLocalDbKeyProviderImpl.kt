@@ -1,7 +1,7 @@
 package com.simprints.infra.security.keyprovider
 
 import android.util.Base64.*
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.exceptions.MatchingLocalDatabaseKeyHashesException
 import com.simprints.infra.security.exceptions.MismatchingLocalDatabaseKeyHashesException
@@ -74,7 +74,7 @@ internal class SecureLocalDbKeyProviderImpl @Inject constructor(
     }
 
     private fun logToCrashReport(message: Throwable) {
-        Simber.tag(REALM_DB.name).i(message)
+        Simber.tag(DB_CORRUPTION.name).i(message)
     }
 
     /**
