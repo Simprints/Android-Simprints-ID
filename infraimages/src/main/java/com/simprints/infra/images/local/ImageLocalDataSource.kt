@@ -12,8 +12,8 @@ internal interface ImageLocalDataSource {
     /**
      * Encrypts and stores an image
      *
-     * @param imageBytes
-     *        the image, as a byte array
+     * @param imageBytes the image, as a byte array
+     * @param projectId the id of the project
      * @param relativePath
      *        the path within the root images folder where the image will be stored,
      *        including file name.
@@ -22,7 +22,7 @@ internal interface ImageLocalDataSource {
      * @see [Path]
      * @return a reference to the newly stored image, if successful, otherwise null
      */
-    fun encryptAndStoreImage(imageBytes: ByteArray, relativePath: Path): SecuredImageRef?
+    fun encryptAndStoreImage(imageBytes: ByteArray, projectId: String,relativePath: Path): SecuredImageRef?
 
     /**
      * Decrypts an image
@@ -33,11 +33,12 @@ internal interface ImageLocalDataSource {
     fun decryptImage(image: SecuredImageRef): FileInputStream?
 
     /**
-     * Recursively lists all images contained in the root images folder
+     * Recursively lists all images contained in the project images folder or all the projectId is
+     * null
      *
      * @return all image files found
      */
-    fun listImages(): List<SecuredImageRef>
+    fun listImages(projectId: String?): List<SecuredImageRef>
 
     /**
      * Deletes an image
