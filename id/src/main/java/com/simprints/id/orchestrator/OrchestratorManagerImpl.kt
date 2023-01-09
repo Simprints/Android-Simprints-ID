@@ -94,6 +94,7 @@ class OrchestratorManagerImpl @Inject constructor(
 
 
     override suspend fun saveState() {
+        hotCache.clearSteps()
         modalitiesFlow.steps.forEach {
             hotCache.save(it)
         }
