@@ -195,7 +195,6 @@ testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents",
 testing-Espresso-barista = "com.adevinta.android:barista:4.2.0" #Used to grant permissions in AndroidTests
 #Testing-AndroidX
 testing-AndroidX-ext_junit = "androidx.test.ext:junit:1.1.4"
-testing-AndroidX-core = { module = "androidx.test:core", version.ref = "androidx_version" }
 testing-AndroidX-core_testing = { module = "android.arch.core:core-testing", version.ref = "androidx_version" }
 testing-AndroidX-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx_test_orchestrator_version" }
 testing-AndroidX-runner = { module = "androidx.test:runner", version.ref = "androidx_version" }

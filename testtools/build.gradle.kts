@@ -25,7 +25,6 @@ dependencies {
     implementation(project(":core"))
 
     implementation(libs.androidX.lifecycle.livedata.ktx)
-    implementation(libs.testing.androidX.core)
     implementation(libs.testing.androidX.core.testing)
     implementation(libs.androidX.multidex)
     implementation(libs.androidX.appcompat)
