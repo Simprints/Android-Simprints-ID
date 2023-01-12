@@ -202,6 +202,7 @@ dependencies {
     }
     androidTestImplementation(libs.testing.robolectric.core)
     androidTestImplementation(libs.testing.retrofit)
+    androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestImplementation(libs.testing.androidX.rules)
