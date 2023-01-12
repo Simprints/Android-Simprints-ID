@@ -37,18 +37,16 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation(project(":moduleapi"))
-    implementation(project(":infraconfig"))
-    implementation(project(":infraenrolmentrecords"))
+    api(project(":moduleapi"))
+    api(project(":infraconfig"))
+    api(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
-    implementation(project(":infrasecurity"))
-    implementation(project(":infrarealm"))
-    implementation(project(":infranetwork"))
-    implementation(project(":core"))
-    implementation(project(":eventsystem"))
+    api(project(":infrasecurity"))
+    api(project(":core"))
+    api(project(":eventsystem"))
     implementation(project(":infraresources"))
 
-    implementation(libs.libsimprints)
+    api(libs.libsimprints)
 
     // DI
     implementation(libs.hilt)
@@ -56,17 +54,11 @@ dependencies {
 
     // Support
     implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.security)
-    implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.lifecycle.scope)
-    implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.support.material)
 
-    // Splitties
-    implementation(libs.splitties.core)
     // Kotlin
     implementation(libs.androidX.core)
-    implementation(libs.androidX.multidex)
 
     // Unit Tests
     testImplementation(project(":testtools"))
@@ -90,15 +82,4 @@ dependencies {
     androidTestImplementation(libs.testing.espresso.intents)
 
     androidTestImplementation(libs.testing.truth)
-}
-
-configurations {
-    androidTestImplementation {
-        // Mockk v1.1.12 and jvm 11 has the same file ValueClassSupport
-        // the issue is reported here https://github.com/mockk/mockk/issues/722
-        exclude("io.mockk", "mockk-agent-jvm")
-    }
-    forEach {
-        it.exclude("com.google.guava", "listenablefuture")
-    }
 }

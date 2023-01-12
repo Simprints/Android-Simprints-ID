@@ -2,7 +2,6 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version Plugins.kotlinxSerializationVersion
 }
 
 apply {
@@ -43,19 +42,21 @@ android {
 
 dependencies {
     api(project(":core"))
-    implementation(project(":moduleapi"))
-    implementation(project(":infraconfig"))
+    api(project(":moduleapi"))
+    api(project(":infraconfig"))
     implementation(project(":infralogging"))
-    implementation(project(":infralogin"))
-    api(project(":infranetwork"))
-    implementation(project(":infrasecurity"))
+    api(project(":infralogin"))
+    implementation(project(":infranetwork"))
+    api(project(":infrasecurity"))
 
     implementation(libs.androidX.room.ktx)
     kapt(libs.androidX.room.compiler)
 
-    implementation(libs.kotlin.coroutinesAndroid)
+    runtimeOnly(libs.kotlin.coroutinesAndroid)
+    api(libs.sqlCipher.core)
 
-    implementation(libs.sqlCipher.core)
+    implementation(libs.retrofit.core)
+    implementation(libs.jackson.core)
 
     // DI
     implementation(libs.hilt)

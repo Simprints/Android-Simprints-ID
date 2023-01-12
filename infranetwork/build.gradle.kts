@@ -33,24 +33,22 @@ dependencies {
 
     implementation(project(":infralogging"))
 
-    debugImplementation(libs.chuck.debug)
+    debugImplementation(libs.chuck.debug) {
+        exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
+    }
     implementation(libs.chuck.release)
 
-    implementation(libs.androidX.core)
+    implementation(libs.jackson.core)
 
-    api(libs.jackson.core)
-
-    implementation(libs.kotlin.coroutinesAndroid)
+    runtimeOnly(libs.kotlin.coroutinesAndroid)
 
     implementation(libs.retrofit.adapter)
     implementation(libs.retrofit.converterScalars)
-    api(libs.retrofit.core)
-    api(libs.retrofit.jackson)
-    api(libs.retrofit.logging)
-    api(libs.retrofit.okhttp)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.jackson)
+    implementation(libs.retrofit.logging)
+    implementation(libs.retrofit.okhttp)
 
-    // This implementation is to fix the issue with duplicated class on the view model
-    implementation(libs.androidX.lifecycle.viewmodel)
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
