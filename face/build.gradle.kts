@@ -99,7 +99,6 @@ dependencies {
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestImplementation(libs.testing.androidX.rules)
     androidTestUtil(libs.testing.androidX.orchestrator)
@@ -123,8 +122,6 @@ dependencies {
 
     // Android X
     testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core)
-    testImplementation(libs.testing.androidX.core.testing)
 
     // Kotlin
     testImplementation(libs.testing.coroutines.test)
