@@ -109,7 +109,6 @@ class CollectFingerprintsActivityTest {
             mockCoroutineScope, mockDispatcher
         )
     ) {
-        every { start(any()) } just Runs
         every { state } returns this@CollectFingerprintsActivityTest.state
         every { vibrate } returns this@CollectFingerprintsActivityTest.vibrate
         every { noFingersScannedToast } returns this@CollectFingerprintsActivityTest.noFingersScannedToast

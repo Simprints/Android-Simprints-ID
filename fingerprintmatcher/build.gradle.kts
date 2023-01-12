@@ -25,11 +25,11 @@ android {
 }
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(libs.simmatcher)
+    runtimeOnly(libs.simmatcher)
     implementation(libs.androidX.annotation.annotation)
 
     // Kotlin
-    implementation(libs.kotlin.coroutinesAndroid)
+    runtimeOnly(libs.kotlin.coroutinesAndroid)
     compileOnly(libs.androidX.annotation.annotation)
 
     // Hilt

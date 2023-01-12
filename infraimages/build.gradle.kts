@@ -25,12 +25,9 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":infralogging"))
-    implementation(project(":infralogin"))
-    implementation(project(":core"))
-    implementation(project(":infrasecurity"))
-    implementation(project(":infraconfig"))
-
-    implementation(libs.androidX.core)
+    api(project(":infralogin"))
+    api(project(":infrasecurity"))
+    api(project(":infraconfig"))
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
@@ -40,7 +37,7 @@ dependencies {
     implementation(libs.firebase.auth)
 
     implementation(libs.androidX.security)
-    implementation(libs.kotlin.coroutinesAndroid)
+    runtimeOnly(libs.kotlin.coroutinesAndroid)
     implementation(libs.kotlin.coroutinesPlayServices)
 
     testImplementation(project(":testtools"))

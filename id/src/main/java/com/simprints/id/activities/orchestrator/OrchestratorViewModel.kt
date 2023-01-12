@@ -15,8 +15,6 @@ import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,7 +43,13 @@ class OrchestratorViewModel @Inject constructor(
         }
     }
 
-    fun initializeModalityFlow(appRequest: AppRequest) {
+    /**
+     * Starts or restore a modality flow
+     *
+     * @param appRequest
+     * @param shouldRestoreState
+     */
+    fun startOrRestoreModalityFlow(appRequest: AppRequest, shouldRestoreState: Boolean) =
         viewModelScope.launch {
             val projectConfiguration = configManager.getProjectConfiguration()
             orchestratorManager.initialise(
@@ -53,14 +57,17 @@ class OrchestratorViewModel @Inject constructor(
                 appRequest,
                 getCurrentSessionId()
             )
+            if (shouldRestoreState) {
+                restoreState()
+            } else {
+                startModalityFlow()
+            }
         }
-    }
 
-    fun startModalityFlow() {
-        viewModelScope.launch {
-            orchestratorManager.startModalityFlow()
-        }
-    }
+
+    private suspend fun startModalityFlow() =
+        orchestratorManager.startModalityFlow()
+
 
     private suspend fun getCurrentSessionId(): String =
         eventRepository.getCurrentCaptureSessionEvent().id
@@ -77,11 +84,9 @@ class OrchestratorViewModel @Inject constructor(
         }
     }
 
-    fun restoreState() {
-        runBlocking {
-            orchestratorManager.restoreState()
-        }
-    }
+    private suspend fun restoreState() =
+        orchestratorManager.restoreState()
+
 
     fun saveState() {
         orchestratorManager.saveState()

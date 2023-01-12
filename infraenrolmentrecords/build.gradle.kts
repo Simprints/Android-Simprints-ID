@@ -16,21 +16,22 @@ android {
     }
 }
 
-
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":core"))
-    implementation(project(":infraconfig"))
+    api(project(":core"))
+    api(project(":infraconfig"))
     implementation(project(":infralogging"))
-    implementation(project(":infralogin"))
-    api(project(":infranetwork"))
-    implementation(project(":infrarealm"))
-    implementation(project(":moduleapi"))
+    api(project(":infralogin"))
+    implementation(project(":infranetwork"))
+    api(project(":infrarealm"))
+    api(project(":moduleapi"))
 
     implementation(libs.hilt)
-    implementation(libs.hilt.work)
+    api(libs.hilt.work)
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
+    implementation(libs.retrofit.core)
+    implementation(libs.jackson.core)
 
     implementation(libs.workManager.work)
     // Unit Tests

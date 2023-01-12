@@ -66,6 +66,7 @@ class EventSyncManagerImpl @Inject constructor(
 
     override fun cancelScheduledSync() {
         wm.cancelAllWorkByTag(MASTER_SYNC_SCHEDULERS)
+        stop()
     }
 
     override fun stop() {

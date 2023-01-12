@@ -91,54 +91,55 @@ class OrchestratorViewModelTest {
     }
 
     @Test
-    fun viewModelInitialize_shouldInitializeOrchestrator() {
-        runTest {
-            vm.initializeModalityFlow(enrolAppRequest)
-            coVerify(exactly = 1) {
-                orchestratorManagerMock.initialise(
-                    listOf(GeneralConfiguration.Modality.FACE),
-                    enrolAppRequest,
-                    fakeSession.id
-                )
-            }
+     fun `test viewModel Start with restoreState=false should InitializeOrchestrator and start modality flow`() = runTest {
+        vm.startOrRestoreModalityFlow(enrolAppRequest, false)
+        coVerify {
+            orchestratorManagerMock.initialise(
+                listOf(GeneralConfiguration.Modality.FACE),
+                enrolAppRequest,
+                fakeSession.id
+            )
+        }
+        coVerify { orchestratorManagerMock.startModalityFlow() }
+    }
+
+
+    @Test
+    fun `test viewModel Start with restoreState=true should InitializeOrchestrator and RestoreState`() = runTest {
+        vm.startOrRestoreModalityFlow(enrolAppRequest, true)
+        coVerify {
+            orchestratorManagerMock.initialise(
+                listOf(GeneralConfiguration.Modality.FACE),
+                enrolAppRequest,
+                fakeSession.id
+            )
+        }
+        coVerify { orchestratorManagerMock.restoreState() }
+    }
+
+
+    @Test
+    fun viewModelStart_shouldForwardResultToOrchestrator() = runTest {
+        vm.onModalStepRequestDone(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
+        coVerify(exactly = 1) {
+            orchestratorManagerMock.handleIntentResult(
+                enrolAppRequest,
+                REQUEST_CODE,
+                Activity.RESULT_OK,
+                null
+            )
         }
     }
 
-    @Test
-    fun viewModelStart_shouldStartOrchestrator() {
-        runTest {
-            vm.startModalityFlow()
-            coVerify(exactly = 1) {
-                orchestratorManagerMock.startModalityFlow()
-            }
-        }
-    }
 
     @Test
-    fun viewModelStart_shouldForwardResultToOrchestrator() {
-        runTest {
-            vm.onModalStepRequestDone(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
-            coVerify(exactly = 1) {
-                orchestratorManagerMock.handleIntentResult(
-                    enrolAppRequest,
-                    REQUEST_CODE,
-                    Activity.RESULT_OK,
-                    null
-                )
-            }
-        }
-    }
+    fun orchestratorCreatesAppResponse_viewModelShouldAddACallbackEvent() = runTest {
+        vm.appResponse.observeForever {}
 
-    @Test
-    fun orchestratorCreatesAppResponse_viewModelShouldAddACallbackEvent() {
-        runTest {
-            vm.appResponse.observeForever {}
+        liveDataAppResponse.postFakeAppResponse<AppEnrolResponse>(ENROL)
 
-            liveDataAppResponse.postFakeAppResponse<AppEnrolResponse>(ENROL)
-
-            every { orchestratorEventsHelperMock.addCallbackEventInSessions(any()) } just runs
-            verify(exactly = 1) { orchestratorEventsHelperMock.addCallbackEventInSessions(any<AppEnrolResponse>()) }
-        }
+        every { orchestratorEventsHelperMock.addCallbackEventInSessions(any()) } just runs
+        verify(exactly = 1) { orchestratorEventsHelperMock.addCallbackEventInSessions(any<AppEnrolResponse>()) }
     }
 
 

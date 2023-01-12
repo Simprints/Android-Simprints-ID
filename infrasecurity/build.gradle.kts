@@ -19,8 +19,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":infralogging"))
 
-    implementation(libs.androidX.core)
-    implementation(libs.androidX.security)
+    api(libs.androidX.security)
 
     // RootBeer (root detection)
     implementation(libs.rootbeer.core)
