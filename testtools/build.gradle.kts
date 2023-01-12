@@ -24,7 +24,6 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":core"))
 
-    implementation(libs.androidX.lifecycle.livedata.ktx)
     implementation(libs.testing.androidX.core.testing)
     api(libs.androidX.multidex)
     api(libs.androidX.appcompat)

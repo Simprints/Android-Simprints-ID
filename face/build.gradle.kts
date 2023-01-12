@@ -107,6 +107,7 @@ dependencies {
 
     // Android X
     testImplementation(libs.testing.androidX.ext.junit)
+    testImplementation(libs.testing.androidX.core.testing)
 
     // Kotlin
     testImplementation(libs.testing.coroutines.test)
