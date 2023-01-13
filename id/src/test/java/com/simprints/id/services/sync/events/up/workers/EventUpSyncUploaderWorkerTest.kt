@@ -202,7 +202,7 @@ class EventUpSyncUploaderWorkerTest {
     }
 
     @Test
-    fun `should create a new scope if the current one is an invalid JSON`() = runTest {
+    fun `should create a new scope if the current one throws JsonParseException`() = runTest {
         val jsonInput = """
         {
             "type": "EventUpSyncScope${'$'}ProjectScope",
@@ -223,9 +223,34 @@ class EventUpSyncUploaderWorkerTest {
         coVerify(exactly = 1) { upSyncHelper.upSync(any(), expectedScope.operation) }
     }
 
+    @Test
+    fun `should create a new scope if the current one throws JsonMappingException`() = runTest {
+        val jsonInput = """
+        {
+            "type": "EventUpSyncScope${'$'}ProjectScope"
+        }
+        """.trimIndent()
+        val eventUpSyncUploaderWorker = init(jsonInput)
+
+        eventUpSyncUploaderWorker.doWork()
+
+        val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
+
+        coVerify(exactly = 1) { upSyncHelper.upSync(any(), expectedScope.operation) }
+    }
+
+    @Test
+    fun `should retry when input is null`() = runTest {
+        val eventUpSyncUploaderWorker = init(null)
+
+        val result = eventUpSyncUploaderWorker.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+    }
+
     // We are using the TestListenableWorkerBuilder and not the constructor directly to have a test worker
     // that will finish when calling setProgress
-    private fun init(scope: String): EventUpSyncUploaderWorker =
+    private fun init(scope: String?): EventUpSyncUploaderWorker =
         TestListenableWorkerBuilder<EventUpSyncUploaderWorker>(
             mockk(),
             workDataOf(INPUT_UP_SYNC to scope)
