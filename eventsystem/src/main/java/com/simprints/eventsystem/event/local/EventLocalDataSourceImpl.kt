@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import net.sqlcipher.database.SQLiteDatabaseCorruptException
 import net.sqlcipher.database.SQLiteException
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -34,17 +33,15 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
                 block()
             } catch (ex: SQLiteException) {
                 if (ex.message?.contains("file is not a database") == true) {
-                    handleDatabaseCorruption(ex, block)
+                    handleDatabaseEncryptionCorruption(ex, block)
                 } else {
                     throw ex
                 }
-            } catch (ex: SQLiteDatabaseCorruptException) {
-                handleDatabaseCorruption(ex, block)
             }
         }
     }
 
-    private suspend fun <R> handleDatabaseCorruption(ex: Exception, block: suspend () -> R): R {
+    private suspend fun <R> handleDatabaseEncryptionCorruption(ex: Exception, block: suspend () -> R): R {
         mutex.withLock {
             //DB corruption detected; either DB file or key is corrupt
             //1. Delete DB file in order to create a new one at next init
