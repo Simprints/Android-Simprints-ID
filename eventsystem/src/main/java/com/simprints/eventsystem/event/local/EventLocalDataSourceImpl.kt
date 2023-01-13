@@ -11,6 +11,8 @@ import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import net.sqlcipher.database.SQLiteDatabaseCorruptException
 import net.sqlcipher.database.SQLiteException
@@ -24,6 +26,7 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
 ) : EventLocalDataSource {
 
     private var eventDao: EventRoomDao = eventDatabaseFactory.build().eventDao
+    private val mutex = Mutex()
 
     private suspend fun <R> useRoom(context: CoroutineContext, block: suspend () -> R): R {
         return withContext(context) {
@@ -42,17 +45,19 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
     }
 
     private suspend fun <R> handleDatabaseCorruption(ex: Exception, block: suspend () -> R): R {
-        //DB corruption detected; either DB file or key is corrupt
-        //1. Delete DB file in order to create a new one at next init
-        eventDatabaseFactory.deleteDatabase()
-        //2. Recreate the DB key
-        eventDatabaseFactory.recreateDatabaseKey()
-        //3. Log exception after recreating the key so we get extra info
-        Simber.tag(DB_CORRUPTION.name).e(ex)
-        //4. Rebuild database
-        eventDao = eventDatabaseFactory.build().eventDao
-        //5. Retry operation with new file and key
-        return block()
+        mutex.withLock {
+            //DB corruption detected; either DB file or key is corrupt
+            //1. Delete DB file in order to create a new one at next init
+            eventDatabaseFactory.deleteDatabase()
+            //2. Recreate the DB key
+            eventDatabaseFactory.recreateDatabaseKey()
+            //3. Log exception after recreating the key so we get extra info
+            Simber.tag(DB_CORRUPTION.name).e(ex)
+            //4. Rebuild database
+            eventDao = eventDatabaseFactory.build().eventDao
+            //5. Retry operation with new file and key
+            return block()
+        }
     }
 
     override suspend fun loadAll(): Flow<Event> =
