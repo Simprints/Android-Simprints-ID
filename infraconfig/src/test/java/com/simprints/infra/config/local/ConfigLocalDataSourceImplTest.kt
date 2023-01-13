@@ -50,17 +50,19 @@ class ConfigLocalDataSourceImplTest {
         serializer = DeviceConfigurationSerializer,
         produceFile = { testContext.dataStoreFile(TEST_DEVICE_CONFIG_DATASTORE_NAME) }
     )
-    private val configLocalDataSourceImpl =
-        ConfigLocalDataSourceImpl(
-            ABSOLUTE_PATH,
-            testProjectDataStore,
-            testProjectConfigDataStore,
-            testDeviceConfigDataStore
-        )
+
+    private lateinit var configLocalDataSourceImpl :ConfigLocalDataSourceImpl
 
     @Before
     fun setup() {
         LanguageHelper.init(mockk(relaxed = true))
+
+        configLocalDataSourceImpl = ConfigLocalDataSourceImpl(
+            ABSOLUTE_PATH,
+            testProjectDataStore,
+            testProjectConfigDataStore,
+            testDeviceConfigDataStore,
+        )
     }
 
     @After
