@@ -9,19 +9,20 @@ import javax.inject.Inject
 
 class ImageRepositoryImpl @Inject internal constructor(
     private val localDataSource: ImageLocalDataSource,
-    private val remoteDataSource: ImageRemoteDataSource
+    private val remoteDataSource: ImageRemoteDataSource,
 ) : ImageRepository {
 
-    override fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {
-        return localDataSource.encryptAndStoreImage(imageBytes, relativePath)
+    override fun storeImageSecurely(imageBytes: ByteArray, projectId: String,relativePath: Path): SecuredImageRef? {
+        return localDataSource.encryptAndStoreImage(imageBytes,projectId, relativePath)
     }
 
-    override fun getNumberOfImagesToUpload(): Int = localDataSource.listImages().count()
+    override fun getNumberOfImagesToUpload(projectId: String): Int =
+        localDataSource.listImages(projectId).count()
 
-    override suspend fun uploadStoredImagesAndDelete(): Boolean {
+    override suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean {
         var allImagesUploaded = true
 
-        val images = localDataSource.listImages()
+        val images = localDataSource.listImages(projectId)
         images.forEach { imageRef ->
             try {
                 localDataSource.decryptImage(imageRef)?.let { stream ->
@@ -42,7 +43,7 @@ class ImageRepositoryImpl @Inject internal constructor(
     }
 
     override fun deleteStoredImages() = with(localDataSource) {
-        listImages().forEach {
+        listImages(null).forEach {
             deleteImage(it)
         }
     }
