@@ -12,6 +12,10 @@ import java.io.File
 
 class ImageLocalDataSourceImplTest {
 
+    companion object {
+        private const val PROJECT_ID = "projectId"
+    }
+
     @Test
     fun `check file directory is created`() {
 
@@ -42,7 +46,7 @@ class ImageLocalDataSourceImplTest {
 
         val fileName = Path("testDir/Images")
         val imageBytes = byteArrayOf()
-        localSource.encryptAndStoreImage(imageBytes, fileName)
+        localSource.encryptAndStoreImage(imageBytes, PROJECT_ID, fileName)
 
         verify(exactly = 1) { mockFile.openFileOutput() }
     }
@@ -61,7 +65,7 @@ class ImageLocalDataSourceImplTest {
             every { filesDir } returns file
         }, encryptedFileMock)
 
-        val images = localSource.listImages()
+        val images = localSource.listImages(PROJECT_ID)
 
         assert(images.isEmpty())
     }

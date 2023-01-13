@@ -9,7 +9,6 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.simprints.core.domain.common.FlowProvider
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.integration.createFingerprintCaptureRequestIntent
@@ -19,16 +18,11 @@ import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.state.FingerprintTaskFlowState
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.assertNotNull
@@ -46,31 +40,17 @@ class OrchestratorActivityAndroidTest {
     var hiltRule = HiltAndroidRule(this)
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
-    private val mockCoroutineScope = CoroutineScope(Dispatchers.Main + Job())
     private val firmwareFileUpdateSchedulerMock = mockk<FirmwareFileUpdateScheduler>(relaxed = true)
-    private val scannerManagerMock = spyk<ScannerManager>(
-        ScannerManagerImpl(
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-            mockk(relaxed = true),
-            mockk(relaxed = true)
-        )
-    )
 
     @BindValue @JvmField
     val orchestratorViewModel = spyk(
         OrchestratorViewModel(
             orchestratorMock,
             mockk(relaxed = true),
-            scannerManagerMock,
             firmwareFileUpdateSchedulerMock,
-            mockCoroutineScope,
             UnconfinedTestDispatcher(),
         )
     )
-
-    @BindValue @JvmField
-    val flowProvider = mockk<FlowProvider>()
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 

@@ -22,8 +22,12 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         createDirectoryIfNonExistent(imageRootPath)
     }
 
-    override fun encryptAndStoreImage(imageBytes: ByteArray, relativePath: Path): SecuredImageRef? {
-        val fullPath = Path.combine(imageRootPath, relativePath).compose()
+    override fun encryptAndStoreImage(
+        imageBytes: ByteArray,
+        projectId: String,
+        relativePath: Path
+    ): SecuredImageRef? {
+        val fullPath = Path.combine(buildProjectPath(projectId), relativePath).compose()
 
         createDirectoryIfNonExistent(fullPath)
 
@@ -58,8 +62,10 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun listImages(): List<SecuredImageRef> {
-        val imageRoot = File(imageRootPath)
+    override fun listImages(projectId: String?): List<SecuredImageRef> {
+        val imageRoot =
+            if (projectId == null) File(imageRootPath) else File(buildProjectPath(projectId))
+
         return imageRoot.walk()
             .filterNot { it.isDirectory }
             .map { file ->
@@ -89,8 +95,12 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         return Path.combine(imageRootPath, path).compose()
     }
 
+    private fun buildProjectPath(projectId: String): String =
+        buildAbsolutePath(Path(arrayOf(PROJECTS_FOLDER, projectId)))
+
     companion object {
         const val IMAGES_FOLDER = "images"
+        const val PROJECTS_FOLDER = "projects"
     }
 
 }
