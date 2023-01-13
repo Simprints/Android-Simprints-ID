@@ -5,12 +5,14 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
-import com.simprints.id.exceptions.unexpected.MalformedDownSyncOperationException
+import com.simprints.id.exceptions.unexpected.MalformedSyncOperationException
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -22,6 +24,7 @@ import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import dagger.assisted.Assisted
@@ -36,6 +39,7 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val upSyncHelper: EventUpSyncHelper,
     private val eventSyncCache: EventSyncCache,
+    private val loginManager: LoginManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
@@ -48,7 +52,11 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
             Simber.d("Received $jsonInput")
             parseUpSyncInput(jsonInput)
         } catch (t: Throwable) {
-            throw MalformedDownSyncOperationException(t.message ?: "")
+            if (t is JsonParseException || t is JsonMappingException) {
+                EventUpSyncScope.ProjectScope(loginManager.getSignedInProjectIdOrEmpty())
+            } else {
+                throw MalformedSyncOperationException(t.message ?: "")
+            }
         }
     }
 
