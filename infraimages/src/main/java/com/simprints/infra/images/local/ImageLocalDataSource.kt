@@ -33,7 +33,7 @@ internal interface ImageLocalDataSource {
     fun decryptImage(image: SecuredImageRef): FileInputStream?
 
     /**
-     * Recursively lists all images contained in the project images folder or all the projectId is
+     * Recursively lists all images contained in the project images folder or all if the projectId is
      * null
      *
      * @return all image files found
