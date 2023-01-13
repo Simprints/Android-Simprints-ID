@@ -113,7 +113,7 @@ internal class SyncInfoViewModel @Inject constructor(
                     _recordsToDelete.postValue(it.toDelete)
                 }
             },
-            async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload()) },
+            async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(loginManager.getSignedInProjectIdOrEmpty())) },
             async { _moduleCounts.postValue(getModuleCounts()) }
         )
     }
