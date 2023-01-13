@@ -18,16 +18,18 @@ class FaceImageManagerImplTest {
 
         val expectedPath = Path(
             arrayOf(
-                "projects", "projectId", "sessions", "sessionId", "faces", "captureEventId.jpg"
+                "sessions", "sessionId", "faces", "captureEventId.jpg"
             )
         )
 
         val imageRepo = mockk<ImageRepository> {
-            every { storeImageSecurely(any(), any()) } returns SecuredImageRef(expectedPath)
+            every { storeImageSecurely(any(), "projectId", any()) } returns SecuredImageRef(
+                expectedPath
+            )
         }
 
         val eventRepo = mockk<EventRepository> {
-            coEvery { getCurrentCaptureSessionEvent() } returns mockk() {
+            coEvery { getCurrentCaptureSessionEvent() } returns mockk {
                 every { payload.projectId } returns "projectId"
                 every { id } returns "sessionId"
             }
@@ -45,6 +47,7 @@ class FaceImageManagerImplTest {
                 withArg {
                     assert(it.isEmpty())
                 },
+                "projectId",
                 withArg {
                     assert(expectedPath.compose().contains(it.compose()))
                 })

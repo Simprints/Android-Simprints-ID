@@ -20,7 +20,11 @@ class FingerprintImageManagerImpl @Inject constructor(
     ): FingerprintImageRef? =
         determinePath(captureEventId, fileExtension)?.let { path ->
             Simber.d("Saving fingerprint image ${path.compose()}")
-            val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
+            val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
+            val projectId = currentSession.payload.projectId
+
+            val securedImageRef =
+                coreImageRepository.storeImageSecurely(imageBytes, projectId, path)
 
             return if (securedImageRef != null) {
                 FingerprintImageRef(securedImageRef.relativePath.toDomain())
@@ -33,13 +37,9 @@ class FingerprintImageManagerImpl @Inject constructor(
     private suspend fun determinePath(captureEventId: String, fileExtension: String): CorePath? =
         try {
             val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
-
-            val projectId = currentSession.payload.projectId
             val sessionId = currentSession.id
             CorePath(
                 arrayOf(
-                    PROJECTS_PATH,
-                    projectId,
                     SESSIONS_PATH,
                     sessionId,
                     FINGERPRINTS_PATH,
@@ -55,7 +55,6 @@ class FingerprintImageManagerImpl @Inject constructor(
         Path(this.parts)
 
     companion object {
-        const val PROJECTS_PATH = "projects"
         const val SESSIONS_PATH = "sessions"
         const val FINGERPRINTS_PATH = "fingerprints"
     }
