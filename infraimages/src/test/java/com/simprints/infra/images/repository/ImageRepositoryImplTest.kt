@@ -30,9 +30,9 @@ internal class ImageRepositoryImplTest {
 
     @Test
     fun withEmptyList_shouldConsiderUploadOperationSuccessful() = runTest {
-        every { localDataSource.listImages() } returns emptyList()
+        every { localDataSource.listImages(PROJECT_ID) } returns emptyList()
 
-        val successful = repository.uploadStoredImagesAndDelete()
+        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
         assertThat(successful).isTrue()
     }
@@ -41,7 +41,7 @@ internal class ImageRepositoryImplTest {
     fun withAllFilesValid_shouldUploadAndDeleteSuccessfully() = runTest {
         configureLocalImageFiles(includeInvalidFile = false)
 
-        val successful = repository.uploadStoredImagesAndDelete()
+        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
         assertThat(successful).isTrue()
     }
@@ -50,7 +50,7 @@ internal class ImageRepositoryImplTest {
     fun shouldDeleteAnImageAfterTheUpload() = runTest {
         configureLocalImageFiles(includeInvalidFile = false)
 
-        val successful = repository.uploadStoredImagesAndDelete()
+        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
         verify(exactly = 3) { localDataSource.decryptImage(any()) }
         verify(exactly = 3) { localDataSource.deleteImage(any()) }
@@ -61,7 +61,7 @@ internal class ImageRepositoryImplTest {
     fun shouldDecryptImageBeforeUploading() = runTest {
         configureLocalImageFiles(numberOfValidFiles = 5, includeInvalidFile = false)
 
-        repository.uploadStoredImagesAndDelete()
+        repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
         verify(exactly = 5) { localDataSource.decryptImage(any()) }
     }
@@ -80,7 +80,7 @@ internal class ImageRepositoryImplTest {
         val nImagesInLocal = 5
         configureLocalImageFiles(numberOfValidFiles = nImagesInLocal, includeInvalidFile = false)
 
-        val imageCount = repository.getNumberOfImagesToUpload()
+        val imageCount = repository.getNumberOfImagesToUpload(PROJECT_ID)
 
         assertThat(imageCount).isEqualTo(nImagesInLocal)
     }
@@ -131,7 +131,8 @@ internal class ImageRepositoryImplTest {
                 add(mockInvalidImage())
         }
 
-        every { localDataSource.listImages() } returns files
+        every { localDataSource.listImages(PROJECT_ID) } returns files
+        every { localDataSource.listImages(null) } returns files
     }
 
     private fun mockValidImage() =
@@ -151,6 +152,7 @@ internal class ImageRepositoryImplTest {
     companion object {
         private const val VALID_PATH = "valid.txt"
         private const val INVALID_PATH = "invalid"
+        private const val PROJECT_ID = "projectId"
     }
 
 }
