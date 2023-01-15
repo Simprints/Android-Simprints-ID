@@ -194,7 +194,6 @@ testing-AndroidX-ext_junit = "androidx.test.ext:junit:1.1.5"
 testing-AndroidX-core_testing = { module = "android.arch.core:core-testing", version.ref = "androidx_version" }
 testing-AndroidX-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx_test_orchestrator_version" }
 testing-AndroidX-runner = { module = "androidx.test:runner", version.ref = "androidx_version" }
-testing-AndroidX-rules = { module = "androidx.test:rules", version.ref = "androidx_version" }
 testing-AndroidX-room = { module = "androidx.room:room-testing", version.ref = "androidx_room_version" }
 testing-AndroidX-navigation = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation_version" }
 testing-AndroidX-uiAutomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiAutomator_version" }

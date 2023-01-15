@@ -85,7 +85,6 @@ dependencies {
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.rules)
     androidTestUtil(libs.testing.androidX.orchestrator)
 
     androidTestImplementation(libs.testing.mockk.core)
