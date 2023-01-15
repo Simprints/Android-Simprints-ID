@@ -73,7 +73,6 @@ dependencies {
 
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.rules)
     androidTestImplementation(libs.testing.mockk.android)
 
     androidTestImplementation(project(":infraenrolmentrecords"))
