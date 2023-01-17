@@ -15,7 +15,7 @@ internal class JwtTokenHelper {
 
                 if (jwtParts?.size == 3) {
                     //we're only really interested in the body/payload
-                    val decodedPayload = String(Base64.decode(jwtParts[1], Base64.DEFAULT))
+                    val decodedPayload = String(Base64.decode(jwtParts[1], Base64.URL_SAFE))
 
                     JSONObject(decodedPayload)
                 } else {
