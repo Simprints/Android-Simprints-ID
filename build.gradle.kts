@@ -23,7 +23,7 @@ buildscript {
         classpath("org.jacoco:org.jacoco.core:${libs.versions.jacoco.version.get()}")
 
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.18.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.5.0")
+        classpath("org.gradle:test-retry-gradle-plugin:1.5.1")
 
         // Firebase
         classpath("com.google.gms:google-services:4.3.14")
