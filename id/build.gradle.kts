@@ -88,6 +88,7 @@ android {
     lint {
         warning += setOf("InvalidPackage")
     }
+    namespace = "com.simprints.id"
 }
 
 repositories {

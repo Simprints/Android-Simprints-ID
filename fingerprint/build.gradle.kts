@@ -47,6 +47,7 @@ android {
     // https://github.com/mockito/mockito/issues/1376
 
     buildFeatures.viewBinding = true
+    namespace = "com.simprints.fingerprint"
 
     packagingOptions {
            resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files

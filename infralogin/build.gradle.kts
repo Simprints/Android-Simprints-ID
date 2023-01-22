@@ -30,6 +30,7 @@ android {
         }
 
     }
+    namespace = "com.simprints.infra.login"
 }
 
 dependencies {
