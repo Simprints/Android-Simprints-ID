@@ -32,6 +32,7 @@ android {
     }
 
     buildFeatures.viewBinding = true
+    namespace = "com.simprints.clientapi"
 }
 
 dependencies {

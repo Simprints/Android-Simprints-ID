@@ -38,6 +38,7 @@ android {
         unitTests.isIncludeAndroidResources = true
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
+    namespace = "com.simprints.infra.logging"
 
 }
 

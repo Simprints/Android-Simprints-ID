@@ -12,6 +12,7 @@ android {
         consumerProguardFiles("proguard-rules.pro")
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
+    namespace = "com.simprints.fingerprintscannermock"
 }
 
 dependencies {
