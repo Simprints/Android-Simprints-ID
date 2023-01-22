@@ -92,7 +92,7 @@ class EventMigration4to5Test {
         ).addMigrations(*ALL_MIGRATIONS).build().apply {
             // retrieve the database reference to force-open the db
             // instance after migrations have been run
-            openHelper.getWritableDatabase()
+            openHelper.writableDatabase
             // then close the db
             close()
         }

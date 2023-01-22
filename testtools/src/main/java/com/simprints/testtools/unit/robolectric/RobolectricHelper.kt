@@ -1,13 +1,9 @@
 package com.simprints.testtools.unit.robolectric
 
 import android.app.Activity
-import android.app.Application
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.assertEquals
 import org.robolectric.Robolectric
 import org.robolectric.Shadows
@@ -36,9 +32,6 @@ fun assertActivityStarted(clazz: Class<out Activity>, intent: Intent) {
 fun assertActivityStarted(clazzName: String, intent: Intent) {
     assertEquals(clazzName, intent.component?.className)
 }
-
-fun getSharedPreferences(fileName: String): SharedPreferences =
-    ApplicationProvider.getApplicationContext<Application>().getSharedPreferences(fileName, Context.MODE_PRIVATE)
 
 inline fun <reified T : Activity> createAndStartActivity(extras: Bundle? = null): T {
     val intent = Intent().apply {
