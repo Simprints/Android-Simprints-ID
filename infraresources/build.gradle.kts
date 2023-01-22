@@ -12,6 +12,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
+    namespace = "com.simprints.infra.resources"
 }
 
 dependencies {
