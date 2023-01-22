@@ -176,10 +176,8 @@ dependencies {
     }
     testImplementation(libs.testing.robolectric.core)
     testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.core.testing)
     testImplementation(libs.testing.androidX.runner)
-    testImplementation(libs.testing.androidX.rules)
     testImplementation(libs.testing.espresso.core)
     testImplementation(libs.testing.espresso.intents)
     testImplementation(libs.testing.truth)
@@ -204,10 +202,8 @@ dependencies {
     androidTestImplementation(libs.testing.robolectric.core)
     androidTestImplementation(libs.testing.retrofit)
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.core)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.rules)
     androidTestImplementation(libs.testing.work)
     androidTestImplementation(libs.testing.espresso.core)
     // explicitly depending on accessibility-test-framework to solve this espresso 3.4.0 build issue

@@ -2,7 +2,6 @@ package com.simprints.infra.images
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.images.local.ImageLocalDataSourceImpl
 import com.simprints.infra.images.model.Path
@@ -14,7 +13,6 @@ import java.io.File
 import java.util.*
 import kotlin.random.Random
 
-@SmallTest
 class ImageLocalDataSourceImplTest {
 
     companion object {

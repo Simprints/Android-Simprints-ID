@@ -23,10 +23,10 @@ buildscript {
         classpath("org.jacoco:org.jacoco.core:${libs.versions.jacoco.version.get()}")
 
         classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.18.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.5.0")
+        classpath("org.gradle:test-retry-gradle-plugin:1.5.1")
 
         // Firebase
-        classpath("com.google.gms:google-services:4.3.14")
+        classpath("com.google.gms:google-services:4.3.15")
         classpath("com.google.firebase:perf-plugin:1.4.2")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.2")
 
@@ -38,7 +38,7 @@ buildscript {
 
         // Deployment
         classpath("com.github.triplet.gradle:play-publisher:3.7.0")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:3.1.1")
+        classpath("com.google.firebase:firebase-appdistribution-gradle:3.2.0")
 
         // Hilt
         classpath("com.google.dagger:hilt-android-gradle-plugin:2.44.2")
@@ -73,7 +73,7 @@ tasks.register("clean", Delete::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.5.0"
+    id("org.gradle.test-retry") version "1.5.1"
 }
 
 /*
