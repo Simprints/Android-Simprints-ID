@@ -15,6 +15,7 @@ android {
     packagingOptions {
         resources.excludes.add("META-INF/*")
     }
+    namespace = "com.simprints.testtools"
 }
 
 //Required to make the mock-android library to work in a no android module.

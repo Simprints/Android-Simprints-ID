@@ -42,6 +42,7 @@ android {
     packagingOptions {
         resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
     }
+    namespace = "com.simprints.face"
 }
 repositories {
     maven(url = "https://jitpack.io")

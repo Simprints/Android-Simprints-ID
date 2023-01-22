@@ -38,6 +38,7 @@ android {
     packagingOptions {
         resources.excludes.add("META-INF/*")
     }
+    namespace = "com.simprints.eventsystem"
 }
 
 dependencies {

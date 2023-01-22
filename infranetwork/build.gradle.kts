@@ -25,6 +25,7 @@ android {
             buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
         }
     }
+    namespace = "com.simprints.infra.network"
 }
 
 

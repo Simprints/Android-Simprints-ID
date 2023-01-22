@@ -18,6 +18,7 @@ android {
     packagingOptions {
         resources.excludes.add("META-INF/*")
     }
+    namespace = "com.simprints.infra.license"
 }
 
 dependencies {
