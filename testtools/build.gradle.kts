@@ -15,6 +15,7 @@ android {
     packagingOptions {
         resources.excludes.add("META-INF/*")
     }
+    namespace = "com.simprints.testtools"
 }
 
 //Required to make the mock-android library to work in a no android module.
@@ -24,7 +25,6 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":core"))
 
-    implementation(libs.testing.androidX.core)
     implementation(libs.testing.androidX.core.testing)
     api(libs.androidX.multidex)
     api(libs.androidX.appcompat)
