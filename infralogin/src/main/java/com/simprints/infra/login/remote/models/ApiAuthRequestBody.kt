@@ -6,14 +6,14 @@ import com.simprints.infra.login.domain.models.AuthRequest
 @Keep
 internal data class ApiAuthRequestBody(
     var encryptedProjectSecret: String = "",
-    var integrityAPIVerdict: String = "",
+    var integrityToken: String = "",
     var deviceId: String
 ) {
     companion object {
         fun fromDomain(authRequest: AuthRequest): ApiAuthRequestBody =
             ApiAuthRequestBody(
                 authRequest.encryptedProjectSecret,
-                authRequest.integrityAPIToken,
+                authRequest.integrityToken,
                 authRequest.deviceId,
             )
     }
