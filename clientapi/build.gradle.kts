@@ -32,6 +32,7 @@ android {
     }
 
     buildFeatures.viewBinding = true
+    namespace = "com.simprints.clientapi"
 }
 
 dependencies {
@@ -67,7 +68,6 @@ dependencies {
     testImplementation(libs.testing.androidX.core.testing)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.coroutines.test)
-    testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.koTest.kotlin.assert)
 
@@ -78,7 +78,6 @@ dependencies {
     androidTestImplementation(libs.testing.androidX.runner)
     androidTestImplementation(libs.testing.mockk.android)
 
-    androidTestImplementation(libs.testing.androidX.rules)
     androidTestImplementation(libs.testing.espresso.core)
     androidTestImplementation(libs.testing.espresso.intents)
 

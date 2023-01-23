@@ -27,6 +27,7 @@ android {
             buildConfigField("String", "CLOUD_PROJECT_ID", "\"$DEV_CLOUD_PROJECT_ID\"")
         }
     }
+    namespace = "com.simprints.infra.login"
 }
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))

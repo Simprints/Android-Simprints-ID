@@ -27,6 +27,7 @@ android {
         }
 
     }
+    namespace = "com.simprints.infra.config"
 }
 
 dependencies {

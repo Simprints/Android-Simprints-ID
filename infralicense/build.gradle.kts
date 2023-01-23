@@ -18,6 +18,7 @@ android {
     packagingOptions {
         resources.excludes.add("META-INF/*")
     }
+    namespace = "com.simprints.infra.license"
 }
 
 dependencies {
@@ -42,9 +43,7 @@ dependencies {
     testImplementation(libs.testing.coroutines.test)
 
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.rules)
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
     androidTestImplementation(libs.testing.truth)
