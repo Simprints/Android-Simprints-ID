@@ -24,7 +24,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
@@ -61,7 +60,6 @@ class AlertActivityTest {
     lateinit var configManager: ConfigManager
 
     private val generalConfiguration = mockk<GeneralConfiguration>()
-    private val eventRepository = mockk<EventRepository>(relaxed = true)
 
     @Before
     fun setUp() {

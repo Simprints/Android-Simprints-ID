@@ -69,16 +69,8 @@ class AuthenticationHelperImpl @Inject constructor(
             is BackendMaintenanceException -> {
                 AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
             }
-            is PlayIntegrityException -> getIntegrityExceptionReason(t.reason)
+            is PlayIntegrityException -> AuthenticateDataResult.PlayIntegrityUnavailable
             else -> AuthenticateDataResult.Unknown
-        }
-    }
-
-    private fun getIntegrityExceptionReason(
-        reason: PlayIntegrityException.PlayIntegrityExceptionReason
-    ): AuthenticateDataResult {
-        return when (reason) {
-            PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE -> AuthenticateDataResult.PlayIntegrityUnavailable
         }
     }
 
