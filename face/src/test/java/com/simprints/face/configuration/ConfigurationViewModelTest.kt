@@ -6,7 +6,6 @@ import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseVendor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -15,22 +14,22 @@ import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestRule
 
 class ConfigurationViewModelTest {
 
     @get:Rule
-    val rule = InstantTaskExecutorRule()
-
-    @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
+    @get:Rule
+    val executorRule: TestRule = InstantTaskExecutorRule()
+
     private val licenseRepository: LicenseRepository = mockk(relaxed = true)
-    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
     private lateinit var viewModel: ConfigurationViewModel
 
     @Before
     fun setUp() {
-        viewModel = ConfigurationViewModel(licenseRepository, dispatcherProvider)
+        viewModel = ConfigurationViewModel(licenseRepository)
         mockLicenseResult(
             "backendError", flowOf(
                 LicenseState.Downloading,

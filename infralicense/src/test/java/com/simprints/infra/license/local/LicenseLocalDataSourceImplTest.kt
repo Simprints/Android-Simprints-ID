@@ -5,26 +5,28 @@ import com.simprints.infra.security.SecurityManager
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.io.File
 
 class LicenseLocalDataSourceImplTest {
 
     @Test
-    fun `check file directory is created`() {
+    fun `check file directory is created`() = runTest {
 
         val path = "testpath"
         val file = File(path)
 
         LicenseLocalDataSourceImpl(context = mockk() {
             every { filesDir } returns file
-        }, mockk())
+        }, mockk(), UnconfinedTestDispatcher())
 
         assert(File("${path}/${LicenseLocalDataSource.LICENSES_FOLDER}").exists())
     }
 
     @Test
-    fun `check saving the file opens a file output`() {
+    fun `check saving the file opens a file output`() = runTest {
 
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
@@ -35,7 +37,7 @@ class LicenseLocalDataSourceImplTest {
 
         val localSource = LicenseLocalDataSourceImpl(context = mockk {
             every { filesDir } returns file
-        }, encryptedFileMock)
+        }, encryptedFileMock, UnconfinedTestDispatcher())
 
 
         val fileName = "testfile"
@@ -45,7 +47,7 @@ class LicenseLocalDataSourceImplTest {
     }
 
     @Test
-    fun `check getting the file requests the created file`() {
+    fun `check getting the file requests the created file`() = runTest {
 
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
@@ -56,7 +58,7 @@ class LicenseLocalDataSourceImplTest {
 
         val localSource = LicenseLocalDataSourceImpl(context = mockk() {
             every { filesDir } returns file
-        }, encryptedFileMock)
+        }, encryptedFileMock, UnconfinedTestDispatcher())
 
         localSource.getLicense()
 
@@ -65,14 +67,14 @@ class LicenseLocalDataSourceImplTest {
     }
 
     @Test
-    fun `check file delete deletes the dir`() {
+    fun `check file delete deletes the dir`() = runTest {
 
         val path = "testpath"
         val file = File(path)
 
         val localsource = LicenseLocalDataSourceImpl(context = mockk() {
             every { filesDir } returns file
-        }, mockk())
+        }, mockk(), UnconfinedTestDispatcher())
 
         localsource.deleteCachedLicense()
 
