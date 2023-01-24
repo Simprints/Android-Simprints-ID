@@ -78,6 +78,14 @@ object CoreModule {
     @Provides
     fun provideDispatcherIo(): CoroutineDispatcher = Dispatchers.IO
 
+    @DispatcherMain
+    @Provides
+    fun provideDispatcherMain(): CoroutineDispatcher = Dispatchers.Main
+
+    @DispatcherBG
+    @Provides
+    fun provideDispatcherBg(): CoroutineDispatcher = Dispatchers.Default
+
     @NonCancellableIO
     @Provides
     fun provideNonCancellableIO(
@@ -108,6 +116,14 @@ annotation class DeviceID
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class DispatcherIO
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DispatcherBG
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DispatcherMain
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
