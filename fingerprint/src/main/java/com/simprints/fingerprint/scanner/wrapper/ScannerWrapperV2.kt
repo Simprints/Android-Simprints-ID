@@ -27,10 +27,13 @@ import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.observers.DisposableObserver
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -43,8 +46,9 @@ class ScannerWrapperV2(
     private val connectionHelper: ConnectionHelper,
     private val cypressOtaHelper: CypressOtaHelper,
     private val stmOtaHelper: StmOtaHelper,
-    private val un20OtaHelper: Un20OtaHelper
-): ScannerWrapper {
+    private val un20OtaHelper: Un20OtaHelper,
+    private val ioDispatcher: CoroutineDispatcher,
+) : ScannerWrapper {
 
     private var scannerVersion: ScannerVersion? = null
     private var batteryInfo: BatteryInfo? = null
@@ -61,9 +65,10 @@ class ScannerWrapperV2(
             generation = ScannerGeneration.VERO_2,
             firmware = ScannerFirmwareVersions.UNKNOWN,
         )
+
     override fun batteryInformation(): BatteryInfo = batteryInfo ?: BatteryInfo.UNKNOWN
 
-    override fun isImageTransferSupported(): Boolean= true
+    override fun isImageTransferSupported(): Boolean = true
 
     override suspend fun connect() =
         connectionHelper.connectScanner(scannerV2, macAddress)
@@ -79,7 +84,7 @@ class ScannerWrapperV2(
      * @throws UnexpectedScannerException
      * @throws OtaFailedException
      */
-    override suspend fun setScannerInfoAndCheckAvailableOta() {
+    override suspend fun setScannerInfoAndCheckAvailableOta() = withContext(ioDispatcher) {
         try {
             scannerInitialSetupHelper.setupScannerWithOtaCheck(
                 scannerV2,
@@ -92,7 +97,7 @@ class ScannerWrapperV2(
         }
     }
 
-    override suspend fun disconnect() {
+    override suspend fun disconnect() = withContext(ioDispatcher) {
         try {
             connectionHelper.disconnectScanner(scannerV2)
         } catch (ex: Throwable) {
@@ -109,7 +114,7 @@ class ScannerWrapperV2(
      * @throws ScannerDisconnectedException
      * @throws UnexpectedScannerException
      */
-    override suspend fun sensorWakeUp()  {
+    override suspend fun sensorWakeUp() = withContext(ioDispatcher) {
         try {
             scannerV2.ensureUn20State(true)
         } catch (ex: Throwable) {
@@ -128,7 +133,7 @@ class ScannerWrapperV2(
      * @throws UnexpectedScannerException
      * @throws NotConnectedException
      */
-    override suspend fun sensorShutDown() {
+    override suspend fun sensorShutDown() = withContext(ioDispatcher) {
         try {
             scannerV2.ensureUn20State(false)
         } catch (ex: Throwable) {
@@ -138,21 +143,21 @@ class ScannerWrapperV2(
 
     override fun isLiveFeedbackAvailable(): Boolean = true
 
-    override suspend fun startLiveFeedback() =
+    override suspend fun startLiveFeedback() = withContext(ioDispatcher) {
         (if (isLiveFeedbackAvailable()) {
             scannerV2.setScannerLedStateOn()
                 .andThen(getImageQualityWhileSettingLEDState())
         } else {
             Completable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK))
         }).await()
-
+    }
 
     private fun getImageQualityWhileSettingLEDState() =
         scannerV2.getImageQualityPreview().flatMapCompletable { quality ->
             scannerV2.setSmileLedState(scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality))
         }.repeat()
 
-    override suspend fun stopLiveFeedback() {
+    override suspend fun stopLiveFeedback(): Unit = withContext(ioDispatcher) {
         if (isLiveFeedbackAvailable()) {
             scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
             scannerV2.setScannerLedStateDefault()
@@ -162,7 +167,7 @@ class ScannerWrapperV2(
     }
 
 
-    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) =
+    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) = withContext(ioDispatcher) {
         getUn20Status().flatMapCompletable { actualState ->
             when {
                 desiredState && !actualState -> turnUn20OnAndAwaitStateChangeEvent()
@@ -170,12 +175,13 @@ class ScannerWrapperV2(
                 else -> Completable.complete()
             }
         }.await()
+    }
 
     override suspend fun captureFingerprint(
         captureFingerprintStrategy: CaptureFingerprintStrategy?,
         timeOutMs: Int,
         qualityThreshold: Int
-    ): CaptureFingerprintResponse =
+    ): CaptureFingerprintResponse = withContext(ioDispatcher) {
         scannerV2
             .captureFingerprint(captureFingerprintStrategy!!.deduceCaptureDpi())
             .ensureCaptureResultOkOrError()
@@ -187,6 +193,7 @@ class ScannerWrapperV2(
             .ifNoFingerDetectedThenSetBadScanLedState()
             .wrapErrorsFromScanner()
             .await()
+    }
 
     private fun Single<CaptureFingerprintResult>.ensureCaptureResultOkOrError() =
         flatMapCompletable {
@@ -242,29 +249,32 @@ class ScannerWrapperV2(
             }
         }
 
-    override suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy?): AcquireImageResponse =
+    override suspend fun acquireImage(
+        saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy?,
+    ): AcquireImageResponse = withContext(ioDispatcher) {
         (saveFingerprintImagesStrategy!!.deduceImageAcquisitionFormat()?.let {
-                scannerV2.acquireImage(it)
-                    .map { imageBytes ->
-                        AcquireImageResponse(imageBytes.image)
-                    }
-            }?.switchIfEmpty(Single.error(NoFingerDetectedException()))
+            scannerV2.acquireImage(it)
+                .map { imageBytes ->
+                    AcquireImageResponse(imageBytes.image)
+                }
+        }?.switchIfEmpty(Single.error(NoFingerDetectedException()))
             ?.wrapErrorsFromScanner()
             ?: Single.error(
                 IllegalArgumentException("Fingerprint strategy $saveFingerprintImagesStrategy should not call acquireImage in ScannerWrapper")
             )).await()
+    }
 
-    override suspend fun setUiIdle() {
-            scannerV2
-                .setSmileLedState(scannerUiHelper.idleLedState())
-                .wrapErrorsFromScanner().await()
+    override suspend fun setUiIdle() = withContext(ioDispatcher) {
+        scannerV2
+            .setSmileLedState(scannerUiHelper.idleLedState())
+            .wrapErrorsFromScanner().await()
     }
 
     private val triggerListenerToObserverMap =
         mutableMapOf<ScannerTriggerListener, Observer<Unit>>()
 
     override fun registerTriggerListener(triggerListener: ScannerTriggerListener) {
-        triggerListenerToObserverMap[triggerListener] = object: DisposableObserver<Unit>() {
+        triggerListenerToObserverMap[triggerListener] = object : DisposableObserver<Unit>() {
             override fun onComplete() {}
             override fun onNext(t: Unit) {
                 triggerListener.onTrigger()
@@ -283,17 +293,19 @@ class ScannerWrapperV2(
     }
 
     override fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep> =
-            cypressOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
-                .mapPotentialErrorFromScanner()
+        cypressOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
+            .mapPotentialErrorFromScanner()
+            .flowOn(ioDispatcher)
 
     override fun performStmOta(firmwareVersion: String): Flow<StmOtaStep> =
-            stmOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
-                .mapPotentialErrorFromScanner()
+        stmOtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
+            .mapPotentialErrorFromScanner()
+            .flowOn(ioDispatcher)
 
     override fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep> =
-             un20OtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
-                .mapPotentialErrorFromScanner()
-
+        un20OtaHelper.performOtaSteps(scannerV2, macAddress, firmwareVersion)
+            .mapPotentialErrorFromScanner()
+            .flowOn(ioDispatcher)
 
     private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
         when (this) {

@@ -20,7 +20,6 @@ import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.common.mock.MockTimer
 import io.mockk.*
@@ -47,8 +46,6 @@ class OtaViewModelTest {
     private val scannerManager: ScannerManager = mockk {
         every { scanner } returns scannerMock
     }
-
-    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     private val recentUserActivityManager = mockk<RecentUserActivityManager> {
         coEvery { getRecentUserActivity() } returns RecentUserActivity(
@@ -77,20 +74,21 @@ class OtaViewModelTest {
         }
     }
 
-    private val otaViewModel = OtaViewModel(
-        scannerManager,
-        sessionEventsManagerMock,
-        timeHelperMock,
-        dispatcherProvider,
-        recentUserActivityManager,
-        configManager
-    )
+    private lateinit var otaViewModel: OtaViewModel
 
     @Before
     fun setup() {
         every { scannerMock.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
         every { scannerMock.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
         every { scannerMock.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()
+
+        otaViewModel = OtaViewModel(
+            scannerManager,
+            sessionEventsManagerMock,
+            timeHelperMock,
+            recentUserActivityManager,
+            configManager
+        )
     }
 
     @Test
