@@ -1,16 +1,20 @@
 package com.simprints.infra.enrolment.records.domain
 
 import android.content.Context
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.remote.EnrolmentRecordRemoteDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class EnrolmentRecordRepositoryImpl(
     context: Context,
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
     private val subjectRepository: SubjectRepository,
+    private val dispatcher: CoroutineDispatcher,
     private val batchSize: Int,
 ) : EnrolmentRecordRepository {
 
@@ -18,8 +22,9 @@ internal class EnrolmentRecordRepositoryImpl(
     constructor(
         @ApplicationContext context: Context,
         remoteDataSource: EnrolmentRecordRemoteDataSource,
-        subjectRepository: SubjectRepository
-    ) : this(context, remoteDataSource, subjectRepository, BATCH_SIZE)
+        subjectRepository: SubjectRepository,
+        @DispatcherIO dispatcher: CoroutineDispatcher,
+    ) : this(context, remoteDataSource, subjectRepository, dispatcher, BATCH_SIZE)
 
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 
@@ -29,7 +34,7 @@ internal class EnrolmentRecordRepositoryImpl(
         private const val PROGRESS_KEY = "PROGRESS"
     }
 
-    override suspend fun uploadRecords(subjectIds: List<String>) {
+    override suspend fun uploadRecords(subjectIds: List<String>) = withContext(dispatcher) {
         val lastUploadedRecord = prefs.getString(PROGRESS_KEY, null)
         var query = SubjectQuery(sort = true, afterSubjectId = lastUploadedRecord)
         if (subjectIds.isNotEmpty()) {
@@ -42,7 +47,7 @@ internal class EnrolmentRecordRepositoryImpl(
         var subjects = mutableListOf<Subject>()
         subjectRepository.load(query).collect {
             subjects.add(it)
-            if (subjects.size >= this.batchSize) {
+            if (subjects.size >= batchSize) {
                 remoteDataSource.uploadRecords(subjects)
                 prefs.edit().putString(PROGRESS_KEY, subjects.last().subjectId).apply()
                 subjects = mutableListOf()
