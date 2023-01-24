@@ -1,0 +1,17 @@
+package com.simprints.id.domain.moduleapi.app.responses
+
+import com.google.common.truth.Truth
+import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.Companion.fromDomainAlertTypeToAppErrorType
+import org.junit.Test
+
+
+internal class AppErrorResponseTest {
+
+
+    @Test
+    fun `test PLAY_INTEGRITY_ERROR is mapped to UNEXPECTED_ERROR`() {
+        val reason =fromDomainAlertTypeToAppErrorType(AlertType.PLAY_INTEGRITY_ERROR)
+        Truth.assertThat(reason).isEqualTo(AppErrorResponse.Reason.UNEXPECTED_ERROR)
+    }
+}
