@@ -3,7 +3,7 @@ package com.simprints.id.services.sync.events.master.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import dagger.assisted.Assisted
@@ -21,7 +21,7 @@ class EventEndSyncReporterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val syncCache: EventSyncCache,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
 
     override val tag: String = EventEndSyncReporterWorker::class.java.simpleName

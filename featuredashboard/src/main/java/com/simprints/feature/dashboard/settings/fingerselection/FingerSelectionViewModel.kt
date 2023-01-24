@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.ExternalScope
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Finger
@@ -20,7 +20,7 @@ import javax.inject.Inject
 internal class FingerSelectionViewModel @Inject constructor(
     private val configManager: ConfigManager,
     @ExternalScope private val externalScope: CoroutineScope,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val fingerSelections: LiveData<List<FingerSelectionItem>>

@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -26,7 +27,7 @@ class EventEndSyncReporterWorkerTest {
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-        verify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
     }
 
     @Test
@@ -35,7 +36,7 @@ class EventEndSyncReporterWorkerTest {
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-        verify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 0) { syncCache.storeLastSuccessfulSyncTime(any()) }
     }
 
     @Test
@@ -44,7 +45,7 @@ class EventEndSyncReporterWorkerTest {
         val result = endSyncReportWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        verify(exactly = 1) { syncCache.storeLastSuccessfulSyncTime(any()) }
+        coVerify(exactly = 1) { syncCache.storeLastSuccessfulSyncTime(any()) }
     }
 
     private fun createWorker(syncId: String?): EventEndSyncReporterWorker =

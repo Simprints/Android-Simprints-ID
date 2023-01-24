@@ -4,14 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,19 +17,18 @@ import javax.inject.Inject
 class PrivacyNoticeViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val loginManager: LoginManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val privacyNoticeViewState = MutableLiveData<PrivacyNoticeState>()
     fun getPrivacyNoticeViewStateLiveData(): LiveData<PrivacyNoticeState> =
         privacyNoticeViewState
 
-    fun retrievePrivacyNotice() = viewModelScope.launch(dispatcher) {
+    fun retrievePrivacyNotice() = viewModelScope.launch {
         val deviceConfiguration = configManager.getDeviceConfiguration()
         configManager.getPrivacyNotice(
             loginManager.getSignedInProjectIdOrEmpty(),
             deviceConfiguration.language
-        ).flowOn(dispatcher)
+        )
             .map { it.toPrivacyNoticeViewState() }
             .catch {
                 it.printStackTrace()

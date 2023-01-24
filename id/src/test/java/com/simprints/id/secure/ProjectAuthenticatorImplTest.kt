@@ -131,7 +131,7 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun safetyNetFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
-        every { loginManager.requestAttestation(any()) } throws SafetyNetException(
+        coEvery { loginManager.requestAttestation(any()) } throws SafetyNetException(
             "",
             SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
         )
@@ -184,7 +184,7 @@ class ProjectAuthenticatorImplTest {
             mockk(),
             mockk(),
         )
-        every { loginManager.requestAttestation(any()) } returns "google_attestation"
+        coEvery { loginManager.requestAttestation(any()) } returns "google_attestation"
     }
 
     private companion object {

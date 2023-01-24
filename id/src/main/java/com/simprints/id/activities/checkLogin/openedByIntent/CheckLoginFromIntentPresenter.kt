@@ -2,7 +2,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
 import com.simprints.core.DeviceID
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.utils.SimNetworkUtils
@@ -49,7 +49,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val simNetworkUtils: SimNetworkUtils,
     @ExternalScope private val externalScope: CoroutineScope,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) :
     CheckLoginPresenter(view),
     CheckLoginFromIntentContract.Presenter {

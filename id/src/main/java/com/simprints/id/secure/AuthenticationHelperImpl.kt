@@ -23,7 +23,7 @@ class AuthenticationHelperImpl @Inject constructor(
     private val loginManager: LoginManager,
     private val timeHelper: TimeHelper,
     private val projectAuthenticator: ProjectAuthenticator,
-    private val eventRepository: EventRepository
+    private val eventRepository: EventRepository,
 ) : AuthenticationHelper {
 
     private var loginStartTime = 0L
@@ -55,9 +55,7 @@ class AuthenticationHelperImpl @Inject constructor(
             }
         }
 
-        return result.also {
-            addEventAndUpdateProjectIdIfRequired(it.toDomainResult(), projectId, userId)
-        }
+        return result.also { addEventAndUpdateProjectIdIfRequired(it.toDomainResult(), projectId, userId) }
     }
 
     private fun extractResultFromException(t: Throwable): AuthenticateDataResult {

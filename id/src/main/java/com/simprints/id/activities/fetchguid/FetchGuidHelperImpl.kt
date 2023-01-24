@@ -1,5 +1,6 @@
 package com.simprints.id.activities.fetchguid
 
+import com.simprints.core.DispatcherIO
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
@@ -11,26 +12,28 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.logging.Simber
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FetchGuidHelperImpl @Inject constructor(
     private val downSyncHelper: EventDownSyncHelper,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val configManager: ConfigManager,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : FetchGuidHelper {
 
     override suspend fun loadFromRemoteIfNeeded(
-        coroutineScope: CoroutineScope,
         projectId: String,
         subjectId: String
-    ): SubjectFetchResult {
-        return try {
+    ): SubjectFetchResult = withContext(dispatcher) {
+        return@withContext try {
             val subjectResultFromDB = fetchFromLocalDb(projectId, subjectId)
             Simber.d("[FETCH_GUID] Fetching $subjectId")
-            return if (subjectResultFromDB != null) {
+            return@withContext if (subjectResultFromDB != null) {
                 Simber.d("[FETCH_GUID] Guid found in Local")
 
                 subjectResultFromDB
@@ -44,7 +47,7 @@ class FetchGuidHelperImpl @Inject constructor(
                     )
                 )
 
-                downSyncHelper.downSync(coroutineScope, op).consumeAsFlow().toList()
+                downSyncHelper.downSync(this, op).consumeAsFlow().toList()
 
                 Simber.d("[FETCH_GUID] Network request done")
 
