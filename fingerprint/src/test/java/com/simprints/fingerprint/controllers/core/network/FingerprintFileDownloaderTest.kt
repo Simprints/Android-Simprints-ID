@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.data.FirmwareTestData
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -29,9 +28,6 @@ class FingerprintFileDownloaderTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
-
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -39,7 +35,7 @@ class FingerprintFileDownloaderTest {
             FingerprintFileDownloader(
                 fingerprintApiClientFactory,
                 loginManager,
-                dispatcherProvider
+                testCoroutineRule.testCoroutineDispatcher
             )
     }
 

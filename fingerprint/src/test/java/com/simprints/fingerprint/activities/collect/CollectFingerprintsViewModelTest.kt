@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.collect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
@@ -73,12 +72,6 @@ class CollectFingerprintsViewModelTest {
 
     private lateinit var vm: CollectFingerprintsViewModel
 
-    private val mockDispatcher = mockk<DispatcherProvider> {
-        every { main() } returns testCoroutineRule.testCoroutineDispatcher
-        every { default() } returns testCoroutineRule.testCoroutineDispatcher
-        every { io() } returns testCoroutineRule.testCoroutineDispatcher
-    }
-
     @Before
     fun setUp() {
         mockBase64EncodingForSavingTemplateInSession()
@@ -98,7 +91,6 @@ class CollectFingerprintsViewModelTest {
             StartingStateDeterminer(),
             EncodingUtilsImplForTests,
             TestScope(),
-            mockDispatcher
         )
     }
 

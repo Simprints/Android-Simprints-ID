@@ -8,6 +8,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -38,7 +39,7 @@ class FingerprintImageManagerImplTest {
             }
         }
 
-        val fingerprintImageManagerImpl = FingerprintImageManagerImpl(imageRepo, eventRepo)
+        val fingerprintImageManagerImpl = FingerprintImageManagerImpl(imageRepo, eventRepo, UnconfinedTestDispatcher())
 
         val imageBytes = byteArrayOf()
         val captureEventId = "captureEventId"

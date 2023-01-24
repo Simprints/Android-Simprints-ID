@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.exceptions.unexpected.result.NoTaskResultException
 import com.simprints.fingerprint.orchestrator.Orchestrator
@@ -17,7 +16,6 @@ import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,14 +24,13 @@ class OrchestratorViewModel @Inject constructor(
     private val orchestrator: Orchestrator,
     private val runnableTaskDispatcher: RunnableTaskDispatcher,
     private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val nextActivityCall = MutableLiveData<ActivityCall>()
     val finishedResult = MutableLiveData<ActivityResult>()
 
     fun start(fingerprintRequest: FingerprintRequest) {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
             orchestrator.start(fingerprintRequest)
             executeNextTaskOrFinish()
