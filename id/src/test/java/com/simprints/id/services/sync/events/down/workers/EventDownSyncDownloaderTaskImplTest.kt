@@ -38,7 +38,7 @@ class EventDownSyncDownloaderTaskImplTest {
         runBlocking {
             val syncCache = mockk<EventSyncCache>()
             eventDownSyncDownloaderTask.execute(GUID1, op, syncHelper, syncCache, mockk(), this)
-            verify { syncCache.readProgress(GUID1) }
+            coVerify { syncCache.readProgress(GUID1) }
         }
     }
 

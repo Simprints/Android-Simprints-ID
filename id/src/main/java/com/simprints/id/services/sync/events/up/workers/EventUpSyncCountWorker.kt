@@ -5,7 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -14,6 +14,7 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.C
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 @HiltWorker
@@ -22,7 +23,7 @@ class EventUpSyncCountWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val eventUpSyncHelper: EventUpSyncHelper,
     private val jsonHelper: JsonHelper,
-    private val dispatcher: DispatcherProvider
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
 
     companion object {
@@ -42,7 +43,7 @@ class EventUpSyncCountWorker @AssistedInject constructor(
     }
 
     override suspend fun doWork(): Result =
-        withContext(dispatcher.io()) {
+        withContext(dispatcher) {
             try {
                 Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
 

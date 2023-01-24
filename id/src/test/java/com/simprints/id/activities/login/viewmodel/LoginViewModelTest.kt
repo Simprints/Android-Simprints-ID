@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -26,7 +25,6 @@ class LoginViewModelTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -34,7 +32,7 @@ class LoginViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        loginViewModel = LoginViewModel(authenticationHelper, testDispatcherProvider)
+        loginViewModel = LoginViewModel(authenticationHelper)
     }
 
 
