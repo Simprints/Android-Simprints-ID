@@ -2,8 +2,6 @@ package com.simprints.core
 
 import android.content.Context
 import com.lyft.kronos.AndroidClockFactory
-import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
 import com.simprints.core.tools.extentions.deviceId
 import com.simprints.core.tools.extentions.packageVersionName
@@ -44,10 +42,6 @@ object CoreModule {
     @Provides
     @Singleton
     fun provideSimNetworkUtils(@ApplicationContext ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
-
-    @Provides
-    @Singleton
-    fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
 
     @Provides
     @Singleton
