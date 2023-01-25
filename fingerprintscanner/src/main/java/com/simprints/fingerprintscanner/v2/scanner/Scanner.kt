@@ -83,23 +83,26 @@ class Scanner(
     }
 
     fun disconnect(): Completable = completable {
-        when (state.mode) {
-            ROOT -> rootMessageChannel.disconnect()
-            MAIN -> {
-                mainMessageChannel.disconnect()
-                scannerTriggerListenerDisposable?.dispose()
+        // Disconnect scanner only when it is connected
+        if (state.connected) {
+            when (state.mode) {
+                ROOT -> rootMessageChannel.disconnect()
+                MAIN -> {
+                    mainMessageChannel.disconnect()
+                    scannerTriggerListenerDisposable?.dispose()
+                }
+                CYPRESS_OTA -> cypressOtaMessageChannel.disconnect()
+                STM_OTA -> stmOtaMessageChannel.disconnect()
+                null -> {/* Do nothing */
+                }
             }
-            CYPRESS_OTA -> cypressOtaMessageChannel.disconnect()
-            STM_OTA -> stmOtaMessageChannel.disconnect()
-            null -> {/* Do nothing */
-            }
+            flowableDisposable.dispose()
+            state = disconnectedScannerState()
         }
-        flowableDisposable.dispose()
-        state = disconnectedScannerState()
     }
 
     private fun assertConnected() = Completable.fromAction {
-        if (state.connected != true) {
+        if (!state.connected) {
             throw NotConnectedException("Attempting to access functionality before calling Scanner::connect()")
         }
     }
