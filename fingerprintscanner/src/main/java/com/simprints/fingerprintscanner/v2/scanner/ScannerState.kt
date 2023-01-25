@@ -8,7 +8,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.Smile
  * Null values indicate unknown state.
  */
 data class ScannerState(
-    var connected: Boolean?,
+    var connected: Boolean,
     var mode: Mode?,
     var un20On: Boolean?,
     var triggerButtonActive: Boolean?,
