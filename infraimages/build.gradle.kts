@@ -29,6 +29,7 @@ dependencies {
     api(project(":infralogin"))
     api(project(":infrasecurity"))
     api(project(":infraconfig"))
+    implementation(project(":core"))
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)

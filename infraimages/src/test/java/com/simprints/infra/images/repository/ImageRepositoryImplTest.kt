@@ -7,14 +7,20 @@ import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.ImageRemoteDataSource
 import com.simprints.infra.images.remote.UploadResult
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.io.FileInputStream
 
 internal class ImageRepositoryImplTest {
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK lateinit var localDataSource: ImageLocalDataSource
     @MockK lateinit var remoteDataSource: ImageRemoteDataSource
@@ -24,7 +30,7 @@ internal class ImageRepositoryImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        repository = ImageRepositoryImpl(localDataSource, remoteDataSource)
+        repository = ImageRepositoryImpl(localDataSource, remoteDataSource, UnconfinedTestDispatcher())
         initialiseMocks()
     }
 
@@ -67,7 +73,7 @@ internal class ImageRepositoryImplTest {
     }
 
     @Test
-    fun shouldDeleteStoredImages() {
+    fun shouldDeleteStoredImages() = runTest {
         configureLocalImageFiles(numberOfValidFiles = 5, includeInvalidFile = false)
 
         repository.deleteStoredImages()
@@ -76,7 +82,7 @@ internal class ImageRepositoryImplTest {
     }
 
     @Test
-    fun shouldGetImagesCount() {
+    fun shouldGetImagesCount() = runTest {
         val nImagesInLocal = 5
         configureLocalImageFiles(numberOfValidFiles = nImagesInLocal, includeInvalidFile = false)
 
