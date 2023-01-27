@@ -4,10 +4,8 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -23,9 +21,7 @@ class FaceImageManagerImplTest {
         )
 
         val imageRepo = mockk<ImageRepository> {
-            every { storeImageSecurely(any(), "projectId", any()) } returns SecuredImageRef(
-                expectedPath
-            )
+            every { storeImageSecurely(any(), "projectId", any()) } returns SecuredImageRef(expectedPath)
         }
 
         val eventRepo = mockk<EventRepository> {
@@ -35,14 +31,14 @@ class FaceImageManagerImplTest {
             }
         }
 
-        val faceImageManagerImpl = FaceImageManagerImpl(imageRepo, eventRepo)
+        val faceImageManagerImpl = FaceImageManagerImpl(imageRepo, eventRepo, UnconfinedTestDispatcher())
 
         val imageBytes = byteArrayOf()
         val captureEventId = "captureEventId"
 
         faceImageManagerImpl.save(imageBytes, captureEventId)
 
-        verify {
+        coVerify {
             imageRepo.storeImageSecurely(
                 withArg {
                     assert(it.isEmpty())
