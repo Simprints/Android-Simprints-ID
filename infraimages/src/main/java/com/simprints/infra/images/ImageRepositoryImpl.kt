@@ -1,25 +1,34 @@
 package com.simprints.infra.images
 
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.ImageRemoteDataSource
 import com.simprints.infra.logging.Simber
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ImageRepositoryImpl @Inject internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val remoteDataSource: ImageRemoteDataSource,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ImageRepository {
 
-    override fun storeImageSecurely(imageBytes: ByteArray, projectId: String,relativePath: Path): SecuredImageRef? {
-        return localDataSource.encryptAndStoreImage(imageBytes,projectId, relativePath)
+    override suspend fun storeImageSecurely(
+        imageBytes: ByteArray,
+        projectId: String,
+        relativePath: Path,
+    ): SecuredImageRef? = withContext(dispatcher) {
+        localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
     }
 
-    override fun getNumberOfImagesToUpload(projectId: String): Int =
+    override suspend fun getNumberOfImagesToUpload(projectId: String): Int = withContext(dispatcher) {
         localDataSource.listImages(projectId).count()
+    }
 
-    override suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean {
+    override suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean = withContext(dispatcher) {
         var allImagesUploaded = true
 
         val images = localDataSource.listImages(projectId)
@@ -39,12 +48,12 @@ class ImageRepositoryImpl @Inject internal constructor(
             }
         }
 
-        return allImagesUploaded
+        allImagesUploaded
     }
 
-    override fun deleteStoredImages() = with(localDataSource) {
-        listImages(null).forEach {
-            deleteImage(it)
+    override suspend fun deleteStoredImages() = withContext(dispatcher) {
+        for (image in localDataSource.listImages(null)) {
+            localDataSource.deleteImage(image)
         }
     }
 }

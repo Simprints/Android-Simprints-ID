@@ -4,10 +4,7 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -27,7 +24,7 @@ class FingerprintImageManagerImplTest {
         )
 
         val imageRepo = mockk<ImageRepository> {
-            every { storeImageSecurely(any(), "projectId", any()) } returns SecuredImageRef(
+            coEvery { storeImageSecurely(any(), "projectId", any()) } returns SecuredImageRef(
                 expectedPath
             )
         }
@@ -46,7 +43,7 @@ class FingerprintImageManagerImplTest {
 
         fingerprintImageManagerImpl.save(imageBytes, captureEventId, "jpg")
 
-        verify {
+        coVerify {
             imageRepo.storeImageSecurely(
                 withArg {
                     assert(it.isEmpty())

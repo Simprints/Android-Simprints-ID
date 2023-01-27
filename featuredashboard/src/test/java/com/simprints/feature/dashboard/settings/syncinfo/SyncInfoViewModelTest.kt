@@ -93,7 +93,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the imagesToUpload live data correctly`() {
         val number = 10
-        every { imageRepository.getNumberOfImagesToUpload(PROJECT_ID) } returns number
+        coEvery { imageRepository.getNumberOfImagesToUpload(PROJECT_ID) } returns number
 
         viewModel.refreshInformation()
 

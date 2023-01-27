@@ -21,7 +21,7 @@ class FaceImageManagerImplTest {
         )
 
         val imageRepo = mockk<ImageRepository> {
-            every { storeImageSecurely(any(), "projectId", any()) } returns SecuredImageRef(expectedPath)
+            coEvery { storeImageSecurely(any(), "projectId", any()) } returns SecuredImageRef(expectedPath)
         }
 
         val eventRepo = mockk<EventRepository> {
