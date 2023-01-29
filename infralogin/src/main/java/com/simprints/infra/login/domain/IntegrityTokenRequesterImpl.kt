@@ -11,8 +11,8 @@ import javax.inject.Inject
 internal class IntegrityTokenRequesterImpl @Inject constructor(private val integrityManager: IntegrityManager) :
     IntegrityTokenRequester {
     /**
-     * This method gets the play integrity api token, using a blocking [Tasks.await] method.
-     *
+     * A method that gets the integrity service token, using a blocking [Tasks.await] method.
+     * it is a blocking function and  shouldn't be called from the main thread
      * @param nonce
      * @return Integrity token
      * @throws RequestingIntegrityTokenException

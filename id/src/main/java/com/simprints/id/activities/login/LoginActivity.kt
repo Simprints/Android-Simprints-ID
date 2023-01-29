@@ -258,7 +258,7 @@ class LoginActivity : BaseSplitActivity() {
     private fun handleIntegrityError() {
         progressDialog.dismiss()
         binding.errorCard.isVisible = false
-        launchAlert(this, AlertType.INTEGRITY_ERROR)
+        launchAlert(this, AlertType.INTEGRITY_SERVICE_ERROR)
     }
 
     private fun handleSignInFailedUnknownReason() {
