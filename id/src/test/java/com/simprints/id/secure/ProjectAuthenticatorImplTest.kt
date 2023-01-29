@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.google.android.play.core.integrity.model.IntegrityErrorCode
 import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.config.ConfigManager
@@ -8,7 +9,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
-import com.simprints.infra.login.exceptions.PlayIntegrityException
+import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -143,13 +144,13 @@ class ProjectAuthenticatorImplTest {
         }
 
     @Test
-    fun playIntegrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
-        every { loginManager.requestPlayIntegrityToken(any()) } throws PlayIntegrityException(
-            "",
-            PlayIntegrityException.PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE
+    fun integrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
+        every { loginManager.requestIntegrityToken(any()) } throws RequestingIntegrityTokenException(
+            errorCode = IntegrityErrorCode.API_NOT_AVAILABLE,
+            cause = Exception("Error in requesting integrity api token")
         )
 
-        assertThrows<PlayIntegrityException> {
+        assertThrows<RequestingIntegrityTokenException> {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
         }
     }
@@ -198,7 +199,7 @@ class ProjectAuthenticatorImplTest {
             mockk(),
             mockk(),
         )
-        every { loginManager.requestPlayIntegrityToken(any()) } returns "token"
+        every { loginManager.requestIntegrityToken(any()) } returns "token"
     }
 
     private companion object {

@@ -1,13 +1,13 @@
 package com.simprints.id.secure
 
+import com.google.android.play.core.integrity.model.IntegrityErrorCode
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.login.exceptions.PlayIntegrityException
-import com.simprints.infra.login.exceptions.PlayIntegrityException.PlayIntegrityExceptionReason
+import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -63,11 +63,16 @@ class AuthenticationHelperImplTest {
     }
 
     @Test
-    fun shouldSetPlayIntegrityUnavailableIfServiceUnavailableException() = runBlocking {
+    fun shouldSetIntegrityErrorIfServiceUnavailableException() = runBlocking {
         val result =
-            mockException(PlayIntegrityException(reason = PlayIntegrityExceptionReason.SERVICE_UNAVAILABLE))
+            mockException(
+                RequestingIntegrityTokenException(
+                    errorCode = IntegrityErrorCode.API_NOT_AVAILABLE,
+                    cause = Exception("Error in requesting integrity api token")
+                )
+            )
 
-        assertThat(result).isInstanceOf(AuthenticateDataResult.PlayIntegrityUnavailable::class.java)
+        assertThat(result).isInstanceOf(AuthenticateDataResult.IntegrityException::class.java)
     }
 
 

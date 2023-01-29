@@ -48,13 +48,13 @@ enum class AlertActivityViewModel(val type: Type,
         message = IDR.string.different_userId_message
     ),
 
-    PLAY_INTEGRITY_ERROR(
+    INTEGRITY_SERVICE_ERROR(
         type = Type.ConfigurationError(title = IDR.string.alert_try_again,
             backgroundColor = IDR.color.simprints_grey,
             mainDrawable = R.drawable.error_icon),
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
-        message = IDR.string.play_integrity_down_alert_message
+        message = IDR.string.integrity_service_error_alert_message
     ),
 
     UNEXPECTED_ERROR(
@@ -80,7 +80,7 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID
                 AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID
                 AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                AlertType.PLAY_INTEGRITY_ERROR -> PLAY_INTEGRITY_ERROR
+                AlertType.INTEGRITY_ERROR -> INTEGRITY_SERVICE_ERROR
                 AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                 AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
                 AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED

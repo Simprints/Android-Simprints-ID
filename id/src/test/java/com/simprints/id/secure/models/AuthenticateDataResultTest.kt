@@ -35,10 +35,10 @@ class AuthenticateDataResultKtTest {
     }
 
     @Test
-    fun mapPlayIntegrityUnavailableResult() {
-        val result = AuthenticateDataResult.PlayIntegrityUnavailable.toDomainResult()
+    fun mapIntegrityErrorResult() {
+        val result = AuthenticateDataResult.IntegrityException.toDomainResult()
 
-        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.PLAY_INTEGRITY_UNAVAILABLE::class.java)
+        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR::class.java)
     }
 
     @Test

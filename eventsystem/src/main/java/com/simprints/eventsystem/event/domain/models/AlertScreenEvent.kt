@@ -60,7 +60,7 @@ data class AlertScreenEvent(
             INVALID_SESSION_ID,
             INVALID_USER_ID,
             INVALID_VERIFY_ID,
-            PLAY_INTEGRITY_ERROR,
+            INTEGRITY_SERVICE_ERROR,
             ENROLMENT_LAST_BIOMETRICS_FAILED,
             INVALID_STATE_FOR_INTENT_ACTION,
             FACE_LICENSE_INVALID,

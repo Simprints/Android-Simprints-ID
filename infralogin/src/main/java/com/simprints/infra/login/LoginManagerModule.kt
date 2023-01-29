@@ -6,10 +6,10 @@ import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.infra.login.db.FirebaseManagerImpl
 import com.simprints.infra.login.db.RemoteDbManager
+import com.simprints.infra.login.domain.IntegrityTokenRequester
+import com.simprints.infra.login.domain.IntegrityTokenRequesterImpl
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.domain.LoginInfoManagerImpl
-import com.simprints.infra.login.domain.PlayIntegrityTokenRequester
-import com.simprints.infra.login.domain.PlayIntegrityTokenRequesterImpl
 import com.simprints.infra.login.network.SimApiClientFactory
 import com.simprints.infra.login.network.SimApiClientFactoryImpl
 import com.simprints.infra.login.remote.AuthenticationRemoteDataSource
@@ -33,7 +33,7 @@ abstract class LoginManagerModule {
     internal abstract fun provideAuthenticationRemoteDataSource(authRemoteDataSource: AuthenticationRemoteDataSourceImpl): AuthenticationRemoteDataSource
 
     @Binds
-    internal abstract fun providePlayIntegrityTokenRequester(impl: PlayIntegrityTokenRequesterImpl): PlayIntegrityTokenRequester
+    internal abstract fun provideIntegrityTokenRequester(impl: IntegrityTokenRequesterImpl): IntegrityTokenRequester
 
     @Binds
     internal abstract fun provideLoginInfoManager(impl: LoginInfoManagerImpl): LoginInfoManager
@@ -48,7 +48,7 @@ abstract class LoginManagerModule {
 object IntegrityModule {
 
     @Provides
-    fun providePlayIntegrityManager(@ApplicationContext context: Context) = IntegrityManagerFactory.create(context)
+    fun provideIntegrityManager(@ApplicationContext context: Context) = IntegrityManagerFactory.create(context)
 
     @Provides
     internal fun provideSimApiClientFactory(

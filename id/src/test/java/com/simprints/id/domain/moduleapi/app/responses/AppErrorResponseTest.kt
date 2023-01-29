@@ -11,7 +11,7 @@ internal class AppErrorResponseTest {
 
     @Test
     fun `test PLAY_INTEGRITY_ERROR is mapped to UNEXPECTED_ERROR`() {
-        val reason =fromDomainAlertTypeToAppErrorType(AlertType.PLAY_INTEGRITY_ERROR)
+        val reason =fromDomainAlertTypeToAppErrorType(AlertType.INTEGRITY_ERROR)
         Truth.assertThat(reason).isEqualTo(AppErrorResponse.Reason.UNEXPECTED_ERROR)
     }
 }

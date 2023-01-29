@@ -7,7 +7,7 @@ sealed class AuthenticateDataResult {
     object BadCredentials : AuthenticateDataResult()
     object Offline : AuthenticateDataResult()
     object TechnicalFailure : AuthenticateDataResult()
-    object PlayIntegrityUnavailable : AuthenticateDataResult()
+    object IntegrityException : AuthenticateDataResult()
     data class BackendMaintenanceError(val estimatedOutage: Long? = null) : AuthenticateDataResult()
     object Unknown : AuthenticateDataResult()
 }
@@ -18,7 +18,7 @@ fun AuthenticateDataResult.toDomainResult(): Result =
         is AuthenticateDataResult.BackendMaintenanceError -> Result.BACKEND_MAINTENANCE_ERROR
         AuthenticateDataResult.BadCredentials -> Result.BAD_CREDENTIALS
         AuthenticateDataResult.Offline -> Result.OFFLINE
-        AuthenticateDataResult.PlayIntegrityUnavailable -> Result.PLAY_INTEGRITY_UNAVAILABLE
+        AuthenticateDataResult.IntegrityException -> Result.INTEGRITY_SERVICE_ERROR
         AuthenticateDataResult.TechnicalFailure -> Result.TECHNICAL_FAILURE
         AuthenticateDataResult.Unknown -> Result.UNKNOWN
     }

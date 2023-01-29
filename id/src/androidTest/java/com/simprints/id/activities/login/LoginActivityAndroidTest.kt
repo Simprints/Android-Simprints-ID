@@ -165,7 +165,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun withIntegrityUnavailable_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(AuthenticateDataResult.PlayIntegrityUnavailable)
+        mockAuthenticationResult(AuthenticateDataResult.IntegrityException)
 
         loginActivity {
             withMandatoryCredentialsPresent()

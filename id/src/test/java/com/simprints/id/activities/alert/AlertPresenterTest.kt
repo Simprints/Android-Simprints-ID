@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.PLAY_INTEGRITY_ERROR
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INTEGRITY_SERVICE_ERROR
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.infra.config.ConfigManager
@@ -41,7 +41,7 @@ internal class AlertPresenterTest {
     @Test
     fun `test start with PLAY_INTEGRITY_ERROR should add the correct event in eventRepositry`() {
         //Given
-        val alertType: AlertType = AlertType.PLAY_INTEGRITY_ERROR
+        val alertType: AlertType = AlertType.INTEGRITY_ERROR
         alertPresenter = AlertPresenter(
             view,
             alertType,
@@ -61,6 +61,6 @@ internal class AlertPresenterTest {
         alertPresenter.start()
         // Then
         Truth.assertThat(event.payload.alertType)
-            .isEqualTo(PLAY_INTEGRITY_ERROR)
+            .isEqualTo(INTEGRITY_SERVICE_ERROR)
     }
 }
