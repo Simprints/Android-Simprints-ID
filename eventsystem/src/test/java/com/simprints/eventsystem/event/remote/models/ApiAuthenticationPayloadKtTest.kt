@@ -35,7 +35,7 @@ class ApiAuthenticationPayloadKtTest {
     }
 
     @Test
-    fun `should map play integrity error correctly`() {
+    fun `should map integrity service error correctly`() {
         val result =
             AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.INTEGRITY_SERVICE_ERROR::class.java)

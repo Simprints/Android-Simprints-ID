@@ -39,9 +39,9 @@ internal class AlertPresenterTest {
     }
 
     @Test
-    fun `test start with PLAY_INTEGRITY_ERROR should add the correct event in eventRepositry`() {
+    fun `test start with INTEGRITY_SERVICE_ERROR should add the correct event in eventRepositry`() {
         //Given
-        val alertType: AlertType = AlertType.INTEGRITY_ERROR
+        val alertType: AlertType = AlertType.INTEGRITY_SERVICE_ERROR
         alertPresenter = AlertPresenter(
             view,
             alertType,
