@@ -46,8 +46,8 @@ class AuthenticationEventTest {
     }
 
     @Test
-    fun create_AuthenticationEvent_withSafetyUnavailableError() {
-        createAuthenticationEvent(AuthenticationPayload.Result.PLAY_INTEGRITY_UNAVAILABLE)
+    fun create_AuthenticationEvent_withIntegrityError() {
+        createAuthenticationEvent(AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR)
     }
 
     private fun createAuthenticationEvent(result: AuthenticationPayload.Result) {

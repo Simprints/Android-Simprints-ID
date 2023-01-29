@@ -106,7 +106,7 @@ class LoginActivity : BaseSplitActivity() {
             )
             AuthenticateDataResult.BadCredentials -> handleSignInFailedInvalidCredentials()
             AuthenticateDataResult.Offline -> handleSignInFailedNoConnection()
-            AuthenticateDataResult.PlayIntegrityUnavailable -> handlePlayIntegrityDownError()
+            AuthenticateDataResult.IntegrityException -> handleIntegrityError()
             AuthenticateDataResult.TechnicalFailure -> handleSignInFailedServerError()
             AuthenticateDataResult.Unknown -> handleSignInFailedUnknownReason()
         }
@@ -255,10 +255,10 @@ class LoginActivity : BaseSplitActivity() {
         }
     }
 
-    private fun handlePlayIntegrityDownError() {
+    private fun handleIntegrityError() {
         progressDialog.dismiss()
         binding.errorCard.isVisible = false
-        launchAlert(this, AlertType.PLAY_INTEGRITY_ERROR)
+        launchAlert(this, AlertType.INTEGRITY_ERROR)
     }
 
     private fun handleSignInFailedUnknownReason() {

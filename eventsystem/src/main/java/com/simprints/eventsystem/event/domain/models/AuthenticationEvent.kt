@@ -46,7 +46,7 @@ data class AuthenticationEvent(
             BAD_CREDENTIALS,
             OFFLINE,
             TECHNICAL_FAILURE,
-            PLAY_INTEGRITY_UNAVAILABLE,
+            INTEGRITY_SERVICE_ERROR,
             BACKEND_MAINTENANCE_ERROR,
             UNKNOWN
         }

@@ -35,10 +35,10 @@ class ApiAuthenticationPayloadKtTest {
     }
 
     @Test
-    fun `should map safety net unavailable error correctly`() {
+    fun `should map play integrity error correctly`() {
         val result =
-            AuthenticationEvent.AuthenticationPayload.Result.PLAY_INTEGRITY_UNAVAILABLE.fromDomainToApi()
-        assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.PLAY_INTEGRITY_UNAVAILABLE::class.java)
+            AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR.fromDomainToApi()
+        assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.INTEGRITY_SERVICE_ERROR::class.java)
     }
 
     @Test

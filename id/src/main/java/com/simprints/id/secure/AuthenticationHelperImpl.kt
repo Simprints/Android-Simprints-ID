@@ -12,7 +12,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.login.exceptions.PlayIntegrityException
+import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -69,7 +69,7 @@ class AuthenticationHelperImpl @Inject constructor(
             is BackendMaintenanceException -> {
                 AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
             }
-            is PlayIntegrityException -> AuthenticateDataResult.PlayIntegrityUnavailable
+            is RequestingIntegrityTokenException -> AuthenticateDataResult.IntegrityException
             else -> AuthenticateDataResult.Unknown
         }
     }

@@ -148,7 +148,7 @@ class LoginActivityTest {
         runBlocking {
             coEvery {
                 authenticationHelper.authenticateSafely(any(), "project_id", any(), any())
-            } returns AuthenticateDataResult.PlayIntegrityUnavailable
+            } returns AuthenticateDataResult.IntegrityException
 
             createAndStartActivity<LoginActivity>(loginBundle)
 

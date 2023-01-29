@@ -161,9 +161,9 @@ class ApiAlertScreenEventTest {
     }
 
     @Test
-    fun playIntegrityError_fromDomainToApi() {
-        val domain = AlertScreenEventType.PLAY_INTEGRITY_ERROR
-        val api = ApiAlertScreenEventType.PLAY_INTEGRITY_ERROR
+    fun integrityError_fromDomainToApi() {
+        val domain = AlertScreenEventType.INTEGRITY_SERVICE_ERROR
+        val api = ApiAlertScreenEventType.INTEGRITY_SERVICE_ERROR
 
         assertThat(domain.fromDomainToApi()).isEqualTo(api)
     }
