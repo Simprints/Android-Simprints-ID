@@ -199,9 +199,9 @@ class NfcPairFragment : FingerprintFragment() {
                 couldNotPairTextView.visibility = View.GONE
                 nfcPairingProgressBar.visibility = View.INVISIBLE
                 tryAgainButton.visibility = View.VISIBLE
-                nfcPairInstructionsTextView.text = String.format(
-                    requireActivity().getString(R.string.nfc_pairing_try_again_instruction),
-                    arrayOf(serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent()))
+                nfcPairInstructionsTextView.text = getString(
+                    R.string.nfc_pairing_try_again_instruction,
+                    serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
                 )
                 tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
             }
