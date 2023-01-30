@@ -34,7 +34,6 @@ internal class AuthenticationRemoteDataSourceImpl @Inject constructor(private va
                 throw e
         }
 
-    //TODO Handle play integration errors returned from bfsid
     override suspend fun requestAuthToken(
         projectId: String,
         userId: String,

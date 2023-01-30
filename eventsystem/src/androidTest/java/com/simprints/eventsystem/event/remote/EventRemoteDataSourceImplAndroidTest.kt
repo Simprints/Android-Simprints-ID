@@ -122,8 +122,7 @@ package com.simprints.eventsystem.event.remote
 //            Result.OFFLINE,
 //            Result.TECHNICAL_FAILURE,
 //            Result.BACKEND_MAINTENANCE_ERROR,
-//            Result.PLAY_INTEGRITY_ERROR,
-//            Result.SAFETYNET_INVALID_CLAIM,
+//            Result.INTEGRITY_SERVICE_ERROR,
 //            Result.UNKNOWN
 //        ).forEach {
 //            add(

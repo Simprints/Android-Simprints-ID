@@ -94,7 +94,7 @@ class AlertActivityTest {
     }
 
     @Test
-    fun safetyNetError_theRightAlertShouldAppear() {
+    fun integrityServiceError_theRightAlertShouldAppear() {
         launchAlertActivity(AlertActRequest(AlertType.INTEGRITY_SERVICE_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.INTEGRITY_SERVICE_ERROR)
     }
@@ -133,7 +133,7 @@ class AlertActivityTest {
     }
 
     @Test
-    fun safetyNetDown_userClicksClose_alertShouldFinishWithRightResult() {
+    fun integrityServiceError_userClicksClose_alertShouldFinishWithRightResult() {
         val scenario = launchAlertActivity(AlertActRequest(AlertType.INTEGRITY_SERVICE_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.INTEGRITY_SERVICE_ERROR)
 
