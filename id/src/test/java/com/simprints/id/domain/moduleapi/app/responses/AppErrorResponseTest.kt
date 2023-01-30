@@ -6,7 +6,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.C
 import org.junit.Test
 
 
-internal class AppErrorResponseTest {
+class AppErrorResponseTest {
 
 
     @Test

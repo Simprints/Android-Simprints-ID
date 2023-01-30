@@ -32,6 +32,9 @@ ext {
     DEBUGGABLE = true
     DB_ENCRYPTION = false
 
+    /**
+    * The cloud project ids used in google integrity service
+    */
     RELEASE_CLOUD_PROJECT_ID  = "964685613552"
 
     STAGING_CLOUD_PROJECT_ID = "423867324644"
