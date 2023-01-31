@@ -50,6 +50,7 @@
     <string name="cannot_connect_devices">Cannot connect devices</string>
     <string name="nfc_pairing_in_progress">Found scanner %1$s</string>
     <string name="nfc_pairing_try_again_instruction">Please ensure scanner %1$s is turned on and try again.</string>
+    <string name="nfc_pairing_rejected_instruction">Pairing cancelled, please try again and accept the pairing request when prompted.</string>
     <string name="nfc_pair_toast_try_again">Could not read NFC chip, please try again</string>
     <string name="nfc_pair_toast_invalid">Invalid NFC chip detected</string>
     <!-- SerialEntryPairFragment -->
@@ -58,6 +59,7 @@
     <string name="enter_scanner_number">Enter scanner number</string>
     <string name="enter_scanner_number_detail">This is found on the bottom of the scanner</string>
     <string name="serial_entry_pair_failed">Please ensure scanner %1$s is turned on and try again.</string>
+    <string name="serial_entry_pair_rejected">Pairing cancelled, please try again and accept the pairing request when prompted.</string>
     <string name="serial_entry_pair_toast_invalid">Please enter the 6 digits of the serial number</string>
     <string name="sp" translatable="false">SP</string>
     <!-- OtaFragment -->

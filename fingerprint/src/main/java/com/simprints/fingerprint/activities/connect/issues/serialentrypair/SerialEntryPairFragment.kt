@@ -158,7 +158,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
     }
 
     private fun checkIfNowBondedToChosenScannerThenProceed() {
-        lifecycleScope.launch(Dispatchers.Main ) {
+        lifecycleScope.launch(Dispatchers.Main) {
             val macAddress = viewModel.awaitingToPairToMacAddress.value?.peekContent()
             if (macAddress != null && scannerPairingManager.isAddressPaired(macAddress)) {
                 recentUserActivityManager.updateRecentUserActivity {
@@ -169,21 +169,25 @@ class SerialEntryPairFragment : FingerprintFragment() {
                 }
                 retryConnectAndFinishFragment()
             } else {
-                handlePairingAttemptFailed()
+                handlePairingAttemptFailed(false)
             }
         }
     }
 
-    private fun handlePairingAttemptFailed() {
+    private fun handlePairingAttemptFailed(pairingRejected: Boolean) {
         handler.removeCallbacks(determineWhetherPairingWasSuccessful)
         viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
             binding.serialEntryPairProgressBar.visibility = View.INVISIBLE
             binding.serialEntryOkButton.visibility = View.VISIBLE
             binding.serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
-            binding.serialEntryPairInstructionsTextView.text = String.format(
-                getString(R.string.serial_entry_pair_failed),
-                serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
-            )
+            binding.serialEntryPairInstructionsTextView.text = if (pairingRejected) {
+                getString(R.string.serial_entry_pair_rejected)
+            } else {
+                getString(
+                    R.string.serial_entry_pair_failed,
+                    serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
+                )
+            }
         }
     }
 

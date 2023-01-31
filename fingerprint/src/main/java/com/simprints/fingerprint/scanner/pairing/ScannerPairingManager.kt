@@ -94,7 +94,7 @@ class ScannerPairingManager @Inject constructor(
 
     fun bluetoothPairStateChangeReceiver(
         onPairSuccess: () -> Unit,
-        onPairFailed: () -> Unit
+        onPairFailed: (Boolean) -> Unit
     ): BroadcastReceiver =
         object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent) {
@@ -107,6 +107,7 @@ class ScannerPairingManager @Inject constructor(
                         ComponentBluetoothDevice.EXTRA_REASON,
                         ComponentBluetoothDevice.BOND_SUCCESS
                     )
+
                     val pairSucceeded = bondState == ComponentBluetoothDevice.BOND_BONDED
                     val pairingFailed = bondState == ComponentBluetoothDevice.BOND_NONE
                         && failReason != ComponentBluetoothDevice.BOND_SUCCESS
@@ -114,7 +115,12 @@ class ScannerPairingManager @Inject constructor(
                     if (pairSucceeded) {
                         onPairSuccess()
                     } else if (pairingFailed) {
-                        onPairFailed()
+                        val pairingRejected = failReason == ComponentBluetoothDevice.REASON_AUTH_FAILED
+                            || failReason == ComponentBluetoothDevice.REASON_AUTH_REJECTED
+                            || failReason == ComponentBluetoothDevice.REASON_AUTH_CANCELED
+                            || failReason == ComponentBluetoothDevice.REASON_REMOTE_AUTH_CANCELED
+
+                        onPairFailed(pairingRejected)
                     }
                 }
             }
