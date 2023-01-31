@@ -23,6 +23,7 @@ android {
             }
         }
     }
+    namespace = "com.simprints.fingerprintscanner"
 }
 
 dependencies {

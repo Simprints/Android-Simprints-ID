@@ -20,6 +20,7 @@ android {
             initWith(getByName(BuildParams.BuildTypes.debug))
         }
     }
+    namespace = "com.simprints.fingerprintmatcher"
 
 
 }

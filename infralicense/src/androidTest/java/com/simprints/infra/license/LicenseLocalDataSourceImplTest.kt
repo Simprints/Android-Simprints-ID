@@ -2,7 +2,6 @@ package com.simprints.infra.license
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.license.local.LicenseLocalDataSource
 import com.simprints.infra.license.local.LicenseLocalDataSourceImpl
@@ -14,7 +13,6 @@ import org.junit.Test
 import java.io.File
 import java.util.*
 
-@SmallTest
 class LicenseLocalDataSourceImplTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val filesFolder = "${app.filesDir}/${LicenseLocalDataSource.LICENSES_FOLDER}"
