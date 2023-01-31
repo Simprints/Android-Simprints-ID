@@ -226,7 +226,7 @@ definitions:
                     # - mv face/build/outputs/apk/androidTest/debug/face-debug-androidTest.apk face-debug-androidTest.apk
                     # Build Universal APK
                     - ./gradlew packageDebugUniversalApk
-                    - mv id/build/outputs/universal_apk/debug/id-debug-universal.apk universal.apk
+                    - mv id/build/outputs/apk_from_bundle/debug/id-debug-universal.apk universal.apk
                 artifacts:
                     - universal.apk
                     # - id-debug-androidTest.apk

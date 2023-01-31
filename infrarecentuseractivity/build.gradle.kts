@@ -14,6 +14,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
+    namespace = "com.simprints.infra.recent.user.activity"
 }
 
 
@@ -39,7 +40,7 @@ dependencies {
 }
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.21.11"
+        artifact = "com.google.protobuf:protoc:3.21.12"
     }
     generateProtoTasks {
         all().forEach { task ->

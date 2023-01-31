@@ -42,6 +42,7 @@ android {
     packagingOptions {
         resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
     }
+    namespace = "com.simprints.face"
 }
 repositories {
     maven(url = "https://jitpack.io")
@@ -84,9 +85,7 @@ dependencies {
 
     // Android X
     androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.androidX.rules)
     androidTestUtil(libs.testing.androidX.orchestrator)
 
     androidTestImplementation(libs.testing.mockk.core)
@@ -108,7 +107,6 @@ dependencies {
 
     // Android X
     testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.core.testing)
 
     // Kotlin

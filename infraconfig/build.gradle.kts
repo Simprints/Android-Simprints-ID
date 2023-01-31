@@ -27,6 +27,7 @@ android {
         }
 
     }
+    namespace = "com.simprints.infra.config"
 }
 
 dependencies {
@@ -62,7 +63,7 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.21.11"
+        artifact = "com.google.protobuf:protoc:3.21.12"
     }
 
     generateProtoTasks {
