@@ -186,12 +186,12 @@ class NfcPairFragment : FingerprintFragment() {
                 }
                 retryConnectAndFinishFragment()
             } else {
-                handlePairingAttemptFailed()
+                handlePairingAttemptFailed(false)
             }
         }
     }
 
-    private fun handlePairingAttemptFailed() {
+    private fun handlePairingAttemptFailed(pairingRejected: Boolean) {
         handler.removeCallbacks(determineWhetherPairingWasSuccessful)
         viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
 
@@ -199,10 +199,14 @@ class NfcPairFragment : FingerprintFragment() {
                 couldNotPairTextView.visibility = View.GONE
                 nfcPairingProgressBar.visibility = View.INVISIBLE
                 tryAgainButton.visibility = View.VISIBLE
-                nfcPairInstructionsTextView.text = getString(
-                    R.string.nfc_pairing_try_again_instruction,
-                    serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
-                )
+                nfcPairInstructionsTextView.text = if (pairingRejected) {
+                    getString(R.string.nfc_pairing_rejected_instruction)
+                } else {
+                    getString(
+                        R.string.nfc_pairing_try_again_instruction,
+                        serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
+                    )
+                }
                 tryAgainButton.setOnClickListener { viewModel.startPairing(macAddressEvent.peekContent()) }
             }
         }
