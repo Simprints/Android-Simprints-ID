@@ -4,11 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,7 +14,6 @@ import javax.inject.Inject
 internal class DailyActivityViewModel @Inject constructor(
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val dailyActivity: LiveData<DashboardDailyActivityState>
@@ -29,7 +26,7 @@ internal class DailyActivityViewModel @Inject constructor(
 
     fun getCurrentDateAsString(): String = timeHelper.getCurrentDateAsString()
 
-    fun load() = viewModelScope.launch(dispatcher) {
+    fun load() = viewModelScope.launch {
         val userActivity = recentUserActivityManager.getRecentUserActivity()
         val state = DashboardDailyActivityState(
             userActivity.enrolmentsToday,
