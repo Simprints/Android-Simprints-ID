@@ -8,9 +8,11 @@ import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.ImageRemoteDataSource
 import com.simprints.infra.images.remote.UploadResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -30,13 +32,13 @@ internal class ImageRepositoryImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        repository = ImageRepositoryImpl(localDataSource, remoteDataSource, UnconfinedTestDispatcher())
+        repository = ImageRepositoryImpl(localDataSource, remoteDataSource)
         initialiseMocks()
     }
 
     @Test
     fun withEmptyList_shouldConsiderUploadOperationSuccessful() = runTest {
-        every { localDataSource.listImages(PROJECT_ID) } returns emptyList()
+        coEvery { localDataSource.listImages(PROJECT_ID) } returns emptyList()
 
         val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
@@ -58,8 +60,8 @@ internal class ImageRepositoryImplTest {
 
         val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
-        verify(exactly = 3) { localDataSource.decryptImage(any()) }
-        verify(exactly = 3) { localDataSource.deleteImage(any()) }
+        coVerify(exactly = 3) { localDataSource.decryptImage(any()) }
+        coVerify(exactly = 3) { localDataSource.deleteImage(any()) }
         assertThat(successful).isTrue()
     }
 
@@ -69,7 +71,7 @@ internal class ImageRepositoryImplTest {
 
         repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
-        verify(exactly = 5) { localDataSource.decryptImage(any()) }
+        coVerify(exactly = 5) { localDataSource.decryptImage(any()) }
     }
 
     @Test
@@ -78,7 +80,7 @@ internal class ImageRepositoryImplTest {
 
         repository.deleteStoredImages()
 
-        verify(exactly = 5) { localDataSource.deleteImage(any()) }
+        coVerify(exactly = 5) { localDataSource.deleteImage(any()) }
     }
 
     @Test
@@ -96,19 +98,19 @@ internal class ImageRepositoryImplTest {
         val invalidImage = mockInvalidImage()
         val mockStream = mockk<FileInputStream>()
 
-        every {
+        coEvery {
             localDataSource.deleteImage(validImage)
         } returns true
 
-        every {
+        coEvery {
             localDataSource.deleteImage(invalidImage)
         } returns false
 
-        every {
+        coEvery {
             localDataSource.decryptImage(validImage)
         } returns mockStream
 
-        every {
+        coEvery {
             localDataSource.decryptImage(invalidImage)
         } returns null
 
@@ -137,8 +139,8 @@ internal class ImageRepositoryImplTest {
                 add(mockInvalidImage())
         }
 
-        every { localDataSource.listImages(PROJECT_ID) } returns files
-        every { localDataSource.listImages(null) } returns files
+        coEvery { localDataSource.listImages(PROJECT_ID) } returns files
+        coEvery { localDataSource.listImages(null) } returns files
     }
 
     private fun mockValidImage() =
