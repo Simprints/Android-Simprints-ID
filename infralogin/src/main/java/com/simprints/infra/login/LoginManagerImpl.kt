@@ -64,7 +64,7 @@ internal class LoginManagerImpl @Inject constructor(
             loginInfoManager.coreFirebaseApiKey = value
         }
 
-    override fun requestAttestation(nonce: String): String =
+    override suspend fun requestAttestation(nonce: String): String =
         attestationManager.requestAttestation(nonce)
 
     override suspend fun requestAuthenticationData(
