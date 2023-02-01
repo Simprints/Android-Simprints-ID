@@ -116,12 +116,11 @@ class EventDownSyncDownloaderWorker @AssistedInject constructor(
     }
 }
 
-fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncCache): Int {
+suspend fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncCache): Int {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
 
-    // TODO Make hidden disc read more explicit to callers
     //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
-    val cached = runBlocking { eventSyncCache.readProgress(id.toString()) }
+    val cached = eventSyncCache.readProgress(id.toString())
     return maxOf(progress, output, cached)
 }
