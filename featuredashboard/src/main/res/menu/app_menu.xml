@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/app_menu">
+    <item
+        android:id="@+id/menuPrivacyNotice"
+        android:title="@string/menu_privacy_notice" />
+    <item
+        android:id="@+id/menuSettings"
+        android:title="@string/menu_settings" />
+
+    <item
+        android:id="@+id/debug"
+        android:title="Debug"
+        android:visible="true"
+        tools:ignore="HardcodedText" />
+</menu>

@@ -2,9 +2,11 @@ package com.simprints.infra.config
 
 import com.simprints.infra.config.domain.ConfigService
 import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.worker.ConfigurationScheduler
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal class ConfigManagerImpl @Inject constructor(
@@ -39,4 +41,10 @@ internal class ConfigManagerImpl @Inject constructor(
 
     override suspend fun clearData() =
         configRepository.clearData()
+
+    override suspend fun getPrivacyNotice(
+        projectId: String,
+        language: String
+    ): Flow<PrivacyNoticeResult> =
+        configRepository.getPrivacyNotice(projectId, language)
 }

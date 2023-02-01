@@ -4,7 +4,7 @@ import android.app.Activity
 import android.widget.Toast
 
 fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit) {
-    runOnUiThreadIfStillRunning(then, {})
+    runOnUiThreadIfStillRunning(then) {}
 }
 
 fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit, otherwise: () -> Unit) {

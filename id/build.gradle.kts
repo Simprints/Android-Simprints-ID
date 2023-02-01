@@ -110,6 +110,7 @@ dependencies {
     implementation(project(":infralogin"))
     implementation(project(":clientapi"))
     implementation(project(":face"))
+    implementation(project(":featuredashboard"))
     implementation(project(":fingerprint"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
@@ -124,8 +125,6 @@ dependencies {
     implementation(libs.splitties.core)
     implementation(libs.kotlin.reflect)
     implementation(libs.androidX.ui.cardview)
-    implementation(libs.androidX.ui.preference)
-    implementation(libs.androidX.ui.fragment)
     runtimeOnly(libs.androidX.cameraX.camera2)
     implementation(libs.androidX.cameraX.lifecycle)
     implementation(libs.androidX.cameraX.view)
@@ -142,7 +141,6 @@ dependencies {
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
 
-    implementation(libs.fuzzywuzzy.core)
     implementation(libs.jackson.core)
 
     // Firebase

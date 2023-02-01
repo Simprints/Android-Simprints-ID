@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/AppTheme">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintBottom_toTopOf="@id/fingerLabelTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/settingsToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:navigationIcon="?android:attr/homeAsUpIndicator"
+            app:navigationContentDescription="back"
+            app:title="@string/finger_selection_activity_title"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <TextView
+        android:id="@+id/fingerLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:text="@string/finger_selection_finger_label"
+        app:layout_constraintBottom_toTopOf="@id/fingerHeaderDivider"
+        app:layout_constraintEnd_toStartOf="@id/quantityLabelTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+
+    <TextView
+        android:id="@+id/quantityLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:paddingStart="50dp"
+        android:paddingEnd="10dp"
+        android:text="@string/finger_selection_quantity_label"
+        app:layout_constraintBottom_toTopOf="@id/fingerHeaderDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/fingerLabelTextView"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+
+    <View
+        android:id="@+id/fingerHeaderDivider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/simprints_grey"
+        app:layout_constraintBottom_toTopOf="@id/fingerSelectionRecyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fingerLabelTextView" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fingerSelectionRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/addFingerButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fingerHeaderDivider" />
+
+    <Button
+        android:id="@+id/addFingerButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/button_rounded_corners_orange"
+        android:fontFamily="@font/muli"
+        android:text="@string/finger_selection_add_finger"
+        android:textColor="@color/simprints_white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/resetButton"
+        app:layout_constraintTop_toBottomOf="@id/fingerSelectionRecyclerView" />
+
+    <Button
+        android:id="@+id/resetButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/button_rounded_corners_orange"
+        android:fontFamily="@font/muli"
+        android:text="@string/finger_selection_reset"
+        android:textColor="@color/simprints_white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/addFingerButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fingerSelectionRecyclerView" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

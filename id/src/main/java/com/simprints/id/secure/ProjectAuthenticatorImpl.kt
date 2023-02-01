@@ -1,15 +1,12 @@
 package com.simprints.id.secure
 
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.security.SecurityManager
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
@@ -19,7 +16,6 @@ class ProjectAuthenticatorImpl @Inject constructor(
     private val secureDataManager: SecurityManager,
     private val configManager: ConfigManager,
     private val signerManager: SignerManager,
-    private val longConsentRepository: LongConsentRepository,
 ) : ProjectAuthenticator {
 
     override suspend fun authenticate(
@@ -35,7 +31,7 @@ class ProjectAuthenticatorImpl @Inject constructor(
 
         val config = configManager.refreshProjectConfiguration(nonceScope.projectId)
 
-        config.general.languageOptions.fetchProjectLongConsentTexts()
+        config.general.languageOptions.fetchProjectLongConsentTexts(nonceScope.projectId)
     }
 
     private suspend fun prepareAuthRequestParameters(
@@ -92,11 +88,9 @@ class ProjectAuthenticatorImpl @Inject constructor(
         secureDataManager.createLocalDatabaseKeyIfMissing(projectId)
     }
 
-    private suspend fun List<String>.fetchProjectLongConsentTexts() {
-        longConsentRepository.deleteLongConsents()
+    private suspend fun List<String>.fetchProjectLongConsentTexts(projectId: String) {
         forEach { language ->
-            longConsentRepository.getLongConsentResultForLanguage(language).catch { Simber.e(it) }
-                .collect()
+            configManager.getPrivacyNotice(projectId, language).collect()
         }
     }
 }

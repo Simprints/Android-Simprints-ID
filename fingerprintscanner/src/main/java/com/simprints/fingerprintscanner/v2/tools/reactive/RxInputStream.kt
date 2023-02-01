@@ -20,6 +20,5 @@ fun InputStream.toFlowable(bufferSize: Int = 1024): Flowable<ByteArray> =
             // IOExceptions should be ignored because it  is
             // thrown when disconnecting the scanner and closing the input stream at the end of fingerprint collection process
             Simber.i(e)
-            emitter.onComplete()
         }
     }

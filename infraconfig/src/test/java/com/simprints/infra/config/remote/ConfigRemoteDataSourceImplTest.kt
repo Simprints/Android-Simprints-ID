@@ -1,6 +1,7 @@
 package com.simprints.infra.config.remote
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.remote.models.ApiFileUrl
 import com.simprints.infra.config.testtools.apiProject
 import com.simprints.infra.config.testtools.apiProjectConfiguration
 import com.simprints.infra.config.testtools.project
@@ -12,6 +13,7 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -22,12 +24,17 @@ class ConfigRemoteDataSourceImplTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
+        private const val FILE_ID = "fileId"
+        private const val URL = "url"
+        private const val PRIVACY_NOTICE = "privacy notice"
     }
 
     private val remoteInterface = mockk<ConfigRemoteInterface>()
     private val simApiClient = mockk<SimNetwork.SimApiClient<ConfigRemoteInterface>>()
     private val loginManager = mockk<LoginManager>()
-    private val configRemoteDataSourceImpl = ConfigRemoteDataSourceImpl(loginManager)
+    private val privacyNoticeDownloader = mockk<(String) -> String>()
+    private val configRemoteDataSourceImpl =
+        ConfigRemoteDataSourceImpl(loginManager, privacyNoticeDownloader)
 
     @Before
     fun setup() {
@@ -119,5 +126,17 @@ class ConfigRemoteDataSourceImplTest {
                 configRemoteDataSourceImpl.getProject(PROJECT_ID)
             }
             assertThat(receivedException).isEqualTo(exception)
+        }
+
+    @Test
+    fun `Get successful privacy notice`() =
+        runTest(StandardTestDispatcher()) {
+            coEvery { remoteInterface.getFileUrl(PROJECT_ID, FILE_ID) } returns ApiFileUrl(URL)
+            every { privacyNoticeDownloader(URL) } returns PRIVACY_NOTICE
+
+            val receivedPrivacyNotice =
+                configRemoteDataSourceImpl.getPrivacyNotice(PROJECT_ID, FILE_ID)
+
+            assertThat(receivedPrivacyNotice).isEqualTo(PRIVACY_NOTICE)
         }
 }

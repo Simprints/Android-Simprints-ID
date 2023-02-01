@@ -2,7 +2,6 @@ package com.simprints.id.secure
 
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
@@ -11,6 +10,7 @@ import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.SimNetwork
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -37,7 +37,7 @@ class SignerManagerImplTest {
     lateinit var mockSecurityStateScheduler: SecurityStateScheduler
 
     @MockK
-    lateinit var mockLongConsentRepository: LongConsentRepository
+    lateinit var mockRecentUserActivityManager: RecentUserActivityManager
 
     @MockK
     lateinit var mockSimNetwork: SimNetwork
@@ -61,7 +61,7 @@ class SignerManagerImplTest {
             mockEventSyncManager,
             mockSyncManager,
             mockSecurityStateScheduler,
-            mockLongConsentRepository,
+            mockRecentUserActivityManager,
             mockSimNetwork,
         )
     }
@@ -170,17 +170,17 @@ class SignerManagerImplTest {
     }
 
     @Test
-    fun signOut_longConsentsAreDeleted() = runTest(UnconfinedTestDispatcher()) {
-        signerManager.signOut()
-
-        verify(exactly = 1) { mockLongConsentRepository.deleteLongConsents() }
-    }
-
-    @Test
     fun signOut_apiBaseUrlIsReset() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
         verify { mockSimNetwork.resetApiBaseUrl() }
+    }
+
+    @Test
+    fun signOut_recentActivityIsCleared() = runTest(UnconfinedTestDispatcher()) {
+        signerManager.signOut()
+
+        coVerify { mockRecentUserActivityManager.clearRecentActivity() }
     }
 
     @Test

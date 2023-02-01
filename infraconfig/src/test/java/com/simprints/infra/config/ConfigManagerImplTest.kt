@@ -17,6 +17,7 @@ class ConfigManagerImplTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
+        private const val LANGUAGE = "fr"
     }
 
     private val configRepository = mockk<ConfigService>(relaxed = true)
@@ -89,7 +90,13 @@ class ConfigManagerImplTest {
 
     @Test
     fun `clearData should call the correct method`() = runTest {
-       configManager.clearData()
+        configManager.clearData()
         coVerify(exactly = 1) { configRepository.clearData() }
+    }
+
+    @Test
+    fun `getPrivacyNotice should call the correct method`() = runTest {
+        configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE)
+        coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE) }
     }
 }

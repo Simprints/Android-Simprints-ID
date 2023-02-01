@@ -194,7 +194,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
     private fun renderNoFace() {
         binding.apply {
             captureFeedbackTxtTitle.text = getString(R.string.capture_title_no_face)
-            captureFeedbackTxtTitle.text = getString(R.string.capture_error_no_face)
+            captureFeedbackTxtExplanation.text = getString(R.string.capture_error_no_face)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
         }

@@ -2,14 +2,17 @@ package com.simprints.infra.config.local
 
 import androidx.datastore.core.DataStore
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.infra.config.AbsolutePath
 import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.local.models.*
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration.FingersToCollect
 import kotlinx.coroutines.flow.first
+import java.io.File
 import javax.inject.Inject
 
 internal class ConfigLocalDataSourceImpl @Inject constructor(
+    @AbsolutePath private val absolutePath: String,
     private val projectDataStore: DataStore<ProtoProject>,
     private val configDataStore: DataStore<ProtoProjectConfiguration>,
     private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>
@@ -86,6 +89,32 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         deviceConfigDataStore.updateData { it.toBuilder().clear().build() }
     }
 
+    override fun storePrivacyNotice(projectId: String, language: String, content: String) {
+        val projectDir = File(filePathForPrivacyNoticeDirectory(projectId))
+        if (!projectDir.exists()) {
+            projectDir.mkdirs()
+        }
+        val privacyNoticeFile = fileForPrivacyNotice(projectId, language)
+        privacyNoticeFile.writeText(content)
+    }
+
+    override fun getPrivacyNotice(projectId: String, language: String): String {
+        return fileForPrivacyNotice(projectId, language).readText()
+    }
+
+    override fun hasPrivacyNoticeFor(projectId: String, language: String): Boolean =
+        fileForPrivacyNotice(projectId, language).exists()
+
+    override fun deletePrivacyNotices() {
+        File("$absolutePath${File.separator}$PRIVACY_NOTICE_FOLDER").deleteRecursively()
+    }
+
+    private fun fileForPrivacyNotice(projectId: String, language: String): File =
+        File(filePathForPrivacyNoticeDirectory(projectId), "$language.$FILE_TYPE")
+
+    private fun filePathForPrivacyNoticeDirectory(projectId: String): String =
+        "$absolutePath${File.separator}$PRIVACY_NOTICE_FOLDER${File.separator}$projectId"
+
     companion object {
         val defaultProjectConfiguration: ProtoProjectConfiguration =
             ProjectConfiguration(
@@ -152,6 +181,9 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
             fingersToCollect = listOf(),
             lastInstructionId = ""
         ).toProto()
+
+        private const val PRIVACY_NOTICE_FOLDER = "long-consents"
+        private const val FILE_TYPE = "txt"
     }
 
 }

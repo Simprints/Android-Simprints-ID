@@ -1,7 +1,6 @@
 package com.simprints.id.secure
 
 import com.google.android.play.core.integrity.model.IntegrityErrorCode
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
@@ -25,9 +24,6 @@ class ProjectAuthenticatorImplTest {
 
     @MockK
     private lateinit var configManager: ConfigManager
-
-    @MockK
-    private lateinit var longConsentRepositoryMock: LongConsentRepository
 
     @MockK
     private lateinit var secureDataManager: SecurityManager
@@ -130,17 +126,8 @@ class ProjectAuthenticatorImplTest {
         runTest(StandardTestDispatcher()) {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
-            coVerify(exactly = 1) { longConsentRepositoryMock.deleteLongConsents() }
-            coVerify(exactly = 1) {
-                longConsentRepositoryMock.getLongConsentResultForLanguage(
-                    LANGUAGE_1
-                )
-            }
-            coVerify(exactly = 1) {
-                longConsentRepositoryMock.getLongConsentResultForLanguage(
-                    LANGUAGE_2
-                )
-            }
+            coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
+            coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
         }
 
     @Test
@@ -162,7 +149,6 @@ class ProjectAuthenticatorImplTest {
             secureDataManager,
             configManager,
             signerManager,
-            longConsentRepositoryMock,
         )
     }
 
