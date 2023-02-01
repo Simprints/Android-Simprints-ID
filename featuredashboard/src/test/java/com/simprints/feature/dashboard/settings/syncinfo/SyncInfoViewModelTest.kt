@@ -58,7 +58,6 @@ class SyncInfoViewModelTest {
         eventDownSyncScopeRepository,
         imageRepository,
         eventSyncManager,
-        testCoroutineRule.testCoroutineDispatcher
     )
 
     @Test

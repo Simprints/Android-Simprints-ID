@@ -47,7 +47,6 @@ class ModuleSelectionViewModelTest {
             repository,
             eventSyncManager,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
-            testCoroutineRule.testCoroutineDispatcher
         )
     }
 
