@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -63,19 +62,19 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun observeUi() {
-        viewModel.getPrivacyNoticeViewStateLiveData().observe(this, Observer {
+        viewModel.getPrivacyNoticeViewStateLiveData().observe(this) {
             when (it) {
-                is PrivacyNoticeViewState.ConsentAvailable -> setConsentAvailable(it)
-                is PrivacyNoticeViewState.ConsentNotAvailable -> setConsentNotAvailable()
-                is PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(
+                is PrivacyNoticeState.ConsentAvailable -> setConsentAvailable(it)
+                is PrivacyNoticeState.ConsentNotAvailable -> setConsentNotAvailable()
+                is PrivacyNoticeState.ConsentNotAvailableBecauseBackendMaintenance -> setConsentNotAvailableBecauseBackendMaintenance(
                     it.estimatedOutage
                 )
-                is PrivacyNoticeViewState.DownloadInProgress -> setDownloadProgress()
+                is PrivacyNoticeState.DownloadInProgress -> setDownloadProgress()
             }
-        })
+        }
     }
 
-    private fun setConsentAvailable(consentAvailableState: PrivacyNoticeViewState.ConsentAvailable) {
+    private fun setConsentAvailable(consentAvailableState: PrivacyNoticeState.ConsentAvailable) {
         val consent = consentAvailableState.consent
         if (consent.isEmpty()) {
             setNoPrivacyNoticeFound()

@@ -59,3 +59,33 @@ fun <T> LiveData<T>.getOrAwaitValue(
     @Suppress("UNCHECKED_CAST")
     return data as T
 }
+
+fun <T> LiveData<T>.getOrAwaitValues(
+    number: Int,
+    time: Long = 5,
+    timeUnit: TimeUnit = TimeUnit.SECONDS,
+    afterObserve: () -> Unit = {}
+): List<T> {
+    val data: MutableList<T> = mutableListOf()
+    val latch = CountDownLatch(number)
+    val observer = object : Observer<T> {
+        override fun onChanged(o: T) {
+            data.add(o)
+            latch.countDown()
+            if(data.size >= number) {
+                this@getOrAwaitValues.removeObserver(this)
+            }
+        }
+    }
+    this.observeForever(observer)
+
+    afterObserve.invoke()
+
+    // Don't wait indefinitely if the LiveData is not set.
+    if (!latch.await(time, timeUnit)) {
+        this.removeObserver(observer)
+        throw TimeoutException("LiveData value was never set $number times.")
+    }
+
+    return data
+}

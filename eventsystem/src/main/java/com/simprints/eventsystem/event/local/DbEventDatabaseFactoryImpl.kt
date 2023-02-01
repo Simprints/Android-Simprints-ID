@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 internal class DbEventDatabaseFactoryImpl @Inject constructor(
     @ApplicationContext val ctx: Context,
-    private val secureLocalDbKeyProvider: SecurityManager
+    private val securityManager: SecurityManager
 ) : EventDatabaseFactory {
 
     override fun build(): EventRoomDatabase {
@@ -32,12 +32,20 @@ internal class DbEventDatabaseFactoryImpl @Inject constructor(
 
     private fun getOrCreateKey(@Suppress("SameParameterValue") dbName: String): CharArray {
         return try {
-            secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
+            securityManager.getLocalDbKeyOrThrow(dbName)
         } catch (t: Throwable) {
             t.message?.let { Simber.d(it) }
-            secureLocalDbKeyProvider.createLocalDatabaseKeyIfMissing(dbName)
-            secureLocalDbKeyProvider.getLocalDbKeyOrThrow(dbName)
+            securityManager.createLocalDatabaseKeyIfMissing(dbName)
+            securityManager.getLocalDbKeyOrThrow(dbName)
         }.value.decodeToString().toCharArray()
+    }
+
+    override fun deleteDatabase() {
+        ctx.deleteDatabase(DB_NAME)
+    }
+
+    override fun recreateDatabaseKey() {
+        securityManager.recreateLocalDatabaseKey(DB_NAME)
     }
 
     companion object {

@@ -9,7 +9,7 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
-import com.simprints.id.activities.dashboard.cards.daily_activity.repository.DashboardDailyActivityRepository
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -26,6 +26,7 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceResponse
@@ -55,7 +56,10 @@ class OrchestratorManagerImplTest {
     private lateinit var modalityFlowMock: ModalityFlow
 
     @MockK
-    private lateinit var dashboardDailyActivityRepositoryMock: DashboardDailyActivityRepository
+    private lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @MockK
+    private lateinit var timeHelper: TimeHelper
 
     @MockK
     private lateinit var hotCache: HotCache
@@ -343,7 +347,8 @@ class OrchestratorManagerImplTest {
             modalityFlowFactoryMock,
             appResponseFactoryMock,
             hotCache,
-            dashboardDailyActivityRepositoryMock,
+            recentUserActivityManager,
+            timeHelper,
             personCreationEventHelper
         )
     }

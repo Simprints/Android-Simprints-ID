@@ -40,7 +40,7 @@
             android:name=".activities.consent.ConsentActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
+            android:name="com.simprints.feature.dashboard.DashboardActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
@@ -84,46 +84,12 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.debug.DebugActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activities.login.LoginActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.qrcapture.QrCaptureActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.requestLogin.RequestLoginActivity"
-            android:launchMode="singleTop"
-            android:noHistory="true"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.settings.SettingsActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar" />
-        <activity
-            android:name=".activities.settings.SettingsAboutActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar" />
-        <activity
-            android:name=".activities.settings.ModuleSelectionActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar.MaterialComponents" />
-        <activity
-            android:name=".activities.settings.fingerselection.FingerSelectionActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar" />
-
-        <activity
-            android:name=".activities.dashboard.DashboardActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
@@ -138,10 +104,6 @@
         <activity
             android:name=".activities.enrollast.EnrolLastBiometricsActivity"
             android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.settings.syncinformation.SyncInformationActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 

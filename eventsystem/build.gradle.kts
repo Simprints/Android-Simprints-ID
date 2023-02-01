@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    id("dagger.hilt.android.plugin")
     kotlin("kapt")
 }
 
@@ -58,6 +59,8 @@ dependencies {
 
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
+
+    implementation(libs.workManager.work)
 
     // DI
     implementation(libs.hilt)

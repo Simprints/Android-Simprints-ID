@@ -1,8 +1,10 @@
 package com.simprints.infra.config
 
 import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import kotlinx.coroutines.flow.Flow
 
 interface ConfigManager {
     /**
@@ -39,6 +41,8 @@ interface ConfigManager {
      * clears the project, project configuration and device configuration
      */
     suspend fun clearData()
+
+    suspend fun getPrivacyNotice(projectId: String, language: String): Flow<PrivacyNoticeResult>
 
     fun scheduleSyncConfiguration()
     fun cancelScheduledSyncConfiguration()

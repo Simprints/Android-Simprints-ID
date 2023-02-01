@@ -11,27 +11,30 @@ interface ImageRepository {
     /**
      * Encrypts and stores an image file locally
      *
-     * @param imageBytes
-     *        the image, in bytes
-     * @param relativePath
-     *        the path of the image within the images root folder, including file name
+     * @param imageBytes the image, in bytes
+     * @param projectId the id of the project
+     * @param relativePath the path of the image within the images root folder, including file name
      * @return a reference to the newly stored image, if successful, otherwise null
      * @see [com.simprints.infra.images.local.ImageLocalDataSource.encryptAndStoreImage]
      */
-    fun storeImageSecurely(imageBytes: ByteArray, relativePath: Path): SecuredImageRef?
+    fun storeImageSecurely(
+        imageBytes: ByteArray,
+        projectId: String,
+        relativePath: Path
+    ): SecuredImageRef?
 
     /**
-     * Uploads all images stored locally and deletes if the upload has been successful
+     * Uploads all images stored locally for the project and deletes if the upload has been successful
      *
      * @return true if all images have been successfully uploaded and deleted from the device
      */
-    suspend fun uploadStoredImagesAndDelete(): Boolean
+    suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean
 
     /**
      * Deletes all images stored on the device
      */
     fun deleteStoredImages()
 
-    fun getNumberOfImagesToUpload(): Int
+    fun getNumberOfImagesToUpload(projectId: String): Int
 
 }
