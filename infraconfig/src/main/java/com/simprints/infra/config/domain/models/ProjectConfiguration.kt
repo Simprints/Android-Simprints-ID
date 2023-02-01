@@ -8,7 +8,8 @@ data class ProjectConfiguration(
     val consent: ConsentConfiguration,
     val identification: IdentificationConfiguration,
     val synchronization: SynchronizationConfiguration,
-)
+) {
+}
 
 fun ProjectConfiguration.canCoSyncAllData(): Boolean =
     synchronization.up.coSync.kind == UpSynchronizationConfiguration.UpSynchronizationKind.ALL

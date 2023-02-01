@@ -23,11 +23,11 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MA
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
-import com.simprints.id.services.sync.events.master.models.EventSyncState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerState.*
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.*
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.eventsystem.events_sync.models.EventSyncState
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState.*
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.*
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC

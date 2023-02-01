@@ -1,8 +1,10 @@
 package com.simprints.infra.config.domain
 
 import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import kotlinx.coroutines.flow.Flow
 
 interface ConfigService {
 
@@ -13,4 +15,5 @@ interface ConfigService {
     suspend fun getDeviceConfiguration(): DeviceConfiguration
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)
     suspend fun clearData()
+    suspend fun getPrivacyNotice(projectId: String, language: String): Flow<PrivacyNoticeResult>
 }

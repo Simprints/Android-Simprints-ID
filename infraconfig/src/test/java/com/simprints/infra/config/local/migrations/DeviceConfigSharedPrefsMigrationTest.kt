@@ -3,6 +3,7 @@ package com.simprints.infra.config.local.migrations
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.FINGERS_TO_COLLECT_KEY
 import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.FINGERS_TO_COLLECT_OVERRIDDEN_KEY
 import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.LANGUAGE_KEY
@@ -34,6 +35,7 @@ class DeviceConfigSharedPrefsMigrationTest {
     fun setup() {
         every { ctx.getSharedPreferences(any(), any()) } returns preferences
         deviceConfigSharedPrefsMigration = DeviceConfigSharedPrefsMigration(ctx, loginManager)
+        LanguageHelper.init(mockk(relaxed = true))
     }
 
     @Test

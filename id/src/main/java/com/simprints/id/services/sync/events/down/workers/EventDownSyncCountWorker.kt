@@ -22,9 +22,9 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWork
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.DOWNLOADER
-import com.simprints.id.services.sync.events.master.models.EventSyncWorkerType.UPLOADER
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException

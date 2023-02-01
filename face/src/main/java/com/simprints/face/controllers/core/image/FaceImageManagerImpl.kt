@@ -16,7 +16,9 @@ class FaceImageManagerImpl @Inject constructor(
     override suspend fun save(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? =
         determinePath(captureEventId)?.let { path ->
             Simber.d("Saving face image ${path.compose()}")
-            val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, path)
+            val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
+            val projectId = currentSession.payload.projectId
+            val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, projectId, path)
 
             return if (securedImageRef != null) {
                 SecuredImageRef(securedImageRef.relativePath.toDomain())
@@ -29,13 +31,9 @@ class FaceImageManagerImpl @Inject constructor(
     private suspend fun determinePath(captureEventId: String): CorePath? =
         try {
             val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
-
-            val projectId = currentSession.payload.projectId
             val sessionId = currentSession.id
             CorePath(
                 arrayOf(
-                    PROJECTS_PATH,
-                    projectId,
                     SESSIONS_PATH,
                     sessionId,
                     FACES_PATH,
@@ -51,7 +49,6 @@ class FaceImageManagerImpl @Inject constructor(
         Path(this.parts)
 
     companion object {
-        const val PROJECTS_PATH = "projects"
         const val SESSIONS_PATH = "sessions"
         const val FACES_PATH = "faces"
     }

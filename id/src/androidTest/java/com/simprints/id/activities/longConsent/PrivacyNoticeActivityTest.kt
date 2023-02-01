@@ -40,7 +40,7 @@ class PrivacyNoticeActivityTest {
         every { deviceManager.isConnected() } returns false
 
         every { viewModel.getPrivacyNoticeViewStateLiveData() } returns
-            MutableLiveData(PrivacyNoticeViewState.ConsentNotAvailable(language))
+            MutableLiveData(PrivacyNoticeState.ConsentNotAvailable(language))
 
         ActivityScenario.launch(PrivacyNoticeActivity::class.java)
         onView(withId(R.id.longConsent_downloadButton)).perform(click())
@@ -53,7 +53,7 @@ class PrivacyNoticeActivityTest {
     fun downloading_notice_should_show_correct_error_when_backend_maintenance_error() {
         every { viewModel.getPrivacyNoticeViewStateLiveData() } returns
             MutableLiveData(
-                PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance(
+                PrivacyNoticeState.ConsentNotAvailableBecauseBackendMaintenance(
                     language
                 )
             )
@@ -78,7 +78,7 @@ class PrivacyNoticeActivityTest {
     fun downloading_notice_should_show_correct_timed_error_when_backend_maintenance_error() {
         every { viewModel.getPrivacyNoticeViewStateLiveData() } returns
             MutableLiveData(
-                PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance(
+                PrivacyNoticeState.ConsentNotAvailableBecauseBackendMaintenance(
                     language,
                     600L
                 )
@@ -105,8 +105,8 @@ class PrivacyNoticeActivityTest {
         val longConsent = "some consent to be displayed"
         every { deviceManager.isConnected() } returns true
 
-        val privacyNoticeMutableData = MutableLiveData<PrivacyNoticeViewState>(
-            PrivacyNoticeViewState.ConsentNotAvailable(language)
+        val privacyNoticeMutableData = MutableLiveData<PrivacyNoticeState>(
+            PrivacyNoticeState.ConsentNotAvailable(language)
         )
 
         every { viewModel.getPrivacyNoticeViewStateLiveData() } returns privacyNoticeMutableData
@@ -115,7 +115,7 @@ class PrivacyNoticeActivityTest {
         ActivityScenario.launch(PrivacyNoticeActivity::class.java)
         onView(withId(R.id.longConsent_downloadButton)).perform(click())
         privacyNoticeMutableData.postValue(
-            PrivacyNoticeViewState.ConsentAvailable(
+            PrivacyNoticeState.ConsentAvailable(
                 language, longConsent
             )
         )

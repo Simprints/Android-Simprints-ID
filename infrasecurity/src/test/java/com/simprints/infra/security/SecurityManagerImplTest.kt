@@ -4,10 +4,7 @@ import com.simprints.infra.security.cryptography.MasterKeyHelper
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.infra.security.root.RootManager
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.spyk
-import io.mockk.verify
+import io.mockk.*
 import org.junit.Test
 
 class SecurityManagerImplTest {
@@ -75,6 +72,22 @@ class SecurityManagerImplTest {
         securityManager.getEncryptedFileBuilder(mockk(), mockk())
 
         verify(exactly = 1) { masterKeyHelperMock.getEncryptedFileBuilder(any(), any()) }
+    }
+
+    @Test
+    fun `test recreateLocalDatabaseKey`() {
+        //Given
+        val dbName = "dbName"
+        val secureLocalDbKeyProvider = mockk<SecureLocalDbKeyProvider> {
+            justRun { recreateLocalDatabaseKey(dbName) }
+        }
+        val securityManager =
+            SecurityManagerImpl(mockk(), secureLocalDbKeyProvider, mockk(), mockk())
+        //When
+        securityManager.recreateLocalDatabaseKey(dbName)
+        //Then
+        verify { secureLocalDbKeyProvider.recreateLocalDatabaseKey(dbName) }
+
     }
 
 }

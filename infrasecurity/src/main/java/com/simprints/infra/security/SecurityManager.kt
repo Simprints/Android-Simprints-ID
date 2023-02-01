@@ -22,6 +22,8 @@ interface SecurityManager {
 
     fun createLocalDatabaseKeyIfMissing(dbName: String)
 
+    fun recreateLocalDatabaseKey(dbName: String)
+
     fun getLocalDbKeyOrThrow(dbName: String): LocalDbKey
 
     /**

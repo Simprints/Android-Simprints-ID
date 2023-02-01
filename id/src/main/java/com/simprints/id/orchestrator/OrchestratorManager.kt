@@ -32,5 +32,5 @@ interface OrchestratorManager {
     )
 
     suspend fun restoreState()
-    fun saveState()
+    suspend fun saveState()
 }

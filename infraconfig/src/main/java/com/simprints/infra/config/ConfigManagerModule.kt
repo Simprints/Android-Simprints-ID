@@ -27,6 +27,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 private const val PROJECT_DATA_STORE_FILE_NAME = "project_prefs.pb"
@@ -95,4 +96,19 @@ object DataStoreModule {
             migrations = listOf(deviceConfigSharedPrefsMigration)
         )
     }
+}
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class AbsolutePath
+
+@Module
+@InstallIn(SingletonComponent::class)
+object ConfigManagerDependencies {
+
+    @AbsolutePath
+    @Provides
+    @Singleton
+    fun provideAbsolutePath(@ApplicationContext context: Context): String =
+        context.filesDir.absolutePath
 }
