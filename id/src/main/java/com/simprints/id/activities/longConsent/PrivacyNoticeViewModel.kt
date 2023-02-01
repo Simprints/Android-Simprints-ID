@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
-import com.simprints.id.data.consent.longconsent.LongConsentFetchResult
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult
+import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.catch
@@ -18,41 +18,43 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PrivacyNoticeViewModel @Inject constructor(
-    private val longConsentRepository: LongConsentRepository,
     private val configManager: ConfigManager,
+    private val loginManager: LoginManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val privacyNoticeViewState = MutableLiveData<PrivacyNoticeViewState>()
-    fun getPrivacyNoticeViewStateLiveData(): LiveData<PrivacyNoticeViewState> =
+    private val privacyNoticeViewState = MutableLiveData<PrivacyNoticeState>()
+    fun getPrivacyNoticeViewStateLiveData(): LiveData<PrivacyNoticeState> =
         privacyNoticeViewState
 
     fun retrievePrivacyNotice() = viewModelScope.launch(dispatcher) {
         val deviceConfiguration = configManager.getDeviceConfiguration()
-        longConsentRepository.getLongConsentResultForLanguage(deviceConfiguration.language)
-            .flowOn(dispatcher)
+        configManager.getPrivacyNotice(
+            loginManager.getSignedInProjectIdOrEmpty(),
+            deviceConfiguration.language
+        ).flowOn(dispatcher)
             .map { it.toPrivacyNoticeViewState() }
             .catch {
                 it.printStackTrace()
-                PrivacyNoticeViewState.ConsentNotAvailable(deviceConfiguration.language)
+                PrivacyNoticeState.ConsentNotAvailable(deviceConfiguration.language)
             }
             .collect { privacyNoticeViewState.postValue(it) }
     }
 
 
-    private fun LongConsentFetchResult.toPrivacyNoticeViewState(): PrivacyNoticeViewState =
+    private fun PrivacyNoticeResult.toPrivacyNoticeViewState(): PrivacyNoticeState =
         when (this) {
-            is LongConsentFetchResult.Succeed -> PrivacyNoticeViewState.ConsentAvailable(
+            is PrivacyNoticeResult.Succeed -> PrivacyNoticeState.ConsentAvailable(
                 language,
                 consent
             )
-            is LongConsentFetchResult.Failed -> PrivacyNoticeViewState.ConsentNotAvailable(language)
-            is LongConsentFetchResult.FailedBecauseBackendMaintenance ->
-                PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance(
+            is PrivacyNoticeResult.Failed -> PrivacyNoticeState.ConsentNotAvailable(language)
+            is PrivacyNoticeResult.FailedBecauseBackendMaintenance ->
+                PrivacyNoticeState.ConsentNotAvailableBecauseBackendMaintenance(
                     language,
                     estimatedOutage
                 )
-            is LongConsentFetchResult.InProgress -> PrivacyNoticeViewState.DownloadInProgress(
+            is PrivacyNoticeResult.InProgress -> PrivacyNoticeState.DownloadInProgress(
                 language
             )
         }

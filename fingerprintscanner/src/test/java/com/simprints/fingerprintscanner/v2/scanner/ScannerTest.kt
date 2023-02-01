@@ -181,6 +181,29 @@ class ScannerTest {
 
         assertThat(scanner.state.mode).isEqualTo(Mode.MAIN)
     }
+    @Test
+    fun `scanner disconnect does nothing when scanner already disconnected`() {
+        val mockRootMessageChannel = mockk<RootMessageChannel>()
+        val mockMainMessageChannel = mockk<MainMessageChannel>()
+        val mockStmOtaMessageChannel = mockk<StmOtaMessageChannel>()
+        val mockCypressOtaMessageChannel = mockk<CypressOtaMessageChannel>()
+        scanner = Scanner(
+            mockMainMessageChannel,
+            mockRootMessageChannel,
+            mockk(),
+            mockCypressOtaMessageChannel,
+            mockStmOtaMessageChannel,
+            mockk(),
+            mockk(),
+            mockk(),
+            responseErrorHandler
+        )
+        scanner.disconnect().blockingAwait()
+        verify(exactly = 0) { mockRootMessageChannel.disconnect() }
+        verify(exactly = 0) { mockMainMessageChannel.disconnect() }
+        verify(exactly = 0) { mockStmOtaMessageChannel.disconnect() }
+        verify(exactly = 0) { mockCypressOtaMessageChannel.disconnect() }
+    }
 
     @Test
     fun scanner_connectThenEnterCypressOtaMode_callsConnectOnCypressOtaMessageStreams() {

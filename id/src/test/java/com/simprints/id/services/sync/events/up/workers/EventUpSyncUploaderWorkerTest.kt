@@ -19,10 +19,13 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAU
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.EventUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOf
@@ -34,29 +37,26 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EventUpSyncUploaderWorkerTest {
 
+    companion object {
+        private const val PROJECT_ID = "projectId"
+    }
+
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val scope = EventUpSyncScope.ProjectScope("pcmqBbcaB4xWvfRHRELG")
+    private val projectScope = JsonHelper.toJson(EventUpSyncScope.ProjectScope(PROJECT_ID))
+    private val loginManager = mockk<LoginManager> {
+        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+    }
     private val upSyncHelper = mockk<EventUpSyncHelper>()
-    // We are using the TestListenableWorkerBuilder and not the constructor directly to have a test worker
-    // that will finish when calling setProgress
-    private val eventUpSyncUploaderWorker = TestListenableWorkerBuilder<EventUpSyncUploaderWorker>(
-        mockk(),
-        workDataOf(INPUT_UP_SYNC to JsonHelper.toJson(scope))
-    ).setWorkerFactory(
-        TestWorkerFactory(
-            upSyncHelper,
-            mockk(relaxed = true),
-            testCoroutineRule.testCoroutineDispatcher
-        )
-    ).build()
 
     @Test
     fun worker_shouldExecuteTheTask() = runTest {
+        val eventUpSyncUploaderWorker = init(projectScope)
+
         coEvery {
             upSyncHelper.upSync(any(), any())
         } returns flowOf(
@@ -82,6 +82,8 @@ class EventUpSyncUploaderWorkerTest {
 
     @Test
     fun worker_shouldSetFailCorrectlyIfBackendError() = runTest {
+        val eventUpSyncUploaderWorker = init(projectScope)
+
         coEvery {
             upSyncHelper.upSync(any(), any())
         } throws BackendMaintenanceException(estimatedOutage = null)
@@ -100,6 +102,8 @@ class EventUpSyncUploaderWorkerTest {
 
     @Test
     fun worker_shouldSetFailCorrectlyIfTimedBackendError() = runTest {
+        val eventUpSyncUploaderWorker = init(projectScope)
+
         coEvery {
             upSyncHelper.upSync(any(), any())
         } throws BackendMaintenanceException(estimatedOutage = 600)
@@ -119,6 +123,8 @@ class EventUpSyncUploaderWorkerTest {
 
     @Test
     fun worker_shouldSetFailCorrectlyIfCloudIntegrationError() = runTest {
+        val eventUpSyncUploaderWorker = init(projectScope)
+
         coEvery {
             upSyncHelper.upSync(any(), any())
         } throws SyncCloudIntegrationException("Cloud integration", Throwable())
@@ -137,6 +143,8 @@ class EventUpSyncUploaderWorkerTest {
 
     @Test
     fun worker_shouldRetryIfNotBackendMaintenanceOrSyncIssue() = runTest {
+        val eventUpSyncUploaderWorker = init(projectScope)
+
         coEvery {
             upSyncHelper.upSync(any(), any())
         } throws Throwable()
@@ -192,11 +200,74 @@ class EventUpSyncUploaderWorkerTest {
         val scope = EventUpSyncUploaderWorker.parseUpSyncInput(jsonInput)
         assertThat(scope).isEqualTo(expectedScope)
     }
+
+    @Test
+    fun `should create a new scope if the current one throws JsonParseException`() = runTest {
+        val jsonInput = """
+        {
+            "type": "EventUpSyncScope${'$'}ProjectScope",
+            "projectId': "pcmqBbcaB4xWvfRHRELG",
+            "operation": {
+                "projectId": "pcmqBbcaB4xWvfRHRELG",
+                "lastState${0.toChar()}": "FAILED",
+                "lastSyncTime": 1620103325620
+            }
+        }
+        """.trimIndent()
+        val eventUpSyncUploaderWorker = init(jsonInput)
+
+        eventUpSyncUploaderWorker.doWork()
+
+        val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
+
+        coVerify(exactly = 1) { upSyncHelper.upSync(any(), expectedScope.operation) }
+    }
+
+    @Test
+    fun `should create a new scope if the current one throws JsonMappingException`() = runTest {
+        val jsonInput = """
+        {
+            "type": "EventUpSyncScope${'$'}ProjectScope"
+        }
+        """.trimIndent()
+        val eventUpSyncUploaderWorker = init(jsonInput)
+
+        eventUpSyncUploaderWorker.doWork()
+
+        val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
+
+        coVerify(exactly = 1) { upSyncHelper.upSync(any(), expectedScope.operation) }
+    }
+
+    @Test
+    fun `should retry when input is null`() = runTest {
+        val eventUpSyncUploaderWorker = init(null)
+
+        val result = eventUpSyncUploaderWorker.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+    }
+
+    // We are using the TestListenableWorkerBuilder and not the constructor directly to have a test worker
+    // that will finish when calling setProgress
+    private fun init(scope: String?): EventUpSyncUploaderWorker =
+        TestListenableWorkerBuilder<EventUpSyncUploaderWorker>(
+            mockk(),
+            workDataOf(INPUT_UP_SYNC to scope)
+        ).setWorkerFactory(
+            TestWorkerFactory(
+                upSyncHelper,
+                mockk(relaxed = true),
+                loginManager,
+                testCoroutineRule.testCoroutineDispatcher
+            )
+        ).build()
 }
 
 class TestWorkerFactory(
     private val upSyncHelper: EventUpSyncHelper,
     private val eventSyncCache: EventSyncCache,
+    private val loginManager: LoginManager,
     private val dispatcher: CoroutineDispatcher,
 ) : WorkerFactory() {
     override fun createWorker(
@@ -209,6 +280,7 @@ class TestWorkerFactory(
             workerParameters,
             upSyncHelper,
             eventSyncCache,
+            loginManager,
             dispatcher
         )
     }

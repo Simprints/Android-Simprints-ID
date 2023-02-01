@@ -3,10 +3,10 @@ package com.simprints.id.activities.longConsent
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.consent.longconsent.LongConsentFetchResult
-import com.simprints.id.data.consent.longconsent.LongConsentRepository
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
@@ -18,6 +18,7 @@ import org.junit.Test
 
 class PrivacyNoticeViewModelTest {
     companion object {
+        private const val PROJECT_ID = "projectId"
         private const val LANGUAGE = "en"
     }
 
@@ -27,7 +28,6 @@ class PrivacyNoticeViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val longConsentRepository = mockk<LongConsentRepository>()
     private val configManager = mockk<ConfigManager> {
         coEvery { getDeviceConfiguration() } returns DeviceConfiguration(
             LANGUAGE,
@@ -36,37 +36,40 @@ class PrivacyNoticeViewModelTest {
             ""
         )
     }
+    private val loginManager = mockk<LoginManager> {
+        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+    }
     private val privacyNoticeViewModel = PrivacyNoticeViewModel(
-        longConsentRepository,
         configManager,
+        loginManager,
         testCoroutineRule.testCoroutineDispatcher,
     )
 
     @Test
     fun retrievePrivacyNotice_shouldReturn_ContentAvailable_wheneverSucceedValue_isReturned() {
-        every { longConsentRepository.getLongConsentResultForLanguage(LANGUAGE) } returns flowOf(
-            LongConsentFetchResult.InProgress(LANGUAGE),
-            LongConsentFetchResult.Succeed(LANGUAGE, "some long consent")
+        coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
+            PrivacyNoticeResult.InProgress(LANGUAGE),
+            PrivacyNoticeResult.Succeed(LANGUAGE, "some long consent")
         )
 
         val privacyNoticeLiveData = privacyNoticeViewModel.getPrivacyNoticeViewStateLiveData()
         privacyNoticeViewModel.retrievePrivacyNotice()
 
         val value = privacyNoticeLiveData.getOrAwaitValue()
-        assertThat(value).isInstanceOf(PrivacyNoticeViewState.ConsentAvailable::class.java)
+        assertThat(value).isInstanceOf(PrivacyNoticeState.ConsentAvailable::class.java)
     }
 
     @Test
     fun retrievePrivacyNotice_shouldReturn_ContentNotAvailable_wheneverFailedBecauseBackendMaintenance_isReturned() {
-        every { longConsentRepository.getLongConsentResultForLanguage(LANGUAGE) } returns flowOf(
-            LongConsentFetchResult.InProgress(LANGUAGE),
-            LongConsentFetchResult.FailedBecauseBackendMaintenance(LANGUAGE, Throwable())
+        coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
+            PrivacyNoticeResult.InProgress(LANGUAGE),
+            PrivacyNoticeResult.FailedBecauseBackendMaintenance(LANGUAGE, Throwable())
         )
 
         val privacyNoticeLiveData = privacyNoticeViewModel.getPrivacyNoticeViewStateLiveData()
         privacyNoticeViewModel.retrievePrivacyNotice()
 
         val value = privacyNoticeLiveData.getOrAwaitValue()
-        assertThat(value).isInstanceOf(PrivacyNoticeViewState.ConsentNotAvailableBecauseBackendMaintenance::class.java)
+        assertThat(value).isInstanceOf(PrivacyNoticeState.ConsentNotAvailableBecauseBackendMaintenance::class.java)
     }
 }

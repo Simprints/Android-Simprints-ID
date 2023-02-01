@@ -9,7 +9,7 @@ import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.BuildConfig
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
-import com.simprints.id.services.sync.events.master.models.EventSyncState
+import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+// TODO move into its own module
 class EventSyncManagerImpl @Inject constructor(
     @ApplicationContext private val ctx: Context,
     private val eventSyncStateProcessor: EventSyncStateProcessor,
@@ -28,7 +29,7 @@ class EventSyncManagerImpl @Inject constructor(
     private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
     @DispatcherIO private val dispatcher: CoroutineDispatcher
-) : EventSyncManager {
+) : EventSyncManager, com.simprints.feature.dashboard.main.sync.EventSyncManager {
 
     companion object {
         private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES

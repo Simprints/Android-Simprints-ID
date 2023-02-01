@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dashboard_navigation"
+    app:startDestination="@id/baseFragment">
+
+    <fragment
+        android:id="@+id/requestLoginFragment"
+        android:name="com.simprints.feature.dashboard.requestlogin.RequestLoginFragment"
+        android:label="RequestLoginFragment"
+        tools:layout="@layout/fragment_request_login">
+        <action
+            android:id="@+id/action_requestLoginFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/baseFragment"
+        android:name="com.simprints.feature.dashboard.base.BaseFragment"
+        android:label="BaseFragment"
+        tools:layout="@layout/fragment_base">
+        <action
+            android:id="@+id/action_baseFragment_to_requestLoginFragment"
+            app:destination="@id/requestLoginFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_baseFragment_to_mainFragment"
+            app:destination="@id/mainFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.simprints.feature.dashboard.main.MainFragment"
+        android:label="MainFragment"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_mainFragment_to_debugFragment"
+            app:destination="@id/debugFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_privacyNoticesFragment"
+            app:destination="@id/privacyNoticesFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_moduleSelectionFragment"
+            app:destination="@id/moduleSelectionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/debugFragment"
+        android:name="com.simprints.feature.dashboard.debug.DebugFragment"
+        android:label="DebugFragment"
+        tools:layout="@layout/fragment_debug" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.simprints.feature.dashboard.settings.SettingsFragment"
+        android:label="FragmentSettings"
+        tools:layout="@layout/fragment_settings">
+        <action
+            android:id="@+id/action_settingsFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_syncInfoFragment"
+            app:destination="@id/syncInfoFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_fingerSelectionFragment"
+            app:destination="@id/fingerSelectionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/privacyNoticesFragment"
+        android:name="com.simprints.feature.dashboard.privacynotices.PrivacyNoticesFragment"
+        android:label="PrivacyNoticesFragment"
+        tools:layout="@layout/fragment_privacy_notices" />
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="com.simprints.feature.dashboard.settings.about.AboutFragment"
+        android:label="AboutFragment"
+        tools:layout="@layout/fragment_settings_about">
+        <action
+            android:id="@+id/action_aboutFragment_to_requestLoginFragment"
+            app:destination="@id/requestLoginFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/syncInfoFragment"
+        android:name="com.simprints.feature.dashboard.settings.syncinfo.SyncInfoFragment"
+        android:label="fragment_sync_info"
+        tools:layout="@layout/fragment_sync_info" >
+        <action
+            android:id="@+id/action_syncInfoFragment_to_moduleSelectionFragment"
+            app:destination="@id/moduleSelectionFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/moduleSelectionFragment"
+        android:name="com.simprints.feature.dashboard.settings.syncinfo.moduleselection.ModuleSelectionFragment"
+        android:label="ModuleSelectionFragment"
+        tools:layout="@layout/fragment_sync_module_selection"/>
+    <fragment
+        android:id="@+id/fingerSelectionFragment"
+        android:name="com.simprints.feature.dashboard.settings.fingerselection.FingerSelectionFragment"
+        android:label="FingerSelectionFragment"
+        tools:layout="@layout/fragment_finger_selection"/>
+</navigation>

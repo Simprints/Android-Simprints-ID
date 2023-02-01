@@ -34,7 +34,8 @@ class ImageLocalDataSourceImplTest {
     @Test
     fun givenAByteArray_storeIt_shouldReturnASecuredImageRef() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
-        val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, path)
+        val securedImageRef =
+            imageLocalDataSource.encryptAndStoreImage(byteArray, "projectId", path)
         require(securedImageRef != null)
 
         assertThat(securedImageRef.relativePath.compose()).contains(FILE_NAME)
@@ -43,7 +44,8 @@ class ImageLocalDataSourceImplTest {
     @Test
     fun givenAnEncryptedFile_decryptIt_shouldReturnTheRightContent() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
-        val securedImageRef = imageLocalDataSource.encryptAndStoreImage(byteArray, path)
+        val securedImageRef =
+            imageLocalDataSource.encryptAndStoreImage(byteArray, "projectId", path)
         require(securedImageRef != null)
 
         val encryptedInputStream = imageLocalDataSource.decryptImage(securedImageRef)
@@ -54,6 +56,7 @@ class ImageLocalDataSourceImplTest {
     fun encryptThrowsAnException_shouldBeHandled() {
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(
             emptyArray<Byte>().toByteArray(),
+            "projectId",
             Path("")
         )
         assertThat(securedImageRef).isNull()
@@ -62,7 +65,7 @@ class ImageLocalDataSourceImplTest {
     @Test
     fun shouldListImageFiles() {
         val expectedFileCount = createImageFiles(10).size
-        val actualFileCount = imageLocalDataSource.listImages().size
+        val actualFileCount = imageLocalDataSource.listImages("projectId").size
 
         assertThat(actualFileCount).isEqualTo(expectedFileCount)
     }
@@ -71,11 +74,11 @@ class ImageLocalDataSourceImplTest {
     fun shouldListImageFilesStoredAtDifferentSubDirs() {
         val bytes = Random.nextBytes(SIZE_IMAGE)
         with(imageLocalDataSource) {
-            encryptAndStoreImage(bytes, Path("dir1/$FILE_NAME"))
-            encryptAndStoreImage(bytes, Path("dir2/$FILE_NAME"))
+            encryptAndStoreImage(bytes, "projectId", Path("dir1/$FILE_NAME"))
+            encryptAndStoreImage(bytes, "projectId", Path("dir2/$FILE_NAME"))
         }
 
-        val images = imageLocalDataSource.listImages()
+        val images = imageLocalDataSource.listImages("projectId")
         val actualFileCount = images.size
 
         assertThat(actualFileCount).isEqualTo(2)
@@ -87,7 +90,7 @@ class ImageLocalDataSourceImplTest {
 
         val fileToDelete = files.first()
         imageLocalDataSource.deleteImage(fileToDelete)
-        val remainingFiles = imageLocalDataSource.listImages()
+        val remainingFiles = imageLocalDataSource.listImages("projectId")
 
         assertThat(remainingFiles.none { it.relativePath == fileToDelete.relativePath }).isTrue()
         assertThat(remainingFiles.size).isEqualTo(2)
@@ -107,6 +110,7 @@ class ImageLocalDataSourceImplTest {
             val byteArray = Random.nextBytes(SIZE_IMAGE)
             imageLocalDataSource.encryptAndStoreImage(
                 byteArray,
+                "projectId",
                 Path("test/${UUID.randomUUID()}")
             )?.let(createdFiles::add)
         }
