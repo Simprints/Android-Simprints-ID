@@ -1,34 +1,28 @@
 package com.simprints.infra.images
 
-import com.simprints.core.DispatcherIO
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.images.remote.ImageRemoteDataSource
 import com.simprints.infra.logging.Simber
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ImageRepositoryImpl @Inject internal constructor(
     private val localDataSource: ImageLocalDataSource,
     private val remoteDataSource: ImageRemoteDataSource,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ImageRepository {
 
     override suspend fun storeImageSecurely(
         imageBytes: ByteArray,
         projectId: String,
         relativePath: Path,
-    ): SecuredImageRef? = withContext(dispatcher) {
-        localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
-    }
+    ): SecuredImageRef? = localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
 
-    override suspend fun getNumberOfImagesToUpload(projectId: String): Int = withContext(dispatcher) {
+    override suspend fun getNumberOfImagesToUpload(projectId: String): Int =
         localDataSource.listImages(projectId).count()
-    }
 
-    override suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean = withContext(dispatcher) {
+
+    override suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean {
         var allImagesUploaded = true
 
         val images = localDataSource.listImages(projectId)
@@ -48,10 +42,10 @@ class ImageRepositoryImpl @Inject internal constructor(
             }
         }
 
-        allImagesUploaded
+        return allImagesUploaded
     }
 
-    override suspend fun deleteStoredImages() = withContext(dispatcher) {
+    override suspend fun deleteStoredImages() {
         for (image in localDataSource.listImages(null)) {
             localDataSource.deleteImage(image)
         }

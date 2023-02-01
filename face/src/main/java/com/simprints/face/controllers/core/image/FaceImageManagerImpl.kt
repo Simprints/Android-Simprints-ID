@@ -1,23 +1,19 @@
 package com.simprints.face.controllers.core.image
 
-import com.simprints.core.DispatcherIO
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.simprints.infra.images.model.Path as CorePath
 
 class FaceImageManagerImpl @Inject constructor(
     private val coreImageRepository: ImageRepository,
     private val coreEventRepository: EventRepository,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : FaceImageManager {
 
-    override suspend fun save(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? = withContext(dispatcher) {
+    override suspend fun save(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? =
         determinePath(captureEventId)?.let { path ->
             Simber.d("Saving face image ${path.compose()}")
             val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
@@ -31,7 +27,6 @@ class FaceImageManagerImpl @Inject constructor(
                 null
             }
         }
-    }
 
     private suspend fun determinePath(captureEventId: String): CorePath? =
         try {

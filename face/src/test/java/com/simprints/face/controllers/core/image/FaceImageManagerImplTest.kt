@@ -31,7 +31,7 @@ class FaceImageManagerImplTest {
             }
         }
 
-        val faceImageManagerImpl = FaceImageManagerImpl(imageRepo, eventRepo, UnconfinedTestDispatcher())
+        val faceImageManagerImpl = FaceImageManagerImpl(imageRepo, eventRepo)
 
         val imageBytes = byteArrayOf()
         val captureEventId = "captureEventId"

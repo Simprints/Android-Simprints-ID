@@ -7,6 +7,8 @@ import com.simprints.infra.images.local.ImageLocalDataSourceImpl
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import io.mockk.mockk
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -24,7 +26,7 @@ class ImageLocalDataSourceImplTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
     private val path = Path("test/$FILE_NAME")
-    private val imageLocalDataSource = ImageLocalDataSourceImpl(app, mockk())
+    private val imageLocalDataSource = ImageLocalDataSourceImpl(app, mockk(), UnconfinedTestDispatcher())
 
     @Before
     fun setUp() {
@@ -32,7 +34,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun givenAByteArray_storeIt_shouldReturnASecuredImageRef() {
+    fun givenAByteArray_storeIt_shouldReturnASecuredImageRef() = runTest {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef =
             imageLocalDataSource.encryptAndStoreImage(byteArray, "projectId", path)
@@ -42,7 +44,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun givenAnEncryptedFile_decryptIt_shouldReturnTheRightContent() {
+    fun givenAnEncryptedFile_decryptIt_shouldReturnTheRightContent() = runTest {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef =
             imageLocalDataSource.encryptAndStoreImage(byteArray, "projectId", path)
@@ -53,7 +55,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun encryptThrowsAnException_shouldBeHandled() {
+    fun encryptThrowsAnException_shouldBeHandled() = runTest {
         val securedImageRef = imageLocalDataSource.encryptAndStoreImage(
             emptyArray<Byte>().toByteArray(),
             "projectId",
@@ -63,7 +65,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun shouldListImageFiles() {
+    fun shouldListImageFiles() = runTest {
         val expectedFileCount = createImageFiles(10).size
         val actualFileCount = imageLocalDataSource.listImages("projectId").size
 
@@ -71,7 +73,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun shouldListImageFilesStoredAtDifferentSubDirs() {
+    fun shouldListImageFilesStoredAtDifferentSubDirs() = runTest {
         val bytes = Random.nextBytes(SIZE_IMAGE)
         with(imageLocalDataSource) {
             encryptAndStoreImage(bytes, "projectId", Path("dir1/$FILE_NAME"))
@@ -85,7 +87,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun shouldDeleteImageFiles() {
+    fun shouldDeleteImageFiles() = runTest {
         val files = createImageFiles(3)
 
         val fileToDelete = files.first()
@@ -97,13 +99,13 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun shouldHandleDeletionOfNonExistingImageFiles() {
+    fun shouldHandleDeletionOfNonExistingImageFiles() = runTest {
         val file = SecuredImageRef(Path("non/existing/path/file.txt"))
 
         assertThat(imageLocalDataSource.deleteImage(file)).isFalse()
     }
 
-    private fun createImageFiles(count: Int): List<SecuredImageRef> {
+    private suspend fun createImageFiles(count: Int): List<SecuredImageRef> {
         val createdFiles = arrayListOf<SecuredImageRef>()
 
         for (i in 0 until count) {
