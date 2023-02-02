@@ -13,8 +13,6 @@ import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -74,30 +72,31 @@ internal class SyncViewModel @Inject constructor(
         }
     }
 
-    private fun load() =
+    private fun load()    {
+        _syncCardLiveData.addSource(deviceManager.isConnectedLiveData) {
+            viewModelScope.launch {
+                emitNewCardState(
+                    it,
+                    isModuleSelectionRequired(),
+                    syncStateLiveData.value
+                )
+            }
+        }
+        _syncCardLiveData.addSource(syncStateLiveData) {
+            viewModelScope.launch {
+                emitNewCardState(
+                    isConnected(),
+                    isModuleSelectionRequired(),
+                    it,
+                )
+            }
+        }
         viewModelScope.launch(dispatcher) {
-            _syncCardLiveData.addSource(deviceManager.isConnectedLiveData) {
-                CoroutineScope(coroutineContext + SupervisorJob()).launch {
-                    emitNewCardState(
-                        it,
-                        isModuleSelectionRequired(),
-                        syncStateLiveData.value
-                    )
-                }
-            }
-            _syncCardLiveData.addSource(syncStateLiveData) {
-                CoroutineScope(coroutineContext + SupervisorJob()).launch {
-                    emitNewCardState(
-                        isConnected(),
-                        isModuleSelectionRequired(),
-                        it,
-                    )
-                }
-            }
             configManager.getProjectConfiguration().also { configuration ->
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
         }
+    }
 
     private fun emitNewCardState(
         isConnected: Boolean,
