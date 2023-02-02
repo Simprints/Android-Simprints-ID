@@ -1,4 +1,5 @@
 package com.simprints.infra.images.repository
+
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.ImageRepositoryImpl
@@ -24,8 +25,10 @@ internal class ImageRepositoryImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    @MockK lateinit var localDataSource: ImageLocalDataSource
-    @MockK lateinit var remoteDataSource: ImageRemoteDataSource
+    @MockK
+    lateinit var localDataSource: ImageLocalDataSource
+    @MockK
+    lateinit var remoteDataSource: ImageRemoteDataSource
 
     private lateinit var repository: ImageRepository
 
@@ -33,7 +36,7 @@ internal class ImageRepositoryImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
         repository = ImageRepositoryImpl(localDataSource, remoteDataSource)
-        initialiseMocks()
+        initValidImageMocks()
     }
 
     @Test
@@ -52,6 +55,31 @@ internal class ImageRepositoryImplTest {
         val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
 
         assertThat(successful).isTrue()
+    }
+
+    @Test
+    fun withException_shouldReturnNotSuccessful() = runTest {
+        coEvery {
+            localDataSource.decryptImage(mockThrowingImage())
+        } throws Exception("Cannot decrypt")
+
+        coEvery { localDataSource.listImages(any()) } returns listOf(
+            mockValidImage(),
+            mockThrowingImage(),
+        )
+
+        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
+        assertThat(successful).isFalse()
+    }
+
+    @Test
+    fun withDecryptedAndNotUploadedImage_shouldReturnNotSuccessful() = runTest {
+        initValidImageFailedUploadMocks()
+        configureLocalImageFiles(includeInvalidFile = true)
+
+        val successful = repository.uploadStoredImagesAndDelete(PROJECT_ID)
+
+        assertThat(successful).isFalse()
     }
 
     @Test
@@ -93,9 +121,8 @@ internal class ImageRepositoryImplTest {
         assertThat(imageCount).isEqualTo(nImagesInLocal)
     }
 
-    private fun initialiseMocks() {
+    private fun initValidImageMocks() {
         val validImage = mockValidImage()
-        val invalidImage = mockInvalidImage()
         val mockStream = mockk<FileInputStream>()
 
         coEvery {
@@ -103,16 +130,8 @@ internal class ImageRepositoryImplTest {
         } returns true
 
         coEvery {
-            localDataSource.deleteImage(invalidImage)
-        } returns false
-
-        coEvery {
             localDataSource.decryptImage(validImage)
         } returns mockStream
-
-        coEvery {
-            localDataSource.decryptImage(invalidImage)
-        } returns null
 
         coEvery {
             remoteDataSource.uploadImage(mockStream, validImage)
@@ -120,6 +139,15 @@ internal class ImageRepositoryImplTest {
             validImage,
             UploadResult.Status.SUCCESSFUL
         )
+    }
+
+    private fun initValidImageFailedUploadMocks() {
+        val invalidImage = mockInvalidImage()
+        val mockStream = mockk<FileInputStream>()
+
+        coEvery {
+            localDataSource.decryptImage(invalidImage)
+        } returns mockStream
 
         coEvery {
             remoteDataSource.uploadImage(mockStream, invalidImage)
@@ -143,23 +171,16 @@ internal class ImageRepositoryImplTest {
         coEvery { localDataSource.listImages(null) } returns files
     }
 
-    private fun mockValidImage() =
-        SecuredImageRef(
-            Path(
-                VALID_PATH
-            )
-        )
+    private fun mockValidImage() = SecuredImageRef(Path(VALID_PATH))
 
-    private fun mockInvalidImage() =
-        SecuredImageRef(
-            Path(
-                INVALID_PATH
-            )
-        )
+    private fun mockInvalidImage() = SecuredImageRef(Path(INVALID_PATH))
+
+    private fun mockThrowingImage() = SecuredImageRef(Path(THROWING_PATH))
 
     companion object {
         private const val VALID_PATH = "valid.txt"
         private const val INVALID_PATH = "invalid"
+        private const val THROWING_PATH = "throw.exe"
         private const val PROJECT_ID = "projectId"
     }
 
