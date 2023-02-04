@@ -37,7 +37,7 @@ buildscript {
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
 
         // Deployment
-        classpath("com.github.triplet.gradle:play-publisher:3.7.0")
+        classpath("com.github.triplet.gradle:play-publisher:3.8.1")
         classpath("com.google.firebase:firebase-appdistribution-gradle:3.2.0")
 
         // Hilt
