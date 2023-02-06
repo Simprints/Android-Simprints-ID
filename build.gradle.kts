@@ -31,7 +31,7 @@ buildscript {
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.2")
 
         // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.13.0")
+        classpath("io.realm:realm-gradle-plugin:10.13.2-transformer-api")
 
         // Android X Navigation components
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
