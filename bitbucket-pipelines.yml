@@ -2,7 +2,7 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: atlassian/default-image:4
+image: androidsdk/android-31
 
 clone:
     depth: full # SonarCloud scanner needs the full history to assign issues properly
