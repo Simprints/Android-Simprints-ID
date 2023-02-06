@@ -32,7 +32,7 @@ internal data class OldProjectConfig(
     @JsonProperty("FingerprintLiveFeedbackOn") private val fingerprintLiveFeedbackOn: String?,
     @JsonProperty("FaceConfidenceThresholds") private val faceConfidenceThresholds: String?,
     @JsonProperty("MatchGroup") private val matchGroup: String,
-    @JsonProperty("SyncDestination") private val syncDestination: String,
+    @JsonProperty("SyncDestination") private val syncDestination: String?,
     @JsonProperty("SimprintsSync") private val simprintsSync: String?,
     @JsonProperty("LocationRequired") private val locationRequired: String,
     @JsonProperty("FingerImagesExist") private val fingerImagesExist: String?,
@@ -155,7 +155,7 @@ internal data class OldProjectConfig(
             up = UpSynchronizationConfiguration(
                 simprints = UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration(
                     kind = if (simprintsSync == null) {
-                        if (syncDestination.contains("SIMPRINTS")) {
+                        if (syncDestination?.contains("SIMPRINTS") == true) {
                             UpSynchronizationConfiguration.UpSynchronizationKind.ALL
                         } else {
                             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
@@ -166,7 +166,7 @@ internal data class OldProjectConfig(
                 ),
                 coSync = UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration(
                     kind = if (coSync == null) {
-                        if (syncDestination.contains("COMMCARE")) {
+                        if (syncDestination?.contains("COMMCARE") == true) {
                             UpSynchronizationConfiguration.UpSynchronizationKind.ALL
                         } else {
                             UpSynchronizationConfiguration.UpSynchronizationKind.NONE
