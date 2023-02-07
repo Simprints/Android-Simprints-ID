@@ -1,6 +1,6 @@
 #!/bin/bash
-# install ndk and cmake
-extras ndk
+# Install make
+apk add --no-cache make
 
 echo "org.gradle.caching=true" >>gradle.properties
 
