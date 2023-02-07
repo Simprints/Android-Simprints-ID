@@ -258,7 +258,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setConsent(PROTO_CONSENT_CONFIGURATION)
             .setGeneral(PROTO_GENERAL_CONFIGURATION)
             .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
-            .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION_NULL_VALUES)
+            .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION_EMPTY_VALUES)
             .setFace(PROTO_FACE_CONFIGURATION)
             .setFingerprint(
                 PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
@@ -379,7 +379,7 @@ class ProjectConfigSharedPrefsMigrationTest {
 
         private val JSON_SYNCHRONIZATION_CONFIGURATION_EMPTY_SYNC_DESTINATION =
             jacksonObjectMapper().readValue<Map<String, String>>(
-                "{\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SimprintsSync\":\"ALL\",\"SyncDestination\":\"\",\"SyncGroup\":\"GLOBAL\"}"
+                "{\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SyncDestination\":\"\",\"SyncGroup\":\"GLOBAL\"}"
             )
         private val JSON_SYNCHRONIZATION_CONFIGURATION_NON_EMPTY_SYNC_DESTINATION =
             jacksonObjectMapper().readValue<Map<String, String>>(
@@ -442,6 +442,32 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .addAllModuleOptions(listOf("module1", "module2"))
                 )
                 .build()
+
+        private val PROTO_SYNCHRONIZATION_CONFIGURATION_EMPTY_VALUES =
+            ProtoSynchronizationConfiguration.newBuilder()
+                .setFrequency(ProtoSynchronizationConfiguration.Frequency.PERIODICALLY)
+                .setUp(
+                    ProtoUpSynchronizationConfiguration.newBuilder()
+                        .setSimprints(
+                            ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
+                                .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+                                .build()
+                        )
+                        .setCoSync(
+                            ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.newBuilder()
+                                .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+                                .build()
+                        )
+                        .build()
+                )
+                .setDown(
+                    ProtoDownSynchronizationConfiguration.newBuilder()
+                        .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
+                        .setMaxNbOfModules(5)
+                        .addAllModuleOptions(listOf("module1", "module2"))
+                )
+                .build()
+
 
         private val PROTO_SYNCHRONIZATION_CONFIGURATION_NULL_VALUES =
             ProtoSynchronizationConfiguration.newBuilder()
