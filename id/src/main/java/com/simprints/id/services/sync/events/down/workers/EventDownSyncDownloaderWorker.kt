@@ -5,7 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -34,7 +34,7 @@ class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private val syncCache: EventSyncCache,
     private val eventDownSyncDownloaderTask: EventDownSyncDownloaderTask,
     private val jsonHelper: JsonHelper,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     companion object {
@@ -116,7 +116,7 @@ class EventDownSyncDownloaderWorker @AssistedInject constructor(
     }
 }
 
-fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncCache): Int {
+suspend fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncCache): Int {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
 

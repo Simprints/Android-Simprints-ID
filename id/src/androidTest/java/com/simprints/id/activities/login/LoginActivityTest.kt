@@ -14,7 +14,6 @@ import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.secure.AuthenticationHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
 import io.mockk.coEvery
@@ -36,7 +35,6 @@ class LoginActivityTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val authenticationHelper: AuthenticationHelper = mockk(relaxed = true)
-    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Test
     fun withSuccessConfirmViews() {

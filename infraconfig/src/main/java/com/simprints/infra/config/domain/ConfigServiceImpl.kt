@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 internal class ConfigServiceImpl @Inject constructor(
     private val localDataSource: ConfigLocalDataSource,
-    private val remoteDataSource: ConfigRemoteDataSource
+    private val remoteDataSource: ConfigRemoteDataSource,
 ) : ConfigService {
 
     companion object {
@@ -25,35 +25,31 @@ internal class ConfigServiceImpl @Inject constructor(
         const val PRIVACY_NOTICE_FILE = "privacy_notice"
     }
 
-    override suspend fun getProject(projectId: String): Project =
-        try {
-            localDataSource.getProject()
-        } catch (e: Exception) {
-            if (e is NoSuchElementException) {
-                refreshProject(projectId)
-            } else {
-                throw e
-            }
+    override suspend fun getProject(projectId: String): Project = try {
+        localDataSource.getProject()
+    } catch (e: Exception) {
+        if (e is NoSuchElementException) {
+            refreshProject(projectId)
+        } else {
+            throw e
         }
+    }
 
-    override suspend fun refreshProject(projectId: String): Project =
-        remoteDataSource.getProject(projectId).also {
-            localDataSource.saveProject(it)
-        }
+    override suspend fun refreshProject(projectId: String): Project = remoteDataSource
+        .getProject(projectId)
+        .also { localDataSource.saveProject(it) }
 
-    override suspend fun getConfiguration(): ProjectConfiguration =
-        localDataSource.getProjectConfiguration()
+    override suspend fun getConfiguration(): ProjectConfiguration = localDataSource.getProjectConfiguration()
 
-    override suspend fun refreshConfiguration(projectId: String): ProjectConfiguration =
-        remoteDataSource.getConfiguration(projectId).also {
-            localDataSource.saveProjectConfiguration(it)
-        }
+    override suspend fun refreshConfiguration(projectId: String): ProjectConfiguration = remoteDataSource
+        .getConfiguration(projectId)
+        .also { localDataSource.saveProjectConfiguration(it) }
 
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
-        localDataSource.getDeviceConfiguration()
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration = localDataSource.getDeviceConfiguration()
 
-    override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
-        localDataSource.updateDeviceConfiguration(update)
+    override suspend fun updateDeviceConfiguration(
+        update: suspend (t: DeviceConfiguration) -> DeviceConfiguration
+    ) = localDataSource.updateDeviceConfiguration(update)
 
     override suspend fun clearData() {
         localDataSource.clearProject()

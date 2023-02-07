@@ -9,7 +9,9 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -21,8 +23,13 @@ class FaceCaptureViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val faceImageManager: FaceImageManager = mockk(relaxed = true) {
-        coEvery { save(any(), any()) } returns null
+    private lateinit var faceImageManager: FaceImageManager
+
+    @Before
+    fun setUp() {
+        faceImageManager = mockk(relaxed = true) {
+            coEvery { save(any(), any()) } returns null
+        }
     }
 
     private val faceDetections = listOf<FaceDetection>(
@@ -43,7 +50,7 @@ class FaceCaptureViewModelTest {
                     }
                 }
             },
-            faceImageManager = faceImageManager
+            faceImageManager = faceImageManager,
         )
 
     @Test

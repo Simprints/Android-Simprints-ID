@@ -195,7 +195,7 @@ class EventDownSyncDownloaderWorkerTest {
     fun worker_progressCountInProgressData_shouldExtractTheProgressCountCorrectly() = runTest {
         val progress = 2
         val syncCacheMock = mockk<EventSyncCache>()
-        every { syncCacheMock.readProgress(any()) } returns 1
+        coEvery { syncCacheMock.readProgress(any()) } returns 1
 
         val workInfo = WorkInfo(
             UUID.randomUUID(),
@@ -212,7 +212,7 @@ class EventDownSyncDownloaderWorkerTest {
     fun worker_SyncDown_shouldExtractTheFinalProgressCountCorrectly() = runTest {
         val progress = 2
         val syncCacheMock = mockk<EventSyncCache>()
-        every { syncCacheMock.readProgress(any()) } returns 1
+        coEvery { syncCacheMock.readProgress(any()) } returns 1
 
         val workInfo = WorkInfo(
             UUID.randomUUID(),
@@ -229,7 +229,7 @@ class EventDownSyncDownloaderWorkerTest {
     fun workerResumed_progressCountInCache_shouldExtractTheProgressCountCorrectly() = runTest {
         val progress = 2
         val syncCacheMock = mockk<EventSyncCache>()
-        every { syncCacheMock.readProgress(any()) } returns progress
+        coEvery { syncCacheMock.readProgress(any()) } returns progress
 
         val workInfo = WorkInfo(
             UUID.randomUUID(),

@@ -9,7 +9,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -41,7 +41,7 @@ class EventDownSyncCountWorker @AssistedInject constructor(
     private val eventDownSyncHelper: EventDownSyncHelper,
     private val jsonHelper: JsonHelper,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
 
     companion object {

@@ -64,7 +64,7 @@ internal class LoginManagerImpl @Inject constructor(
             loginInfoManager.coreFirebaseApiKey = value
         }
 
-    override fun requestIntegrityToken(nonce: String): String =
+    override suspend fun requestIntegrityToken(nonce: String): String =
         integrityTokenRequester.getToken(nonce)
 
     override suspend fun requestAuthenticationData(

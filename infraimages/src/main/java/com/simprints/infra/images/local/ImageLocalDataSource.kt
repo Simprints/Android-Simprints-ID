@@ -22,7 +22,7 @@ internal interface ImageLocalDataSource {
      * @see [Path]
      * @return a reference to the newly stored image, if successful, otherwise null
      */
-    fun encryptAndStoreImage(imageBytes: ByteArray, projectId: String,relativePath: Path): SecuredImageRef?
+    suspend fun encryptAndStoreImage(imageBytes: ByteArray, projectId: String,relativePath: Path): SecuredImageRef?
 
     /**
      * Decrypts an image
@@ -30,7 +30,7 @@ internal interface ImageLocalDataSource {
      * @param image a reference to the path of the encrypted image
      * @return a stream for the decrypted image, if the operation was successful, otherwise null
      */
-    fun decryptImage(image: SecuredImageRef): FileInputStream?
+    suspend fun decryptImage(image: SecuredImageRef): FileInputStream?
 
     /**
      * Recursively lists all images contained in the project images folder or all if the projectId is
@@ -38,7 +38,7 @@ internal interface ImageLocalDataSource {
      *
      * @return all image files found
      */
-    fun listImages(projectId: String?): List<SecuredImageRef>
+    suspend fun listImages(projectId: String?): List<SecuredImageRef>
 
     /**
      * Deletes an image
@@ -46,7 +46,7 @@ internal interface ImageLocalDataSource {
      * @param image the image to be deleted
      * @return true if the operation was successful
      */
-    fun deleteImage(image: SecuredImageRef): Boolean
+    suspend fun deleteImage(image: SecuredImageRef): Boolean
 
 }
 

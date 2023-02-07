@@ -10,7 +10,6 @@ import com.simprints.infra.images.ImageRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +38,7 @@ class SecurityStateProcessorImplTest {
             mockImageRepository,
             enrolmentRecordManager,
             eventLocalDataSource,
-            mockSignerManager
+            mockSignerManager,
         )
     }
 
@@ -61,7 +60,7 @@ class SecurityStateProcessorImplTest {
 
         securityStateProcessor.processSecurityState(securityState)
 
-        verify(exactly = 0) { mockImageRepository.deleteStoredImages() }
+        coVerify(exactly = 0) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 0) { enrolmentRecordManager.deleteAll() }
         coVerify(exactly = 0) { eventLocalDataSource.deleteAll() }
         coVerify(exactly = 0) { mockSignerManager.signOut() }
@@ -74,7 +73,7 @@ class SecurityStateProcessorImplTest {
 
         securityStateProcessor.processSecurityState(securityState)
 
-        verify(exactly = 1) { mockImageRepository.deleteStoredImages() }
+        coVerify(exactly = 1) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 1) { enrolmentRecordManager.deleteAll() }
         coVerify(exactly = 1) { eventLocalDataSource.deleteAll() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
@@ -87,7 +86,7 @@ class SecurityStateProcessorImplTest {
 
         securityStateProcessor.processSecurityState(securityState)
 
-        verify(exactly = 1) { mockImageRepository.deleteStoredImages() }
+        coVerify(exactly = 1) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 1) { enrolmentRecordManager.deleteAll() }
         coVerify(exactly = 1) { eventLocalDataSource.deleteAll() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }

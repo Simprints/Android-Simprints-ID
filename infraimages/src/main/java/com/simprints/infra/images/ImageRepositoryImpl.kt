@@ -12,12 +12,15 @@ class ImageRepositoryImpl @Inject internal constructor(
     private val remoteDataSource: ImageRemoteDataSource,
 ) : ImageRepository {
 
-    override fun storeImageSecurely(imageBytes: ByteArray, projectId: String,relativePath: Path): SecuredImageRef? {
-        return localDataSource.encryptAndStoreImage(imageBytes,projectId, relativePath)
-    }
+    override suspend fun storeImageSecurely(
+        imageBytes: ByteArray,
+        projectId: String,
+        relativePath: Path,
+    ): SecuredImageRef? = localDataSource.encryptAndStoreImage(imageBytes, projectId, relativePath)
 
-    override fun getNumberOfImagesToUpload(projectId: String): Int =
+    override suspend fun getNumberOfImagesToUpload(projectId: String): Int =
         localDataSource.listImages(projectId).count()
+
 
     override suspend fun uploadStoredImagesAndDelete(projectId: String): Boolean {
         var allImagesUploaded = true
@@ -42,9 +45,9 @@ class ImageRepositoryImpl @Inject internal constructor(
         return allImagesUploaded
     }
 
-    override fun deleteStoredImages() = with(localDataSource) {
-        listImages(null).forEach {
-            deleteImage(it)
+    override suspend fun deleteStoredImages() {
+        for (image in localDataSource.listImages(null)) {
+            localDataSource.deleteImage(image)
         }
     }
 }

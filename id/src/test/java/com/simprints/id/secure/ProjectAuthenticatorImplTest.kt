@@ -132,7 +132,7 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun integrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
-        every { loginManager.requestIntegrityToken(any()) } throws RequestingIntegrityTokenException(
+        coEvery { loginManager.requestIntegrityToken(any()) } throws RequestingIntegrityTokenException(
             errorCode = IntegrityErrorCode.API_NOT_AVAILABLE,
             cause = Exception("Error in requesting integrity api token")
         )
@@ -185,7 +185,7 @@ class ProjectAuthenticatorImplTest {
             mockk(),
             mockk(),
         )
-        every { loginManager.requestIntegrityToken(any()) } returns "token"
+        coEvery { loginManager.requestIntegrityToken(any()) } returns "token"
     }
 
     private companion object {

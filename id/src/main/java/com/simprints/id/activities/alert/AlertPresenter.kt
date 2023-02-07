@@ -1,6 +1,5 @@
 package com.simprints.id.activities.alert
 
-import com.simprints.core.DispatcherIO
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
@@ -20,7 +19,6 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -34,7 +32,6 @@ class AlertPresenter @AssistedInject constructor(
     private val timeHelper: TimeHelper,
     private val exitFormHelper: ExitFormHelper,
     @ExternalScope private val externalScope: CoroutineScope,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : AlertContract.Presenter {
 
     private val alertViewModel = AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
@@ -91,7 +88,7 @@ class AlertPresenter @AssistedInject constructor(
         }
     }
 
-    private fun getParamsForLastBiometricsFailedAlert() = runBlocking(dispatcher) {
+    private fun getParamsForLastBiometricsFailedAlert() = runBlocking {
         with(configManager.getProjectConfiguration().general.modalities) {
             when {
                 isFingerprintAndFace() -> {
