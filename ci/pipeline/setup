@@ -1,4 +1,6 @@
 #!/bin/bash
+# install ndk and cmake
+extras ndk
 
 echo "org.gradle.caching=true" >>gradle.properties
 
