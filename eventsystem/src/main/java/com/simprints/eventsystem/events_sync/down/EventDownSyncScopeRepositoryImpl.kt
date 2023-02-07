@@ -2,7 +2,6 @@ package com.simprints.eventsystem.events_sync.down
 
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.*
@@ -11,13 +10,11 @@ import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperation
 import com.simprints.eventsystem.events_sync.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
 import com.simprints.eventsystem.exceptions.MissingArgumentForDownSyncScopeException
 import com.simprints.infra.login.LoginManager
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class EventDownSyncScopeRepositoryImpl @Inject constructor(
     val loginManager: LoginManager,
     private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
-    private val dispatcher: DispatcherProvider
 ) : EventDownSyncScopeRepository {
 
     override suspend fun getDownSyncScope(
@@ -60,13 +57,7 @@ internal class EventDownSyncScopeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
-        withContext(dispatcher.io()) {
-            downSyncOperationOperationDao.insertOrUpdate(
-                buildFromEventsDownSyncOperationState(
-                    syncScopeOperation
-                )
-            )
-        }
+        downSyncOperationOperationDao.insertOrUpdate(buildFromEventsDownSyncOperationState(syncScopeOperation))
     }
 
     override suspend fun refreshState(syncScopeOperation: EventDownSyncOperation): EventDownSyncOperation {
@@ -85,17 +76,13 @@ internal class EventDownSyncScopeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteOperations(moduleIds: List<String>, modes: List<Modes>) {
-        withContext(dispatcher.io()) {
-            val scope = SubjectModuleScope(getProjectId(), moduleIds, modes)
-            scope.operations.forEach {
-                downSyncOperationOperationDao.delete(it.getUniqueKey())
-            }
+        val scope = SubjectModuleScope(getProjectId(), moduleIds, modes)
+        scope.operations.forEach {
+            downSyncOperationOperationDao.delete(it.getUniqueKey())
         }
     }
 
     override suspend fun deleteAll() {
-        withContext(dispatcher.io()) {
-            downSyncOperationOperationDao.deleteAll()
-        }
+        downSyncOperationOperationDao.deleteAll()
     }
 }

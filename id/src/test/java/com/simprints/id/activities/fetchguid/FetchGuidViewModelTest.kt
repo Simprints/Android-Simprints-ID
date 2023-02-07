@@ -13,7 +13,6 @@ import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.just
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -27,6 +26,9 @@ class FetchGuidViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     private lateinit var viewModel: FetchGuidViewModel
 
@@ -42,10 +44,6 @@ class FetchGuidViewModelTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
 
-    @get:Rule
-    val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -54,7 +52,6 @@ class FetchGuidViewModelTest {
             deviceManager,
             eventRepository,
             timeHelper,
-            testDispatcherProvider
         )
 
         configureMocks()
@@ -69,11 +66,7 @@ class FetchGuidViewModelTest {
     @Test
     fun fetchGuidSucceedsFromLocal_shouldReturnCorrectSubjectSource() {
         coEvery {
-            fetchGuidHelper.loadFromRemoteIfNeeded(
-                any(),
-                any(),
-                any()
-            )
+            fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(defaultSubject, LOCAL)
 
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
@@ -85,11 +78,7 @@ class FetchGuidViewModelTest {
     @Test
     fun fetchGuidSucceedsFromRemote_shouldReturnCorrectSubjectSource() {
         coEvery {
-            fetchGuidHelper.loadFromRemoteIfNeeded(
-                any(),
-                any(),
-                any()
-            )
+            fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(defaultSubject, REMOTE)
 
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
@@ -101,11 +90,7 @@ class FetchGuidViewModelTest {
     @Test
     fun fetchGuidFailsFromLocalAndOffline_shouldReturnFailedOfflineSubjectSource() {
         coEvery {
-            fetchGuidHelper.loadFromRemoteIfNeeded(
-                any(),
-                any(),
-                any()
-            )
+            fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
         coEvery { deviceManager.isConnected() } returns false
 
@@ -118,11 +103,7 @@ class FetchGuidViewModelTest {
     @Test
     fun fetchGuidFailsFromLocalAndRemoteOnline_shouldReturnNotFoundSubjectSource() {
         coEvery {
-            fetchGuidHelper.loadFromRemoteIfNeeded(
-                any(),
-                any(),
-                any()
-            )
+            fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
         coEvery { deviceManager.isConnected() } returns true
 
@@ -136,11 +117,7 @@ class FetchGuidViewModelTest {
     fun fetchGuidInLocal_shouldAddCandidateReadEvent() {
         runBlocking {
             coEvery {
-                fetchGuidHelper.loadFromRemoteIfNeeded(
-                    any(),
-                    any(),
-                    any()
-                )
+                fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
             } returns SubjectFetchResult(defaultSubject, LOCAL)
 
             viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
@@ -163,11 +140,7 @@ class FetchGuidViewModelTest {
     fun fetchGuidInRemote_shouldAddCandidateReadEvent() {
         runBlocking {
             coEvery {
-                fetchGuidHelper.loadFromRemoteIfNeeded(
-                    any(),
-                    any(),
-                    any()
-                )
+                fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
             } returns SubjectFetchResult(defaultSubject, REMOTE)
 
             viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
@@ -190,11 +163,7 @@ class FetchGuidViewModelTest {
     fun localGuidNotFoundAndOffline_shouldAddCandidateReadEvent() {
         runBlocking {
             coEvery {
-                fetchGuidHelper.loadFromRemoteIfNeeded(
-                    any(),
-                    any(),
-                    any()
-                )
+                fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
             } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
             coEvery { deviceManager.isConnected() } returns false
 
@@ -218,11 +187,7 @@ class FetchGuidViewModelTest {
     fun fetchGuidNotFound_shouldAddCandidateReadEvent() {
         runBlocking {
             coEvery {
-                fetchGuidHelper.loadFromRemoteIfNeeded(
-                    any(),
-                    any(),
-                    any()
-                )
+                fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
             } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
             coEvery { deviceManager.isConnected() } returns true
 

@@ -1,7 +1,6 @@
 package com.simprints.feature.dashboard.main.sync
 
 import androidx.lifecycle.*
-import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
@@ -12,10 +11,10 @@ import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import javax.inject.Inject
 
@@ -26,7 +25,6 @@ internal class SyncViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val cacheSync: EventSyncCache,
     private val timeHelper: TimeHelper,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     companion object {
@@ -43,16 +41,20 @@ internal class SyncViewModel @Inject constructor(
     private val _syncCardLiveData = MediatorLiveData<DashboardSyncCardState>()
 
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
-    private val lastTimeSyncSucceed
-        get() = cacheSync
-            .readLastSuccessfulSyncTime()
+
+    private suspend fun lastTimeSyncSucceed() = runBlocking {
+        cacheSync.readLastSuccessfulSyncTime()
             ?.let { timeHelper.readableBetweenNowAndTime(it) }
+    }
 
     private var lastTimeSyncRun: Date? = null
     private var estimatedOutage: Long? = null
 
     init {
-        _syncCardLiveData.postValue(SyncConnecting(lastTimeSyncSucceed, 0, null))
+        viewModelScope.launch {
+            _syncCardLiveData.postValue(SyncConnecting(lastTimeSyncSucceed(), 0, null))
+        }
+
         startInitialSyncIfRequired()
         load()
     }
@@ -63,19 +65,21 @@ internal class SyncViewModel @Inject constructor(
     }
 
     private fun startInitialSyncIfRequired() {
-        val isRunning = syncStateLiveData.value?.let {
-            isSyncRunning(it.downSyncWorkersInfo + it.upSyncWorkersInfo)
-        } ?: false
+        viewModelScope.launch {
+            val lastUpdate = lastTimeSyncRun ?: cacheSync.readLastSuccessfulSyncTime()
 
-        val lastUpdate = lastTimeSyncRun ?: cacheSync.readLastSuccessfulSyncTime()
+            val isRunning = syncStateLiveData.value?.let {
+                isSyncRunning(it.downSyncWorkersInfo + it.upSyncWorkersInfo)
+            } ?: false
 
-        if (!isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate.time) > MAX_TIME_BEFORE_SYNC_AGAIN)) {
-            this.sync()
+            if (!isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate.time) > MAX_TIME_BEFORE_SYNC_AGAIN)) {
+                sync()
+            }
         }
     }
 
     private fun load() =
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             _syncCardLiveData.addSource(deviceManager.isConnectedLiveData) {
                 CoroutineScope(coroutineContext + SupervisorJob()).launch {
                     emitNewCardState(
@@ -99,7 +103,7 @@ internal class SyncViewModel @Inject constructor(
             }
         }
 
-    private fun emitNewCardState(
+    private suspend fun emitNewCardState(
         isConnected: Boolean,
         isModuleSelectionRequired: Boolean,
         syncState: EventSyncState?
@@ -110,10 +114,10 @@ internal class SyncViewModel @Inject constructor(
             syncState == null && _syncCardLiveData.value !is SyncConnecting
 
         when {
-            isModuleSelectionRequired -> SyncHasNoModules(lastTimeSyncSucceed)
-            !isConnected -> SyncOffline(lastTimeSyncSucceed)
-            syncRunningAndInfoNotReadyYet -> SyncConnecting(lastTimeSyncSucceed, 0, null)
-            syncNotRunningAndInfoNotReadyYet -> SyncDefault(lastTimeSyncSucceed)
+            isModuleSelectionRequired -> SyncHasNoModules(lastTimeSyncSucceed())
+            !isConnected -> SyncOffline(lastTimeSyncSucceed())
+            syncRunningAndInfoNotReadyYet -> SyncConnecting(lastTimeSyncSucceed(), 0, null)
+            syncNotRunningAndInfoNotReadyYet -> SyncDefault(lastTimeSyncSucceed())
             syncState == null -> SyncDefault(null) //Useless after the 2 above - just to satisfy nullability in the else
             else -> processRecentSyncState(syncState)
         }.let {
@@ -122,37 +126,37 @@ internal class SyncViewModel @Inject constructor(
             }
             _syncCardLiveData.postValue(it)
         }
-
     }
 
-    private fun processRecentSyncState(syncState: EventSyncState): DashboardSyncCardState {
+    private suspend fun processRecentSyncState(syncState: EventSyncState): DashboardSyncCardState {
 
         val downSyncStates = syncState.downSyncWorkersInfo
         val upSyncStates = syncState.upSyncWorkersInfo
         val allSyncStates = downSyncStates + upSyncStates
+
         return when {
-            isThereNotSyncHistory(allSyncStates) -> SyncDefault(lastTimeSyncSucceed)
-            isSyncCompleted(allSyncStates) -> SyncComplete(lastTimeSyncSucceed)
+            isThereNotSyncHistory(allSyncStates) -> SyncDefault(lastTimeSyncSucceed())
+            isSyncCompleted(allSyncStates) -> SyncComplete(lastTimeSyncSucceed())
             isSyncProcess(allSyncStates) -> SyncProgress(
-                lastTimeSyncSucceed,
+                lastTimeSyncSucceed(),
                 syncState.progress,
                 syncState.total
             )
             isSyncConnecting(allSyncStates) -> SyncConnecting(
-                lastTimeSyncSucceed,
+                lastTimeSyncSucceed(),
                 syncState.progress,
                 syncState.total
             )
             isSyncFailedBecauseTooManyRequests(allSyncStates) -> SyncTooManyRequests(
-                lastTimeSyncSucceed
+                lastTimeSyncSucceed()
             )
-            isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed)
+            isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed())
             isSyncFailedBecauseBackendMaintenance(allSyncStates) -> SyncFailedBackendMaintenance(
-                lastTimeSyncSucceed,
+                lastTimeSyncSucceed(),
                 estimatedOutage
             )
-            isSyncFailed(allSyncStates) -> SyncTryAgain(lastTimeSyncSucceed)
-            else -> SyncProgress(lastTimeSyncSucceed, syncState.progress, syncState.total)
+            isSyncFailed(allSyncStates) -> SyncTryAgain(lastTimeSyncSucceed())
+            else -> SyncProgress(lastTimeSyncSucceed(), syncState.progress, syncState.total)
         }
     }
 

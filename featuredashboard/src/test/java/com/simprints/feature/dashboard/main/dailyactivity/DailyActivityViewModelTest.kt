@@ -48,7 +48,6 @@ class DailyActivityViewModelTest {
         val viewModel = DailyActivityViewModel(
             recentUserActivityManager,
             timeHelper,
-            testCoroutineRule.testCoroutineDispatcher
         )
 
         val expectedState = DashboardDailyActivityState(
@@ -64,7 +63,6 @@ class DailyActivityViewModelTest {
         val viewModel = DailyActivityViewModel(
             recentUserActivityManager,
             timeHelper,
-            testCoroutineRule.testCoroutineDispatcher
         )
 
         assertThat(viewModel.getCurrentDateAsString()).isEqualTo(DATE)

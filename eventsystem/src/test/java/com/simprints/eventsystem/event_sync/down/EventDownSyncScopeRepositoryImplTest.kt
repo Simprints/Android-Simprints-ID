@@ -3,7 +3,6 @@ package com.simprints.eventsystem.event_sync.down
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepositoryImpl
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState
@@ -30,7 +29,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -57,17 +55,6 @@ class EventDownSyncScopeRepositoryImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val testDispatcherProvider = object : DispatcherProvider {
-        override fun main(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun default(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun io(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-
-        override fun unconfined(): CoroutineDispatcher = testCoroutineRule.testCoroutineDispatcher
-    }
-
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
@@ -75,7 +62,6 @@ class EventDownSyncScopeRepositoryImplTest {
             EventDownSyncScopeRepositoryImpl(
                 loginManager,
                 downSyncOperationOperationDao,
-                testDispatcherProvider
             )
 
         every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID

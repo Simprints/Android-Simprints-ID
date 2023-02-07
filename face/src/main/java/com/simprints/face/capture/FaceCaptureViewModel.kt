@@ -3,7 +3,6 @@ package com.simprints.face.capture
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
@@ -19,8 +18,6 @@ import com.simprints.infra.config.domain.models.FaceConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -29,7 +26,6 @@ import javax.inject.Inject
 class FaceCaptureViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val faceImageManager: FaceImageManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     var faceDetections = listOf<FaceDetection>()
@@ -54,7 +50,7 @@ class FaceCaptureViewModel @Inject constructor(
     }
 
     fun flowFinished() {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             val projectConfiguration = configManager.getProjectConfiguration()
             if (projectConfiguration.face?.imageSavingStrategy == FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN) {
                 saveFaceDetections()

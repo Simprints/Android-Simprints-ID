@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.randomUUID
@@ -54,8 +53,7 @@ class CollectFingerprintsViewModel(
     private val fingerPriorityDeterminer: FingerPriorityDeterminer,
     private val startingStateDeterminer: StartingStateDeterminer,
     private val encoder: EncodingUtils,
-    private val externalScope: CoroutineScope,
-    private val dispatcherProvider: DispatcherProvider
+    @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     @Inject
@@ -68,7 +66,6 @@ class CollectFingerprintsViewModel(
         fingerPriorityDeterminer: FingerPriorityDeterminer,
         startingStateDeterminer: StartingStateDeterminer,
         @ExternalScope externalScope: CoroutineScope,
-        dispatcherProvider: DispatcherProvider
     ) : this(
         scannerManager,
         configManager,
@@ -79,7 +76,6 @@ class CollectFingerprintsViewModel(
         startingStateDeterminer,
         EncodingUtilsImpl,
         externalScope,
-        dispatcherProvider
     )
 
     lateinit var configuration: FingerprintConfiguration
@@ -127,7 +123,7 @@ class CollectFingerprintsViewModel(
     private data class CaptureId(val finger: FingerIdentifier, val captureIndex: Int)
 
     private val scannerTriggerListener = ScannerTriggerListener {
-        viewModelScope.launch(context = dispatcherProvider.main()) {
+        viewModelScope.launch {
             if (state().isShowingConfirmDialog) {
                 logScannerMessageForCrashReport("Scanner trigger clicked for confirm dialog")
                 handleConfirmFingerprintsAndContinue()
@@ -139,12 +135,14 @@ class CollectFingerprintsViewModel(
     }
 
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
-        viewModelScope.launch {
+        runBlocking {
+            // Configuration must be initialised when start returns for UI to be initialised correctly,
+            // and since fetching happens on IO thread execution must be suspended until it is available
             configuration = configManager.getProjectConfiguration().fingerprint!!
-            originalFingerprintsToCapture = fingerprintsToCapture
-            setStartingState()
-            startObserverForLiveFeedback()
         }
+        originalFingerprintsToCapture = fingerprintsToCapture
+        setStartingState()
+        startObserverForLiveFeedback()
     }
 
     private fun startObserverForLiveFeedback() {
@@ -170,7 +168,7 @@ class CollectFingerprintsViewModel(
             logScannerMessageForCrashReport("startLiveFeedback")
             liveFeedbackState = LiveFeedbackState.START
             stopLiveFeedbackTask?.cancel()
-            liveFeedbackTask = viewModelScope.launch(dispatcherProvider.io()) {
+            liveFeedbackTask = viewModelScope.launch {
                 scannerManager.scanner.startLiveFeedback()
             }
         }
@@ -187,7 +185,7 @@ class CollectFingerprintsViewModel(
             logScannerMessageForCrashReport("stopLiveFeedback")
             liveFeedbackState = LiveFeedbackState.STOP
             liveFeedbackTask?.cancel()
-            stopLiveFeedbackTask = viewModelScope.launch(dispatcherProvider.io()) {
+            stopLiveFeedbackTask = viewModelScope.launch {
                 scannerManager.scanner.stopLiveFeedback()
             }
         }
@@ -204,7 +202,7 @@ class CollectFingerprintsViewModel(
             scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             scannerManager.scanner.setUiIdle()
         }
         updateState {
@@ -260,7 +258,7 @@ class CollectFingerprintsViewModel(
         lastCaptureStartedAt = timeHelper.now()
         scanningTask?.cancel()
 
-        scanningTask = viewModelScope.launch(dispatcherProvider.io()) {
+        scanningTask = viewModelScope.launch {
             try {
                 scannerManager.scanner.setUiIdle()
                 val capturedFingerprint = scannerManager.scanner.captureFingerprint(
@@ -305,7 +303,7 @@ class CollectFingerprintsViewModel(
     private fun proceedToImageTransfer() {
         imageTransferTask?.cancel()
 
-        imageTransferTask = viewModelScope.launch(dispatcherProvider.io()) {
+        imageTransferTask = viewModelScope.launch {
             try {
                 val acquiredImage = scannerManager.scanner.acquireImage(
                     configuration.vero2?.imageSavingStrategy?.toDomain()
@@ -401,7 +399,7 @@ class CollectFingerprintsViewModel(
             if (currentCaptureIndex < captures.size - 1) {
                 timeHelper.newTimer().schedule(AUTO_SWIPE_DELAY) {
                     updateFingerState { currentCaptureIndex += 1 }
-                    viewModelScope.launch(dispatcherProvider.io()) {
+                    viewModelScope.launch {
                         scannerManager.scanner.setUiIdle()
                     }
                 }

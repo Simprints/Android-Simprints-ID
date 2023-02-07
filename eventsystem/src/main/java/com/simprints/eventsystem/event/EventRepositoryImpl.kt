@@ -53,7 +53,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     private val sessionDataCache: SessionDataCache,
-    private val configManager: ConfigManager
+    private val configManager: ConfigManager,
 ) : EventRepository {
 
     companion object {
@@ -133,20 +133,16 @@ internal open class EventRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun localCount(projectId: String): Int =
-        eventLocalDataSource.count(projectId = projectId)
+    override suspend fun localCount(projectId: String): Int = eventLocalDataSource.count(projectId = projectId)
 
-    override suspend fun localCount(projectId: String, type: EventType): Int =
-        eventLocalDataSource.count(projectId = projectId, type = type)
+    override suspend fun localCount(projectId: String, type: EventType): Int = eventLocalDataSource.count(projectId = projectId, type = type)
 
-    override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> =
-        eventRemoteDataSource.count(query.fromDomainToApi())
+    override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> = eventRemoteDataSource.count(query.fromDomainToApi())
 
     override suspend fun downloadEvents(
         scope: CoroutineScope,
         query: RemoteEventQuery
-    ): ReceiveChannel<Event> =
-        eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
+    ): ReceiveChannel<Event> = eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
     /**
      * Note that only the IDs of the SessionCapture events of closed sessions are all held in
@@ -212,10 +208,8 @@ internal open class EventRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun deleteSessionEvents(sessionId: String) {
-        reportException {
-            eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
-        }
+    override suspend fun deleteSessionEvents(sessionId: String) = reportException {
+        eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
     }
 
     private suspend fun attemptEventUpload(
@@ -275,13 +269,11 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.delete(eventsIds)
     }
 
-    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent =
-        reportException {
-            cachedCaptureSessionEvent()
-                ?: localCaptureSessionEvent()
-                ?: createSession()
-
-        }
+    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
+        cachedCaptureSessionEvent()
+            ?: localCaptureSessionEvent()
+            ?: createSession()
+    }
 
     private fun cachedCaptureSessionEvent() =
         sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()

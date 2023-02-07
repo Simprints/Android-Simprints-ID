@@ -4,14 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.core.ExternalScope
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +18,6 @@ import javax.inject.Inject
 internal class FingerSelectionViewModel @Inject constructor(
     private val configManager: ConfigManager,
     @ExternalScope private val externalScope: CoroutineScope,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val fingerSelections: LiveData<List<FingerSelectionItem>>
@@ -31,7 +28,7 @@ internal class FingerSelectionViewModel @Inject constructor(
     private var initialItems: List<FingerSelectionItem> = listOf()
 
     private fun postUpdatedItems(block: suspend MutableList<FingerSelectionItem>.() -> Unit) {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             _items.block()
             _fingerSelections.postValue(_items)
         }

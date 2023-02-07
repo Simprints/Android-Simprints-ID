@@ -11,9 +11,14 @@ import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import io.mockk.*
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 
 class ConfigServiceImplTest {
@@ -26,7 +31,16 @@ class ConfigServiceImplTest {
 
     private val localDataSource = mockk<ConfigLocalDataSource>(relaxed = true)
     private val remoteDataSource = mockk<ConfigRemoteDataSource>()
-    private val configServiceImpl = ConfigServiceImpl(localDataSource, remoteDataSource)
+
+    private lateinit var configServiceImpl: ConfigServiceImpl
+
+    @Before
+    fun setup() {
+        configServiceImpl = ConfigServiceImpl(
+            localDataSource,
+            remoteDataSource,
+        )
+    }
 
     @Test
     fun `should get the project locally if available`() = runTest {

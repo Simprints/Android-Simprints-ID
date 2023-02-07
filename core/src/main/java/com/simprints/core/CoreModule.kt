@@ -2,8 +2,6 @@ package com.simprints.core
 
 import android.content.Context
 import com.lyft.kronos.AndroidClockFactory
-import com.simprints.core.tools.coroutines.DefaultDispatcherProvider
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
 import com.simprints.core.tools.extentions.deviceId
 import com.simprints.core.tools.extentions.packageVersionName
@@ -47,10 +45,6 @@ object CoreModule {
 
     @Provides
     @Singleton
-    fun provideDispatcher(): DispatcherProvider = DefaultDispatcherProvider()
-
-    @Provides
-    @Singleton
     fun provideJsonHelper(): JsonHelper = JsonHelper
 
     @Provides
@@ -77,6 +71,14 @@ object CoreModule {
     @DispatcherIO
     @Provides
     fun provideDispatcherIo(): CoroutineDispatcher = Dispatchers.IO
+
+    @DispatcherMain
+    @Provides
+    fun provideDispatcherMain(): CoroutineDispatcher = Dispatchers.Main
+
+    @DispatcherBG
+    @Provides
+    fun provideDispatcherBg(): CoroutineDispatcher = Dispatchers.Default
 
     @NonCancellableIO
     @Provides
@@ -108,6 +110,14 @@ annotation class DeviceID
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class DispatcherIO
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DispatcherBG
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DispatcherMain
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

@@ -17,7 +17,6 @@ import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
@@ -62,7 +61,6 @@ class EventDownSyncHelperImplTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val testDispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     @Before
     fun setup() {
@@ -75,7 +73,6 @@ class EventDownSyncHelperImplTest {
             subjectFactory,
             configManager,
             timeHelper,
-            testDispatcherProvider
         )
 
         runTest(StandardTestDispatcher()) {

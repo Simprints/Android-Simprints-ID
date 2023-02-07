@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
@@ -36,7 +35,6 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,7 +45,6 @@ class ConnectScannerViewModel @Inject constructor(
     private val recentUserActivityManager: RecentUserActivityManager,
     private val configManager: ConfigManager,
     private val nfcManager: NfcManager,
-    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     lateinit var configuration: FingerprintConfiguration
@@ -98,21 +95,19 @@ class ConnectScannerViewModel @Inject constructor(
         _isConnecting.postValue(true)
         stopConnectingAndResetState()
 
-        withContext(dispatcherProvider.io()) {
-            try {
-                disconnectVero()
-                checkIfBluetoothIsEnabled()
-                initVero()
-                connectToVero()
-                setupVero()
-                resetVeroUI()
-                wakeUpVero()
-                _isConnecting.postValue(false)
-                handleSetupFinished()
-            } catch (ex: Throwable) {
-                _isConnecting.postValue(false)
-                manageVeroErrors(ex)
-            }
+        try {
+            disconnectVero()
+            checkIfBluetoothIsEnabled()
+            initVero()
+            connectToVero()
+            setupVero()
+            resetVeroUI()
+            wakeUpVero()
+            _isConnecting.postValue(false)
+            handleSetupFinished()
+        } catch (ex: Throwable) {
+            _isConnecting.postValue(false)
+            manageVeroErrors(ex)
         }
     }
 
@@ -170,12 +165,12 @@ class ConnectScannerViewModel @Inject constructor(
         scannerManager.scanner.sensorWakeUp()
         logMessageForCrashReport("ScannerManager: wakeUpVero")
     }
-    private fun postProgressAndMessage(step: Int,  @StringRes messageRes: Int) {
+
+    private fun postProgressAndMessage(step: Int, @StringRes messageRes: Int) {
         val progress = computeProgress(step)
         this.progress.postValue(progress)
         this.message.postValue(messageRes)
     }
-
 
     private suspend fun manageVeroErrors(e: Throwable) {
         Simber.d(e)

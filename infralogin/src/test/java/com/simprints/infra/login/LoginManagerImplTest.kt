@@ -166,8 +166,8 @@ class LoginManagerImplTest {
     }
 
     @Test
-    fun `requestAttestation should call the correct method`() {
-        every { attestationManager.requestAttestation(NONCE) } returns ATTESTATION
+    fun `requestAttestation should call the correct method`() = runTest {
+        coEvery { attestationManager.requestAttestation(NONCE) } returns ATTESTATION
         val receivedAttestation = loginManagerManagerImpl.requestAttestation(NONCE)
 
         assertThat(receivedAttestation).isEqualTo(ATTESTATION)

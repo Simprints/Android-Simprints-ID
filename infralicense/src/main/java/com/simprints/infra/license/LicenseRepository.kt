@@ -6,6 +6,6 @@ interface LicenseRepository {
 
     fun getLicenseStates(projectId: String, deviceId: String, licenseVendor: LicenseVendor): Flow<LicenseState>
 
-    fun deleteCachedLicense()
+    suspend fun deleteCachedLicense()
 
 }
