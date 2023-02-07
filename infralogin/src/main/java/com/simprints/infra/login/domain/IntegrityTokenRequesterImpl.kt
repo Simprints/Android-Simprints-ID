@@ -4,21 +4,26 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.play.core.integrity.IntegrityManager
 import com.google.android.play.core.integrity.IntegrityServiceException
 import com.google.android.play.core.integrity.IntegrityTokenRequest
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.login.BuildConfig
 import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-internal class IntegrityTokenRequesterImpl @Inject constructor(private val integrityManager: IntegrityManager) :
+internal class IntegrityTokenRequesterImpl @Inject constructor(
+    private val integrityManager: IntegrityManager,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
+) :
     IntegrityTokenRequester {
     /**
      * A method that gets the integrity service token, using a blocking [Tasks.await] method.
-     * it is a blocking function and  shouldn't be called from the main thread
      * @param nonce
      * @return Integrity token
      * @throws RequestingIntegrityTokenException
      */
 
-    override fun getToken(nonce: String): String =
+    override suspend fun getToken(nonce: String): String = withContext(dispatcher) {
         try {
             //Wait till the integrity token gets retrieved
             Tasks.await(
@@ -33,4 +38,5 @@ internal class IntegrityTokenRequesterImpl @Inject constructor(private val integ
                 cause = integrityServiceException
             )
         }
+    }
 }

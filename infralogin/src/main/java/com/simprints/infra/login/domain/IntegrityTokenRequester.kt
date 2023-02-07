@@ -2,5 +2,5 @@ package com.simprints.infra.login.domain
 
 internal interface IntegrityTokenRequester {
 
-    fun getToken(nonce: String): String
+    suspend fun getToken(nonce: String): String
 }
