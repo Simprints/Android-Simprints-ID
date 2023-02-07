@@ -19,11 +19,11 @@ import com.simprints.fingerprint.orchestrator.state.FingerprintTaskFlowState
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.*
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -37,18 +37,21 @@ import org.junit.runner.RunWith
 class OrchestratorActivityAndroidTest {
 
     @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
     private val orchestratorMock = mockk<Orchestrator>(relaxed = true)
     private val firmwareFileUpdateSchedulerMock = mockk<FirmwareFileUpdateScheduler>(relaxed = true)
 
-    @BindValue @JvmField
+    @BindValue
+    @JvmField
     val orchestratorViewModel = spyk(
         OrchestratorViewModel(
             orchestratorMock,
             mockk(relaxed = true),
             firmwareFileUpdateSchedulerMock,
-            UnconfinedTestDispatcher(),
         )
     )
 

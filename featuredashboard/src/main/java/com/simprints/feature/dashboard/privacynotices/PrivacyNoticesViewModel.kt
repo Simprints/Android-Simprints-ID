@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.privacynotices.PrivacyNoticeState.*
 import com.simprints.infra.config.ConfigManager
@@ -12,7 +11,6 @@ import com.simprints.infra.config.domain.models.PrivacyNoticeResult
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult.*
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +20,6 @@ internal class PrivacyNoticesViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val loginManager: LoginManager,
     private val deviceManager: DeviceManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     init {
@@ -33,7 +30,7 @@ internal class PrivacyNoticesViewModel @Inject constructor(
         get() = _privacyNoticeState
     private val _privacyNoticeState = MutableLiveData<PrivacyNoticeState>()
 
-    fun fetchPrivacyNotice() = viewModelScope.launch(dispatcher) {
+    fun fetchPrivacyNotice() = viewModelScope.launch {
         val deviceConfiguration = configManager.getDeviceConfiguration()
         configManager.getPrivacyNotice(
             loginManager.getSignedInProjectIdOrEmpty(),

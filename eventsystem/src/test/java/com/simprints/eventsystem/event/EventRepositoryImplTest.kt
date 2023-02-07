@@ -1,6 +1,7 @@
 package com.simprints.eventsystem.event
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
@@ -8,20 +9,24 @@ import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BAT
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_REFUSAL
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.validators.EventValidator
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.local.SessionDataCache
+import com.simprints.eventsystem.event.remote.ApiModes
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
+import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
+import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
+import com.simprints.eventsystem.sampledata.*
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID3
-import com.simprints.eventsystem.sampledata.createAlertScreenEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.login.LoginManager
@@ -29,6 +34,7 @@ import com.simprints.infra.network.exceptions.NetworkConnectionException
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
@@ -101,6 +107,49 @@ class EventRepositoryImplTest {
         runBlocking {
             coEvery { eventLocalDataSource.loadAll() } returns emptyFlow()
             mockDbToLoadPersonRecordEvents(0)
+        }
+    }
+
+    @Test
+    fun `download count correctly passes query arguments`() = runTest {
+        coEvery { eventRemoteDataSource.count(any()) }.returns(emptyList())
+
+        eventRepo.countEventsToDownload(
+            RemoteEventQuery(
+                DEFAULT_PROJECT_ID,
+                modes = listOf(Modes.FACE, Modes.FINGERPRINT),
+                types = listOf(SESSION_CAPTURE, CALLBACK_REFUSAL),
+            )
+        )
+
+        coVerify {
+            eventRemoteDataSource.count(withArg { query ->
+                assertThat(query.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                assertThat(query.modes).containsExactly(ApiModes.FACE, ApiModes.FINGERPRINT)
+                assertThat(query.types).containsExactly(ApiEventPayloadType.SessionCapture, ApiEventPayloadType.Callback)
+            })
+        }
+    }
+
+    @Test
+    fun `download correctly passes query arguments`() = runTest {
+        coEvery { eventRemoteDataSource.getEvents(any(), any()) }.returns(produce { this@produce.close() })
+
+        eventRepo.downloadEvents(
+            this@runTest,
+            RemoteEventQuery(
+                DEFAULT_PROJECT_ID,
+                modes = listOf(Modes.FACE),
+                types = listOf(SESSION_CAPTURE),
+            )
+        )
+
+        coVerify {
+            eventRemoteDataSource.getEvents(withArg { query ->
+                assertThat(query.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                assertThat(query.modes).containsExactly(ApiModes.FACE)
+                assertThat(query.types).containsExactly(ApiEventPayloadType.SessionCapture)
+            }, any())
         }
     }
 
@@ -279,6 +328,76 @@ class EventRepositoryImplTest {
             coVerify { eventLocalDataSource.loadAllFromSession(sessionId = GUID1) }
         }
     }
+
+    @Test
+    fun upload_shouldFilterBiometricEventsOnUpload() {
+        runBlocking {
+            coEvery {
+                eventLocalDataSource.loadAllClosedSessionIds(any())
+            } returns listOf(GUID1)
+            coEvery {
+                eventLocalDataSource.loadAllFromSession(any())
+            } returns listOf(
+                createAuthenticationEvent(),
+                createAlertScreenEvent(),
+                // only following should be uploaded
+                createEnrolmentEventV2(),
+                createPersonCreationEvent(),
+                createFingerprintCaptureBiometricsEvent(),
+                createFaceCaptureBiometricsEvent(),
+            )
+
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = true,
+                canSyncAnalyticsDataToSimprints = false
+            ).toList()
+
+            coVerify {
+                eventRemoteDataSource.post(
+                    any(),
+                    withArg { assertThat(it).hasSize(4) },
+                    any()
+                )
+            }
+        }
+    }
+
+    @Test
+    fun upload_shouldFilterAnalyticsEventsOnUpload() {
+        runBlocking {
+            coEvery {
+                eventLocalDataSource.loadAllClosedSessionIds(any())
+            } returns listOf(GUID1)
+            coEvery {
+                eventLocalDataSource.loadAllFromSession(any())
+            } returns listOf(
+                createFingerprintCaptureBiometricsEvent(),
+                createFaceCaptureBiometricsEvent(),
+                // only following should be uploaded
+                createPersonCreationEvent(),
+                createEnrolmentEventV2(),
+                createAlertScreenEvent(),
+            )
+
+            eventRepo.uploadEvents(
+                DEFAULT_PROJECT_ID,
+                canSyncAllDataToSimprints = false,
+                canSyncBiometricDataToSimprints = false,
+                canSyncAnalyticsDataToSimprints = true
+            ).toList()
+
+            coVerify {
+                eventRemoteDataSource.post(
+                    any(),
+                    withArg { assertThat(it).hasSize(3) },
+                    any()
+                )
+            }
+        }
+    }
+
 
     @Test
     fun upload_shouldNotUploadOpenSession() {
@@ -549,7 +668,7 @@ class EventRepositoryImplTest {
 
 
     @Test
-    fun `test getCurrentCaptureSessionEvent should create new CaptureSessionEvent is not exist` () =
+    fun `test getCurrentCaptureSessionEvent should create new CaptureSessionEvent is not exist`() =
         runTest {
             //Given
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
@@ -559,6 +678,16 @@ class EventRepositoryImplTest {
             //Then
             assertThat(loadedSession.labels.projectId).isEqualTo("projectId")
         }
+
+    @Test
+    fun `events loaded to cache on request from session`() = runTest {
+        mockDbToLoadOpenSession(GUID1)
+
+        eventRepo.getEventsFromSession(GUID1).toList()
+
+        coVerify { eventLocalDataSource.loadAllFromSession(any()) }
+        assertThat(sessionDataCache.eventCache).isNotEmpty()
+    }
 
     @Test
     fun insertEventIntoCurrentOpenSession() {

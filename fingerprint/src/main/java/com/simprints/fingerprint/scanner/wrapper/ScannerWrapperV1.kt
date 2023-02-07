@@ -16,8 +16,10 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIss
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.v1.ScannerCallback
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -34,7 +36,10 @@ import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
  * @param scannerV1  the vero 1 scanner object
  *
  */
-class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
+class ScannerWrapperV1(
+    private val scannerV1: ScannerV1,
+    private val ioDispatcher: CoroutineDispatcher,
+) : ScannerWrapper {
 
 
     /**
@@ -57,65 +62,73 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
     //Vero 1 scanners doesn't support image transfer
     override fun isImageTransferSupported(): Boolean = false
 
-    override suspend fun connect() = suspendCoroutine { cont ->
-        scannerV1.connect(ScannerCallbackWrapper(
-            success = {
-                cont.resume(Unit)
-            },
-            failure = { scannerError ->
-                scannerError?.let {
-                    val fingerprintException = when (scannerError) {
-                        BLUETOOTH_DISABLED -> BluetoothNotEnabledException()
-                        BLUETOOTH_NOT_SUPPORTED -> BluetoothNotSupportedException()
-                        SCANNER_UNBONDED -> ScannerNotPairedException()
-                        BUSY, IO_ERROR -> ScannerDisconnectedException()
-                        else -> UnknownScannerIssueException.forScannerError(scannerError)
-                    }
+    override suspend fun connect() = withContext(ioDispatcher) {
+        suspendCoroutine { cont ->
+            scannerV1.connect(ScannerCallbackWrapper(
+                success = {
+                    cont.resume(Unit)
+                },
+                failure = { scannerError ->
+                    scannerError?.let {
+                        val fingerprintException = when (scannerError) {
+                            BLUETOOTH_DISABLED -> BluetoothNotEnabledException()
+                            BLUETOOTH_NOT_SUPPORTED -> BluetoothNotSupportedException()
+                            SCANNER_UNBONDED -> ScannerNotPairedException()
+                            BUSY, IO_ERROR -> ScannerDisconnectedException()
+                            else -> UnknownScannerIssueException.forScannerError(scannerError)
+                        }
 
-                    cont.resumeWithException(fingerprintException)
-                } ?: cont.resume(Unit)
-            }
-        ))
+                        cont.resumeWithException(fingerprintException)
+                    } ?: cont.resume(Unit)
+                }
+            ))
+        }
     }
 
     /**
      * This function does nothing because vero 1 scanner doesn't support firmware updates
      */
-    override suspend fun setScannerInfoAndCheckAvailableOta() {
+    override suspend fun setScannerInfoAndCheckAvailableOta() = withContext(ioDispatcher) {
         //Not implemented
     }
 
 
-    override suspend fun disconnect() = suspendCoroutine { cont ->
-        scannerV1.disconnect(ScannerCallbackWrapper(
-            success = { cont.resume(Unit) },
-            failure = { cont.resume(Unit) }
-        ))
+    override suspend fun disconnect() = withContext(ioDispatcher) {
+        suspendCoroutine { cont ->
+            scannerV1.disconnect(ScannerCallbackWrapper(
+                success = { cont.resume(Unit) },
+                failure = { cont.resume(Unit) }
+            ))
+        }
     }
 
-    override suspend fun sensorWakeUp() = suspendCoroutine { cont ->
-        scannerV1.un20Wakeup(ScannerCallbackWrapper(
-            success = {
-                cont.resume(Unit)
-            },
-            failure = { scannerError ->
-                scannerError?.let {
-                    val fingerprintException = when (scannerError) {
-                        UN20_LOW_VOLTAGE -> ScannerLowBatteryException()
-                        else -> UnknownScannerIssueException.forScannerError(scannerError)
-                    }
+    override suspend fun sensorWakeUp() = withContext(ioDispatcher) {
+        suspendCoroutine { cont ->
+            scannerV1.un20Wakeup(ScannerCallbackWrapper(
+                success = {
+                    cont.resume(Unit)
+                },
+                failure = { scannerError ->
+                    scannerError?.let {
+                        val fingerprintException = when (scannerError) {
+                            UN20_LOW_VOLTAGE -> ScannerLowBatteryException()
+                            else -> UnknownScannerIssueException.forScannerError(scannerError)
+                        }
 
-                    cont.resumeWithException(fingerprintException)
-                } ?: cont.resume(Unit)
-            }
-        ))
+                        cont.resumeWithException(fingerprintException)
+                    } ?: cont.resume(Unit)
+                }
+            ))
+        }
     }
 
-    override suspend fun sensorShutDown() = suspendCoroutine { cont ->
-        scannerV1.un20Shutdown(ScannerCallbackWrapper(
-            success = { cont.resume(Unit) },
-            failure = { cont.resumeWithException(UnknownScannerIssueException.forScannerError(it)) }
-        ))
+    override suspend fun sensorShutDown() = withContext(ioDispatcher) {
+        suspendCoroutine { cont ->
+            scannerV1.un20Shutdown(ScannerCallbackWrapper(
+                success = { cont.resume(Unit) },
+                failure = { cont.resumeWithException(UnknownScannerIssueException.forScannerError(it)) }
+            ))
+        }
     }
 
     override suspend fun startLiveFeedback() =
@@ -127,7 +140,11 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
 
     override fun isLiveFeedbackAvailable(): Boolean = false
 
-    override suspend fun captureFingerprint(captureFingerprintStrategy: CaptureFingerprintStrategy?, timeOutMs: Int, qualityThreshold: Int) =
+    override suspend fun captureFingerprint(
+        captureFingerprintStrategy: CaptureFingerprintStrategy?,
+        timeOutMs: Int,
+        qualityThreshold: Int,
+    )  = withContext(ioDispatcher) {
         suspendCancellableCoroutine { cont ->
             scannerV1.startContinuousCapture(qualityThreshold, timeOutMs.toLong(), continuousCaptureCallback(qualityThreshold, cont))
 
@@ -135,7 +152,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
                 scannerV1.stopContinuousCapture()
             }
         }
-
+    }
 
     private fun continuousCaptureCallback(qualityThreshold: Int, cont: Continuation<CaptureFingerprintResponse>) =
         ScannerCallbackWrapper(
@@ -171,16 +188,18 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
     override suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy?): AcquireImageResponse =
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
 
-    override suspend fun setUiIdle() = suspendCoroutine { cont ->
-        scannerV1.resetUI(ScannerCallbackWrapper(
-            success = {
-                cont.resume(Unit)
-            },
-            failure = {
-                // not sure if the comment is still relevant.
-                cont.resume(Unit)  // This call on Vero 1 can sometimes be buggy
-            }
-        ))
+    override suspend fun setUiIdle()  = withContext(ioDispatcher) {
+        suspendCoroutine { cont ->
+            scannerV1.resetUI(ScannerCallbackWrapper(
+                success = {
+                    cont.resume(Unit)
+                },
+                failure = {
+                    // not sure if the comment is still relevant.
+                    cont.resume(Unit)  // This call on Vero 1 can sometimes be buggy
+                }
+            ))
+        }
     }
 
     private val triggerListenerToV1Map = mutableMapOf<ScannerTriggerListener, ScannerTriggerListenerV1>()
@@ -206,7 +225,7 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1): ScannerWrapper {
     override fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep> =
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.OTA)
 
-    private class ScannerCallbackWrapper(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit): ScannerCallback {
+    private class ScannerCallbackWrapper(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {
         override fun onSuccess() {
             success()
         }

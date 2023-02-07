@@ -30,6 +30,7 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -67,7 +68,8 @@ class ScannerWrapperV2Test {
                 connectionHelper,
                 cypressOtaHelper,
                 stmOtaHelper,
-                un20OtaHelper
+                un20OtaHelper,
+                UnconfinedTestDispatcher(),
             ),
             recordPrivateCalls = true
         )

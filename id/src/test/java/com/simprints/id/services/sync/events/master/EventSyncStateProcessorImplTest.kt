@@ -19,6 +19,7 @@ import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.START_SY
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verify
@@ -213,7 +214,7 @@ class EventSyncStateProcessorImplTest {
     private fun mockDependencies() {
         every { syncWorkersLiveDataProvider.getStartSyncReportersLiveData() } returns startSyncReporterWorker
         every { syncWorkersLiveDataProvider.getSyncWorkersLiveData(any()) } returns syncWorkersLiveData
-        every { eventSyncCache.readProgress(any()) } returns 0
+        coEvery { eventSyncCache.readProgress(any()) } returns 0
     }
 }
 

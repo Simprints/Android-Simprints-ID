@@ -10,8 +10,9 @@ import javax.inject.Inject
 
 internal class LicenseRepositoryImpl @Inject constructor(
     private val licenseLocalDataSource: LicenseLocalDataSource,
-    private val licenseRemoteDataSource: LicenseRemoteDataSource
+    private val licenseRemoteDataSource: LicenseRemoteDataSource,
 ) : LicenseRepository {
+
     override fun getLicenseStates(
         projectId: String,
         deviceId: String,
@@ -49,7 +50,6 @@ internal class LicenseRepositoryImpl @Inject constructor(
         emit(LicenseState.FinishedWithBackendMaintenanceError(apiLicenseResult.estimatedOutage))
     }
 
-    override fun deleteCachedLicense() {
-        licenseLocalDataSource.deleteCachedLicense()
-    }
+    override suspend fun deleteCachedLicense() = licenseLocalDataSource.deleteCachedLicense()
+
 }

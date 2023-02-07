@@ -2,20 +2,21 @@ package com.simprints.id.services.sync.events.master
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.events.common.filterByTags
-import com.simprints.id.services.sync.events.common.sortByScheduledTime
-import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgress
-import com.simprints.id.services.sync.events.down.workers.getDownCountsFromOutput
-import com.simprints.id.services.sync.events.master.internal.*
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncState.SyncWorkerInfo
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState.Companion.fromWorkInfo
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.*
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
+import com.simprints.id.services.sync.events.common.filterByTags
+import com.simprints.id.services.sync.events.common.sortByScheduledTime
+import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgress
+import com.simprints.id.services.sync.events.down.workers.getDownCountsFromOutput
+import com.simprints.id.services.sync.events.master.internal.*
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.services.sync.events.up.workers.extractUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
@@ -30,24 +31,23 @@ class EventSyncStateProcessorImpl @Inject constructor(
     override fun getLastSyncState(): LiveData<EventSyncState> =
         observerForLastSyncId().switchMap { lastSyncId ->
             observerForLastSyncIdWorkers(lastSyncId).switchMap { syncWorkers ->
-                MutableLiveData<EventSyncState>().apply {
-                    with(syncWorkers) {
-                        val progress = calculateProgressForDownSync() + calculateProgressForUpSync()
-                        val total = calculateTotalForSync()
+                liveData {
+                    val progress = calculateProgressForDownSync(syncWorkers) + calculateProgressForUpSync(syncWorkers)
+                    val total = calculateTotalForSync(syncWorkers)
 
-                        val upSyncStates = upSyncUploadersStates() + upSyncCountersStates()
-                        val downSyncStates = downSyncDownloadersStates() + downSyncCountersStates()
+                    val upSyncStates = upSyncUploadersStates(syncWorkers) + upSyncCountersStates(syncWorkers)
+                    val downSyncStates = downSyncDownloadersStates(syncWorkers) + downSyncCountersStates(syncWorkers)
 
-                        val syncState = EventSyncState(
-                            lastSyncId,
-                            progress,
-                            total,
-                            upSyncStates,
-                            downSyncStates
-                        )
-                        this@apply.postValue(syncState)
-                        Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Emitting for UI $syncState")
-                    }
+                    val syncState = EventSyncState(
+                        lastSyncId,
+                        progress,
+                        total,
+                        upSyncStates,
+                        downSyncStates
+                    )
+
+                    emit(syncState)
+                    Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Emitting for UI $syncState")
                 }
             }
         }
@@ -58,7 +58,7 @@ class EventSyncStateProcessorImpl @Inject constructor(
             .switchMap { startSyncReporters ->
                 Simber.tag(SYNC_LOG_TAG).d("[PROCESSOR] Received updated from Master Scheduler")
 
-                val completedSyncMaster = startSyncReporters.completedWorkers()
+                val completedSyncMaster = completedWorkers(startSyncReporters)
                 val mostRecentSyncMaster = completedSyncMaster.sortByScheduledTime().lastOrNull()
 
                 MutableLiveData<String>().apply {
@@ -76,12 +76,12 @@ class EventSyncStateProcessorImpl @Inject constructor(
     private fun observerForLastSyncIdWorkers(lastSyncId: String) =
         syncWorkersLiveDataProvider.getSyncWorkersLiveData(lastSyncId)
 
-    private fun List<WorkInfo>.completedWorkers() =
-        this.filter { it.state == WorkInfo.State.SUCCEEDED }
+    private fun completedWorkers(workInfos: List<WorkInfo>) =
+        workInfos.filter { it.state == WorkInfo.State.SUCCEEDED }
 
-    private fun List<WorkInfo>.calculateTotalForSync(): Int? {
-        val totalDown = calculateTotalForDownSync()
-        val totalUp = calculateTotalForUpSync()
+    private fun calculateTotalForSync(workInfos: List<WorkInfo>): Int? {
+        val totalDown = calculateTotalForDownSync(workInfos)
+        val totalUp = calculateTotalForUpSync(workInfos)
         return if (totalUp != null && totalDown != null) {
             totalUp + totalDown
         } else {
@@ -89,35 +89,35 @@ class EventSyncStateProcessorImpl @Inject constructor(
         }
     }
 
-    private fun List<WorkInfo>.calculateTotalForDownSync(): Int? {
-        val countersCompleted = this.filterByTags(tagForType(DOWN_COUNTER)).completedWorkers()
+    private fun calculateTotalForDownSync(workInfos: List<WorkInfo>): Int? {
+        val countersCompleted = completedWorkers(workInfos.filterByTags(tagForType(DOWN_COUNTER)))
         val counter = countersCompleted.firstOrNull()
         return counter?.getDownCountsFromOutput()?.sumOf { it.count }
     }
 
-    private fun List<WorkInfo>.calculateTotalForUpSync(): Int? {
-        val countersCompleted = this.filterByTags(tagForType(UP_COUNTER)).completedWorkers()
+    private fun calculateTotalForUpSync(workInfos: List<WorkInfo>): Int? {
+        val countersCompleted = completedWorkers(workInfos.filterByTags(tagForType(UP_COUNTER)))
         val counter = countersCompleted.firstOrNull()
         return counter?.getUpCountsFromOutput()
     }
 
-    private fun List<WorkInfo>.upSyncUploadersStates(): List<SyncWorkerInfo> =
-        filterByTags(tagForType(UPLOADER)).map {
+    private fun upSyncUploadersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
+        workInfos.filterByTags(tagForType(UPLOADER)).map {
             SyncWorkerInfo(UPLOADER, it.toEventSyncWorkerState())
         }
 
-    private fun List<WorkInfo>.downSyncDownloadersStates(): List<SyncWorkerInfo> =
-        filterByTags(tagForType(DOWNLOADER)).map {
+    private fun downSyncDownloadersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
+        workInfos.filterByTags(tagForType(DOWNLOADER)).map {
             SyncWorkerInfo(DOWNLOADER, it.toEventSyncWorkerState())
         }
 
-    private fun List<WorkInfo>.downSyncCountersStates(): List<SyncWorkerInfo> =
-        filterByTags(tagForType(DOWN_COUNTER)).map {
+    private fun downSyncCountersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
+        workInfos.filterByTags(tagForType(DOWN_COUNTER)).map {
             SyncWorkerInfo(DOWN_COUNTER, it.toEventSyncWorkerState())
         }
 
-    private fun List<WorkInfo>.upSyncCountersStates(): List<SyncWorkerInfo> =
-        filterByTags(tagForType(UP_COUNTER)).map {
+    private fun upSyncCountersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
+        workInfos.filterByTags(tagForType(UP_COUNTER)).map {
             SyncWorkerInfo(UP_COUNTER, it.toEventSyncWorkerState())
         }
 
@@ -130,8 +130,8 @@ class EventSyncStateProcessorImpl @Inject constructor(
             getEstimatedOutageTime()
         )
 
-    private fun List<WorkInfo>.calculateProgressForDownSync(): Int {
-        val downWorkers = this.filterByTags(tagForType(DOWNLOADER))
+    private suspend fun calculateProgressForDownSync(workInfos: List<WorkInfo>): Int {
+        val downWorkers = workInfos.filterByTags(tagForType(DOWNLOADER))
         val progresses = downWorkers.map { worker ->
             worker.extractDownSyncProgress(eventSyncCache)
         }
@@ -139,8 +139,8 @@ class EventSyncStateProcessorImpl @Inject constructor(
         return progresses.sum()
     }
 
-    private fun List<WorkInfo>.calculateProgressForUpSync(): Int {
-        val upWorkers = this.filterByTags(tagForType(UPLOADER))
+    private suspend fun calculateProgressForUpSync(workInfos: List<WorkInfo>): Int {
+        val upWorkers = workInfos.filterByTags(tagForType(UPLOADER))
         val progresses = upWorkers.map { worker ->
             worker.extractUpSyncProgress(eventSyncCache)
         }

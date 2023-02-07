@@ -20,6 +20,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -36,7 +37,7 @@ class ScannerWrapperV1Test {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        scannerWrapper = ScannerWrapperV1(scanner)
+        scannerWrapper = ScannerWrapperV1(scanner, UnconfinedTestDispatcher())
     }
 
     @Test(expected = ScannerOperationInterruptedException::class)

@@ -3,7 +3,7 @@ package com.simprints.id.services.sync.events.master.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
@@ -30,7 +30,7 @@ open class EventSyncMasterWorker @AssistedInject constructor(
     private val eventSyncCache: EventSyncCache,
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
     private val timeHelper: TimeHelper,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
 
     companion object {

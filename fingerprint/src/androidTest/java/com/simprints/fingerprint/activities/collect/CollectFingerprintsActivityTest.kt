@@ -41,7 +41,6 @@ import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.*
@@ -99,14 +98,13 @@ class CollectFingerprintsActivityTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val mockDispatcher = TestDispatcherProvider(testCoroutineRule)
     private val mockCoroutineScope = CoroutineScope(Dispatchers.Main + Job())
 
     private val vm: CollectFingerprintsViewModel = spyk(
         CollectFingerprintsViewModel(
             scannerManager, configManager, imageManager, timeHelper,
             sessionEventsManager, mockk(), mockk(), EncodingUtilsImplForTests,
-            mockCoroutineScope, mockDispatcher
+            mockCoroutineScope,
         )
     ) {
         every { state } returns this@CollectFingerprintsActivityTest.state

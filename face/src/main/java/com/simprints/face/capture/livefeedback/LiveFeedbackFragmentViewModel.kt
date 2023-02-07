@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.otaliastudios.cameraview.frame.Frame
-import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -28,7 +27,6 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val faceSessionEventsManager: FaceSessionEventsManager,
     private val faceTimeHelper: FaceTimeHelper,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val faceTarget = FaceTarget(
@@ -91,7 +89,7 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
      * If any of the user captures are good, use them. If not, use the fallback capture.
      */
     private fun finishCapture(attemptNumber: Int) {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             val projectConfiguration = configManager.getProjectConfiguration()
             sortedQualifyingCaptures = userCaptures
                 .filter { it.hasValidStatus() && it.isAboveQualityThreshold(projectConfiguration.face!!.qualityThreshold) }
@@ -172,7 +170,7 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     }
 
     private fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             val projectConfiguration = configManager.getProjectConfiguration()
             // The payloads of these two events need to have the same ids
             val faceCaptureEvent =

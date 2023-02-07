@@ -3,7 +3,7 @@ package com.simprints.id.services.securitystate
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -18,7 +18,7 @@ class SecurityStateWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val repository: SecurityStateRepository,
     private val securityStateProcessor: SecurityStateProcessor,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, workerParams) {
 
     override val tag: String = SecurityStateWorker::class.java.simpleName

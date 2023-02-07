@@ -55,7 +55,6 @@ class ProjectDetailsViewModelTest {
             configManager,
             loginManager,
             recentUserActivityManager,
-            testCoroutineRule.testCoroutineDispatcher
         )
 
         val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER, LAST_SCANNER)

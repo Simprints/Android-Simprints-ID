@@ -42,7 +42,6 @@ class PrivacyNoticeViewModelTest {
     private val privacyNoticeViewModel = PrivacyNoticeViewModel(
         configManager,
         loginManager,
-        testCoroutineRule.testCoroutineDispatcher,
     )
 
     @Test

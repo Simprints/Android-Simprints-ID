@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
@@ -10,6 +10,7 @@ import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDe
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.infra.logging.Simber
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.rx2.await
@@ -24,11 +25,11 @@ import javax.inject.Inject
  *
  * @param bluetoothAdapter  a reference to the [ComponentBluetoothSocket] for connecting and
  *         disconnecting from the bluetooth socket.
- * @param dispatcher  a [DispatcherProvider] for specifying which context a coroutine should run
+ * @param dispatcher  a [CoroutineDispatcher] for running coroutines in background
  */
 class ConnectionHelper @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
-    private val dispatcher: DispatcherProvider
+    @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) {
 
     private var socket: ComponentBluetoothSocket? = null
@@ -79,11 +80,11 @@ class ConnectionHelper @Inject constructor(
     private suspend fun initiateAndReturnSocketConnection(device: ComponentBluetoothDevice): ComponentBluetoothSocket {
         try {
             Simber.d("Attempting connect...")
-            val socket = withContext(dispatcher.io()) {
+            val socket = withContext(dispatcher) {
                 device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
             }
             bluetoothAdapter.cancelDiscovery()
-            withContext(dispatcher.io()) { socket.connect() }
+            withContext(dispatcher) { socket.connect() }
             this.socket = socket
             return socket
         } catch (e: IOException) {
