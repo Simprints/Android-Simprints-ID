@@ -25,7 +25,7 @@ class EnrolmentRecordManagerImplTest {
         EnrolmentRecordManagerImpl(
             enrolmentRecordScheduler,
             enrolmentRecordRepository,
-            subjectRepository
+            subjectRepository,
         )
 
     @Test

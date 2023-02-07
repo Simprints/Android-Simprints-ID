@@ -74,7 +74,6 @@ class OrchestratorViewModelTest {
             configManager,
             eventRepositoryMock,
             domainToModuleApiConverter,
-            testCoroutineRule.testCoroutineDispatcher
         )
     }
 

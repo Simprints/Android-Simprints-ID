@@ -28,7 +28,7 @@ class MainViewModelTest {
 
     @Test
     fun `should initialize the live data correctly`() {
-        val viewModel = MainViewModel(configManager, testCoroutineRule.testCoroutineDispatcher)
+        val viewModel = MainViewModel(configManager)
 
         assertThat(viewModel.consentRequired.value).isEqualTo(true)
     }

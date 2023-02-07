@@ -10,6 +10,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -49,13 +50,20 @@ class EnrolmentRecordRepositoryImplTest {
     private val ctx = mockk<Context> {
         every { getSharedPreferences(any(), any()) } returns prefs
     }
-    private val repository =
-        EnrolmentRecordRepositoryImpl(ctx, remoteDataSource, subjectRepository, BATCH_SIZE)
+    private lateinit var repository :EnrolmentRecordRepositoryImpl
 
     @Before
     fun setup() {
         every { prefsEditor.putString(any(), any()) } returns prefsEditor
         every { prefsEditor.remove(any()) } returns prefsEditor
+
+        repository = EnrolmentRecordRepositoryImpl(
+            ctx,
+            remoteDataSource,
+            subjectRepository,
+            UnconfinedTestDispatcher(),
+            BATCH_SIZE,
+        )
     }
 
     @Test

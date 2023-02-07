@@ -28,13 +28,12 @@ class AuthenticationHelperImplTest {
 
     @Before
     fun setUp() {
-        authenticationHelperImpl =
-            AuthenticationHelperImpl(
-                loginManager,
-                timeHelper,
-                projectAuthenticator,
-                eventRepository
-            )
+        authenticationHelperImpl = AuthenticationHelperImpl(
+            loginManager,
+            timeHelper,
+            projectAuthenticator,
+            eventRepository,
+        )
     }
 
     @Test

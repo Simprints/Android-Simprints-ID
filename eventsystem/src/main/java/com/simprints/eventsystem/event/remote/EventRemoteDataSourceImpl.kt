@@ -25,22 +25,21 @@ import javax.inject.Inject
 
 internal class EventRemoteDataSourceImpl @Inject constructor(
     private val loginManager: LoginManager,
-    private val jsonHelper: JsonHelper
+    private val jsonHelper: JsonHelper,
 ) : EventRemoteDataSource {
 
     override suspend fun count(query: ApiRemoteEventQuery): List<EventCount> =
-        with(query) {
-            executeCall { eventsRemoteInterface ->
-                eventsRemoteInterface.countEvents(
-                    projectId = projectId,
-                    moduleIds = moduleIds,
-                    attendantId = userId,
-                    subjectId = subjectId,
-                    modes = modes,
-                    lastEventId = lastEventId
-                ).map { it.fromApiToDomain() }
-            }
+        executeCall { eventsRemoteInterface ->
+            eventsRemoteInterface.countEvents(
+                projectId = query.projectId,
+                moduleIds = query.moduleIds,
+                attendantId = query.userId,
+                subjectId = query.subjectId,
+                modes = query.modes,
+                lastEventId = query.lastEventId
+            ).map { it.fromApiToDomain() }
         }
+
 
     override suspend fun dumpInvalidEvents(projectId: String, events: List<String>) {
         executeCall { remoteInterface ->
@@ -92,17 +91,15 @@ internal class EventRemoteDataSourceImpl @Inject constructor(
     }
 
     private suspend fun takeStreaming(query: ApiRemoteEventQuery) =
-        with(query) {
-            executeCall { eventsRemoteInterface ->
-                eventsRemoteInterface.downloadEvents(
-                    projectId = projectId,
-                    moduleIds = moduleIds,
-                    attendantId = userId,
-                    subjectId = subjectId,
-                    modes = modes,
-                    lastEventId = lastEventId
-                )
-            }
+        executeCall { eventsRemoteInterface ->
+            eventsRemoteInterface.downloadEvents(
+                projectId = query.projectId,
+                moduleIds = query.moduleIds,
+                attendantId = query.userId,
+                subjectId = query.subjectId,
+                modes = query.modes,
+                lastEventId = query.lastEventId
+            )
         }.byteStream()
 
     override suspend fun post(
@@ -122,11 +119,7 @@ internal class EventRemoteDataSourceImpl @Inject constructor(
     }
 
     private suspend fun <T> executeCall(block: suspend (EventRemoteInterface) -> T): T =
-        with(getEventsApiClient()) {
-            executeCall {
-                block(it)
-            }
-        }
+        getEventsApiClient().executeCall { block(it) }
 
     private suspend fun getEventsApiClient(): SimApiClient<EventRemoteInterface> =
         loginManager.buildClient(EventRemoteInterface::class)

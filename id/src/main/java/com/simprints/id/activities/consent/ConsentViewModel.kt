@@ -3,16 +3,13 @@ package com.simprints.id.activities.consent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.core.ExternalScope
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,14 +21,13 @@ class ConsentViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val eventRepository: EventRepository,
     @ExternalScope private val externalScope: CoroutineScope,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     val configuration = MutableLiveData<ProjectConfiguration>()
 
 
     init {
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             configuration.postValue(configManager.getProjectConfiguration())
         }
     }

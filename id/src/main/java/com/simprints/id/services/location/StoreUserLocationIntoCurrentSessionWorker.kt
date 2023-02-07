@@ -5,7 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
-import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.core.DispatcherMain
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
@@ -13,6 +13,7 @@ import com.simprints.id.tools.LocationManager
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.take
@@ -29,7 +30,7 @@ class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val eventRepository: EventRepository,
     private val locationManager: LocationManager,
-    private val dispatcherProvider: DispatcherProvider,
+    @DispatcherMain private val dispatcher: CoroutineDispatcher,
 ) :
     SimCoroutineWorker(context, params) {
 
@@ -37,7 +38,7 @@ class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constructor(
     override val tag: String = StoreUserLocationIntoCurrentSessionWorker::class.java.simpleName
 
     override suspend fun doWork(): Result =
-        withContext(dispatcherProvider.main()) {
+        withContext(dispatcher) {
             try {
                 val locationsFlow = createLocationFlow()
                 locationsFlow.filterNotNull().collect { location ->

@@ -9,10 +9,10 @@ interface EventSyncCache {
         const val FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS = "CACHE_LAST_SYNC_TIME"
     }
 
-    fun readLastSuccessfulSyncTime(): Date?
-    fun storeLastSuccessfulSyncTime(lastSyncTime: Date?)
+    suspend fun readLastSuccessfulSyncTime(): Date?
+    suspend fun storeLastSuccessfulSyncTime(lastSyncTime: Date?)
 
-    fun readProgress(workerId: String): Int
-    fun saveProgress(workerId: String, progress: Int)
-    fun clearProgresses()
+    suspend fun readProgress(workerId: String): Int
+    suspend fun saveProgress(workerId: String, progress: Int)
+    suspend fun clearProgresses()
 }

@@ -9,7 +9,6 @@ import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDe
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.*
 import io.reactivex.Completable
 import kotlinx.coroutines.flow.collect
@@ -40,10 +39,7 @@ class ConnectionHelperTest {
         every { disconnect() } returns Completable.complete()
     }
 
-    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
-
-
-    private val connectionHelper = ConnectionHelper(mockAdapter, dispatcherProvider)
+    private val connectionHelper = ConnectionHelper(mockAdapter, testCoroutineRule.testCoroutineDispatcher)
 
     @Test
     fun connect_successful_connectsScannerAndSocket() = runBlocking {

@@ -17,7 +17,7 @@ interface ImageRepository {
      * @return a reference to the newly stored image, if successful, otherwise null
      * @see [com.simprints.infra.images.local.ImageLocalDataSource.encryptAndStoreImage]
      */
-    fun storeImageSecurely(
+    suspend fun storeImageSecurely(
         imageBytes: ByteArray,
         projectId: String,
         relativePath: Path
@@ -33,8 +33,8 @@ interface ImageRepository {
     /**
      * Deletes all images stored on the device
      */
-    fun deleteStoredImages()
+    suspend fun deleteStoredImages()
 
-    fun getNumberOfImagesToUpload(projectId: String): Int
+    suspend fun getNumberOfImagesToUpload(projectId: String): Int
 
 }

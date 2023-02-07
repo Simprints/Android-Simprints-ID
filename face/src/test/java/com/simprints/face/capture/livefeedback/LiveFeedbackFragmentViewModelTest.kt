@@ -64,7 +64,6 @@ class LiveFeedbackFragmentViewModelTest {
         configManager,
         faceSessionEventsManager,
         faceTimeHelper,
-        UnconfinedTestDispatcher()
     )
 
     private val rectF: RectF = mockk()

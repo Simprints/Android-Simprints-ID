@@ -1,11 +1,14 @@
 package com.simprints.infra.images.local
 
 import android.content.Context
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -13,7 +16,8 @@ import javax.inject.Inject
 
 internal class ImageLocalDataSourceImpl @Inject constructor(
     @ApplicationContext private val ctx: Context,
-    private val keyHelper: SecurityManager
+    private val keyHelper: SecurityManager,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ImageLocalDataSource {
 
     private val imageRootPath = "${ctx.filesDir}/$IMAGES_FOLDER"
@@ -22,11 +26,11 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         createDirectoryIfNonExistent(imageRootPath)
     }
 
-    override fun encryptAndStoreImage(
+    override suspend fun encryptAndStoreImage(
         imageBytes: ByteArray,
         projectId: String,
         relativePath: Path
-    ): SecuredImageRef? {
+    ): SecuredImageRef? = withContext(dispatcher) {
         val fullPath = Path.combine(buildProjectPath(projectId), relativePath).compose()
 
         createDirectoryIfNonExistent(fullPath)
@@ -34,7 +38,7 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         val file = File(fullPath)
         Simber.d(file.absoluteFile.toString())
 
-        return try {
+        try {
             if (relativePath.compose().isEmpty())
                 throw FileNotFoundException()
 
@@ -50,11 +54,11 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun decryptImage(image: SecuredImageRef): FileInputStream? {
+    override suspend fun decryptImage(image: SecuredImageRef): FileInputStream? = withContext(dispatcher) {
         val absolutePath = buildAbsolutePath(image.relativePath)
         val file = File(absolutePath)
         val encryptedFile = keyHelper.getEncryptedFileBuilder(file, ctx)
-        return try {
+        try {
             encryptedFile.openFileInput()
         } catch (t: Throwable) {
             Simber.d(t)
@@ -62,11 +66,11 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun listImages(projectId: String?): List<SecuredImageRef> {
+    override suspend fun listImages(projectId: String?): List<SecuredImageRef> = withContext(dispatcher) {
         val imageRoot =
             if (projectId == null) File(imageRootPath) else File(buildProjectPath(projectId))
 
-        return imageRoot.walk()
+        imageRoot.walk()
             .filterNot { it.isDirectory }
             .map { file ->
                 val subsetToRemove = Path.parse(imageRootPath)
@@ -76,10 +80,10 @@ internal class ImageLocalDataSourceImpl @Inject constructor(
             .toList()
     }
 
-    override fun deleteImage(image: SecuredImageRef): Boolean {
+    override suspend fun deleteImage(image: SecuredImageRef): Boolean = withContext(dispatcher) {
         val absolutePath = buildAbsolutePath(image.relativePath)
         val file = File(absolutePath)
-        return file.delete()
+        file.delete()
     }
 
     private fun createDirectoryIfNonExistent(path: String) {

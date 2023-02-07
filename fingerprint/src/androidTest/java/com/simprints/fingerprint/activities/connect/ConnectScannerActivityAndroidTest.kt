@@ -30,7 +30,6 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.testtools.android.tryOnSystemUntilTimeout
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import com.simprints.testtools.common.mock.MockTimer
 import io.mockk.*
 import org.junit.After
@@ -46,9 +45,6 @@ class ConnectScannerActivityAndroidTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-
-    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
-
 
     private val mockTimer = MockTimer()
     private val timeHelper: FingerprintTimeHelper = mockk(relaxed = true) {
@@ -83,7 +79,6 @@ class ConnectScannerActivityAndroidTest {
             mockk(relaxed = true),
             configManager,
             nfcManager,
-            dispatcherProvider
         )
     ) {
         every { start() } just Runs

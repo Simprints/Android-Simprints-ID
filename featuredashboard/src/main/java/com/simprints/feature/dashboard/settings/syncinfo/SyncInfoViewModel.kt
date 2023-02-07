@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.event.EventRepository
@@ -25,7 +24,6 @@ import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -40,7 +38,6 @@ internal class SyncInfoViewModel @Inject constructor(
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
     eventSyncManager: EventSyncManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val recordsInLocal: LiveData<Int?>
@@ -102,7 +99,7 @@ internal class SyncInfoViewModel @Inject constructor(
         }
     }
 
-    private fun load() = viewModelScope.launch(dispatcher) {
+    private fun load() = viewModelScope.launch {
         awaitAll(
             async { _configuration.postValue(configManager.getProjectConfiguration()) },
             async { _recordsInLocal.postValue(getRecordsInLocal()) },

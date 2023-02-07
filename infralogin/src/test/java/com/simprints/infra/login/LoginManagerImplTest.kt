@@ -166,8 +166,8 @@ class LoginManagerImplTest {
     }
 
     @Test
-    fun `requestIntegrityToken should call the correct method`() {
-        every { integrityTokenRequester.getToken(NONCE) } returns INTEGRITY_TOKEN
+    fun `requestIntegrityToken should call the correct method`() = runTest {
+        coEvery { integrityTokenRequester.getToken(NONCE) } returns INTEGRITY_TOKEN
         val receivedToken = loginManagerManagerImpl.requestIntegrityToken(NONCE)
 
         assertThat(receivedToken).isEqualTo(INTEGRITY_TOKEN)

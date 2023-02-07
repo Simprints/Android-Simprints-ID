@@ -26,7 +26,6 @@ class ConfigurationWorkerTest {
             mockk(relaxed = true),
             loginManager,
             configService,
-            UnconfinedTestDispatcher()
         )
 
     @Test

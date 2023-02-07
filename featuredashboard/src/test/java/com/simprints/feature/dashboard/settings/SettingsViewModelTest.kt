@@ -11,6 +11,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -42,10 +43,15 @@ class SettingsViewModelTest {
         }
     }
 
+    private lateinit var viewModel: SettingsViewModel
+
+    @Before
+    fun setup() {
+        viewModel = SettingsViewModel(configManager)
+    }
+
     @Test
     fun `should initialize the live data correctly`() {
-        val viewModel = SettingsViewModel(configManager, testCoroutineRule.testCoroutineDispatcher)
-
         assertThat(viewModel.generalConfiguration.value).isEqualTo(generalConfiguration)
         assertThat(viewModel.languagePreference.value).isEqualTo(LANGUAGE)
     }
@@ -55,8 +61,6 @@ class SettingsViewModelTest {
         val updatedLanguage = "en"
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
         coEvery { configManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
-
-        val viewModel = SettingsViewModel(configManager, testCoroutineRule.testCoroutineDispatcher)
 
         viewModel.updateLanguagePreference(updatedLanguage)
 

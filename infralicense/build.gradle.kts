@@ -47,5 +47,6 @@ dependencies {
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
     androidTestImplementation(libs.testing.truth)
+    androidTestImplementation(libs.testing.coroutines.test)
 
 }
