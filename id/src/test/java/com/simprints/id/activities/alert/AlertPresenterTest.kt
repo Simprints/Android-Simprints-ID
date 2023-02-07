@@ -9,7 +9,6 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.infra.config.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -20,7 +19,6 @@ import org.junit.Test
 
 
 internal class AlertPresenterTest {
-
 
     private val view: AlertContract.View = mockk()
     private val eventRepository: EventRepository = mockk()
@@ -49,8 +47,7 @@ internal class AlertPresenterTest {
             configManager,
             timeHelper,
             exitFormHelper,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
-            TestDispatcherProvider(testCoroutineRule).io()
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
         var event = mockk<AlertScreenEvent>()
 
