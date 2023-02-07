@@ -239,6 +239,69 @@ class ProjectConfigSharedPrefsMigrationTest {
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
         assertThat(proto).isEqualTo(expectedProto)
     }
+    @Test
+    fun `migrate should work when empty SyncDestination`() = runTest {
+        val json = concatMapsAsString(
+            JSON_GENERAL_CONFIGURATION,
+            JSON_CONSENT_CONFIGURATION,
+            JSON_IDENTIFICATION_CONFIGURATION,
+            JSON_SYNCHRONIZATION_CONFIGURATION_EMPTY_SYNC_DESTINATION,
+            JSON_FACE_CONFIGURATION,
+            JSON_FINGERPRINT_CONFIGURATION,
+            JSON_VERO_2_CONFIGURATION
+        )
+        every { preferences.getString(any(), any()) } returns json
+        every { loginManager.signedInProjectId } returns PROJECT_ID
+
+        val expectedProto = ProtoProjectConfiguration.newBuilder()
+            .setProjectId(PROJECT_ID)
+            .setConsent(PROTO_CONSENT_CONFIGURATION)
+            .setGeneral(PROTO_GENERAL_CONFIGURATION)
+            .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
+            .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION_NULL_VALUES)
+            .setFace(PROTO_FACE_CONFIGURATION)
+            .setFingerprint(
+                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
+                    PROTO_VERO_2_CONFIGURATION
+                ).build()
+            )
+            .build()
+
+        val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
+        assertThat(proto).isEqualTo(expectedProto)
+    }
+
+    @Test
+    fun `migrate should work when non empty SyncDestination`() = runTest {
+        val json = concatMapsAsString(
+            JSON_GENERAL_CONFIGURATION,
+            JSON_CONSENT_CONFIGURATION,
+            JSON_IDENTIFICATION_CONFIGURATION,
+            JSON_SYNCHRONIZATION_CONFIGURATION_NON_EMPTY_SYNC_DESTINATION,
+            JSON_FACE_CONFIGURATION,
+            JSON_FINGERPRINT_CONFIGURATION,
+            JSON_VERO_2_CONFIGURATION
+        )
+        every { preferences.getString(any(), any()) } returns json
+        every { loginManager.signedInProjectId } returns PROJECT_ID
+
+        val expectedProto = ProtoProjectConfiguration.newBuilder()
+            .setProjectId(PROJECT_ID)
+            .setConsent(PROTO_CONSENT_CONFIGURATION)
+            .setGeneral(PROTO_GENERAL_CONFIGURATION)
+            .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
+            .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION_NON_NULL_VALUES)
+            .setFace(PROTO_FACE_CONFIGURATION)
+            .setFingerprint(
+                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
+                    PROTO_VERO_2_CONFIGURATION
+                ).build()
+            )
+            .build()
+
+        val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
+        assertThat(proto).isEqualTo(expectedProto)
+    }
 
     @Test
     fun `cleanUp should do remove all the keys`() = runTest {
@@ -314,6 +377,14 @@ class ProjectConfigSharedPrefsMigrationTest {
             )
             .build()
 
+        private val JSON_SYNCHRONIZATION_CONFIGURATION_EMPTY_SYNC_DESTINATION =
+            jacksonObjectMapper().readValue<Map<String, String>>(
+                "{\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SimprintsSync\":\"ALL\",\"SyncDestination\":\"\",\"SyncGroup\":\"GLOBAL\"}"
+            )
+        private val JSON_SYNCHRONIZATION_CONFIGURATION_NON_EMPTY_SYNC_DESTINATION =
+            jacksonObjectMapper().readValue<Map<String, String>>(
+                "{\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SimprintsSync\":\"ALL\",\"SyncDestination\":\"SIMPRINTS,COMMCARE\",\"SyncGroup\":\"GLOBAL\"}"
+            )
         private val JSON_SYNCHRONIZATION_CONFIGURATION =
             jacksonObjectMapper().readValue<Map<String, String>>(
                 "{\"CoSync\":\"ONLY_ANALYTICS\",\"DownSyncSetting\":\"ON\",\"MaxNbOfModules\":\"5\",\"ModuleIdOptions\":\"module1|module2\",\"SimprintsSync\":\"ALL\",\"SyncDestination\":\"SIMPRINTS,COMMCARE\",\"SyncGroup\":\"GLOBAL\"}"
@@ -335,6 +406,31 @@ class ProjectConfigSharedPrefsMigrationTest {
                         .setCoSync(
                             ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.newBuilder()
                                 .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS)
+                                .build()
+                        )
+                        .build()
+                )
+                .setDown(
+                    ProtoDownSynchronizationConfiguration.newBuilder()
+                        .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
+                        .setMaxNbOfModules(5)
+                        .addAllModuleOptions(listOf("module1", "module2"))
+                )
+                .build()
+
+        private val PROTO_SYNCHRONIZATION_CONFIGURATION_NON_NULL_VALUES =
+            ProtoSynchronizationConfiguration.newBuilder()
+                .setFrequency(ProtoSynchronizationConfiguration.Frequency.PERIODICALLY)
+                .setUp(
+                    ProtoUpSynchronizationConfiguration.newBuilder()
+                        .setSimprints(
+                            ProtoUpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration.newBuilder()
+                                .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+                                .build()
+                        )
+                        .setCoSync(
+                            ProtoUpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration.newBuilder()
+                                .setKind(ProtoUpSynchronizationConfiguration.UpSynchronizationKind.ALL)
                                 .build()
                         )
                         .build()
