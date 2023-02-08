@@ -51,6 +51,11 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             viewModel.refreshInformation()
             true
         }
+        binding.syncButton.setOnClickListener {
+            viewModel.forceSync()
+            // Prevent double-clicks while sync master worker is preparing
+            updateSyncButton(true)
+        }
     }
 
     private fun observeUI() {
@@ -89,6 +94,17 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
         viewModel.lastSyncState.observe(viewLifecycleOwner) {
             viewModel.fetchSyncInformationIfNeeded(it)
+            updateSyncButton(it.isSyncRunning())
+        }
+    }
+
+    private fun updateSyncButton(isSyncInProgress: Boolean) {
+        with(binding.syncButton) {
+            isEnabled = !isSyncInProgress
+            text = getString(
+                if (isSyncInProgress) IDR.string.sync_info_sync_in_progress
+                else IDR.string.sync_info_sync_now
+            )
         }
     }
 

@@ -277,6 +277,10 @@
     <string name="sync_info_unselected_modules">Unselected modules</string>
     <string name="sync_info_total_records">Total records</string>
     <string name="sync_info_images_to_upload">Images to upload</string>
+
+    <string name="sync_info_sync_now">Sync now</string>
+    <string name="sync_info_sync_in_progress">Syncing…</string>
+
     <string name="re_fetch_sync_info" translatable="false">Re-fetch Sync Info</string>
 
     <string name="progress_sync_overlay">Syncing…</string>
