@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.connect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Companion.MAX_RETRY_COUNT
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
@@ -34,8 +33,8 @@ import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import kotlinx.coroutines.test.runTest
 import io.mockk.*
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -65,15 +64,9 @@ class ConnectScannerViewModelTest {
             bluetoothAdapter,
             scannerFactory,
             pairingManager,
-            SerialNumberConverter()
+            SerialNumberConverter(),
         )
     private lateinit var viewModel: ConnectScannerViewModel
-
-    private val mockDispatcher = mockk<DispatcherProvider> {
-        every { main() } returns testCoroutineRule.testCoroutineDispatcher
-        every { default() } returns testCoroutineRule.testCoroutineDispatcher
-        every { io() } returns testCoroutineRule.testCoroutineDispatcher
-    }
 
     @Before
     fun setUp() {
@@ -85,7 +78,6 @@ class ConnectScannerViewModelTest {
                 recentUserActivityManager,
                 configManager,
                 nfcManager,
-                mockDispatcher
             )
     }
 

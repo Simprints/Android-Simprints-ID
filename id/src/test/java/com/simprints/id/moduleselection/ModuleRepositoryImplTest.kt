@@ -25,11 +25,7 @@ class ModuleRepositoryImplTest {
     private val enrolmentRecordManager: EnrolmentRecordManager = mockk(relaxed = true)
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
 
-    private var repository = ModuleRepositoryImpl(
-        mockConfigManager,
-        enrolmentRecordManager,
-        eventDownSyncScopeRepository
-    )
+    private lateinit var repository: ModuleRepositoryImpl
 
     @Before
     fun setUp() {
@@ -39,6 +35,12 @@ class ModuleRepositoryImplTest {
         coEvery {
             mockConfigManager.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c"), listOf(), "")
+
+        repository = ModuleRepositoryImpl(
+            mockConfigManager,
+            enrolmentRecordManager,
+            eventDownSyncScopeRepository,
+        )
     }
 
     @Test
@@ -57,7 +59,7 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(),""))
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(), ""))
         // Comparing string representation as when executing the lambda captured in the mock it will
         // not return an ArrayList but a LinkedHashMap.
         assertThat(updatedConfig.selectedModules.toString()).isEqualTo(selectedModuleNames.toString())

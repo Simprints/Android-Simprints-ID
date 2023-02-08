@@ -68,7 +68,6 @@ class AboutViewModelTest {
             signerManager,
             recentUserActivityManager,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
-            testCoroutineRule.testCoroutineDispatcher
         )
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
@@ -88,7 +87,6 @@ class AboutViewModelTest {
             signerManager,
             recentUserActivityManager,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
-            testCoroutineRule.testCoroutineDispatcher
         )
 
         viewModel.logout()

@@ -34,7 +34,7 @@ class AttestationManagerImplTest {
     private val safetyNetClient = mockk<SafetyNetClient>()
     private val attestationResponseTask = mockk<Task<SafetyNetApi.AttestationResponse>>()
     private val attestationResponse = mockk<SafetyNetApi.AttestationResponse>()
-    private val attestationManagerImpl = AttestationManagerImpl(safetyNetClient)
+    private val attestationManagerImpl = AttestationManagerImpl(safetyNetClient, UnconfinedTestDispatcher())
 
     @Before
     fun setup() {
@@ -58,7 +58,7 @@ class AttestationManagerImplTest {
     }
 
     @Test
-    fun `should throw a safety net exception with unavailable when failing to retrieve`() {
+    fun `should throw a safety net exception with unavailable when failing to retrieve`() = runTest(UnconfinedTestDispatcher()) {
         every {
             safetyNetClient.attest(
                 DECODED_NONCE,
@@ -73,7 +73,7 @@ class AttestationManagerImplTest {
     }
 
     @Test
-    fun `should throw a safety net exception with invalid claims when a null attestation`() {
+    fun `should throw a safety net exception with invalid claims when a null attestation`() = runTest(UnconfinedTestDispatcher()) {
         every {
             safetyNetClient.attest(
                 DECODED_NONCE,
@@ -89,7 +89,7 @@ class AttestationManagerImplTest {
     }
 
     @Test
-    fun `should throw a safety net exception with invalid claims when an attestation with error claim`() {
+    fun `should throw a safety net exception with invalid claims when an attestation with error claim`() = runTest(UnconfinedTestDispatcher()) {
         every {
             safetyNetClient.attest(
                 DECODED_NONCE,

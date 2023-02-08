@@ -7,6 +7,8 @@ import com.simprints.infra.security.SecurityManager
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.io.File
 
@@ -24,13 +26,13 @@ class ImageLocalDataSourceImplTest {
 
         ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
-        }, mockk())
+        }, mockk(), UnconfinedTestDispatcher())
 
         assert(File(path).exists())
     }
 
     @Test
-    fun `check saving the file opens a file output`() {
+    fun `check saving the file opens a file output`() = runTest {
 
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
@@ -41,7 +43,7 @@ class ImageLocalDataSourceImplTest {
 
         val localSource = ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
-        }, encryptedFileMock)
+        }, encryptedFileMock, UnconfinedTestDispatcher())
 
 
         val fileName = Path("testDir/Images")
@@ -52,7 +54,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun `checking listing files without saving returns empty list`() {
+    fun `checking listing files without saving returns empty list`()  = runTest {
 
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
@@ -63,7 +65,7 @@ class ImageLocalDataSourceImplTest {
 
         val localSource = ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
-        }, encryptedFileMock)
+        }, encryptedFileMock, UnconfinedTestDispatcher())
 
         val images = localSource.listImages(PROJECT_ID)
 
@@ -71,7 +73,7 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun `checking decrypting the files opens the file stream`() {
+    fun `checking decrypting the files opens the file stream`()  = runTest {
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
 
@@ -81,7 +83,7 @@ class ImageLocalDataSourceImplTest {
 
         val localSource = ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
-        }, encryptedFileMock)
+        }, encryptedFileMock, UnconfinedTestDispatcher())
 
         val fileName = Path("testDir/Images")
         localSource.decryptImage(SecuredImageRef(fileName))
@@ -90,14 +92,14 @@ class ImageLocalDataSourceImplTest {
     }
 
     @Test
-    fun `check file delete deletes the dir`() {
+    fun `check file delete deletes the dir`()  = runTest {
 
         val path = "testpath"
         val file = File(path)
 
         val localSource = ImageLocalDataSourceImpl(ctx = mockk {
             every { filesDir } returns file
-        }, mockk())
+        }, mockk(), UnconfinedTestDispatcher())
 
         localSource.deleteImage(SecuredImageRef(Path("${path}/Image")))
 

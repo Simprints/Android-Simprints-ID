@@ -22,6 +22,7 @@ import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -45,7 +46,13 @@ class FetchGuidHelperImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        fetchGuidHelper = FetchGuidHelperImpl(downSyncHelper, enrolmentRecordManager, configManager)
+        fetchGuidHelper = FetchGuidHelperImpl(
+            downSyncHelper,
+            enrolmentRecordManager,
+            configManager,
+            UnconfinedTestDispatcher(),
+        )
+
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
@@ -68,7 +75,7 @@ class FetchGuidHelperImplTest {
                 )
             } returns flowOf(defaultSubject)
 
-            fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
+            fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
             coVerify {
                 enrolmentRecordManager.load(
@@ -93,7 +100,7 @@ class FetchGuidHelperImplTest {
                 )
             } returns flowOf(defaultSubject)
 
-            val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
+            val result = fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
             assertThat(result).isEqualTo(SubjectFetchResult(defaultSubject, LOCAL))
         }
@@ -112,7 +119,7 @@ class FetchGuidHelperImplTest {
             } returns emptyFlow()
             mockProgressEmission(listOf(EventDownSyncProgress(op, 0)))
 
-            fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
+            fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
             coVerify {
                 downSyncHelper.downSync(
@@ -143,7 +150,7 @@ class FetchGuidHelperImplTest {
             } returns emptyFlow()
             mockProgressEmission(listOf(EventDownSyncProgress(op, 0)))
 
-            val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
+            val result = fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
             coVerify(exactly = 2) {
                 enrolmentRecordManager.load(
@@ -170,7 +177,7 @@ class FetchGuidHelperImplTest {
             } returnsMany listOf(emptyFlow(), flowOf(defaultSubject))
             mockProgressEmission(listOf(EventDownSyncProgress(op, 0)))
 
-            val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
+            val result = fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
             coVerify(exactly = 2) {
                 enrolmentRecordManager.load(
@@ -195,7 +202,7 @@ class FetchGuidHelperImplTest {
                     )
                 )
             } throws Throwable("IO exception")
-            val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
+            val result = fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
             assertThat(result).isEqualTo(SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE))
         }
@@ -215,7 +222,7 @@ class FetchGuidHelperImplTest {
         coEvery { downSyncHelper.downSync(any(), any()) } returns channel
         channel.close()
 
-        val result = fetchGuidHelper.loadFromRemoteIfNeeded(this, DEFAULT_PROJECT_ID, GUID1)
+        val result = fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
         assertThat(result).isEqualTo(SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE))
     }

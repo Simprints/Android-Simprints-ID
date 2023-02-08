@@ -14,7 +14,7 @@ import javax.inject.Inject
 class ModuleRepositoryImpl @Inject constructor(
     private val configManager: ConfigManager,
     private val enrolmentRecordManager: EnrolmentRecordManager,
-    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository
+    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
 ) : ModuleRepository {
 
     override suspend fun getModules(): List<Module> =
@@ -27,8 +27,8 @@ class ModuleRepositoryImpl @Inject constructor(
         handleUnselectedModules(modules.filter { !it.isSelected })
     }
 
-    override suspend fun getMaxNumberOfModules(): Int =
-        configManager.getProjectConfiguration().synchronization.down.maxNbOfModules
+    override suspend fun getMaxNumberOfModules(): Int = configManager.getProjectConfiguration()
+        .synchronization.down.maxNbOfModules
 
     private suspend fun isModuleSelected(moduleName: String): Boolean {
         return configManager.getDeviceConfiguration().selectedModules.contains(moduleName)

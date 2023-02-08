@@ -131,6 +131,5 @@ class PrivacyNoticesViewModelTest {
             configManager,
             loginManager,
             deviceManager,
-            testCoroutineRule.testCoroutineDispatcher
         )
 }

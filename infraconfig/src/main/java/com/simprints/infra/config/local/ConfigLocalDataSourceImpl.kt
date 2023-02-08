@@ -15,19 +15,18 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     @AbsolutePath private val absolutePath: String,
     private val projectDataStore: DataStore<ProtoProject>,
     private val configDataStore: DataStore<ProtoProjectConfiguration>,
-    private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>
+    private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>,
 ) : ConfigLocalDataSource {
 
     override suspend fun saveProject(project: Project) {
         projectDataStore.updateData { project.toProto() }
     }
 
-    override suspend fun getProject(): Project =
-        projectDataStore.data.first().toDomain().also {
-            if (it.id == "") {
-                throw NoSuchElementException()
-            }
+    override suspend fun getProject(): Project = projectDataStore.data.first().toDomain().also {
+        if (it.id == "") {
+            throw NoSuchElementException()
         }
+    }
 
     override suspend fun clearProject() {
         projectDataStore.updateData { it.toBuilder().clear().build() }
@@ -58,15 +57,13 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getProjectConfiguration(): ProjectConfiguration =
-        configDataStore.data.first().toDomain()
+    override suspend fun getProjectConfiguration(): ProjectConfiguration = configDataStore.data.first().toDomain()
 
     override suspend fun clearProjectConfiguration() {
         configDataStore.updateData { it.toBuilder().clear().build() }
     }
 
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
-        deviceConfigDataStore.data.first().toDomain()
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration = deviceConfigDataStore.data.first().toDomain()
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) {
         deviceConfigDataStore.updateData { currentData ->

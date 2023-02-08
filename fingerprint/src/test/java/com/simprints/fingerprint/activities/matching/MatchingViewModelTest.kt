@@ -22,8 +22,10 @@ import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -79,17 +81,19 @@ class MatchingViewModelTest {
         } throws Exception("Oops! Match failed")
     }
 
-    private val viewModel = MatchingViewModel(
-        mockMatcher,
-        dbManagerMock,
-        mockFingerprintSessionEventsManager,
-        mockk(relaxed = true),
-        masterFlowManager,
-        mockConfigManager,
-        mockk {
-            every { io() } returns testCoroutineRule.testCoroutineDispatcher
-        }
-    )
+    private lateinit var viewModel: MatchingViewModel
+
+    @Before
+    fun setUp() {
+        viewModel = MatchingViewModel(
+            mockMatcher,
+            dbManagerMock,
+            mockFingerprintSessionEventsManager,
+            mockk(relaxed = true),
+            masterFlowManager,
+            mockConfigManager,
+        )
+    }
 
     @Test
     fun identifyRequest_startedAndAwaitedWithSuccessfulMatch_finishesWithProbeInMatchResult() {

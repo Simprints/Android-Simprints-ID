@@ -11,7 +11,7 @@ import javax.inject.Inject
 internal class EnrolmentRecordManagerImpl @Inject constructor(
     private val enrolmentRecordScheduler: EnrolmentRecordScheduler,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val subjectRepository: SubjectRepository
+    private val subjectRepository: SubjectRepository,
 ) : EnrolmentRecordManager {
 
     override fun upload(id: String, subjectIds: List<String>) =
@@ -23,21 +23,16 @@ internal class EnrolmentRecordManagerImpl @Inject constructor(
     override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
         subjectRepository.loadFingerprintIdentities(query)
 
-    override suspend fun uploadRecords(subjectIds: List<String>) =
-        enrolmentRecordRepository.uploadRecords(subjectIds)
+    override suspend fun uploadRecords(subjectIds: List<String>) = enrolmentRecordRepository.uploadRecords(subjectIds)
 
     override suspend fun load(query: SubjectQuery): Flow<Subject> =
         subjectRepository.load(query)
 
-    override suspend fun delete(queries: List<SubjectQuery>) =
-        subjectRepository.delete(queries)
+    override suspend fun delete(queries: List<SubjectQuery>) = subjectRepository.delete(queries)
 
-    override suspend fun deleteAll() =
-        subjectRepository.deleteAll()
+    override suspend fun deleteAll() = subjectRepository.deleteAll()
 
-    override suspend fun count(query: SubjectQuery): Int =
-        subjectRepository.count(query)
+    override suspend fun count(query: SubjectQuery): Int = subjectRepository.count(query)
 
-    override suspend fun performActions(actions: List<SubjectAction>) =
-        subjectRepository.performActions(actions)
+    override suspend fun performActions(actions: List<SubjectAction>) = subjectRepository.performActions(actions)
 }

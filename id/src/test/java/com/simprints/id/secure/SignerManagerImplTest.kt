@@ -63,6 +63,7 @@ class SignerManagerImplTest {
             mockSecurityStateScheduler,
             mockRecentUserActivityManager,
             mockSimNetwork,
+            UnconfinedTestDispatcher(),
         )
     }
 
