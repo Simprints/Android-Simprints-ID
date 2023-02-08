@@ -3,7 +3,6 @@ package com.simprints.id.activities.fetchguid
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
@@ -14,7 +13,6 @@ import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
 import com.simprints.id.tools.device.DeviceManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +21,6 @@ class FetchGuidViewModel @Inject constructor(
     private val deviceManager: DeviceManager,
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper,
-    private val dispatcher: DispatcherProvider
 ) : ViewModel() {
 
     var subjectFetch = MutableLiveData<SubjectSource>()
@@ -37,14 +34,13 @@ class FetchGuidViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getSubjectFetchResult(projectId: String, verifyGuid: String) =
-        withContext(dispatcher.io()) {
-            val fetchResult = fetchGuidHelper.loadFromRemoteIfNeeded(this, projectId, verifyGuid)
-            if (fetchResult.subjectSource == SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
-                getSubjectFetchResultForError()
-            else
-                fetchResult
-        }
+    private suspend fun getSubjectFetchResult(projectId: String, verifyGuid: String): SubjectFetchResult {
+        val fetchResult = fetchGuidHelper.loadFromRemoteIfNeeded(projectId, verifyGuid)
+        return if (fetchResult.subjectSource == SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
+            getSubjectFetchResultForError()
+        else
+            fetchResult
+    }
 
     private fun getSubjectFetchResultForError() =
         if (deviceManager.isConnected()) {

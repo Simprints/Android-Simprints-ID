@@ -8,7 +8,7 @@ import androidx.work.workDataOf
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import com.simprints.core.DispatcherIO
+import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
@@ -40,7 +40,7 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
     private val upSyncHelper: EventUpSyncHelper,
     private val eventSyncCache: EventSyncCache,
     private val loginManager: LoginManager,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
     override val tag: String = EventUpSyncUploaderWorker::class.java.simpleName
@@ -129,7 +129,7 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
     }
 }
 
-fun WorkInfo.extractUpSyncProgress(eventSyncCache: EventSyncCache): Int {
+suspend fun WorkInfo.extractUpSyncProgress(eventSyncCache: EventSyncCache): Int {
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
 

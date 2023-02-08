@@ -29,6 +29,7 @@ dependencies {
     api(project(":infralogin"))
     api(project(":infrasecurity"))
     api(project(":infraconfig"))
+    implementation(project(":core"))
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
@@ -55,4 +56,5 @@ dependencies {
     androidTestImplementation(libs.testing.mockk.core)
     androidTestImplementation(libs.testing.mockk.android)
     androidTestImplementation(libs.testing.truth)
+    androidTestImplementation(libs.testing.coroutines.test)
 }

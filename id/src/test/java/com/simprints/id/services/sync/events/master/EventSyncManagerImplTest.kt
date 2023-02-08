@@ -49,7 +49,6 @@ class EventSyncManagerImplTest {
             eventDownSyncScopeRepository,
             eventUpSyncScopeRepository,
             eventSyncCache,
-            testCoroutineRule.testCoroutineDispatcher
         )
     }
 
@@ -117,8 +116,8 @@ class EventSyncManagerImplTest {
 
             coVerify(exactly = 1) { eventUpSyncScopeRepository.deleteAll() }
             coVerify(exactly = 1) { eventDownSyncScopeRepository.deleteAll() }
-            verify(exactly = 1) { eventSyncCache.clearProgresses() }
-            verify(exactly = 1) { eventSyncCache.storeLastSuccessfulSyncTime(null) }
+            coVerify(exactly = 1) { eventSyncCache.clearProgresses() }
+            coVerify(exactly = 1) { eventSyncCache.storeLastSuccessfulSyncTime(null) }
             verify(exactly = 1) { workManager.pruneWork() }
         }
     }

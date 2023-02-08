@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.core.ExternalScope
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
@@ -12,7 +11,6 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +20,6 @@ internal class ModuleSelectionViewModel @Inject constructor(
     private val repository: ModuleRepository,
     private val eventSyncManager: EventSyncManager,
     @ExternalScope private val externalScope: CoroutineScope,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val modulesList: LiveData<List<Module>>
@@ -70,7 +67,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
     }
 
     private fun postUpdateModules(block: suspend MutableList<Module>.() -> Unit) =
-        viewModelScope.launch(dispatcher) {
+        viewModelScope.launch {
             modules.block()
             _modulesList.postValue(modules)
         }

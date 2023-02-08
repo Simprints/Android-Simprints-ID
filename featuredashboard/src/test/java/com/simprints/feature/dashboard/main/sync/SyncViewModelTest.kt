@@ -73,7 +73,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should trigger an initial sync if the sync is not running and there is no last sync`() {
-        every { cacheSync.readLastSuccessfulSyncTime() } returns null
+        coEvery { cacheSync.readLastSuccessfulSyncTime() } returns null
         syncState.value = null
         isConnected.value = true
 
@@ -356,6 +356,5 @@ class SyncViewModelTest {
             configManager,
             cacheSync,
             timeHelper,
-            testCoroutineRule.testCoroutineDispatcher
         )
 }

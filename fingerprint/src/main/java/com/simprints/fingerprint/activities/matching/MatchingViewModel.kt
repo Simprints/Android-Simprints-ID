@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -43,7 +42,6 @@ class MatchingViewModel @Inject constructor(
     private val timeHelper: FingerprintTimeHelper,
     private val masterFlowManager: MasterFlowManager,
     private val configManager: ConfigManager,
-    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
 
@@ -82,7 +80,7 @@ class MatchingViewModel @Inject constructor(
     }
 
     private fun runMatchTask(matchTask: MatchTask) {
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             val configuration = configManager.getProjectConfiguration()
             val isCrossFingerMatchingEnabled =
                 matchTask is VerificationTask &&

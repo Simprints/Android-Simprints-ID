@@ -6,7 +6,6 @@ import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.testtools.TestData
 import com.simprints.id.tools.LocationManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.coroutines.TestDispatcherProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -19,7 +18,6 @@ import org.junit.Test
 class StoreUserLocationIntoCurrentSessionWorkerTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
-    private val dispatcherProvider = TestDispatcherProvider(testCoroutineRule)
 
     private val locationManager = mockk<LocationManager>()
     private val eventRepository = mockk<EventRepository> {
@@ -30,7 +28,7 @@ class StoreUserLocationIntoCurrentSessionWorkerTest {
         mockk(relaxed = true),
         eventRepository,
         locationManager,
-        dispatcherProvider,
+        testCoroutineRule.testCoroutineDispatcher,
     )
 
 

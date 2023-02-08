@@ -88,7 +88,7 @@ class EventRepositoryImplIntegrationTest {
             timeHelper,
             sessionEventValidatorsFactory,
             sessionDataCache,
-            mockk()
+            mockk(),
         )
 
     }

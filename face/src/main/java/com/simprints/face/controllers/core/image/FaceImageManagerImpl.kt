@@ -10,7 +10,7 @@ import com.simprints.infra.images.model.Path as CorePath
 
 class FaceImageManagerImpl @Inject constructor(
     private val coreImageRepository: ImageRepository,
-    private val coreEventRepository: EventRepository
+    private val coreEventRepository: EventRepository,
 ) : FaceImageManager {
 
     override suspend fun save(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? =
@@ -20,7 +20,7 @@ class FaceImageManagerImpl @Inject constructor(
             val projectId = currentSession.payload.projectId
             val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, projectId, path)
 
-            return if (securedImageRef != null) {
+            if (securedImageRef != null) {
                 SecuredImageRef(securedImageRef.relativePath.toDomain())
             } else {
                 Simber.e("Saving image failed for captureId $captureEventId")

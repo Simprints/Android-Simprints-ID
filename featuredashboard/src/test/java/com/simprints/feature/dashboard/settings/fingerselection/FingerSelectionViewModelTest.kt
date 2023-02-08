@@ -35,7 +35,6 @@ class FingerSelectionViewModelTest {
     private val viewModel = FingerSelectionViewModel(
         configManager,
         CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
-        testCoroutineRule.testCoroutineDispatcher
     )
 
     @Test

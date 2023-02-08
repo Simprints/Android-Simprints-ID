@@ -1,7 +1,6 @@
 package com.simprints.id.services.sync.events.down
 
 import androidx.annotation.VisibleForTesting
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.EventCount
@@ -25,7 +24,6 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletio
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.*
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class EventDownSyncHelperImpl @Inject constructor(
@@ -35,7 +33,6 @@ class EventDownSyncHelperImpl @Inject constructor(
     private val subjectFactory: SubjectFactory,
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
-    private val dispatcher: DispatcherProvider
 ) : EventDownSyncHelper {
 
     override suspend fun countForDownSync(operation: EventDownSyncOperation): List<EventCount> =
@@ -134,9 +131,7 @@ class EventDownSyncHelperImpl @Inject constructor(
         Simber.d("[DOWN_SYNC_HELPER] Emit progress")
 
         if (!this.isClosedForSend) {
-            withContext(dispatcher.io()) {
-                eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
-            }
+            eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
             this.send(EventDownSyncProgress(lastOperation, count))
         }
     }
@@ -238,9 +233,7 @@ class EventDownSyncHelperImpl @Inject constructor(
         op.queryEvent.moduleIds?.let { moduleId.partOf(it) } ?: false
 
     private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
-        withContext(dispatcher.io()) {
-            moduleId.partOf(configManager.getDeviceConfiguration().selectedModules)
-        }
+        moduleId.partOf(configManager.getDeviceConfiguration().selectedModules)
 
     private fun String.partOf(modules: List<String>) = modules.contains(this)
 

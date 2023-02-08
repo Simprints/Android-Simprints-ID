@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.core.tools.coroutines.DispatcherProvider
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -36,7 +35,6 @@ class OtaViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
-    private val dispatcherProvider: DispatcherProvider,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val configManager: ConfigManager
 ) : ViewModel() {
@@ -52,7 +50,7 @@ class OtaViewModel @Inject constructor(
     @SuppressLint("CheckResult")
     fun startOta(availableOtas: List<AvailableOta>, currentRetryAttempt: Int) {
         remainingOtas.addAll(availableOtas)
-        viewModelScope.launch(dispatcherProvider.io()) {
+        viewModelScope.launch {
             try {
                 availableOtas.asFlow()
                     .flatMapConcat {

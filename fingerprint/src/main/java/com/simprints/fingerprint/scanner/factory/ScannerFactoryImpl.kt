@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.factory
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
@@ -12,6 +13,7 @@ import com.simprints.fingerprintscanner.v2.scanner.create
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
@@ -26,7 +28,8 @@ class ScannerFactoryImpl @Inject constructor(
     private val connectionHelper: ConnectionHelper,
     private val cypressOtaHelper: CypressOtaHelper,
     private val stmOtaHelper: StmOtaHelper,
-    private val un20OtaHelper: Un20OtaHelper
+    private val un20OtaHelper: Un20OtaHelper,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
 ) : ScannerFactory {
 
     override suspend fun create(macAddress: String): ScannerWrapper {
@@ -50,7 +53,8 @@ class ScannerFactoryImpl @Inject constructor(
 
     private fun createScannerV1(macAddress: String): ScannerWrapper =
         ScannerWrapperV1(
-            ScannerV1(macAddress, bluetoothAdapter)
+            ScannerV1(macAddress, bluetoothAdapter),
+            ioDispatcher,
         )
 
     private fun createScannerV2(macAddress: String): ScannerWrapper =
@@ -62,6 +66,7 @@ class ScannerFactoryImpl @Inject constructor(
             connectionHelper,
             cypressOtaHelper,
             stmOtaHelper,
-            un20OtaHelper
+            un20OtaHelper,
+            ioDispatcher,
         )
 }

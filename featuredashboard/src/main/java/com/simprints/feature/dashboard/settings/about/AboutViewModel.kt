@@ -4,14 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.DispatcherIO
 import com.simprints.core.ExternalScope
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +20,6 @@ internal class AboutViewModel @Inject constructor(
     private val signerManager: SignerManager,
     private val recentUserActivityManager: RecentUserActivityManager,
     @ExternalScope private val externalScope: CoroutineScope,
-    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     val syncAndSearchConfig: LiveData<SyncAndSearchConfig>
@@ -45,7 +42,7 @@ internal class AboutViewModel @Inject constructor(
         externalScope.launch { signerManager.signOut() }
     }
 
-    private fun load() = viewModelScope.launch(dispatcher) {
+    private fun load() = viewModelScope.launch {
         val configuration = configManager.getProjectConfiguration()
         val syncAndSearchConfig = SyncAndSearchConfig(
             configuration.synchronization.down.partitionType.name,
