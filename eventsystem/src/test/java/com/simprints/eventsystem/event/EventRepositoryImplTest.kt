@@ -9,7 +9,6 @@ import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BAT
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.EventType.CALLBACK_REFUSAL
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.event.domain.validators.EventValidator
@@ -18,7 +17,6 @@ import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.local.SessionDataCache
 import com.simprints.eventsystem.event.remote.ApiModes
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
-import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
@@ -106,7 +104,6 @@ class EventRepositoryImplTest {
 
         runBlocking {
             coEvery { eventLocalDataSource.loadAll() } returns emptyFlow()
-            mockDbToLoadPersonRecordEvents(0)
         }
     }
 
@@ -118,7 +115,6 @@ class EventRepositoryImplTest {
             RemoteEventQuery(
                 DEFAULT_PROJECT_ID,
                 modes = listOf(Modes.FACE, Modes.FINGERPRINT),
-                types = listOf(SESSION_CAPTURE, CALLBACK_REFUSAL),
             )
         )
 
@@ -126,21 +122,24 @@ class EventRepositoryImplTest {
             eventRemoteDataSource.count(withArg { query ->
                 assertThat(query.projectId).isEqualTo(DEFAULT_PROJECT_ID)
                 assertThat(query.modes).containsExactly(ApiModes.FACE, ApiModes.FINGERPRINT)
-                assertThat(query.types).containsExactly(ApiEventPayloadType.SessionCapture, ApiEventPayloadType.Callback)
             })
         }
     }
 
     @Test
     fun `download correctly passes query arguments`() = runTest {
-        coEvery { eventRemoteDataSource.getEvents(any(), any()) }.returns(produce { this@produce.close() })
+        coEvery {
+            eventRemoteDataSource.getEvents(
+                any(),
+                any()
+            )
+        }.returns(produce { this@produce.close() })
 
         eventRepo.downloadEvents(
             this@runTest,
             RemoteEventQuery(
                 DEFAULT_PROJECT_ID,
                 modes = listOf(Modes.FACE),
-                types = listOf(SESSION_CAPTURE),
             )
         )
 
@@ -148,7 +147,6 @@ class EventRepositoryImplTest {
             eventRemoteDataSource.getEvents(withArg { query ->
                 assertThat(query.projectId).isEqualTo(DEFAULT_PROJECT_ID)
                 assertThat(query.modes).containsExactly(ApiModes.FACE)
-                assertThat(query.types).containsExactly(ApiEventPayloadType.SessionCapture)
             }, any())
         }
     }
@@ -434,8 +432,7 @@ class EventRepositoryImplTest {
     fun upload_succeeds_shouldDeleteEvents() {
         runBlocking {
             val events =
-                mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
-                    mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
+                mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
@@ -457,7 +454,6 @@ class EventRepositoryImplTest {
     fun upload_inProgress_shouldEmitProgress() {
         runBlocking {
             mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
-            mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
             val progress = eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
@@ -468,16 +464,13 @@ class EventRepositoryImplTest {
 
             assertThat(progress[0]).isEqualTo(SESSION_BATCH_SIZE)
             assertThat(progress[1]).isEqualTo(SESSION_BATCH_SIZE)
-            assertThat(progress[2]).isEqualTo(SESSION_BATCH_SIZE / 2)
         }
     }
 
     @Test
     fun upload_succeeds_shouldDeleteUploadedEvents() {
         runBlocking {
-            val events =
-                mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE) +
-                    mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
+            val events = mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
@@ -537,7 +530,6 @@ class EventRepositoryImplTest {
             coEvery { eventRemoteDataSource.post(any(), any()) } throws IllegalArgumentException()
 
             val events = mockDbToLoadTwoClosedSessionsWithEvents(2 * SESSION_BATCH_SIZE)
-            val subjectEvents = mockDbToLoadPersonRecordEvents(SESSION_BATCH_SIZE / 2)
 
             eventRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
@@ -552,8 +544,6 @@ class EventRepositoryImplTest {
                 eventLocalDataSource.delete(events.filter { it.labels.sessionId == GUID2 }
                     .map { it.id })
             }
-
-            coVerify(exactly = 0) { eventLocalDataSource.delete(subjectEvents.map { it.id }) }
         }
     }
 

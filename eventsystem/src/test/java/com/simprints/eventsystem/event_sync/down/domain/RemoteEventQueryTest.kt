@@ -1,9 +1,7 @@
 package com.simprints.eventsystem.event_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.event.remote.fromDomainToApi
-import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODES
@@ -25,7 +23,6 @@ class RemoteEventQueryTest {
             GUID1,
             GUID2,
             DEFAULT_MODES,
-            listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION)
         ).fromDomainToApi()
 
         with(api) {
@@ -35,7 +32,6 @@ class RemoteEventQueryTest {
             assertThat(subjectId).isEqualTo(GUID1)
             assertThat(lastEventId).isEqualTo(GUID2)
             assertThat(modes).isEqualTo(DEFAULT_MODES.map { it.fromDomainToApi() })
-            assertThat(types).isEqualTo(listOf(EnrolmentRecordCreation, EnrolmentRecordMove, EnrolmentRecordDeletion))
         }
     }
 }

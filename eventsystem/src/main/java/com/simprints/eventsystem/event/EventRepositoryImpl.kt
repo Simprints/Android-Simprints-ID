@@ -18,6 +18,7 @@ import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCapt
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.event.local.SessionDataCache
@@ -27,7 +28,6 @@ import com.simprints.eventsystem.events_sync.down.domain.fromDomainToApi
 import com.simprints.eventsystem.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.eventsystem.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -125,12 +125,9 @@ internal open class EventRepositoryImpl @Inject constructor(
     private fun checkAndUpdateLabels(event: Event, session: SessionCaptureEvent) {
         event.labels = event.labels.copy(
             sessionId = session.id,
-            projectId = session.payload.projectId
+            projectId = session.payload.projectId,
+            deviceId = deviceId,
         )
-
-        if (event.type.isNotASubjectEvent()) {
-            event.labels = event.labels.copy(deviceId = deviceId)
-        }
     }
 
     override suspend fun localCount(projectId: String): Int = eventLocalDataSource.count(projectId = projectId)
@@ -142,7 +139,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun downloadEvents(
         scope: CoroutineScope,
         query: RemoteEventQuery
-    ): ReceiveChannel<Event> = eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
+    ): ReceiveChannel<EnrolmentRecordEvent> = eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
 
     /**
      * Note that only the IDs of the SessionCapture events of closed sessions are all held in
@@ -189,20 +186,6 @@ internal open class EventRepositoryImpl @Inject constructor(
                     Simber.tag("SYNC").i("Failed to un-marshal events for $sessionId")
                     Simber.e(ex)
                 }
-            }
-        }
-
-        Simber.tag("SYNC").d("[EVENT_REPO] Uploading old SubjectCreation events")
-        eventLocalDataSource.loadOldSubjectCreationEvents(projectId).let {
-            Simber.tag(CrashReportTag.SYNC.name).i("Old SubjectCreation: ${it.size}")
-            if (it.isNotEmpty()) {
-                attemptEventUpload(
-                    it, projectId,
-                    canSyncAllDataToSimprints,
-                    canSyncBiometricDataToSimprints,
-                    canSyncAnalyticsDataToSimprints
-                )
-                this.emit(it.size)
             }
         }
     }
