@@ -38,7 +38,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val loginManager: LoginManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
-    eventSyncManager: EventSyncManager,
+    private val eventSyncManager: EventSyncManager,
 ) : ViewModel() {
 
     val recordsInLocal: LiveData<Int?>
@@ -82,6 +82,10 @@ internal class SyncInfoViewModel @Inject constructor(
         load()
     }
 
+    fun forceSync() {
+        eventSyncManager.sync()
+    }
+
     /**
      * Calls fetchSyncInformation() when all workers are done.
      * To determine this EventSyncState is checked to have all workers in Succeeded state.
@@ -101,29 +105,28 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
+        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+
         awaitAll(
             async { _configuration.postValue(configManager.getProjectConfiguration()) },
-            async { _recordsInLocal.postValue(getRecordsInLocal()) },
-            async { _recordsToUpSync.postValue(getRecordsToUpSync()) },
+            async { _recordsInLocal.postValue(getRecordsInLocal(projectId)) },
+            async { _recordsToUpSync.postValue(getRecordsToUpSync(projectId)) },
             async {
                 fetchRecordsToCreateAndDeleteCount().let {
                     _recordsToDownSync.postValue(it.toCreate)
                     _recordsToDelete.postValue(it.toDelete)
                 }
             },
-            async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(loginManager.getSignedInProjectIdOrEmpty())) },
-            async { _moduleCounts.postValue(getModuleCounts()) }
+            async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
+            async { _moduleCounts.postValue(getModuleCounts(projectId)) }
         )
     }
 
-    private suspend fun getRecordsInLocal(): Int =
-        enrolmentRecordManager.count(SubjectQuery(projectId = loginManager.getSignedInProjectIdOrEmpty()))
+    private suspend fun getRecordsInLocal(projectId: String): Int =
+        enrolmentRecordManager.count(SubjectQuery(projectId = projectId))
 
-    private suspend fun getRecordsToUpSync(): Int =
-        eventRepository.localCount(
-            loginManager.getSignedInProjectIdOrEmpty(),
-            EventType.ENROLMENT_V2
-        )
+    private suspend fun getRecordsToUpSync(projectId: String): Int =
+        eventRepository.localCount(projectId, EventType.ENROLMENT_V2)
 
     private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
         if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {
@@ -161,16 +164,11 @@ internal class SyncInfoViewModel @Inject constructor(
             DownSyncCounts(0, 0)
         }
 
-    private suspend fun getModuleCounts(): List<ModuleCount> =
+    private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
         configManager.getDeviceConfiguration().selectedModules.map {
             ModuleCount(
                 it,
-                enrolmentRecordManager.count(
-                    SubjectQuery(
-                        projectId = loginManager.getSignedInProjectIdOrEmpty(),
-                        moduleId = it
-                    )
-                )
+                enrolmentRecordManager.count(SubjectQuery(projectId = projectId, moduleId = it))
             )
         }
 

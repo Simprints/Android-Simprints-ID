@@ -23,10 +23,7 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import org.junit.Rule
 import org.junit.Test
 
@@ -260,4 +257,10 @@ class SyncInfoViewModelTest {
         coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
 
+    @Test
+    fun `should invoke sync manager when sync is requested`() {
+        viewModel.forceSync()
+
+        verify(exactly = 1) { eventSyncManager.sync() }
+    }
 }
