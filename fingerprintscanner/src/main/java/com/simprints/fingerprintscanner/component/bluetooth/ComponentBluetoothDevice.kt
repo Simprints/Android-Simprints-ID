@@ -23,6 +23,11 @@ interface ComponentBluetoothDevice {
         const val BOND_BONDED = 12
         const val BOND_NONE = 10
         const val EXTRA_REASON = "android.bluetooth.device.extra.REASON"
+        const val REASON_AUTH_FAILED = 1
+        const val REASON_AUTH_REJECTED = 2
+        const val REASON_AUTH_CANCELED = 3
+        const val REASON_REMOTE_AUTH_CANCELED = 8
+
         const val BOND_SUCCESS = 0
         const val UNBOND_REASON_REMOVED = 9
     }
