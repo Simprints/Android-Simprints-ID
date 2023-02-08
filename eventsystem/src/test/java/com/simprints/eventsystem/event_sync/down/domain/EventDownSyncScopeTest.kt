@@ -1,7 +1,6 @@
 package com.simprints.eventsystem.event_sync.down.domain
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
@@ -13,8 +12,6 @@ import org.junit.Test
 
 class EventDownSyncScopeTest {
 
-    private val eventTypes = listOf(ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION)
-
     @Test
     fun projectScopeBuild() {
         with(projectDownSyncScope.operations) {
@@ -22,7 +19,6 @@ class EventDownSyncScopeTest {
             val query = this.first().queryEvent
             assertThat(query.projectId).isEqualTo(projectDownSyncScope.projectId)
             assertThat(query.modes).isEqualTo(projectDownSyncScope.modes)
-            assertThat(query.types).isEqualTo(eventTypes)
 
             assertThat(query.subjectId).isNull()
             assertThat(query.attendantId).isNull()
@@ -38,7 +34,6 @@ class EventDownSyncScopeTest {
             val query = this.first().queryEvent
             assertThat(query.projectId).isEqualTo(projectDownSyncScope.projectId)
             assertThat(query.modes).isEqualTo(projectDownSyncScope.modes)
-            assertThat(query.types).isEqualTo(eventTypes)
             assertThat(query.attendantId).isEqualTo(DEFAULT_USER_ID)
 
             assertThat(query.subjectId).isNull()
@@ -63,7 +58,6 @@ class EventDownSyncScopeTest {
     private fun checkModuleScope(op: RemoteEventQuery, moduleId: String) {
         assertThat(op.projectId).isEqualTo(projectDownSyncScope.projectId)
         assertThat(op.modes).isEqualTo(projectDownSyncScope.modes)
-        assertThat(op.types).isEqualTo(eventTypes)
         assertThat(op.moduleIds).isEqualTo(listOf(moduleId))
 
         assertThat(op.subjectId).isNull()

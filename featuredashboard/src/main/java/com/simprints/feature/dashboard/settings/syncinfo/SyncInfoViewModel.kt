@@ -8,6 +8,7 @@ import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
@@ -146,10 +147,10 @@ internal class SyncInfoViewModel @Inject constructor(
             downSyncScope.operations.forEach { syncOperation ->
                 val counts = eventRepository.countEventsToDownload(syncOperation.queryEvent)
                 creationsToDownload += counts
-                    .firstOrNull { it.type == EventType.ENROLMENT_RECORD_CREATION }
+                    .firstOrNull { it.type == EnrolmentRecordEventType.EnrolmentRecordCreation }
                     ?.count ?: 0
                 deletionsToDownload += counts
-                    .firstOrNull { it.type == EventType.ENROLMENT_RECORD_DELETION }
+                    .firstOrNull { it.type == EnrolmentRecordEventType.EnrolmentRecordDeletion }
                     ?.count ?: 0
             }
 

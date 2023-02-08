@@ -11,15 +11,6 @@ enum class ApiEventPayloadType {
     // ApiEventPayload correctly with Jackson (see annotation in ApiEventPayload).
     // Add a key in the companion object for each enum value
 
-    /* key added: ENROLMENT_RECORD_CREATION_KEY */
-    EnrolmentRecordCreation,
-
-    /* key added: ENROLMENT_RECORD_DELETION_KEY */
-    EnrolmentRecordDeletion,
-
-    /* key added: ENROLMENT_RECORD_MOVE_KEY */
-    EnrolmentRecordMove,
-
     /* key added: CALLOUT_KEY */
     Callout,
 
@@ -111,9 +102,6 @@ enum class ApiEventPayloadType {
     FaceCaptureConfirmation;
 
     companion object {
-        const val ENROLMENT_RECORD_CREATION_KEY = "EnrolmentRecordCreation"
-        const val ENROLMENT_RECORD_DELETION_KEY = "EnrolmentRecordDeletion"
-        const val ENROLMENT_RECORD_MOVE_KEY = "EnrolmentRecordMove"
         const val CALLOUT_KEY = "Callout"
         const val CALLBACK_KEY = "Callback"
         const val ARTIFICIAL_TERMINATION_KEY = "ArtificialTermination"
@@ -148,8 +136,6 @@ enum class ApiEventPayloadType {
 }
 
 fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
-    ENROLMENT_RECORD_CREATION -> ApiEventPayloadType.EnrolmentRecordCreation
-    ENROLMENT_RECORD_DELETION -> ApiEventPayloadType.EnrolmentRecordDeletion
     ARTIFICIAL_TERMINATION -> ApiEventPayloadType.ArtificialTermination
     AUTHENTICATION -> ApiEventPayloadType.Authentication
     CONSENT -> ApiEventPayloadType.Consent
@@ -184,7 +170,6 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     INTENT_PARSING -> ApiEventPayloadType.IntentParsing
     COMPLETION_CHECK -> ApiEventPayloadType.CompletionCheck
     SESSION_CAPTURE -> ApiEventPayloadType.SessionCapture
-    ENROLMENT_RECORD_MOVE -> ApiEventPayloadType.EnrolmentRecordMove
     FACE_ONBOARDING_COMPLETE -> ApiEventPayloadType.FaceOnboardingComplete
     FACE_FALLBACK_CAPTURE -> ApiEventPayloadType.FaceFallbackCapture
     FACE_CAPTURE -> ApiEventPayloadType.FaceCapture
@@ -195,8 +180,6 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
 
 
 fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
-    ApiEventPayloadType.EnrolmentRecordCreation -> ENROLMENT_RECORD_CREATION
-    ApiEventPayloadType.EnrolmentRecordDeletion -> ENROLMENT_RECORD_DELETION
     ApiEventPayloadType.ArtificialTermination -> ARTIFICIAL_TERMINATION
     ApiEventPayloadType.Authentication -> AUTHENTICATION
     ApiEventPayloadType.Consent -> CONSENT
@@ -219,7 +202,6 @@ fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.IntentParsing -> INTENT_PARSING
     ApiEventPayloadType.CompletionCheck -> COMPLETION_CHECK
     ApiEventPayloadType.SessionCapture -> SESSION_CAPTURE
-    ApiEventPayloadType.EnrolmentRecordMove -> ENROLMENT_RECORD_MOVE
     ApiEventPayloadType.FaceOnboardingComplete -> FACE_ONBOARDING_COMPLETE
     ApiEventPayloadType.FaceFallbackCapture -> FACE_FALLBACK_CAPTURE
     ApiEventPayloadType.FaceCapture -> FACE_CAPTURE
