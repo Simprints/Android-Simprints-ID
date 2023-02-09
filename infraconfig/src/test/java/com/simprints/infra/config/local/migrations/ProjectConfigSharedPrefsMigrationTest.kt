@@ -369,6 +369,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                 projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
             }
             assertThat(receivedException).isEqualTo(exception)
+            unmockkAll()
         }
 
     @Test
