@@ -54,7 +54,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.syncButton.setOnClickListener {
             viewModel.forceSync()
             // Prevent double-clicks while sync master worker is preparing
-            updateSyncButton(true)
+            updateSyncButton(isSyncInProgress = true, isConnected = true)
         }
     }
 
@@ -92,15 +92,24 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             updateModuleCounts(it)
         }
 
+        viewModel.isConnected.observe(viewLifecycleOwner) {
+            updateSyncButton(
+                viewModel.lastSyncState.value?.isSyncRunning() ?: false,
+                viewModel.isConnected.value == true
+            )
+        }
         viewModel.lastSyncState.observe(viewLifecycleOwner) {
             viewModel.fetchSyncInformationIfNeeded(it)
-            updateSyncButton(it.isSyncRunning())
+            updateSyncButton(
+                it.isSyncRunning(),
+                viewModel.isConnected.value == true
+            )
         }
     }
 
-    private fun updateSyncButton(isSyncInProgress: Boolean) {
+    private fun updateSyncButton(isSyncInProgress: Boolean, isConnected: Boolean) {
         with(binding.syncButton) {
-            isEnabled = !isSyncInProgress
+            isEnabled = !isSyncInProgress && isConnected
             text = getString(
                 if (isSyncInProgress) IDR.string.sync_info_sync_in_progress
                 else IDR.string.sync_info_sync_now
