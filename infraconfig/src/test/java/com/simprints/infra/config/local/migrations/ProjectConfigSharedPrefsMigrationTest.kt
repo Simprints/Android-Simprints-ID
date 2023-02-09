@@ -3,6 +3,7 @@ package com.simprints.infra.config.local.migrations
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.common.truth.Truth.assertThat
@@ -11,9 +12,8 @@ import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigra
 import com.simprints.infra.config.local.models.*
 import com.simprints.infra.config.testtools.protoProjectConfiguration
 import com.simprints.infra.login.LoginManager
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -208,6 +208,7 @@ class ProjectConfigSharedPrefsMigrationTest {
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
         assertThat(proto).isEqualTo(expectedProto)
     }
+
     @Test
     fun `migrate should work when SyncDestination is null`() = runTest {
         val json = concatMapsAsString(
@@ -239,6 +240,7 @@ class ProjectConfigSharedPrefsMigrationTest {
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
         assertThat(proto).isEqualTo(expectedProto)
     }
+
     @Test
     fun `migrate should work when empty SyncDestination`() = runTest {
         val json = concatMapsAsString(
@@ -302,6 +304,73 @@ class ProjectConfigSharedPrefsMigrationTest {
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
         assertThat(proto).isEqualTo(expectedProto)
     }
+
+    @Test
+    fun `migrate should work when there is unexpected fields`() = runTest {
+        val json = concatMapsAsString(
+            JSON_GENERAL_CONFIGURATION,
+            JSON_CONSENT_CONFIGURATION,
+            JSON_IDENTIFICATION_CONFIGURATION,
+            JSON_SYNCHRONIZATION_CONFIGURATION,
+            JSON_FACE_CONFIGURATION_WITH_UNEXPECTED_FIELD,
+            JSON_FINGERPRINT_CONFIGURATION,
+            JSON_VERO_2_CONFIGURATION
+        )
+        every { preferences.getString(any(), any()) } returns json
+        every { loginManager.signedInProjectId } returns PROJECT_ID
+
+        val expectedProto = ProtoProjectConfiguration.newBuilder()
+            .setProjectId(PROJECT_ID)
+            .setConsent(PROTO_CONSENT_CONFIGURATION)
+            .setGeneral(PROTO_GENERAL_CONFIGURATION)
+            .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
+            .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION)
+            .setFace(PROTO_FACE_CONFIGURATION)
+            .setFingerprint(
+                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
+                    PROTO_VERO_2_CONFIGURATION
+                ).build()
+            )
+            .build()
+
+        val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
+        assertThat(proto).isEqualTo(expectedProto)
+    }
+
+    @Test
+    fun `migrate should return the default project configuration if the existing config is invalid`() =
+        runTest {
+            every { preferences.getString(any(), any()) } returns "{invalidJson}"
+            every { loginManager.signedInProjectId } returns PROJECT_ID
+
+            val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
+            assertThat(proto).isEqualTo(ProtoProjectConfiguration.getDefaultInstance())
+        }
+
+    @Test
+    fun `migrate should throw an exception if there is an issue that is not related to jackson`() =
+        runTest {
+            val json = concatMapsAsString(
+                JSON_GENERAL_CONFIGURATION,
+                JSON_CONSENT_CONFIGURATION,
+                JSON_IDENTIFICATION_CONFIGURATION,
+                JSON_SYNCHRONIZATION_CONFIGURATION,
+                JSON_FINGERPRINT_CONFIGURATION
+            )
+            every { preferences.getString(any(), any()) } returns json
+            every { loginManager.signedInProjectId } returns PROJECT_ID
+
+            // Force an exception
+            val exception = Exception("")
+            mockkStatic(JsonMapper::class)
+            every { JsonMapper.builder() } throws exception
+
+            val receivedException = assertThrows<Exception> {
+                projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
+            }
+            assertThat(receivedException).isEqualTo(exception)
+            unmockkAll()
+        }
 
     @Test
     fun `cleanUp should do remove all the keys`() = runTest {
@@ -507,6 +576,10 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val JSON_FACE_CONFIGURATION = jacksonObjectMapper().readValue<Map<String, String>>(
             "{\"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
         )
+        private val JSON_FACE_CONFIGURATION_WITH_UNEXPECTED_FIELD =
+            jacksonObjectMapper().readValue<Map<String, String>>(
+                "{\"FaceMatchThreshold\":30, \"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
+            )
         private val PROTO_FACE_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
             .setNbOfImagesToCapture(2)
             .setQualityThreshold(-1)
