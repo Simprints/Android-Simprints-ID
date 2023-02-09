@@ -50,6 +50,7 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
                 Simber.i("Invalid old configuration for project ${loginManager.signedInProjectId}: $e")
                 ProtoProjectConfiguration.getDefaultInstance()
             } else {
+                Simber.e(e)
                 throw e
             }
         }
