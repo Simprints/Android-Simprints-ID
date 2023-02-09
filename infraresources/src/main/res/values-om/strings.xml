@@ -6,7 +6,7 @@
     <string name="confirmation_logout_cancel">Addan kuti</string>
     <string name="confirmation_logout_message">Keessa bahuu barbaadda?</string>
     <string name="confirmation_logout_title">Keessaa bahi</string>
-    <string name="dashboard_card_calculating">Shalagaa jira...</string>
+    <string name="dashboard_card_calculating">Shalagaa jira…</string>
     <string name="dashboard_card_current_user">Fayyadamaa Mosaajii: %1$s</string>
     <string name="dashboard_card_scanner_used">Iskaanarii hojii irra oole: %1$s</string>
     <string name="dashboard_card_sync_last_sync">Yeroo dhumaaf siink kan tahe: %1$s</string>
@@ -143,6 +143,8 @@
     <string name="sync_info_total_records">Barreeffama waliigalaa</string>
     <string name="sync_info_total_records_on_device">Barreeffama waliigalaa meeshaarra</string>
     <string name="sync_info_unselected_modules">Moojuulaa hin filatamne</string>
+    <string name="sync_info_sync_now">Amma Siink godhi</string>
+    <string name="sync_info_sync_in_progress">Siink gochaa jira</string>
     <string name="title_activity_sync_information">Odeffannoo Siinkii</string>
     <string name="try_again_label">Irra deebi\'ii yaali</string>
     <string name="verify_guid_not_found_offline_message">Namni arti barbaadde hin argamne,maaloo tajaajia interneetii argachuu kee mirkaneeffadhuu irra deebi\'ii yaali.</string>

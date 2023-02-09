@@ -130,6 +130,8 @@
     <string name="sync_info_unselected_modules">Módulos não selecionados</string>
     <string name="sync_info_total_records">Registos totais</string>
     <string name="sync_info_images_to_upload">Imagens para fazer upload</string>
+    <string name="sync_info_sync_now">Sincronize agora</string>
+    <string name="sync_info_sync_in_progress">Sincronizando</string>
     <string name="progress_sync_overlay">Sincronizando …</string>
     <string name="refusal_toast_select_option_submit">Selecione uma opção e envie</string>
     <string name="refusal_toast_submit">Por favor, envie o formulário</string>
