@@ -12,6 +12,7 @@ import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType
+import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
@@ -45,11 +46,13 @@ class SyncInfoViewModelTest {
     private val loginManager = mockk<LoginManager> {
         every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
     }
+    private val deviceManager = mockk<DeviceManager>(relaxed = true)
     private val eventDownSyncScopeRepository = mockk<EventDownSyncScopeRepository>(relaxed = true)
     private val imageRepository = mockk<ImageRepository>(relaxed = true)
     private val eventSyncManager = mockk<EventSyncManager>(relaxed = true)
     private val viewModel = SyncInfoViewModel(
         configManager,
+        deviceManager,
         eventRepository,
         enrolmentRecordManager,
         loginManager,

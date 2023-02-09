@@ -12,6 +12,7 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEven
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
+import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
@@ -33,6 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SyncInfoViewModel @Inject constructor(
     private val configManager: ConfigManager,
+    deviceManager: DeviceManager,
     private val eventRepository: EventRepository,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val loginManager: LoginManager,
@@ -68,6 +70,8 @@ internal class SyncInfoViewModel @Inject constructor(
     val configuration: LiveData<ProjectConfiguration>
         get() = _configuration
     private val _configuration = MutableLiveData<ProjectConfiguration>()
+
+    val isConnected: LiveData<Boolean> = deviceManager.isConnectedLiveData
 
     val lastSyncState = eventSyncManager.getLastSyncState()
     private var lastKnownEventSyncState: EventSyncState? = null
