@@ -87,7 +87,7 @@ class HotCacheImplTest {
     fun shouldCacheStep() {
         val step = mockStep()
 
-        hotCache.save(step)
+        hotCache.save(listOf(step))
         val cachedSteps = hotCache.load()
 
         val isStepCached = cachedSteps.contains(step)
@@ -103,8 +103,8 @@ class HotCacheImplTest {
         val newStep = oldStep.copy(requestCode = 321)
 
         with(hotCache) {
-            save(oldStep)
-            save(newStep)
+            save(listOf(oldStep))
+            save(listOf(newStep))
         }
 
         val cachedSteps = hotCache.load()
@@ -122,8 +122,7 @@ class HotCacheImplTest {
         val step2 = mockStep()
 
         with(hotCache) {
-            save(step1)
-            save(step2)
+            save(listOf(step1, step2))
         }
 
         val cachedSteps = hotCache.load()
@@ -139,7 +138,7 @@ class HotCacheImplTest {
         val step = mockStep()
 
         with(hotCache) {
-            save(step)
+            save(listOf(step))
             clearSteps()
         }
 
