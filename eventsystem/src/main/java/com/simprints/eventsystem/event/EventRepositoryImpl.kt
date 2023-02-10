@@ -134,6 +134,9 @@ internal open class EventRepositoryImpl @Inject constructor(
 
     override suspend fun localCount(projectId: String, type: EventType): Int = eventLocalDataSource.count(projectId = projectId, type = type)
 
+    override suspend fun observeLocalCount(projectId: String, type: EventType): Flow<Int> = eventLocalDataSource
+        .observeCount(projectId, type)
+
     override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> = eventRemoteDataSource.count(query.fromDomainToApi())
 
     override suspend fun downloadEvents(
