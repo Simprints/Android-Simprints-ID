@@ -96,6 +96,18 @@ class OrchestratorActivity : BaseSplitActivity() {
         vm.saveState()
     }
 
+    /* Save state in onDestroy(), too, because we may need the flow steps outside this activity
+    (e.g. when doing an IDENTIFY followed by REGISTER_LAST_BIOMETRICS) and onSaveInstanceState() is
+    called only if the OS intends to restore the activity later. So if we receive onActivityResult(),
+    modify step status and destroy the activity, we want to have the latest status saved.
+    TODO: This is an implementation detail that the activity and it's ViewModel shouldn't know or
+     care about and therefore is an error-prone. We should consider refactoring it.
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        vm.saveState()
+    }
+
     override fun onResume() {
         super.onResume()
 

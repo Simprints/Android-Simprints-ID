@@ -6,6 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -15,6 +16,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,6 +28,7 @@ class OrchestratorViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val eventRepository: EventRepository,
     private val domainToModuleApiConverter: DomainToModuleApiAppResponse,
+    @ExternalScope private val externalScope: CoroutineScope,
     @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -76,7 +79,6 @@ class OrchestratorViewModel @Inject constructor(
         getCurrentSessionId()
     )
 
-
     private suspend fun startModalityFlow() =
         orchestratorManager.startModalityFlow()
 
@@ -85,7 +87,6 @@ class OrchestratorViewModel @Inject constructor(
 
     private suspend fun getCurrentSessionId(): String =
         eventRepository.getCurrentCaptureSessionEvent().id
-
 
     fun onModalStepRequestDone(
         appRequest: AppRequest,
@@ -99,8 +100,9 @@ class OrchestratorViewModel @Inject constructor(
         }
     }
 
-
-    fun saveState() = viewModelScope.launch {
+    /* Use externalScope to ensure saving completes even when called from onDestroy()
+     */
+    fun saveState() = externalScope.launch {
         modalityFlowInitJob.join()
         orchestratorManager.saveState()
     }
