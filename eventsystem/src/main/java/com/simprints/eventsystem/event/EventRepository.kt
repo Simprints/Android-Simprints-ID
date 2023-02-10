@@ -47,6 +47,8 @@ interface EventRepository {
 
     suspend fun localCount(projectId: String, type: EventType): Int
 
+    suspend fun observeLocalCount(projectId: String, type: EventType): Flow<Int>
+
     suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
 
     suspend fun downloadEvents(
