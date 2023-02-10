@@ -16,7 +16,9 @@ import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.images.ImageRepository
@@ -213,46 +215,36 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `fetchSyncInformationIfNeeded should not fetch the information if there is a non succeeded worker`() {
-        viewModel.fetchSyncInformationIfNeeded(
-            EventSyncState(
-                "", 0, 0, listOf(), listOf(
-                    EventSyncState.SyncWorkerInfo(
-                        EventSyncWorkerType.DOWNLOADER,
-                        EventSyncWorkerState.Running
-                    )
-                )
+        viewModel.fetchSyncInformationIfNeeded(EventSyncState("", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Running
             )
-        )
+        )))
 
         coVerify(exactly = 0) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
 
     @Test
     fun `fetchSyncInformationIfNeeded should fetch the information if there is only succeeded worker`() {
-        viewModel.fetchSyncInformationIfNeeded(
-            EventSyncState(
-                "", 0, 0, listOf(), listOf(
-                    EventSyncState.SyncWorkerInfo(
-                        EventSyncWorkerType.DOWNLOADER,
-                        EventSyncWorkerState.Succeeded
-                    )
-                )
+        viewModel.fetchSyncInformationIfNeeded(EventSyncState("", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Succeeded
             )
-        )
+        )))
 
         coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
 
     @Test
     fun `fetchSyncInformationIfNeeded should not fetch the information if the state hasn't changed`() {
-        val state = EventSyncState(
-            "", 0, 0, listOf(), listOf(
-                EventSyncState.SyncWorkerInfo(
-                    EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Succeeded
-                )
+        val state = EventSyncState("", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Succeeded
             )
-        )
+        ))
 
         viewModel.fetchSyncInformationIfNeeded(state)
         viewModel.fetchSyncInformationIfNeeded(state)
@@ -265,5 +257,96 @@ class SyncInfoViewModelTest {
         viewModel.forceSync()
 
         verify(exactly = 1) { eventSyncManager.sync() }
+    }
+
+    @Test
+    fun `isModuleSyncAndModuleIdOptionsNotEmpty returns true only if module sync and has modules`() {
+        // Not module sync
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.USER,
+            ))
+        ).isFalse()
+        // Module sync + no modules
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+            ))
+        ).isFalse()
+        // Module sync + has modules
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                modules = listOf("module")
+            ))
+        ).isTrue()
+    }
+
+    @Test
+    fun `emits correct sync availability for valid module sync`() {
+        val configuration = createMockDownSyncConfig(
+            partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+            modules = listOf("module")
+        )
+
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValues(4) {
+            viewModel.emitSyncAvailable(isSyncRunning = true, isConnected = true, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = false, isConnected = true, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = true, isConnected = false, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = false, isConnected = false, configuration)
+        }).containsExactly(false, true, false, false)
+    }
+
+    @Test
+    fun `emits correct sync availability values for invalid module sync`() {
+        val configuration = createMockDownSyncConfig(
+            partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+        )
+
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValues(4) {
+            viewModel.emitSyncAvailable(isSyncRunning = true, isConnected = true, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = false, isConnected = true, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = true, isConnected = false, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = false, isConnected = false, configuration)
+        }).containsExactly(false, false, false, false)
+    }
+
+    @Test
+    fun `emits correct sync availability values for non-module sync`() {
+        val configuration = createMockDownSyncConfig(
+            partitionType = DownSynchronizationConfiguration.PartitionType.USER,
+        )
+
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValues(4) {
+            viewModel.emitSyncAvailable(isSyncRunning = true, isConnected = true, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = false, isConnected = true, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = true, isConnected = false, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = false, isConnected = false, configuration)
+        }).containsExactly(false, true, false, false)
+    }
+
+    @Test
+    fun `emits correct sync availability values if any param is null`() {
+        val configuration = createMockDownSyncConfig(
+            partitionType = DownSynchronizationConfiguration.PartitionType.USER,
+        )
+
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValues(3) {
+            viewModel.emitSyncAvailable(isSyncRunning = null, isConnected = true, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = false, isConnected = null, configuration)
+            viewModel.emitSyncAvailable(isSyncRunning = false, isConnected = true, null)
+        }).containsExactly(false, false, false)
+    }
+
+    private fun createMockDownSyncConfig(
+        partitionType: DownSynchronizationConfiguration.PartitionType,
+        modules: List<String> = emptyList(),
+    ) = mockk<SynchronizationConfiguration> {
+        every { frequency }.returns(SynchronizationConfiguration.Frequency.PERIODICALLY)
+        every { down }.returns(DownSynchronizationConfiguration(
+            partitionType = partitionType,
+            moduleOptions = modules,
+            maxNbOfModules = 0,
+        ))
     }
 }

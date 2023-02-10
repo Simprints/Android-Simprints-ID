@@ -16,10 +16,7 @@ import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
+import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.images.ImageRepository
@@ -76,6 +73,8 @@ internal class SyncInfoViewModel @Inject constructor(
     val lastSyncState = eventSyncManager.getLastSyncState()
     private var lastKnownEventSyncState: EventSyncState? = null
 
+    val isSyncAvailable = MutableLiveData(false)
+
     fun refreshInformation() {
         _recordsInLocal.postValue(null)
         _recordsToUpSync.postValue(null)
@@ -124,7 +123,30 @@ internal class SyncInfoViewModel @Inject constructor(
             async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
             async { _moduleCounts.postValue(getModuleCounts(projectId)) }
         )
+        emitSyncAvailable(
+            isSyncRunning = lastSyncState.value?.isSyncRunning(),
+            isConnected = isConnected.value,
+            syncConfiguration = configuration.value?.synchronization,
+        )
     }
+
+    fun emitSyncAvailable(
+        isSyncRunning: Boolean?,
+        isConnected: Boolean?,
+        syncConfiguration: SynchronizationConfiguration?,
+    ) {
+        isSyncAvailable.postValue(
+            isConnected == true
+                && isSyncRunning == false
+                && syncConfiguration?.let { !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(it) } == true
+        )
+    }
+
+    private fun isModuleSync(syncConfiguration: DownSynchronizationConfiguration) =
+        syncConfiguration.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+
+    fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
+        synchronizationConfiguration.down.let { it.moduleOptions.isNotEmpty() && isModuleSync(it) }
 
     private suspend fun getRecordsInLocal(projectId: String): Int =
         enrolmentRecordManager.count(SubjectQuery(projectId = projectId))
