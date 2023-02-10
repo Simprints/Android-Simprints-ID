@@ -12,7 +12,6 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration.PartitionType
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
@@ -54,7 +53,12 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.syncButton.setOnClickListener {
             viewModel.forceSync()
             // Prevent double-clicks while sync master worker is preparing
-            updateSyncButton(isSyncInProgress = true, isConnected = true)
+            viewModel.emitSyncAvailable(
+                isSyncRunning = true,
+                isConnected = viewModel.isConnected.value,
+                syncConfiguration = viewModel.configuration.value?.synchronization,
+            )
+            updateSyncButton(isSyncInProgress = true)
         }
     }
 
@@ -93,32 +97,36 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
 
         viewModel.isConnected.observe(viewLifecycleOwner) {
-            updateSyncButton(
-                viewModel.lastSyncState.value?.isSyncRunning() ?: false,
-                viewModel.isConnected.value == true
+            viewModel.emitSyncAvailable(
+                isSyncRunning = viewModel.lastSyncState.value?.isSyncRunning(),
+                isConnected = it,
+                syncConfiguration = viewModel.configuration.value?.synchronization,
             )
         }
         viewModel.lastSyncState.observe(viewLifecycleOwner) {
             viewModel.fetchSyncInformationIfNeeded(it)
-            updateSyncButton(
-                it.isSyncRunning(),
-                viewModel.isConnected.value == true
+            val isRunning = it.isSyncRunning()
+            updateSyncButton(isRunning)
+            viewModel.emitSyncAvailable(
+                isSyncRunning = isRunning,
+                isConnected = viewModel.isConnected.value,
+                syncConfiguration = viewModel.configuration.value?.synchronization,
             )
+        }
+        viewModel.isSyncAvailable.observe(viewLifecycleOwner) {
+            binding.syncButton.isEnabled = it
         }
     }
 
-    private fun updateSyncButton(isSyncInProgress: Boolean, isConnected: Boolean) {
-        with(binding.syncButton) {
-            isEnabled = !isSyncInProgress && isConnected
-            text = getString(
-                if (isSyncInProgress) IDR.string.sync_info_sync_in_progress
-                else IDR.string.sync_info_sync_now
-            )
-        }
+    private fun updateSyncButton(isSyncInProgress: Boolean) {
+        binding.syncButton.text = getString(
+            if (isSyncInProgress) IDR.string.sync_info_sync_in_progress
+            else IDR.string.sync_info_sync_now
+        )
     }
 
     private fun enableModuleSelectionButtonAndTabsIfNecessary(synchronizationConfiguration: SynchronizationConfiguration) {
-        if (isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
+        if (viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
             binding.moduleSelectionButton.visibility = View.VISIBLE
             binding.modulesTabHost.visibility = View.VISIBLE
         } else {
@@ -126,11 +134,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             binding.modulesTabHost.visibility = View.GONE
         }
     }
-
-    private fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
-        with(synchronizationConfiguration.down) {
-            moduleOptions.isNotEmpty() && partitionType == PartitionType.MODULE
-        }
 
     private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
         if (!configuration.isEventDownSyncAllowed()) {
