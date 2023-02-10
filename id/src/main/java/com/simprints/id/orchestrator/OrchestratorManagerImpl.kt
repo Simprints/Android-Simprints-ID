@@ -92,12 +92,8 @@ class OrchestratorManagerImpl @Inject constructor(
         proceedToNextStepOrAppResponse()
     }
 
-
     override suspend fun saveState() {
-        hotCache.clearSteps()
-        modalitiesFlow.steps.forEach {
-            hotCache.save(it)
-        }
+        hotCache.save(modalitiesFlow.steps)
     }
 
     override fun getCurrentFlow() =
@@ -173,10 +169,8 @@ class OrchestratorManagerImpl @Inject constructor(
         }
     }
 
-
     private fun resetInternalState() {
         appResponse.value = null
         ongoingStep.value = null
     }
-
 }
