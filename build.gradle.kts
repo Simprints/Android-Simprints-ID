@@ -41,7 +41,7 @@ buildscript {
         classpath("com.google.firebase:firebase-appdistribution-gradle:3.2.0")
 
         // Hilt
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.44.2")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.45")
     }
 
 }
