@@ -2,7 +2,7 @@
 kotlin_version = "1.8.10"
 androidx_navigation_version = "2.5.3"
 kotlin_coroutine_version = "1.6.4"
-app_compat_version = "1.6.0"
+app_compat_version = "1.6.1"
 androidx_version = "1.5.2"
 androidx_test_orchestrator_version = "1.4.2"
 espresso_version = "3.5.1"
