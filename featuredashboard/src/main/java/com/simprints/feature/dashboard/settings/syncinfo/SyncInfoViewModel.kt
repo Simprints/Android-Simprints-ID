@@ -73,7 +73,9 @@ internal class SyncInfoViewModel @Inject constructor(
     val lastSyncState = eventSyncManager.getLastSyncState()
     private var lastKnownEventSyncState: EventSyncState? = null
 
-    val isSyncAvailable = MutableLiveData(false)
+    val isSyncAvailable: LiveData<Boolean>
+        get() = _isSyncAvailable
+    private val _isSyncAvailable = MutableLiveData(false)
 
     fun refreshInformation() {
         _recordsInLocal.postValue(null)
@@ -135,7 +137,7 @@ internal class SyncInfoViewModel @Inject constructor(
         isConnected: Boolean?,
         syncConfiguration: SynchronizationConfiguration?,
     ) {
-        isSyncAvailable.postValue(
+        _isSyncAvailable.postValue(
             isConnected == true
                 && isSyncRunning == false
                 && syncConfiguration?.let { !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(it) } == true
