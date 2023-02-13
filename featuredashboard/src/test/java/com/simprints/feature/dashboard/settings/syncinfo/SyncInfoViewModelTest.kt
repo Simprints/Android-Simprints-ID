@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
@@ -170,16 +171,11 @@ class SyncInfoViewModelTest {
                     PROJECT_ID,
                     moduleIds = listOf(module1),
                     modes = listOf(),
-                    types = listOf(
-                        EventType.ENROLMENT_RECORD_CREATION,
-                        EventType.ENROLMENT_RECORD_MOVE,
-                        EventType.ENROLMENT_RECORD_DELETION
-                    )
                 )
             )
         } returns listOf(
-            EventCount(EventType.ENROLMENT_RECORD_CREATION, creationForModule1),
-            EventCount(EventType.ENROLMENT_RECORD_DELETION, deletionForModule1),
+            EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, creationForModule1),
+            EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, deletionForModule1),
         )
         coEvery {
             eventRepository.countEventsToDownload(
@@ -187,15 +183,10 @@ class SyncInfoViewModelTest {
                     PROJECT_ID,
                     moduleIds = listOf(module2),
                     modes = listOf(),
-                    types = listOf(
-                        EventType.ENROLMENT_RECORD_CREATION,
-                        EventType.ENROLMENT_RECORD_MOVE,
-                        EventType.ENROLMENT_RECORD_DELETION
-                    )
                 )
             )
         } returns listOf(
-            EventCount(EventType.ENROLMENT_RECORD_CREATION, creationForModule2),
+            EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, creationForModule2),
         )
 
         viewModel.refreshInformation()

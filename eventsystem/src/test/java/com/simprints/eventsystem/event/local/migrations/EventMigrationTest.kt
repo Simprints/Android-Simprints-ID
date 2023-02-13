@@ -36,15 +36,7 @@ class EventMigrationTest {
         FrameworkSQLiteOpenHelperFactory()
     )
 
-    // The EnrolmentRecordCreation, EnrolmentRecordDeletion and EnrolmentRecordMove are not stored
-    // in the database so we don't need to test them.
-    private val allEventTypes = EventType.values().filter { eventType ->
-        !listOf(
-            EventType.ENROLMENT_RECORD_CREATION,
-            EventType.ENROLMENT_RECORD_DELETION,
-            EventType.ENROLMENT_RECORD_MOVE
-        ).contains(eventType)
-    }
+    private val allEventTypes = EventType.values()
 
     @Test
     fun `validate all the migrations are successful`() {
