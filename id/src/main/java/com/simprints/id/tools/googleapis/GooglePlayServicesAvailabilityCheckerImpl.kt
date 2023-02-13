@@ -48,7 +48,7 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
     ) {
         googleApiAvailability.showErrorDialogFragment(
             activity,
-            googleApiAvailability.isGooglePlayServicesAvailable(activity),
+            statusCode,
             GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
         ) {
             // Throw exception when user cancels the dialog
