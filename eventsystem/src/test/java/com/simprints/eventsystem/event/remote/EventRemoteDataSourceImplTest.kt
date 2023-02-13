@@ -4,12 +4,14 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.EventType.*
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
 import com.simprints.eventsystem.event.remote.models.ApiEventCount
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.*
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
+import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordPayloadType
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -56,7 +58,6 @@ class EventRemoteDataSourceImplTest {
         subjectId = GUID1,
         lastEventId = GUID2,
         modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
-        types = listOf(EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove)
     )
 
     @Before
@@ -85,11 +86,11 @@ class EventRemoteDataSourceImplTest {
                     any(),
                     any()
                 )
-            } returns listOf(ApiEventCount(EnrolmentRecordCreation, 1))
+            } returns listOf(ApiEventCount(ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation, 1))
 
             val count = eventRemoteDataSource.count(query)
 
-            assertThat(count).isEqualTo(listOf(EventCount(ENROLMENT_RECORD_CREATION, 1)))
+            assertThat(count).isEqualTo(listOf(EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, 1)))
             coVerify(exactly = 1) {
                 eventRemoteInterface.countEvents(
                     DEFAULT_PROJECT_ID,
@@ -127,7 +128,7 @@ class EventRemoteDataSourceImplTest {
         runBlocking {
             val responseStreamWith6Events =
                 this.javaClass.classLoader?.getResourceAsStream("responses/down_sync_7events.json")!!
-            val channel = mockk<ProducerScope<Event>>(relaxed = true)
+            val channel = mockk<ProducerScope<EnrolmentRecordEvent>>(relaxed = true)
             excludeRecords { channel.isClosedForSend }
 
             (eventRemoteDataSource as EventRemoteDataSourceImpl).parseStreamAndEmitEvents(
@@ -138,21 +139,21 @@ class EventRemoteDataSourceImplTest {
             verifySequenceOfEventsEmitted(
                 channel,
                 listOf(
-                    ENROLMENT_RECORD_CREATION,
-                    ENROLMENT_RECORD_DELETION,
-                    ENROLMENT_RECORD_MOVE,
-                    ENROLMENT_RECORD_CREATION,
-                    ENROLMENT_RECORD_DELETION,
-                    ENROLMENT_RECORD_MOVE,
-                    ENROLMENT_RECORD_MOVE
+                    EnrolmentRecordEventType.EnrolmentRecordCreation,
+                    EnrolmentRecordEventType.EnrolmentRecordDeletion,
+                    EnrolmentRecordEventType.EnrolmentRecordMove,
+                    EnrolmentRecordEventType.EnrolmentRecordCreation,
+                    EnrolmentRecordEventType.EnrolmentRecordDeletion,
+                    EnrolmentRecordEventType.EnrolmentRecordMove,
+                    EnrolmentRecordEventType.EnrolmentRecordMove
                 )
             )
         }
     }
 
     private fun verifySequenceOfEventsEmitted(
-        channel: ProducerScope<Event>,
-        eventTypes: List<EventType>
+        channel: ProducerScope<EnrolmentRecordEvent>,
+        eventTypes: List<EnrolmentRecordEventType>
     ) {
         coVerifySequence {
             eventTypes.forEach { eventType ->

@@ -1,14 +1,8 @@
 package com.simprints.eventsystem.sampledata
 
 import android.os.Build
-import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.modality.Modes.FACE
-import com.simprints.core.domain.modality.Modes.FINGERPRINT
-import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
-import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
@@ -42,13 +36,9 @@ import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.Location
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.event.domain.models.subject.*
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
@@ -56,11 +46,7 @@ import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
-import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
-import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
-import kotlin.random.Random
 
 val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = DEFAULT_PROJECT_ID)
 
@@ -200,87 +186,6 @@ fun createSessionCaptureEvent(
     }
 }
 
-fun createEnrolmentRecordCreationEvent(encoder: EncodingUtils) =
-    EnrolmentRecordCreationEvent(
-        CREATED_AT,
-        GUID1,
-        DEFAULT_PROJECT_ID,
-        DEFAULT_MODULE_ID,
-        DEFAULT_USER_ID,
-        listOf(FINGERPRINT, FACE),
-        buildFakeBiometricReferences(encoder),
-        EventLabels(
-            projectId = DEFAULT_PROJECT_ID,
-            moduleIds = listOf(GUID2),
-            attendantId = DEFAULT_USER_ID,
-            mode = listOf(FINGERPRINT, FACE)
-        )
-    )
-
-fun createEnrolmentRecordDeletionEvent() =
-    EnrolmentRecordDeletionEvent(
-        CREATED_AT, GUID1, DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, DEFAULT_USER_ID,
-        EventLabels(
-            projectId = DEFAULT_PROJECT_ID,
-            moduleIds = listOf(GUID2),
-            attendantId = DEFAULT_USER_ID,
-            mode = listOf(FINGERPRINT, FACE)
-        )
-    )
-
-fun createEnrolmentRecordMoveEvent(encoder: EncodingUtils) =
-    EnrolmentRecordMoveEvent(
-        CREATED_AT,
-        EnrolmentRecordCreationInMove(
-            GUID1,
-            DEFAULT_PROJECT_ID,
-            DEFAULT_MODULE_ID_2,
-            DEFAULT_USER_ID,
-            buildFakeBiometricReferences(encoder)
-        ),
-        EnrolmentRecordDeletionInMove(
-            GUID1,
-            DEFAULT_PROJECT_ID,
-            DEFAULT_MODULE_ID,
-            DEFAULT_USER_ID
-        ),
-        EventLabels(
-            projectId = DEFAULT_PROJECT_ID,
-            moduleIds = listOf(GUID2),
-            attendantId = DEFAULT_USER_ID,
-            mode = listOf(FINGERPRINT, FACE)
-        )
-    )
-
-fun buildFakeBiometricReferences(encoder: EncodingUtils): List<BiometricReference> {
-    val fingerprintReference = FingerprintReference(
-        GUID1,
-        listOf(FingerprintTemplate(0, buildFakeFingerprintTemplate(encoder), LEFT_3RD_FINGER)),
-        FingerprintTemplateFormat.ISO_19794_2,
-        hashMapOf("some_key" to "some_value")
-    )
-    val faceReference =
-        FaceReference(
-            GUID2,
-            listOf(FaceTemplate(buildFakeFaceTemplate(encoder))),
-            FaceTemplateFormat.RANK_ONE_1_23
-        )
-    return listOf(fingerprintReference, faceReference)
-}
-
-fun buildFakeFingerprintTemplate(encoder: EncodingUtils) = encoder.byteArrayToBase64(
-    FingerprintSample(
-        LEFT_THUMB,
-        Random.nextBytes(64),
-        50,
-        IFingerprintTemplateFormat.ISO_19794_2
-    ).template
-)
-
-private fun buildFakeFaceTemplate(encoder: EncodingUtils) = encoder.byteArrayToBase64(
-    FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23).template
-)
-
 fun createAlertScreenEvent() = AlertScreenEvent(CREATED_AT, BLUETOOTH_NOT_ENABLED, eventLabels)
 
 fun createArtificialTerminationEvent() =
@@ -333,8 +238,6 @@ fun createEnrolmentEventV2() =
     )
 
 fun createEnrolmentEventV1() = EnrolmentEventV1(CREATED_AT, GUID1, eventLabels)
-
-private val payloadId = randomUUID()
 
 fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
     val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(

@@ -34,10 +34,6 @@ interface EventRoomDao {
         type: EventType = EventType.SESSION_CAPTURE
     ): List<String>
 
-    @Deprecated(message = "Can be removed once all projects are on 2021.1.0+")
-    @Query("select * from DbEvent where projectId = :projectId and sessionId is null")
-    suspend fun loadOldSubjectCreationEvents(projectId: String): List<DbEvent>
-
     @Query("select count(*) from DbEvent where projectId = :projectId")
     suspend fun countFromProject(projectId: String): Int
 

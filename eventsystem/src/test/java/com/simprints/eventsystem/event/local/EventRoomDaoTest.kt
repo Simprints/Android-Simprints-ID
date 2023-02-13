@@ -5,16 +5,12 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.local.models.DbEvent
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
@@ -35,9 +31,6 @@ class EventRoomDaoTest {
         GUID1,
         EventLabels(
             projectId = DEFAULT_PROJECT_ID,
-            attendantId = DEFAULT_USER_ID,
-            moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-            mode = listOf(Modes.FACE, Modes.FINGERPRINT),
             sessionId = GUID1,
             deviceId = GUID1
         ),
@@ -115,22 +108,6 @@ class EventRoomDaoTest {
                 eventDao.loadAllClosedSessionIds(
                     DEFAULT_PROJECT_ID
                 )
-            )
-        }
-    }
-
-    @Test
-    fun loadAbandonedEvents() {
-        runBlocking {
-            val closedEvent = event.copy(
-                id = randomUUID(),
-                labels = event.labels.copy(sessionId = null)
-            )
-
-            addIntoDb(event, closedEvent)
-            verifyEvents(
-                listOf(closedEvent),
-                eventDao.loadOldSubjectCreationEvents(DEFAULT_PROJECT_ID)
             )
         }
     }

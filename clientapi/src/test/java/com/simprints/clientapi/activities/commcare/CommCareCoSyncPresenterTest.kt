@@ -279,9 +279,8 @@ class CommCareCoSyncPresenterTest {
                     "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
                     match {
                         it.contains("{\"events\":[{\"id\":") // Can't verify the ID because it's created dynamically, so checking all the rest
-                        it.contains("\"labels\":{\"projectId\":\"$projectId\",\"subjectId\":\"$registerId\",\"attendantId\":\"thales\",\"moduleIds\":[\"mod1\"],\"mode\":[\"FACE\"]},")
-                        it.contains("\"payload\":{\"createdAt\":1,\"eventVersion\":2,\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[],\"type\":\"ENROLMENT_RECORD_CREATION\",\"endedAt\":0},")
-                        it.contains("\"type\":\"ENROLMENT_RECORD_CREATION\"}]}")
+                        it.contains("\"payload\":{\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[]},")
+                        it.contains("\"type\":\"EnrolmentRecordCreation\"}]}")
                     }
                 )
             }
@@ -352,9 +351,8 @@ class CommCareCoSyncPresenterTest {
                     "{\"events\":[${jsonHelper.toJson(sessionCaptureEvent)}]}",
                     match {
                         it.contains("{\"events\":[{\"id\":") // Can't verify the ID because it's created dynamically, so checking all the rest
-                        it.contains("\"labels\":{\"projectId\":\"$projectId\",\"subjectId\":\"$registerId\",\"attendantId\":\"thales\",\"moduleIds\":[\"mod1\"],\"mode\":[\"FACE\"]},")
-                        it.contains("\"payload\":{\"createdAt\":1,\"eventVersion\":2,\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[],\"type\":\"ENROLMENT_RECORD_CREATION\",\"endedAt\":0},")
-                        it.contains("\"type\":\"ENROLMENT_RECORD_CREATION\"}]}")
+                        it.contains("\"payload\":{\"subjectId\":\"$registerId\",\"projectId\":\"$projectId\",\"moduleId\":\"mod1\",\"attendantId\":\"thales\",\"biometricReferences\":[]},")
+                        it.contains("\"type\":\"EnrolmentRecordCreation\"}]}")
                     }
                 )
             }
