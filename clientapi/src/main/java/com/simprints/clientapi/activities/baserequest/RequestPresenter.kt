@@ -8,14 +8,17 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.*
+import com.simprints.infra.config.domain.models.canCoSyncAllData
+import com.simprints.infra.config.domain.models.canCoSyncBiometricData
+import com.simprints.infra.config.domain.models.canCoSyncData
+import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
@@ -152,13 +155,11 @@ abstract class RequestPresenter(
             )
                 .firstOrNull()
                 ?.fromSubjectToEnrolmentCreationEvent(
-                    now = timeHelper.now(),
-                    modalities = projectConfig.general.modalities,
                     encoder = encoder
                 )
                 ?: return null
 
-        return jsonHelper.toJson(CoSyncEvents(listOf(recordCreationEvent)))
+        return jsonHelper.toJson(CoSyncEnrolmentRecordEvents(listOf(recordCreationEvent)))
     }
 
     /**
@@ -176,18 +177,17 @@ abstract class RequestPresenter(
     @Keep
     private data class CoSyncEvents(val events: List<Event>)
 
+    @Keep
+    private data class CoSyncEnrolmentRecordEvents(val events: List<EnrolmentRecordEvent>)
+
     private fun Subject.fromSubjectToEnrolmentCreationEvent(
-        now: Long,
-        modalities: List<GeneralConfiguration.Modality>,
         encoder: EncodingUtils
     ): EnrolmentRecordCreationEvent {
         return EnrolmentRecordCreationEvent(
-            now,
             subjectId,
             projectId,
             moduleId,
             attendantId,
-            modalities.map { it.toMode() },
             EnrolmentRecordCreationEvent.buildBiometricReferences(
                 fingerprintSamples,
                 faceSamples,
@@ -195,10 +195,4 @@ abstract class RequestPresenter(
             )
         )
     }
-
-    private fun GeneralConfiguration.Modality.toMode(): Modes =
-        when (this) {
-            GeneralConfiguration.Modality.FACE -> Modes.FACE
-            GeneralConfiguration.Modality.FINGERPRINT -> Modes.FINGERPRINT
-        }
 }

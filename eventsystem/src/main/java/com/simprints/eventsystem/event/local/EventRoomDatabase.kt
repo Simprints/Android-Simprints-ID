@@ -13,7 +13,7 @@ import com.simprints.eventsystem.event.local.models.DbEvent
 import net.sqlcipher.database.SupportFactory
 
 
-@Database(entities = [DbEvent::class], version = 8, exportSchema = true)
+@Database(entities = [DbEvent::class], version = 9, exportSchema = true)
 @TypeConverters(Converters::class)
 @Keep
 abstract class EventRoomDatabase : RoomDatabase() {
@@ -35,6 +35,7 @@ abstract class EventRoomDatabase : RoomDatabase() {
                 .addMigrations(EventMigration5to6())
                 .addMigrations(EventMigration6to7())
                 .addMigrations(EventMigration7to8())
+                .addMigrations(EventMigration8to9())
 
             if (BuildConfig.DB_ENCRYPTION)
                 builder.openHelperFactory(factory)

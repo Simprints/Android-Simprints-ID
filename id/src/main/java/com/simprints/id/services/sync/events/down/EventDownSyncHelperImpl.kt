@@ -4,11 +4,7 @@ import androidx.annotation.VisibleForTesting
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.event.domain.models.EventType.*
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.eventsystem.event.domain.models.subject.*
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
@@ -46,7 +42,7 @@ class EventDownSyncHelperImpl @Inject constructor(
         scope.produce(capacity = Channel.UNLIMITED) {
             var lastOperation = operation.copy()
             var count = 0
-            val batchOfEventsToProcess = mutableListOf<Event>()
+            val batchOfEventsToProcess = mutableListOf<EnrolmentRecordEvent>()
 
             try {
                 eventRepository.downloadEvents(scope, operation.queryEvent).consumeEach {
@@ -87,23 +83,20 @@ class EventDownSyncHelperImpl @Inject constructor(
 
     private suspend fun processBatchedEvents(
         operation: EventDownSyncOperation,
-        batchOfEventsToProcess: MutableList<Event>,
+        batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
         lastOperation: EventDownSyncOperation
     ): EventDownSyncOperation {
 
         val actions = batchOfEventsToProcess.map { event ->
             return@map when (event.type) {
-                ENROLMENT_RECORD_CREATION -> {
+                EnrolmentRecordEventType.EnrolmentRecordCreation -> {
                     handleSubjectCreationEvent(event as EnrolmentRecordCreationEvent)
                 }
-                ENROLMENT_RECORD_DELETION -> {
+                EnrolmentRecordEventType.EnrolmentRecordDeletion -> {
                     handleSubjectDeletionEvent(event as EnrolmentRecordDeletionEvent)
                 }
-                ENROLMENT_RECORD_MOVE -> {
+                EnrolmentRecordEventType.EnrolmentRecordMove -> {
                     handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
-                }
-                else -> {
-                    emptyList()
                 }
             }
         }.flatten()
