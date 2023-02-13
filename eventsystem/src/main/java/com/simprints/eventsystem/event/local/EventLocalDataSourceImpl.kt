@@ -102,11 +102,6 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
             eventDao.insertOrUpdate(event.fromDomainToDb())
         }
 
-    override suspend fun loadOldSubjectCreationEvents(projectId: String): List<Event> =
-        useRoom(writingContext) {
-            eventDao.loadOldSubjectCreationEvents(projectId).map { it.fromDbToDomain() }
-        }
-
     override suspend fun delete(ids: List<String>) =
         useRoom(writingContext) {
             eventDao.delete(ids)

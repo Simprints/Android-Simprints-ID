@@ -1,5 +1,6 @@
 package com.simprints.eventsystem.event.domain.models.subject
 
+import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
@@ -16,6 +17,7 @@ import com.simprints.eventsystem.event.remote.models.subject.biometricref.finger
     JsonSubTypes.Type(value = FaceReference::class, name = FACE_REFERENCE_KEY),
     JsonSubTypes.Type(value = FingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY)
 )
+@Keep
 sealed class BiometricReference(open val id: String,
                                 val type: BiometricReferenceType)
 

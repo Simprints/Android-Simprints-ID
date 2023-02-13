@@ -8,10 +8,12 @@ import com.fasterxml.jackson.core.JsonToken.START_OBJECT
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
-import com.simprints.eventsystem.event.remote.models.ApiEvent
 import com.simprints.eventsystem.event.remote.models.fromApiToDomain
 import com.simprints.eventsystem.event.remote.models.fromDomainToApi
+import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordEvent
+import com.simprints.eventsystem.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork.SimApiClient
@@ -50,7 +52,7 @@ internal class EventRemoteDataSourceImpl @Inject constructor(
     override suspend fun getEvents(
         query: ApiRemoteEventQuery,
         scope: CoroutineScope
-    ): ReceiveChannel<Event> {
+    ): ReceiveChannel<EnrolmentRecordEvent> {
         return try {
             val streaming = takeStreaming(query)
             Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
@@ -68,7 +70,7 @@ internal class EventRemoteDataSourceImpl @Inject constructor(
     }
 
     @VisibleForTesting
-    suspend fun parseStreamAndEmitEvents(streaming: InputStream, channel: ProducerScope<Event>) {
+    suspend fun parseStreamAndEmitEvents(streaming: InputStream, channel: ProducerScope<EnrolmentRecordEvent>) {
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
@@ -76,7 +78,7 @@ internal class EventRemoteDataSourceImpl @Inject constructor(
 
         try {
             while (parser.nextToken() == START_OBJECT) {
-                val event = jsonHelper.jackson.readValue(parser, ApiEvent::class.java)
+                val event = jsonHelper.jackson.readValue(parser, ApiEnrolmentRecordEvent::class.java)
                 channel.send(event.fromApiToDomain())
             }
 

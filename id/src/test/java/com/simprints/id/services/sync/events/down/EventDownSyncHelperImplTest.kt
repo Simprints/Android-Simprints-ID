@@ -3,10 +3,10 @@ package com.simprints.id.services.sync.events.down
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.eventsystem.event.domain.models.subject.*
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.eventsystem.sampledata.*
+import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
@@ -35,10 +35,41 @@ import org.junit.Test
 
 class EventDownSyncHelperImplTest {
 
+    companion object {
+        val ENROLMENT_RECORD_DELETION = EnrolmentRecordDeletionEvent(
+            "subjectId",
+            "projectId",
+            "moduleId",
+            "attendantId",
+        )
+        val ENROLMENT_RECORD_CREATION = EnrolmentRecordCreationEvent(
+            "subjectId",
+            "projectId",
+            "moduleId",
+            "attendantId",
+            listOf(FaceReference("id", listOf(FaceTemplate("template"))))
+        )
+        val ENROLMENT_RECORD_MOVE = EnrolmentRecordMoveEvent(
+            EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
+                "subjectId",
+                "projectId",
+                DEFAULT_MODULE_ID_2,
+                "attendantId",
+                listOf(FaceReference("id", listOf(FaceTemplate("template"))))
+            ),
+            EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
+                "subjectId",
+                "projectId",
+                DEFAULT_MODULE_ID,
+                "attendantId",
+            )
+        )
+    }
+
     private val projectOp = SampleDefaults.projectDownSyncScope.operations.first()
     private val moduleOp = SampleDefaults.modulesDownSyncScope.operations.first()
 
-    private lateinit var downloadEventsChannel: Channel<Event>
+    private lateinit var downloadEventsChannel: Channel<EnrolmentRecordEvent>
 
     private lateinit var eventDownSyncHelper: EventDownSyncHelper
 
@@ -100,8 +131,8 @@ class EventDownSyncHelperImplTest {
     @Test
     fun downSync_shouldProgressEventsInBatches() {
         runTest(StandardTestDispatcher()) {
-            val eventsToDownload = mutableListOf<Event>()
-            repeat(2 * EVENTS_BATCH_SIZE) { eventsToDownload += createPersonCreationEvent() }
+            val eventsToDownload = mutableListOf<EnrolmentRecordEvent>()
+            repeat(2 * EVENTS_BATCH_SIZE) { eventsToDownload += ENROLMENT_RECORD_DELETION }
             mockProgressEmission(eventsToDownload)
 
             val channel = eventDownSyncHelper.downSync(this, projectOp)
@@ -143,7 +174,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun downSync_shouldProcessRecordCreationEvent() {
         runTest(StandardTestDispatcher()) {
-            val event = createEnrolmentRecordCreationEvent(EncodingUtilsImplForTests)
+            val event = ENROLMENT_RECORD_CREATION
             mockProgressEmission(listOf(event))
 
             eventDownSyncHelper.downSync(this, projectOp).consumeAsFlow().toList()
@@ -165,7 +196,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun downSync_shouldProcessRecordDeletionEvent() {
         runTest(StandardTestDispatcher()) {
-            val event = createEnrolmentRecordDeletionEvent()
+            val event = ENROLMENT_RECORD_DELETION
             mockProgressEmission(listOf(event))
 
             eventDownSyncHelper.downSync(this, projectOp).consumeAsFlow().toList()
@@ -177,7 +208,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun moveSubjectFromModulesUnderSyncing_theOriginalModuleSyncShouldDoNothing() {
         runTest(StandardTestDispatcher()) {
-            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
+            val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
             mockProgressEmission(listOf(eventToMoveToModule2))
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
@@ -197,7 +228,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() {
         runTest(StandardTestDispatcher()) {
-            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
+            val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
             mockProgressEmission(listOf(eventToMoveToModule2))
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
@@ -226,7 +257,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun moveSubjectToAModuleNotUnderSyncing_shouldPerformDeletionOnly() {
         runTest(StandardTestDispatcher()) {
-            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
+            val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
             mockProgressEmission(listOf(eventToMoveToModule2))
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
@@ -250,7 +281,7 @@ class EventDownSyncHelperImplTest {
     @Test
     fun moveSubjectToAModuleUnderSyncing_shouldPerformCreationOnly() {
         runTest(StandardTestDispatcher()) {
-            val eventToMoveToModule2 = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
+            val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
             mockProgressEmission(listOf(eventToMoveToModule2))
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
@@ -276,7 +307,7 @@ class EventDownSyncHelperImplTest {
         }
     }
 
-    private suspend fun mockProgressEmission(progressEvents: List<Event>) {
+    private suspend fun mockProgressEmission(progressEvents: List<EnrolmentRecordEvent>) {
         downloadEventsChannel = Channel(capacity = Channel.UNLIMITED)
         coEvery { eventRepository.downloadEvents(any(), any()) } returns downloadEventsChannel
 

@@ -62,7 +62,7 @@ class RemoteTestingManagerImpl(ctx: Context) : RemoteTestingManager {
     fun enforceThatAnyTestHasATest() {
         val type: ApiEventPayloadType? = null
         when (type) {
-            EnrolmentRecordCreation, EnrolmentRecordDeletion, EnrolmentRecordMove, Callout, Callback, ArtificialTermination,
+            Callout, Callback, ArtificialTermination,
             Authentication, Consent, Enrolment, Authorization, FingerprintCapture, OneToOneMatch,
             OneToManyMatch, PersonCreation, AlertScreen, GuidSelection, ConnectivitySnapshot, Refusal, CandidateRead,
             ScannerConnection, Vero2InfoSnapshot, ScannerFirmwareUpdate, InvalidIntent, SuspiciousIntent, IntentParsing,
