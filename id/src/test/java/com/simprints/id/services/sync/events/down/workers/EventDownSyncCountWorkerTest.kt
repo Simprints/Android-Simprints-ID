@@ -147,7 +147,8 @@ class EventDownSyncCountWorkerTest {
                 workDataOf(),
                 listOf(tagForMasterSyncId, tagForType(EventSyncWorkerType.DOWNLOADER)),
                 workDataOf(),
-                2
+                2,
+                0
             )
         )
         every { mockWm.getWorkInfosByTag(any()) } returns mockWorkInfo
