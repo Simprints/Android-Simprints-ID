@@ -245,6 +245,7 @@ fun createWorkInfo(
         output,
         tags,
         progress,
+        0,
         0
     )
 
