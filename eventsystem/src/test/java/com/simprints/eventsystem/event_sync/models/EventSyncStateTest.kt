@@ -9,20 +9,23 @@ import org.junit.Test
 class EventSyncStateTest {
 
     @Test
-    fun testIsRunning() {
-        // No workers
+    fun `is not running when there are no workers`() {
         assertThat(createState(
             up = emptyList(),
             down = emptyList(),
         ).isSyncRunning()).isFalse()
+    }
 
-        // All workers completed
+    @Test
+    fun `is not running when when all workers completed`() {
         assertThat(createState(
             up = listOf(createWorker(EventSyncWorkerState.Succeeded)),
             down = listOf(createWorker(EventSyncWorkerState.Succeeded)),
         ).isSyncRunning()).isFalse()
+    }
 
-        // Has running workers
+    @Test
+    fun `is running when there are running workers`() {
         assertThat(createState(
             up = listOf(createWorker(EventSyncWorkerState.Running)),
             down = listOf(createWorker(EventSyncWorkerState.Succeeded)),
@@ -35,8 +38,10 @@ class EventSyncStateTest {
             up = listOf(createWorker(EventSyncWorkerState.Running)),
             down = listOf(createWorker(EventSyncWorkerState.Running)),
         ).isSyncRunning()).isTrue()
+    }
 
-        // Has enqueued workers
+    @Test
+    fun `is running when there are enqueued workers`() {
         assertThat(createState(
             up = listOf(createWorker(EventSyncWorkerState.Enqueued)),
             down = listOf(createWorker(EventSyncWorkerState.Succeeded)),
