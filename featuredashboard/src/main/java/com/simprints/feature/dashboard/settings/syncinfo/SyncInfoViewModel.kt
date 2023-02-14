@@ -128,14 +128,13 @@ internal class SyncInfoViewModel @Inject constructor(
         emitSyncAvailable(
             isSyncRunning = lastSyncState.value?.isSyncRunning(),
             isConnected = isConnected.value,
-            syncConfiguration = configuration.value?.synchronization,
         )
     }
 
     fun emitSyncAvailable(
         isSyncRunning: Boolean?,
         isConnected: Boolean?,
-        syncConfiguration: SynchronizationConfiguration?,
+        syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
     ) {
         _isSyncAvailable.postValue(
             isConnected == true

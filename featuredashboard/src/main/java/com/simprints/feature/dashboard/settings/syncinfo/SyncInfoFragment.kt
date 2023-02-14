@@ -56,7 +56,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             viewModel.emitSyncAvailable(
                 isSyncRunning = true,
                 isConnected = viewModel.isConnected.value,
-                syncConfiguration = viewModel.configuration.value?.synchronization,
             )
             updateSyncButton(isSyncInProgress = true)
         }
@@ -100,7 +99,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             viewModel.emitSyncAvailable(
                 isSyncRunning = viewModel.lastSyncState.value?.isSyncRunning(),
                 isConnected = it,
-                syncConfiguration = viewModel.configuration.value?.synchronization,
             )
         }
         viewModel.lastSyncState.observe(viewLifecycleOwner) {
@@ -110,7 +108,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             viewModel.emitSyncAvailable(
                 isSyncRunning = isRunning,
                 isConnected = viewModel.isConnected.value,
-                syncConfiguration = viewModel.configuration.value?.synchronization,
             )
         }
         viewModel.isSyncAvailable.observe(viewLifecycleOwner) {
