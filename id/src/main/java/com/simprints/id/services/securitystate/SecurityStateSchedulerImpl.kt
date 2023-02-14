@@ -2,6 +2,7 @@ package com.simprints.id.services.securitystate
 
 import android.content.Context
 import androidx.work.*
+import androidx.work.WorkRequest.Companion.MIN_BACKOFF_MILLIS
 import com.simprints.id.BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
@@ -41,7 +42,7 @@ class SecurityStateSchedulerImpl @Inject constructor(@ApplicationContext context
             .setConstraints(workerConstraints())
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
-                PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
+                MIN_BACKOFF_MILLIS,
                 TimeUnit.MILLISECONDS
             ).build()
     }
