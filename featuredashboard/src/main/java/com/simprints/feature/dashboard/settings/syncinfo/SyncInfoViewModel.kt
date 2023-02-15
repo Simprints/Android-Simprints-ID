@@ -1,9 +1,6 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.event.EventRepository
@@ -75,7 +72,31 @@ internal class SyncInfoViewModel @Inject constructor(
 
     val isSyncAvailable: LiveData<Boolean>
         get() = _isSyncAvailable
-    private val _isSyncAvailable = MutableLiveData(false)
+    private val _isSyncAvailable = MediatorLiveData<Boolean>()
+
+    init {
+        _isSyncAvailable.addSource(lastSyncState) { lastSyncStateValue ->
+            _isSyncAvailable.postValue(emitSyncAvailable(
+                isSyncRunning = lastSyncStateValue?.isSyncRunning(),
+                isConnected = isConnected.value,
+                syncConfiguration = configuration.value?.synchronization,
+            ))
+        }
+        _isSyncAvailable.addSource(isConnected) { isConnectedValue ->
+            _isSyncAvailable.postValue(emitSyncAvailable(
+                isSyncRunning = lastSyncState.value?.isSyncRunning(),
+                isConnected = isConnectedValue,
+                syncConfiguration = configuration.value?.synchronization,
+            ))
+        }
+        _isSyncAvailable.addSource(_configuration) { config ->
+            _isSyncAvailable.postValue(emitSyncAvailable(
+                isSyncRunning = lastSyncState.value?.isSyncRunning(),
+                isConnected = isConnected.value,
+                syncConfiguration = config.synchronization,
+            ))
+        }
+    }
 
     fun refreshInformation() {
         _recordsInLocal.postValue(null)
@@ -89,6 +110,9 @@ internal class SyncInfoViewModel @Inject constructor(
 
     fun forceSync() {
         eventSyncManager.sync()
+        // There is a delay between starting sync and lastSyncState
+        // reporting it so this prevents starting multiple syncs by accident
+        _isSyncAvailable.postValue(false)
     }
 
     /**
@@ -125,23 +149,15 @@ internal class SyncInfoViewModel @Inject constructor(
             async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
             async { _moduleCounts.postValue(getModuleCounts(projectId)) }
         )
-        emitSyncAvailable(
-            isSyncRunning = lastSyncState.value?.isSyncRunning(),
-            isConnected = isConnected.value,
-        )
     }
 
-    fun emitSyncAvailable(
+    private fun emitSyncAvailable(
         isSyncRunning: Boolean?,
         isConnected: Boolean?,
         syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
-    ) {
-        _isSyncAvailable.postValue(
-            isConnected == true
-                && isSyncRunning == false
-                && syncConfiguration?.let { !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(it) } == true
-        )
-    }
+    ) = isConnected == true
+        && isSyncRunning == false
+        && syncConfiguration?.let { !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(it) } == true
 
     private fun isModuleSync(syncConfiguration: DownSynchronizationConfiguration) =
         syncConfiguration.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE

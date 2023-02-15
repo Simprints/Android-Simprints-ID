@@ -52,11 +52,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
         binding.syncButton.setOnClickListener {
             viewModel.forceSync()
-            // Prevent double-clicks while sync master worker is preparing
-            viewModel.emitSyncAvailable(
-                isSyncRunning = true,
-                isConnected = viewModel.isConnected.value,
-            )
             updateSyncButton(isSyncInProgress = true)
         }
     }
@@ -94,21 +89,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         viewModel.moduleCounts.observe(viewLifecycleOwner) {
             updateModuleCounts(it)
         }
-
-        viewModel.isConnected.observe(viewLifecycleOwner) {
-            viewModel.emitSyncAvailable(
-                isSyncRunning = viewModel.lastSyncState.value?.isSyncRunning(),
-                isConnected = it,
-            )
-        }
         viewModel.lastSyncState.observe(viewLifecycleOwner) {
             viewModel.fetchSyncInformationIfNeeded(it)
             val isRunning = it.isSyncRunning()
             updateSyncButton(isRunning)
-            viewModel.emitSyncAvailable(
-                isSyncRunning = isRunning,
-                isConnected = viewModel.isConnected.value,
-            )
         }
         viewModel.isSyncAvailable.observe(viewLifecycleOwner) {
             binding.syncButton.isEnabled = it
