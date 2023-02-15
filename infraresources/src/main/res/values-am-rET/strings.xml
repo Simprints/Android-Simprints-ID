@@ -142,6 +142,8 @@
     <string name="sync_info_total_records">አጠቃላይ የተመዘገበ</string>
     <string name="sync_info_total_records_on_device">በስልኩ አጠቃላይ የተመዘገበ</string>
     <string name="sync_info_unselected_modules">ያልተመረጡ ሞጁሎች</string>
+    <string name="sync_info_sync_now">አሁን ግንኙነት ፍጠር</string>
+    <string name="sync_info_sync_in_progress">በግንኙነት ላይ</string>
     <string name="title_activity_sync_information">ሲንክ የተደረገ መረጃ</string>
     <string name="try_again_label">እንደገና ይሞክሩ</string>
     <string name="verify_guid_not_found_offline_message">ግለሰቡ የለም፡ እባክዎ ከኢንተርኔት ጋር መገናኘትዎን አረጋግጠው እንደገና ይሞክሩ</string>

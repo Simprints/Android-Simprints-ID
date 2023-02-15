@@ -68,9 +68,7 @@ internal class SyncViewModel @Inject constructor(
         viewModelScope.launch {
             val lastUpdate = lastTimeSyncRun ?: cacheSync.readLastSuccessfulSyncTime()
 
-            val isRunning = syncStateLiveData.value?.let {
-                isSyncRunning(it.downSyncWorkersInfo + it.upSyncWorkersInfo)
-            } ?: false
+            val isRunning = syncStateLiveData.value?.isSyncRunning() ?: false
 
             if (!isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate.time) > MAX_TIME_BEFORE_SYNC_AGAIN)) {
                 sync()
@@ -121,10 +119,10 @@ internal class SyncViewModel @Inject constructor(
             syncState == null -> SyncDefault(null) //Useless after the 2 above - just to satisfy nullability in the else
             else -> processRecentSyncState(syncState)
         }.let {
-            if (syncState != null && isSyncRunning(syncState.downSyncWorkersInfo + syncState.upSyncWorkersInfo)) {
+            _syncCardLiveData.postValue(it)
+            if (syncState != null && syncState.isSyncRunning()) {
                 lastTimeSyncRun = Date()
             }
-            _syncCardLiveData.postValue(it)
         }
     }
 
@@ -207,7 +205,5 @@ internal class SyncViewModel @Inject constructor(
 
     private fun isConnected() = deviceManager.isConnectedLiveData.value ?: true
 
-    private fun isSyncRunning(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        isSyncProcess(allSyncStates) || isSyncConnecting(allSyncStates)
 }
 

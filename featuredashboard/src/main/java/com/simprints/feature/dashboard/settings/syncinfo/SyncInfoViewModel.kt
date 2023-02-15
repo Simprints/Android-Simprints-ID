@@ -1,9 +1,6 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
 import com.simprints.eventsystem.event.EventRepository
@@ -12,13 +9,11 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEven
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
+import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
+import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.images.ImageRepository
@@ -33,12 +28,13 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SyncInfoViewModel @Inject constructor(
     private val configManager: ConfigManager,
+    deviceManager: DeviceManager,
     private val eventRepository: EventRepository,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val loginManager: LoginManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
-    eventSyncManager: EventSyncManager,
+    private val eventSyncManager: EventSyncManager,
 ) : ViewModel() {
 
     val recordsInLocal: LiveData<Int?>
@@ -69,8 +65,38 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _configuration
     private val _configuration = MutableLiveData<ProjectConfiguration>()
 
+    val isConnected: LiveData<Boolean> = deviceManager.isConnectedLiveData
+
     val lastSyncState = eventSyncManager.getLastSyncState()
     private var lastKnownEventSyncState: EventSyncState? = null
+
+    val isSyncAvailable: LiveData<Boolean>
+        get() = _isSyncAvailable
+    private val _isSyncAvailable = MediatorLiveData<Boolean>()
+
+    init {
+        _isSyncAvailable.addSource(lastSyncState) { lastSyncStateValue ->
+            _isSyncAvailable.postValue(emitSyncAvailable(
+                isSyncRunning = lastSyncStateValue?.isSyncRunning(),
+                isConnected = isConnected.value,
+                syncConfiguration = configuration.value?.synchronization,
+            ))
+        }
+        _isSyncAvailable.addSource(isConnected) { isConnectedValue ->
+            _isSyncAvailable.postValue(emitSyncAvailable(
+                isSyncRunning = lastSyncState.value?.isSyncRunning(),
+                isConnected = isConnectedValue,
+                syncConfiguration = configuration.value?.synchronization,
+            ))
+        }
+        _isSyncAvailable.addSource(_configuration) { config ->
+            _isSyncAvailable.postValue(emitSyncAvailable(
+                isSyncRunning = lastSyncState.value?.isSyncRunning(),
+                isConnected = isConnected.value,
+                syncConfiguration = config.synchronization,
+            ))
+        }
+    }
 
     fun refreshInformation() {
         _recordsInLocal.postValue(null)
@@ -80,6 +106,13 @@ internal class SyncInfoViewModel @Inject constructor(
         _imagesToUpload.postValue(null)
         _moduleCounts.postValue(listOf())
         load()
+    }
+
+    fun forceSync() {
+        eventSyncManager.sync()
+        // There is a delay between starting sync and lastSyncState
+        // reporting it so this prevents starting multiple syncs by accident
+        _isSyncAvailable.postValue(false)
     }
 
     /**
@@ -101,29 +134,42 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
+        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+
         awaitAll(
             async { _configuration.postValue(configManager.getProjectConfiguration()) },
-            async { _recordsInLocal.postValue(getRecordsInLocal()) },
-            async { _recordsToUpSync.postValue(getRecordsToUpSync()) },
+            async { _recordsInLocal.postValue(getRecordsInLocal(projectId)) },
+            async { _recordsToUpSync.postValue(getRecordsToUpSync(projectId)) },
             async {
                 fetchRecordsToCreateAndDeleteCount().let {
                     _recordsToDownSync.postValue(it.toCreate)
                     _recordsToDelete.postValue(it.toDelete)
                 }
             },
-            async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(loginManager.getSignedInProjectIdOrEmpty())) },
-            async { _moduleCounts.postValue(getModuleCounts()) }
+            async { _imagesToUpload.postValue(imageRepository.getNumberOfImagesToUpload(projectId)) },
+            async { _moduleCounts.postValue(getModuleCounts(projectId)) }
         )
     }
 
-    private suspend fun getRecordsInLocal(): Int =
-        enrolmentRecordManager.count(SubjectQuery(projectId = loginManager.getSignedInProjectIdOrEmpty()))
+    private fun emitSyncAvailable(
+        isSyncRunning: Boolean?,
+        isConnected: Boolean?,
+        syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
+    ) = isConnected == true
+        && isSyncRunning == false
+        && syncConfiguration?.let { !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(it) } == true
 
-    private suspend fun getRecordsToUpSync(): Int =
-        eventRepository.localCount(
-            loginManager.getSignedInProjectIdOrEmpty(),
-            EventType.ENROLMENT_V2
-        )
+    private fun isModuleSync(syncConfiguration: DownSynchronizationConfiguration) =
+        syncConfiguration.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+
+    fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
+        synchronizationConfiguration.down.let { it.moduleOptions.isNotEmpty() && isModuleSync(it) }
+
+    private suspend fun getRecordsInLocal(projectId: String): Int =
+        enrolmentRecordManager.count(SubjectQuery(projectId = projectId))
+
+    private suspend fun getRecordsToUpSync(projectId: String): Int =
+        eventRepository.localCount(projectId, EventType.ENROLMENT_V2)
 
     private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
         if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {
@@ -161,16 +207,11 @@ internal class SyncInfoViewModel @Inject constructor(
             DownSyncCounts(0, 0)
         }
 
-    private suspend fun getModuleCounts(): List<ModuleCount> =
+    private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
         configManager.getDeviceConfiguration().selectedModules.map {
             ModuleCount(
                 it,
-                enrolmentRecordManager.count(
-                    SubjectQuery(
-                        projectId = loginManager.getSignedInProjectIdOrEmpty(),
-                        moduleId = it
-                    )
-                )
+                enrolmentRecordManager.count(SubjectQuery(projectId = projectId, moduleId = it))
             )
         }
 
