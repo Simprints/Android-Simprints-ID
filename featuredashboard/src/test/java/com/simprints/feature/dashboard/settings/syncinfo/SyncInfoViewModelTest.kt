@@ -1,6 +1,7 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.EventCount
@@ -12,10 +13,13 @@ import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType
+import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.images.ImageRepository
@@ -23,10 +27,10 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
+
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -42,24 +46,58 @@ class SyncInfoViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val configManager = mockk<ConfigManager>(relaxed = true)
-    private val eventRepository = mockk<EventRepository>(relaxed = true)
-    private val enrolmentRecordManager = mockk<EnrolmentRecordManager>(relaxed = true)
-    private val loginManager = mockk<LoginManager> {
-        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+    @MockK
+    private lateinit var configManager: ConfigManager
+
+    @MockK
+    private lateinit var eventRepository: EventRepository
+
+    @MockK
+    private lateinit var enrolmentRecordManager: EnrolmentRecordManager
+
+    @MockK
+    private lateinit var loginManager: LoginManager
+
+    @MockK
+    private lateinit var deviceManager: DeviceManager
+
+    @MockK
+    private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
+
+    @MockK
+    private lateinit var imageRepository: ImageRepository
+
+    @MockK
+    private lateinit var eventSyncManager: EventSyncManager
+
+    private lateinit var connectionLiveData: MutableLiveData<Boolean>
+    private lateinit var stateLiveData: MutableLiveData<EventSyncState>
+
+    private lateinit var viewModel: SyncInfoViewModel
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+
+        connectionLiveData = MutableLiveData<Boolean>()
+        every { deviceManager.isConnectedLiveData } returns connectionLiveData
+
+        stateLiveData = MutableLiveData<EventSyncState>()
+        every { eventSyncManager.getLastSyncState() } returns stateLiveData
+
+        viewModel = SyncInfoViewModel(
+            configManager,
+            deviceManager,
+            eventRepository,
+            enrolmentRecordManager,
+            loginManager,
+            eventDownSyncScopeRepository,
+            imageRepository,
+            eventSyncManager,
+        )
     }
-    private val eventDownSyncScopeRepository = mockk<EventDownSyncScopeRepository>(relaxed = true)
-    private val imageRepository = mockk<ImageRepository>(relaxed = true)
-    private val eventSyncManager = mockk<EventSyncManager>(relaxed = true)
-    private val viewModel = SyncInfoViewModel(
-        configManager,
-        eventRepository,
-        enrolmentRecordManager,
-        loginManager,
-        eventDownSyncScopeRepository,
-        imageRepository,
-        eventSyncManager,
-    )
 
     @Test
     fun `should initialize the configuration live data correctly`() {
@@ -213,46 +251,36 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `fetchSyncInformationIfNeeded should not fetch the information if there is a non succeeded worker`() {
-        viewModel.fetchSyncInformationIfNeeded(
-            EventSyncState(
-                "", 0, 0, listOf(), listOf(
-                    EventSyncState.SyncWorkerInfo(
-                        EventSyncWorkerType.DOWNLOADER,
-                        EventSyncWorkerState.Running
-                    )
-                )
+        viewModel.fetchSyncInformationIfNeeded(EventSyncState("", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Running
             )
-        )
+        )))
 
         coVerify(exactly = 0) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
 
     @Test
     fun `fetchSyncInformationIfNeeded should fetch the information if there is only succeeded worker`() {
-        viewModel.fetchSyncInformationIfNeeded(
-            EventSyncState(
-                "", 0, 0, listOf(), listOf(
-                    EventSyncState.SyncWorkerInfo(
-                        EventSyncWorkerType.DOWNLOADER,
-                        EventSyncWorkerState.Succeeded
-                    )
-                )
+        viewModel.fetchSyncInformationIfNeeded(EventSyncState("", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Succeeded
             )
-        )
+        )))
 
         coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
 
     @Test
     fun `fetchSyncInformationIfNeeded should not fetch the information if the state hasn't changed`() {
-        val state = EventSyncState(
-            "", 0, 0, listOf(), listOf(
-                EventSyncState.SyncWorkerInfo(
-                    EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Succeeded
-                )
+        val state = EventSyncState("", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Succeeded
             )
-        )
+        ))
 
         viewModel.fetchSyncInformationIfNeeded(state)
         viewModel.fetchSyncInformationIfNeeded(state)
@@ -260,4 +288,118 @@ class SyncInfoViewModelTest {
         coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
     }
 
+    @Test
+    fun `should invoke sync manager when sync is requested`() {
+        viewModel.forceSync()
+
+        verify(exactly = 1) { eventSyncManager.sync() }
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isEqualTo(false)
+    }
+
+    @Test
+    fun `isModuleSyncAndModuleIdOptionsNotEmpty returns true only if module sync and has modules`() {
+        // Not module sync
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.USER,
+            ))
+        ).isFalse()
+        // Module sync + no modules
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+            ))
+        ).isFalse()
+        // Module sync + has modules
+        assertThat(
+            viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                modules = listOf("module")
+            ))
+        ).isTrue()
+    }
+
+    @Test
+    fun `emit correct sync availability when connection status changes`() {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                modules = listOf("module")
+            )
+        }
+        viewModel.refreshInformation()
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
+
+        connectionLiveData.value = false
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
+
+        connectionLiveData.value = true
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isTrue()
+    }
+
+    @Test
+    fun `emit correct sync availability when sync status changes`() {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                modules = listOf("module")
+            )
+        }
+        viewModel.refreshInformation()
+        connectionLiveData.value = true
+
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isTrue()
+
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(),
+            listOf(EventSyncState.SyncWorkerInfo(EventSyncWorkerType.DOWNLOADER, EventSyncWorkerState.Running))
+        )
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
+
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(),
+            listOf(EventSyncState.SyncWorkerInfo(EventSyncWorkerType.DOWNLOADER, EventSyncWorkerState.Succeeded))
+        )
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isTrue()
+    }
+
+    @Test
+    fun `emit correct sync availability when non-module config`() {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.USER,
+            )
+        }
+        viewModel.refreshInformation()
+        connectionLiveData.value = true
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
+
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isTrue()
+    }
+
+    @Test
+    fun `emit correct sync availability when module config without modules`() {
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns createMockDownSyncConfig(
+                partitionType = DownSynchronizationConfiguration.PartitionType.MODULE,
+                modules = emptyList()
+            )
+        }
+        viewModel.refreshInformation()
+        connectionLiveData.value = true
+        stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
+
+        assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
+    }
+
+    private fun createMockDownSyncConfig(
+        partitionType: DownSynchronizationConfiguration.PartitionType,
+        modules: List<String> = emptyList(),
+    ) = mockk<SynchronizationConfiguration> {
+        every { frequency }.returns(SynchronizationConfiguration.Frequency.PERIODICALLY)
+        every { down }.returns(DownSynchronizationConfiguration(
+            partitionType = partitionType,
+            moduleOptions = modules,
+            maxNbOfModules = 0,
+        ))
+    }
 }

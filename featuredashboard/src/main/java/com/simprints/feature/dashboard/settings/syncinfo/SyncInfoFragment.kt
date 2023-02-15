@@ -12,7 +12,6 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration.PartitionType
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
@@ -51,6 +50,10 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             viewModel.refreshInformation()
             true
         }
+        binding.syncButton.setOnClickListener {
+            viewModel.forceSync()
+            updateSyncButton(isSyncInProgress = true)
+        }
     }
 
     private fun observeUI() {
@@ -86,14 +89,25 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         viewModel.moduleCounts.observe(viewLifecycleOwner) {
             updateModuleCounts(it)
         }
-
         viewModel.lastSyncState.observe(viewLifecycleOwner) {
             viewModel.fetchSyncInformationIfNeeded(it)
+            val isRunning = it.isSyncRunning()
+            updateSyncButton(isRunning)
+        }
+        viewModel.isSyncAvailable.observe(viewLifecycleOwner) {
+            binding.syncButton.isEnabled = it
         }
     }
 
+    private fun updateSyncButton(isSyncInProgress: Boolean) {
+        binding.syncButton.text = getString(
+            if (isSyncInProgress) IDR.string.sync_info_sync_in_progress
+            else IDR.string.sync_info_sync_now
+        )
+    }
+
     private fun enableModuleSelectionButtonAndTabsIfNecessary(synchronizationConfiguration: SynchronizationConfiguration) {
-        if (isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
+        if (viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
             binding.moduleSelectionButton.visibility = View.VISIBLE
             binding.modulesTabHost.visibility = View.VISIBLE
         } else {
@@ -101,11 +115,6 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
             binding.modulesTabHost.visibility = View.GONE
         }
     }
-
-    private fun isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration: SynchronizationConfiguration) =
-        with(synchronizationConfiguration.down) {
-            moduleOptions.isNotEmpty() && partitionType == PartitionType.MODULE
-        }
 
     private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
         if (!configuration.isEventDownSyncAllowed()) {
