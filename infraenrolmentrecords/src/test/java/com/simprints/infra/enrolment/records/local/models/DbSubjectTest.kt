@@ -26,7 +26,7 @@ class DbSubjectTest {
             IFingerIdentifier.RIGHT_3RD_FINGER,
             Random.nextBytes(64),
             30,
-            IFingerprintTemplateFormat.NEC,
+            IFingerprintTemplateFormat.NEC_1,
         )
         val faceSample = FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23)
 

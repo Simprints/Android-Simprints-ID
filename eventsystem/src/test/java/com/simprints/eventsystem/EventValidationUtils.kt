@@ -439,7 +439,7 @@ fun validateFingerprintCaptureEventApiModel(json: JSONObject) {
         with(getJSONObject("fingerprint")) {
             assertThat(getString("finger")).isIn(fingerIdentifiers)
             assertThat(getInt("quality"))
-            assertThat(getString("format")).isIn(listOf("ISO_19794_2", "NEC"))
+            assertThat(getString("format")).isIn(listOf("ISO_19794_2", "NEC_1"))
             assertThat(length()).isEqualTo(3)
         }
         assertThat(length()).isEqualTo(9)

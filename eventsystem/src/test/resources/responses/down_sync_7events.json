@@ -23,7 +23,7 @@
       "attendantId": "testAttendant314",
       "biometricReferences": [
         {
-          "format": "NEC",
+          "format": "NEC_1",
           "templates": [
             {
               "finger": "LEFT_INDEX_FINGER",
@@ -183,7 +183,7 @@
       "attendantId": "e87ecb95-8148-42b4-8911-40014d66c9bb",
       "biometricReferences": [
         {
-          "format": "NEC",
+          "format": "NEC_1",
           "templates": [
             {
               "finger": "RIGHT_4TH_FINGER",
@@ -321,7 +321,7 @@
         "attendantId": "user a",
         "biometricReferences": [
           {
-            "format": "NEC",
+            "format": "NEC_1",
             "templates": [
               {
                 "finger": "LEFT_THUMB",
