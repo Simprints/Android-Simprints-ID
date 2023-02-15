@@ -317,9 +317,9 @@
     <string name="modality_download_taking_longer">Download taking longer than expected…</string>
     <string name="confirmation_sent">Confirmation sent</string>
     <string name="redirecting_you_back">Redirecting you back</string>
-    <string name="outdated_google_play_services_alert_title">Outdated google play services</string>
-    <string name="outdated_google_play_services_alert_message">The installed google play services version on this device is older than the one required by SID</string>
-    <string name="missing_google_play_services_alert_title">Missing Google play services</string>
-    <string name="missing_google_play_services_alert_message">The google play services isn\'t installed on this device.</string>
+    <string name="outdated_google_play_services_alert_title">Outdated \"Google Play Services\"</string>
+    <string name="outdated_google_play_services_alert_message">The installed \"Google Play Services\" version on this device is older than the one required by SID</string>
+    <string name="missing_google_play_services_alert_title">Missing \"Google Play Services\"</string>
+    <string name="missing_google_play_services_alert_message">The \"Google Play Services\" isn\'t installed on this device.</string>
 
 </resources>
