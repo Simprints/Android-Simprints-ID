@@ -4,10 +4,12 @@ import androidx.annotation.Keep
 import java.util.*
 
 @Keep
-data class EventDownSyncOperation(val queryEvent: RemoteEventQuery,
-                                  val state: DownSyncState? = null,
-                                  val lastEventId: String? = null,
-                                  val lastSyncTime: Long? = null) {
+data class EventDownSyncOperation(
+    val queryEvent: RemoteEventQuery,
+    val state: DownSyncState? = null,
+    val lastEventId: String? = null,
+    val lastSyncTime: Long? = null
+) {
 
     @Keep
     enum class DownSyncState {
@@ -16,6 +18,11 @@ data class EventDownSyncOperation(val queryEvent: RemoteEventQuery,
         FAILED
     }
 }
+
+// We need to keep this old types otherwise the unique key of the down-sync will change
+// and we will need to down-sync again from scratch.
+internal var oldTypes =
+    "ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION"
 
 //Unique key: all request params expect for lastEventId
 fun EventDownSyncOperation.getUniqueKey(): String =
@@ -26,7 +33,7 @@ fun EventDownSyncOperation.getUniqueKey(): String =
                 (subjectId ?: "") +
                 ((moduleIds ?: emptyList()).joinToString()) +
                 modes.joinToString { it.name } +
-                types.joinToString { it.name }
+                oldTypes
                 ).toByteArray()
         ).toString()
     }

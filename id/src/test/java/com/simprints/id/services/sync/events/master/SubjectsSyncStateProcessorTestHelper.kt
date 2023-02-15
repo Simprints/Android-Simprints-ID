@@ -7,7 +7,12 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.EventType.ENROLMENT_RECORD_CREATION
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEventType
+import com.simprints.eventsystem.events_sync.models.EventSyncState
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState.*
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.*
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -23,11 +28,6 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MA
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
-import com.simprints.eventsystem.events_sync.models.EventSyncState
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState.*
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.*
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
@@ -168,7 +168,7 @@ private fun createDownSyncCounterWorker(
             OUTPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(
                 listOf(
                     EventCount(
-                        ENROLMENT_RECORD_CREATION,
+                        EnrolmentRecordEventType.EnrolmentRecordCreation,
                         TO_DOWNLOAD
                     )
                 )
@@ -245,6 +245,7 @@ fun createWorkInfo(
         output,
         tags,
         progress,
+        0,
         0
     )
 

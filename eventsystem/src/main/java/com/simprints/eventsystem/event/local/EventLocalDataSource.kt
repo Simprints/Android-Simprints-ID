@@ -18,7 +18,4 @@ interface EventLocalDataSource {
     suspend fun deleteAllFromSession(sessionId: String)
     suspend fun deleteAll()
     suspend fun insertOrUpdate(event: Event)
-    @Deprecated(message = "Can be removed once all projects are on 2021.1.0+")
-    suspend fun loadOldSubjectCreationEvents(projectId: String): List<Event>
-
 }
