@@ -30,7 +30,7 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
                 showErrorDialog(activity, statusCode)
             }
             else -> {
-                handelMissingGooglePlayServices(activity, statusCode)
+                handleMissingGooglePlayServices(activity, statusCode)
             }
         }
     }
@@ -57,12 +57,12 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
     }
 
     /**
-     * Handel non resolvable errors, then throw exception
+     * Handle non resolvable errors, then throw exception
      *
      * @param activity
      * @param statusCode
      */
-    private fun handelMissingGooglePlayServices(
+    private fun handleMissingGooglePlayServices(
         activity: Activity,
         statusCode: Int
     ) {
