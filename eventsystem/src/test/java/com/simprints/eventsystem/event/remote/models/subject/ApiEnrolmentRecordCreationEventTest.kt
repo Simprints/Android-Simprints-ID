@@ -25,7 +25,7 @@ class ApiEnrolmentRecordCreationEventTest {
                     listOf(
                         ApiFingerprintTemplate(10, "template", IFingerIdentifier.LEFT_THUMB)
                     ),
-                    FingerprintTemplateFormat.NEC,
+                    FingerprintTemplateFormat.NEC_1,
                 )
             )
         )
@@ -40,7 +40,7 @@ class ApiEnrolmentRecordCreationEventTest {
                     listOf(
                         FingerprintTemplate(10, "template", IFingerIdentifier.LEFT_THUMB)
                     ),
-                    FingerprintTemplateFormat.NEC,
+                    FingerprintTemplateFormat.NEC_1,
                 )
             )
         )
