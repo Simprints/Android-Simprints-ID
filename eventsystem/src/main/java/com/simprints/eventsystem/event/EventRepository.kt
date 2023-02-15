@@ -6,6 +6,7 @@ import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -51,7 +52,7 @@ interface EventRepository {
     suspend fun downloadEvents(
         scope: CoroutineScope,
         query: RemoteEventQuery
-    ): ReceiveChannel<Event>
+    ): ReceiveChannel<EnrolmentRecordEvent>
 
     suspend fun deleteSessionEvents(sessionId: String)
 

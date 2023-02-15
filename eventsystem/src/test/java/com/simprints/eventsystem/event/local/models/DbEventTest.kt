@@ -2,47 +2,7 @@ package com.simprints.eventsystem.event.local.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.eventsystem.sampledata.createAlertScreenEvent
-import com.simprints.eventsystem.sampledata.createArtificialTerminationEvent
-import com.simprints.eventsystem.sampledata.createAuthenticationEvent
-import com.simprints.eventsystem.sampledata.createAuthorizationEvent
-import com.simprints.eventsystem.sampledata.createCandidateReadEvent
-import com.simprints.eventsystem.sampledata.createCompletionCheckEvent
-import com.simprints.eventsystem.sampledata.createConfirmationCallbackEvent
-import com.simprints.eventsystem.sampledata.createConfirmationCalloutEvent
-import com.simprints.eventsystem.sampledata.createConnectivitySnapshotEvent
-import com.simprints.eventsystem.sampledata.createConsentEvent
-import com.simprints.eventsystem.sampledata.createEnrolmentCallbackEvent
-import com.simprints.eventsystem.sampledata.createEnrolmentCalloutEvent
-import com.simprints.eventsystem.sampledata.createEnrolmentEventV2
-import com.simprints.eventsystem.sampledata.createEnrolmentRecordCreationEvent
-import com.simprints.eventsystem.sampledata.createEnrolmentRecordDeletionEvent
-import com.simprints.eventsystem.sampledata.createEnrolmentRecordMoveEvent
-import com.simprints.eventsystem.sampledata.createErrorCallbackEvent
-import com.simprints.eventsystem.sampledata.createFaceCaptureConfirmationEvent
-import com.simprints.eventsystem.sampledata.createFaceCaptureEvent
-import com.simprints.eventsystem.sampledata.createFaceFallbackCaptureEvent
-import com.simprints.eventsystem.sampledata.createFaceOnboardingCompleteEvent
-import com.simprints.eventsystem.sampledata.createFingerprintCaptureEvent
-import com.simprints.eventsystem.sampledata.createGuidSelectionEvent
-import com.simprints.eventsystem.sampledata.createIdentificationCallbackEvent
-import com.simprints.eventsystem.sampledata.createIdentificationCalloutEvent
-import com.simprints.eventsystem.sampledata.createIntentParsingEvent
-import com.simprints.eventsystem.sampledata.createInvalidIntentEvent
-import com.simprints.eventsystem.sampledata.createLastBiometricsEnrolmentCalloutEvent
-import com.simprints.eventsystem.sampledata.createOneToManyMatchEvent
-import com.simprints.eventsystem.sampledata.createOneToOneMatchEvent
-import com.simprints.eventsystem.sampledata.createPersonCreationEvent
-import com.simprints.eventsystem.sampledata.createRefusalCallbackEvent
-import com.simprints.eventsystem.sampledata.createRefusalEvent
-import com.simprints.eventsystem.sampledata.createScannerConnectionEvent
-import com.simprints.eventsystem.sampledata.createScannerFirmwareUpdateEvent
-import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
-import com.simprints.eventsystem.sampledata.createSuspiciousIntentEvent
-import com.simprints.eventsystem.sampledata.createVerificationCallbackEvent
-import com.simprints.eventsystem.sampledata.createVerificationCalloutEvent
-import com.simprints.eventsystem.sampledata.createVero2InfoSnapshotEvent
-import com.simprints.testtools.unit.EncodingUtilsImplForTests
+import com.simprints.eventsystem.sampledata.*
 import org.junit.Test
 
 class DbEventTest {
@@ -169,30 +129,6 @@ class DbEventTest {
     @Test
     fun convert_SessionCaptureEvent() {
         val original = createSessionCaptureEvent()
-        val transformed = (original.fromDomainToDb().fromDbToDomain())
-
-        assertThat(original).isEqualTo(transformed)
-    }
-
-    @Test
-    fun convert_EnrolmentRecordCreationEvent() {
-        val original = createEnrolmentRecordCreationEvent(EncodingUtilsImplForTests)
-        val transformed = (original.fromDomainToDb().fromDbToDomain())
-
-        assertThat(original).isEqualTo(transformed)
-    }
-
-    @Test
-    fun convert_EnrolmentRecordDeletionEvent() {
-        val original = createEnrolmentRecordDeletionEvent()
-        val transformed = (original.fromDomainToDb().fromDbToDomain())
-
-        assertThat(original).isEqualTo(transformed)
-    }
-
-    @Test
-    fun convert_EnrolmentRecordMoveEvent() {
-        val original = createEnrolmentRecordMoveEvent(EncodingUtilsImplForTests)
         val transformed = (original.fromDomainToDb().fromDbToDomain())
 
         assertThat(original).isEqualTo(transformed)

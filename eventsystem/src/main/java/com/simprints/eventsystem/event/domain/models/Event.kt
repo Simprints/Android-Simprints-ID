@@ -21,9 +21,6 @@ import com.simprints.eventsystem.event.domain.models.EventType.Companion.CANDIDA
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.COMPLETION_CHECK_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.CONNECTIVITY_SNAPSHOT_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.CONSENT_KEY
-import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_RECORD_CREATION_KEY
-import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_RECORD_DELETION_KEY
-import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_RECORD_MOVE_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_V1_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.ENROLMENT_V2_KEY
 import com.simprints.eventsystem.event.domain.models.EventType.Companion.FACE_CAPTURE_BIOMETRICS_KEY
@@ -51,9 +48,6 @@ import com.simprints.eventsystem.event.domain.models.face.*
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
 
 
 @JsonTypeInfo(
@@ -92,15 +86,6 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
         name = FACE_ONBOARDING_COMPLETE_KEY
     ),
     JsonSubTypes.Type(value = SessionCaptureEvent::class, name = SESSION_CAPTURE_KEY),
-    JsonSubTypes.Type(
-        value = EnrolmentRecordCreationEvent::class,
-        name = ENROLMENT_RECORD_CREATION_KEY
-    ),
-    JsonSubTypes.Type(
-        value = EnrolmentRecordDeletionEvent::class,
-        name = ENROLMENT_RECORD_DELETION_KEY
-    ),
-    JsonSubTypes.Type(value = EnrolmentRecordMoveEvent::class, name = ENROLMENT_RECORD_MOVE_KEY),
     JsonSubTypes.Type(value = AlertScreenEvent::class, name = ALERT_SCREEN_KEY),
     JsonSubTypes.Type(value = ArtificialTerminationEvent::class, name = ARTIFICIAL_TERMINATION_KEY),
     JsonSubTypes.Type(value = AuthenticationEvent::class, name = AUTHENTICATION_KEY),
@@ -143,8 +128,3 @@ abstract class Event {
     }
 
 }
-
-fun EventType.isNotASubjectEvent() =
-    this != EventType.ENROLMENT_RECORD_CREATION &&
-        this != EventType.ENROLMENT_RECORD_MOVE &&
-        this != EventType.ENROLMENT_RECORD_DELETION
