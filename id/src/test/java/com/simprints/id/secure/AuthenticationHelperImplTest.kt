@@ -64,13 +64,7 @@ class AuthenticationHelperImplTest {
     @Test
     fun shouldSetIntegrityErrorIfServiceUnavailableException() = runBlocking {
         val result =
-            mockException(
-                RequestingIntegrityTokenException(
-                    errorCode = IntegrityErrorCode.API_NOT_AVAILABLE,
-                    cause = Exception("Error in requesting integrity api token")
-                )
-            )
-
+            mockException(RequestingIntegrityTokenException(IntegrityErrorCode.API_NOT_AVAILABLE))
         assertThat(result).isInstanceOf(AuthenticateDataResult.IntegrityException::class.java)
     }
 

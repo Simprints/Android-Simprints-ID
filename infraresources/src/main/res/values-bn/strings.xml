@@ -113,7 +113,6 @@
     <string name="records_up_to_date">সকল তথ্য আপডেটেড আছে</string>
     <string name="requestLogin_message">আপনাকে লগইন করতে হবে। সিমপ্রিন্টস আইডি খুলতে আপনার ক্লায়েন্ট অ্যাপ ব্যবহার করুন এবং লগইন করুন</string>
     <string name="requestLogin_title">লগইন প্রয়োজন</string>
-    <string name="integrity_service_error_alert_message">৫-১০ মিনিট পর চেষ্টা করুন</string>
     <string name="scan_qr">কিউআর কোড স্ক্যান করুন</string>
     <string name="settings_app_details">অ্যাপ বিবরন</string>
     <string name="settings_general">সাধারণ</string>

@@ -6,7 +6,10 @@ import com.google.android.play.core.integrity.IntegrityServiceException
 import com.google.android.play.core.integrity.IntegrityTokenRequest
 import com.google.android.play.core.integrity.model.IntegrityErrorCode.*
 import com.simprints.core.DispatcherIO
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.BuildConfig
+import com.simprints.infra.login.exceptions.IntegrityServiceTemporaryDown
+import com.simprints.infra.login.exceptions.MissingOrOutdatedGooglePlayStoreApp
 import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,41 +38,37 @@ internal class IntegrityTokenRequesterImpl @Inject constructor(
                 )
             ).token()
         } catch (integrityServiceException: IntegrityServiceException) {
-            throw getException(integrityServiceException.errorCode,integrityServiceException) // Todo Find a better name
+            Simber.e(integrityServiceException)
+            throw mapException(
+                integrityServiceException
+            )
 
         }
     }
 
-    private fun getException(errorCode: Int, cause: Throwable): Throwable =
-        when (errorCode) {
-            //  errors where the user should update or instLL  play store app
-            API_NOT_AVAILABLE, CANNOT_BIND_TO_SERVICE, PLAY_SERVICES_NOT_FOUND, PLAY_SERVICES_VERSION_OUTDATED,
-            PLAY_STORE_ACCOUNT_NOT_FOUND,/* This error also means that the google play store app is outdated*/
+    private fun mapException(integrityServiceException: IntegrityServiceException): Throwable =
+        when (val errorCode = integrityServiceException.errorCode) {
+            // errors where the user should install or update play store app
+            API_NOT_AVAILABLE, CANNOT_BIND_TO_SERVICE,
+            PLAY_STORE_ACCOUNT_NOT_FOUND,
             PLAY_STORE_NOT_FOUND, PLAY_STORE_VERSION_OUTDATED -> {
-                RequestingIntegrityTokenException(
-                    errorCode = errorCode,
-                    cause = cause
-                )
+                MissingOrOutdatedGooglePlayStoreApp(errorCode)
             }
             // errors where the user should retry again later
             GOOGLE_SERVER_UNAVAILABLE, INTERNAL_ERROR -> {
-                RequestingIntegrityTokenException(
-                    errorCode = errorCode,
-                    cause = cause
-                )
+                IntegrityServiceTemporaryDown(errorCode)
             }
             // Network errors
             NETWORK_ERROR -> {
-                NetworkConnectionException(cause = cause)
+                NetworkConnectionException(cause = integrityServiceException)
             }
             // Non-actionable errors
             // APP_NOT_INSTALLED,APP_UID_MISMATCH, CLOUD_PROJECT_NUMBER_IS_INVALID, NONCE_IS_NOT_BASE64,
-            // NONCE_TOO_LONG, NONCE_TOO_SHORT,and  TOO_MANY_REQUESTS,
+            // NONCE_TOO_LONG, NONCE_TOO_SHORT,and  TOO_MANY_REQUESTS
+            // error that should be already caught in earlier steps like
+            // PLAY_SERVICES_NOT_FOUND,  PLAY_SERVICES_VERSION_OUTDATED
             else -> {
-                RequestingIntegrityTokenException(
-                    errorCode = errorCode,
-                    cause = cause
-                )
+                RequestingIntegrityTokenException(errorCode)
             }
 
         }

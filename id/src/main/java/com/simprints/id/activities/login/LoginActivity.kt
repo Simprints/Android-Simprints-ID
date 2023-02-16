@@ -113,7 +113,11 @@ class LoginActivity : BaseSplitActivity() {
             )
             AuthenticateDataResult.BadCredentials -> handleSignInFailedInvalidCredentials()
             AuthenticateDataResult.Offline -> handleSignInFailedNoConnection()
-            AuthenticateDataResult.IntegrityException -> handleIntegrityError()
+            AuthenticateDataResult.IntegrityException -> handleIntegrityError(AlertType.INTEGRITY_SERVICE_ERROR)
+            AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp -> handleIntegrityError(
+                AlertType.MissingOrOutdatedGooglePlayStoreApp
+            )
+            AuthenticateDataResult.IntegrityServiceTemporaryDown -> handleIntegrityServiceTemporaryDownError()
             AuthenticateDataResult.TechnicalFailure -> handleSignInFailedServerError()
             AuthenticateDataResult.Unknown -> handleSignInFailedUnknownReason()
         }
@@ -269,10 +273,15 @@ class LoginActivity : BaseSplitActivity() {
         }
     }
 
-    private fun handleIntegrityError() {
+    private fun handleIntegrityServiceTemporaryDownError() {
+        progressDialog.dismiss()
+        showToast(IDR.string.integrity_service_down)
+    }
+
+    private fun handleIntegrityError(alertType: AlertType) {
         progressDialog.dismiss()
         binding.errorCard.isVisible = false
-        launchAlert(this, AlertType.INTEGRITY_SERVICE_ERROR)
+        launchAlert(this, alertType)
     }
 
     private fun handleSignInFailedUnknownReason() {

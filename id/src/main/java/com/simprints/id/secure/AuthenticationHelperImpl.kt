@@ -12,6 +12,8 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
+import com.simprints.infra.login.exceptions.IntegrityServiceTemporaryDown
+import com.simprints.infra.login.exceptions.MissingOrOutdatedGooglePlayStoreApp
 import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -68,6 +70,8 @@ class AuthenticationHelperImpl @Inject constructor(
                 AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
             }
             is RequestingIntegrityTokenException -> AuthenticateDataResult.IntegrityException
+            is MissingOrOutdatedGooglePlayStoreApp -> AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp
+            is IntegrityServiceTemporaryDown -> AuthenticateDataResult.IntegrityServiceTemporaryDown
             else -> AuthenticateDataResult.Unknown
         }
     }
