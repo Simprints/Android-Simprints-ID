@@ -72,6 +72,28 @@ enum class AlertActivityViewModel(val type: Type,
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
         message = IDR.string.enrol_last_biometrics_alert_message
+    ),
+
+
+    GOOGLE_PLAY_SERVICES_OUTDATED(
+        type = Type.UnexpectedError(
+            title = IDR.string.outdated_google_play_services_alert_title,
+            hintDrawable = null
+        ),
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
+        message = IDR.string.outdated_google_play_services_alert_message
+    ),
+
+
+    MISSING_GOOGLE_PLAY_SERVICES(
+        type = Type.UnexpectedError(
+            title = IDR.string.missing_google_play_services_alert_title,
+            hintDrawable = null
+        ),
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
+        message = IDR.string.missing_google_play_services_alert_message
     );
 
     companion object {
@@ -84,6 +106,8 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                 AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
                 AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
+                AlertType.GOOGLE_PLAY_SERVICES_OUTDATED -> GOOGLE_PLAY_SERVICES_OUTDATED
+                AlertType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
             }
     }
 

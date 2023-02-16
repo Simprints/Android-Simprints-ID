@@ -203,7 +203,8 @@ class EventDownSyncDownloaderWorkerTest {
             workDataOf(),
             listOf(),
             workDataOf(PROGRESS_DOWN_SYNC to progress),
-            2
+            2,
+            0
         )
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
@@ -220,7 +221,8 @@ class EventDownSyncDownloaderWorkerTest {
             workDataOf(OUTPUT_DOWN_SYNC to progress),
             listOf(),
             workDataOf(),
-            2
+            2,
+            1
         )
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }
@@ -237,7 +239,8 @@ class EventDownSyncDownloaderWorkerTest {
             workDataOf(),
             listOf(),
             workDataOf(),
-            2
+            2,
+            1
         )
         assertThat(workInfo.extractDownSyncProgress(syncCacheMock)).isEqualTo(progress)
     }

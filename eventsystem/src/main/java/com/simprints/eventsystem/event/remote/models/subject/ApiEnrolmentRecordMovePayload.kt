@@ -1,27 +1,21 @@
 package com.simprints.eventsystem.event.remote.models.subject
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.eventsystem.event.domain.models.subject.fromApiToDomain
-import com.simprints.eventsystem.event.remote.models.ApiEventPayload
-import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType
 import com.simprints.eventsystem.event.remote.models.subject.biometricref.ApiBiometricReference
-import com.simprints.eventsystem.event.remote.models.subject.biometricref.fromDomainToApi
 
 
 @Keep
 @JsonInclude(Include.NON_NULL)
 data class ApiEnrolmentRecordMovePayload(
-    @JsonIgnore override val startTime: Long = 0, //Not added on down-sync API yet
-    override val version: Int,
     val enrolmentRecordCreation: ApiEnrolmentRecordCreationInMove,
     val enrolmentRecordDeletion: ApiEnrolmentRecordDeletionInMove
-) : ApiEventPayload(ApiEventPayloadType.EnrolmentRecordMove, version, startTime) {
+) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordMove) {
 
     data class ApiEnrolmentRecordDeletionInMove(
         val subjectId: String,
@@ -38,22 +32,14 @@ data class ApiEnrolmentRecordMovePayload(
         val biometricReferences: List<ApiBiometricReference>?
     )
 
-    constructor(payload: EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload) : this(
-        payload.createdAt,
-        payload.eventVersion,
-        payload.enrolmentRecordCreation.let {
-            ApiEnrolmentRecordCreationInMove(it.subjectId, it.projectId, it.moduleId, it.attendantId, it.biometricReferences?.map { it.fromDomainToApi() })
-        },
-        payload.enrolmentRecordDeletion.let {
-            ApiEnrolmentRecordDeletionInMove(it.subjectId, it.projectId, it.moduleId, it.attendantId)
-        })
+    companion object {
+        const val ENROLMENT_RECORD_MOVE = "EnrolmentRecordMove"
+    }
 }
 
 
 fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
     EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload(
-        startTime,
-        version,
         with(enrolmentRecordCreation) {
             EnrolmentRecordCreationInMove(
                 subjectId,

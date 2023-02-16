@@ -97,14 +97,14 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
             eventDao.countFromType(type = type)
         }
 
+    override suspend fun observeCount(projectId: String, type: EventType): Flow<Int> =
+        useRoom(readingDispatcher) {
+            eventDao.observeCountFromType(projectId = projectId, type = type)
+        }
+
     override suspend fun insertOrUpdate(event: Event) =
         useRoom(writingContext) {
             eventDao.insertOrUpdate(event.fromDomainToDb())
-        }
-
-    override suspend fun loadOldSubjectCreationEvents(projectId: String): List<Event> =
-        useRoom(writingContext) {
-            eventDao.loadOldSubjectCreationEvents(projectId).map { it.fromDbToDomain() }
         }
 
     override suspend fun delete(ids: List<String>) =

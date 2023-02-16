@@ -5,7 +5,6 @@ plugins {
 }
 
 apply {
-    from("profiling.gradle")
     from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
 }
 
@@ -15,11 +14,6 @@ android {
         consumerProguardFiles("proguard-rules.pro")
     }
 
-    buildTypes {
-        getByName(BuildParams.BuildTypes.profiling) {
-            initWith(getByName(BuildParams.BuildTypes.debug))
-        }
-    }
     namespace = "com.simprints.fingerprintmatcher"
 
 

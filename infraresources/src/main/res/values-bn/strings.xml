@@ -167,6 +167,8 @@
     <string name="sync_info_total_records">সকল রেকর্ড</string>
     <string name="sync_info_total_records_on_device">ফোনে সংরক্ষিত সকল রেকর্ড</string>
     <string name="sync_info_unselected_modules">অনির্বাচিত মডিউল</string>
+    <string name="sync_info_sync_now">সিঙ্ক করুন</string>
+    <string name="sync_info_sync_in_progress">সিঙ্ক হচ্ছে…</string>
     <string name="dashboard_sync_card_connecting">সংযুক্ত হচ্ছে</string>
     <string name="dashboard_sync_card_no_modules_message">সিঙ্ক করতে মডিউল নির্বাচন করুন</string>
     <string name="dashboard_sync_card_no_modules_button">মডিউল সমূহ</string>

@@ -33,7 +33,7 @@
     <string name="consent_share_data_no">Simprints, une organisation à but non lucratif basée au Royaume-Uni, aura accès à vos %1$s et à votre localisation actuelle.</string>
     <string name="consent_share_data_yes">%1$s et Simprints, une organisation à but non lucratif basée au Royaume-Uni, auront accès à vos %2$s et à votre emplacement actuel.</string>
     <string name="dashboard_card_activity">Activité : %1$s</string>
-    <string name="dashboard_card_calculating">Calcul en cours...</string>
+    <string name="dashboard_card_calculating">Calcul en cours…</string>
     <string name="dashboard_card_current_user">Utilisateur actuel: %1$s</string>
     <string name="dashboard_card_scanner_used">Scanner utilisé %1$s</string>
     <string name="dashboard_card_sync_last_sync">Dernière synchronisation : %1$s</string>
@@ -47,7 +47,7 @@
     <string name="dashboard_sync_card_no_modules_message">Veuillez sélectionner les modules à synchroniser</string>
     <string name="dashboard_sync_card_offline_button">Réglages</string>
     <string name="dashboard_sync_card_offline_message">Veuillez activer la connexion Internet dans les réglages</string>
-    <string name="dashboard_sync_card_progress">Synchronisation... %1$s</string>
+    <string name="dashboard_sync_card_progress">Synchronisation… %1$s</string>
     <string name="dashboard_sync_card_sync_button">Synchroniser maintenant</string>
     <string name="dashboard_sync_card_try_again_button">Réessayez</string>
     <string name="different_projectId_message">Une erreur de configuration s\'est produite (Id de projet différent), veuillez vous déconnecter de l\'écran d\'accueil ou contacter votre administrateur système.</string>
@@ -62,7 +62,7 @@
     <string name="fetch_guid_checking_person_in_database">Vérification de la personne dans la base de données</string>
     <string name="hint_other_reason">Informations supplémentaires</string>
     <string name="hint_search_modules">Recherche de modules</string>
-    <string name="calculating_overlay">Calcul en cours...</string>
+    <string name="calculating_overlay">Calcul en cours…</string>
     <string name="launch_consent_accept_button">Accepter</string>
     <string name="launch_consent_decline_button">Refuser</string>
     <string name="login">Connexion</string>
@@ -83,11 +83,11 @@
     <string name="long_consent_failed_to_download">Le téléchargement de la politique de confidentialité a échoué.</string>
     <string name="menu_privacy_notice">Politique de confidentialité</string>
     <string name="menu_settings">Réglages</string>
-    <string name="modality_download_taking_longer">Le téléchargement prend plus de temps que prévu...</string>
-    <string name="modality_downloading">Téléchargement de... %1$s</string>
+    <string name="modality_download_taking_longer">Le téléchargement prend plus de temps que prévu…</string>
+    <string name="modality_downloading">Téléchargement de… %1$s</string>
     <string name="modality_installation_offline">Vérifiez que le Wi-Fi ou les données mobiles sont activés dans les réglages pour terminer le téléchargement.</string>
     <string name="modality_installation_offline_title">Erreur dans le téléchargement des modalités</string>
-    <string name="modality_installing">Installation...</string>
+    <string name="modality_installing">Installation…</string>
     <string name="modality_starting_download">Début du téléchargement</string>
     <string name="no_modules_selected">Aucun module sélectionné</string>
     <string name="no_results">Aucun résultat</string>
@@ -104,7 +104,7 @@
     <string name="preference_sync_information_title">Informations sur la synchronisation</string>
     <string name="privacy_notice_text">Politique de confidentialité</string>
     <string name="privacy_notice_title">Politique de confidentialité</string>
-    <string name="progress_sync_overlay">Synchronisation...</string>
+    <string name="progress_sync_overlay">Synchronisation…</string>
     <string name="records_up_to_date">Tous les enregistrements sont mis à jour</string>
     <string name="refusal_app_not_working">L\'application ne fonctionne pas</string>
     <string name="refusal_data_concerns">Ne veut pas donner de données</string>
@@ -171,7 +171,7 @@
     <string name="l_3_finger_name">Majeur gauche</string>
     <string name="l_4_finger_name">Annulaire gauche</string>
     <string name="l_5_finger_name">Auriculaire gauche</string>
-    <string name="loading_candidates">Chargement des candidats...</string>
+    <string name="loading_candidates">Chargement des candidats…</string>
     <string name="preference_select_fingers_title">Selectionnez les doigts par défault</string>
     <string name="preference_summary_settings_fingers">Sélectionnez les doigts que vous souhaitez scanner</string>
     <string name="r_1_finger_name">Pouce droit</string>
@@ -183,6 +183,9 @@
     <string name="sync_info_records_to_delete">Enregistrements à supprimer</string>
     <string name="sync_info_records_to_download">Enregistrements à télécharger</string>
     <string name="sync_info_records_to_upload">Enregistrements à envoyer</string>
+    <string name="sync_info_sync_now">Synchroniser maintenant</string>
+    <string name="sync_info_sync_in_progress">Synchronisation…</string>
+
     <string name="toast_login_failed">La connexion a échoué. Veuillez contacter votre superviseur.</string>
     <string name="why_did_you_skip_face_capture">Pourquoi avez-vous ignoré la capture du visage ?</string>
     <string name="why_did_you_skip_fingerprinting">Pourquoi avez-vous ignoré le scan d\'empreinte digitale ?</string>

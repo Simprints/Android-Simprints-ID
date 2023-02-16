@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.local.models.DbEvent
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EventRoomDao {
@@ -34,10 +35,6 @@ interface EventRoomDao {
         type: EventType = EventType.SESSION_CAPTURE
     ): List<String>
 
-    @Deprecated(message = "Can be removed once all projects are on 2021.1.0+")
-    @Query("select * from DbEvent where projectId = :projectId and sessionId is null")
-    suspend fun loadOldSubjectCreationEvents(projectId: String): List<DbEvent>
-
     @Query("select count(*) from DbEvent where projectId = :projectId")
     suspend fun countFromProject(projectId: String): Int
 
@@ -46,6 +43,9 @@ interface EventRoomDao {
 
     @Query("select count(*) from DbEvent where type = :type")
     suspend fun countFromType(type: EventType): Int
+
+    @Query("select count(*) from DbEvent where projectId = :projectId and type = :type")
+    fun observeCountFromType(projectId: String, type: EventType): Flow<Int>
 
     @Query("delete from DbEvent where id in (:ids)")
     suspend fun delete(ids: List<String>)

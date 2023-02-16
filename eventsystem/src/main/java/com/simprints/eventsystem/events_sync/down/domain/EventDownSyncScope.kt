@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.modality.Modes
-import com.simprints.eventsystem.event.domain.models.EventType.*
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectModuleScope
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope.SubjectUserScope
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope.ProjectScope
@@ -35,7 +34,6 @@ sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation
                     RemoteEventQuery(
                         projectId,
                         modes = modes,
-                        types = subjectEvents
                     )
                 )
             )
@@ -55,7 +53,6 @@ sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation
                         projectId,
                         attendantId = attendantId,
                         modes = modes,
-                        types = subjectEvents
                     )
                 )
             )
@@ -76,16 +73,9 @@ sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation
                         projectId,
                         moduleIds = listOf(it),
                         modes = modes,
-                        types = subjectEvents
                     )
                 )
             }
 
-    }
-
-    companion object {
-        val subjectEvents = listOf(
-            ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION
-        )
     }
 }

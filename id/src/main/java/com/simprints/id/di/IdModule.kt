@@ -2,6 +2,7 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.id.activities.alert.AlertContract
@@ -86,6 +87,8 @@ import com.simprints.id.tools.device.ConnectivityHelper
 import com.simprints.id.tools.device.ConnectivityHelperImpl
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.device.DeviceManagerImpl
+import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityChecker
+import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityCheckerImpl
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Binds
@@ -229,6 +232,9 @@ abstract class IdOrchestratorModule {
     abstract fun provideLoginActivityHelper(impl: LoginActivityHelperImpl): LoginActivityHelper
 
     @Binds
+    abstract fun provideGooglePlayServicesAvailabilityChecker(impl: GooglePlayServicesAvailabilityCheckerImpl): GooglePlayServicesAvailabilityChecker
+
+    @Binds
     abstract fun provideFetchGuidHelper(impl: FetchGuidHelperImpl): FetchGuidHelper
 
     @Binds
@@ -353,6 +359,8 @@ object IdDependenciesModule {
     fun provideDomainToModuleApiAppResponse(): DomainToModuleApiAppResponse =
         DomainToModuleApiAppResponse
 
+    @Provides
+    fun provideGoogleApiAvailability() = GoogleApiAvailability.getInstance()
 }
 
 // TODO remove when the interfaces have been moved into its one module
