@@ -3,6 +3,7 @@ package com.simprints.feature.dashboard.settings.about
 import androidx.lifecycle.Observer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.PreferenceMatchers.*
@@ -16,6 +17,7 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
 import com.simprints.feature.dashboard.tools.testNavController
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -119,7 +121,8 @@ class AboutFragmentTest {
     }
 
     @Test
-    fun `should logout and redirect correctly when clicking on logout`() {
+    fun `should logout and redirect correctly when no password and clicking on logout`() {
+        mockSettingsPassword(SettingsPasswordConfig.NotSet)
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
@@ -136,7 +139,8 @@ class AboutFragmentTest {
     }
 
     @Test
-    fun `should not logout when refusing on the alert dialog `() {
+    fun `should not logout when no password and refusing on the alert dialog`() {
+        mockSettingsPassword(SettingsPasswordConfig.NotSet)
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
@@ -152,11 +156,54 @@ class AboutFragmentTest {
         verify(exactly = 0) { viewModel.logout() }
     }
 
+    @Test
+    fun `should prompt PIN input when has password and clicking on logout`() {
+        mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
+        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
+
+
+        launchFragmentInHiltContainer<AboutFragment>(navController = navController)
+        onView(withText(IDR.string.preference_logout_title)).perform(click())
+        onView(withId(R.id.pin_input_field))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+            .perform(replaceText("1234"))
+
+        Truth.assertThat(navController.currentDestination?.id).isEqualTo(R.id.requestLoginFragment)
+        verify(exactly = 1) { viewModel.logout() }
+    }
+
+
+    @Test
+    fun `should not log out when prompted PIN and it was incorrect`() {
+        mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
+        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
+
+
+        launchFragmentInHiltContainer<AboutFragment>(navController = navController)
+        onView(withText(IDR.string.preference_logout_title)).perform(click())
+        onView(withId(R.id.pin_input_field))
+            .inRoot(isDialog())
+            .check(matches(isDisplayed()))
+            .perform(replaceText("1111"))
+
+        Truth.assertThat(navController.currentDestination?.id).isEqualTo(R.id.aboutFragment)
+        verify(exactly = 0) { viewModel.logout() }
+    }
+
     private fun mockModalities(modalities: List<GeneralConfiguration.Modality>) {
         every { viewModel.modalities } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<List<GeneralConfiguration.Modality>>>().onChanged(modalities)
             }
+        }
+    }
+
+    private fun mockSettingsPassword(lock: SettingsPasswordConfig) {
+        every { viewModel.settingsLocked } returns mockk {
+            every { value } returns lock
         }
     }
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,6 +35,10 @@ internal class AboutViewModel @Inject constructor(
         get() = _recentUserActivity
     private val _recentUserActivity = MutableLiveData<RecentUserActivity>()
 
+    val settingsLocked: LiveData<SettingsPasswordConfig>
+        get() = _settingsLocked
+    private val _settingsLocked = MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
+
     init {
         load()
     }
@@ -51,6 +56,7 @@ internal class AboutViewModel @Inject constructor(
         _syncAndSearchConfig.postValue(syncAndSearchConfig)
         _modalities.postValue(configuration.general.modalities)
         _recentUserActivity.postValue(recentUserActivityManager.getRecentUserActivity())
+        _settingsLocked.postValue(configuration.general.settingsPassword)
     }
 
 }

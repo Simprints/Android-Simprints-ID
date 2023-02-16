@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
@@ -33,6 +34,7 @@ class SettingsViewModelTest {
         defaultLanguage = "fr",
         collectLocation = true,
         duplicateBiometricEnrolmentCheck = true,
+        settingsPassword = SettingsPasswordConfig.NotSet,
     )
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {

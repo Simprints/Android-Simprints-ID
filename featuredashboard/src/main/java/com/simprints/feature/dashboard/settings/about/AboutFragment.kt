@@ -14,7 +14,9 @@ import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
+import com.simprints.feature.dashboard.settings.pin.SettingsPinDialogFragment
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -38,12 +40,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(IDR.string.confirmation_logout_title))
             .setMessage(getString(IDR.string.confirmation_logout_message))
-            .setPositiveButton(
-                getString(IDR.string.logout)
-            ) { _, _ ->
-                viewModel.logout()
-                findNavController().navigate(R.id.action_aboutFragment_to_requestLoginFragment)
-            }
+            .setPositiveButton(getString(IDR.string.logout)) { _, _ -> logOut() }
             .setNegativeButton(
                 getString(IDR.string.confirmation_logout_cancel), null
             ).create()
@@ -87,11 +84,28 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         getAppVersionPreference()?.summary = packageVersionName
         getDeviceIdPreference()?.summary = deviceId
         getLogoutPreference()?.setOnPreferenceClickListener {
-            activity?.runOnUiThread { confirmationDialogForLogout.show() }
+            activity?.runOnUiThread {
+                val lock = viewModel.settingsLocked.value
+                    ?.let { it as? SettingsPasswordConfig.Locked }
+
+                if (lock != null) {
+                    SettingsPinDialogFragment(
+                        title = IDR.string.pin_lock_title_logout,
+                        codeToMatch = lock.code,
+                        onSuccess = { logOut() }
+                    ).show(childFragmentManager, SettingsPinDialogFragment.TAG)
+                } else {
+                    confirmationDialogForLogout.show()
+                }
+            }
             true
         }
     }
 
+    private fun logOut() {
+        viewModel.logout()
+        findNavController().navigate(R.id.action_aboutFragment_to_requestLoginFragment)
+    }
 
     private fun getAppVersionPreference(): Preference? =
         findPreference(getString(R.string.preference_app_version_key))
