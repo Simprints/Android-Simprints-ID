@@ -122,6 +122,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                     defaultLanguage = "en",
                     collectLocation = true,
                     duplicateBiometricEnrolmentCheck = false,
+                    settingsPassword = SettingsPasswordConfig.NotSet,
                 ),
                 face = null,
                 fingerprint = FingerprintConfiguration(

@@ -19,6 +19,7 @@ message ProtoGeneralConfiguration {
     string default_language = 3;
     bool collect_location = 4;
     bool duplicate_biometric_enrolment_check = 5;
+    string settings_password = 6;
 
     enum Modality {
         FACE = 0;

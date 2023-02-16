@@ -69,6 +69,7 @@ internal data class OldProjectConfig(
             defaultLanguage = selectedLanguage,
             collectLocation = locationRequired.toBoolean(),
             duplicateBiometricEnrolmentCheck = enrolmentPlus.toBoolean(),
+            settingsPassword = SettingsPasswordConfig.NotSet,
         )
 
     private fun faceConfiguration(): FaceConfiguration? =
