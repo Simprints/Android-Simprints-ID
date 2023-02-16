@@ -57,7 +57,9 @@ data class ApiAlertScreenPayload(override val startTime: Long,
         SAFETYNET_ERROR,
         FACE_LICENSE_INVALID,
         BACKEND_MAINTENANCE_ERROR,
-        FACE_LICENSE_MISSING;
+        FACE_LICENSE_MISSING,
+        GOOGLE_PLAY_SERVICES_OUTDATED,
+        MISSING_GOOGLE_PLAY_SERVICES
     }
 }
 
@@ -95,4 +97,6 @@ fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
         AlertScreenEventType.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
         AlertScreenEventType.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
         AlertScreenEventType.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
+        AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED -> GOOGLE_PLAY_SERVICES_OUTDATED
+        AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
     }
