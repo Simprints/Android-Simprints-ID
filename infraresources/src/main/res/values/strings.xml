@@ -335,4 +335,11 @@
     <string name="missing_or_outdated_google_play_store_app_alert_title">Missing or outdated \"Google Play Store app\"</string>
     <string name="missing_or_outdated_google_play_store_app_alert_message">The \"Google Play Store app\" isn\'t installed or updated.</string>
 
+    <!--Settings lock dialog-->
+    <string name="pin_lock_title_default">Enter PIN to unlock</string>
+    <string name="pin_lock_title_logout">Enter PIN to log out</string>
+    <string name="pin_lock_hint">PIN code</string>
+    <string name="pin_lock_cancel">Cancel</string>
+    <string name="pin_lock_wrong_pin">Incorrect PIN code</string>
+
 </resources>
