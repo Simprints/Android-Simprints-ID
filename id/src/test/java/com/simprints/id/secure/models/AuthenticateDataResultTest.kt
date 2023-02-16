@@ -35,12 +35,25 @@ class AuthenticateDataResultKtTest {
     }
 
     @Test
+    fun mapMissingOrOutdatedGooglePlayStoreAppErrorResult() {
+        val result = AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp.toDomainResult()
+
+        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.MISSING_OR_OUTDATED_PLAY_STORE_ERROR::class.java)
+    }
+
+    @Test
+    fun mapIntegrityServiceTemporaryDownErrorResult() {
+        val result = AuthenticateDataResult.IntegrityServiceTemporaryDown.toDomainResult()
+
+        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR::class.java)
+    }
+
+    @Test
     fun mapIntegrityErrorResult() {
         val result = AuthenticateDataResult.IntegrityException.toDomainResult()
 
         assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR::class.java)
     }
-
     @Test
     fun mapBackendMaintenanceErrorResult() {
         val result = AuthenticateDataResult.BackendMaintenanceError().toDomainResult()
