@@ -135,7 +135,7 @@ class AlertActivityTest {
     @Test
     fun integrityServiceError_userClicksClose_alertShouldFinishWithRightResult() {
         val scenario = launchAlertActivity(AlertActRequest(AlertType.INTEGRITY_SERVICE_ERROR))
-        ensureAlertScreenLaunched(AlertActivityViewModel.INTEGRITY_SERVICE_ERROR)
+        ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
         onView(withId(R.id.alertLeftButton)).perform(click())
 
