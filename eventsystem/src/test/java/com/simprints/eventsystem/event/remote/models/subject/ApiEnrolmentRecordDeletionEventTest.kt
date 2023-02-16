@@ -1,18 +1,26 @@
 package com.simprints.eventsystem.event.remote.models.subject
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.sampledata.createEnrolmentRecordDeletionEvent
-import com.simprints.eventsystem.event.remote.models.fromApiToDomain
-import com.simprints.eventsystem.event.remote.models.fromDomainToApi
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import org.junit.Test
 
 class ApiEnrolmentRecordDeletionEventTest {
 
     @Test
     fun convert_EnrolmentRecordDeletionEvent() {
-        val original = createEnrolmentRecordDeletionEvent()
-        val transformed = original.fromDomainToApi().fromApiToDomain()
+        val apiPayload = ApiEnrolmentRecordDeletionPayload(
+            "subjectId",
+            "projectId",
+            "moduleId",
+            "attendantId",
+        )
+        val expectedPayload = EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload(
+            "subjectId",
+            "projectId",
+            "moduleId",
+            "attendantId",
+        )
 
-        assertThat(original).isEqualTo(transformed)
+        assertThat(apiPayload.fromApiToDomain()).isEqualTo(expectedPayload)
     }
 }

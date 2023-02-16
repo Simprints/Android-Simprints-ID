@@ -195,9 +195,6 @@ class ClientApiEventRepositoryImplTest {
         FingerprintCaptureBiometricsEvent(
             id = "", labels = EventLabels(
                 projectId = null,
-                attendantId = null,
-                moduleIds = listOf(),
-                mode = listOf(),
                 sessionId = null,
                 deviceId = null
             ), payload = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload(
@@ -215,9 +212,6 @@ class ClientApiEventRepositoryImplTest {
         FaceCaptureBiometricsEvent(
             id = "", labels = EventLabels(
                 projectId = null,
-                attendantId = null,
-                moduleIds = listOf(),
-                mode = listOf(),
                 sessionId = null,
                 deviceId = null
             ), payload = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload(

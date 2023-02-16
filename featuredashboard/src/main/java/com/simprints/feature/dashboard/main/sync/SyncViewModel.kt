@@ -2,6 +2,8 @@ package com.simprints.feature.dashboard.main.sync
 
 import androidx.lifecycle.*
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.feature.dashboard.main.sync.DashboardSyncCardState.*
@@ -10,6 +12,7 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
+import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -25,6 +28,8 @@ internal class SyncViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val cacheSync: EventSyncCache,
     private val timeHelper: TimeHelper,
+    private val loginManager: LoginManager,
+    private val eventRepository: EventRepository,
 ) : ViewModel() {
 
     companion object {
@@ -40,6 +45,7 @@ internal class SyncViewModel @Inject constructor(
         get() = _syncCardLiveData
     private val _syncCardLiveData = MediatorLiveData<DashboardSyncCardState>()
 
+    private val upSyncCountLiveData = MutableLiveData(0)
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
 
     private suspend fun lastTimeSyncSucceed() = runBlocking {
@@ -68,9 +74,7 @@ internal class SyncViewModel @Inject constructor(
         viewModelScope.launch {
             val lastUpdate = lastTimeSyncRun ?: cacheSync.readLastSuccessfulSyncTime()
 
-            val isRunning = syncStateLiveData.value?.let {
-                isSyncRunning(it.downSyncWorkersInfo + it.upSyncWorkersInfo)
-            } ?: false
+            val isRunning = syncStateLiveData.value?.isSyncRunning() ?: false
 
             if (!isRunning && (lastUpdate == null || timeHelper.msBetweenNowAndTime(lastUpdate.time) > MAX_TIME_BEFORE_SYNC_AGAIN)) {
                 sync()
@@ -85,7 +89,8 @@ internal class SyncViewModel @Inject constructor(
                     emitNewCardState(
                         it,
                         isModuleSelectionRequired(),
-                        syncStateLiveData.value
+                        syncStateLiveData.value,
+                        upSyncCountLiveData.value ?: 0,
                     )
                 }
             }
@@ -95,18 +100,33 @@ internal class SyncViewModel @Inject constructor(
                         isConnected(),
                         isModuleSelectionRequired(),
                         it,
+                        upSyncCountLiveData.value ?: 0,
+                    )
+                }
+            }
+            _syncCardLiveData.addSource(upSyncCountLiveData) {
+                CoroutineScope(coroutineContext + SupervisorJob()).launch {
+                    emitNewCardState(
+                        isConnected(),
+                        isModuleSelectionRequired(),
+                        syncStateLiveData.value,
+                        it
                     )
                 }
             }
             configManager.getProjectConfiguration().also { configuration ->
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
+            eventRepository
+                .observeLocalCount(loginManager.getSignedInProjectIdOrEmpty(), EventType.ENROLMENT_V2)
+                .collect { upSyncCountLiveData.postValue(it) }
         }
 
     private suspend fun emitNewCardState(
         isConnected: Boolean,
         isModuleSelectionRequired: Boolean,
-        syncState: EventSyncState?
+        syncState: EventSyncState?,
+        itemsToUpSync: Int,
     ) {
         val syncRunningAndInfoNotReadyYet =
             syncState == null && _syncCardLiveData.value is SyncConnecting
@@ -119,16 +139,16 @@ internal class SyncViewModel @Inject constructor(
             syncRunningAndInfoNotReadyYet -> SyncConnecting(lastTimeSyncSucceed(), 0, null)
             syncNotRunningAndInfoNotReadyYet -> SyncDefault(lastTimeSyncSucceed())
             syncState == null -> SyncDefault(null) //Useless after the 2 above - just to satisfy nullability in the else
-            else -> processRecentSyncState(syncState)
+            else -> processRecentSyncState(syncState, itemsToUpSync)
         }.let {
-            if (syncState != null && isSyncRunning(syncState.downSyncWorkersInfo + syncState.upSyncWorkersInfo)) {
+            _syncCardLiveData.postValue(it)
+            if (syncState != null && syncState.isSyncRunning()) {
                 lastTimeSyncRun = Date()
             }
-            _syncCardLiveData.postValue(it)
         }
     }
 
-    private suspend fun processRecentSyncState(syncState: EventSyncState): DashboardSyncCardState {
+    private suspend fun processRecentSyncState(syncState: EventSyncState, itemsToUpSync: Int): DashboardSyncCardState {
 
         val downSyncStates = syncState.downSyncWorkersInfo
         val upSyncStates = syncState.upSyncWorkersInfo
@@ -136,7 +156,10 @@ internal class SyncViewModel @Inject constructor(
 
         return when {
             isThereNotSyncHistory(allSyncStates) -> SyncDefault(lastTimeSyncSucceed())
-            isSyncCompleted(allSyncStates) -> SyncComplete(lastTimeSyncSucceed())
+            isSyncCompleted(allSyncStates) -> {
+                if (itemsToUpSync == 0) SyncComplete(lastTimeSyncSucceed())
+                else SyncPendingUpload(lastTimeSyncSucceed(), itemsToUpSync)
+            }
             isSyncProcess(allSyncStates) -> SyncProgress(
                 lastTimeSyncSucceed(),
                 syncState.progress,
@@ -207,7 +230,5 @@ internal class SyncViewModel @Inject constructor(
 
     private fun isConnected() = deviceManager.isConnectedLiveData.value ?: true
 
-    private fun isSyncRunning(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        isSyncProcess(allSyncStates) || isSyncConnecting(allSyncStates)
 }
 

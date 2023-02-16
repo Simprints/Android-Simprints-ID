@@ -45,17 +45,11 @@ import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingComplete
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
 import com.simprints.eventsystem.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.eventsystem.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.eventsystem.event.remote.models.callout.ApiCalloutPayload
 import com.simprints.eventsystem.event.remote.models.face.*
 import com.simprints.eventsystem.event.remote.models.session.ApiSessionCapturePayload
-import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordCreationPayload
-import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordDeletionPayload
-import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordMovePayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
@@ -65,9 +59,6 @@ import com.simprints.eventsystem.event.remote.models.subject.ApiEnrolmentRecordM
     JsonSubTypes.Type(value = ApiFaceFallbackCapturePayload::class, name = Companion.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiFaceOnboardingCompletePayload::class, name = Companion.FACE_ONBOARDING_COMPLETE_KEY),
     JsonSubTypes.Type(value = ApiSessionCapturePayload::class, name = Companion.SESSION_CAPTURE_KEY),
-    JsonSubTypes.Type(value = ApiEnrolmentRecordCreationPayload::class, name = Companion.ENROLMENT_RECORD_CREATION_KEY),
-    JsonSubTypes.Type(value = ApiEnrolmentRecordDeletionPayload::class, name = Companion.ENROLMENT_RECORD_DELETION_KEY),
-    JsonSubTypes.Type(value = ApiEnrolmentRecordMovePayload::class, name = Companion.ENROLMENT_RECORD_MOVE_KEY),
     JsonSubTypes.Type(value = ApiAlertScreenPayload::class, name = Companion.ALERT_SCREEN_KEY),
     JsonSubTypes.Type(value = ApiArtificialTerminationPayload::class, name = Companion.ARTIFICIAL_TERMINATION_KEY),
     JsonSubTypes.Type(value = ApiAuthenticationPayload::class, name = Companion.AUTHENTICATION_KEY),
@@ -102,9 +93,6 @@ abstract class ApiEventPayload(
 
 fun EventPayload.fromDomainToApi(): ApiEventPayload =
     when (this.type) {
-        ENROLMENT_RECORD_CREATION -> ApiEnrolmentRecordCreationPayload(this as EnrolmentRecordCreationPayload)
-        ENROLMENT_RECORD_DELETION -> ApiEnrolmentRecordDeletionPayload(this as EnrolmentRecordDeletionPayload)
-        ENROLMENT_RECORD_MOVE -> ApiEnrolmentRecordMovePayload(this as EnrolmentRecordMovePayload)
         ARTIFICIAL_TERMINATION -> ApiArtificialTerminationPayload(this as ArtificialTerminationPayload)
         AUTHENTICATION -> ApiAuthenticationPayload(this as AuthenticationPayload)
         CONSENT -> ApiConsentPayload(this as ConsentPayload)
