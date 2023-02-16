@@ -41,9 +41,6 @@ import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingComplete
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
@@ -64,9 +61,6 @@ import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMove
     JsonSubTypes.Type(value = FaceFallbackCapturePayload::class, name = EventType.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = FaceOnboardingCompletePayload::class, name = EventType.FACE_ONBOARDING_COMPLETE_KEY),
     JsonSubTypes.Type(value = SessionCapturePayload::class, name = EventType.SESSION_CAPTURE_KEY),
-    JsonSubTypes.Type(value = EnrolmentRecordCreationPayload::class, name = EventType.ENROLMENT_RECORD_CREATION_KEY),
-    JsonSubTypes.Type(value = EnrolmentRecordDeletionPayload::class, name = EventType.ENROLMENT_RECORD_DELETION_KEY),
-    JsonSubTypes.Type(value = EnrolmentRecordMovePayload::class, name = EventType.ENROLMENT_RECORD_MOVE_KEY),
     JsonSubTypes.Type(value = AlertScreenPayload::class, name = EventType.ALERT_SCREEN_KEY),
     JsonSubTypes.Type(value = ArtificialTerminationPayload::class, name = EventType.ARTIFICIAL_TERMINATION_KEY),
     JsonSubTypes.Type(value = AuthenticationPayload::class, name = EventType.AUTHENTICATION_KEY),

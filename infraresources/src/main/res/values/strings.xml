@@ -200,6 +200,12 @@
     <string name="dashboard_sync_card_offline_button">Settings</string>
     <string name="dashboard_sync_card_too_many_modules_message">Too many modules have been downloaded.</string>
 
+    <string name="dashboard_sync_card_records_uploaded">All records uploaded</string>
+    <plurals name="dashboard_sync_card_records_to_upload">
+        <item quantity="one">%1$d record to upload</item>
+        <item quantity="other">%1$d records to upload</item>
+    </plurals>
+
     <string name="dashboard_card_sync_title">Sync status</string>
     <string name="dashboard_card_sync_last_sync">Last sync: %1$s</string>
 
@@ -277,6 +283,10 @@
     <string name="sync_info_unselected_modules">Unselected modules</string>
     <string name="sync_info_total_records">Total records</string>
     <string name="sync_info_images_to_upload">Images to upload</string>
+
+    <string name="sync_info_sync_now">Sync now</string>
+    <string name="sync_info_sync_in_progress">Syncing…</string>
+
     <string name="re_fetch_sync_info" translatable="false">Re-fetch Sync Info</string>
 
     <string name="progress_sync_overlay">Syncing…</string>
@@ -317,5 +327,9 @@
     <string name="modality_download_taking_longer">Download taking longer than expected…</string>
     <string name="confirmation_sent">Confirmation sent</string>
     <string name="redirecting_you_back">Redirecting you back</string>
+    <string name="outdated_google_play_services_alert_title">Outdated \"Google Play Services\"</string>
+    <string name="outdated_google_play_services_alert_message">The installed \"Google Play Services\" version on this device is older than the one required by SID</string>
+    <string name="missing_google_play_services_alert_title">Missing \"Google Play Services\"</string>
+    <string name="missing_google_play_services_alert_message">The \"Google Play Services\" isn\'t installed on this device.</string>
 
 </resources>

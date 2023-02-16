@@ -1,11 +1,14 @@
 package com.simprints.fingerprint.scanner.pairing
 
+import android.content.Intent
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothDevice
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
@@ -16,8 +19,13 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.fail
 import org.junit.Test
+import org.junit.runner.RunWith
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
+@RunWith(AndroidJUnit4::class)
 class ScannerPairingManagerTest {
 
     private val bluetoothAdapterMock = mockk<ComponentBluetoothAdapter>()
@@ -184,6 +192,88 @@ class ScannerPairingManagerTest {
 
             assertThrows<MultiplePossibleScannersPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
         }
+
+    @Test
+    fun receivedNotBondedIntent_pairStateReceiver_doesNotReact() = runTest {
+        suspendCoroutine { continuation ->
+            val receiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
+                onPairSuccess = { fail() },
+                onPairFailed = { fail() }
+            )
+            receiver.onReceive(mockk(), createReceivedIntent())
+            continuation.resume(Unit)
+        }
+    }
+
+    @Test
+    fun receivedBondRemovedIntent_pairStateReceiver_doesNotReact() = runTest {
+        suspendCoroutine { continuation ->
+            val receiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
+                onPairSuccess = { fail() },
+                onPairFailed = { fail() }
+            )
+            receiver.onReceive(mockk(), createReceivedIntent(
+                failReason = ComponentBluetoothDevice.UNBOND_REASON_REMOVED,
+            ))
+            continuation.resume(Unit)
+        }
+    }
+
+    @Test
+    fun receivedBondedIntent_pairStateReceiver_triggersSuccess() = runTest {
+        suspendCoroutine { continuation ->
+            val receiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
+                onPairSuccess = { continuation.resume(Unit) },
+                onPairFailed = { fail() }
+            )
+            receiver.onReceive(mockk(), createReceivedIntent(state = ComponentBluetoothDevice.BOND_BONDED))
+        }
+    }
+
+    @Test
+    fun receivedPairingFailedIntent_pairStateReceiver_triggersFailWithFalse() = runTest {
+        suspendCoroutine { continuation ->
+            val receiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
+                onPairSuccess = { fail() },
+                onPairFailed = {
+                    assertThat(it).isFalse()
+                    continuation.resume(Unit)
+                }
+            )
+            receiver.onReceive(mockk(), createReceivedIntent(
+                failReason = 5, // Not one of the "rejected" reason codes
+            ))
+        }
+    }
+
+    @Test
+    fun receivedPairingRejectedIntent_pairStateReceiver_triggersFailWithTrue() = runTest {
+        listOf(
+            ComponentBluetoothDevice.REASON_AUTH_FAILED,
+            ComponentBluetoothDevice.REASON_AUTH_REJECTED,
+            ComponentBluetoothDevice.REASON_AUTH_CANCELED,
+            ComponentBluetoothDevice.REASON_REMOTE_AUTH_CANCELED,
+        ).forEach { failReason ->
+            suspendCoroutine { continuation ->
+                val receiver = scannerPairingManager.bluetoothPairStateChangeReceiver(
+                    onPairSuccess = { fail() },
+                    onPairFailed = {
+                        assertThat(it).isTrue()
+                        continuation.resume(Unit)
+                    }
+                )
+                receiver.onReceive(mockk(), createReceivedIntent(failReason = failReason))
+            }
+        }
+    }
+
+    private fun createReceivedIntent(
+        state: Int = ComponentBluetoothDevice.BOND_NONE,
+        failReason: Int = ComponentBluetoothDevice.BOND_SUCCESS,
+    ) = Intent(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED).apply {
+        putExtra(ComponentBluetoothDevice.EXTRA_BOND_STATE, state)
+        putExtra(ComponentBluetoothDevice.EXTRA_REASON, failReason)
+    }
 
     companion object {
         private const val correctAddress = "F0:AC:D7:C0:00:01"

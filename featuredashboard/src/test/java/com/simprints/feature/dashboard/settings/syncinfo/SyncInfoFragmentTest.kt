@@ -144,15 +144,7 @@ class SyncInfoFragmentTest {
 
     @Test
     fun `should display the module selection if the partition is Module and the module options is not empty`() {
-        mockConfiguration(mockk {
-            every { synchronization } returns mockk(relaxed = true) {
-                every { down } returns DownSynchronizationConfiguration(
-                    DownSynchronizationConfiguration.PartitionType.MODULE,
-                    3,
-                    listOf("module1")
-                )
-            }
-        })
+        every { viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(any()) } returns true
 
         launchFragmentInHiltContainer<SyncInfoFragment>()
 
@@ -290,6 +282,12 @@ class SyncInfoFragmentTest {
     fun `should fetch the sync information when the last sync state is updated`() {
         val eventSyncState = EventSyncState("id", 0, 10, listOf(), listOf())
         mockLastSyncState(eventSyncState)
+        mockIsConnection(true)
+        mockConfiguration(mockk {
+            every { synchronization } returns mockk(relaxed = true) {
+                every { down } returns DownSynchronizationConfiguration(DownSynchronizationConfiguration.PartitionType.USER, 0, emptyList())
+            }
+        })
 
         launchFragmentInHiltContainer<SyncInfoFragment>()
 
@@ -338,6 +336,7 @@ class SyncInfoFragmentTest {
 
     private fun mockConfiguration(configuration: ProjectConfiguration) {
         every { viewModel.configuration } returns mockk {
+            every { value } returns configuration
             every { observe(any(), any()) } answers {
                 secondArg<Observer<ProjectConfiguration>>().onChanged(configuration)
             }
@@ -346,8 +345,18 @@ class SyncInfoFragmentTest {
 
     private fun mockLastSyncState(state: EventSyncState) {
         every { viewModel.lastSyncState } returns mockk {
+            every { value } returns state
             every { observe(any(), any()) } answers {
                 secondArg<Observer<EventSyncState>>().onChanged(state)
+            }
+        }
+    }
+
+    private fun mockIsConnection(isConnected: Boolean) {
+        every { viewModel.isConnected } returns mockk {
+            every { value } returns isConnected
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<Boolean>>().onChanged(isConnected)
             }
         }
     }

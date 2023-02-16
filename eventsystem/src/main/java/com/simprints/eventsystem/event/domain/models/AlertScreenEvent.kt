@@ -64,7 +64,9 @@ data class AlertScreenEvent(
             ENROLMENT_LAST_BIOMETRICS_FAILED,
             INVALID_STATE_FOR_INTENT_ACTION,
             FACE_LICENSE_INVALID,
-            FACE_LICENSE_MISSING
+            FACE_LICENSE_MISSING,
+            GOOGLE_PLAY_SERVICES_OUTDATED,
+            MISSING_GOOGLE_PLAY_SERVICES
         }
     }
 

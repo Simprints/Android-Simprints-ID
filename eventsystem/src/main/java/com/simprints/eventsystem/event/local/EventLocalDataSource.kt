@@ -9,6 +9,7 @@ interface EventLocalDataSource {
     suspend fun count(projectId: String): Int
     suspend fun count(projectId: String, type: EventType): Int
     suspend fun count(type: EventType): Int
+    suspend fun observeCount(projectId: String, type: EventType): Flow<Int>
     suspend fun loadAll(): Flow<Event>
     suspend fun loadAllEventJsonFromSession(sessionId: String): List<String>
     suspend fun loadAllFromSession(sessionId: String): List<Event>
@@ -18,7 +19,4 @@ interface EventLocalDataSource {
     suspend fun deleteAllFromSession(sessionId: String)
     suspend fun deleteAll()
     suspend fun insertOrUpdate(event: Event)
-    @Deprecated(message = "Can be removed once all projects are on 2021.1.0+")
-    suspend fun loadOldSubjectCreationEvents(projectId: String): List<Event>
-
 }

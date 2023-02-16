@@ -136,6 +136,26 @@
 
     </androidx.cardview.widget.CardView>
 
+    <Button
+        android:id="@+id/syncButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_rounded_corners"
+        android:fontFamily="@font/muli"
+        android:textColor="@color/simprints_white"
+        android:textSize="16sp"
+        android:text="Sync now"
+        app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
+        app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
+        app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView"
+        tools:ignore="SpeakableTextPresentCheck" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/recordsInLocalCardView"
         android:layout_width="0dp"
@@ -305,7 +325,7 @@
         app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView"
+        app:layout_constraintTop_toBottomOf="@+id/syncButton"
         android:background="@color/cardview_light_background"
         tools:ignore="SpeakableTextPresentCheck">
 

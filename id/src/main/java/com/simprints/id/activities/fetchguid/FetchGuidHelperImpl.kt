@@ -2,7 +2,6 @@ package com.simprints.id.activities.fetchguid
 
 import com.simprints.core.DispatcherIO
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
@@ -13,7 +12,6 @@ import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
@@ -43,7 +41,6 @@ class FetchGuidHelperImpl @Inject constructor(
                         projectId,
                         subjectId = subjectId,
                         modes = configManager.getProjectConfiguration().general.modalities.map { it.toMode() },
-                        types = EventDownSyncScope.subjectEvents
                     )
                 )
 

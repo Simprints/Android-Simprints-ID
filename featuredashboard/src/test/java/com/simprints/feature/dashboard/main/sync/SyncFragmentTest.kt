@@ -79,11 +79,42 @@ class SyncFragmentTest {
         )
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.dashboard_sync_card_default_items_to_upload)).check(matches(withText(
+            context.getString(IDR.string.dashboard_sync_card_records_uploaded)
+        )))
         onView(withId(R.id.dashboard_sync_card_default_state_sync_button))
             .check(matches(isDisplayed()))
             .perform(click())
         verify(exactly = 1) { viewModel.sync() }
     }
+
+    @Test
+    fun `should display the correct sync card view for the SyncPendingUpload state`() {
+        mockSyncToBFSIDAllowed(true)
+        mockSyncCardLiveData(DashboardSyncCardState.SyncPendingUpload(LAST_SYNC_TIME, 2))
+
+        launchFragmentInHiltContainer<SyncFragment>()
+
+        checkHiddenViews(
+            listOf(
+                R.id.dashboard_sync_card_failed_message,
+                R.id.dashboard_sync_card_select_no_modules,
+                R.id.dashboard_sync_card_offline,
+                R.id.dashboard_sync_card_progress,
+                R.id.dashboard_sync_card_try_again,
+            )
+        )
+        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.dashboard_sync_card_default_items_to_upload)).check(matches(withText(
+            context.resources.getQuantityString(IDR.plurals.dashboard_sync_card_records_to_upload, 2, 2)
+        )))
+        onView(withId(R.id.dashboard_sync_card_default_state_sync_button))
+            .check(matches(isDisplayed()))
+            .perform(click())
+        verify(exactly = 1) { viewModel.sync() }
+    }
+
 
     @Test
     fun `should display the correct sync card view for the SyncFailed state`() {

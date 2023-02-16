@@ -1,8 +1,6 @@
 #!/bin/bash
-
-bash ./ci/tools/install_android
-bash ./ci/tools/install_java_11
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+# Install make
+apk add --no-cache make
 
 echo "org.gradle.caching=true" >>gradle.properties
 
