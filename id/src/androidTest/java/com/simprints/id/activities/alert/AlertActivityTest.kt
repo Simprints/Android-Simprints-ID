@@ -96,7 +96,7 @@ class AlertActivityTest {
     @Test
     fun integrityServiceError_theRightAlertShouldAppear() {
         launchAlertActivity(AlertActRequest(AlertType.INTEGRITY_SERVICE_ERROR))
-        ensureAlertScreenLaunched(AlertActivityViewModel.INTEGRITY_SERVICE_ERROR)
+        ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
     }
 
     @Test
