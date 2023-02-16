@@ -44,7 +44,7 @@
     <string name="records_up_to_date">ሁሉም መረጃዎች ወቅታዊ ሆነዋል</string>
     <string name="requestLogin_message">መግባት ከፈለጉ፡ እባክዎ የደንበኛውን አፕልኬሽን ከፍተው የሲም ፕሪንትን መለያቁጥር በመጠቀም መግባት ይችላሉ</string>
     <string name="requestLogin_title">መግባት ይጠበቅበዎታል፡፡</string>
-    <string name="safetynet_down_alert_message">1. እባክዎ ከ5 እስከ 10 ደቂቃ ቆይተው ይሞክሩ</string>
+    <string name="integrity_service_error_alert_message">1. እባክዎ ከ5 እስከ 10 ደቂቃ ቆይተው ይሞክሩ</string>
     <string name="scan_qr">የፈጣን ምላሽ መለያ እስካን ያድርጉ</string>
     <string name="settings_app_details">ስለ አፕልኬሽኑ የበለጠ</string>
     <string name="settings_general">አጠቃላይ</string>

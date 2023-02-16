@@ -35,17 +35,10 @@ class AuthenticateDataResultKtTest {
     }
 
     @Test
-    fun mapSafetyNetUnavailableResult() {
-        val result = AuthenticateDataResult.SafetyNetUnavailable.toDomainResult()
+    fun mapIntegrityErrorResult() {
+        val result = AuthenticateDataResult.IntegrityException.toDomainResult()
 
-        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_UNAVAILABLE::class.java)
-    }
-
-    @Test
-    fun mapSafetyNetInvalidClaimResult() {
-        val result = AuthenticateDataResult.SafetyNetInvalidClaim.toDomainResult()
-
-        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.SAFETYNET_INVALID_CLAIM::class.java)
+        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR::class.java)
     }
 
     @Test

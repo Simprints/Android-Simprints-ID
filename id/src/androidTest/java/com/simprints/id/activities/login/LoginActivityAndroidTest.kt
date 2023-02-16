@@ -164,22 +164,8 @@ class LoginActivityAndroidTest {
     }
 
     @Test
-    fun withInvalidSafetyNetClaims_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(AuthenticateDataResult.SafetyNetInvalidClaim)
-
-        loginActivity {
-            withMandatoryCredentialsPresent()
-            withSuppliedProjectIdAndIntentProjectIdMatching()
-            typeProjectId(VALID_PROJECT_ID)
-            typeProjectSecret(VALID_PROJECT_SECRET)
-        } clickSignIn {
-            alertScreenIsLaunched()
-        }
-    }
-
-    @Test
-    fun withSafetyNetUnavailable_clickSignIn_shouldLaunchAlertScreen() {
-        mockAuthenticationResult(AuthenticateDataResult.SafetyNetUnavailable)
+    fun withIntegrityUnavailable_clickSignIn_shouldLaunchAlertScreen() {
+        mockAuthenticationResult(AuthenticateDataResult.IntegrityException)
 
         loginActivity {
             withMandatoryCredentialsPresent()

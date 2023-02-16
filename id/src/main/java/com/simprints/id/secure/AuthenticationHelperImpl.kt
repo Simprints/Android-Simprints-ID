@@ -12,7 +12,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.login.exceptions.SafetyNetException
+import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -67,17 +67,8 @@ class AuthenticationHelperImpl @Inject constructor(
             is BackendMaintenanceException -> {
                 AuthenticateDataResult.BackendMaintenanceError(t.estimatedOutage)
             }
-            is SafetyNetException -> getSafetyNetExceptionReason(t.reason)
+            is RequestingIntegrityTokenException -> AuthenticateDataResult.IntegrityException
             else -> AuthenticateDataResult.Unknown
-        }
-    }
-
-    private fun getSafetyNetExceptionReason(
-        reason: SafetyNetException.SafetyNetExceptionReason
-    ): AuthenticateDataResult {
-        return when (reason) {
-            SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> AuthenticateDataResult.SafetyNetUnavailable
-            SafetyNetException.SafetyNetExceptionReason.INVALID_CLAIMS -> AuthenticateDataResult.SafetyNetInvalidClaim
         }
     }
 

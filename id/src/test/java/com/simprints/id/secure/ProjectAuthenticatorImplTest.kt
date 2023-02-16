@@ -1,5 +1,6 @@
 package com.simprints.id.secure
 
+import com.google.android.play.core.integrity.model.IntegrityErrorCode
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
@@ -7,7 +8,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
-import com.simprints.infra.login.exceptions.SafetyNetException
+import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -130,13 +131,13 @@ class ProjectAuthenticatorImplTest {
         }
 
     @Test
-    fun safetyNetFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
-        coEvery { loginManager.requestAttestation(any()) } throws SafetyNetException(
-            "",
-            SafetyNetException.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
+    fun integrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
+        coEvery { loginManager.requestIntegrityToken(any()) } throws RequestingIntegrityTokenException(
+            errorCode = IntegrityErrorCode.API_NOT_AVAILABLE,
+            cause = Exception("Error in requesting integrity api token")
         )
 
-        assertThrows<SafetyNetException> {
+        assertThrows<RequestingIntegrityTokenException> {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
         }
     }
@@ -184,7 +185,7 @@ class ProjectAuthenticatorImplTest {
             mockk(),
             mockk(),
         )
-        coEvery { loginManager.requestAttestation(any()) } returns "google_attestation"
+        coEvery { loginManager.requestIntegrityToken(any()) } returns "token"
     }
 
     private companion object {

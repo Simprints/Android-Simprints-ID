@@ -33,10 +33,11 @@ ext {
     DB_ENCRYPTION = false
 
     /**
-     * API key for Google attestation endpoint to check root detection. We keep the DEV and STAGING
-     * ones here so we can test none production builds locally. The release one is added by the CD.
-     */
-    RELEASE_SAFETYNET_KEY = ""
-    STAGING_SAFETYNET_KEY = "AIzaSyBBu-O2HOB21688mu9mB38K475wFxrqm7A"
-    DEV_SAFETYNET_KEY = "AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I"
+    * The cloud project ids used in google integrity service
+    */
+    RELEASE_CLOUD_PROJECT_ID  = "964685613552"
+
+    STAGING_CLOUD_PROJECT_ID = "423867324644"
+
+    DEV_CLOUD_PROJECT_ID = "79630518081"
 }
