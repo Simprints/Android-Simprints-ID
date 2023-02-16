@@ -47,6 +47,8 @@ data class AuthenticationEvent(
             OFFLINE,
             TECHNICAL_FAILURE,
             INTEGRITY_SERVICE_ERROR,
+            INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR,
+            MISSING_OR_OUTDATED_PLAY_STORE_ERROR,
             BACKEND_MAINTENANCE_ERROR,
             UNKNOWN
         }

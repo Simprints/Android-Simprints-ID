@@ -7,10 +7,13 @@ import com.google.android.play.core.integrity.IntegrityManager
 import com.google.android.play.core.integrity.IntegrityServiceException
 import com.google.android.play.core.integrity.IntegrityTokenRequest
 import com.google.android.play.core.integrity.IntegrityTokenResponse
-import com.google.android.play.core.integrity.model.IntegrityErrorCode.PLAY_SERVICES_VERSION_OUTDATED
+import com.google.android.play.core.integrity.model.IntegrityErrorCode.*
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.login.BuildConfig
+import com.simprints.infra.login.exceptions.IntegrityServiceTemporaryDown
+import com.simprints.infra.login.exceptions.MissingOrOutdatedGooglePlayStoreApp
 import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
@@ -73,11 +76,63 @@ class IntegrityTokenRequesterImplTest {
                         .build()
                 )
             } throws mockk<IntegrityServiceException> {
-                every { errorCode } returns PLAY_SERVICES_VERSION_OUTDATED
+                every { errorCode } returns CLOUD_PROJECT_NUMBER_IS_INVALID
             }
             val exception = assertThrows<RequestingIntegrityTokenException> {
                 integrityTokenRequesterImpl.getToken(NONCE)
             }
-            assertThat(exception.errorCode).isEqualTo(PLAY_SERVICES_VERSION_OUTDATED)
+            assertThat(exception.errorCode).isEqualTo(CLOUD_PROJECT_NUMBER_IS_INVALID)
         }
+
+    @Test
+    fun `should throw a MissingOrOutdatedGooglePlayStoreApp when google play store not found`() =
+        runTest {
+            every {
+                integrityManager.requestIntegrityToken(
+                    IntegrityTokenRequest.builder().setNonce(NONCE)
+                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                        .build()
+                )
+            } throws mockk<IntegrityServiceException> {
+                every { errorCode } returns PLAY_STORE_NOT_FOUND
+            }
+            val exception = assertThrows<MissingOrOutdatedGooglePlayStoreApp> {
+                integrityTokenRequesterImpl.getToken(NONCE)
+            }
+            assertThat(exception.errorCode).isEqualTo(PLAY_STORE_NOT_FOUND)
+        }
+    @Test
+    fun `should throw a IntegrityServiceTemporaryDown when integrity service is down`() =
+        runTest {
+            every {
+                integrityManager.requestIntegrityToken(
+                    IntegrityTokenRequest.builder().setNonce(NONCE)
+                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                        .build()
+                )
+            } throws mockk<IntegrityServiceException> {
+                every { errorCode } returns GOOGLE_SERVER_UNAVAILABLE
+            }
+            val exception = assertThrows<IntegrityServiceTemporaryDown> {
+                integrityTokenRequesterImpl.getToken(NONCE)
+            }
+            assertThat(exception.errorCode).isEqualTo(GOOGLE_SERVER_UNAVAILABLE)
+        }
+    @Test
+    fun `should throw a NetworkConnectionException when network error happens`() =
+        runTest {
+            every {
+                integrityManager.requestIntegrityToken(
+                    IntegrityTokenRequest.builder().setNonce(NONCE)
+                        .setCloudProjectNumber(BuildConfig.CLOUD_PROJECT_ID.toLong())
+                        .build()
+                )
+            } throws mockk<IntegrityServiceException> {
+                every { errorCode } returns NETWORK_ERROR
+            }
+            val exception = assertThrows<NetworkConnectionException> {
+                integrityTokenRequesterImpl.getToken(NONCE)
+            }
+        }
+
 }

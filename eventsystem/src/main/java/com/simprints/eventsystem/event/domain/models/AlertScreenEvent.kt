@@ -66,7 +66,8 @@ data class AlertScreenEvent(
             FACE_LICENSE_INVALID,
             FACE_LICENSE_MISSING,
             GOOGLE_PLAY_SERVICES_OUTDATED,
-            MISSING_GOOGLE_PLAY_SERVICES
+            MISSING_GOOGLE_PLAY_SERVICES,
+            MissingOrOutdatedGooglePlayStoreApp
         }
     }
 
