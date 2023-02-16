@@ -200,6 +200,12 @@
     <string name="dashboard_sync_card_offline_button">Settings</string>
     <string name="dashboard_sync_card_too_many_modules_message">Too many modules have been downloaded.</string>
 
+    <string name="dashboard_sync_card_records_uploaded">All records uploaded</string>
+    <plurals name="dashboard_sync_card_records_to_upload">
+        <item quantity="one">%1$d record to upload</item>
+        <item quantity="other">%1$d records to upload</item>
+    </plurals>
+
     <string name="dashboard_card_sync_title">Sync status</string>
     <string name="dashboard_card_sync_last_sync">Last sync: %1$s</string>
 

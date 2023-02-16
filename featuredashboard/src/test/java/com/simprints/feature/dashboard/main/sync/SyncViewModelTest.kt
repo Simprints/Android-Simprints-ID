@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType
@@ -14,12 +15,14 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Rule
 import org.junit.Test
 
@@ -60,6 +63,10 @@ class SyncViewModelTest {
     private val timeHelper = mockk<TimeHelper>(relaxed = true) {
         every { readableBetweenNowAndTime(any()) } returns DATE
     }
+    private val loginManager = mockk<LoginManager>(){
+        every { getSignedInProjectIdOrEmpty() } returns "projectId"
+    }
+    private val eventRepository = mockk<EventRepository>()
 
     @Test
     fun `should initialize the live data syncToBFSIDAllowed correctly`() {
@@ -190,6 +197,30 @@ class SyncViewModelTest {
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
         assertThat(syncCardLiveData).isEqualTo(SyncComplete(DATE))
+    }
+
+    @Test
+    fun `should post a SyncPendingUpload card state if there are records to upload`() {
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf("module 1"),
+            listOf(),
+            ""
+        )
+        coEvery { eventRepository.observeLocalCount(any(), any()) }.returns(flowOf(2))
+
+        isConnected.value = true
+        syncState.value = EventSyncState(
+            "", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Succeeded
+            )
+        )
+        )
+        val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
+
+        assertThat(syncCardLiveData).isEqualTo(SyncPendingUpload(DATE, 2))
     }
 
     @Test
@@ -356,5 +387,7 @@ class SyncViewModelTest {
             configManager,
             cacheSync,
             timeHelper,
+            loginManager,
+            eventRepository,
         )
 }
