@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ProgressBar
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -48,6 +49,7 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         hideAllViews()
         when (state) {
             is SyncDefault -> prepareSyncDefaultStateView()
+            is SyncPendingUpload -> prepareSyncDefaultStateView(state.itemsToUpSync)
             is SyncFailed -> prepareSyncFailedStateView()
             is SyncFailedBackendMaintenance -> prepareSyncFailedBecauseBackendMaintenanceView(
                 state
@@ -63,10 +65,17 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         updateLastSyncTime(state.lastTimeSyncSucceed)
     }
 
-    private fun prepareSyncDefaultStateView() {
-        binding.dashboardSyncCardDefaultStateSyncButton.visibility = View.VISIBLE
-        binding.dashboardSyncCardDefaultStateSyncButton.setOnClickListener {
-            viewModel.sync()
+    private fun prepareSyncDefaultStateView(itemsToSync: Int = 0) {
+        binding.dashboardSyncCardDefault.visibility = View.VISIBLE
+        binding.dashboardSyncCardDefaultStateSyncButton.setOnClickListener { viewModel.sync() }
+        binding.dashboardSyncCardDefaultItemsToUpload.text = if (itemsToSync <= 0) {
+            getString(IDR.string.dashboard_sync_card_records_uploaded)
+        } else {
+            resources.getQuantityString(
+                IDR.plurals.dashboard_sync_card_records_to_upload,
+                itemsToSync,
+                itemsToSync
+            )
         }
     }
 
@@ -204,7 +213,7 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
 
     private fun hideAllViews() {
-        binding.dashboardSyncCardDefaultStateSyncButton.visibility = View.GONE
+        binding.dashboardSyncCardDefault.visibility = View.GONE
         binding.dashboardSyncCardFailedMessage.visibility = View.GONE
         binding.dashboardSyncCardSelectNoModules.visibility = View.GONE
         binding.dashboardSyncCardOffline.visibility = View.GONE

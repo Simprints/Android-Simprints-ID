@@ -52,7 +52,7 @@
     <string name="nfc_pair_instructions">স্ক্যানার-এর পেছন কে ফোন এর পেছনের সাথে লাগান</string>
     <string name="cannot_connect_devices">ডিভাইস গুলো সংযুক্ত করা যাচ্ছেনা</string>
     <string name="nfc_pairing_in_progress">%1$s স্ক্যানার পাওয়া গেছে</string>
-    <string name="nfc_pairing_try_again_instruction">স্ক্যানার চালুু আছে কিনা নিশ্চিত করুন এবং আবার চেষ্টা করুন</string>
+    <string name="nfc_pairing_try_again_instruction">স্ক্যানার %1$s চালুু আছে কিনা নিশ্চিত করুন এবং আবার চেষ্টা করুন</string>
     <string name="nfc_pair_toast_try_again">এন.এফ.সি চিপ পড়া যাচ্ছেনা, আবার চেষ্টা করুন</string>
     <string name="nfc_pair_toast_invalid">অবৈধ এন.এফ.সি চিপ</string>
     <!-- SerialEntryPairFragment -->
@@ -60,7 +60,7 @@
     <string name="serial_entry_pair_title">স্ক্যানার সংযুুক্ত নেই</string>
     <string name="enter_scanner_number">নিচের বক্স-এ স্ক্যানার এর নাম্বার লিখুন</string>
     <string name="enter_scanner_number_detail">এই নাম্বারটি স্ক্যানার-এর একদম নিচে পাবেন</string>
-    <string name="serial_entry_pair_failed">স্ক্যানার চালুু আছে কিনা নিশ্চিত করুন এবং আবার চেষ্টা করুন</string>
+    <string name="serial_entry_pair_failed">স্ক্যানার %1$s চালুু আছে কিনা নিশ্চিত করুন এবং আবার চেষ্টা করুন</string>
     <string name="serial_entry_pair_toast_invalid">৬ সংখ্যার সিরিয়াল নাম্বারটি লিখুন</string>
     <!-- OtaFragment -->
     <string name="ota_title">স্ক্যানার আপডেট করা প্রয়োজন</string>

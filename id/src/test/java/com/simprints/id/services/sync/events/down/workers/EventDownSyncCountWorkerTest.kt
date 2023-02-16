@@ -9,15 +9,15 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType
+import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -69,7 +69,7 @@ class EventDownSyncCountWorkerTest {
     @Test
     fun countWorker_shouldExecuteTheTaskSuccessfully() {
         runTest {
-            val counts = EventCount(SESSION_CAPTURE, 1)
+            val counts = EventCount(EnrolmentRecordEventType.EnrolmentRecordMove, 1)
             mockDependenciesToSucceed(counts)
 
             val result = countWorker.doWork()
@@ -147,7 +147,8 @@ class EventDownSyncCountWorkerTest {
                 workDataOf(),
                 listOf(tagForMasterSyncId, tagForType(EventSyncWorkerType.DOWNLOADER)),
                 workDataOf(),
-                2
+                2,
+                0
             )
         )
         every { mockWm.getWorkInfosByTag(any()) } returns mockWorkInfo

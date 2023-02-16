@@ -26,6 +26,8 @@ import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.PERMISS
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
+import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityChecker
+import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityCheckerImpl.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
@@ -40,6 +42,9 @@ class LoginActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var loginActivityHelper: LoginActivityHelper
+
+    @Inject
+    lateinit var googlePlayServicesAvailabilityChecker: GooglePlayServicesAvailabilityChecker
 
     @Inject
     lateinit var simNetwork: SimNetwork
@@ -60,6 +65,8 @@ class LoginActivity : BaseSplitActivity() {
         simNetwork.resetApiBaseUrl()
         initUI()
         observeSignInResult()
+        // Check if google play services is installed and updated
+        googlePlayServicesAvailabilityChecker.check(this)
     }
 
     private fun initUI() {
@@ -121,13 +128,20 @@ class LoginActivity : BaseSplitActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(data)
 
-        if (potentialAlertScreenResponse != null) {
-            setResult(resultCode, data)
-            finish()
-        } else if (requestCode == QR_REQUEST_CODE) {
-            data?.let {
-                handleQrScanResult(resultCode, it)
-            } ?: showErrorForQRCodeFailed()
+        when {
+            potentialAlertScreenResponse != null -> {
+                setResult(resultCode, data)
+                finish()
+            }
+            requestCode == QR_REQUEST_CODE -> {
+                data?.let {
+                    handleQrScanResult(resultCode, it)
+                } ?: showErrorForQRCodeFailed()
+            }
+            requestCode == GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE -> {
+                // Check again to make sure that the user did the need actions.
+                googlePlayServicesAvailabilityChecker.check(this)
+            }
         }
     }
 

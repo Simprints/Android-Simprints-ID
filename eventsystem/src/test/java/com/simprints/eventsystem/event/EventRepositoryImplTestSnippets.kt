@@ -15,17 +15,14 @@ import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
 import com.simprints.eventsystem.event.domain.models.session.Device
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.eventsystem.event.remote.EventRemoteDataSource
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.eventsystem.sampledata.createAlertScreenEvent
-import com.simprints.eventsystem.sampledata.createEnrolmentRecordCreationEvent
 import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.flow.asFlow
@@ -120,10 +117,6 @@ fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(
         eventLocalDataSource.loadAllClosedSessionIds(any())
     } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().map { it.id }
 
-    coEvery {
-        eventLocalDataSource.loadOldSubjectCreationEvents(any())
-    } returns (group1 + group2).filter { it.labels.sessionId.isNullOrBlank() }
-
     return (group1 + group2)
 }
 
@@ -146,10 +139,6 @@ fun EventRepositoryImplTest.mockDbToLoadInvalidSessions(
     coEvery {
         eventLocalDataSource.loadAllClosedSessionIds(any())
     } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().map { it.id }
-
-    coEvery {
-        eventLocalDataSource.loadOldSubjectCreationEvents(any())
-    } returns (group1 + group2).filter { it.labels.sessionId.isNullOrBlank() }
 
     return (group1 + group2)
 }
@@ -188,19 +177,6 @@ fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
     val session = createSessionCaptureEvent(id).openSession()
     coEvery { eventLocalDataSource.loadAllFromSession(sessionId = id) } returns listOf(session)
     coEvery { eventLocalDataSource.loadAll() } returns flowOf(session)
-}
-
-suspend fun EventRepositoryImplTest.mockDbToLoadPersonRecordEvents(nPersonRecordEvents: Int): List<Event> {
-    val events = mutableListOf<EnrolmentRecordCreationEvent>()
-    (0 until nPersonRecordEvents).forEach { _ ->
-        events += createEnrolmentRecordCreationEvent(EncodingUtilsImplForTests)
-    }
-
-    coEvery {
-        eventLocalDataSource.loadOldSubjectCreationEvents(any())
-    } returns events.filter { it.labels.sessionId.isNullOrBlank() }
-
-    return events.toList()
 }
 
 fun EventRepositoryImplTest.verifyArtificialEventWasAdded(
