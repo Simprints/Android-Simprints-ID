@@ -2,6 +2,7 @@ package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 
 @Keep
 internal data class ApiGeneralConfiguration(
@@ -9,7 +10,8 @@ internal data class ApiGeneralConfiguration(
     val languageOptions: List<String>,
     val defaultLanguage: String,
     val collectLocation: Boolean,
-    val duplicateBiometricEnrolmentCheck: Boolean
+    val duplicateBiometricEnrolmentCheck: Boolean,
+    val settingsPassword: String?,
 ) {
 
     fun toDomain(): GeneralConfiguration =
@@ -19,6 +21,7 @@ internal data class ApiGeneralConfiguration(
             defaultLanguage,
             collectLocation,
             duplicateBiometricEnrolmentCheck,
+            SettingsPasswordConfig.toDomain(settingsPassword),
         )
 
     @Keep
