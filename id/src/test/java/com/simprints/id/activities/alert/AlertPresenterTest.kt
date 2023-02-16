@@ -6,7 +6,7 @@ import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.*
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.infra.config.ConfigManager
@@ -14,7 +14,6 @@ import com.simprints.infra.resources.R
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
->>>>>>>>> Temporary merge branch 2
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Before
 import org.junit.Rule
@@ -100,7 +99,7 @@ internal class AlertPresenterTest {
 
         // Then
         assertThat(eventSlot.captured.payload.alertType)
-            .isEqualTo(AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED)
+            .isEqualTo(GOOGLE_PLAY_SERVICES_OUTDATED)
         verify {
             view.getColorForColorRes(R.color.simprints_red)
         }
@@ -127,13 +126,13 @@ internal class AlertPresenterTest {
 
         // Then
         assertThat(eventSlot.captured.payload.alertType)
-            .isEqualTo(AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES)
+            .isEqualTo(MISSING_GOOGLE_PLAY_SERVICES)
         verify {
             view.getColorForColorRes(R.color.simprints_red)
         }
     }
     @Test
-    fun `start the presenter with alertType MissingOrOutdatedGooglePlayStoreApp shows gray screen and saves AlertScreenEvent of MissingOrOutdatedGooglePlayStoreApp type`() {
+    fun `start the presenter with alertType MissingOrOutdatedGooglePlayStoreApp shows red screen and saves AlertScreenEvent of MissingOrOutdatedGooglePlayStoreApp type`() {
         // Given
         val alertType = AlertType.MissingOrOutdatedGooglePlayStoreApp
         alertPresenter = AlertPresenter(
@@ -153,9 +152,9 @@ internal class AlertPresenterTest {
 
         // Then
         assertThat(eventSlot.captured.payload.alertType)
-            .isEqualTo(AlertScreenEventType.MissingOrOutdatedGooglePlayStoreApp)
+            .isEqualTo(MissingOrOutdatedGooglePlayStoreApp)
         verify {
-            view.getColorForColorRes(R.color.simprints_grey)
+            view.getColorForColorRes(R.color.simprints_red)
         }
     }
 }

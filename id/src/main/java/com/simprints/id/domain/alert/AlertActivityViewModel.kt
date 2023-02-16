@@ -52,7 +52,7 @@ enum class AlertActivityViewModel(val type: Type,
 
     MissingOrOutdatedGooglePlayStoreApp(
         type = Type.ConfigurationError(title = IDR.string.missing_or_outdated_google_play_store_app_alert_title,
-            backgroundColor = IDR.color.simprints_grey,
+            backgroundColor = IDR.color.simprints_red,
             mainDrawable = R.drawable.error_icon),
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
