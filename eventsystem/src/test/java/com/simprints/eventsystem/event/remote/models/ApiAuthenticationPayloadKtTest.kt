@@ -35,6 +35,18 @@ class ApiAuthenticationPayloadKtTest {
     }
 
     @Test
+    fun `should map outdated play store service error correctly`() {
+        val result =
+            AuthenticationEvent.AuthenticationPayload.Result.MISSING_OR_OUTDATED_PLAY_STORE_ERROR.fromDomainToApi()
+        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.MISSING_OR_OUTDATED_PLAY_STORE_ERROR::class.java)
+    }
+    @Test
+    fun `should map integration service temp down error correctly`() {
+        val result =
+            AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR.fromDomainToApi()
+        assertThat(result).isInstanceOf(AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR::class.java)
+    }
+    @Test
     fun `should map integrity service error correctly`() {
         val result =
             AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR.fromDomainToApi()
