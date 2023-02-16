@@ -136,7 +136,7 @@ class AlertPresenter @AssistedInject constructor(
             AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED,
             AlertType.GOOGLE_PLAY_SERVICES_OUTDATED ,
             AlertType.MISSING_GOOGLE_PLAY_SERVICES ,
-            AlertType.SAFETYNET_ERROR -> {
+            AlertType.INTEGRITY_SERVICE_ERROR -> {
                 view.closeActivityAfterCloseButton()
             }
             AlertType.GUID_NOT_FOUND_OFFLINE -> {

@@ -1,66 +1,5 @@
 package com.simprints.eventsystem.event.remote
 
-import android.app.Application
-import android.os.Build
-import android.os.Build.VERSION
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.tools.extentions.safeSealedWhens
-import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.EncodingUtilsImpl
-import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.event.domain.models.*
-import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload
-import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload
-import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.eventsystem.event.domain.models.EventType.*
-import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload
-import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
-import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload
-import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload
-import com.simprints.eventsystem.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
-import com.simprints.eventsystem.event.domain.models.callback.*
-import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.eventsystem.event.domain.models.callout.*
-import com.simprints.eventsystem.event.domain.models.face.*
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.eventsystem.event.domain.models.session.DatabaseInfo
-import com.simprints.eventsystem.event.domain.models.session.Device
-import com.simprints.eventsystem.event.domain.models.session.Location
-import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.createEnrolmentEventV1
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
-import com.simprints.infra.enrolment.records.domain.models.FingerIdentifier
-import com.simprints.infra.enrolment.records.domain.models.fromDomainToModuleApi
-import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.apiclient.SimApiClientImpl
-import com.simprints.moduleapi.app.responses.IAppResponseTier
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
-import okhttp3.internal.toImmutableList
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
-import kotlin.random.Random
-
 // TODO fix
 //@RunWith(AndroidJUnit4::class)
 //class EventRemoteDataSourceImplAndroidTest {
@@ -183,8 +122,7 @@ import kotlin.random.Random
 //            Result.OFFLINE,
 //            Result.TECHNICAL_FAILURE,
 //            Result.BACKEND_MAINTENANCE_ERROR,
-//            Result.SAFETYNET_UNAVAILABLE,
-//            Result.SAFETYNET_INVALID_CLAIM,
+//            Result.INTEGRITY_SERVICE_ERROR,
 //            Result.UNKNOWN
 //        ).forEach {
 //            add(

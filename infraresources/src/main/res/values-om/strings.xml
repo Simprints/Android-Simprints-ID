@@ -40,7 +40,7 @@
     <string name="records_up_to_date">Galmeen hundi haaromfameera</string>
     <string name="requestLogin_message">Seenuu si barbaachisa. \"Simprints ID\" banuuf maaloo mosaajii tajaajilamtuu seeni</string>
     <string name="requestLogin_title">Seenuu si barbaachisa</string>
-    <string name="safetynet_down_alert_message">Daqiiqaa 5–10 booda irra deebi\'uun yaali</string>
+    <string name="integrity_service_error_alert_message">Daqiiqaa 5–10 booda irra deebi\'uun yaali</string>
     <string name="settings_app_details">Odeeffannoo Mosaajii</string>
     <string name="settings_general">Waliigala</string>
     <string name="settings_invalid_selection">Filannoo dogoggoraa</string>

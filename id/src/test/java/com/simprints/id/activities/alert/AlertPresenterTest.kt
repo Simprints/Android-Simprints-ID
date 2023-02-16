@@ -1,12 +1,14 @@
 package com.simprints.id.activities.alert
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INTEGRITY_SERVICE_ERROR
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.infra.config.ConfigManager
@@ -52,6 +54,7 @@ class AlertPresenterTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+        mockkStatic("com.simprints.id.domain.alert.AlertTypeKt")
     }
 
 
@@ -107,5 +110,29 @@ class AlertPresenterTest {
         verify {
             view.getColorForColorRes(R.color.simprints_red)
         }
+    }
+    @Test
+    fun `test start with INTEGRITY_SERVICE_ERROR should add the correct event in eventRepositry`() {
+        //Given
+        val alertType: AlertType = AlertType.INTEGRITY_SERVICE_ERROR
+        alertPresenter = AlertPresenter(
+            view,
+            alertType,
+            eventRepository,
+            configManager,
+            timeHelper,
+            exitFormHelper,
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+        )
+        var event = mockk<AlertScreenEvent>()
+
+        coEvery { eventRepository.addOrUpdateEvent(any()) } answers {
+            event = args[0] as AlertScreenEvent
+        }
+        // When
+        alertPresenter.start()
+        // Then
+        Truth.assertThat(event.payload.alertType)
+            .isEqualTo(INTEGRITY_SERVICE_ERROR)
     }
 }

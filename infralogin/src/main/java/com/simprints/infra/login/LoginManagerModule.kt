@@ -1,14 +1,13 @@
 package com.simprints.infra.login
 
 import android.content.Context
-import com.google.android.gms.safetynet.SafetyNet
-import com.google.android.gms.safetynet.SafetyNetClient
+import com.google.android.play.core.integrity.IntegrityManagerFactory
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.infra.login.db.FirebaseManagerImpl
 import com.simprints.infra.login.db.RemoteDbManager
-import com.simprints.infra.login.domain.AttestationManager
-import com.simprints.infra.login.domain.AttestationManagerImpl
+import com.simprints.infra.login.domain.IntegrityTokenRequester
+import com.simprints.infra.login.domain.IntegrityTokenRequesterImpl
 import com.simprints.infra.login.domain.LoginInfoManager
 import com.simprints.infra.login.domain.LoginInfoManagerImpl
 import com.simprints.infra.login.network.SimApiClientFactory
@@ -34,7 +33,7 @@ abstract class LoginManagerModule {
     internal abstract fun provideAuthenticationRemoteDataSource(authRemoteDataSource: AuthenticationRemoteDataSourceImpl): AuthenticationRemoteDataSource
 
     @Binds
-    internal abstract fun provideAttestationManager(impl: AttestationManagerImpl): AttestationManager
+    internal abstract fun provideIntegrityTokenRequester(impl: IntegrityTokenRequesterImpl): IntegrityTokenRequester
 
     @Binds
     internal abstract fun provideLoginInfoManager(impl: LoginInfoManagerImpl): LoginInfoManager
@@ -46,10 +45,10 @@ abstract class LoginManagerModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object SafetyNetModule {
+object IntegrityModule {
 
     @Provides
-    fun provideSafetyNetClient(@ApplicationContext context: Context): SafetyNetClient = SafetyNet.getClient(context)
+    fun provideIntegrityManager(@ApplicationContext context: Context) = IntegrityManagerFactory.create(context)
 
     @Provides
     internal fun provideSimApiClientFactory(

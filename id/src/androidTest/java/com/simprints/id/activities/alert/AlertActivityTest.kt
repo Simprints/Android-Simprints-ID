@@ -24,7 +24,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
@@ -61,7 +60,6 @@ class AlertActivityTest {
     lateinit var configManager: ConfigManager
 
     private val generalConfiguration = mockk<GeneralConfiguration>()
-    private val eventRepository = mockk<EventRepository>(relaxed = true)
 
     @Before
     fun setUp() {
@@ -96,9 +94,9 @@ class AlertActivityTest {
     }
 
     @Test
-    fun safetyNetError_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
-        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
+    fun integrityServiceError_theRightAlertShouldAppear() {
+        launchAlertActivity(AlertActRequest(AlertType.INTEGRITY_SERVICE_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.INTEGRITY_SERVICE_ERROR)
     }
 
     @Test
@@ -135,13 +133,13 @@ class AlertActivityTest {
     }
 
     @Test
-    fun safetyNetDown_userClicksClose_alertShouldFinishWithRightResult() {
-        val scenario = launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
-        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
+    fun integrityServiceError_userClicksClose_alertShouldFinishWithRightResult() {
+        val scenario = launchAlertActivity(AlertActRequest(AlertType.INTEGRITY_SERVICE_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.INTEGRITY_SERVICE_ERROR)
 
         onView(withId(R.id.alertLeftButton)).perform(click())
 
-        verifyIntentReturned(scenario.result, AlertType.SAFETYNET_ERROR, ButtonAction.CLOSE)
+        verifyIntentReturned(scenario.result, AlertType.INTEGRITY_SERVICE_ERROR, ButtonAction.CLOSE)
     }
 
 

@@ -32,8 +32,8 @@ class AuthenticationRemoteDataSourceImplTest {
         private const val DEVICE_ID = "deviceId"
         private const val NONCE = "nonce_from_server"
         private const val PUBLIC_KEY = "public_key_from_server"
-        private val AUTH_REQUEST = AuthRequest("secret", "safety", "deviceId")
-        private val API_AUTH_REQUEST_BODY = ApiAuthRequestBody("secret", "safety", "deviceId")
+        private val AUTH_REQUEST = AuthRequest("secret", "integrityToken", "deviceId")
+        private val API_AUTH_REQUEST_BODY = ApiAuthRequestBody("secret", "integrityToken", "deviceId")
     }
 
     private val remoteInterface = mockk<AuthenticationRemoteInterface>()
