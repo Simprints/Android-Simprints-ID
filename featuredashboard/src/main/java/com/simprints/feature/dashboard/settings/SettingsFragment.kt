@@ -5,17 +5,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
+import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,7 +49,6 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
         viewModel.generalConfiguration.observe(viewLifecycleOwner) {
             enableFingerprintSettings(it.modalities)
-            configureAvailableLanguageEntriesFromProjectLanguages(it.languageOptions)
         }
         viewModel.languagePreference.observe(viewLifecycleOwner) {
             loadSelectedLanguage(it)
@@ -54,10 +56,26 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         bindClickListeners()
     }
 
+    private fun enableFingerprintSettings(modalities: List<GeneralConfiguration.Modality>) {
+        getFingerSelectionPreference()?.isVisible = modalities.contains(FINGERPRINT)
+    }
+
     private fun bindClickListeners() {
-        getLanguagePreference()?.setOnPreferenceChangeListener { _, newValue ->
-            handleLanguageChange(newValue as String)
-            clearActivityStackAndRelaunchApp()
+        getLanguagePreference()?.setOnPreferenceClickListener {
+            val lock = viewModel.settingsLocked.value
+                ?.let { it as? SettingsPasswordConfig.Locked }
+
+            if (lock != null) {
+                SettingsPasswordDialogFragment(
+                    codeToMatch = lock.code,
+                    onSuccess = {
+                        viewModel.unlockSettings()
+                        createLanguageSelectionDialog().show()
+                    },
+                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+            } else {
+                createLanguageSelectionDialog().show()
+            }
             true
         }
 
@@ -77,56 +95,42 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun enableFingerprintSettings(modalities: List<GeneralConfiguration.Modality>) {
-        getFingerSelectionPreference()?.isVisible = modalities.contains(FINGERPRINT)
+    private fun createLanguageSelectionDialog(): AlertDialog {
+        val languagesOptions = viewModel.generalConfiguration.value?.languageOptions.orEmpty()
+        val languagesCodeToName = computeAvailableLanguageCodeAndName(languagesOptions)
+        val languageNames = languagesCodeToName.map { it.second }
+
+        val selectedLanguage = viewModel.languagePreference.value
+            ?.let { selectedCode -> languagesCodeToName.indexOfFirst { selectedCode == it.first } }
+            ?: ArrayAdapter.NO_SELECTION
+
+        return AlertDialog.Builder(requireContext())
+            .setSingleChoiceItems(
+                ArrayAdapter(requireContext(), android.R.layout.simple_list_item_single_choice, languageNames),
+                selectedLanguage
+            ) { _, which -> handleLanguageChange(languagesCodeToName[which].first) }
+            .create()
     }
 
-    private fun configureAvailableLanguageEntriesFromProjectLanguages(availableLanguages: List<String>) {
-        getLanguagePreference()?.apply {
-            val languageCodeToName = resources.getStringArray(R.array.language_values)
-                .zip(resources.getStringArray(R.array.language_array)).toMap()
-            val (availableLanguageNames, availableLanguageCodes) = computeAvailableLanguageNamesAndCodes(
-                availableLanguages,
-                languageCodeToName
-            )
-
-            entries = availableLanguageNames.toTypedArray()
-            entryValues = availableLanguageCodes.toTypedArray()
-        }
+    private fun computeAvailableLanguageCodeAndName(availableLanguages: List<String>): List<Pair<String, String>> {
+        val languageCodeToName = getLanguageMaps()
+        return availableLanguages.mapNotNull { code -> languageCodeToName[code]?.let { code to it } }
     }
 
-    private fun computeAvailableLanguageNamesAndCodes(
-        availableLanguages: List<String>,
-        languageCodeToName: Map<String, String>
-    ): Pair<MutableList<String>, MutableList<String>> {
+    private fun getLanguageMaps(): Map<String, String> = resources
+        .getStringArray(R.array.language_values)
+        .zip(resources.getStringArray(R.array.language_array))
+        .toMap()
 
-        val availableLanguageNames = mutableListOf<String>()
-        val availableLanguageCodes = mutableListOf<String>()
-        availableLanguages.forEach { code ->
-            val name = languageCodeToName[code]
-            if (name != null) {
-                availableLanguageNames.add(name)
-                availableLanguageCodes.add(code)
-            }
-        }
-
-        if (availableLanguageNames.isEmpty()) {
-            availableLanguageNames.addAll(languageCodeToName.values)
-            availableLanguageCodes.addAll(languageCodeToName.keys)
-        }
-        return Pair(availableLanguageNames, availableLanguageCodes)
+    private fun loadSelectedLanguage(languageCode: String) {
+        val newLanguageName = getLanguageMaps()[languageCode]
+        getLanguagePreference()?.summary = newLanguageName
     }
 
-    private fun loadSelectedLanguage(language: String) {
-        getLanguagePreference()?.apply {
-            value = language
-            summary = findIndexOfValue(value).let { if (it == -1) null else entries[it] }
-        }
-    }
-
-    private fun handleLanguageChange(newLanguage: String) {
-        viewModel.updateLanguagePreference(newLanguage)
-        loadSelectedLanguage(newLanguage)
+    private fun handleLanguageChange(newLanguageCode: String) {
+        viewModel.updateLanguagePreference(newLanguageCode)
+        loadSelectedLanguage(newLanguageCode)
+        clearActivityStackAndRelaunchApp()
     }
 
     private fun clearActivityStackAndRelaunchApp() {
@@ -135,7 +139,7 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
         activity?.overridePendingTransition(0, 0)
     }
 
-    private fun getLanguagePreference(): ListPreference? =
+    private fun getLanguagePreference(): Preference? =
         findPreference(getString(R.string.preference_select_language_key))
 
     private fun getFingerSelectionPreference(): Preference? =
