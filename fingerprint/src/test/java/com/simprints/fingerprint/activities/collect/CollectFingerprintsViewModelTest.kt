@@ -1159,6 +1159,18 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.STOP)
     }
 
+    @Test
+    fun whenScannerDisconnects_AndUserSelectsDifferentFinger_updatesStateCorrectlyAndReconnects() {
+        mockScannerSetUiIdle()
+        coEvery { scanner.setUiIdle() } throws ScannerDisconnectedException()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.updateSelectedFinger(1)
+
+        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        vm.launchReconnect.assertEventReceived()
+    }
+
     @ExperimentalTime
     private fun getToEndOfWorkflow() {
         setupCaptureFingerprintResponses(GOOD_SCAN)
