@@ -34,7 +34,7 @@ class SettingsViewModelTest {
         defaultLanguage = "fr",
         collectLocation = true,
         duplicateBiometricEnrolmentCheck = true,
-        settingsPassword = SettingsPasswordConfig.NotSet,
+        settingsPassword = SettingsPasswordConfig.Locked("1234"),
     )
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
@@ -56,6 +56,7 @@ class SettingsViewModelTest {
     fun `should initialize the live data correctly`() {
         assertThat(viewModel.generalConfiguration.value).isEqualTo(generalConfiguration)
         assertThat(viewModel.languagePreference.value).isEqualTo(LANGUAGE)
+        assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
     }
 
     @Test
@@ -70,5 +71,14 @@ class SettingsViewModelTest {
 
         assertThat(updatedConfig.language).isEqualTo(updatedLanguage)
         assertThat(viewModel.languagePreference.value).isEqualTo(updatedLanguage)
+    }
+
+    @Test
+    fun `mark settings as unlocked when called`() {
+        assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
+
+        viewModel.unlockSettings()
+
+        assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Unlocked)
     }
 }
