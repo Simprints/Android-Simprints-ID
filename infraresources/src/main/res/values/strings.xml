@@ -175,7 +175,7 @@
     <string name="login_invalid_credentials">Invalid credentials. Please check the Project ID and key</string>
     <string name="login_project_id_intent_mismatch">Project ID different from that supplied in intent. Please contact your system administrator.</string>
     <string name="login_no_network">Currently offline. Please check your internet connection.</string>
-    <string name="integrity_service_down">A problem occurred trying to contact to the Integrity Service. Please try again later.</string>
+    <string name="integrity_service_down">A problem occurred trying to contact the Integrity Service. Please try again later.</string>
     <string name="login_server_error">A problem occurred trying to contact the server. Please try again later.</string>
 
 
@@ -333,6 +333,6 @@
     <string name="missing_google_play_services_alert_message">The \"Google Play Services\" isn\'t installed on this device.</string>
 
     <string name="missing_or_outdated_google_play_store_app_alert_title">Missing or outdated \"Google Play Store app\"</string>
-    <string name="missing_or_outdated_google_play_store_app_alert_message">The \"Google Play Store app\" isn\'t installed or not updated.</string>
+    <string name="missing_or_outdated_google_play_store_app_alert_message">The \"Google Play Store app\" isn\'t installed or updated.</string>
 
 </resources>
