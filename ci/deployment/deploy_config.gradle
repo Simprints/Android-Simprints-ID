@@ -10,7 +10,7 @@ android {
         staging {
             firebaseAppDistribution {
                 artifactType = "APK"
-                artifactPath = "$rootDir/id/build/outputs/universal_apk/staging/id-staging-universal.apk"
+                artifactPath = "$rootDir/id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk"
                 serviceCredentialsFile = "id/src/staging/serviceCredentialsFile.json"
                 groups = "pre-release-testers"
             }
