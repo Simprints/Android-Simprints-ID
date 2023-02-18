@@ -50,7 +50,7 @@ enum class AlertActivityViewModel(val type: Type,
 
 
 
-    MissingOrOutdatedGooglePlayStoreApp(
+    MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP(
         type = Type.ConfigurationError(title = IDR.string.missing_or_outdated_google_play_store_app_alert_title,
             backgroundColor = IDR.color.simprints_red,
             mainDrawable = R.drawable.error_icon),
@@ -110,7 +110,7 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
                 AlertType.GOOGLE_PLAY_SERVICES_OUTDATED -> GOOGLE_PLAY_SERVICES_OUTDATED
                 AlertType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
-                AlertType.MissingOrOutdatedGooglePlayStoreApp ->MissingOrOutdatedGooglePlayStoreApp
+                AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP ->MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
             }
     }
 

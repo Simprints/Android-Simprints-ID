@@ -137,7 +137,7 @@ class AlertPresenter @AssistedInject constructor(
             AlertType.GOOGLE_PLAY_SERVICES_OUTDATED ,
             AlertType.MISSING_GOOGLE_PLAY_SERVICES ,
             AlertType.INTEGRITY_SERVICE_ERROR,
-            AlertType.MissingOrOutdatedGooglePlayStoreApp
+            AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
             -> {
                 view.closeActivityAfterCloseButton()
             }

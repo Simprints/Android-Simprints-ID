@@ -34,7 +34,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
                     AlertType.GOOGLE_PLAY_SERVICES_OUTDATED,
                     AlertType.MISSING_GOOGLE_PLAY_SERVICES,
-                    AlertType.MissingOrOutdatedGooglePlayStoreApp,
+                    AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
                     AlertType.INTEGRITY_SERVICE_ERROR,
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
