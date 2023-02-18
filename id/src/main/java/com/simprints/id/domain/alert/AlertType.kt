@@ -12,7 +12,7 @@ enum class AlertType(val modalities: List<Modality>? = null) {
     GOOGLE_PLAY_SERVICES_OUTDATED,
     MISSING_GOOGLE_PLAY_SERVICES,
     INTEGRITY_SERVICE_ERROR,
-    MissingOrOutdatedGooglePlayStoreApp,
+    MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
     UNEXPECTED_ERROR
 }
 
@@ -26,5 +26,5 @@ fun AlertType.fromAlertToAlertTypeEvent() = when (this) {
     AlertType.GOOGLE_PLAY_SERVICES_OUTDATED -> AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED
     AlertType.MISSING_GOOGLE_PLAY_SERVICES -> AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES
     AlertType.INTEGRITY_SERVICE_ERROR -> AlertScreenEventType.INTEGRITY_SERVICE_ERROR
-    AlertType.MissingOrOutdatedGooglePlayStoreApp -> AlertScreenEventType.MissingOrOutdatedGooglePlayStoreApp
+    AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
 }

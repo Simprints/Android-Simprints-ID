@@ -132,9 +132,9 @@ internal class AlertPresenterTest {
         }
     }
     @Test
-    fun `start the presenter with alertType MissingOrOutdatedGooglePlayStoreApp shows red screen and saves AlertScreenEvent of MissingOrOutdatedGooglePlayStoreApp type`() {
+    fun `start the presenter with alertType MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP shows red screen and saves AlertScreenEvent of MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP type`() {
         // Given
-        val alertType = AlertType.MissingOrOutdatedGooglePlayStoreApp
+        val alertType = AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
         alertPresenter = AlertPresenter(
             view,
             alertType,
@@ -152,7 +152,7 @@ internal class AlertPresenterTest {
 
         // Then
         assertThat(eventSlot.captured.payload.alertType)
-            .isEqualTo(MissingOrOutdatedGooglePlayStoreApp)
+            .isEqualTo(MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP)
         verify {
             view.getColorForColorRes(R.color.simprints_red)
         }

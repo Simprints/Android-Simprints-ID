@@ -115,7 +115,7 @@ class LoginActivity : BaseSplitActivity() {
             AuthenticateDataResult.Offline -> handleSignInFailedNoConnection()
             AuthenticateDataResult.IntegrityException -> handleIntegrityError(AlertType.INTEGRITY_SERVICE_ERROR)
             AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp -> handleIntegrityError(
-                AlertType.MissingOrOutdatedGooglePlayStoreApp
+                AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
             )
             AuthenticateDataResult.IntegrityServiceTemporaryDown -> handleIntegrityServiceTemporaryDownError()
             AuthenticateDataResult.TechnicalFailure -> handleSignInFailedServerError()

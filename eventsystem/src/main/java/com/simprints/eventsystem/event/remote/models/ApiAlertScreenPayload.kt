@@ -60,7 +60,7 @@ data class ApiAlertScreenPayload(override val startTime: Long,
         FACE_LICENSE_MISSING,
         GOOGLE_PLAY_SERVICES_OUTDATED,
         MISSING_GOOGLE_PLAY_SERVICES,
-        MissingOrOutdatedGooglePlayStoreApp
+        MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
     }
 }
 
@@ -100,5 +100,5 @@ fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
         AlertScreenEventType.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
         AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED -> GOOGLE_PLAY_SERVICES_OUTDATED
         AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
-        AlertScreenEventType.MissingOrOutdatedGooglePlayStoreApp ->MissingOrOutdatedGooglePlayStoreApp
+        AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP ->MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
     }
