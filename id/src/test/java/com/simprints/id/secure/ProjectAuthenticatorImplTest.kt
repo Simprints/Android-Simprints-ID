@@ -180,6 +180,7 @@ class ProjectAuthenticatorImplTest {
                 defaultLanguage = LANGUAGE_1,
                 mockk(),
                 mockk(),
+                mockk()
             ),
             mockk(),
             mockk(),
