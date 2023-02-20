@@ -1,14 +1,12 @@
 package com.simprints.id.activities.alert
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.eventsystem.event.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INTEGRITY_SERVICE_ERROR
+import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.*
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.infra.config.ConfigManager
@@ -21,8 +19,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class AlertPresenterTest {
 
+internal class AlertPresenterTest {
 
     @MockK
     private lateinit var view: AlertContract.View
@@ -57,7 +55,28 @@ class AlertPresenterTest {
         mockkStatic("com.simprints.id.domain.alert.AlertTypeKt")
     }
 
+    @Test
+    fun `test start with INTEGRITY_SERVICE_ERROR should add the correct event in eventRepository`() {
+        //Given
+        val alertType: AlertType = AlertType.INTEGRITY_SERVICE_ERROR
+        alertPresenter = AlertPresenter(
+            view,
+            alertType,
+            eventRepository,
+            configManager,
+            timeHelper,
+            exitFormHelper,
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+        )
+        val eventSlot = slot<AlertScreenEvent>()
+        coEvery { eventRepository.addOrUpdateEvent(capture(eventSlot)) } just runs
 
+        // When
+        alertPresenter.start()
+        // Then
+        assertThat(eventSlot.captured.payload.alertType)
+            .isEqualTo(INTEGRITY_SERVICE_ERROR)
+    }
     @Test
     fun `start the presenter with alertType GOOGLE_PLAY_SERVICES_OUTDATED shows red screen and saves AlertScreenEvent of GOOGLE_PLAY_SERVICES_OUTDATED type`() {
         // Given
@@ -69,8 +88,9 @@ class AlertPresenterTest {
             configManager,
             timeHelper,
             exitFormHelper,
-            externalScope
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
+
         val eventSlot = slot<AlertScreenEvent>()
         coEvery { eventRepository.addOrUpdateEvent(capture(eventSlot)) } just runs
 
@@ -79,7 +99,7 @@ class AlertPresenterTest {
 
         // Then
         assertThat(eventSlot.captured.payload.alertType)
-            .isEqualTo(AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED)
+            .isEqualTo(GOOGLE_PLAY_SERVICES_OUTDATED)
         verify {
             view.getColorForColorRes(R.color.simprints_red)
         }
@@ -106,15 +126,15 @@ class AlertPresenterTest {
 
         // Then
         assertThat(eventSlot.captured.payload.alertType)
-            .isEqualTo(AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES)
+            .isEqualTo(MISSING_GOOGLE_PLAY_SERVICES)
         verify {
             view.getColorForColorRes(R.color.simprints_red)
         }
     }
     @Test
-    fun `test start with INTEGRITY_SERVICE_ERROR should add the correct event in eventRepositry`() {
-        //Given
-        val alertType: AlertType = AlertType.INTEGRITY_SERVICE_ERROR
+    fun `start the presenter with alertType MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP shows red screen and saves AlertScreenEvent of MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP type`() {
+        // Given
+        val alertType = AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
         alertPresenter = AlertPresenter(
             view,
             alertType,
@@ -122,17 +142,19 @@ class AlertPresenterTest {
             configManager,
             timeHelper,
             exitFormHelper,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+            externalScope
         )
-        var event = mockk<AlertScreenEvent>()
+        val eventSlot = slot<AlertScreenEvent>()
+        coEvery { eventRepository.addOrUpdateEvent(capture(eventSlot)) } just runs
 
-        coEvery { eventRepository.addOrUpdateEvent(any()) } answers {
-            event = args[0] as AlertScreenEvent
-        }
         // When
         alertPresenter.start()
+
         // Then
-        Truth.assertThat(event.payload.alertType)
-            .isEqualTo(INTEGRITY_SERVICE_ERROR)
+        assertThat(eventSlot.captured.payload.alertType)
+            .isEqualTo(MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP)
+        verify {
+            view.getColorForColorRes(R.color.simprints_red)
+        }
     }
 }

@@ -110,7 +110,6 @@
     <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
     <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
     <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
-    <string name="integrity_service_error_alert_message">1. Please try again after 5–10 minutes \n 2. Tap close</string>
     <string name="enrol_last_biometrics_alert_message">1. Failed to save %1$s record \n 2. Tap close</string>
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Fingerprint</string>
@@ -176,6 +175,7 @@
     <string name="login_invalid_credentials">Invalid credentials. Please check the Project ID and key</string>
     <string name="login_project_id_intent_mismatch">Project ID different from that supplied in intent. Please contact your system administrator.</string>
     <string name="login_no_network">Currently offline. Please check your internet connection.</string>
+    <string name="integrity_service_down">A problem occurred trying to contact the Integrity Service. Please try again later.</string>
     <string name="login_server_error">A problem occurred trying to contact the server. Please try again later.</string>
 
 
@@ -331,5 +331,8 @@
     <string name="outdated_google_play_services_alert_message">The installed \"Google Play Services\" version on this device is older than the one required by SID</string>
     <string name="missing_google_play_services_alert_title">Missing \"Google Play Services\"</string>
     <string name="missing_google_play_services_alert_message">The \"Google Play Services\" isn\'t installed on this device.</string>
+
+    <string name="missing_or_outdated_google_play_store_app_alert_title">Missing or outdated \"Google Play Store app\"</string>
+    <string name="missing_or_outdated_google_play_store_app_alert_message">The \"Google Play Store app\" isn\'t installed or updated.</string>
 
 </resources>

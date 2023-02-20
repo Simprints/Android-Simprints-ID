@@ -7,6 +7,8 @@ import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
+import com.simprints.infra.login.exceptions.IntegrityServiceTemporaryDown
+import com.simprints.infra.login.exceptions.MissingOrOutdatedGooglePlayStoreApp
 import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -62,18 +64,26 @@ class AuthenticationHelperImplTest {
     }
 
     @Test
-    fun shouldSetIntegrityErrorIfServiceUnavailableException() = runBlocking {
+    fun shouldSetMissingOrOutdatedGooglePlayStoreAppIfMissingOrOutdatedGooglePlayStoreAppException() = runBlocking {
         val result =
-            mockException(
-                RequestingIntegrityTokenException(
-                    errorCode = IntegrityErrorCode.API_NOT_AVAILABLE,
-                    cause = Exception("Error in requesting integrity api token")
-                )
-            )
-
-        assertThat(result).isInstanceOf(AuthenticateDataResult.IntegrityException::class.java)
+            mockException(MissingOrOutdatedGooglePlayStoreApp(IntegrityErrorCode.PLAY_STORE_VERSION_OUTDATED))
+        assertThat(result).isInstanceOf(AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp::class.java)
     }
 
+
+    @Test
+    fun shouldSetIntegrityServiceTemporaryDownIfIntegrityServiceTemporaryDown () = runBlocking {
+        val result =
+            mockException(IntegrityServiceTemporaryDown(IntegrityErrorCode.GOOGLE_SERVER_UNAVAILABLE))
+        assertThat(result).isInstanceOf(AuthenticateDataResult.IntegrityServiceTemporaryDown::class.java)
+    }
+
+    @Test
+    fun shouldSetIntegrityErrorIfServiceUnavailableException() = runBlocking {
+        val result =
+            mockException(RequestingIntegrityTokenException(IntegrityErrorCode.API_NOT_AVAILABLE))
+        assertThat(result).isInstanceOf(AuthenticateDataResult.IntegrityException::class.java)
+    }
 
     @Test
     fun shouldSetUnknownIfGenericException() = runBlocking {

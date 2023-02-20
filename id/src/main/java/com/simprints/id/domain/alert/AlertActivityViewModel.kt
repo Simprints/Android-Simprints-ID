@@ -48,13 +48,15 @@ enum class AlertActivityViewModel(val type: Type,
         message = IDR.string.different_userId_message
     ),
 
-    INTEGRITY_SERVICE_ERROR(
-        type = Type.ConfigurationError(title = IDR.string.alert_try_again,
-            backgroundColor = IDR.color.simprints_grey,
+
+
+    MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP(
+        type = Type.ConfigurationError(title = IDR.string.missing_or_outdated_google_play_store_app_alert_title,
+            backgroundColor = IDR.color.simprints_red,
             mainDrawable = R.drawable.error_icon),
         leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
-        message = IDR.string.integrity_service_error_alert_message
+        message = IDR.string.missing_or_outdated_google_play_store_app_alert_message
     ),
 
     UNEXPECTED_ERROR(
@@ -102,12 +104,13 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID
                 AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID
                 AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                AlertType.INTEGRITY_SERVICE_ERROR -> INTEGRITY_SERVICE_ERROR
+                AlertType.INTEGRITY_SERVICE_ERROR -> UNEXPECTED_ERROR
                 AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                 AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
                 AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
                 AlertType.GOOGLE_PLAY_SERVICES_OUTDATED -> GOOGLE_PLAY_SERVICES_OUTDATED
                 AlertType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
+                AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP ->MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
             }
     }
 

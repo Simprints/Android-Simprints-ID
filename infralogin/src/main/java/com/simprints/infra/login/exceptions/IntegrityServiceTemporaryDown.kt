@@ -2,12 +2,11 @@ package com.simprints.infra.login.exceptions
 
 import com.google.android.play.core.integrity.model.IntegrityErrorCode
 
+
 /**
- * An exception indicating something went wrong while requesting the Integrity token.
+ * An exception indicating Integrity service is down. and user should try again after a while.
  *
  * @property errorCode is one of the integrity api error codes listed in [IntegrityErrorCode]
  */
-class RequestingIntegrityTokenException(
-    val errorCode: Int
-) : RuntimeException("Integrity API error $errorCode")
-
+class IntegrityServiceTemporaryDown(val errorCode: Int) :
+    RuntimeException("Integrity API error $errorCode")

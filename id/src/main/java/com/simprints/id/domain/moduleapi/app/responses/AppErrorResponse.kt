@@ -32,10 +32,11 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                 when (alertType) {
                     AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
                     AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
-                    AlertType.UNEXPECTED_ERROR,
-                    AlertType.INTEGRITY_SERVICE_ERROR,
                     AlertType.GOOGLE_PLAY_SERVICES_OUTDATED,
-                    AlertType.MISSING_GOOGLE_PLAY_SERVICES -> UNEXPECTED_ERROR
+                    AlertType.MISSING_GOOGLE_PLAY_SERVICES,
+                    AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
+                    AlertType.INTEGRITY_SERVICE_ERROR,
+                    AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                     AlertType.GUID_NOT_FOUND_OFFLINE ->
                         throw Throwable("No ErrorType associated. GUID_NOT_FOUND_OFFLINE should return a ExitForm, not a Error Response.")
