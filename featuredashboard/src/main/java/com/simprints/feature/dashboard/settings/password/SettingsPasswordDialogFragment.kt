@@ -1,4 +1,4 @@
-package com.simprints.feature.dashboard.settings.pin
+package com.simprints.feature.dashboard.settings.password
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -7,12 +7,12 @@ import android.text.Editable
 import androidx.annotation.StringRes
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
-import com.simprints.feature.dashboard.databinding.FragmentPinInputBinding
+import com.simprints.feature.dashboard.databinding.FragmentSettingsPasswordInputBinding
 import com.google.android.material.R as MR
 import com.simprints.infra.resources.R as IDR
 
-class SettingsPinDialogFragment(
-    @StringRes val title: Int = IDR.string.pin_lock_title_default,
+class SettingsPasswordDialogFragment(
+    @StringRes val title: Int = IDR.string.password_lock_title_default,
     val codeToMatch: String,
     val onSuccess: () -> Unit,
 ) : DialogFragment() {
@@ -21,39 +21,39 @@ class SettingsPinDialogFragment(
         .Builder(requireContext(), MR.style.ThemeOverlay_AppCompat_Dialog)
         .setTitle(title)
         .setView(inflateInputView())
-        .setNegativeButton(IDR.string.pin_lock_cancel) { _, _ -> dismiss() }
+        .setNegativeButton(IDR.string.password_lock_cancel) { _, _ -> dismiss() }
         .create()
 
-    private fun inflateInputView() = FragmentPinInputBinding.inflate(layoutInflater)
+    private fun inflateInputView() = FragmentSettingsPasswordInputBinding.inflate(layoutInflater)
         .apply {
-            pinInputField.addTextChangedListener(
+            passwordInputField.addTextChangedListener(
                 afterTextChanged = { text ->
                     resetErrorText(text)
-                    checkPin(text)
+                    checkPassword(text)
                 }
             )
         }
         .root
 
-    private fun FragmentPinInputBinding.resetErrorText(text: Editable?) {
-        if (pinInputLayout.error != null && text?.isNotEmpty() == true) {
-            pinInputLayout.error = null
+    private fun FragmentSettingsPasswordInputBinding.resetErrorText(text: Editable?) {
+        if (passwordInputLayout.error != null && text?.isNotEmpty() == true) {
+            passwordInputLayout.error = null
         }
     }
 
-    private fun FragmentPinInputBinding.checkPin(text: Editable?) {
+    private fun FragmentSettingsPasswordInputBinding.checkPassword(text: Editable?) {
         if (text?.length == codeToMatch.length) {
             if (text.toString() == codeToMatch) {
                 onSuccess()
                 dismiss()
             } else {
-                pinInputField.text = null
-                pinInputLayout.error = getString(IDR.string.pin_lock_wrong_pin)
+                passwordInputField.text = null
+                passwordInputLayout.error = getString(IDR.string.password_lock_wrong_pin)
             }
         }
     }
 
     companion object {
-        const val TAG = "SettingsPinDialogFragment"
+        const val TAG = "SettingsPasswordDialogFragment"
     }
 }

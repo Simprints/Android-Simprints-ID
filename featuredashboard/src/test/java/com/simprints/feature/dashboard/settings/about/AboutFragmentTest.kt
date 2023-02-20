@@ -157,7 +157,7 @@ class AboutFragmentTest {
     }
 
     @Test
-    fun `should prompt PIN input when has password and clicking on logout`() {
+    fun `should prompt password input when has password and clicking on logout`() {
         mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
@@ -165,7 +165,7 @@ class AboutFragmentTest {
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
         onView(withText(IDR.string.preference_logout_title)).perform(click())
-        onView(withId(R.id.pin_input_field))
+        onView(withId(R.id.password_input_field))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
             .perform(replaceText("1234"))
@@ -176,7 +176,7 @@ class AboutFragmentTest {
 
 
     @Test
-    fun `should not log out when prompted PIN and it was incorrect`() {
+    fun `should not log out when prompted password and it was incorrect`() {
         mockSettingsPassword(SettingsPasswordConfig.Locked("1234"))
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
@@ -184,7 +184,7 @@ class AboutFragmentTest {
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
         onView(withText(IDR.string.preference_logout_title)).perform(click())
-        onView(withId(R.id.pin_input_field))
+        onView(withId(R.id.password_input_field))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
             .perform(replaceText("1111"))

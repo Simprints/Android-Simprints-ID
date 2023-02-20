@@ -14,7 +14,7 @@ import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
-import com.simprints.feature.dashboard.settings.pin.SettingsPinDialogFragment
+import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,11 +89,11 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                     ?.let { it as? SettingsPasswordConfig.Locked }
 
                 if (lock != null) {
-                    SettingsPinDialogFragment(
-                        title = IDR.string.pin_lock_title_logout,
+                    SettingsPasswordDialogFragment(
+                        title = IDR.string.password_lock_title_logout,
                         codeToMatch = lock.code,
                         onSuccess = { logOut() }
-                    ).show(childFragmentManager, SettingsPinDialogFragment.TAG)
+                    ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
                 } else {
                     confirmationDialogForLogout.show()
                 }
