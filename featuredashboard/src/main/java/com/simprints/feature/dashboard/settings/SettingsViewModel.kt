@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,9 @@ internal class SettingsViewModel @Inject constructor(
         get() = _languagePreference
     private val _languagePreference = MutableLiveData<String>()
 
+    val settingsLocked: LiveData<SettingsPasswordConfig>
+        get() = _settingsLocked
+    private val _settingsLocked = MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
 
     init {
         load()
@@ -39,7 +43,14 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
-        _generalConfiguration.postValue(configManager.getProjectConfiguration().general)
+        val configuration = configManager.getProjectConfiguration().general
+
         _languagePreference.postValue(configManager.getDeviceConfiguration().language)
+        _generalConfiguration.postValue(configuration)
+        _settingsLocked.postValue(configuration.settingsPassword)
+    }
+
+    fun unlockSettings() {
+        _settingsLocked.postValue(SettingsPasswordConfig.Unlocked)
     }
 }
