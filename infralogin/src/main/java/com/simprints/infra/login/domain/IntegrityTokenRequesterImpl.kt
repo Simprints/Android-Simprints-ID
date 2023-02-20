@@ -55,7 +55,7 @@ internal class IntegrityTokenRequesterImpl @Inject constructor(
                 MissingOrOutdatedGooglePlayStoreApp(errorCode)
             }
             // errors where the user should retry again later
-            GOOGLE_SERVER_UNAVAILABLE, INTERNAL_ERROR -> {
+            GOOGLE_SERVER_UNAVAILABLE, INTERNAL_ERROR,CLIENT_TRANSIENT_ERROR  -> {
                 IntegrityServiceTemporaryDown(errorCode)
             }
             // Network errors
