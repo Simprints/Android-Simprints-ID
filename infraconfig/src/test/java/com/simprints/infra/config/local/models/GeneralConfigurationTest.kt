@@ -5,6 +5,7 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.testtools.generalConfiguration
 import com.simprints.infra.config.testtools.protoGeneralConfiguration
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class GeneralConfigurationTest {
@@ -32,12 +33,14 @@ class GeneralConfigurationTest {
     fun `should map correctly the settings password`() {
         val mapping = mapOf(
             SettingsPasswordConfig.NotSet to "",
-            SettingsPasswordConfig.Unlocked to "",
             SettingsPasswordConfig.Locked("123") to "123"
         )
 
-        mapping.forEach {
-            assertThat(it.key.toProto()).isEqualTo(it.value)
-        }
+        mapping.forEach { assertThat(it.key.toProto()).isEqualTo(it.value) }
+    }
+
+    @Test
+    fun `should not allow to save unlocked state`() {
+        assertThrows<IllegalStateException> { SettingsPasswordConfig.Unlocked.toProto() }
     }
 }
