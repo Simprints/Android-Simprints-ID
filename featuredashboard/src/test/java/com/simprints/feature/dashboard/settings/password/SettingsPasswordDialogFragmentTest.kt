@@ -1,4 +1,4 @@
-package com.simprints.feature.dashboard.settings.pin
+package com.simprints.feature.dashboard.settings.password
 
 import androidx.fragment.app.testing.launchFragment
 import androidx.test.espresso.Espresso.*
@@ -18,12 +18,12 @@ import com.google.android.material.R as MR
 import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
-class SettingsPinDialogFragmentTest {
+class SettingsPasswordDialogFragmentTest {
 
     @Test
     fun `closes without success on cancel`() {
         launchFragment(themeResId = MR.style.Theme_AppCompat) {
-            SettingsPinDialogFragment(
+            SettingsPasswordDialogFragment(
                 codeToMatch = "1234",
                 onSuccess = { fail() }
             )
@@ -34,45 +34,45 @@ class SettingsPinDialogFragmentTest {
     }
 
     @Test
-    fun `shows error if incorrect PIN`() {
+    fun `shows error if incorrect password`() {
         launchFragment(themeResId = MR.style.Theme_AppCompat) {
-            SettingsPinDialogFragment(
+            SettingsPasswordDialogFragment(
                 codeToMatch = "1234",
                 onSuccess = { fail() }
             )
         }
 
-        onView(withId(R.id.pin_input_field))
+        onView(withId(R.id.password_input_field))
             .inRoot(isDialog())
             .perform(replaceText("1111"))
 
         onView(withId(MR.id.textinput_error))
             .check(matches(isDisplayed()))
-            .check(matches(withText(IDR.string.pin_lock_wrong_pin)))
+            .check(matches(withText(IDR.string.password_lock_wrong_pin)))
 
-        onView(withId(R.id.pin_input_field))
+        onView(withId(R.id.password_input_field))
             .check(matches(withText("")))
     }
 
     @Test
-    fun `resets error on new PIN attempt`() {
+    fun `resets error on new password attempt`() {
         launchFragment(themeResId = MR.style.Theme_AppCompat) {
-            SettingsPinDialogFragment(
+            SettingsPasswordDialogFragment(
                 codeToMatch = "1234",
                 onSuccess = { fail() }
             )
         }
 
-        onView(withId(R.id.pin_input_field))
+        onView(withId(R.id.password_input_field))
             .inRoot(isDialog())
             .perform(replaceText("1111"))
 
         onView(withId(MR.id.textinput_error))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
-            .check(matches(withText(IDR.string.pin_lock_wrong_pin)))
+            .check(matches(withText(IDR.string.password_lock_wrong_pin)))
 
-        onView(withId(R.id.pin_input_field))
+        onView(withId(R.id.password_input_field))
             .inRoot(isDialog())
             .perform(replaceText("12"))
 
@@ -82,16 +82,16 @@ class SettingsPinDialogFragmentTest {
     }
 
     @Test
-    fun `triggers callback when PIN matches`() = runTest {
+    fun `triggers callback when password matches`() = runTest {
         suspendCoroutine { cont ->
             launchFragment(themeResId = MR.style.Theme_AppCompat) {
-                SettingsPinDialogFragment(
+                SettingsPasswordDialogFragment(
                     codeToMatch = "1234",
                     onSuccess = { cont.resume(Unit) }
                 )
             }
 
-            onView(withId(R.id.pin_input_field))
+            onView(withId(R.id.password_input_field))
                 .inRoot(isDialog())
                 .perform(replaceText("1234"))
         }
