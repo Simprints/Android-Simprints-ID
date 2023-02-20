@@ -13,7 +13,7 @@ import com.simprints.infra.resources.R as IDR
 
 class SettingsPasswordDialogFragment(
     @StringRes val title: Int = IDR.string.password_lock_title_default,
-    val codeToMatch: String,
+    val passwordToMatch: String,
     val onSuccess: () -> Unit,
 ) : DialogFragment() {
 
@@ -42,8 +42,8 @@ class SettingsPasswordDialogFragment(
     }
 
     private fun FragmentSettingsPasswordInputBinding.checkPassword(text: Editable?) {
-        if (text?.length == codeToMatch.length) {
-            if (text.toString() == codeToMatch) {
+        if (text?.length == passwordToMatch.length) {
+            if (text.toString() == passwordToMatch) {
                 onSuccess()
                 dismiss()
             } else {

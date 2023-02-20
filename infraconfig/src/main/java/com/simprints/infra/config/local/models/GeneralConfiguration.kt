@@ -37,4 +37,4 @@ internal fun ProtoGeneralConfiguration.Modality.toDomain(): GeneralConfiguration
         ProtoGeneralConfiguration.Modality.UNRECOGNIZED -> throw InvalidProtobufEnumException("invalid modality $name")
     }
 
-internal fun SettingsPasswordConfig.toProto(): String = if (this is SettingsPasswordConfig.Locked) code else ""
+internal fun SettingsPasswordConfig.toProto(): String = if (this is SettingsPasswordConfig.Locked) password else ""
