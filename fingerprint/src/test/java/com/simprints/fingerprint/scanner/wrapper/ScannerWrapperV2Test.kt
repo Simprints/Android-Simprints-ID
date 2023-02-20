@@ -28,9 +28,9 @@ import io.mockk.impl.annotations.MockK
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -443,7 +443,7 @@ class ScannerWrapperV2Test {
             scannerWrapper.startLiveFeedback()
         }
 
-        delay(500)
+        advanceTimeBy(500)
 
         // force-stop the continuous live feedback
         job.cancel()
@@ -461,7 +461,7 @@ class ScannerWrapperV2Test {
                 scannerWrapper.startLiveFeedback()
             }
 
-            delay(500)
+            advanceTimeBy(500)
 
             // force-stop the continuous live feedback
             job.cancel()
