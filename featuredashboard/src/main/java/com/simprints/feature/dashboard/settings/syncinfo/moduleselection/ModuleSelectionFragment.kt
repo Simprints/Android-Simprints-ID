@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -21,6 +22,7 @@ import com.simprints.core.tools.extentions.hideKeyboard
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncModuleSelectionBinding
+import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.adapter.ModuleAdapter
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
@@ -67,6 +69,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        configureOverlay()
         configureRecyclerView()
         fetchData()
         binding.dashboardToolbar.setNavigationOnClickListener {
@@ -80,6 +83,21 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
                 }
             }
         )
+    }
+
+    private fun configureOverlay() {
+        viewModel.screenLocked.observe(viewLifecycleOwner) {
+            binding.modulesLockOverlay.isVisible = it?.locked == true
+        }
+        binding.modulesLockOverlayClickableArea.setOnClickListener {
+            val password = viewModel.screenLocked.value?.getNullablePassword()
+            if (password != null) {
+                SettingsPasswordDialogFragment(
+                    passwordToMatch = password,
+                    onSuccess = { viewModel.unlockScreen() }
+                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+            }
+        }
     }
 
     override fun onModuleSelected(module: Module) {
