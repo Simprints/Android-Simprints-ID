@@ -12,8 +12,11 @@ import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -133,8 +136,7 @@ class ProjectAuthenticatorImplTest {
     @Test
     fun integrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
         coEvery { loginManager.requestIntegrityToken(any()) } throws RequestingIntegrityTokenException(
-            errorCode = IntegrityErrorCode.API_NOT_AVAILABLE,
-            cause = Exception("Error in requesting integrity api token")
+            IntegrityErrorCode.API_NOT_AVAILABLE
         )
 
         assertThrows<RequestingIntegrityTokenException> {

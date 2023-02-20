@@ -102,7 +102,6 @@
     <string name="refusal_too_young">Mdogo sana</string>
     <string name="requestLogin_message">Unahitaji kuingia. Tafadhali tumia programu yako ya mteja kufungua Kitambulisho cha Simprints na uingie</string>
     <string name="requestLogin_title">Inahitajika kuingia</string>
-    <string name="integrity_service_error_alert_message">1. Tafadhali jaribu tena baada ya dakika 5–10 \n 2. Sa funga</string>
     <string name="select_modules_button_title">Chagua vipengele</string>
     <string name="selected_modules">Vipengele villivyochaguliwa</string>
     <string name="scan_qr">Chukua QR</string>

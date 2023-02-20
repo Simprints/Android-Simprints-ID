@@ -26,6 +26,8 @@ data class ApiAuthenticationPayload(override val startTime: Long,
         BACKEND_MAINTENANCE_ERROR,
         TECHNICAL_FAILURE,
         INTEGRITY_SERVICE_ERROR,
+        INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR,
+        MISSING_OR_OUTDATED_PLAY_STORE_ERROR
     }
 
     constructor(domainPayload: AuthenticationPayload):
@@ -44,6 +46,8 @@ fun AuthenticationPayload.Result.fromDomainToApi() =
         OFFLINE -> ApiResult.OFFLINE
         TECHNICAL_FAILURE -> ApiResult.TECHNICAL_FAILURE
         INTEGRITY_SERVICE_ERROR -> ApiResult.INTEGRITY_SERVICE_ERROR
+        INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR -> ApiResult.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR
+        MISSING_OR_OUTDATED_PLAY_STORE_ERROR -> ApiResult.MISSING_OR_OUTDATED_PLAY_STORE_ERROR
         BACKEND_MAINTENANCE_ERROR -> ApiResult.BACKEND_MAINTENANCE_ERROR
         UNKNOWN -> ApiResult.TECHNICAL_FAILURE
     }
