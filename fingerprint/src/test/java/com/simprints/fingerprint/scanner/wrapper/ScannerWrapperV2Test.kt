@@ -28,8 +28,9 @@ import io.mockk.impl.annotations.MockK
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -428,7 +429,6 @@ class ScannerWrapperV2Test {
         runTest {
             coEvery { scannerV2.getUn20Status() } throws IllegalArgumentException()
             scannerWrapper.sensorShutDown()
-
         }
 
     @Test
@@ -443,9 +443,29 @@ class ScannerWrapperV2Test {
             scannerWrapper.startLiveFeedback()
         }
 
+        advanceTimeBy(500)
+
         // force-stop the continuous live feedback
         job.cancel()
     }
+
+    @Test
+    fun `should complete execution successfully when startLiveFeedback is called and scanner disconnects`() =
+        runTest {
+            every { scannerWrapper.isLiveFeedbackAvailable() } returns true
+            every { scannerV2.setSmileLedState(any()) } throws IOException()
+            every { scannerV2.getImageQualityPreview() } returns Maybe.just(50)
+
+            // get the job of the continuous feedback
+            val job = launch {
+                scannerWrapper.startLiveFeedback()
+            }
+
+            advanceTimeBy(500)
+
+            // force-stop the continuous live feedback
+            job.cancel()
+        }
 
     @Test
     fun `should complete execution successfully when setting scanner UI to default, when stopLiveFeedback is called`() =
