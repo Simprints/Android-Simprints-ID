@@ -152,6 +152,7 @@ internal val apiGeneralConfiguration = ApiGeneralConfiguration(
     "en",
     collectLocation = true,
     duplicateBiometricEnrolmentCheck = false,
+    settingsPassword = null,
 )
 
 internal val generalConfiguration = GeneralConfiguration(
@@ -160,6 +161,7 @@ internal val generalConfiguration = GeneralConfiguration(
     "en",
     collectLocation = true,
     duplicateBiometricEnrolmentCheck = false,
+    settingsPassword = SettingsPasswordConfig.NotSet,
 )
 
 internal val protoGeneralConfiguration = ProtoGeneralConfiguration.newBuilder()

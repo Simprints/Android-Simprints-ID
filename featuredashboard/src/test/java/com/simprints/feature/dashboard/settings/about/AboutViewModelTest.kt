@@ -6,6 +6,7 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -44,6 +45,7 @@ class AboutViewModelTest {
         coEvery { getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns MODALITIES
+                every { settingsPassword } returns SettingsPasswordConfig.Locked("1234")
             }
             every { identification } returns mockk {
                 every { poolType } returns POOL_TYPE
@@ -78,6 +80,7 @@ class AboutViewModelTest {
             )
         )
         assertThat(viewModel.recentUserActivity.value).isEqualTo(recentUserActivity)
+        assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
     }
 
     @Test

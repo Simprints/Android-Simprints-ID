@@ -2,6 +2,7 @@ package com.simprints.infra.config.remote.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.testtools.apiGeneralConfiguration
 import com.simprints.infra.config.testtools.generalConfiguration
 import org.junit.Test
@@ -23,5 +24,12 @@ class ApiGeneralConfigurationTest {
         mapping.forEach {
             assertThat(it.key.toDomain()).isEqualTo(it.value)
         }
+    }
+
+    @Test
+    fun `should map correctly the settings passwords`() {
+        assertThat(SettingsPasswordConfig.toDomain(null)).isEqualTo(SettingsPasswordConfig.NotSet)
+        assertThat(SettingsPasswordConfig.toDomain("")).isEqualTo(SettingsPasswordConfig.NotSet)
+        assertThat(SettingsPasswordConfig.toDomain("123")).isEqualTo(SettingsPasswordConfig.Locked("123"))
     }
 }

@@ -5,7 +5,8 @@ data class GeneralConfiguration(
     val languageOptions: List<String>,
     val defaultLanguage: String,
     val collectLocation: Boolean,
-    val duplicateBiometricEnrolmentCheck: Boolean
+    val duplicateBiometricEnrolmentCheck: Boolean,
+    val settingsPassword: SettingsPasswordConfig,
 ) {
 
     enum class Modality {
