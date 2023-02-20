@@ -341,5 +341,6 @@
     <string name="password_lock_hint">Password</string>
     <string name="password_lock_cancel">Cancel</string>
     <string name="password_lock_wrong_pin">Incorrect password</string>
+    <string name="password_lock_overlay_title">Tap to unlock</string>
 
 </resources>

@@ -16,6 +16,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposit
 import com.simprints.feature.dashboard.tools.clickCloseChipIcon
 import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
 import com.simprints.feature.dashboard.tools.typeSearchViewText
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -237,7 +238,6 @@ class ModuleSelectionFragmentTest {
     fun `should display the no result test when the search doesn't have results`() {
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
-
         onView(withId(R.id.searchView)).perform(typeSearchViewText("no-results"))
         onView(withId(R.id.rvModules))
             .check(matches(not(hasDescendant(withText("module12")))))
@@ -245,5 +245,48 @@ class ModuleSelectionFragmentTest {
             .check(matches(not(hasDescendant(withText("module3")))))
 
         onView(withId(R.id.txtNoResults)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun `should not show overlay if screen is not locked`() {
+        every { viewModel.screenLocked }.returns(mockk {
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<SettingsPasswordConfig>>().onChanged(
+                    SettingsPasswordConfig.Unlocked
+                )
+            }
+        })
+        launchFragmentInHiltContainer<ModuleSelectionFragment>()
+
+        onView(withId(R.id.modulesLockOverlay)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun `should show overlay if screen is locked`() {
+        every { viewModel.screenLocked }.returns(mockk {
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<SettingsPasswordConfig>>().onChanged(
+                    SettingsPasswordConfig.Locked("1234")
+                )
+            }
+        })
+        launchFragmentInHiltContainer<ModuleSelectionFragment>()
+
+        onView(withId(R.id.modulesLockOverlay)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun `should show password dialog when overlay clicked`() {
+        every { viewModel.screenLocked }.returns(mockk {
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<SettingsPasswordConfig>>().onChanged(
+                    SettingsPasswordConfig.Locked("1234")
+                )
+            }
+            every { value } returns SettingsPasswordConfig.Locked("1234")
+        })
+        launchFragmentInHiltContainer<ModuleSelectionFragment>()
+
+        onView(withId(R.id.modulesLockOverlayClickableArea)).perform(click())
     }
 }

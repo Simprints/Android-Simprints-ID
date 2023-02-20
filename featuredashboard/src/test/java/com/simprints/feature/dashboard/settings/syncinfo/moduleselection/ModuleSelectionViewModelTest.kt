@@ -8,12 +8,14 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
+import com.simprints.testtools.common.livedata.getOrAwaitValues
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Before
 import org.junit.Rule
@@ -29,23 +31,36 @@ class ModuleSelectionViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val repository: ModuleRepository = mockk(relaxed = true) {
-        coEvery { getModules() } returns listOf(
+    @MockK(relaxed = true)
+    private lateinit var repository: ModuleRepository
+
+    @MockK(relaxed = true)
+    private lateinit var eventSyncManager: EventSyncManager
+
+    @MockK(relaxed = true)
+    private lateinit var configManager: ConfigManager
+
+    private lateinit var viewModel: ModuleSelectionViewModel
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this)
+
+        coEvery { repository.getModules() } returns listOf(
             Module("a", false),
             Module("b", false),
             Module("c", true),
             Module("d", false)
         )
-        coEvery { getMaxNumberOfModules() } returns 2
-    }
-    private val eventSyncManager: EventSyncManager = mockk(relaxed = true)
-    private lateinit var viewModel: ModuleSelectionViewModel
+        coEvery { repository.getMaxNumberOfModules() } returns 2
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general.settingsPassword } returns SettingsPasswordConfig.Locked("1234")
+        }
 
-    @Before
-    fun setUp() {
         viewModel = ModuleSelectionViewModel(
             repository,
             eventSyncManager,
+            configManager,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
@@ -59,6 +74,9 @@ class ModuleSelectionViewModelTest {
                 Module("c", true),
                 Module("d", false)
             )
+        )
+        assertThat(viewModel.screenLocked.getOrAwaitValue()).isEqualTo(
+            SettingsPasswordConfig.Locked("1234")
         )
     }
 
@@ -122,5 +140,14 @@ class ModuleSelectionViewModelTest {
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
         coVerify(exactly = 1) { eventSyncManager.stop() }
         coVerify(exactly = 1) { eventSyncManager.sync() }
+    }
+
+    @Test
+    fun `unlockScreens marks screen as unlocked`() {
+        viewModel.unlockScreen()
+
+        assertThat(viewModel.screenLocked.getOrAwaitValue()).isEqualTo(
+            SettingsPasswordConfig.Unlocked
+        )
     }
 }
