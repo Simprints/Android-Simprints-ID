@@ -16,7 +16,6 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
-import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -85,13 +84,11 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         getDeviceIdPreference()?.summary = deviceId
         getLogoutPreference()?.setOnPreferenceClickListener {
             activity?.runOnUiThread {
-                val lock = viewModel.settingsLocked.value
-                    ?.let { it as? SettingsPasswordConfig.Locked }
-
-                if (lock != null) {
+                val password = viewModel.settingsLocked.value?.getNullablePassword()
+                if (password != null) {
                     SettingsPasswordDialogFragment(
                         title = IDR.string.password_lock_title_logout,
-                        codeToMatch = lock.code,
+                        passwordToMatch = password,
                         onSuccess = { logOut() }
                     ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
                 } else {
