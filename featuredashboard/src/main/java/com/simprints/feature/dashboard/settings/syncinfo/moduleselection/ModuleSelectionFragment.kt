@@ -86,6 +86,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     }
 
     private fun configureOverlay() {
+        viewModel.loadPasswordSettings()
         viewModel.screenLocked.observe(viewLifecycleOwner) {
             binding.modulesLockOverlay.isVisible = it?.locked == true
         }
