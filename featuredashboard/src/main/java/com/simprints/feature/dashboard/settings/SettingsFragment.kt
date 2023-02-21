@@ -18,7 +18,6 @@ import com.simprints.feature.dashboard.databinding.FragmentSettingsBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
-import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -62,12 +61,10 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun bindClickListeners() {
         getLanguagePreference()?.setOnPreferenceClickListener {
-            val lock = viewModel.settingsLocked.value
-                ?.let { it as? SettingsPasswordConfig.Locked }
-
-            if (lock != null) {
+            val password = viewModel.settingsLocked.value?.getNullablePassword()
+            if (password != null) {
                 SettingsPasswordDialogFragment(
-                    codeToMatch = lock.code,
+                    passwordToMatch = password,
                     onSuccess = {
                         viewModel.unlockSettings()
                         createLanguageSelectionDialog().show()

@@ -6,11 +6,13 @@ sealed class SettingsPasswordConfig {
     object Unlocked : SettingsPasswordConfig()
 
     data class Locked(
-        val code: String,
+        val password: String,
     ) : SettingsPasswordConfig()
 
     val locked: Boolean
         get() = this is Locked
+
+    fun getNullablePassword(): String? = (this as? Locked)?.password
 
     companion object {
 
