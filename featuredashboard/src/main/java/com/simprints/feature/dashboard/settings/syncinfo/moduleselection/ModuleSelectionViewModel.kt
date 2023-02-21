@@ -39,17 +39,19 @@ internal class ModuleSelectionViewModel @Inject constructor(
     private val _screenLocked = MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
 
     init {
-        viewModelScope.launch {
-            configManager.getProjectConfiguration()
-                .general
-                .settingsPassword
-                .let { _screenLocked.postValue(it) }
-        }
-
         postUpdateModules {
             maxNumberOfModules = repository.getMaxNumberOfModules()
             initialModules = repository.getModules()
             addAll(initialModules.map { it.copy() })
+        }
+    }
+
+    fun loadPasswordSettings() {
+        viewModelScope.launch {
+            configManager.getProjectConfiguration()
+                    .general
+                    .settingsPassword
+                    .let { _screenLocked.postValue(it) }
         }
     }
 

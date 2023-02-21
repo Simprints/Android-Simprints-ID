@@ -12,7 +12,6 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import com.simprints.testtools.common.livedata.getOrAwaitValues
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -74,9 +73,6 @@ class ModuleSelectionViewModelTest {
                 Module("c", true),
                 Module("d", false)
             )
-        )
-        assertThat(viewModel.screenLocked.getOrAwaitValue()).isEqualTo(
-            SettingsPasswordConfig.Locked("1234")
         )
     }
 
@@ -140,6 +136,15 @@ class ModuleSelectionViewModelTest {
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
         coVerify(exactly = 1) { eventSyncManager.stop() }
         coVerify(exactly = 1) { eventSyncManager.sync() }
+    }
+
+    @Test
+    fun `should initialize password settings when called`() {
+        viewModel.loadPasswordSettings()
+
+        assertThat(viewModel.screenLocked.getOrAwaitValue()).isEqualTo(
+            SettingsPasswordConfig.Locked("1234")
+        )
     }
 
     @Test
