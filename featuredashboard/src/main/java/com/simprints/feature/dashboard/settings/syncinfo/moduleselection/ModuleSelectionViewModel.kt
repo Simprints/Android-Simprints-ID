@@ -10,6 +10,8 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -19,6 +21,7 @@ import javax.inject.Inject
 internal class ModuleSelectionViewModel @Inject constructor(
     private val repository: ModuleRepository,
     private val eventSyncManager: EventSyncManager,
+    private val configManager: ConfigManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -31,11 +34,24 @@ internal class ModuleSelectionViewModel @Inject constructor(
     private var modules: MutableList<Module> = mutableListOf()
     private var initialModules: List<Module> = listOf()
 
+    val screenLocked: LiveData<SettingsPasswordConfig>
+        get() = _screenLocked
+    private val _screenLocked = MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
+
     init {
         postUpdateModules {
             maxNumberOfModules = repository.getMaxNumberOfModules()
             initialModules = repository.getModules()
             addAll(initialModules.map { it.copy() })
+        }
+    }
+
+    fun loadPasswordSettings() {
+        viewModelScope.launch {
+            configManager.getProjectConfiguration()
+                    .general
+                    .settingsPassword
+                    .let { _screenLocked.postValue(it) }
         }
     }
 
@@ -73,4 +89,8 @@ internal class ModuleSelectionViewModel @Inject constructor(
         }
 
     private fun getSelected() = modules.filter { it.isSelected }
+
+    fun unlockScreen() {
+        _screenLocked.postValue(SettingsPasswordConfig.Unlocked)
+    }
 }

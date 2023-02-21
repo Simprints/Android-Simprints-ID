@@ -24,7 +24,7 @@ class SettingsPasswordDialogFragmentTest {
     fun `closes without success on cancel`() {
         launchFragment(themeResId = MR.style.Theme_AppCompat) {
             SettingsPasswordDialogFragment(
-                codeToMatch = "1234",
+                passwordToMatch = "1234",
                 onSuccess = { fail() }
             )
         }
@@ -37,7 +37,7 @@ class SettingsPasswordDialogFragmentTest {
     fun `shows error if incorrect password`() {
         launchFragment(themeResId = MR.style.Theme_AppCompat) {
             SettingsPasswordDialogFragment(
-                codeToMatch = "1234",
+                passwordToMatch = "1234",
                 onSuccess = { fail() }
             )
         }
@@ -58,7 +58,7 @@ class SettingsPasswordDialogFragmentTest {
     fun `resets error on new password attempt`() {
         launchFragment(themeResId = MR.style.Theme_AppCompat) {
             SettingsPasswordDialogFragment(
-                codeToMatch = "1234",
+                passwordToMatch = "1234",
                 onSuccess = { fail() }
             )
         }
@@ -86,7 +86,7 @@ class SettingsPasswordDialogFragmentTest {
         suspendCoroutine { cont ->
             launchFragment(themeResId = MR.style.Theme_AppCompat) {
                 SettingsPasswordDialogFragment(
-                    codeToMatch = "1234",
+                    passwordToMatch = "1234",
                     onSuccess = { cont.resume(Unit) }
                 )
             }
