@@ -1,6 +1,11 @@
 package com.simprints.infra.logging
 
+import com.google.firebase.FirebaseNetworkException
 import timber.log.Timber
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import javax.net.ssl.SSLHandshakeException
+import javax.net.ssl.SSLProtocolException
 
 /**
  * A very lightweight wrapper around Timber in case we ever decide to use a different logging
@@ -52,26 +57,50 @@ object Simber {
      * error mode, but maybe you recovered from some unexpected behavior. Basically, use this to log
      * stuff you didn't expect to happen but isn't necessarily an error. Kind of like a "hey, this
      * happened, and it's weird, we should look into it."
+     *
+     * NOTE: Set list of throwable classes are not reported to Crashlytics to reduce amount of
+     * false-positive issues. Such exceptions are usually part of normal error flow,
+     * e.g. connection timeout in bad network conditions.
+     *
      * DEBUG: Is sent to Log.w
      * STAGING: Is sent to Log.w & sent to Firebase Crashlytics
      * RELEASE: Is sent to Firebase Crashlytics
      */
-    fun w(t: Throwable) = Timber.w(t)
+    fun w(t: Throwable) {
+        if (shouldSkipThrowableReporting(t)) Timber.i(t)
+        else Timber.w(t)
+    }
+
     fun w(message: String, vararg args: Any?) = Timber.w(message, *args)
-    fun w(t: Throwable, message: String, args: Any? = null) = Timber.w(t, message, args)
+    fun w(t: Throwable, message: String, args: Any? = null) {
+        if (shouldSkipThrowableReporting(t)) Timber.i(t)
+        else Timber.w(t, message, args)
+    }
 
     /**
      * This is for when bad stuff happens. You know that an error has occurred and therefore you're
      * logging an error. NOTE: There is an important difference between Exceptions and Errors.
      * Exceptions are used to pass information and handle logic, but this doesn't mean they are bad.
      * We only log Exceptions as errors when we know the product is not behaving and expected.
+     *
+     * NOTE: Set list of throwable classes are not reported to Crashlytics to reduce amount of
+     * false-positive issues. Such exceptions are usually part of normal error flow,
+     * e.g. connection timeout in bad network conditions.
+     *
      * DEBUG: Is sent to Log.e
      * STAGING: Is sent to Log.e & sent to Firebase Crashlytics
      * RELEASE: Is sent to Firebase Crashlytics
      */
-    fun e(t: Throwable) = Timber.e(t)
+    fun e(t: Throwable) {
+        if (shouldSkipThrowableReporting(t)) Timber.i(t)
+        else Timber.e(t)
+    }
+
     fun e(message: String, vararg args: Any?) = Timber.e(message, *args)
-    fun e(t: Throwable, message: String, args: Any? = null) = Timber.e(t, message, args)
+    fun e(t: Throwable, message: String, args: Any? = null) {
+        if (shouldSkipThrowableReporting(t)) Timber.i(t, message, args)
+        else Timber.e(t, message, args)
+    }
 
     /**
      * Adds a custom tag to the log.
@@ -96,5 +125,16 @@ object Simber {
             Timber.tag(tag)
         return Simber
     }
+
+    // Some exception do not provide any value when logged into crashlytics,
+    // e.g. issues due to bad network
+    private fun shouldSkipThrowableReporting(t: Throwable) =
+        isSkippableException(t) || isSkippableException(t.cause)
+
+    private fun isSkippableException(it: Throwable?) = it is SocketTimeoutException
+        || it is UnknownHostException
+        || it is SSLProtocolException
+        || it is SSLHandshakeException
+        || it is FirebaseNetworkException
 
 }
