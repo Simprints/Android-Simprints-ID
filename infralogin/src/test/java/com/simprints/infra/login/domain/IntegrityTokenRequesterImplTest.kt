@@ -77,6 +77,7 @@ class IntegrityTokenRequesterImplTest {
                 )
             } throws mockk<IntegrityServiceException> {
                 every { errorCode } returns CLOUD_PROJECT_NUMBER_IS_INVALID
+                every { cause } returns null
             }
             val exception = assertThrows<RequestingIntegrityTokenException> {
                 integrityTokenRequesterImpl.getToken(NONCE)
@@ -95,12 +96,14 @@ class IntegrityTokenRequesterImplTest {
                 )
             } throws mockk<IntegrityServiceException> {
                 every { errorCode } returns PLAY_STORE_NOT_FOUND
+                every { cause } returns null
             }
             val exception = assertThrows<MissingOrOutdatedGooglePlayStoreApp> {
                 integrityTokenRequesterImpl.getToken(NONCE)
             }
             assertThat(exception.errorCode).isEqualTo(PLAY_STORE_NOT_FOUND)
         }
+
     @Test
     fun `should throw a IntegrityServiceTemporaryDown when integrity service is down`() =
         runTest {
@@ -112,12 +115,14 @@ class IntegrityTokenRequesterImplTest {
                 )
             } throws mockk<IntegrityServiceException> {
                 every { errorCode } returns GOOGLE_SERVER_UNAVAILABLE
+                every { cause } returns null
             }
             val exception = assertThrows<IntegrityServiceTemporaryDown> {
                 integrityTokenRequesterImpl.getToken(NONCE)
             }
             assertThat(exception.errorCode).isEqualTo(GOOGLE_SERVER_UNAVAILABLE)
         }
+
     @Test
     fun `should throw a NetworkConnectionException when network error happens`() =
         runTest {
@@ -129,6 +134,7 @@ class IntegrityTokenRequesterImplTest {
                 )
             } throws mockk<IntegrityServiceException> {
                 every { errorCode } returns NETWORK_ERROR
+                every { cause } returns null
             }
             val exception = assertThrows<NetworkConnectionException> {
                 integrityTokenRequesterImpl.getToken(NONCE)
