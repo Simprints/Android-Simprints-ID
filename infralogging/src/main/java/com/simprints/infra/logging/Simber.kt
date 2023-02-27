@@ -73,7 +73,7 @@ object Simber {
 
     fun w(message: String, vararg args: Any?) = Timber.w(message, *args)
     fun w(t: Throwable, message: String, args: Any? = null) {
-        if (shouldSkipThrowableReporting(t)) Timber.i(t)
+        if (shouldSkipThrowableReporting(t)) Timber.i(t, message, args)
         else Timber.w(t, message, args)
     }
 
