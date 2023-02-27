@@ -52,9 +52,7 @@ class SimberTest {
 
     @Test
     fun `skips false-positive crash reporting when logging warnings`() {
-        mockkObject(Timber.Forest)
         val list = getListOfSkippableExceptions()
-
         list.forEach { Simber.w(it) }
 
         verify(exactly = 0) { Timber.Forest.w(any<Exception>()) }
@@ -63,9 +61,7 @@ class SimberTest {
 
     @Test
     fun `skips false-positive crash reporting when logging warnings with message`() {
-        mockkObject(Timber.Forest)
         val list = getListOfSkippableExceptions()
-
         list.forEach { Simber.w(it, "test", null) }
 
         verify(exactly = 0) { Timber.Forest.w(any<Exception>(), any(), any()) }
@@ -74,9 +70,7 @@ class SimberTest {
 
     @Test
     fun `skips false-positive crash reporting when logging error`() {
-        mockkObject(Timber.Forest)
         val list = getListOfSkippableExceptions()
-
         list.forEach { Simber.e(it) }
 
         verify(exactly = 0) { Timber.Forest.e(any<Exception>()) }
@@ -85,9 +79,7 @@ class SimberTest {
 
     @Test
     fun `skips false-positive crash reporting when logging error with message`() {
-        mockkObject(Timber.Forest)
         val list = getListOfSkippableExceptions()
-
         list.forEach { Simber.e(it, "test", null) }
 
         verify(exactly = 0) { Timber.Forest.e(any<Exception>(), any(), any()) }
@@ -97,7 +89,6 @@ class SimberTest {
 
     @Test
     fun `skips false-positive cause crash reporting when logging warnings`() {
-        mockkObject(Timber.Forest)
         val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
 
         list.forEach { Simber.w(it) }
@@ -108,9 +99,7 @@ class SimberTest {
 
     @Test
     fun `skips false-positive cause crash reporting when logging warnings with message`() {
-        mockkObject(Timber.Forest)
         val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
-
         list.forEach { Simber.w(it, "test", null) }
 
         verify(exactly = 0) { Timber.Forest.w(any<Exception>(), any(), any()) }
@@ -119,9 +108,7 @@ class SimberTest {
 
     @Test
     fun `skips false-positive cause crash reporting when logging error`() {
-        mockkObject(Timber.Forest)
         val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
-
         list.forEach { Simber.e(it) }
 
         verify(exactly = 0) { Timber.Forest.e(any<Exception>()) }
@@ -130,16 +117,14 @@ class SimberTest {
 
     @Test
     fun `skips false-positive cause crash reporting when logging error with message`() {
-        mockkObject(Timber.Forest)
         val list = getListOfSkippableExceptions().map { Throwable(cause = it) }
-
         list.forEach { Simber.e(it, "test", null) }
 
         verify(exactly = 0) { Timber.Forest.e(any<Exception>(), any(), any()) }
         verify(exactly = list.size) { Timber.Forest.i(any<Exception>(), any(), any()) }
     }
     
-    private fun getListOfSkippableExceptions() = listOf<Exception>(
+    private fun getListOfSkippableExceptions() = listOf(
         SocketTimeoutException(),
         UnknownHostException(),
         SSLProtocolException("Stub"),
