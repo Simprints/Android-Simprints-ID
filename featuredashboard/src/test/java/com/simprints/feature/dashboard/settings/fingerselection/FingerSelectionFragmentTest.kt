@@ -41,16 +41,16 @@ class FingerSelectionFragmentTest {
     internal val viewModel = mockk<FingerSelectionViewModel>(relaxed = true) {
         every { fingerSelections } returns mockk {
             every { value } returns listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 1, false),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true)
+                FingerSelectionItem(Finger.LEFT_THUMB, 1),
+                FingerSelectionItem(Finger.RIGHT_THUMB, 1),
+                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2)
             )
             every { observe(any(), any()) } answers {
                 secondArg<Observer<List<FingerSelectionItem>>>().onChanged(
                     listOf(
-                        FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                        FingerSelectionItem(Finger.RIGHT_THUMB, 1, false),
-                        FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true)
+                        FingerSelectionItem(Finger.LEFT_THUMB, 1),
+                        FingerSelectionItem(Finger.RIGHT_THUMB, 1),
+                        FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2)
                     )
                 )
             }
@@ -61,9 +61,9 @@ class FingerSelectionFragmentTest {
     fun `should display the fingers correctly`() {
         mockFingerSelections(
             listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 3, false),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true)
+                FingerSelectionItem(Finger.LEFT_THUMB, 1),
+                FingerSelectionItem(Finger.RIGHT_THUMB, 3),
+                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2)
             )
         )
         launchFragmentInHiltContainer<FingerSelectionFragment>()
@@ -83,219 +83,6 @@ class FingerSelectionFragmentTest {
             .check(matches(hasDescendant(withText("2"))))
     }
 
-    @Test
-    fun `should only enable to change the fingers for non removable ones`() {
-        mockFingerSelections(
-            listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 3, false),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true)
-            )
-        )
-        launchFragmentInHiltContainer<FingerSelectionFragment>()
-
-        onView(withText("Left Thumb")).check(matches(not(isEnabled())))
-        onView(withText("Right Thumb")).check(matches(not(isEnabled())))
-        onView(withText("Left Index Finger")).check(matches(isEnabled()))
-    }
-
-    @Test
-    fun `should only enable to delete the fingers for non removable ones`() {
-        mockFingerSelections(
-            listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 3, false),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true)
-            )
-        )
-        launchFragmentInHiltContainer<FingerSelectionFragment>()
-
-        // Left thumb
-        onView(nThDeleteFinger(0)).check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
-
-        // Right thumb
-        onView(nThDeleteFinger(1)).check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
-
-        // Left index finger
-        onView(nThDeleteFinger(2)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun `should be able to remove a finger correctly`() {
-        mockFingerSelections(
-            listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 3, false),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true)
-            )
-        )
-        launchFragmentInHiltContainer<FingerSelectionFragment>()
-
-        // Left thumb
-        onView(nThDeleteFinger(2)).perform(click())
-
-        verify(exactly = 1) { viewModel.removeItem(2) }
-    }
-
-    @Test
-    fun `should be able to reset the fingers correctly`() {
-        mockFingerSelections(
-            listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 3, false),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true)
-            )
-        )
-        launchFragmentInHiltContainer<FingerSelectionFragment>()
-
-        onView(withId(R.id.resetButton)).perform(click())
-
-        verify(exactly = 1) { viewModel.resetFingerItems() }
-    }
-
-    @Test
-    fun `should be able to add a new finger correctly`() {
-        mockFingerSelections(
-            listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 3, false),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true)
-            )
-        )
-        launchFragmentInHiltContainer<FingerSelectionFragment>()
-
-        onView(withId(R.id.addFingerButton)).perform(click())
-
-        verify(exactly = 1) { viewModel.addNewFinger() }
-    }
-
-    @Test
-    fun `should prevent to add a new finger when there is already 10 fingers`() {
-        mockFingerSelections(
-            listOf(
-                FingerSelectionItem(Finger.LEFT_THUMB, 1, false),
-                FingerSelectionItem(Finger.LEFT_INDEX_FINGER, 2, true),
-                FingerSelectionItem(Finger.LEFT_3RD_FINGER, 2, true),
-                FingerSelectionItem(Finger.LEFT_4TH_FINGER, 2, true),
-                FingerSelectionItem(Finger.LEFT_5TH_FINGER, 2, true),
-                FingerSelectionItem(Finger.RIGHT_THUMB, 1, true),
-                FingerSelectionItem(Finger.RIGHT_INDEX_FINGER, 2, true),
-                FingerSelectionItem(Finger.RIGHT_3RD_FINGER, 2, true),
-                FingerSelectionItem(Finger.RIGHT_4TH_FINGER, 2, true),
-                FingerSelectionItem(Finger.RIGHT_5TH_FINGER, 2, true),
-            )
-        )
-        launchFragmentInHiltContainer<FingerSelectionFragment>()
-
-        onView(withId(R.id.addFingerButton)).check(matches(not(isEnabled())))
-    }
-
-    @Test
-    fun `should navigate back when clicking on the back button and nothing has changed`() {
-        mockFingerSelections(listOf(FingerSelectionItem(Finger.LEFT_THUMB, 1, false)))
-
-        val navController = mockk<NavController>(relaxed = true)
-
-        launchFragmentInHiltContainer<FingerSelectionFragment>(navController = navController)
-
-        onView(withId(R.id.fingerSelectionRecyclerView)).perform(pressBack())
-
-        verify(exactly = 1) { navController.popBackStack() }
-    }
-
-    @Test
-    fun `should display the save dialog when clicking on the back button and the selection has changed and save the selection if validating`() {
-        every { viewModel.hasSelectionChanged() } returns true
-
-        mockFingerSelections(listOf(FingerSelectionItem(Finger.LEFT_THUMB, 1, false)))
-
-        val navController = mockk<NavController>(relaxed = true)
-
-        launchFragmentInHiltContainer<FingerSelectionFragment>(navController = navController)
-
-        onView(withId(R.id.fingerSelectionRecyclerView)).perform(pressBack())
-        onView(withId(android.R.id.button1))
-            .inRoot(RootMatchers.isDialog())
-            .check(matches(isDisplayed()))
-            .perform(click())
-
-        verify(exactly = 1) { viewModel.savePreference() }
-        verify(exactly = 1) { navController.popBackStack() }
-    }
-
-    @Test
-    fun `should display the save dialog when clicking on the back button and the selection has changed and not save the selection if canceling`() {
-        every { viewModel.hasSelectionChanged() } returns true
-
-        mockFingerSelections(listOf(FingerSelectionItem(Finger.LEFT_THUMB, 1, false)))
-
-        val navController = mockk<NavController>(relaxed = true)
-
-        launchFragmentInHiltContainer<FingerSelectionFragment>(navController = navController)
-
-        onView(withId(R.id.fingerSelectionRecyclerView)).perform(pressBack())
-        onView(withId(android.R.id.button2))
-            .inRoot(RootMatchers.isDialog())
-            .check(matches(isDisplayed()))
-            .perform(click())
-
-        verify(exactly = 0) { viewModel.savePreference() }
-        verify(exactly = 1) { navController.popBackStack() }
-    }
-
-    @Test
-    fun `should navigate back when clicking on the back navigation and nothing has changed`() {
-        mockFingerSelections(listOf(FingerSelectionItem(Finger.LEFT_THUMB, 1, false)))
-
-        val navController = mockk<NavController>(relaxed = true)
-
-        launchFragmentInHiltContainer<FingerSelectionFragment>(navController = navController)
-
-        onView(withContentDescription("back")).perform(click())
-
-        verify(exactly = 1) { navController.popBackStack() }
-    }
-
-    @Test
-    fun `should display the save dialog when clicking on the back navigation and the selection has changed and save the selection if validating`() {
-        every { viewModel.hasSelectionChanged() } returns true
-
-        mockFingerSelections(listOf(FingerSelectionItem(Finger.LEFT_THUMB, 1, false)))
-
-        val navController = mockk<NavController>(relaxed = true)
-
-        launchFragmentInHiltContainer<FingerSelectionFragment>(navController = navController)
-
-        onView(withContentDescription("back")).perform(click())
-        onView(withId(android.R.id.button1))
-            .inRoot(RootMatchers.isDialog())
-            .check(matches(isDisplayed()))
-            .perform(click())
-
-        verify(exactly = 1) { viewModel.savePreference() }
-        verify(exactly = 1) { navController.popBackStack() }
-    }
-
-    @Test
-    fun `should display the save dialog when clicking on the back navigation and the selection has changed and not save the selection if canceling`() {
-        every { viewModel.hasSelectionChanged() } returns true
-
-        mockFingerSelections(listOf(FingerSelectionItem(Finger.LEFT_THUMB, 1, false)))
-
-        val navController = mockk<NavController>(relaxed = true)
-
-        launchFragmentInHiltContainer<FingerSelectionFragment>(navController = navController)
-
-        onView(withContentDescription("back")).perform(click())
-        onView(withId(android.R.id.button2))
-            .inRoot(RootMatchers.isDialog())
-            .check(matches(isDisplayed()))
-            .perform(click())
-
-        verify(exactly = 0) { viewModel.savePreference() }
-        verify(exactly = 1) { navController.popBackStack() }
-    }
-
     private fun mockFingerSelections(fingers: List<FingerSelectionItem>) {
         every { viewModel.fingerSelections } returns mockk {
             every { value } returns fingers
@@ -309,13 +96,6 @@ class FingerSelectionFragmentTest {
         return allOf(
             withParent(withId(R.id.fingerSelectionRecyclerView)),
             withParentIndex(position)
-        )
-    }
-
-    private fun nThDeleteFinger(position: Int): Matcher<View> {
-        return allOf(
-            withParent(nThFingerSelection(position)),
-            withId(R.id.deleteFingerSelectionImageView)
         )
     }
 }
