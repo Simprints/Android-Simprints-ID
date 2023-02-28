@@ -5,51 +5,30 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/gripFingerSelectionImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:tint="@color/colorAccent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/fingerSelectionSpinner"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_reorder_24"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/deleteFingerSelectionImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        app:srcCompat="@drawable/ic_close_chip"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/fingerQuantitySpinner"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="ContentDescription"
-        android:tint="@color/colorAccent" />
-
-    <Spinner
-        android:id="@+id/fingerSelectionSpinner"
+    <TextView
+        android:id="@+id/fingerNameTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:padding="16dp"
         android:fontFamily="@font/muli"
+        app:layout_constraintWidth_percent="0.7"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/gripFingerSelectionImageView"
-        app:layout_constraintEnd_toStartOf="@id/fingerQuantitySpinner"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fingerQuantityTextView"
+        tools:text="Left Thumb"/>
 
-    <Spinner
-        android:id="@+id/fingerQuantitySpinner"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/fingerQuantityTextView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:padding="16dp"
         android:fontFamily="@font/muli"
+        android:gravity="center"
+        app:layout_constraintWidth_percent="0.3"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/fingerSelectionSpinner"
-        app:layout_constraintEnd_toStartOf="@id/deleteFingerSelectionImageView"/>
+        app:layout_constraintStart_toEndOf="@id/fingerNameTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="1"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

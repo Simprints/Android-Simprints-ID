@@ -36,7 +36,7 @@
     <string name="preference_device_id_title">የመሳሪያው መለያ</string>
     <string name="preference_logout_title">ይውጡ</string>
     <string name="preference_scanner_version_title">የእስካነር  ስሪት</string>
-    <string name="preference_select_fingers_title">ለአሻራ የሚሆን ቋሚ እጣት ይምረጡ</string>
+    <string name="preference_view_fingers_title">ለአሻራ የሚሆን ቋሚ እጣት ይምረጡ</string>
     <string name="preference_select_language_title">ቋንቋ</string>
     <string name="preference_select_modules_title">ምዕራፍ ይመረጡ</string>
     <string name="preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
