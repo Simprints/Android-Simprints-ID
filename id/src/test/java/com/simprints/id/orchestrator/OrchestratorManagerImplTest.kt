@@ -124,6 +124,26 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
+    fun saveState_shouldSaveHotCache() = runTest {
+        with(orchestrator) {
+            startFlowForEnrol(modalities)
+            saveState()
+        }
+
+        verify(exactly = 1) { hotCache.save(mockSteps) }
+    }
+
+    @Test
+    fun restoreState_shouldLoadStepsFromHotCache() = runTest {
+        with(orchestrator) {
+            startFlowForEnrol(modalities)
+            orchestrator.restoreState()
+        }
+
+        verify(exactly = 1) { hotCache.load() }
+    }
+
+    @Test
     fun modalityFlowReceivesAWrongResult_orchestratorShouldNotGoAhead() {
         runTest {
             with(orchestrator) {

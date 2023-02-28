@@ -3,7 +3,10 @@ package com.simprints.infra.config.local.migrations
 import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
+import com.fasterxml.jackson.core.JacksonException
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.simprints.infra.config.local.migrations.models.OldProjectConfig
 import com.simprints.infra.config.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.local.models.toProto
@@ -35,10 +38,22 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         val projectSettingsJson = prefs.getString(PROJECT_SETTINGS_JSON_STRING_KEY, "")
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 
-        return jacksonObjectMapper()
-            .readValue(projectSettingsJson, OldProjectConfig::class.java)
-            .toDomain(loginManager.signedInProjectId)
-            .toProto()
+        return try {
+            jacksonObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .readValue<OldProjectConfig>(projectSettingsJson)
+                .toDomain(loginManager.signedInProjectId)
+                .toProto()
+        } catch (e: Exception) {
+            if (e is JacksonException) {
+                // Return default value
+                Simber.i("Invalid old configuration for project ${loginManager.signedInProjectId}: $e")
+                ProtoProjectConfiguration.getDefaultInstance()
+            } else {
+                Simber.e(e)
+                throw e
+            }
+        }
     }
 
     override suspend fun shouldMigrate(currentData: ProtoProjectConfiguration): Boolean =
