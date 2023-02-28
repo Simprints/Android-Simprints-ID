@@ -37,9 +37,14 @@ class HotCacheImpl @Inject constructor(
     private val memoryCache
         get() = LinkedHashMap(sharedPrefs.getMap(KEY_STEPS, emptyMap()))
 
-    override fun save(step: Step) {
-        stepEncoder.encode(step).also { encodedStep ->
-            saveEncodedStep(step.id, encodedStep)
+    override fun save(steps: List<Step>) {
+        clearSteps()
+        val cache = memoryCache
+        steps.forEach { step ->
+            cache[step.id] = stepEncoder.encode(step)
+        }
+        saveInSharedPrefs {
+            it.putMap(KEY_STEPS, cache)
         }
     }
 
@@ -51,12 +56,6 @@ class HotCacheImpl @Inject constructor(
 
     override fun clearSteps() {
         saveInSharedPrefs { it.putMap(KEY_STEPS, emptyMap()) }
-    }
-
-    private fun saveEncodedStep(id: String, encodedStep: String) {
-        val cache = memoryCache
-        cache[id] = encodedStep
-        saveInSharedPrefs { it.putMap(KEY_STEPS, cache) }
     }
 
     private fun saveInSharedPrefs(transaction: (SharedPreferences.Editor) -> Unit) {
