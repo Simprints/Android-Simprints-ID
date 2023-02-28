@@ -20,10 +20,10 @@ class EnrolmentEventValidator : EventValidator {
             val hasPersonCreation = currentEvents.any { it is PersonCreationEvent }
 
             if (!hasFingerprint && !hasFace)
-                throw EnrolmentEventValidatorException()
+                throw EnrolmentEventValidatorException("Missing fingerprint or face capture event")
 
             if (!hasPersonCreation)
-                throw EnrolmentEventValidatorException()
+                throw EnrolmentEventValidatorException("Missing person creation event")
         }
     }
 

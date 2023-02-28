@@ -12,6 +12,8 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
+import com.simprints.id.exceptions.safe.DuplicateBiometricEnrolmentCheckFailed
+import com.simprints.id.exceptions.unexpected.MissingCaptureResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
@@ -40,6 +42,7 @@ class EnrolLastBiometricsViewModel @Inject constructor(
             val previousLastEnrolmentResult =
                 steps.firstOrNull { it.request is EnrolLastBiometricsRequest }?.getResult()
             if (previousLastEnrolmentResult is EnrolLastBiometricsResponse) {
+                //TODO: Log in Crashlytics if remaining
                 previousLastEnrolmentResult.newSubjectId?.let { Success(it) } ?: Failed
             } else {
                 performEnrolmentIfRequiredAndGetViewState(
@@ -89,27 +92,35 @@ class EnrolLastBiometricsViewModel @Inject constructor(
              */
             fingerprintResponse != null && faceResponse != null -> {
                 if (isAnyResponseWithHighConfidence(configuration, fingerprintResponse)) {
-                    Failed
+                    failWithDuplicateBiometricEnrolmentCheckFailed()
                 } else {
                     buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
                 }
             }
             fingerprintResponse != null -> {
                 if (isAnyResponseWithHighConfidence(configuration, fingerprintResponse)) {
-                    Failed
+                    failWithDuplicateBiometricEnrolmentCheckFailed()
                 } else {
                     buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
                 }
             }
             faceResponse != null -> {
                 if (isAnyResponseWithHighConfidence(configuration, faceResponse)) {
-                    Failed
+                    failWithDuplicateBiometricEnrolmentCheckFailed()
                 } else {
                     buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
                 }
             }
-            else -> Failed
+            else -> {
+                Simber.e(MissingCaptureResponse())
+                Failed
+            }
         }
+    }
+
+    private fun failWithDuplicateBiometricEnrolmentCheckFailed(): ViewState {
+        Simber.i(DuplicateBiometricEnrolmentCheckFailed())
+        return Failed
     }
 
     private suspend fun buildSubjectAndGetViewState(
@@ -121,6 +132,7 @@ class EnrolLastBiometricsViewModel @Inject constructor(
             enrolmentHelper.enrol(subject)
             Success(subject.subjectId)
         } catch (e: EnrolmentEventValidatorException) {
+            Simber.e(e)
             Failed
         }
     }
