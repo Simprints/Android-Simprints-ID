@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import android.annotation.SuppressLint
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.scanner.controllers.v2.*
@@ -147,9 +148,11 @@ class ScannerWrapperV2(
         (if (isLiveFeedbackAvailable()) {
             scannerV2.setScannerLedStateOn()
                 .andThen(getImageQualityWhileSettingLEDState())
+                .onErrorComplete()
         } else {
             Completable.error(UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK))
-        }).await()
+        })
+            .await()
     }
 
     private fun getImageQualityWhileSettingLEDState() =
@@ -157,10 +160,15 @@ class ScannerWrapperV2(
             scannerV2.setSmileLedState(scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality))
         }.repeat()
 
+    @SuppressLint("CheckResult")
     override suspend fun stopLiveFeedback(): Unit = withContext(ioDispatcher) {
         if (isLiveFeedbackAvailable()) {
-            scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
-            scannerV2.setScannerLedStateDefault()
+            scannerV2
+                .setSmileLedState(scannerUiHelper.idleLedState())
+                .onErrorComplete()
+            scannerV2
+                .setScannerLedStateDefault()
+                .onErrorComplete()
         } else {
             throw UnavailableVero2FeatureException(UnavailableVero2Feature.LIVE_FEEDBACK)
         }
@@ -267,7 +275,8 @@ class ScannerWrapperV2(
     override suspend fun setUiIdle() = withContext(ioDispatcher) {
         scannerV2
             .setSmileLedState(scannerUiHelper.idleLedState())
-            .wrapErrorsFromScanner().await()
+            .wrapErrorsFromScanner()
+            .await()
     }
 
     private val triggerListenerToObserverMap =
