@@ -42,7 +42,6 @@ class EnrolLastBiometricsViewModel @Inject constructor(
             val previousLastEnrolmentResult =
                 steps.firstOrNull { it.request is EnrolLastBiometricsRequest }?.getResult()
             if (previousLastEnrolmentResult is EnrolLastBiometricsResponse) {
-                //TODO: Log in Crashlytics if remaining
                 previousLastEnrolmentResult.newSubjectId?.let { Success(it) } ?: Failed
             } else {
                 performEnrolmentIfRequiredAndGetViewState(
