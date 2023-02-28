@@ -7,7 +7,7 @@ import com.simprints.id.orchestrator.steps.Step
 interface HotCache: WorkflowCacheClearer {
 
     var appRequest: AppRequest
-    fun save(step: Step)
+    fun save(steps: List<Step>)
     fun load(): List<Step>
 
 }

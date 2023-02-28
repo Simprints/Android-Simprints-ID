@@ -150,11 +150,17 @@ class CollectFingerprintsViewModel(
             if (!scannerManager.isScannerAvailable) return@observeForever launchReconnect.postEvent()
 
             when (it.currentCaptureState()) {
-                CaptureState.NotCollected, CaptureState.Skipped, is CaptureState.NotDetected, is CaptureState.Collected -> {
-                    if (it.isShowingConfirmDialog) stopLiveFeedback(scannerManager.scanner)
-                    else startLiveFeedback(scannerManager.scanner)
+                CaptureState.NotCollected,
+                CaptureState.Skipped,
+                is CaptureState.NotDetected,
+                is CaptureState.Collected -> {
+                    if (it.isShowingConfirmDialog)
+                        stopLiveFeedback(scannerManager.scanner)
+                    else
+                        startLiveFeedback(scannerManager.scanner)
                 }
-                is CaptureState.Scanning, is CaptureState.TransferringImage -> pauseLiveFeedback()
+                is CaptureState.Scanning,
+                is CaptureState.TransferringImage -> pauseLiveFeedback()
             }
         }
     }
@@ -203,7 +209,11 @@ class CollectFingerprintsViewModel(
 
     fun updateSelectedFinger(index: Int) {
         viewModelScope.launch {
-            scannerManager.scanner.setUiIdle()
+            try {
+                scannerManager.scanner.setUiIdle()
+            } catch (ex: Exception) {
+                handleScannerCommunicationsError(ex)
+            }
         }
         updateState {
             isAskingRescan = false
@@ -400,7 +410,11 @@ class CollectFingerprintsViewModel(
                 timeHelper.newTimer().schedule(AUTO_SWIPE_DELAY) {
                     updateFingerState { currentCaptureIndex += 1 }
                     viewModelScope.launch {
-                        scannerManager.scanner.setUiIdle()
+                        try {
+                            scannerManager.scanner.setUiIdle()
+                        } catch (ex: Exception) {
+                            handleScannerCommunicationsError(ex)
+                        }
                     }
                 }
             }
