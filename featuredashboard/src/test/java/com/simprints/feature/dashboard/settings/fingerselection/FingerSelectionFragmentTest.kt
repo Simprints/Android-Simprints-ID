@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
 import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.resources.R as IDR
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -65,15 +66,15 @@ class FingerSelectionFragmentTest {
         onView(withId(R.id.fingerSelectionRecyclerView)).check(matches(hasChildCount(3)))
 
         onView(nThFingerSelection(0))
-            .check(matches(hasDescendant(withText(com.simprints.infra.resources.R.string.l_1_finger_name))))
+            .check(matches(hasDescendant(withText(IDR.string.l_1_finger_name))))
             .check(matches(hasDescendant(withText("1"))))
 
         onView(nThFingerSelection(1))
-            .check(matches(hasDescendant(withText(com.simprints.infra.resources.R.string.r_1_finger_name))))
+            .check(matches(hasDescendant(withText(IDR.string.r_1_finger_name))))
             .check(matches(hasDescendant(withText("3"))))
 
         onView(nThFingerSelection(2))
-            .check(matches(hasDescendant(withText(com.simprints.infra.resources.R.string.l_2_finger_name))))
+            .check(matches(hasDescendant(withText(IDR.string.l_2_finger_name))))
             .check(matches(hasDescendant(withText("2"))))
     }
 

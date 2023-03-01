@@ -34,7 +34,7 @@ class FingerSelectionViewModelTest {
     )
 
     @Test
-    fun start_loadsStartingFingerStateCorrectly() {
+    fun start_loadsFingerStateCorrectly() {
         every { deviceConfiguration.fingersToCollect } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
@@ -47,6 +47,60 @@ class FingerSelectionViewModelTest {
             listOf(
                 FingerSelectionItem(LEFT_THUMB, 2),
                 FingerSelectionItem(RIGHT_THUMB, 2)
+            )
+        ).inOrder()
+    }
+
+    @Test
+    fun scatteredFingers_areAggregated() {
+        every { deviceConfiguration.fingersToCollect } returns listOf(
+            LEFT_THUMB,
+            RIGHT_THUMB,
+            RIGHT_INDEX_FINGER,
+            LEFT_3RD_FINGER,
+            LEFT_3RD_FINGER,
+            LEFT_4TH_FINGER,
+            LEFT_INDEX_FINGER,
+            RIGHT_5TH_FINGER,
+            LEFT_5TH_FINGER,
+            LEFT_3RD_FINGER,
+            LEFT_4TH_FINGER,
+            RIGHT_5TH_FINGER,
+            RIGHT_5TH_FINGER,
+            LEFT_5TH_FINGER,
+            RIGHT_4TH_FINGER,
+            LEFT_4TH_FINGER,
+            RIGHT_3RD_FINGER,
+            RIGHT_4TH_FINGER,
+            RIGHT_5TH_FINGER,
+            LEFT_5TH_FINGER,
+            RIGHT_INDEX_FINGER,
+            RIGHT_4TH_FINGER,
+            LEFT_4TH_FINGER,
+            LEFT_5TH_FINGER,
+            RIGHT_3RD_FINGER,
+            LEFT_5TH_FINGER,
+            RIGHT_4TH_FINGER,
+            RIGHT_5TH_FINGER,
+            LEFT_INDEX_FINGER,
+            RIGHT_3RD_FINGER,
+        )
+        every { fingerprintConfiguration.fingersToCapture } returns listOf(LEFT_THUMB)
+
+        viewModel.start()
+
+        assertThat(viewModel.fingerSelections.value).containsExactlyElementsIn(
+            listOf(
+                FingerSelectionItem(LEFT_THUMB, 1),
+                FingerSelectionItem(RIGHT_THUMB, 1),
+                FingerSelectionItem(RIGHT_INDEX_FINGER, 2),
+                FingerSelectionItem(LEFT_3RD_FINGER, 3),
+                FingerSelectionItem(LEFT_4TH_FINGER, 4),
+                FingerSelectionItem(LEFT_INDEX_FINGER, 2),
+                FingerSelectionItem(RIGHT_5TH_FINGER, 5),
+                FingerSelectionItem(LEFT_5TH_FINGER, 5),
+                FingerSelectionItem(RIGHT_4TH_FINGER, 4),
+                FingerSelectionItem(RIGHT_3RD_FINGER, 3),
             )
         ).inOrder()
     }

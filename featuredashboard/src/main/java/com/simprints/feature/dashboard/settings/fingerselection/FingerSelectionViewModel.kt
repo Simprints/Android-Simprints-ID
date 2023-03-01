@@ -29,11 +29,15 @@ internal class FingerSelectionViewModel @Inject constructor(
 
     private fun List<Finger>.toFingerSelectionItems(): List<FingerSelectionItem> {
         val result = mutableListOf<FingerSelectionItem>()
-        this.forEach {
-            if (result.lastOrNull()?.finger == it) {
-                result.last().quantity++
+        this.forEach { finger ->
+            val alreadyExistingFingerSelection = result.firstOrNull { fingerSelectionItem ->
+                fingerSelectionItem.finger == finger
+            }
+
+            if (alreadyExistingFingerSelection != null) {
+                alreadyExistingFingerSelection.quantity++
             } else {
-                result.add(FingerSelectionItem(it, 1))
+                result.add(FingerSelectionItem(finger, 1))
             }
         }
         return result
