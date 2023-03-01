@@ -34,7 +34,7 @@ class ModuleRepositoryImplTest {
         every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d")
         coEvery {
             mockConfigManager.getDeviceConfiguration()
-        } returns DeviceConfiguration("", listOf("b", "c"), listOf(), "")
+        } returns DeviceConfiguration("", listOf("b", "c"), "")
 
         repository = ModuleRepositoryImpl(
             mockConfigManager,
@@ -59,7 +59,7 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(), ""))
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
         // Comparing string representation as when executing the lambda captured in the mock it will
         // not return an ArrayList but a LinkedHashMap.
         assertThat(updatedConfig.selectedModules.toString()).isEqualTo(selectedModuleNames.toString())
