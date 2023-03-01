@@ -44,16 +44,3 @@ data class FingerSelectionItem(
     var finger: Finger,
     var quantity: Int
 )
-
-val ORDERED_FINGERS = listOf(
-    Finger.LEFT_THUMB,
-    Finger.LEFT_INDEX_FINGER,
-    Finger.LEFT_3RD_FINGER,
-    Finger.LEFT_4TH_FINGER,
-    Finger.LEFT_5TH_FINGER,
-    Finger.RIGHT_THUMB,
-    Finger.RIGHT_INDEX_FINGER,
-    Finger.RIGHT_3RD_FINGER,
-    Finger.RIGHT_4TH_FINGER,
-    Finger.RIGHT_5TH_FINGER
-)
