@@ -7,7 +7,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.domain.models.DeviceConfiguration
-import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.local.models.toDomain
 import com.simprints.infra.config.local.serializer.DeviceConfigurationSerializer
@@ -108,7 +107,6 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = projectConfiguration.general.defaultLanguage,
                 selectedModules = listOf(),
-                fingersToCollect = projectConfiguration.fingerprint!!.fingersToCapture,
                 lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
@@ -132,7 +130,6 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = "fr",
                 selectedModules = listOf("module1"),
-                fingersToCollect = projectConfiguration.fingerprint!!.fingersToCapture,
                 lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
@@ -144,7 +141,6 @@ class ConfigLocalDataSourceImplTest {
         runTest(UnconfinedTestDispatcher()) {
             configLocalDataSourceImpl.updateDeviceConfiguration {
                 it.apply {
-                    it.fingersToCollect = listOf(Finger.LEFT_THUMB)
                     it.selectedModules = listOf("module1")
                 }
             }
@@ -156,7 +152,6 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = projectConfiguration.general.defaultLanguage,
                 selectedModules = listOf("module1"),
-                fingersToCollect = listOf(Finger.LEFT_THUMB),
                 lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
@@ -182,7 +177,6 @@ class ConfigLocalDataSourceImplTest {
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = generalConfiguration.defaultLanguage,
                 selectedModules = listOf(),
-                fingersToCollect = listOf(),
                 lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfigurationToSave)
@@ -210,12 +204,11 @@ class ConfigLocalDataSourceImplTest {
         configLocalDataSourceImpl.updateDeviceConfiguration {
             it.apply {
                 it.language = "fr"
-                it.fingersToCollect = listOf(Finger.LEFT_THUMB)
             }
         }
         val savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
         val expectedDeviceConfiguration =
-            DeviceConfiguration("fr", listOf(), listOf(Finger.LEFT_THUMB), "")
+            DeviceConfiguration("fr", listOf(), "")
 
         assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
     }
@@ -226,19 +219,17 @@ class ConfigLocalDataSourceImplTest {
             configLocalDataSourceImpl.updateDeviceConfiguration {
                 it.apply {
                     it.language = "fr"
-                    it.fingersToCollect = listOf(Finger.LEFT_THUMB)
                 }
             }
             var savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
             var expectedDeviceConfiguration =
-                DeviceConfiguration("fr", listOf(), listOf(Finger.LEFT_THUMB), "")
+                DeviceConfiguration("fr", listOf(), "")
 
             assertThat(savedDeviceConfiguration).isEqualTo(expectedDeviceConfiguration)
 
             configLocalDataSourceImpl.updateDeviceConfiguration {
                 it.apply {
                     it.language = "fr"
-                    it.fingersToCollect = listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER)
                 }
             }
             savedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
@@ -246,7 +237,6 @@ class ConfigLocalDataSourceImplTest {
                 DeviceConfiguration(
                     "fr",
                     listOf(),
-                    listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER),
                     ""
                 )
 
