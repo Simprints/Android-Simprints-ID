@@ -6,7 +6,6 @@ import com.simprints.infra.config.AbsolutePath
 import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.local.models.*
-import com.simprints.infra.config.local.models.ProtoDeviceConfiguration.FingersToCollect
 import kotlinx.coroutines.flow.first
 import java.io.File
 import javax.inject.Inject
@@ -45,13 +44,6 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         ).build()
                     LanguageHelper.language = it.language.language
                 }
-                if (!protoDeviceConfiguration.fingersToCollect.isOverwritten) {
-                    proto.setFingersToCollect(
-                        FingersToCollect.newBuilder()
-                            .addAllFingersToCollect(config.fingerprint?.fingersToCapture?.map { finger -> finger.toProto() }
-                                ?: listOf())
-                    ).build()
-                }
                 proto.build()
             }
         }
@@ -73,10 +65,6 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 updatedProtoBuilder.language =
                     updatedProto.language.toBuilder().setIsOverwritten(true).build()
                 LanguageHelper.language = updatedProto.language.language
-            }
-            if (updatedProto.fingersToCollect.fingersToCollectList != currentData.fingersToCollect.fingersToCollectList) {
-                updatedProtoBuilder.fingersToCollect =
-                    updatedProto.fingersToCollect.toBuilder().setIsOverwritten(true).build()
             }
             updatedProtoBuilder.build()
         }
@@ -176,7 +164,6 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         val defaultDeviceConfiguration: ProtoDeviceConfiguration = DeviceConfiguration(
             language = "",
             selectedModules = listOf(),
-            fingersToCollect = listOf(),
             lastInstructionId = ""
         ).toProto()
 

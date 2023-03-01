@@ -22,7 +22,8 @@ internal class FingerSelectionViewModel @Inject constructor(
     fun start() {
         viewModelScope.launch {
             _fingerSelections.postValue(
-                configManager.getDeviceConfiguration().fingersToCollect.toFingerSelectionItems()
+                configManager.getProjectConfiguration().fingerprint!!.fingersToCapture
+                    .toFingerSelectionItems()
             )
         }
     }

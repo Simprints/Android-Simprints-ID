@@ -37,7 +37,6 @@ class PrivacyNoticesViewModelTest {
         coEvery { getDeviceConfiguration() } returns DeviceConfiguration(
             LANGUAGE,
             listOf(),
-            listOf(),
             ""
         )
     }
