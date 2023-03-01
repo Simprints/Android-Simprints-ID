@@ -2,12 +2,8 @@ package com.simprints.feature.dashboard.settings.fingerselection
 
 import android.view.View
 import androidx.lifecycle.Observer
-import androidx.navigation.NavController
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.pressBack
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.feature.dashboard.R
@@ -19,10 +15,8 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import org.hamcrest.Matcher
 import org.hamcrest.core.AllOf.allOf
-import org.hamcrest.core.IsNot.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -71,15 +65,15 @@ class FingerSelectionFragmentTest {
         onView(withId(R.id.fingerSelectionRecyclerView)).check(matches(hasChildCount(3)))
 
         onView(nThFingerSelection(0))
-            .check(matches(hasDescendant(withText("Left Thumb"))))
+            .check(matches(hasDescendant(withText(com.simprints.infra.resources.R.string.l_1_finger_name))))
             .check(matches(hasDescendant(withText("1"))))
 
         onView(nThFingerSelection(1))
-            .check(matches(hasDescendant(withText("Right Thumb"))))
+            .check(matches(hasDescendant(withText(com.simprints.infra.resources.R.string.r_1_finger_name))))
             .check(matches(hasDescendant(withText("3"))))
 
         onView(nThFingerSelection(2))
-            .check(matches(hasDescendant(withText("Left Index Finger"))))
+            .check(matches(hasDescendant(withText(com.simprints.infra.resources.R.string.l_2_finger_name))))
             .check(matches(hasDescendant(withText("2"))))
     }
 

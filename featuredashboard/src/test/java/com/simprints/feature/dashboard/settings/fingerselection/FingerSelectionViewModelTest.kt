@@ -10,9 +10,6 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 

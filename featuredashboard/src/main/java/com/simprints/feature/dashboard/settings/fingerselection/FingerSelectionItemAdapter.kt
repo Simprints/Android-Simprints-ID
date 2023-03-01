@@ -42,7 +42,7 @@ internal class FingerSelectionItemAdapter(
         private val fingerQuantityTextView = binding.fingerQuantityTextView
 
         fun bind() {
-            fingerNameTextView.text = getItems()[adapterPosition].finger.toString()
+            fingerNameTextView.text = getItems()[adapterPosition].finger.toString(context)
             fingerQuantityTextView.text = getItems()[adapterPosition].quantity.toString()
         }
     }
