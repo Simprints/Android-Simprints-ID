@@ -9,6 +9,7 @@ import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.exceptions.unexpected.MissingCaptureResponse
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
@@ -89,7 +90,7 @@ class EnrolmentHelperImpl @Inject constructor(
                 buildSubjectFromFace(projectId, userId, moduleId, faceResponse, timeHelper)
             }
 
-            else -> throw Throwable("Invalid response. Must be either fingerprint, face or both")
+            else -> throw MissingCaptureResponse()
         }
 
 
