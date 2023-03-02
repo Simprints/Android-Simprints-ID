@@ -2,7 +2,7 @@ package com.simprints.clientapi.controllers.core.eventData
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.eventsystem.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.Event
 import kotlinx.coroutines.flow.Flow
 
 

@@ -12,14 +12,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.eventsystem.EventRepository
-import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.events_sync.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher

@@ -1,16 +1,16 @@
 package com.simprints.id.domain.moduleapi.app
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_METADATA
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.testtools.moduleApi.AppConfirmationConfirmIdentityRequestModuleApi
 import com.simprints.id.testtools.moduleApi.AppEnrolRequestModuleApi
 import com.simprints.id.testtools.moduleApi.AppIdentifyRequestModuleApi
 import com.simprints.id.testtools.moduleApi.AppVerifyRequestModuleApi
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import org.junit.Test
 import java.util.*
 

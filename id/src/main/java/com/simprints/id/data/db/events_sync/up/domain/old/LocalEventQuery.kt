@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.events_sync.up.domain.old
 
 import androidx.annotation.Keep
-import com.simprints.eventsystem.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.EventType
 
 
 @Keep

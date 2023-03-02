@@ -1,12 +1,6 @@
 package com.simprints.id.activities.fetchguid
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODES
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
@@ -16,6 +10,12 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.infra.events.events_sync.down.domain.RemoteEventQuery
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODES
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.events.sampledata.SampleDefaults.projectDownSyncScope
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel

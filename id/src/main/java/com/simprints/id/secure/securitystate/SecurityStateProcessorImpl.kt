@@ -1,9 +1,9 @@
 package com.simprints.id.secure.securitystate
 
-import com.simprints.eventsystem.EventRepository
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject

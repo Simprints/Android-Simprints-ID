@@ -2,8 +2,6 @@ package com.simprints.id.orchestrator.cache
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
@@ -15,6 +13,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.testtools.common.mock.mockTemplate
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.hamcrest.CoreMatchers

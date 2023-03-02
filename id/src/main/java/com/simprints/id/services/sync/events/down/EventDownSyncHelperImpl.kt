@@ -2,14 +2,6 @@ package com.simprints.id.services.sync.events.down
 
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.EventRepository
-import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.subject.*
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.id.data.db.subject.domain.SubjectFactory
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.infra.config.ConfigManager
@@ -17,6 +9,14 @@ import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.EventCount
+import com.simprints.infra.events.event.domain.models.subject.*
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
+import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.*

@@ -2,13 +2,13 @@ package com.simprints.fingerprint.controllers.core.eventData
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
-import com.simprints.eventsystem.EventRepository
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
+import com.simprints.infra.events.EventRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
+import com.simprints.infra.events.event.domain.models.Event as CoreEvent
 
 class FingerprintSessionEventsManagerImpl @Inject constructor(
     private val eventRepository: EventRepository,

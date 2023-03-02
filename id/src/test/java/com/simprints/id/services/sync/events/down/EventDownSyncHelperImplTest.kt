@@ -2,13 +2,6 @@ package com.simprints.id.services.sync.events.down
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.EventRepository
-import com.simprints.eventsystem.event.domain.models.subject.*
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.eventsystem.sampledata.SampleDefaults
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
 import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
 import com.simprints.infra.config.ConfigManager
@@ -16,6 +9,13 @@ import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.subject.*
+import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
+import com.simprints.infra.events.sampledata.SampleDefaults
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.EncodingUtilsImplForTests

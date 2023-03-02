@@ -1,9 +1,9 @@
 package com.simprints.face.controllers.core.events.model
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.face.controllers.core.events.model.FaceAlertType.Companion.fromErrorType
 import com.simprints.face.error.ErrorType
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import org.junit.Test
 
 class FaceAlertTypeTest {

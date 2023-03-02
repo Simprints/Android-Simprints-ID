@@ -3,9 +3,9 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 import androidx.annotation.Keep
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import java.io.Serializable
-import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent as CoreOneToManyMatchEvent
-import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool as CoreMatchPool
-import com.simprints.eventsystem.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType as CoreMatchPoolType
+import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent as CoreOneToManyMatchEvent
+import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool as CoreMatchPool
+import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType as CoreMatchPoolType
 
 /**
  * This class represents a fingerprint identification event (i.e. one-to-many match event).
