@@ -10,6 +10,7 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
+import com.simprints.id.exceptions.unexpected.MissingCaptureResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
@@ -41,7 +42,7 @@ class AppResponseBuilderForIdentify(private val projectConfiguration: ProjectCon
             faceResponse != null -> {
                 buildAppIdentifyResponseForFace(faceResponse, sessionId)
             }
-            else -> throw Throwable("All responses are null")
+            else -> throw MissingCaptureResponse()
         }
     }
 
