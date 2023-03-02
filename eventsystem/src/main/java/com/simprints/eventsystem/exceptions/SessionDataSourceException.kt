@@ -1,6 +1,3 @@
 package com.simprints.eventsystem.exceptions
 
-open class SessionDataSourceException : RuntimeException {
-    constructor(message: String) : super(message)
-    constructor(cause: Throwable) : super(cause)
-}
+internal open class SessionDataSourceException(message: String) : RuntimeException(message)

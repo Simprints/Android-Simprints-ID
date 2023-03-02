@@ -9,7 +9,7 @@ import com.simprints.eventsystem.event.local.models.DbEvent
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface EventRoomDao {
+internal interface EventRoomDao {
 
     @Query("select * from DbEvent order by createdAt desc")
     suspend fun loadAll(): List<DbEvent>

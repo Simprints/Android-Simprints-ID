@@ -59,4 +59,8 @@ interface EventRepository {
     suspend fun deleteSessionEvents(sessionId: String)
 
     suspend fun removeLocationDataFromCurrentSession()
+
+    suspend fun loadAll(): Flow<Event>
+
+    suspend fun deleteAll()
 }

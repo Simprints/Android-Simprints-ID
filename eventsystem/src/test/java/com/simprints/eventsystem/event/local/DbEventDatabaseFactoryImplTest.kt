@@ -14,7 +14,7 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class DbEventDatabaseFactoryImplTest {
+internal class DbEventDatabaseFactoryImplTest {
 
     private val dbName = "dbevents"
     private val localDbKey = LocalDbKey(

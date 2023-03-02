@@ -16,7 +16,7 @@ import net.sqlcipher.database.SupportFactory
 @Database(entities = [DbEvent::class], version = 9, exportSchema = true)
 @TypeConverters(Converters::class)
 @Keep
-abstract class EventRoomDatabase : RoomDatabase() {
+internal abstract class EventRoomDatabase : RoomDatabase() {
 
     abstract val eventDao: EventRoomDao
 

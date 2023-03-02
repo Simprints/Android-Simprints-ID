@@ -5,7 +5,7 @@ import com.simprints.eventsystem.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.eventsystem.exceptions.validator.SessionEventCaptureAlreadyExists
 
-class SessionCaptureEventValidator : EventValidator {
+internal class SessionCaptureEventValidator : EventValidator {
 
     /**
      * This validator checks to make sure that no new SESSION_CAPTURE events are added to the session.

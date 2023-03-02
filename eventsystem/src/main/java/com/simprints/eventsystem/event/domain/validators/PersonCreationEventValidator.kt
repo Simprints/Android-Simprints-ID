@@ -5,7 +5,7 @@ import com.simprints.eventsystem.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.exceptions.validator.SessionEventCaptureAlreadyExists
 
-class PersonCreationEventValidator : EventValidator {
+internal class PersonCreationEventValidator : EventValidator {
 
     /**
      * This validator checks to make sure that no new PERSON_CREATION events are added to the session.

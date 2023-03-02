@@ -45,7 +45,7 @@ import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 
-class EventRepositoryImplTest {
+internal class EventRepositoryImplTest {
 
     private lateinit var eventRepo: EventRepository
 

@@ -7,7 +7,7 @@ import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 
-class EnrolmentEventValidator : EventValidator {
+internal class EnrolmentEventValidator : EventValidator {
 
     /**
      * In order to create an enrolment event we need to already have a biometric capture event

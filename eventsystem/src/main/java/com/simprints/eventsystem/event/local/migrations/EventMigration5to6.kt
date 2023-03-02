@@ -12,7 +12,7 @@ import org.json.JSONObject
  * https://simprints.atlassian.net/servicedesk/customer/portal/2/RF-170
  * Changes to the SimNetworkUtils to use an enum instead of
  */
-class EventMigration5to6 : Migration(5, 6) {
+internal class EventMigration5to6 : Migration(5, 6) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {

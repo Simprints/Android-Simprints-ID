@@ -350,4 +350,8 @@ internal open class EventRepositoryImpl @Inject constructor(
             else -> Simber.e(t)
         }
     }
+
+    override suspend fun loadAll(): Flow<Event> = eventLocalDataSource.loadAll()
+
+    override suspend fun deleteAll() = eventLocalDataSource.deleteAll()
 }

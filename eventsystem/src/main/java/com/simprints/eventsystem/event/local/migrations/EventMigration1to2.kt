@@ -20,7 +20,7 @@ import org.json.JSONObject
  * 3) Adding a sessionIsClosed field to the SessionCaptureEvent domain class in order to stop using
  * endedAt to mark a sessiona as closed.
  */
-class EventMigration1to2 : Migration(1, 2) {
+internal class EventMigration1to2 : Migration(1, 2) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {
