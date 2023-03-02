@@ -27,7 +27,6 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
-import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.FINGERS_SELECTED
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.PROJECT_ID
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
@@ -316,8 +315,6 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(projectConfiguration.synchronization.frequency.toString())
-        Simber.tag(FINGERS_SELECTED, true)
-            .i(deviceConfiguration.fingersToCollect.map { it.toString() }.toString())
         Simber.d("[CHECK_LOGIN] Added keys in CrashManager")
     }
 

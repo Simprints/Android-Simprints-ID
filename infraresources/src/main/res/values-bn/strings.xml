@@ -49,15 +49,9 @@
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
     <!-- Finger Selection Activity -->
-    <string name="finger_selection_activity_title">আঙ্গুল নির্বাচন করুন</string>
-    <string name="finger_selection_confirm_dialog_text">সেটিংস সেভ করতে চাচ্ছেন?</string>
-    <string name="finger_selection_confirm_dialog_yes">সেভ</string>
-    <string name="finger_selection_confirm_dialog_no">বাতিল</string>
+    <string name="finger_selection_fragment_title">আঙ্গুল নির্বাচন করুন</string>
     <string name="finger_selection_finger_label">আঙ্গুল </string>
     <string name="finger_selection_quantity_label">সংখ্যা</string>
-    <string name="finger_selection_reset">পুনরায় নির্বাচন</string>
-    <string name="finger_selection_add_finger">আঙ্গুল যোগ করুন</string>
-    <string name="finger_selection_invalid">অবৈধ নির্বাচন- এক আঙ্গুল ৫ বারের বেশি আছে</string>
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
     <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙ্গুলের ছাপ দেয়া এড়িয়ে গেছেন\?</string>
@@ -105,7 +99,7 @@
     <string name="preference_app_details_title">সম্বন্ধে</string>
     <string name="preference_device_id_title">ডিভাইস এর আইডি</string>
     <string name="preference_logout_title">লগআউট করুন</string>
-    <string name="preference_select_fingers_title">নির্ধারিত আঙ্গুল গুলো সমূহ নির্বাচন করুন</string>
+    <string name="preference_view_fingers_title">নির্ধারিত আঙ্গুল গুলো সমূহ নির্বাচন করুন</string>
     <string name="preference_select_language_title">ভাষা</string>
     <string name="preference_select_modules_title">মডিউল নির্বাচন করুন</string>
     <string name="preference_summary_settings_fingers">যে আঙ্গুল গুলো স্ক্যান করবেন সেগুলো সিলেক্ট করুন</string>

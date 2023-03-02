@@ -213,7 +213,6 @@ class EventDownSyncHelperImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-                listOf(),
                 ""
             )
 
@@ -233,7 +232,6 @@ class EventDownSyncHelperImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-                listOf(),
                 ""
             )
 
@@ -262,7 +260,6 @@ class EventDownSyncHelperImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(DEFAULT_MODULE_ID),
-                listOf(),
                 ""
             )
 
@@ -286,7 +283,6 @@ class EventDownSyncHelperImplTest {
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
                 listOf(DEFAULT_MODULE_ID_2),
-                listOf(),
                 ""
             )
 
