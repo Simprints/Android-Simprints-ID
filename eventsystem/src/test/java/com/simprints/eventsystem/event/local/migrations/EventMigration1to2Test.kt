@@ -13,7 +13,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.domain.models.EnrolmentEventV1
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType
@@ -25,6 +24,7 @@ import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.eventsystem.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +32,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = EventSystemApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigration1to2Test {
 
     @get:Rule
