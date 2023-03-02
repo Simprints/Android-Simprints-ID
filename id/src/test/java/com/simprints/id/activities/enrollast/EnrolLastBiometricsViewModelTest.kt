@@ -3,6 +3,7 @@ package com.simprints.id.activities.enrollast
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
@@ -13,6 +14,8 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
+import com.simprints.id.exceptions.safe.DuplicateBiometricEnrolmentCheckFailed
+import com.simprints.id.exceptions.unexpected.MissingCaptureResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
@@ -22,9 +25,8 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.domain.models.Subject
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
+import com.simprints.infra.logging.Simber
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -78,6 +80,7 @@ class EnrolLastBiometricsViewModelTest {
 
     @Before
     fun setUp() {
+        mockkObject(Simber)
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
             every { fingerprint } returns mockk {
@@ -148,6 +151,7 @@ class EnrolLastBiometricsViewModelTest {
             )
 
             assertThat(viewModel.getViewStateLiveData().value).isEqualTo(Failed)
+            verify { Simber.i(any<DuplicateBiometricEnrolmentCheckFailed>()) }
         }
     }
 
@@ -190,6 +194,7 @@ class EnrolLastBiometricsViewModelTest {
             )
 
             assertThat(viewModel.getViewStateLiveData().value).isEqualTo(Failed)
+            verify { Simber.i(any<DuplicateBiometricEnrolmentCheckFailed>()) }
         }
     }
 
@@ -217,6 +222,61 @@ class EnrolLastBiometricsViewModelTest {
                 assertThat(this.value).isInstanceOf(Success::class.java)
                 assertThat((this.value as Success).newGuid).isEqualTo(newEnrolment.subjectId)
             }
+        }
+    }
+
+    @Test
+    fun fingerprintAndFaceWithEnrolmentPlus_processRequestWithHighConfidenceInPreviousSteps_shouldFail() {
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
+            val highConfidenceScore = 40f
+            viewModel.processEnrolLastBiometricsRequest(
+                EnrolLastBiometricsRequest(
+                    DEFAULT_PROJECT_ID,
+                    DEFAULT_USER_ID,
+                    DEFAULT_MODULE_ID,
+                    buildFaceMatchStepsWithConfidence(highConfidenceScore) +
+                        buildFingerprintMatchStepsWithConfidence(highConfidenceScore),
+                    GUID1
+                )
+            )
+
+            assertThat(viewModel.getViewStateLiveData().value).isEqualTo(Failed)
+            verify { Simber.i(any<DuplicateBiometricEnrolmentCheckFailed>()) }
+        }
+    }
+
+    @Test
+    fun requestWithNeitherFingerprintNorFaceMatchResponse_shouldFail() {
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
+            viewModel.processEnrolLastBiometricsRequest(
+                EnrolLastBiometricsRequest(
+                    DEFAULT_PROJECT_ID,
+                    DEFAULT_USER_ID,
+                    DEFAULT_MODULE_ID,
+                    listOf(),
+                    GUID1
+                )
+            )
+
+            assertThat(viewModel.getViewStateLiveData().value).isEqualTo(Failed)
+            verify { Simber.e(any<MissingCaptureResponse>()) }
+        }
+    }
+
+    @Test
+    fun exceptionDuringEnrolment_shouldFail() {
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns false
+            val exception = EnrolmentEventValidatorException()
+            coEvery { enrolHelper.enrol(any()) } throws exception
+            viewModel.processEnrolLastBiometricsRequest(
+                buildRequestWithFacePreviousStepsHavingAHighConfidence(30f)
+            )
+
+            assertThat(viewModel.getViewStateLiveData().value).isEqualTo(Failed)
+            verify { Simber.e(exception) }
         }
     }
 
