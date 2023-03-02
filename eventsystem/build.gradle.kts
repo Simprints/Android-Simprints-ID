@@ -74,6 +74,7 @@ dependencies {
     testImplementation(project(":testtools"))
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
+    testImplementation(libs.hilt.testing)
 
     androidTestImplementation(libs.testing.androidX.core.testing)
     androidTestImplementation(libs.testing.androidX.ext.junit)

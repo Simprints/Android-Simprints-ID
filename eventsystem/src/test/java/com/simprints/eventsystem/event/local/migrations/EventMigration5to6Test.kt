@@ -17,13 +17,13 @@ import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionState.CONNECTED
 import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionState.DISCONNECTED
 import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionType
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.spyk
 import io.mockk.verify
 import org.junit.Rule
@@ -33,7 +33,7 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = EventSystemApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigration5to6Test {
 
     @get:Rule

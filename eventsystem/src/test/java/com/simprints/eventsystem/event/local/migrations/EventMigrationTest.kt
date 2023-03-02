@@ -9,11 +9,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.EventSystemApplication
 import com.simprints.eventsystem.event.domain.models.Event
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.local.EventRoomDatabase
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ import java.io.File
  * new events create a new file in src/test/resources/all-events.
  */
 @RunWith(AndroidJUnit4::class)
-@Config(application = EventSystemApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigrationTest {
 
     @get:Rule
