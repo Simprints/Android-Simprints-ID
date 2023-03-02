@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-class EventRoomDaoTest {
+internal class EventRoomDaoTest {
 
     private val eventJson = """{"id": "anID", "payload": "a payload"}"""
     val event = DbEvent(

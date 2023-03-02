@@ -11,7 +11,7 @@ import com.simprints.infra.logging.Simber
  * query and close open sessions instead of reading all sessions and checking their is closed field
  * in the JSON payload.
  */
-class EventMigration2to3 : Migration(2, 3) {
+internal class EventMigration2to3 : Migration(2, 3) {
 
     private val sessionType = "SESSION_CAPTURE"
     private val idColumn = "id"

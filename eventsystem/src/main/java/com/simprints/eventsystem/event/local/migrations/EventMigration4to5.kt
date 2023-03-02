@@ -8,7 +8,7 @@ import com.simprints.infra.logging.Simber
  * This migration updates EventLabels payload, removing the parameter subjectId, as it is no longer
  * being used.
  */
-class EventMigration4to5: Migration(4, 5)  {
+internal class EventMigration4to5: Migration(4, 5)  {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 4 to schema 5.")

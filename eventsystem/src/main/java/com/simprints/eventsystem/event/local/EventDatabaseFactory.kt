@@ -1,6 +1,6 @@
 package com.simprints.eventsystem.event.local
 
-interface EventDatabaseFactory {
+internal interface EventDatabaseFactory {
     fun build(): EventRoomDatabase
     fun deleteDatabase()
     fun recreateDatabaseKey()

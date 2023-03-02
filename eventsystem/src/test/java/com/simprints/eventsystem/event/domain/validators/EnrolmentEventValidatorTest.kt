@@ -10,7 +10,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import org.junit.Before
 import org.junit.Test
 
-class EnrolmentEventValidatorTest {
+internal class EnrolmentEventValidatorTest {
 
     lateinit var validator: EnrolmentEventValidator
 

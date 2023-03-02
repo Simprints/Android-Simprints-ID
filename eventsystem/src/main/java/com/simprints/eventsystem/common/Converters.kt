@@ -8,7 +8,7 @@ import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState
 
-class Converters {
+internal class Converters {
 
     private val jsonHelper = JsonHelper
 

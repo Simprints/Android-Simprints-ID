@@ -1,6 +1,6 @@
 package com.simprints.id.secure.securitystate
 
-import com.simprints.eventsystem.event.local.EventLocalDataSource
+import com.simprints.eventsystem.event.EventRepository
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -11,7 +11,7 @@ import javax.inject.Inject
 class SecurityStateProcessorImpl @Inject constructor(
     private val imageRepository: ImageRepository,
     private val enrolmentRecordManager: EnrolmentRecordManager,
-    private val eventLocalDataSource: EventLocalDataSource,
+    private val eventRepository: EventRepository,
     private val signerManager: SignerManager
 ) : SecurityStateProcessor {
 
@@ -34,7 +34,7 @@ class SecurityStateProcessorImpl @Inject constructor(
 
     private suspend fun deleteLocalData() {
         imageRepository.deleteStoredImages()
-        eventLocalDataSource.deleteAll()
+        eventRepository.deleteAll()
         enrolmentRecordManager.deleteAll()
     }
 

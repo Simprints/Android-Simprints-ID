@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-class EventLocalDataSourceImplTest {
+internal class EventLocalDataSourceImplTest {
 
     private lateinit var db: EventRoomDatabase
     private lateinit var eventDao: EventRoomDao

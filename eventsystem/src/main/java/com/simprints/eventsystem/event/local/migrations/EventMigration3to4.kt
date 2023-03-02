@@ -12,7 +12,7 @@ import org.json.JSONObject
  * v1 to v2. In order to accommodate android API 30, we are removing the network type from the event
  * payload.
  */
-class EventMigration3to4 : Migration(3, 4) {
+internal class EventMigration3to4 : Migration(3, 4) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {

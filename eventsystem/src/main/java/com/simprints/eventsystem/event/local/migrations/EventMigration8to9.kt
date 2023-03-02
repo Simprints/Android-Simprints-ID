@@ -4,7 +4,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.simprints.infra.logging.Simber
 
-class EventMigration8to9 : Migration(8, 9) {
+internal class EventMigration8to9 : Migration(8, 9) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         Simber.d("Migrating room db from schema 8 to schema 9.")

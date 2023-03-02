@@ -11,7 +11,7 @@ import org.json.JSONObject
  *
  * Changes OneToOneMatchEvent by adding fingerComparisonStrategy to all fingerprint matching events
  */
-class EventMigration6to7 : Migration(6, 7) {
+internal class EventMigration6to7 : Migration(6, 7) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         try {

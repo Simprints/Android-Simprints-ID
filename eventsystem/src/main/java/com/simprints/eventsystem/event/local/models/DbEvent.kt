@@ -11,7 +11,7 @@ import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 
 @Entity
-data class DbEvent(
+internal data class DbEvent(
     @PrimaryKey var id: String,
 
     @Embedded var labels: EventLabels,
@@ -27,7 +27,7 @@ data class DbEvent(
     }
 }
 
-fun Event.fromDomainToDb(): DbEvent {
+internal fun Event.fromDomainToDb(): DbEvent {
     val sessionIsClosed =
         if (this is SessionCaptureEvent) this.payload.sessionIsClosed
         else false
@@ -43,5 +43,5 @@ fun Event.fromDomainToDb(): DbEvent {
     )
 }
 
-fun DbEvent.fromDbToDomain(): Event =
+internal fun DbEvent.fromDbToDomain(): Event =
     JsonHelper.fromJson(this.eventJson, object : TypeReference<Event>() {})
