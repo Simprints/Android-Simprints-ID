@@ -124,7 +124,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -138,7 +137,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = false
@@ -152,7 +150,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -167,7 +164,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -182,7 +178,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -204,7 +199,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         coEvery { eventRepository.observeLocalCount(any(), any()) }.returns(flowOf(2))
@@ -228,7 +222,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -250,7 +243,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -272,7 +264,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -294,7 +285,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -316,7 +306,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -338,7 +327,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true
@@ -363,7 +351,6 @@ class SyncViewModelTest {
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf("module 1"),
-            listOf(),
             ""
         )
         isConnected.value = true

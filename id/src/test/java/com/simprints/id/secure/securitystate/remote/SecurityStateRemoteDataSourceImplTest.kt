@@ -36,7 +36,6 @@ class SecurityStateRemoteDataSourceImplTest {
         coEvery { getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             listOf(),
-            listOf(),
             PREVIOUS_INSTRUCTION_ID
         )
     }

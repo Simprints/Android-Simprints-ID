@@ -251,27 +251,21 @@
     <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
     <string name="preference_logout_title">Log Out</string>
     <string name="preference_select_language_title">Language</string>
-    <string name="preference_select_fingers_title">Select default fingers</string>
+    <string name="preference_view_fingers_title">View default fingers</string>
     <string name="preference_select_modules_title">Select modules</string>
     <string name="preference_app_version_title">App Version</string>
     <string name="preference_sync_information_title">Sync Information</string>
     <string name="preference_scanner_version_title">Scanner Version</string>
     <string name="preference_device_id_title">Device ID</string>
-    <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
+    <string name="preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="preference_summary_sync_information">Further details on sync</string>
     <string name="preferences_general_key">preferences_general</string>
     <string name="preferences_app_details_key">app_details_key</string>
 
-    <!-- Finger Selection Activity -->
-    <string name="finger_selection_activity_title">Select Fingers</string>
-    <string name="finger_selection_confirm_dialog_text">Save settings?</string>
-    <string name="finger_selection_confirm_dialog_yes">Save</string>
-    <string name="finger_selection_confirm_dialog_no">Cancel</string>
+    <!-- View Fingers Activity -->
+    <string name="finger_selection_fragment_title">View Fingers</string>
     <string name="finger_selection_finger_label">Finger</string>
     <string name="finger_selection_quantity_label">Quantity</string>
-    <string name="finger_selection_reset">Reset</string>
-    <string name="finger_selection_add_finger">+ Add Finger</string>
-    <string name="finger_selection_invalid">Invalid Selection - there is more than 5 of one finger</string>
 
     <!--Sync Information Activity-->
     <string name="select_modules_button_title">Select modules</string>
