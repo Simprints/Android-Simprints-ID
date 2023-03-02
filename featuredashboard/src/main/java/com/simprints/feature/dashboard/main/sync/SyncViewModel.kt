@@ -2,16 +2,16 @@ package com.simprints.feature.dashboard.main.sync
 
 import androidx.lifecycle.*
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.EventRepository
-import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.events_sync.models.EventSyncState
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.feature.dashboard.main.sync.DashboardSyncCardState.*
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.events_sync.models.EventSyncState
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope

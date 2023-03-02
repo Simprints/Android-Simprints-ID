@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.eventsystem.event.domain.models.FingerComparisonStrategy as FingerComparisonStrategyDomain
+import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy as FingerComparisonStrategyDomain
 @Keep
 enum class FingerComparisonStrategy {
     SAME_FINGER,

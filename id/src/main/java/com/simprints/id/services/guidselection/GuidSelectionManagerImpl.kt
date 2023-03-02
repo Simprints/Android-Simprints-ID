@@ -2,10 +2,10 @@ package com.simprints.id.services.guidselection
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.EventRepository
-import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import kotlinx.coroutines.CoroutineScope

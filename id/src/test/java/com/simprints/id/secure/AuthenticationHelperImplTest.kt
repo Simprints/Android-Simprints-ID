@@ -3,8 +3,8 @@ package com.simprints.id.secure
 import com.google.android.play.core.integrity.model.IntegrityErrorCode
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.EventRepository
 import com.simprints.id.secure.models.AuthenticateDataResult
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
 import com.simprints.infra.login.exceptions.IntegrityServiceTemporaryDown

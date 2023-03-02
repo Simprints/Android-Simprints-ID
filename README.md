@@ -47,7 +47,6 @@ Following the guidelines above the end goal of SID should look roughly like:
 - featureabout (com.simprints.feature.about)
 - featureclientapi (com.simprints.feature.clientapi)
 - featuredashboard (com.simprints.feature.dashboard)
-- featureeventsystem (com.simprints.feature.eventsystem)
 - featureface (com.simprints.feature.face)
 - featurefingerprint (com.simprints.feature.fingerprint)
 - featurelogin (com.simprints.feature.login)
@@ -55,7 +54,7 @@ Following the guidelines above the end goal of SID should look roughly like:
 - id
 - infraconfig (com.simprints.infra.config)
 - infraenrolmentrecords (com.simprints.infra.enrolment.records)
-- infraeventsystem (com.simprints.infra.eventsystem)
+- infraevents (com.simprints.infra.events)
 - infrafacematcher_roc (com.simprints.infra.facematcher)
 - infrafingerprintmatcher (com.simprints.infra.fingerprintmatcher)
 - infrafingerprintscanner (com.simprints.infra.fingerprintscanner)

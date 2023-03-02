@@ -6,13 +6,13 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
-import com.simprints.eventsystem.EventRepository
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.events.EventRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
