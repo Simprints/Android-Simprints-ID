@@ -2,7 +2,7 @@ package com.simprints.id.services.sync.events.down
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.subject.*
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*

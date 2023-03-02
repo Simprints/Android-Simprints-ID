@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.event
+package com.simprints.eventsystem
 
 import android.os.Build
 import android.os.Build.VERSION
@@ -81,7 +81,7 @@ fun assertANewSessionCaptureWasAdded(event: Event): Boolean =
         event.payload.device == Device(
         VERSION.SDK_INT.toString(),
         Build.MANUFACTURER + "_" + Build.MODEL,
-        EventRepositoryImplTest.DEVICE_ID
+            EventRepositoryImplTest.DEVICE_ID
     ) &&
         event.payload.databaseInfo == DatabaseInfo(0) &&
         event.payload.endedAt == 0L &&

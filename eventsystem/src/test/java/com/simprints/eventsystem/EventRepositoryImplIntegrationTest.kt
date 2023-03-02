@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.event
+package com.simprints.eventsystem
 
 import android.content.Context
 import androidx.room.Room

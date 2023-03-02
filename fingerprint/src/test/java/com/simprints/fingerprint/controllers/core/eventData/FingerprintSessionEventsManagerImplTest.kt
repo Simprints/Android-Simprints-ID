@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
 import com.google.common.truth.Truth
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.Matcher

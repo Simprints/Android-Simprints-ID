@@ -3,6 +3,7 @@ package com.simprints.id.activities.fetchguid
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.eventsystem.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
@@ -39,7 +40,7 @@ class FetchGuidViewModelTest {
     private lateinit var deviceManager: DeviceManager
 
     @MockK
-    private lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    private lateinit var eventRepository: EventRepository
 
     @MockK
     private lateinit var timeHelper: TimeHelper

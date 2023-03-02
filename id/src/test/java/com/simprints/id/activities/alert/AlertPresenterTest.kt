@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.*
 import com.simprints.id.domain.alert.AlertType

@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
@@ -71,7 +72,7 @@ class PersonCreationEventHelperImplTest {
     )
 
     @MockK
-    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    lateinit var eventRepository: EventRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper

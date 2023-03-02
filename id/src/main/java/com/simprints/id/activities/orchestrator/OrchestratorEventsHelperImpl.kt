@@ -2,7 +2,7 @@ package com.simprints.id.activities.orchestrator
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.callback.*
 import com.simprints.eventsystem.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse

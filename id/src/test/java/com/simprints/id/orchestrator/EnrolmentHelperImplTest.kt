@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
 import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID

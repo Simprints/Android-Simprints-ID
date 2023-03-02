@@ -1,6 +1,6 @@
 package com.simprints.face.controllers.core.events
 
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.face.controllers.core.events.model.EventType
 import com.simprints.face.controllers.core.events.model.FaceOnboardingCompleteEvent as FaceEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceOnboardingCompleteEvent as CoreEvent

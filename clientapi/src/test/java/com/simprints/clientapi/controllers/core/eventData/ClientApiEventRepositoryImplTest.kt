@@ -3,7 +3,7 @@ package com.simprints.clientapi.controllers.core.eventData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_PROJECT_ID
 import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.NFC_NOT_ENABLED

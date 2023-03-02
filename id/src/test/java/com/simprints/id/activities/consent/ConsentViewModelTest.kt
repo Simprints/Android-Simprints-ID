@@ -2,7 +2,7 @@ package com.simprints.id.activities.consent
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.ConsentEvent
 import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.config.ConfigManager

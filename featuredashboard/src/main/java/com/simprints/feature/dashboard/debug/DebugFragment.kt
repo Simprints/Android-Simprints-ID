@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.feature.dashboard.R

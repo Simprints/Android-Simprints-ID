@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType

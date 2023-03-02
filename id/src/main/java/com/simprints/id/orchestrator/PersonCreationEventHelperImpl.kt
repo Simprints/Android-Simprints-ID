@@ -7,7 +7,7 @@ import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent

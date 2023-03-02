@@ -1,7 +1,7 @@
 package com.simprints.clientapi.controllers.core.eventData
 
 import com.google.common.truth.Truth
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery

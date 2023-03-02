@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.EnrolmentEventV2
 import com.simprints.eventsystem.event.domain.models.PersonCreationEvent
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
