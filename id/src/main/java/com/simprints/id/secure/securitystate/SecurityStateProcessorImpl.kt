@@ -1,6 +1,6 @@
 package com.simprints.id.secure.securitystate
 
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager

@@ -1,7 +1,7 @@
 package com.simprints.id.services.sync.events.up
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
 import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*

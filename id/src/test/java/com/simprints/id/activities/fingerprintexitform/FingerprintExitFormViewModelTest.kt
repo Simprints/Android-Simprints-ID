@@ -1,6 +1,6 @@
 package com.simprints.id.activities.fingerprintexitform
 
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.RefusalEvent
 import com.simprints.id.data.exitform.FingerprintExitFormReason
 import com.simprints.id.data.exitform.toRefusalEventAnswer

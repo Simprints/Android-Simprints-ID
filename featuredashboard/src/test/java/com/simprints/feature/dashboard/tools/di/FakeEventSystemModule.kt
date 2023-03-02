@@ -1,7 +1,7 @@
 package com.simprints.feature.dashboard.tools.di
 
 import com.simprints.eventsystem.EventSystemModule
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import dagger.Module

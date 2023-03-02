@@ -3,7 +3,7 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.lifecycle.*
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository

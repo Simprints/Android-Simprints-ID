@@ -1,4 +1,4 @@
-package com.simprints.eventsystem.event
+package com.simprints.eventsystem
 
 import com.simprints.eventsystem.event.domain.EventCount
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent

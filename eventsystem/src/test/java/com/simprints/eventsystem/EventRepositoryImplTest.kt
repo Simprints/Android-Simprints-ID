@@ -1,11 +1,11 @@
-package com.simprints.eventsystem.event
+package com.simprints.eventsystem
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
-import com.simprints.eventsystem.event.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
+import com.simprints.eventsystem.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
+import com.simprints.eventsystem.EventRepositoryImpl.Companion.SESSION_BATCH_SIZE
 import com.simprints.eventsystem.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.eventsystem.event.domain.models.EventLabels
 import com.simprints.eventsystem.event.domain.models.EventType

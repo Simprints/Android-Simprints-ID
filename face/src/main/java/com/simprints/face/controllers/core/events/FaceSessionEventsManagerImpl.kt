@@ -2,7 +2,7 @@ package com.simprints.face.controllers.core.events
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.EventType.*
 import kotlinx.coroutines.CoroutineScope

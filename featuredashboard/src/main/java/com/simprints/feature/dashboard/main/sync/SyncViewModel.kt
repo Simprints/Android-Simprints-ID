@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.main.sync
 
 import androidx.lifecycle.*
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.EventType
 import com.simprints.eventsystem.events_sync.models.EventSyncState
 import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState

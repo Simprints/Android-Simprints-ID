@@ -2,7 +2,7 @@ package com.simprints.id.services.guidselection
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.GuidSelectionEvent
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest

@@ -6,7 +6,7 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.eventsystem.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo

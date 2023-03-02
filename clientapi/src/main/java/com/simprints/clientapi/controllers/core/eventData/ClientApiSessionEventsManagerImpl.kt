@@ -6,7 +6,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.eventsystem.EventRepository
 import com.simprints.eventsystem.event.domain.models.*
 import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent

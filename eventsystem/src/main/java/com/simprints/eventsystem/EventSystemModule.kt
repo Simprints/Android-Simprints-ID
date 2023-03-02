@@ -1,8 +1,6 @@
 package com.simprints.eventsystem
 
 import android.content.Context
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.EventRepositoryImpl
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.eventsystem.event.domain.validators.SessionEventValidatorsFactoryImpl
 import com.simprints.eventsystem.event.local.*
