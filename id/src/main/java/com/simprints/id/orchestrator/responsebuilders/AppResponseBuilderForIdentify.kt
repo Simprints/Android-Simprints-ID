@@ -30,11 +30,15 @@ class AppResponseBuilderForIdentify(private val projectConfiguration: ProjectCon
 
         val results = steps.map { it.getResult() }
         val faceResponse = getFaceResponseForIdentify(results)
-        val fingerprintResponse = getFingerprintResponseForMatching(results)
+        val fingerprintResponse = getFingerprintResponseForIdentify(results)
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
-                buildAppIdentifyResponseForFaceAndFinger(fingerprintResponse, sessionId)
+                buildAppIdentifyResponseForFingerprintAndFace(
+                    fingerprintResponse,
+                    faceResponse,
+                    sessionId
+                )
             }
             fingerprintResponse != null -> {
                 buildAppIdentifyResponseForFingerprint(fingerprintResponse, sessionId)
@@ -49,38 +53,39 @@ class AppResponseBuilderForIdentify(private val projectConfiguration: ProjectCon
     private fun getFaceResponseForIdentify(results: List<Step.Result?>): FaceMatchResponse? =
         results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
 
-    private fun getFingerprintResponseForMatching(results: List<Step.Result?>): FingerprintMatchResponse? =
+    private fun getFingerprintResponseForIdentify(results: List<Step.Result?>): FingerprintMatchResponse? =
         results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
-    private fun buildAppIdentifyResponseForFaceAndFinger(
+    private fun buildAppIdentifyResponseForFingerprintAndFace(
         fingerprintResponse: FingerprintMatchResponse,
+        faceResponse: FaceMatchResponse,
         sessionId: String
-    ) =
-        AppIdentifyResponse(
-            getSortedIdentificationsForFingerprint(fingerprintResponse),
-            sessionId
-        )
+    ): AppIdentifyResponse {
+        val fingerprintResultSortedByConfidence = buildResultsFromFingerprintMatchResponse(fingerprintResponse)
+        val faceResultsSortedByConfidence = buildResultsFromFaceMatchResponse(faceResponse)
+        val bestFingerprintCandidate = fingerprintResultSortedByConfidence.first()
+        val bestFaceCandidate = faceResultsSortedByConfidence.first()
 
-    private fun getSortedIdentificationsForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
-        fingerprintResponse.result.map {
-            MatchResult(
-                it.personId,
-                it.confidenceScore.toInt(),
-                Tier.computeTier(it.confidenceScore),
-                computeMatchConfidence(
-                    it.confidenceScore.toInt(),
-                    projectConfiguration.fingerprint!!.decisionPolicy
-                )
-            )
+        return if (bestFingerprintCandidate.confidenceScore > bestFaceCandidate.confidence) {
+            buildAppIdentifyResponseForFingerprint(fingerprintResultSortedByConfidence, sessionId)
+        } else {
+            buildAppIdentifyResponseForFace(faceResultsSortedByConfidence, sessionId)
         }
+    }
 
     private fun buildAppIdentifyResponseForFingerprint(
         fingerprintResponse: FingerprintMatchResponse,
         sessionId: String
     ): AppIdentifyResponse {
         val resultSortedByConfidence = buildResultsFromFingerprintMatchResponse(fingerprintResponse)
+        return buildAppIdentifyResponseForFingerprint(resultSortedByConfidence, sessionId)
+    }
 
-        return AppIdentifyResponse(resultSortedByConfidence.map {
+    private fun buildAppIdentifyResponseForFingerprint(
+        resultSortedByConfidence: List<FingerprintMatchResult>,
+        sessionId: String
+    ) = AppIdentifyResponse(
+        resultSortedByConfidence.map {
             MatchResult(
                 it.personId,
                 it.confidenceScore.toInt(),
@@ -90,30 +95,35 @@ class AppResponseBuilderForIdentify(private val projectConfiguration: ProjectCon
                     projectConfiguration.fingerprint!!.decisionPolicy
                 )
             )
-        }, sessionId)
-    }
+        },
+        sessionId
+    )
 
     private fun buildAppIdentifyResponseForFace(
         faceResponse: FaceMatchResponse,
         sessionId: String
     ): AppIdentifyResponse {
         val resultsSortedByConfidence = buildResultsFromFaceMatchResponse(faceResponse)
-
-        return AppIdentifyResponse(
-            resultsSortedByConfidence.map {
-                MatchResult(
-                    it.guidFound,
-                    it.confidence.toInt(),
-                    Tier.computeTier(it.confidence),
-                    computeMatchConfidence(
-                        it.confidence.toInt(),
-                        projectConfiguration.face!!.decisionPolicy
-                    )
-                )
-            },
-            sessionId
-        )
+        return buildAppIdentifyResponseForFace(resultsSortedByConfidence, sessionId)
     }
+
+    private fun buildAppIdentifyResponseForFace(
+        resultsSortedByConfidence: List<FaceMatchResult>,
+        sessionId: String
+    ) = AppIdentifyResponse(
+        resultsSortedByConfidence.map {
+            MatchResult(
+                it.guidFound,
+                it.confidence.toInt(),
+                Tier.computeTier(it.confidence),
+                computeMatchConfidence(
+                    it.confidence.toInt(),
+                    projectConfiguration.face!!.decisionPolicy
+                )
+            )
+        },
+        sessionId
+    )
 
     private fun buildResultsFromFingerprintMatchResponse(fingerprintResponse: FingerprintMatchResponse): List<FingerprintMatchResult> {
 
