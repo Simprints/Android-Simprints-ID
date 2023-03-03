@@ -10,8 +10,8 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GetTokenResult
-import com.google.firebase.internal.api.FirebaseNoSignedInUserException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import com.simprints.infra.login.domain.LoginInfoManager
@@ -37,10 +37,11 @@ class FirebaseManagerImplTest {
 
     private val firebaseAuth = mockk<FirebaseAuth>(relaxed = true)
     private val firebaseApp = mockk<FirebaseApp>(relaxed = true)
+    private val firebaseUser = mockk<FirebaseUser>(relaxed = true)
     private val loginInfoManager = mockk<LoginInfoManager>(relaxed = true)
     private val context = mockk<Context>(relaxed = true)
     private val firebaseOptionsBuilder = mockk<FirebaseOptions.Builder>(relaxed = true)
-    private val firebaseManagerImpl = FirebaseManagerImpl(loginInfoManager, context)
+    private val firebaseManagerImpl = FirebaseManagerImpl(loginInfoManager, context, UnconfinedTestDispatcher())
 
     @Before
     fun setUp() {
@@ -127,7 +128,8 @@ class FirebaseManagerImplTest {
     @Test
     fun `getCurrentToken throws NetworkConnectionException if Firebase throws FirebaseNetworkException`() {
         runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.getAccessToken(any()) } throws FirebaseNetworkException("Failed")
+            every { firebaseAuth.currentUser } returns firebaseUser
+            every { firebaseUser.getIdToken(any()) } throws FirebaseNetworkException("Failed")
             assertThrows<NetworkConnectionException> { firebaseManagerImpl.getCurrentToken() }
         }
     }
@@ -135,7 +137,8 @@ class FirebaseManagerImplTest {
     @Test
     fun `getCurrentToken throws NetworkConnectionException if Firebase throws ApiException`() {
         runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.getAccessToken(any()) } throws ApiException(Status.RESULT_TIMEOUT)
+            every { firebaseAuth.currentUser } returns firebaseUser
+            every { firebaseUser.getIdToken(any()) } throws ApiException(Status.RESULT_TIMEOUT)
             assertThrows<NetworkConnectionException> { firebaseManagerImpl.getCurrentToken() }
         }
     }
@@ -143,16 +146,15 @@ class FirebaseManagerImplTest {
     @Test
     fun `getCurrentToken throws RemoteDbNotSignedInException if FirebaseNoSignedInUserException`() {
         runTest(UnconfinedTestDispatcher()) {
-            every { firebaseAuth.getAccessToken(any()) } throws FirebaseNoSignedInUserException("Failed")
+            every { firebaseAuth.currentUser } returns null
             assertThrows<RemoteDbNotSignedInException> { firebaseManagerImpl.getCurrentToken() }
         }
     }
 
     @Test
     fun `getCurrentToken success`() = runBlocking {
-        every {
-            firebaseAuth.getAccessToken(any())
-        } returns Tasks.forResult(GetTokenResult("Token", HashMap()))
+        every { firebaseAuth.currentUser } returns firebaseUser
+        every { firebaseUser.getIdToken(any()) } returns Tasks.forResult(GetTokenResult("Token", HashMap()))
 
         val result = firebaseManagerImpl.getCurrentToken()
         assertThat(result).isEqualTo("Token")
