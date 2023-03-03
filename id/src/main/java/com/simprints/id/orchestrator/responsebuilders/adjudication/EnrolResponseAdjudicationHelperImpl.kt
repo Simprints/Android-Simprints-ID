@@ -15,14 +15,18 @@ class EnrolResponseAdjudicationHelperImpl @Inject constructor(): EnrolResponseAd
         if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
             val results = steps.map { it.getResult() }
             val faceResponse = getFaceMatchResponseFromResultsOrNull(results)
-            val fingerResponse = getFingerMatchResponseFromResultsOrNull(results)
+            val fingerprintResponse = getFingerprintMatchResponseFromResultsOrNull(results)
 
             return when {
-                fingerResponse != null && faceResponse != null -> {
-                    performAdjudicationForFingerprint(projectConfiguration, fingerResponse)
+                fingerprintResponse != null && faceResponse != null -> {
+                    performAdjudicationForFingerprintAndFace(
+                        projectConfiguration,
+                        fingerprintResponse,
+                        faceResponse
+                    )
                 }
-                fingerResponse != null -> {
-                    performAdjudicationForFingerprint(projectConfiguration, fingerResponse)
+                fingerprintResponse != null -> {
+                    performAdjudicationForFingerprint(projectConfiguration, fingerprintResponse)
                 }
                 faceResponse != null -> {
                     performAdjudicationForFace(projectConfiguration, faceResponse)
@@ -35,11 +39,30 @@ class EnrolResponseAdjudicationHelperImpl @Inject constructor(): EnrolResponseAd
         }
     }
 
-    private fun getFingerMatchResponseFromResultsOrNull(results: List<Step.Result?>) =
+    private fun getFingerprintMatchResponseFromResultsOrNull(results: List<Step.Result?>) =
         results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
     private fun getFaceMatchResponseFromResultsOrNull(results: List<Step.Result?>) =
         results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
+
+    private fun performAdjudicationForFingerprintAndFace(
+        projectConfiguration: ProjectConfiguration,
+        fingerprintResponse: FingerprintMatchResponse,
+        faceResponse: FaceMatchResponse
+    ): EnrolAdjudicationAction {
+        val fingerprintAdjudication = performAdjudicationForFingerprint(
+            projectConfiguration,
+            fingerprintResponse
+        )
+        val faceAdjudication = performAdjudicationForFace(projectConfiguration, faceResponse)
+        return if (fingerprintAdjudication == EnrolAdjudicationAction.ENROL &&
+            faceAdjudication == EnrolAdjudicationAction.ENROL
+        ) {
+            EnrolAdjudicationAction.ENROL
+        } else {
+            EnrolAdjudicationAction.IDENTIFY
+        }
+    }
 
     private fun performAdjudicationForFingerprint(
         projectConfiguration: ProjectConfiguration,
