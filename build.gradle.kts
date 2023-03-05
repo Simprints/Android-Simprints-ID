@@ -73,7 +73,7 @@ tasks.register("clean", Delete::class) {
 }
 
 plugins {
-    id("org.gradle.test-retry") version "1.5.1"
+    id("org.gradle.test-retry") version "1.5.2"
 }
 
 /*
