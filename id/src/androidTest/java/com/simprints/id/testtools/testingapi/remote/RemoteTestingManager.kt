@@ -1,8 +1,8 @@
 package com.simprints.id.testtools.testingapi.remote
 
 import android.content.Context
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.testtools.testingapi.models.*
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 
 interface RemoteTestingManager {
 

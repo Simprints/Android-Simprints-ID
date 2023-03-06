@@ -6,22 +6,22 @@ import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.*
-import com.simprints.eventsystem.event.domain.models.callback.IdentificationCallbackEvent
-import com.simprints.eventsystem.event.domain.models.callout.EnrolmentCalloutEvent
-import com.simprints.eventsystem.event.domain.models.callout.IdentificationCalloutEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.canCoSyncAllData
 import com.simprints.infra.config.domain.models.canCoSyncAnalyticsData
 import com.simprints.infra.config.domain.models.canCoSyncBiometricData
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.*
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl @Inject constructor(
     private val coreEventRepository: EventRepository,

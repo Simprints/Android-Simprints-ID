@@ -12,14 +12,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.eventsystem.event.local.EventLocalDataSource
-import com.simprints.eventsystem.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.events_sync.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -44,7 +44,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var securityStateScheduler: SecurityStateScheduler
 
     @Inject
-    lateinit var eventLocalDataSource: EventLocalDataSource
+    lateinit var eventRepository: EventRepository
 
     @Inject
     lateinit var enrolmentRecordManager: EnrolmentRecordManager
@@ -115,7 +115,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
                 val logStringBuilder = StringBuilder()
                 logStringBuilder.append("\nSubjects ${enrolmentRecordManager.count()}")
 
-                val events = eventLocalDataSource.loadAll().toList().groupBy { it.type }
+                val events = eventRepository.loadAll().toList().groupBy { it.type }
                 events.forEach {
                     logStringBuilder.append("\n${it.key} ${it.value.size}")
                 }
@@ -128,7 +128,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             lifecycleScope.launch(dispatcher) {
                 eventSyncManager.cancelScheduledSync()
                 eventSyncManager.stop()
-                eventLocalDataSource.deleteAll()
+                eventRepository.deleteAll()
                 dbEventDownSyncOperationStateDao.deleteAll()
                 enrolmentRecordManager.deleteAll()
                 wm.pruneWork()

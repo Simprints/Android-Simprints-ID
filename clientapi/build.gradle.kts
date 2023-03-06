@@ -44,7 +44,7 @@ dependencies {
     implementation(project(":infralogging"))
     api(project(":infrasecurity"))
     api(project(":core"))
-    api(project(":eventsystem"))
+    api(project(":infraevents"))
     implementation(project(":infraresources"))
 
     api(libs.libsimprints)

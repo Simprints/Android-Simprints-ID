@@ -2,13 +2,13 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposi
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.modality.Modes
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

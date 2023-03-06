@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import java.io.Serializable
-import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent as CoreOneToOneMatchEvent
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
 /**
  * This class represents a verification match event (i.e. a one-to-one match event).

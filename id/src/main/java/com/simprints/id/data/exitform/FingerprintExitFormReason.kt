@@ -1,6 +1,6 @@
 package com.simprints.id.data.exitform
 
-import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer
 
 enum class FingerprintExitFormReason {
     REFUSED_RELIGION,

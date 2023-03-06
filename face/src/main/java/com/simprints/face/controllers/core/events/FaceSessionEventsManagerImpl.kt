@@ -2,14 +2,14 @@ package com.simprints.face.controllers.core.events
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.face.controllers.core.events.model.*
 import com.simprints.face.controllers.core.events.model.EventType.*
+import com.simprints.infra.events.EventRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
-import com.simprints.eventsystem.event.domain.models.Event as CoreEvent
+import com.simprints.infra.events.event.domain.models.Event as CoreEvent
 
 class FaceSessionEventsManagerImpl @Inject constructor(
     private val eventRepository: EventRepository,

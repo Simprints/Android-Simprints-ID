@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
@@ -12,6 +11,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.logging.Simber
 
 class AppResponseBuilderForEnrol(
     private val enrolmentHelper: EnrolmentHelper,
@@ -46,7 +46,8 @@ class AppResponseBuilderForEnrol(
         return try {
             enrolmentHelper.enrol(subject)
             AppEnrolResponse(subject.subjectId)
-        } catch (e: EnrolmentEventValidatorException) {
+        } catch (e: Exception) {
+            Simber.i(e)
             AppErrorResponse(AppErrorResponse.Reason.UNEXPECTED_ERROR)
         }
 
