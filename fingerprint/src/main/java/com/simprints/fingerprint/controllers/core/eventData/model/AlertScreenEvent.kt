@@ -3,8 +3,8 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 import androidx.annotation.Keep
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent as CoreAlertScreenEvent
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent as CoreAlertScreenEvent
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 /**
  * This class represents an event that occurs as a result of an alert screen being presented to the

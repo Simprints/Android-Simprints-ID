@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.image
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.EventRepository
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef

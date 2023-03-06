@@ -2,8 +2,6 @@ package com.simprints.id.activities.alert
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.AlertScreenEvent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertActivityViewModel.ButtonAction
 import com.simprints.id.domain.alert.AlertActivityViewModel.ENROLMENT_LAST_BIOMETRICS_FAILED
@@ -14,6 +12,8 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FACE
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.resources.R
@@ -71,10 +71,7 @@ class AlertPresenter @AssistedInject constructor(
         view.setAlertTitleWithStringRes(alertViewModel.title)
         view.setAlertImageWithDrawableId(alertViewModel.mainDrawable)
         view.setAlertHintImageWithDrawableId(alertViewModel.hintDrawable)
-        view.setAlertMessageWithStringRes(
-            alertViewModel.message,
-            getParamsForMessageString().toTypedArray()
-        )
+        view.setAlertMessageWithStringRes(alertViewModel.message, getParamsForMessageString().toTypedArray())
     }
 
     private fun getParamsForMessageString(): List<Any> {
@@ -107,12 +104,7 @@ class AlertPresenter @AssistedInject constructor(
         }
     }
 
-    private fun List<Modality>.isFingerprintAndFace() = containsAll(
-        listOf(
-            FACE,
-            FINGERPRINT
-        )
-    )
+    private fun List<Modality>.isFingerprintAndFace() = containsAll(listOf(FACE, FINGERPRINT))
 
     private fun List<Modality>.isFingerprint() = contains(FINGERPRINT) && this.size == 1
     private fun List<Modality>.isFace() = contains(FACE) && this.size == 1

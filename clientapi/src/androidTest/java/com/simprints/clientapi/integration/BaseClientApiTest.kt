@@ -8,8 +8,8 @@ import android.os.Parcelable
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.moduleapi.app.responses.IAppResponse
 import io.mockk.coEvery
 import io.mockk.every

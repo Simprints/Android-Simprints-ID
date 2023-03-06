@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.face.exceptions.FaceUnexpectedException
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import java.io.Serializable
-import com.simprints.eventsystem.event.domain.models.OneToOneMatchEvent as CoreOneToOneMatchEvent
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
 @Keep
 class OneToOneMatchEvent(

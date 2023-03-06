@@ -10,8 +10,6 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
@@ -19,6 +17,8 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAU
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.EventUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
+import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation
+import com.simprints.infra.events.events_sync.up.domain.EventUpSyncScope
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException

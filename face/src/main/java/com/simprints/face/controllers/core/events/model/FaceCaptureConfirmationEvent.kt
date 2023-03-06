@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent as CoreFaceCaptureConfirmationEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result as CoreFaceCaptureConfirmationEventResult
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent as CoreFaceCaptureConfirmationEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result as CoreFaceCaptureConfirmationEventResult
 
 class FaceCaptureConfirmationEvent(
     startTime: Long,

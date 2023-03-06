@@ -67,7 +67,7 @@ dependencies {
 
     // Simprints
     api(project(":core"))
-    api(project(":eventsystem"))
+    api(project(":infraevents"))
     api(project(":infraenrolmentrecords"))
     api(project(":fingerprintmatcher"))
     api(project(":fingerprintscanner"))

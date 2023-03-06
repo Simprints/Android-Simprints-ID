@@ -3,9 +3,6 @@ package com.simprints.id.orchestrator.steps
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID2
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.data.exitform.FaceExitFormReason
 import com.simprints.id.data.exitform.FingerprintExitFormReason
@@ -16,6 +13,9 @@ import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
