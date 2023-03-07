@@ -8,7 +8,7 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.events_sync.models.EventSyncState
 import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
@@ -29,7 +29,7 @@ internal class SyncViewModel @Inject constructor(
     private val cacheSync: EventSyncCache,
     private val timeHelper: TimeHelper,
     private val loginManager: LoginManager,
-    private val eventRepository: EventRepository,
+    private val eventSyncRepository: EventSyncRepository,
 ) : ViewModel() {
 
     companion object {
@@ -117,8 +117,8 @@ internal class SyncViewModel @Inject constructor(
             configManager.getProjectConfiguration().also { configuration ->
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
-            eventRepository
-                .observeLocalCount(loginManager.getSignedInProjectIdOrEmpty(), EventType.ENROLMENT_V2)
+            eventSyncRepository
+                .countEventsToUpload(loginManager.getSignedInProjectIdOrEmpty(), EventType.ENROLMENT_V2)
                 .collect { upSyncCountLiveData.postValue(it) }
         }
 

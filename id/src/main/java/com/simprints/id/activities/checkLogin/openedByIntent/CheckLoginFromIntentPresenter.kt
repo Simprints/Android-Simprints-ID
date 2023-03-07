@@ -296,7 +296,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             currentSessionEvent.updateModalities(projectConfiguration.general.modalities)
             eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
-        val associatedEvents = eventRepository.getEventsFromSession(currentSessionEvent.id)
+        val associatedEvents = eventRepository.observeEventsFromSession(currentSessionEvent.id)
         associatedEvents.collect {
             it.labels = it.labels.copy(projectId = signedProjectId)
             eventRepository.addOrUpdateEvent(it)

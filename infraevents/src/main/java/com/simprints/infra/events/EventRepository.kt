@@ -1,15 +1,10 @@
 package com.simprints.infra.events
 
-import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
-import com.simprints.infra.events.events_sync.down.domain.RemoteEventQuery
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 
 
@@ -32,35 +27,25 @@ interface EventRepository {
      */
     suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent
 
-    suspend fun getEventsFromSession(sessionId: String): Flow<Event>
+    suspend fun observeEventsFromSession(sessionId: String): Flow<Event>
+
+    suspend fun getAllClosedSessionIds(projectId: String): List<String>
+
+    suspend fun getEventsFromSession(sessionId: String): List<Event>
+
+    suspend fun getEventsJsonFromSession(sessionId: String): List<String>
+
+    suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int>
+
+    suspend fun loadAll(): Flow<Event>
 
     suspend fun addOrUpdateEvent(event: Event)
 
-    fun uploadEvents(
-        projectId: String,
-        canSyncAllDataToSimprints: Boolean,
-        canSyncBiometricDataToSimprints: Boolean,
-        canSyncAnalyticsDataToSimprints: Boolean
-    ): Flow<Int>
-
-    suspend fun localCount(projectId: String): Int
-
-    suspend fun localCount(projectId: String, type: EventType): Int
-
-    suspend fun observeLocalCount(projectId: String, type: EventType): Flow<Int>
-
-    suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount>
-
-    suspend fun downloadEvents(
-        scope: CoroutineScope,
-        query: RemoteEventQuery
-    ): ReceiveChannel<EnrolmentRecordEvent>
+    suspend fun removeLocationDataFromCurrentSession()
 
     suspend fun deleteSessionEvents(sessionId: String)
 
-    suspend fun removeLocationDataFromCurrentSession()
-
-    suspend fun loadAll(): Flow<Event>
+    suspend fun delete(eventIds: List<String>)
 
     suspend fun deleteAll()
 }

@@ -44,6 +44,9 @@ internal interface EventRoomDao {
     @Query("select count(*) from DbEvent where type = :type")
     suspend fun countFromType(type: EventType): Int
 
+    @Query("select count(*) from DbEvent where projectId = :projectId")
+    fun observeCount(projectId: String): Flow<Int>
+
     @Query("select count(*) from DbEvent where projectId = :projectId and type = :type")
     fun observeCountFromType(projectId: String, type: EventType): Flow<Int>
 

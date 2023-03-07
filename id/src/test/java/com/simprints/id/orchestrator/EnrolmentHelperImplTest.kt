@@ -6,6 +6,7 @@ import com.simprints.id.tools.mockUUID
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -33,6 +34,9 @@ class EnrolmentHelperImplTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
+    lateinit var eventSyncRepository: EventSyncRepository
+
+    @MockK
     lateinit var timeHelper: TimeHelper
 
     private lateinit var enrolmentHelper: EnrolmentHelper
@@ -45,7 +49,7 @@ class EnrolmentHelperImplTest {
         enrolmentHelper = EnrolmentHelperImpl(enrolmentRecordManager, eventRepository, timeHelper)
         every { timeHelper.now() } returns CREATED_AT
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-        coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(personCreationEvent)
+        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(personCreationEvent)
 
         mockUUID()
     }
@@ -103,7 +107,7 @@ class EnrolmentHelperImplTest {
             )
         }
         coVerify(exactly = 0) {
-            eventRepository.uploadEvents(
+            eventSyncRepository.uploadEvents(
                 projectId = DEFAULT_PROJECT_ID,
                 canSyncAllDataToSimprints = false,
                 canSyncBiometricDataToSimprints = false,

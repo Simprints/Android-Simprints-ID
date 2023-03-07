@@ -11,7 +11,7 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.events_sync.models.EventSyncState
 import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
 import com.simprints.infra.events.events_sync.models.EventSyncWorkerType
@@ -66,7 +66,7 @@ class SyncViewModelTest {
     private val loginManager = mockk<LoginManager>(){
         every { getSignedInProjectIdOrEmpty() } returns "projectId"
     }
-    private val eventRepository = mockk<EventRepository>()
+    private val eventSyncRepository = mockk<EventSyncRepository>()
 
     @Test
     fun `should initialize the live data syncToBFSIDAllowed correctly`() {
@@ -201,7 +201,7 @@ class SyncViewModelTest {
             listOf("module 1"),
             ""
         )
-        coEvery { eventRepository.observeLocalCount(any(), any()) }.returns(flowOf(2))
+        coEvery { eventSyncRepository.countEventsToUpload(any(), any()) }.returns(flowOf(2))
 
         isConnected.value = true
         syncState.value = EventSyncState(
@@ -375,6 +375,6 @@ class SyncViewModelTest {
             cacheSync,
             timeHelper,
             loginManager,
-            eventRepository,
+            eventSyncRepository,
         )
 }

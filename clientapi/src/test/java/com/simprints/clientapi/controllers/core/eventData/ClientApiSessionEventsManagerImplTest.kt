@@ -37,7 +37,7 @@ class ClientApiSessionEventsManagerImplTest {
     fun `test isSessionHasIdentificationCallback return true if session has IdentificationCallbackEvent`() =
         runTest {
             // Given
-            coEvery { coreEventRepository.getEventsFromSession(sessionId) } returns flowOf(
+            coEvery { coreEventRepository.observeEventsFromSession(sessionId) } returns flowOf(
                 mockk(), mockk(), mockk<IdentificationCallbackEvent>()
             )
             // When
@@ -50,7 +50,7 @@ class ClientApiSessionEventsManagerImplTest {
     fun `test isSessionHasIdentificationCallback return false if session doesn't have IdentificationCallbackEvent`() =
         runTest {
             // Given
-            coEvery { coreEventRepository.getEventsFromSession(sessionId) } returns flowOf(
+            coEvery { coreEventRepository.observeEventsFromSession(sessionId) } returns flowOf(
                 mockk(), mockk(), mockk()
             )
             // When
@@ -63,7 +63,7 @@ class ClientApiSessionEventsManagerImplTest {
     fun `test isSessionHasIdentificationCallback return false if session events is empty`() =
         runTest {
             // Given
-            coEvery { coreEventRepository.getEventsFromSession(sessionId) } returns emptyFlow()
+            coEvery { coreEventRepository.observeEventsFromSession(sessionId) } returns emptyFlow()
             // When
             val result = clientApiSessionEventsManager.isSessionHasIdentificationCallback(sessionId)
             //Then

@@ -12,7 +12,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
@@ -29,6 +29,7 @@ import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,7 +50,7 @@ class SyncInfoViewModelTest {
     private lateinit var configManager: ConfigManager
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventSyncRepository: EventSyncRepository
 
     @MockK
     private lateinit var enrolmentRecordManager: EnrolmentRecordManager
@@ -89,7 +90,7 @@ class SyncInfoViewModelTest {
         viewModel = SyncInfoViewModel(
             configManager,
             deviceManager,
-            eventRepository,
+            eventSyncRepository,
             enrolmentRecordManager,
             loginManager,
             eventDownSyncScopeRepository,
@@ -121,7 +122,9 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the recordsToUpSync live data correctly`() {
         val number = 10
-        coEvery { eventRepository.localCount(PROJECT_ID, EventType.ENROLMENT_V2) } returns number
+        coEvery {
+            eventSyncRepository.countEventsToUpload(PROJECT_ID, EventType.ENROLMENT_V2)
+        } returns flowOf(number)
 
         viewModel.refreshInformation()
 
@@ -203,7 +206,7 @@ class SyncInfoViewModelTest {
         )
 
         coEvery {
-            eventRepository.countEventsToDownload(
+            eventSyncRepository.countEventsToDownload(
                 RemoteEventQuery(
                     PROJECT_ID,
                     moduleIds = listOf(module1),
@@ -215,7 +218,7 @@ class SyncInfoViewModelTest {
             EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, deletionForModule1),
         )
         coEvery {
-            eventRepository.countEventsToDownload(
+            eventSyncRepository.countEventsToDownload(
                 RemoteEventQuery(
                     PROJECT_ID,
                     moduleIds = listOf(module2),

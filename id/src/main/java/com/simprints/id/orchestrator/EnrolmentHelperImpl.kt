@@ -41,7 +41,7 @@ class EnrolmentHelperImpl @Inject constructor(
         Simber.tag(TAG).d("Register events for enrolments")
 
         val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
-        val personCreationEvent = eventRepository.getEventsFromSession(currentSession)
+        val personCreationEvent = eventRepository.observeEventsFromSession(currentSession)
             .filterIsInstance<PersonCreationEvent>().first()
 
         eventRepository.addOrUpdateEvent(
