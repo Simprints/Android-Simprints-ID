@@ -2,7 +2,7 @@ package com.simprints.id.services.sync.events.master.models
 
 import androidx.work.WorkInfo
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import org.junit.Test
 
 class EventSyncWorkerStateTest {

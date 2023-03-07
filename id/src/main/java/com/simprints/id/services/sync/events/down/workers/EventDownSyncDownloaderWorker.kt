@@ -14,9 +14,9 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.sync.events.master.internal.*
-import com.simprints.infra.events.remote.exceptions.TooManyRequestsException
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation
+import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException

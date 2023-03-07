@@ -5,7 +5,7 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.Simber

@@ -18,8 +18,8 @@ import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher

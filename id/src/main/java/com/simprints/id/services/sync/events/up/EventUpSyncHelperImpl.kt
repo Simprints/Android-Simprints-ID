@@ -6,10 +6,10 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.canSyncAllDataToSimprints
 import com.simprints.infra.config.domain.models.canSyncAnalyticsDataToSimprints
 import com.simprints.infra.config.domain.models.canSyncBiometricDataToSimprints
-import com.simprints.infra.events.EventSyncRepository
-import com.simprints.infra.events.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
+import com.simprints.infra.eventsync.EventSyncRepository
+import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.*
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.FlowCollector

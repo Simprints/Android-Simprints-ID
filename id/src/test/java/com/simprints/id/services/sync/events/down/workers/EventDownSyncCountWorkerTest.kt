@@ -14,10 +14,10 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWork
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.infra.events.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify

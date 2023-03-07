@@ -3,7 +3,7 @@ package com.simprints.id.data.db.events_sync.up.domain.old
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncScope as NewEventUpSyncScope
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope as NewEventUpSyncScope
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(

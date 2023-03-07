@@ -10,12 +10,12 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.infra.events.events_sync.down.domain.RemoteEventQuery
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
+import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel

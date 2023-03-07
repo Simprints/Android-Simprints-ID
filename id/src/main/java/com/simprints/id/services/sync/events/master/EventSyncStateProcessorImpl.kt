@@ -14,12 +14,12 @@ import com.simprints.id.services.sync.events.master.internal.*
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.services.sync.events.up.workers.extractUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
-import com.simprints.infra.events.events_sync.models.EventSyncState
-import com.simprints.infra.events.events_sync.models.EventSyncState.SyncWorkerInfo
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState.Companion.fromWorkInfo
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.*
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncState.SyncWorkerInfo
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Companion.fromWorkInfo
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.*
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 

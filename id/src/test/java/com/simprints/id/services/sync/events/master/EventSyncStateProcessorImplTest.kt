@@ -11,12 +11,13 @@ import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.common.TAG_SCHEDULED_AT
 import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS
 import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
+import com.simprints.id.services.sync.events.master.*
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.SyncWorkersLiveDataProvider
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.START_SYNC_REPORTER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.START_SYNC_REPORTER
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

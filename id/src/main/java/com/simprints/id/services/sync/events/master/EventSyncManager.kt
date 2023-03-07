@@ -1,7 +1,7 @@
 package com.simprints.id.services.sync.events.master
 
 import androidx.lifecycle.LiveData
-import com.simprints.infra.events.events_sync.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncState
 
 interface EventSyncManager {
 

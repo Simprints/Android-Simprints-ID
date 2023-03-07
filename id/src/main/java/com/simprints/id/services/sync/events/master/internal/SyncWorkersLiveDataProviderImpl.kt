@@ -5,8 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.simprints.id.services.sync.events.common.getUniqueSyncIdTag
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

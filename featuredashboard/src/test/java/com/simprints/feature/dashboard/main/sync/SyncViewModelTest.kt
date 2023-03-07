@@ -11,10 +11,10 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-import com.simprints.infra.events.EventSyncRepository
-import com.simprints.infra.events.events_sync.models.EventSyncState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType
+import com.simprints.infra.eventsync.EventSyncRepository
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
