@@ -30,7 +30,7 @@ class FirebaseManagerImplIntegrationTest {
     private val firebaseApp = mockk<FirebaseApp>(relaxed = true)
     private val loginInfoManager = mockk<LoginInfoManager>(relaxed = true)
     private val context = mockk<Context>()
-    private val firebaseManagerImpl = FirebaseManagerImpl(loginInfoManager, context)
+    private val firebaseManagerImpl = FirebaseManagerImpl(loginInfoManager, context, UnconfinedTestDispatcher())
 
     @Before
     fun setUp() {

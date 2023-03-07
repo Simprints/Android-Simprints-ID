@@ -6,13 +6,6 @@ import androidx.work.WorkInfo.State.*
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.eventsystem.events_sync.models.EventSyncState
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState.*
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.*
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
@@ -31,6 +24,13 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAU
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
+import com.simprints.infra.events.event.domain.EventCount
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
+import com.simprints.infra.events.events_sync.models.EventSyncState
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerState.*
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.*
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.Companion.tagForType
 import java.util.*
 
 fun EventSyncWorkerState.assertEqualToFailedState(e: Failed) {

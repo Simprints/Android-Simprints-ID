@@ -1,20 +1,16 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result
-import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result.BAD_QUALITY
-import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result.FAILURE_TO_ACQUIRE
-import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result.GOOD_SCAN
-import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result.NO_FINGER_DETECTED
-import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result.SKIPPED
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result.*
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore
 
 /**
  * This class represents a Fingerprint Capture [Event].

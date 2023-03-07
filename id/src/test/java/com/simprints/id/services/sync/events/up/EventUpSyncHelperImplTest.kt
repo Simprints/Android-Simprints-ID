@@ -2,16 +2,16 @@ package com.simprints.id.services.sync.events.up
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.Event
-import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.eventsystem.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
-import com.simprints.eventsystem.sampledata.SampleDefaults
-import com.simprints.eventsystem.sampledata.createPersonCreationEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.events_sync.up.EventUpSyncScopeRepository
+import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
+import com.simprints.infra.events.sampledata.SampleDefaults
+import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel

@@ -1,7 +1,7 @@
 package com.simprints.face.controllers.core.events.model
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
+import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import org.junit.Test
 
 class FaceCaptureBiometricsEventTest {

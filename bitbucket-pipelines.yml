@@ -62,7 +62,7 @@ definitions:
                     - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew core:jacocoTestReport
-                    - ./gradlew eventsystem:jacocoTestReport
+                    - ./gradlew infraevents:jacocoTestReport
                     - ./gradlew infraconfig:jacocoTestReport
                     - ./gradlew infraenrolmentrecords:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
@@ -76,7 +76,7 @@ definitions:
                     - ./gradlew infraresources:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
-                    - eventsystem/build/reports/**
+                    - infraevents/build/reports/**
                     - infraconfig/build/reports/**
                     - infraenrolmentrecords/build/reports/**
                     - infralogging/build/reports/**
@@ -193,7 +193,7 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     #  Disabling health check in test variants because there is a compilation issue in finding
-                    # eventsystem/sampledata folder which only  available in debug variants but the health check tool gets executed in all variants.
+                    # infraevents/sampledata folder which only  available in debug variants but the health check tool gets executed in all variants.
                     # Should be fixed in https://simprints.atlassian.net/browse/CORE-2045
                     - ./gradlew buildHealth  -Ddependency.analysis.test.analysis=false
 

@@ -75,7 +75,7 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
-        onView(withText(IDR.string.preference_select_fingers_title)).check(doesNotExist())
+        onView(withText(IDR.string.preference_view_fingers_title)).check(doesNotExist())
     }
 
     @Test
@@ -84,7 +84,7 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
-        onView(withText(IDR.string.preference_select_fingers_title)).check(matches(isDisplayed()))
+        onView(withText(IDR.string.preference_view_fingers_title)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -107,7 +107,7 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>(navController = navController)
 
-        onView(withText(IDR.string.preference_select_fingers_title)).perform(click())
+        onView(withText(IDR.string.preference_view_fingers_title)).perform(click())
         assertThat(navController.currentDestination?.id).isEqualTo(R.id.fingerSelectionFragment)
     }
 

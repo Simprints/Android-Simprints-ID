@@ -78,7 +78,7 @@
     <string name="preference_device_id_title">Utambulisho wa Kifaa</string>
     <string name="preference_logout_title">Toka</string>
     <string name="preference_scanner_version_title">Toleo la skana</string>
-    <string name="preference_select_fingers_title">Chagua kidole kinachofaa</string>
+    <string name="preference_view_fingers_title">Chagua kidole kinachofaa</string>
     <string name="preference_select_language_title">Lugha</string>
     <string name="preference_select_modules_title">Chagua kipengele</string>
     <string name="preference_summary_settings_fingers">Chagua vidole ambavyo ungependa kuscan</string>

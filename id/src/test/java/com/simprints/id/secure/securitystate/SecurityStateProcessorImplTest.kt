@@ -1,11 +1,11 @@
 package com.simprints.id.secure.securitystate
 
-import com.simprints.eventsystem.event.local.EventLocalDataSource
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.SecurityState.Status.*
 import com.simprints.id.secure.models.UpSyncEnrolmentRecords
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -26,7 +26,7 @@ class SecurityStateProcessorImplTest {
     lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
-    lateinit var eventLocalDataSource: EventLocalDataSource
+    lateinit var eventRepository: EventRepository
 
     private lateinit var securityStateProcessor: SecurityStateProcessorImpl
 
@@ -37,7 +37,7 @@ class SecurityStateProcessorImplTest {
         securityStateProcessor = SecurityStateProcessorImpl(
             mockImageRepository,
             enrolmentRecordManager,
-            eventLocalDataSource,
+            eventRepository,
             mockSignerManager,
         )
     }
@@ -62,7 +62,7 @@ class SecurityStateProcessorImplTest {
 
         coVerify(exactly = 0) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 0) { enrolmentRecordManager.deleteAll() }
-        coVerify(exactly = 0) { eventLocalDataSource.deleteAll() }
+        coVerify(exactly = 0) { eventRepository.deleteAll() }
         coVerify(exactly = 0) { mockSignerManager.signOut() }
     }
 
@@ -75,7 +75,7 @@ class SecurityStateProcessorImplTest {
 
         coVerify(exactly = 1) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 1) { enrolmentRecordManager.deleteAll() }
-        coVerify(exactly = 1) { eventLocalDataSource.deleteAll() }
+        coVerify(exactly = 1) { eventRepository.deleteAll() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
     }
 
@@ -88,7 +88,7 @@ class SecurityStateProcessorImplTest {
 
         coVerify(exactly = 1) { mockImageRepository.deleteStoredImages() }
         coVerify(exactly = 1) { enrolmentRecordManager.deleteAll() }
-        coVerify(exactly = 1) { eventLocalDataSource.deleteAll() }
+        coVerify(exactly = 1) { eventRepository.deleteAll() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
     }
 

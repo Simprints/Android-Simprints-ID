@@ -2,13 +2,14 @@ package com.simprints.id.services.sync.events.up
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.INPUT_COUNT_WORKER_UP
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
+import com.simprints.infra.events.events_sync.up.EventUpSyncScopeRepository
+import com.simprints.infra.events.events_sync.up.domain.EventUpSyncScope
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -34,7 +35,7 @@ class EventUpSyncWorkersBuilderImpl @Inject constructor(
     private fun buildUpSyncWorkers(
         uniqueSyncID: String?,
         uniqueUpSyncId: String,
-        upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
+        upSyncScope: EventUpSyncScope
     ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventUpSyncUploaderWorker::class.java)
             .setInputData(workDataOf(INPUT_UP_SYNC to jsonHelper.toJson(upSyncScope)))
@@ -46,7 +47,7 @@ class EventUpSyncWorkersBuilderImpl @Inject constructor(
     private fun buildCountWorker(
         uniqueSyncID: String?,
         uniqueUpSyncID: String,
-        upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope
+        upSyncScope: EventUpSyncScope
     ): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(EventUpSyncCountWorker::class.java)
             .setInputData(workDataOf(INPUT_COUNT_WORKER_UP to jsonHelper.toJson(upSyncScope)))

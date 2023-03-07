@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.eventsystem.event.domain.models.MatchEntry as MatchEntryCore
+import com.simprints.infra.events.event.domain.models.MatchEntry as MatchEntryCore
 
 /**
  * This class represents a candidate for a matching fingerprint

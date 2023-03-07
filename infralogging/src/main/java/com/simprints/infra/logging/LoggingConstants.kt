@@ -15,7 +15,6 @@ object LoggingConstants {
         const val DEVICE_ID = "Device ID"
         const val SUBJECTS_DOWN_SYNC_TRIGGERS = "People down sync triggers"
         const val SESSION_ID = "Session ID"
-        const val FINGERS_SELECTED = "Fingers selected"
     }
 
     object AnalyticsUserProperties {

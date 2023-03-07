@@ -11,6 +11,7 @@ import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
+import com.simprints.infra.events.events_sync.up.domain.EventUpSyncScope
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -37,7 +38,7 @@ class EventUpSyncCountWorker @AssistedInject constructor(
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_UP)
             ?: throw IllegalArgumentException("input required")
         Simber.d("Received $jsonInput")
-        jsonHelper.fromJson<com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope>(
+        jsonHelper.fromJson<EventUpSyncScope>(
             jsonInput
         )
     }
@@ -57,7 +58,7 @@ class EventUpSyncCountWorker @AssistedInject constructor(
             }
         }
 
-    private suspend fun execute(upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope): Result {
+    private suspend fun execute(upSyncScope: EventUpSyncScope): Result {
         val upCount = getUpCount(upSyncScope)
         Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Done $upCount")
 
@@ -69,7 +70,7 @@ class EventUpSyncCountWorker @AssistedInject constructor(
 
     }
 
-    private suspend fun getUpCount(upSyncScope: com.simprints.eventsystem.events_sync.up.domain.EventUpSyncScope) =
+    private suspend fun getUpCount(upSyncScope: EventUpSyncScope) =
         eventUpSyncHelper.countForUpSync(upSyncScope.operation)
 }
 
