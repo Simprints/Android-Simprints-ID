@@ -63,10 +63,10 @@ class AppResponseBuilderForIdentify(private val projectConfiguration: ProjectCon
     ): AppIdentifyResponse {
         val fingerprintResultSortedByConfidence = buildResultsFromFingerprintMatchResponse(fingerprintResponse)
         val faceResultsSortedByConfidence = buildResultsFromFaceMatchResponse(faceResponse)
-        val bestFingerprintCandidate = fingerprintResultSortedByConfidence.first()
-        val bestFaceCandidate = faceResultsSortedByConfidence.first()
-
-        return if (bestFingerprintCandidate.confidenceScore > bestFaceCandidate.confidence) {
+        val bestFingerprintScore =
+            fingerprintResultSortedByConfidence.firstOrNull()?.confidenceScore ?: 0f
+        val bestFaceScore = faceResultsSortedByConfidence.firstOrNull()?.confidence ?: 0f
+        return if (bestFingerprintScore > bestFaceScore) {
             buildAppIdentifyResponseForFingerprint(fingerprintResultSortedByConfidence, sessionId)
         } else {
             buildAppIdentifyResponseForFace(faceResultsSortedByConfidence, sessionId)
