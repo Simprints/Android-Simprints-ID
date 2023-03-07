@@ -11,9 +11,9 @@ import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorke
 import com.simprints.id.tools.extensions.toGroup
 import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncScope
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

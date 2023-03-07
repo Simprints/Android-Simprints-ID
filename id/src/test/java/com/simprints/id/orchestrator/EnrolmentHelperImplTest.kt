@@ -6,7 +6,7 @@ import com.simprints.id.tools.mockUUID
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.EventSyncRepository
+import com.simprints.infra.eventsync.EventSyncRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID

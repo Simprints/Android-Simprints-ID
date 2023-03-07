@@ -7,10 +7,6 @@ import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
-import com.simprints.infra.events.remote.models.subject.biometricref.ApiBiometricReference
-import com.simprints.infra.events.remote.models.subject.biometricref.ApiBiometricReferenceType
-import com.simprints.infra.events.remote.models.subject.biometricref.face.ApiFaceReference
-import com.simprints.infra.events.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes(
@@ -48,12 +44,3 @@ enum class BiometricReferenceType {
         const val FINGERPRINT_REFERENCE_KEY = "FINGERPRINT_REFERENCE"
     }
 }
-
-fun ApiBiometricReference.fromApiToDomain() = when (this.type) {
-    ApiBiometricReferenceType.FaceReference -> (this as ApiFaceReference).fromApiToDomain()
-    ApiBiometricReferenceType.FingerprintReference -> (this as ApiFingerprintReference).fromApiToDomain()
-}
-
-fun ApiFaceReference.fromApiToDomain() = FaceReference(id, templates.map { it.fromApiToDomain() }, format, metadata)
-
-fun ApiFingerprintReference.fromApiToDomain() = FingerprintReference(id, templates.map { it.fromApiToDomain() }, format, metadata)

@@ -10,12 +10,12 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.*
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.infra.events.events_sync.models.EventSyncState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.EventSyncRepository
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager

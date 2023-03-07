@@ -36,12 +36,20 @@ android {
 
 dependencies {
     api(project(":core"))
+    implementation(project(":infralogging"))
+    api(project(":infraevents"))
+    implementation(project(":infranetwork"))
 
     implementation(libs.androidX.room.ktx)
     kapt(libs.androidX.room.compiler)
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
     api(libs.sqlCipher.core)
+    implementation(libs.workManager.work)
+
+    implementation(libs.retrofit.core)
+    implementation(libs.jackson.core)
+
     implementation(libs.workManager.work)
 
     // DI

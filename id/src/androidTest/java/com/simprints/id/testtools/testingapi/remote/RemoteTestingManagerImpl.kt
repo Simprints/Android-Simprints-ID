@@ -3,8 +3,8 @@ package com.simprints.id.testtools.testingapi.remote
 import android.content.Context
 import com.simprints.id.testtools.testingapi.exceptions.TestingRemoteApiError
 import com.simprints.id.testtools.testingapi.models.*
-import com.simprints.infra.events.remote.models.ApiEventPayloadType
-import com.simprints.infra.events.remote.models.ApiEventPayloadType.*
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
+import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.network.apiclient.SimApiClientImpl
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers

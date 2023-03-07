@@ -13,8 +13,8 @@ import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.infra.events.events_sync.up.EventUpSyncScopeRepository
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import kotlinx.coroutines.test.runTest

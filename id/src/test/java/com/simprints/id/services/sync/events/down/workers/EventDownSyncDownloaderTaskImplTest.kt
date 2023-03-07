@@ -5,7 +5,7 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncProgress
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.SampleDefaults.projectDownSyncScope
+import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

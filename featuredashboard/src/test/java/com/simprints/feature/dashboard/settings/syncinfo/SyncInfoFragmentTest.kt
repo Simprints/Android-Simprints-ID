@@ -16,7 +16,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
-import com.simprints.infra.events.events_sync.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncState
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

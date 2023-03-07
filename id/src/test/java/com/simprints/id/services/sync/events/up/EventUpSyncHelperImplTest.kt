@@ -6,13 +6,13 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
-import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
-import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.createPersonCreationEvent
+import com.simprints.infra.eventsync.EventSyncRepository
+import com.simprints.infra.eventsync.SampleSyncScopes
+import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
@@ -25,7 +25,7 @@ import java.io.IOException
 
 class EventUpSyncHelperImplTest {
 
-    private val operation = SampleDefaults.projectUpSyncScope.operation
+    private val operation = SampleSyncScopes.projectUpSyncScope.operation
     private lateinit var uploadEventsChannel: Channel<Event>
 
     private lateinit var eventUpSyncHelper: EventUpSyncHelper

@@ -19,6 +19,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":core"))
     api(project(":infraevents"))
+    api(project(":infraeventsync"))
     api(project(":infraconfig"))
     api(project(":infraenrolmentrecords"))
     api(project(":infraimages"))

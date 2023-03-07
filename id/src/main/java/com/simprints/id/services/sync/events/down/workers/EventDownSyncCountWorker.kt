@@ -21,11 +21,11 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAU
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.infra.events.event.domain.EventCount
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncScope
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.DOWNLOADER
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.UPLOADER
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException

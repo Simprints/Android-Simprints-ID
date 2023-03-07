@@ -22,7 +22,7 @@ import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAU
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncScope
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException

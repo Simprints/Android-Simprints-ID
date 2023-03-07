@@ -11,7 +11,7 @@ import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncScope
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

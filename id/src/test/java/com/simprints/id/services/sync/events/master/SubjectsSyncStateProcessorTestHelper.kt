@@ -26,11 +26,11 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.infra.events.events_sync.models.EventSyncState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState.*
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.*
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.*
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.*
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import java.util.*
 
 fun EventSyncWorkerState.assertEqualToFailedState(e: Failed) {

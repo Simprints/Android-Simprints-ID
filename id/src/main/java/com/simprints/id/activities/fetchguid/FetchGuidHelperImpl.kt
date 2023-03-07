@@ -8,8 +8,8 @@ import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation
-import com.simprints.infra.events.events_sync.down.domain.RemoteEventQuery
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
+import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.consumeAsFlow

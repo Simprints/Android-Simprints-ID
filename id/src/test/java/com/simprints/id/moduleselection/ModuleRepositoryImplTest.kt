@@ -7,7 +7,7 @@ import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

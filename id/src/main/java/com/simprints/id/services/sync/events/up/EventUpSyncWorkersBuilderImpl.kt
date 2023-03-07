@@ -8,8 +8,8 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.INPUT_COUNT_WORKER_UP
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
-import com.simprints.infra.events.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncScope
+import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

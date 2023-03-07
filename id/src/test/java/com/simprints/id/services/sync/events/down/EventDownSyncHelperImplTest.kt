@@ -9,13 +9,13 @@ import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
-import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.models.subject.*
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
+import com.simprints.infra.eventsync.EventSyncRepository
+import com.simprints.infra.eventsync.SampleSyncScopes
+import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.*
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -66,8 +66,8 @@ class EventDownSyncHelperImplTest {
         )
     }
 
-    private val projectOp = SampleDefaults.projectDownSyncScope.operations.first()
-    private val moduleOp = SampleDefaults.modulesDownSyncScope.operations.first()
+    private val projectOp = SampleSyncScopes.projectDownSyncScope.operations.first()
+    private val moduleOp = SampleSyncScopes.modulesDownSyncScope.operations.first()
 
     private lateinit var downloadEventsChannel: Channel<EnrolmentRecordEvent>
 
