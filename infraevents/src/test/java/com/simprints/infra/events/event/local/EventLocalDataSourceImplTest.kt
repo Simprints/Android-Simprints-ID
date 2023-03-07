@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.local.*
 import com.simprints.infra.events.event.local.models.DbEvent
@@ -15,6 +16,7 @@ import com.simprints.infra.events.local.*
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -165,6 +167,36 @@ internal class EventLocalDataSourceImplTest {
     }
 
     @Test
+    fun observeCountWithAProjectIdQuery() {
+        runBlocking {
+            eventLocalDataSource.observeCount(projectId = "PROJECT_ID").toList()
+
+            coVerify {
+                eventDao.observeCount(projectId = "PROJECT_ID")
+            }
+        }
+    }
+
+
+    @Test
+    fun observeCountWithAProjectIdAndTypeQuery() {
+        runBlocking {
+            eventLocalDataSource.observeCount(
+                projectId = "PROJECT_ID",
+                type = CALLBACK_ENROLMENT,
+            ).toList()
+
+            coVerify {
+                eventDao.observeCountFromType(
+                    projectId = "PROJECT_ID",
+                    type = CALLBACK_ENROLMENT,
+                )
+            }
+        }
+    }
+
+
+    @Test
     fun insertOrUpdate() {
         runBlocking {
             mockkStatic("com.simprints.infra.events.event.local.models.DbEventKt")
@@ -176,17 +208,6 @@ internal class EventLocalDataSourceImplTest {
 
             coVerify {
                 eventDao.insertOrUpdate(dbEvent)
-            }
-        }
-    }
-
-    @Test
-    fun countWithATypeAndProjectIdQuery() {
-        runBlocking {
-            eventLocalDataSource.count(type = SESSION_CAPTURE, projectId = "PROJECT_ID")
-
-            coVerify {
-                eventDao.countFromProjectByType(type = SESSION_CAPTURE, projectId = "PROJECT_ID")
             }
         }
     }

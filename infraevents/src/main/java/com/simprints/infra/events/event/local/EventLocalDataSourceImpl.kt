@@ -87,14 +87,14 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
             eventDao.countFromProject(projectId = projectId)
         }
 
-    override suspend fun count(projectId: String, type: EventType): Int =
-        useRoom(readingDispatcher) {
-            eventDao.countFromProjectByType(type = type, projectId = projectId)
-        }
-
     override suspend fun count(type: EventType): Int =
         useRoom(readingDispatcher) {
             eventDao.countFromType(type = type)
+        }
+
+    override suspend fun observeCount(projectId: String): Flow<Int> =
+        useRoom(readingDispatcher) {
+            eventDao.observeCount(projectId = projectId)
         }
 
     override suspend fun observeCount(projectId: String, type: EventType): Flow<Int> =

@@ -102,13 +102,13 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
 
     override suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
         val session = coreEventRepository.getCurrentCaptureSessionEvent()
-        return coreEventRepository.getEventsFromSession(session.id).toList().any {
+        return coreEventRepository.observeEventsFromSession(session.id).toList().any {
             it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
         }
     }
 
     override suspend fun isSessionHasIdentificationCallback(sessionId: String): Boolean {
-        val events = coreEventRepository.getEventsFromSession(sessionId)
+        val events = coreEventRepository.observeEventsFromSession(sessionId)
         return events.toList().any {
             it is IdentificationCallbackEvent
         }
@@ -117,15 +117,15 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
     override suspend fun getAllEventsForSession(sessionId: String): Flow<Event> =
         when {
             configManager.getProjectConfiguration().canCoSyncAllData() -> {
-                coreEventRepository.getEventsFromSession(sessionId)
+                coreEventRepository.observeEventsFromSession(sessionId)
             }
             configManager.getProjectConfiguration().canCoSyncBiometricData() -> {
-                coreEventRepository.getEventsFromSession(sessionId).filter {
+                coreEventRepository.observeEventsFromSession(sessionId).filter {
                     it is EnrolmentEventV2 || it is PersonCreationEvent || it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
                 }
             }
             configManager.getProjectConfiguration().canCoSyncAnalyticsData() -> {
-                coreEventRepository.getEventsFromSession(sessionId).filterNot {
+                coreEventRepository.observeEventsFromSession(sessionId).filterNot {
                     it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
                 }
             }

@@ -9,7 +9,7 @@ import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.*
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 class EventDownSyncHelperImpl @Inject constructor(
     private val subjectRepository: EnrolmentRecordManager,
-    private val eventRepository: EventRepository,
+    private val eventSyncRepository: EventSyncRepository,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
     private val configManager: ConfigManager,
@@ -32,7 +32,7 @@ class EventDownSyncHelperImpl @Inject constructor(
 ) : EventDownSyncHelper {
 
     override suspend fun countForDownSync(operation: EventDownSyncOperation): List<EventCount> =
-        eventRepository.countEventsToDownload(operation.queryEvent)
+        eventSyncRepository.countEventsToDownload(operation.queryEvent)
 
     override suspend fun downSync(
         scope: CoroutineScope,
@@ -45,7 +45,7 @@ class EventDownSyncHelperImpl @Inject constructor(
             val batchOfEventsToProcess = mutableListOf<EnrolmentRecordEvent>()
 
             try {
-                eventRepository.downloadEvents(scope, operation.queryEvent).consumeEach {
+                eventSyncRepository.downloadEvents(scope, operation.queryEvent).consumeEach {
                     batchOfEventsToProcess.add(it)
                     count++
                     //We immediately process the first event to initialise a progress

@@ -38,8 +38,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 internal class EventRepositoryImplIntegrationTest {
 
-    private lateinit var eventRepo: EventRepository
-
     @MockK
     lateinit var loginManager: LoginManager
 
@@ -55,12 +53,15 @@ internal class EventRepositoryImplIntegrationTest {
     @MockK
     lateinit var sessionDataCache: SessionDataCache
 
+    @MockK
+    lateinit var eventDatabaseFactory: EventDatabaseFactory
+
     private lateinit var db: EventRoomDatabase
     private lateinit var eventDao: EventRoomDao
     private lateinit var eventLocalDataSource: EventLocalDataSource
+    private lateinit var eventRepo: EventRepository
 
-    @MockK
-    lateinit var eventDatabaseFactory: EventDatabaseFactory
+    private lateinit var eventSyncRepo: EventSyncRepository
 
     @Before
     fun setup() {
@@ -80,18 +81,23 @@ internal class EventRepositoryImplIntegrationTest {
             UnconfinedTestDispatcher()
         )
         eventRepo = EventRepositoryImpl(
-            "",
-            "",
-            "",
+            DEFAULT_DEVICE_ID,
+            "1",
+            "1",
             loginManager,
             eventLocalDataSource,
-            eventRemoteDataSource,
             timeHelper,
             sessionEventValidatorsFactory,
             sessionDataCache,
             mockk(),
         )
 
+        eventSyncRepo = EventSyncRepositoryImpl(
+            loginManager,
+            eventRepo,
+            eventRemoteDataSource,
+            timeHelper,
+        )
     }
 
     @Test
@@ -113,7 +119,8 @@ internal class EventRepositoryImplIntegrationTest {
             // Adding two sessions one with an invalid event + session capture and one with only a session capture.
             addIntoDb(invalidDbEvent, sessionCaptureForInvalidEvent, sessionCapture2)
 
-            eventRepo.uploadEvents(
+
+            eventSyncRepo.uploadEvents(
                 DEFAULT_PROJECT_ID,
                 canSyncAllDataToSimprints = true,
                 canSyncBiometricDataToSimprints = false,

@@ -64,6 +64,8 @@ abstract class EventSystemModule {
     @Binds
     internal abstract fun bindEventRepositoryImpl(impl: EventRepositoryImpl): EventRepository
 
+    @Binds
+    internal abstract fun bindEventSyncRepositoryImpl(impl: EventSyncRepositoryImpl): EventSyncRepository
 }
 
 @Module

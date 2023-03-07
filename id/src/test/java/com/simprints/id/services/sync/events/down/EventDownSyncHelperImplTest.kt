@@ -9,7 +9,7 @@ import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.models.subject.*
 import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation.DownSyncState.*
@@ -77,7 +77,7 @@ class EventDownSyncHelperImplTest {
     private lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventSyncRepository: EventSyncRepository
 
     @MockK
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -99,7 +99,7 @@ class EventDownSyncHelperImplTest {
 
         eventDownSyncHelper = EventDownSyncHelperImpl(
             enrolmentRecordManager,
-            eventRepository,
+            eventSyncRepository,
             eventDownSyncScopeRepository,
             subjectFactory,
             configManager,
@@ -115,7 +115,7 @@ class EventDownSyncHelperImplTest {
     fun countForDownSync_shouldReturnRepoEventChannel() {
         runTest(StandardTestDispatcher()) {
             eventDownSyncHelper.countForDownSync(projectOp)
-            coVerify { eventRepository.countEventsToDownload(any()) }
+            coVerify { eventSyncRepository.countEventsToDownload(any()) }
         }
     }
 
@@ -124,7 +124,7 @@ class EventDownSyncHelperImplTest {
         runTest(UnconfinedTestDispatcher()) {
             eventDownSyncHelper.downSync(this, projectOp)
 
-            coVerify { eventRepository.downloadEvents(this@runTest, projectOp.queryEvent) }
+            coVerify { eventSyncRepository.downloadEvents(this@runTest, projectOp.queryEvent) }
         }
     }
 
@@ -155,7 +155,7 @@ class EventDownSyncHelperImplTest {
     fun downSync_shouldEmitAFailureIfDownloadFailsAndThrowsAnException() {
         runTest(StandardTestDispatcher()) {
             coEvery {
-                eventRepository.downloadEvents(
+                eventSyncRepository.downloadEvents(
                     any(),
                     any()
                 )
@@ -305,7 +305,7 @@ class EventDownSyncHelperImplTest {
 
     private suspend fun mockProgressEmission(progressEvents: List<EnrolmentRecordEvent>) {
         downloadEventsChannel = Channel(capacity = Channel.UNLIMITED)
-        coEvery { eventRepository.downloadEvents(any(), any()) } returns downloadEventsChannel
+        coEvery { eventSyncRepository.downloadEvents(any(), any()) } returns downloadEventsChannel
 
         progressEvents.forEach {
             downloadEventsChannel.send(it)

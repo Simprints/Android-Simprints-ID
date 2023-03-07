@@ -6,7 +6,7 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.EventSyncRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.events_sync.up.EventUpSyncScopeRepository
 import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
@@ -31,7 +31,7 @@ class EventUpSyncHelperImplTest {
     private lateinit var eventUpSyncHelper: EventUpSyncHelper
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventSyncRepository: EventSyncRepository
 
     @MockK
     private lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
@@ -52,7 +52,7 @@ class EventUpSyncHelperImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         eventUpSyncHelper = EventUpSyncHelperImpl(
-            eventRepository,
+            eventSyncRepository,
             eventUpSyncScopeRepository,
             timeHelper,
             configManager
@@ -67,7 +67,7 @@ class EventUpSyncHelperImplTest {
     fun countForUpSync_shouldInvokeTheEventRepo() = runTest {
         eventUpSyncHelper.countForUpSync(operation)
 
-        coVerify { eventRepository.localCount(operation.projectId) }
+        coVerify { eventSyncRepository.countEventsToUpload(operation.projectId, null) }
     }
 
     @Test
@@ -75,7 +75,7 @@ class EventUpSyncHelperImplTest {
         eventUpSyncHelper.upSync(this, operation).toList()
 
         coVerify {
-            eventRepository.uploadEvents(
+            eventSyncRepository.uploadEvents(
                 operation.projectId,
                 any(), any(), any()
             )
@@ -95,7 +95,7 @@ class EventUpSyncHelperImplTest {
             eventUpSyncHelper.upSync(this, operation).toList()
 
             coVerify {
-                eventRepository.uploadEvents(
+                eventSyncRepository.uploadEvents(
                     operation.projectId,
                     canSyncAllDataToSimprints = true,
                     canSyncBiometricDataToSimprints = false,
@@ -117,7 +117,7 @@ class EventUpSyncHelperImplTest {
             eventUpSyncHelper.upSync(this, operation).toList()
 
             coVerify {
-                eventRepository.uploadEvents(
+                eventSyncRepository.uploadEvents(
                     operation.projectId,
                     canSyncAllDataToSimprints = false,
                     canSyncBiometricDataToSimprints = true,
@@ -139,7 +139,7 @@ class EventUpSyncHelperImplTest {
             eventUpSyncHelper.upSync(this, operation).toList()
 
             coVerify {
-                eventRepository.uploadEvents(
+                eventSyncRepository.uploadEvents(
                     operation.projectId,
                     canSyncAllDataToSimprints = false,
                     canSyncBiometricDataToSimprints = false,
@@ -170,7 +170,7 @@ class EventUpSyncHelperImplTest {
     @Test(expected = IOException::class)
     fun upSync_shouldEmitAFailureIfUploadFails() = runTest {
         coEvery {
-            eventRepository.uploadEvents(
+            eventSyncRepository.uploadEvents(
                 any(),
                 any(),
                 any(),
@@ -186,6 +186,6 @@ class EventUpSyncHelperImplTest {
 
     private fun mockProgressEmission(sequence: Flow<Int>) {
         uploadEventsChannel = Channel(capacity = Channel.UNLIMITED)
-        coEvery { eventRepository.uploadEvents(any(), any(), any(), any()) } returns sequence
+        coEvery { eventSyncRepository.uploadEvents(any(), any(), any(), any()) } returns sequence
     }
 }

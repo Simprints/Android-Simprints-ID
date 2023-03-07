@@ -2,42 +2,28 @@ package com.simprints.infra.events
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.core.DeviceID
 import com.simprints.core.LibSimprintsVersionName
 import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
-import com.simprints.infra.events.remote.EventRemoteDataSource
-import com.simprints.infra.events.events_sync.down.domain.RemoteEventQuery
-import com.simprints.infra.events.events_sync.down.domain.fromDomainToApi
-import com.simprints.infra.events.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
-import com.simprints.infra.network.exceptions.NetworkConnectionException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import retrofit2.HttpException
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -49,7 +35,6 @@ internal open class EventRepositoryImpl @Inject constructor(
     @LibSimprintsVersionName override val libSimprintsVersionName: String,
     private val loginManager: LoginManager,
     private val eventLocalDataSource: EventLocalDataSource,
-    private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     private val sessionDataCache: SessionDataCache,
@@ -58,7 +43,6 @@ internal open class EventRepositoryImpl @Inject constructor(
 
     companion object {
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
-        const val SESSION_BATCH_SIZE = 20
     }
 
     private val validators = validatorsFactory.build()
@@ -130,129 +114,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun localCount(projectId: String): Int = eventLocalDataSource.count(projectId = projectId)
-
-    override suspend fun localCount(projectId: String, type: EventType): Int = eventLocalDataSource.count(projectId = projectId, type = type)
-
-    override suspend fun observeLocalCount(projectId: String, type: EventType): Flow<Int> = eventLocalDataSource
-        .observeCount(projectId, type)
-
-    override suspend fun countEventsToDownload(query: RemoteEventQuery): List<EventCount> = eventRemoteDataSource.count(query.fromDomainToApi())
-
-    override suspend fun downloadEvents(
-        scope: CoroutineScope,
-        query: RemoteEventQuery
-    ): ReceiveChannel<EnrolmentRecordEvent> = eventRemoteDataSource.getEvents(query.fromDomainToApi(), scope)
-
-    /**
-     * Note that only the IDs of the SessionCapture events of closed sessions are all held in
-     * memory at once. Events are loaded in memory and uploaded session by session, ensuring the
-     * memory usage stays low. It means that we do not exploit connectivity as aggressively as
-     * possible (we could have a more complex system that always pre-fetches the next batch of
-     * events while we upload the current one), but given the relatively small amount of data to
-     * upload, and how critical this system is, we are happy to trade off speed for reliability
-     * (through simplicity and low resource usage)
-     */
-    override fun uploadEvents(
-        projectId: String,
-        canSyncAllDataToSimprints: Boolean,
-        canSyncBiometricDataToSimprints: Boolean,
-        canSyncAnalyticsDataToSimprints: Boolean
-    ): Flow<Int> = flow {
-        Simber.tag("SYNC").d("[EVENT_REPO] Uploading")
-
-        if (projectId != loginManager.getSignedInProjectIdOrEmpty()) {
-            throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
-                Simber.e(it)
-            }
-        }
-
-        eventLocalDataSource.loadAllClosedSessionIds(projectId).forEach { sessionId ->
-            // The events will include the SessionCaptureEvent event
-            Simber.tag("SYNC").d("[EVENT_REPO] Uploading session $sessionId")
-            try {
-                eventLocalDataSource.loadAllFromSession(sessionId).let {
-                    attemptEventUpload(
-                        it, projectId,
-                        canSyncAllDataToSimprints,
-                        canSyncBiometricDataToSimprints,
-                        canSyncAnalyticsDataToSimprints
-                    )
-                    this.emit(it.size)
-                }
-            } catch (ex: Exception) {
-                if (ex is JsonParseException || ex is JsonMappingException) {
-                    attemptInvalidEventUpload(projectId, sessionId)?.let {
-                        this.emit(it)
-                    }
-                } else {
-                    Simber.tag("SYNC").i("Failed to un-marshal events for $sessionId")
-                    Simber.e(ex)
-                }
-            }
-        }
-    }
-
-
     override suspend fun deleteSessionEvents(sessionId: String) = reportException {
         eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
-    }
-
-    private suspend fun attemptEventUpload(
-        events: List<Event>, projectId: String,
-        canSyncAllDataToSimprints: Boolean,
-        canSyncBiometricDataToSimprints: Boolean,
-        canSyncAnalyticsDataToSimprints: Boolean
-    ) {
-        try {
-            val filteredEvents = when {
-                canSyncAllDataToSimprints -> {
-                    events
-                }
-                canSyncBiometricDataToSimprints -> {
-                    events.filter {
-                        it is EnrolmentEventV2 || it is PersonCreationEvent || it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
-                    }
-                }
-                canSyncAnalyticsDataToSimprints -> {
-                    events.filterNot {
-                        it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
-                    }
-                }
-                else -> {
-                    emptyList()
-                }
-            }
-            uploadEvents(filteredEvents, projectId)
-            deleteEventsFromDb(events.map { it.id })
-        } catch (t: Throwable) {
-            handleUploadException(t)
-        }
-    }
-
-    private suspend fun uploadEvents(events: List<Event>, projectId: String) {
-        events.filterIsInstance<SessionCaptureEvent>().forEach {
-            it.payload.uploadedAt = timeHelper.now()
-        }
-        eventRemoteDataSource.post(projectId, events)
-    }
-
-    private suspend fun attemptInvalidEventUpload(projectId: String, sessionId: String): Int? =
-        try {
-            Simber.tag("SYNC").i("Uploading invalid events for session $sessionId")
-            eventLocalDataSource.loadAllEventJsonFromSession(sessionId).let {
-                eventRemoteDataSource.dumpInvalidEvents(projectId, events = it)
-                deleteSessionEvents(sessionId)
-                it.size
-            }
-        } catch (t: Throwable) {
-            handleUploadException(t)
-            null
-        }
-
-    private suspend fun deleteEventsFromDb(eventsIds: List<String>) {
-        Simber.tag("SYNC").d("[EVENT_REPO] Deleting ${eventsIds.count()} events")
-        eventLocalDataSource.delete(eventsIds)
     }
 
     override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
@@ -273,7 +136,7 @@ internal open class EventRepositoryImpl @Inject constructor(
         }
 
 
-    override suspend fun getEventsFromSession(sessionId: String): Flow<Event> =
+    override suspend fun observeEventsFromSession(sessionId: String): Flow<Event> =
         reportException {
             if (sessionDataCache.eventCache.isEmpty()) {
                 loadEventsIntoCache(sessionId)
@@ -283,6 +146,19 @@ internal open class EventRepositoryImpl @Inject constructor(
                 sessionDataCache.eventCache.values.toList().forEach { emit(it) }
             }
         }
+
+    override suspend fun getAllClosedSessionIds(projectId: String): List<String> =
+        eventLocalDataSource.loadAllClosedSessionIds(projectId)
+
+    override suspend fun getEventsFromSession(sessionId: String): List<Event> =
+        eventLocalDataSource.loadAllFromSession(sessionId)
+
+    override suspend fun getEventsJsonFromSession(sessionId: String): List<String> =
+        eventLocalDataSource.loadAllEventJsonFromSession(sessionId)
+
+    override suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int> =
+        if (type != null) eventLocalDataSource.observeCount(projectId, type)
+        else eventLocalDataSource.observeCount(projectId)
 
     /**
      * The reason is only used when we want to create an [ArtificialTerminationEvent].
@@ -342,16 +218,10 @@ internal open class EventRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun handleUploadException(t: Throwable) {
-        when (t) {
-            is NetworkConnectionException -> Simber.i(t)
-            // We don't need to report http exceptions as cloud logs all of them.
-            is HttpException -> Simber.i(t)
-            else -> Simber.e(t)
-        }
-    }
-
     override suspend fun loadAll(): Flow<Event> = eventLocalDataSource.loadAll()
+
+    override suspend fun delete(eventIds: List<String>) =
+        eventLocalDataSource.delete(eventIds)
 
     override suspend fun deleteAll() = eventLocalDataSource.deleteAll()
 }
