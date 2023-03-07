@@ -1,6 +1,6 @@
 package com.simprints.id.secure.models
 
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 
 sealed class AuthenticateDataResult {
     object Authenticated : AuthenticateDataResult()

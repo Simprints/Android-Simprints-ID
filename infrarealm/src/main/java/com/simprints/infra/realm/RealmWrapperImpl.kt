@@ -91,7 +91,7 @@ class RealmWrapperImpl @Inject constructor(
         val intent = Intent()
         intent.component = ComponentName(
             "com.simprints.id",
-            "com.simprints.eventsystem.events_sync.down.temp.ResetDownSyncService"
+            "com.simprints.infra.events.events_sync.down.temp.ResetDownSyncService"
         )
         try {
             appContext.startService(intent)

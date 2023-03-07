@@ -1,6 +1,6 @@
 package com.simprints.clientapi.controllers.core.eventData.model
 
-import com.simprints.eventsystem.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo as CoreIntegrationInfo
+import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo as CoreIntegrationInfo
 
 
 enum class IntegrationInfo {

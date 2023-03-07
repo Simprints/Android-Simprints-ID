@@ -3,11 +3,6 @@ package com.simprints.id.activities.enrollast
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Failed
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Success
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
@@ -25,6 +20,10 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.logging.Simber
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
@@ -269,7 +268,7 @@ class EnrolLastBiometricsViewModelTest {
     fun exceptionDuringEnrolment_shouldFail() {
         runTest {
             every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns false
-            val exception = EnrolmentEventValidatorException()
+            val exception = Exception()
             coEvery { enrolHelper.enrol(any()) } throws exception
             viewModel.processEnrolLastBiometricsRequest(
                 buildRequestWithFacePreviousStepsHavingAHighConfidence(30f)

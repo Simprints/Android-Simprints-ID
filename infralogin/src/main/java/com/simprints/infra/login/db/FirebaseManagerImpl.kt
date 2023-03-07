@@ -6,10 +6,9 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GetTokenResult
-import com.google.firebase.internal.api.FirebaseNoSignedInUserException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.domain.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.infra.login.domain.LoginInfoManager
@@ -17,14 +16,15 @@ import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class FirebaseManagerImpl @Inject constructor(
-    val loginInfoManager: LoginInfoManager,
-    @ApplicationContext val context: Context,
+    private val loginInfoManager: LoginInfoManager,
+    @ApplicationContext private val context: Context,
+    @DispatcherIO private val dispatcherIO: CoroutineDispatcher
 ) : RemoteDbManager {
 
     override suspend fun signIn(token: Token) {
@@ -63,25 +63,22 @@ internal class FirebaseManagerImpl @Inject constructor(
     }
 
     override suspend fun getCurrentToken(): String =
-        withContext(Dispatchers.IO) {
+        withContext(dispatcherIO) {
             // Projects that were signed in and then updated to 2021.2.0 need to check the
             // previous Firebase project until they login again.
             val result = try {
                 FirebaseAuth.getInstance(getLegacyAppFallback())
-                    .getAccessToken(false).await() as GetTokenResult
+                    .currentUser
+                    ?.getIdToken(false)
+                    ?.await()
             } catch (ex: Exception) {
-                if (ex is FirebaseNoSignedInUserException) {
-                    Simber.d(ex)
-                    null
-                } else {
-                    throw transformFirebaseExceptionIfNeeded(ex)
-                }
+                Simber.e(ex, "Failed to get access token")
+                throw transformFirebaseExceptionIfNeeded(ex)
             }
 
-            result?.token?.let {
-                cacheTokenClaims(it)
-                it
-            } ?: throw RemoteDbNotSignedInException()
+            result?.token
+                ?.also { cacheTokenClaims(it) }
+                ?: throw RemoteDbNotSignedInException()
         }
 
 

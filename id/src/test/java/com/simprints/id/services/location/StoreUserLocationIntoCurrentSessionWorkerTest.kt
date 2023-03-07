@@ -1,10 +1,10 @@
 package com.simprints.id.services.location
 
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.session.SessionCaptureEvent
-import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.testtools.TestData
 import com.simprints.id.tools.LocationManager
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify

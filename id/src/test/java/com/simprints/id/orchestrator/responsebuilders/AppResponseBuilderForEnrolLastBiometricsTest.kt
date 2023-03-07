@@ -1,10 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.orchestrator.steps.Step
@@ -13,6 +9,10 @@ import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test

@@ -2,13 +2,13 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposi
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.modality.Modes
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -42,7 +42,7 @@ class ModuleRepositoryImplTest {
         every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d")
         coEvery {
             mockConfigManager.getDeviceConfiguration()
-        } returns DeviceConfiguration("", listOf("b", "c"), listOf(), "")
+        } returns DeviceConfiguration("", listOf("b", "c"), "")
     }
 
     @Test
@@ -61,7 +61,7 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(), ""))
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
         // Comparing string representation as when executing the lambda captured in the mock it will
         // not return an ArrayList but a LinkedHashMap.
         assertThat(updatedConfig.selectedModules.toString()).isEqualTo(selectedModuleNames.toString())

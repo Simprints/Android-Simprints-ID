@@ -154,15 +154,9 @@
     <string name="exit_form_capture_face">Capturer le visage</string>
     <string name="exit_form_return_to_simprints">Retourner à Simprints</string>
     <string name="face_feature_alert">fonctionalité de reconnaissance faciale</string>
-    <string name="finger_selection_activity_title">Choississez les doigts</string>
-    <string name="finger_selection_add_finger">+ Ajouter un doigt</string>
-    <string name="finger_selection_confirm_dialog_text">Sauvegarder les réglages?</string>
-    <string name="finger_selection_confirm_dialog_yes">Sauvegarder</string>
-    <string name="finger_selection_confirm_dialog_no">Annuler</string>
+    <string name="finger_selection_fragment_title">Choississez les doigts</string>
     <string name="finger_selection_finger_label">Doigt</string>
     <string name="finger_selection_quantity_label">Quantité</string>
-    <string name="finger_selection_reset">Réinitialiser</string>
-    <string name="finger_selection_invalid">Sélection invalide - il y a plus de 5 instances d\'un doigt</string>
     <string name="fingerprint_face_feature_alert">fonctionalité d\'empreinte digitale et de reconnaissance faciale</string>
     <string name="fingerprint_feature_alert">fonctionalité d\'empreinte digitale</string>
     <string name="l_1_finger_name">Pouce gauche</string>
@@ -171,7 +165,7 @@
     <string name="l_4_finger_name">Annulaire gauche</string>
     <string name="l_5_finger_name">Auriculaire gauche</string>
     <string name="loading_candidates">Chargement des candidats…</string>
-    <string name="preference_select_fingers_title">Selectionnez les doigts par défault</string>
+    <string name="preference_view_fingers_title">Selectionnez les doigts par défault</string>
     <string name="preference_summary_settings_fingers">Sélectionnez les doigts que vous souhaitez scanner</string>
     <string name="r_1_finger_name">Pouce droit</string>
     <string name="r_2_finger_name">Index droit</string>

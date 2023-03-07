@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent.Result.Companion.fromFaceDetectionStatus
 import com.simprints.face.models.FaceDetection
 import org.junit.Test
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result as CoreFaceCaptureEventResult
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result as CoreFaceCaptureEventResult
 
 class FaceCaptureEventTest {
 

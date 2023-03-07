@@ -1,10 +1,10 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent as FingerprintCaptureBiometricsEventCore
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent as FingerprintCaptureBiometricsEventCore
 
 @Keep
 class FingerprintCaptureBiometricsEvent(

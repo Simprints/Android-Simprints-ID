@@ -2,9 +2,9 @@ package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.utils.EncodingUtilsImpl
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.detection.Face
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureBiometricsEvent as CoreFaceCaptureBiometricsEventFace
+import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent as CoreFaceCaptureBiometricsEventFace
 
 @Keep
 class FaceCaptureBiometricsEvent(

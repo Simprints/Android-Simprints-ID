@@ -1,8 +1,8 @@
 package com.simprints.face.controllers.core.image
 
-import com.simprints.eventsystem.event.EventRepository
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject

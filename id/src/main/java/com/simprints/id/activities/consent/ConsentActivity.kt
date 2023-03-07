@@ -12,11 +12,6 @@ import com.google.android.material.tabs.TabLayout
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.eventsystem.event.domain.models.ConsentEvent
-import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
-import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
-import com.simprints.eventsystem.event.domain.models.ConsentEvent.ConsentPayload.Type
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.databinding.ActivityConsentBinding
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -30,6 +25,11 @@ import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.events.event.domain.models.ConsentEvent
+import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload
+import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
+import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
+import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type
 import com.simprints.infra.resources.R
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

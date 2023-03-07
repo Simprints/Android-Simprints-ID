@@ -57,7 +57,7 @@ dependencies {
     api(project(":infraenrolmentrecords"))
     implementation(project(":infralogging"))
     api(project(":core"))
-    api(project(":eventsystem"))
+    api(project(":infraevents"))
     implementation(project(":infraresources"))
     api(project(":infralicense"))
     api(project(":infraimages"))
