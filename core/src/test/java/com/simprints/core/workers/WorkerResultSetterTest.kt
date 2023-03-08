@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.common
+package com.simprints.core.workers
 
 import androidx.work.ListenableWorker.Result
 import androidx.work.workDataOf
@@ -6,13 +6,15 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Test
 
-class WorkerResultSetterImplTest {
+class WorkerResultSetterTest {
 
-    lateinit var setter: WorkerResultSetter
     private val outputData = workDataOf()
+
+    private lateinit var setter: WorkerResultSetter
+
     @Before
     fun setup(){
-        setter = WorkerResultSetterImpl()
+        setter = WorkerResultSetter()
     }
 
     @Test

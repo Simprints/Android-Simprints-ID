@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.Priority
 import com.simprints.core.DispatcherMain
-import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.id.tools.LocationManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.session.Location
@@ -31,8 +31,7 @@ class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constructor(
     private val eventRepository: EventRepository,
     private val locationManager: LocationManager,
     @DispatcherMain private val dispatcher: CoroutineDispatcher,
-) :
-    SimCoroutineWorker(context, params) {
+) : SimCoroutineWorker(context, params) {
 
 
     override val tag: String = StoreUserLocationIntoCurrentSessionWorker::class.java.simpleName
