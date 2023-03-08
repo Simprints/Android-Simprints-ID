@@ -11,7 +11,6 @@ import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigrat
 import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.LAST_INSTRUCTION_ID_KEY
 import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.SELECTED_MODULES_KEY
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
-import com.simprints.infra.config.local.models.ProtoFinger
 import com.simprints.infra.config.testtools.protoDeviceConfiguration
 import com.simprints.infra.login.LoginManager
 import io.mockk.every
@@ -120,17 +119,6 @@ class DeviceConfigSharedPrefsMigrationTest {
 
         val expectedDeviceConfiguration = ProtoDeviceConfiguration
             .newBuilder()
-            .setFingersToCollect(
-                ProtoDeviceConfiguration.FingersToCollect.newBuilder()
-                    .addAllFingersToCollect(
-                        listOf(
-                            ProtoFinger.LEFT_THUMB,
-                            ProtoFinger.LEFT_THUMB,
-                            ProtoFinger.LEFT_INDEX_FINGER
-                        )
-                    )
-                    .setIsOverwritten(true)
-            )
             .build()
         assertThat(deviceConfiguration).isEqualTo(expectedDeviceConfiguration)
     }

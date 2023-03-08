@@ -2,7 +2,7 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.eventsystem.event.domain.models.ScannerFirmwareUpdateEvent as ScannerFirmwareUpdateEventCore
+import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent as ScannerFirmwareUpdateEventCore
 
 /**
  * This class represents a event from updating the firmware on the scanner.

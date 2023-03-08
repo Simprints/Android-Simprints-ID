@@ -1,12 +1,15 @@
 package com.simprints.id.activities.coreexitform
 
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.models.RefusalEvent
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.id.data.exitform.toRefusalEventAnswer
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
+import io.mockk.slot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

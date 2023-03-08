@@ -1,12 +1,18 @@
 package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.models.FaceDetection
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face as CoreFaceCaptureEventFace
-import com.simprints.eventsystem.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result as CoreFaceCaptureEventResult
+import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
+import kotlin.Boolean
+import kotlin.Float
+import kotlin.Int
+import kotlin.Long
+import kotlin.String
+import kotlin.let
 import com.simprints.face.detection.Face as DetectionFace
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent as CoreFaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Face as CoreFaceCaptureEventFace
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload.Result as CoreFaceCaptureEventResult
 
 @Keep
 class FaceCaptureEvent(

@@ -41,7 +41,7 @@ class EnrolmentRecordWorkerTest {
         worker.doWork()
 
         coVerify(exactly = 1) { manager.uploadRecords(listOf(SUBJECT_ID)) }
-        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(), ""))
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
         assertThat(updatedConfig.lastInstructionId).isEqualTo(INSTRUCTION_ID)
     }
 }

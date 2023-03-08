@@ -1,13 +1,6 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.eventsystem.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.eventsystem.sampledata.createFaceCaptureBiometricsEvent
-import com.simprints.eventsystem.sampledata.createFingerprintCaptureBiometricsEvent
-import com.simprints.eventsystem.sampledata.createPersonCreationEvent
-import com.simprints.eventsystem.sampledata.createSessionCaptureEvent
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
@@ -15,6 +8,14 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createPersonCreationEvent
+import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -71,7 +72,7 @@ class PersonCreationEventHelperImplTest {
     )
 
     @MockK
-    lateinit var eventRepository: com.simprints.eventsystem.event.EventRepository
+    lateinit var eventRepository: EventRepository
 
     @MockK
     lateinit var timeHelper: TimeHelper
@@ -166,7 +167,7 @@ class PersonCreationEventHelperImplTest {
                 currentSession,
                 fingerprintCaptureBiometricsEvent,
                 faceCaptureBiometricsEvent,
-                createPersonCreationEvent()
+                    createPersonCreationEvent()
             )
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(

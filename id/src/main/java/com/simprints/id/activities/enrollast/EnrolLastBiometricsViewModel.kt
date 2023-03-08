@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.eventsystem.exceptions.validator.EnrolmentEventValidatorException
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Failed
 import com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity.ViewState.Success
@@ -131,7 +130,7 @@ class EnrolLastBiometricsViewModel @Inject constructor(
             val subject = enrolLastBiometricsRequest.buildSubject(steps)
             enrolmentHelper.enrol(subject)
             Success(subject.subjectId)
-        } catch (e: EnrolmentEventValidatorException) {
+        } catch (e: Exception) {
             Simber.e(e)
             Failed
         }

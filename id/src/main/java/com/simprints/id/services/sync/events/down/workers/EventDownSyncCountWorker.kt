@@ -11,9 +11,6 @@ import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
@@ -22,10 +19,13 @@ import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWork
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.Companion.tagForType
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.DOWNLOADER
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType.UPLOADER
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.infra.events.event.domain.EventCount
+import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.events.events_sync.down.domain.EventDownSyncScope
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerType.UPLOADER
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException

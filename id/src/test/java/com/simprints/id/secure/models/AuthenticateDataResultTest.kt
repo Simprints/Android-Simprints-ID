@@ -1,7 +1,7 @@
 package com.simprints.id.secure.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.domain.models.AuthenticationEvent
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import org.junit.Test
 
 class AuthenticateDataResultKtTest {

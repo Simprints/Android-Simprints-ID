@@ -4,9 +4,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
 import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
-import com.simprints.infra.config.local.models.toProto
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -47,19 +45,6 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
                     .setIsOverwritten(isOverridden)
                     .build()
                 LanguageHelper.language = language
-            }
-
-            val fingersToCollect = prefs.getString(FINGERS_TO_COLLECT_KEY, "")
-            if (!fingersToCollect.isNullOrEmpty()) {
-                val isOverridden = prefs.getBoolean(FINGERS_TO_COLLECT_OVERRIDDEN_KEY, false)
-                proto.fingersToCollect = ProtoDeviceConfiguration.FingersToCollect.newBuilder()
-                    .addAllFingersToCollect(
-                        fingersToCollect
-                            .split(",")
-                            .map { finger -> Finger.valueOf(finger).toProto() }
-                    )
-                    .setIsOverwritten(isOverridden)
-                    .build()
             }
 
             val selectedModules = prefs.getString(SELECTED_MODULES_KEY, "")
