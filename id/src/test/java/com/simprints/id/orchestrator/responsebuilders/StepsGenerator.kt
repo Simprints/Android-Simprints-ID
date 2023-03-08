@@ -17,6 +17,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
 import com.simprints.infra.config.domain.models.Finger
 import io.mockk.mockk
 
@@ -68,7 +69,7 @@ private fun buildMatchResults(includeHighMatch: Boolean) = if (includeHighMatch)
     )
 } else {
     listOf(
-        FingerprintMatchResult("person_id2", 15f),
+        FingerprintMatchResult("person_id", 15f),
         FingerprintMatchResult("person_id2", 30f)
     )
 }
@@ -114,6 +115,15 @@ fun mockFaceMatchStep(includeHighMatch: Boolean = true): Step {
         status = Step.Status.COMPLETED
     )
 }
+
+fun mockCoreExitFormResponse() = Step(
+        requestCode = 0,
+        activityName = "",
+        bundleKey = "",
+        request = mockk(),
+        result = CoreExitFormResponse(),
+        status = Step.Status.COMPLETED
+    )
 
 private fun buildMatchResultsForFace(includeHighMatch: Boolean) = if (includeHighMatch) {
     listOf(
