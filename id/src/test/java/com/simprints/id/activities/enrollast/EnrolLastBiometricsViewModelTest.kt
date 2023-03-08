@@ -247,6 +247,79 @@ class EnrolLastBiometricsViewModelTest {
     }
 
     @Test
+    fun fingerprintAndFaceWithEnrolmentPlus_processRequestWithHighConfidenceInFingerprint_shouldFail() {
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
+            viewModel.processEnrolLastBiometricsRequest(
+                EnrolLastBiometricsRequest(
+                    DEFAULT_PROJECT_ID,
+                    DEFAULT_USER_ID,
+                    DEFAULT_MODULE_ID,
+                    buildFaceMatchStepsWithConfidence(10f) +
+                        buildFingerprintMatchStepsWithConfidence(40f),
+                    GUID1
+                )
+            )
+
+            assertThat(viewModel.getViewStateLiveData().value).isEqualTo(Failed)
+            verify { Simber.i(any<DuplicateBiometricEnrolmentCheckFailed>()) }
+        }
+    }
+
+    @Test
+    fun fingerprintAndFaceWithEnrolmentPlus_processRequestWithHighConfidenceInFace_shouldFail() {
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
+            viewModel.processEnrolLastBiometricsRequest(
+                EnrolLastBiometricsRequest(
+                    DEFAULT_PROJECT_ID,
+                    DEFAULT_USER_ID,
+                    DEFAULT_MODULE_ID,
+                    buildFaceMatchStepsWithConfidence(40f) +
+                        buildFingerprintMatchStepsWithConfidence(10f),
+                    GUID1
+                )
+            )
+
+            assertThat(viewModel.getViewStateLiveData().value).isEqualTo(Failed)
+            verify { Simber.i(any<DuplicateBiometricEnrolmentCheckFailed>()) }
+        }
+    }
+
+    @Test
+    fun fingerprintAndFaceWithEnrolmentPlus_processRequestWithNoHighConfidence_shouldSucceedWithRegistration() {
+        runTest {
+            every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
+            viewModel.processEnrolLastBiometricsRequest(
+                EnrolLastBiometricsRequest(
+                    DEFAULT_PROJECT_ID,
+                    DEFAULT_USER_ID,
+                    DEFAULT_MODULE_ID,
+                    buildFaceMatchStepsWithConfidence(10f) +
+                        buildFingerprintMatchStepsWithConfidence(10f),
+                    GUID1
+                )
+            )
+            val newEnrolment = mockk<Subject>()
+            every {
+                enrolHelper.buildSubject(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns newEnrolment
+
+            with(viewModel.getViewStateLiveData()) {
+                assertThat(this.value).isInstanceOf(Success::class.java)
+                assertThat((this.value as Success).newGuid).isEqualTo(newEnrolment.subjectId)
+            }
+        }
+    }
+
+    @Test
     fun requestWithNeitherFingerprintNorFaceMatchResponse_shouldFail() {
         runTest {
             every { generalConfiguration.duplicateBiometricEnrolmentCheck } returns true
