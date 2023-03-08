@@ -2,9 +2,9 @@ package com.simprints.feature.dashboard.tools.di
 
 import com.simprints.feature.dashboard.debug.SecurityStateScheduler
 import com.simprints.feature.dashboard.main.sync.DeviceManager
-import com.simprints.feature.dashboard.main.sync.EventSyncCache
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.about.SignerManager
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

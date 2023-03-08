@@ -3,13 +3,12 @@ package com.simprints.id.services.sync.events.master.workers
 import androidx.work.ListenableWorker
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.workers.EventEndSyncReporterWorker.Companion.SYNC_ID_TO_MARK_AS_COMPLETED
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test

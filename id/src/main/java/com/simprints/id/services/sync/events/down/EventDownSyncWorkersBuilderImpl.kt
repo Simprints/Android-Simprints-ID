@@ -2,7 +2,6 @@ package com.simprints.id.services.sync.events.down
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
@@ -14,6 +13,7 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
+import com.simprints.infra.eventsync.sync.common.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

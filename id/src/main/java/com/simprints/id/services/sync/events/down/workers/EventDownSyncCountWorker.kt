@@ -12,13 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
 import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -26,6 +20,8 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
+import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException

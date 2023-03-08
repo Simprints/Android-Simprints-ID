@@ -6,7 +6,6 @@ import androidx.work.WorkInfo.State.*
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
@@ -17,10 +16,6 @@ import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplT
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.UNIQUE_SYNC_ID
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.UNIQUE_UP_SYNC_ID
 import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImplTest.Companion.UPLOADED
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
-import com.simprints.id.services.sync.events.master.internal.OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
@@ -31,6 +26,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.*
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.*
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.sync.common.*
 import java.util.*
 
 fun EventSyncWorkerState.assertEqualToFailedState(e: Failed) {
@@ -214,22 +210,22 @@ fun createCommonDownSyncTags(
     uniqueMasterSyncId: String?,
     uniqueSyncId: String?
 ) = listOf(
-    "${TAG_DOWN_MASTER_SYNC_ID}${uniqueSyncId}",
-    "${TAG_SCHEDULED_AT}${Date().time}",
+    "$TAG_DOWN_MASTER_SYNC_ID${uniqueSyncId}",
+    "$TAG_SCHEDULED_AT${Date().time}",
     TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS,
     TAG_SUBJECTS_SYNC_ALL_WORKERS,
-    "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
+    "$TAG_MASTER_SYNC_ID${uniqueMasterSyncId}"
 )
 
 private fun createCommonUpSyncTags(
     uniqueMasterSyncId: String?,
     uniqueSyncId: String?
 ) = listOf(
-    "${TAG_UP_MASTER_SYNC_ID}${uniqueSyncId}",
-    "${TAG_SCHEDULED_AT}${Date().time}",
+    "$TAG_UP_MASTER_SYNC_ID${uniqueSyncId}",
+    "$TAG_SCHEDULED_AT${Date().time}",
     TAG_SUBJECTS_UP_SYNC_ALL_WORKERS,
     TAG_SUBJECTS_SYNC_ALL_WORKERS,
-    "${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}"
+    "$TAG_MASTER_SYNC_ID${uniqueMasterSyncId}"
 )
 
 fun createWorkInfo(

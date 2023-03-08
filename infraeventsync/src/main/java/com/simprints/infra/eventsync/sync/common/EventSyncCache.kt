@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.master.internal
+package com.simprints.infra.eventsync.sync.common
 
 import java.util.*
 

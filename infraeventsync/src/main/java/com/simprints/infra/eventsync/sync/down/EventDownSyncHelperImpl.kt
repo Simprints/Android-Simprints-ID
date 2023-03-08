@@ -1,9 +1,7 @@
-package com.simprints.id.services.sync.events.down
+package com.simprints.infra.eventsync.sync.down
 
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.data.db.subject.domain.SubjectFactory
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
@@ -17,6 +15,7 @@ import com.simprints.infra.eventsync.EventSyncRepository
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.*
+import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.*

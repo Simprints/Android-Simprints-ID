@@ -8,10 +8,10 @@ import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.events.up.EventUpSyncHelper
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
+import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.eventsync.sync.up.EventUpSyncHelper
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":infralogging"))
     api(project(":infraevents"))
     implementation(project(":infranetwork"))
+    implementation(project(":infraenrolmentrecords"))
 
     implementation(libs.androidX.room.ktx)
     kapt(libs.androidX.room.compiler)

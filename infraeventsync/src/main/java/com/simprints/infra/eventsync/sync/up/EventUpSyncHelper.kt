@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.up
+package com.simprints.infra.eventsync.sync.up
 
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import kotlinx.coroutines.CoroutineScope

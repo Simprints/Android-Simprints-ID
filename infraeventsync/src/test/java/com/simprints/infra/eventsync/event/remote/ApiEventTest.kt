@@ -4,11 +4,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.*
+import com.simprints.infra.events.sampledata.*
+import com.simprints.infra.eventsync.event.*
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
-import com.simprints.infra.events.sampledata.*
-import com.simprints.infra.eventsync.event.*
 import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith

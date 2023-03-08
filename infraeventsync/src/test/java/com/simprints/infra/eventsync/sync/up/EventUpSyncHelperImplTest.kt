@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.up
+package com.simprints.infra.eventsync.sync.up
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
@@ -39,7 +39,9 @@ class EventUpSyncHelperImplTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
 
-    private val synchronizationConfiguration = mockk<SynchronizationConfiguration>()
+    private val synchronizationConfiguration = mockk<SynchronizationConfiguration> {
+        every { up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+    }
     private val projectConfiguration = mockk<ProjectConfiguration> {
         every { synchronization } returns synchronizationConfiguration
     }
@@ -74,12 +76,7 @@ class EventUpSyncHelperImplTest {
     fun upSync_shouldConsumeRepoEventChannel() = runTest {
         eventUpSyncHelper.upSync(this, operation).toList()
 
-        coVerify {
-            eventSyncRepository.uploadEvents(
-                operation.projectId,
-                any(), any(), any()
-            )
-        }
+        coVerify { eventSyncRepository.uploadEvents(operation.projectId, any(), any(), any()) }
     }
 
     @Test
@@ -155,9 +152,8 @@ class EventUpSyncHelperImplTest {
         val sequenceOfProgress = flowOf(1, 1, 1)
         mockProgressEmission(sequenceOfProgress)
 
-        val channel = eventUpSyncHelper.upSync(this, operation)
+        val progress = eventUpSyncHelper.upSync(this, operation).toList()
 
-        val progress = channel.toList()
         sequenceOfProgress.onEach {
             assertThat(progress[it].progress).isEqualTo(it)
             assertThat(progress[it].operation.lastState).isEqualTo(RUNNING)

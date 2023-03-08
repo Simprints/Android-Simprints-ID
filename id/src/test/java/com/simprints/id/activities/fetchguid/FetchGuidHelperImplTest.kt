@@ -3,8 +3,8 @@ package com.simprints.id.activities.fetchguid
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.down.EventDownSyncProgress
+import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.EventDownSyncProgress
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration

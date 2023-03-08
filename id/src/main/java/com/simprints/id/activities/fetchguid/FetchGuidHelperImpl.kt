@@ -3,7 +3,7 @@ package com.simprints.id.activities.fetchguid
 import com.simprints.core.DispatcherIO
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.id.services.sync.events.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
 import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager

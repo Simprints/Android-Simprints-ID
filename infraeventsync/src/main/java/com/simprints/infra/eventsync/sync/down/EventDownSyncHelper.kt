@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.down
+package com.simprints.infra.eventsync.sync.down
 
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation

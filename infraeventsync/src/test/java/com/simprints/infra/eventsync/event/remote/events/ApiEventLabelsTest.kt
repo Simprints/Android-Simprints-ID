@@ -1,12 +1,12 @@
 package com.simprints.infra.eventsync.event.remote.events
 
 import com.google.common.truth.Truth
-import com.simprints.infra.eventsync.event.remote.models.ApiEventLabels
-import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
-import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
+import com.simprints.infra.eventsync.event.remote.models.ApiEventLabels
+import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
+import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import org.junit.Test
 
 class ApiEventLabelsTest {
