@@ -7,8 +7,8 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC

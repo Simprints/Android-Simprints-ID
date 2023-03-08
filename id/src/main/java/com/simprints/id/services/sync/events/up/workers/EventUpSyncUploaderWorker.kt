@@ -12,8 +12,8 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.events_sync.up.domain.old.toNewScope
 import com.simprints.id.exceptions.unexpected.MalformedSyncOperationException
+import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.internal.OUTPUT_ESTIMATED_MAINTENANCE_TIME

@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.common
+package com.simprints.core.workers
 
 import android.content.Context
 import androidx.work.CoroutineWorker
@@ -9,13 +9,13 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CancellationException
 
-const val SYNC_LOG_TAG = "SYNC"
-
-abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) :
-    CoroutineWorker(context, params) {
+abstract class SimCoroutineWorker(
+    context: Context,
+    params: WorkerParameters,
+) : CoroutineWorker(context, params) {
 
     abstract val tag: String
-    var resultSetter: WorkerResultSetter = WorkerResultSetterImpl()
+    private var resultSetter = WorkerResultSetter()
 
     protected fun retry(t: Throwable? = null, message: String = t?.message ?: ""): Result {
         crashlyticsLog("$tag - Retry] $message")

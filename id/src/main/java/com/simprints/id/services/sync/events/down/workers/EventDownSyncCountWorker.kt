@@ -11,8 +11,8 @@ import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN

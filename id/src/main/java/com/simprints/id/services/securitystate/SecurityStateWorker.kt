@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.id.secure.securitystate.SecurityStateProcessor
 import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.core.workers.SimCoroutineWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher

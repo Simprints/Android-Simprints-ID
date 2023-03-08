@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
-import com.simprints.id.services.sync.events.common.SimCoroutineWorker
+import com.simprints.core.workers.SimCoroutineWorker
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
