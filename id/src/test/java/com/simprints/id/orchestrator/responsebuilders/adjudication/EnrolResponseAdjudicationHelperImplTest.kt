@@ -5,8 +5,6 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
-import com.simprints.id.orchestrator.responsebuilders.FaceConfidenceThresholds
-import com.simprints.id.orchestrator.responsebuilders.FingerprintConfidenceThresholds
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.ProjectConfiguration
@@ -17,8 +15,10 @@ import org.junit.Test
 class EnrolResponseAdjudicationHelperImplTest {
 
     companion object {
-        private val fingerprintConfidenceDecisionPolicy = DecisionPolicy(15, 30, 40)
-        private val faceConfidenceDecisionPolicy = DecisionPolicy(15, 30, 40)
+        private const val mediumConfidenceScore = 30
+        private const val lowerThanMediumConfidenceScore = mediumConfidenceScore - 1
+        private val fingerprintConfidenceDecisionPolicy = DecisionPolicy(15, mediumConfidenceScore, 40)
+        private val faceConfidenceDecisionPolicy = DecisionPolicy(15, mediumConfidenceScore, 40)
     }
 
     private val isEnrolmentPlus = true
@@ -37,12 +37,22 @@ class EnrolResponseAdjudicationHelperImplTest {
         EnrolResponseAdjudicationHelperImpl()
 
     @Test
-    fun getAdjudicationForFingerprintConfidenceScoreBelowMedium_shouldReturnEnrolAction() {
-        val lowerThanMediumConfidenceScore = 29f
+    fun getAdjudicationForNoMatchResponse_shouldReturnEnrolAction() {
         val adjudication =
             enrolResponseAdjudicationHelper.getAdjudicationAction(
                 projectConfiguration,
-                buildFingerprintMatchStepsWithMatchScore(lowerThanMediumConfidenceScore)
+                listOf()
+            )
+
+        assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.ENROL)
+    }
+
+    @Test
+    fun getAdjudicationForFingerprintConfidenceScoreBelowMedium_shouldReturnEnrolAction() {
+        val adjudication =
+            enrolResponseAdjudicationHelper.getAdjudicationAction(
+                projectConfiguration,
+                buildFingerprintMatchStepsWithMatchScore(lowerThanMediumConfidenceScore.toFloat())
             )
 
         assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.ENROL)
@@ -50,24 +60,33 @@ class EnrolResponseAdjudicationHelperImplTest {
 
     @Test
     fun getAdjudicationForFingerprintConfidenceScoreAboveMedium_shouldReturnIdentifyAction() {
-        val mediumConfidenceScore = 30f
         val adjudication =
             enrolResponseAdjudicationHelper.getAdjudicationAction(
                 projectConfiguration,
-                buildFingerprintMatchStepsWithMatchScore(mediumConfidenceScore)
+                buildFingerprintMatchStepsWithMatchScore(mediumConfidenceScore.toFloat())
             )
 
         assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.IDENTIFY)
     }
 
-
     @Test
-    fun getAdjudicationForFaceConfidenceScoreBelowMedium_shouldReturnEnrolAction() {
-        val lowerThanMediumConfidenceScore = 29f
+    fun getAdjudicationForFingerprintConfidenceScoreAboveMediumWithDbecOff_shouldReturnEnrolAction() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns false
         val adjudication =
             enrolResponseAdjudicationHelper.getAdjudicationAction(
                 projectConfiguration,
-                buildFaceMatchStepsWithConfidenceScore(lowerThanMediumConfidenceScore)
+                buildFingerprintMatchStepsWithMatchScore(mediumConfidenceScore.toFloat())
+            )
+
+        assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.ENROL)
+    }
+
+    @Test
+    fun getAdjudicationForFaceConfidenceScoreBelowMedium_shouldReturnEnrolAction() {
+        val adjudication =
+            enrolResponseAdjudicationHelper.getAdjudicationAction(
+                projectConfiguration,
+                buildFaceMatchStepsWithConfidenceScore(lowerThanMediumConfidenceScore.toFloat())
             )
 
         assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.ENROL)
@@ -75,14 +94,73 @@ class EnrolResponseAdjudicationHelperImplTest {
 
     @Test
     fun getAdjudicationForFaceConfidenceScoreAboveMedium_shouldReturnIdentifyAction() {
-        val mediumConfidenceScore = 30f
         val adjudication =
             enrolResponseAdjudicationHelper.getAdjudicationAction(
                 projectConfiguration,
-                buildFaceMatchStepsWithConfidenceScore(mediumConfidenceScore)
+                buildFaceMatchStepsWithConfidenceScore(mediumConfidenceScore.toFloat())
             )
 
         assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.IDENTIFY)
+    }
+
+    @Test
+    fun getAdjudicationForFaceConfidenceScoreAboveMediumWithDbecOff_shouldReturnEnrolAction() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns false
+        val adjudication =
+            enrolResponseAdjudicationHelper.getAdjudicationAction(
+                projectConfiguration,
+                buildFaceMatchStepsWithConfidenceScore(mediumConfidenceScore.toFloat())
+            )
+
+        assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.ENROL)
+    }
+
+    @Test
+    fun getAdjudicationForFingerprintAboveAndFaceBelowMedium_shouldReturnIdentifyAction() {
+        val adjudication =
+            enrolResponseAdjudicationHelper.getAdjudicationAction(
+                projectConfiguration,
+                buildFingerprintMatchStepsWithMatchScore(mediumConfidenceScore.toFloat()) +
+                    buildFaceMatchStepsWithConfidenceScore(lowerThanMediumConfidenceScore.toFloat())
+            )
+
+        assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.IDENTIFY)
+    }
+
+    @Test
+    fun getAdjudicationForFingerprintBelowAndFaceAboveMedium_shouldReturnIdentifyAction() {
+        val adjudication =
+            enrolResponseAdjudicationHelper.getAdjudicationAction(
+                projectConfiguration,
+                buildFingerprintMatchStepsWithMatchScore(lowerThanMediumConfidenceScore.toFloat()) +
+                    buildFaceMatchStepsWithConfidenceScore(mediumConfidenceScore.toFloat())
+            )
+
+        assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.IDENTIFY)
+    }
+
+    @Test
+    fun getAdjudicationForFingerprintAndFaceAboveMedium_shouldReturnIdentifyAction() {
+        val adjudication =
+            enrolResponseAdjudicationHelper.getAdjudicationAction(
+                projectConfiguration,
+                buildFingerprintMatchStepsWithMatchScore(mediumConfidenceScore.toFloat()) +
+                    buildFaceMatchStepsWithConfidenceScore(mediumConfidenceScore.toFloat())
+            )
+
+        assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.IDENTIFY)
+    }
+
+    @Test
+    fun getAdjudicationForFingerprintAndFaceBelowMedium_shouldReturnEnrolAction() {
+        val adjudication =
+            enrolResponseAdjudicationHelper.getAdjudicationAction(
+                projectConfiguration,
+                buildFingerprintMatchStepsWithMatchScore(lowerThanMediumConfidenceScore.toFloat()) +
+                    buildFaceMatchStepsWithConfidenceScore(lowerThanMediumConfidenceScore.toFloat())
+            )
+
+        assertThat(adjudication).isEqualTo(EnrolAdjudicationAction.ENROL)
     }
 
     private fun buildFingerprintMatchStepsWithMatchScore(confidenceScore: Float) = listOf(
