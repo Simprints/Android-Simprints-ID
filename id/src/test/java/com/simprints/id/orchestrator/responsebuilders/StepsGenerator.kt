@@ -62,15 +62,26 @@ fun mockFingerprintMatchStep(includeHighMatch: Boolean = true): Step {
     )
 }
 
+fun mockEmptyFingerprintMatchStep() = Step(
+        requestCode = 234,
+        activityName = "com.simprints.id.MyFingerprintActivity",
+        bundleKey = "BUNDLE_KEY",
+        request = FingerprintMatchRequest(mockk(), mockk()),
+        result = FingerprintMatchResponse(listOf()),
+        status = Step.Status.COMPLETED
+    )
+
 private fun buildMatchResults(includeHighMatch: Boolean) = if (includeHighMatch) {
     listOf(
         FingerprintMatchResult("person_id", 40f),
-        FingerprintMatchResult("person_id2", 15f)
+        FingerprintMatchResult("person_id2", 15f),
+        FingerprintMatchResult("person_id3", 10f)
     )
 } else {
     listOf(
         FingerprintMatchResult("person_id", 15f),
-        FingerprintMatchResult("person_id2", 30f)
+        FingerprintMatchResult("person_id2", 30f),
+        FingerprintMatchResult("person_id3", 10f)
     )
 }
 
@@ -116,6 +127,15 @@ fun mockFaceMatchStep(includeHighMatch: Boolean = true): Step {
     )
 }
 
+fun mockEmptyFaceMatchStep() = Step(
+        requestCode = 322,
+        activityName = "com.simprints.id.MyFaceActivity",
+        bundleKey = "BUNDLE_KEY",
+        request = FaceMatchRequest(mockk(), mockk()),
+        result = FaceMatchResponse(listOf()),
+        status = Step.Status.COMPLETED
+    )
+
 fun mockCoreExitFormResponse() = Step(
         requestCode = 0,
         activityName = "",
@@ -129,12 +149,14 @@ private fun buildMatchResultsForFace(includeHighMatch: Boolean) = if (includeHig
     listOf(
         FaceMatchResult(guidFound = "guid", confidence = 40f),
         FaceMatchResult(guidFound = "guid2", confidence = 15f),
-        FaceMatchResult(guidFound = "guid3", confidence = 30f)
+        FaceMatchResult(guidFound = "guid3", confidence = 30f),
+        FaceMatchResult(guidFound = "guid4", confidence = 10f),
     )
 } else {
     listOf(
         FaceMatchResult(guidFound = "guid", confidence = 35f),
         FaceMatchResult(guidFound = "guid2", confidence = 15f),
-        FaceMatchResult(guidFound = "guid3", confidence = 30f)
+        FaceMatchResult(guidFound = "guid3", confidence = 30f),
+        FaceMatchResult(guidFound = "guid4", confidence = 10f),
     )
 }

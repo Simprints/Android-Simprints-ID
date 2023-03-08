@@ -171,6 +171,31 @@ class AppResponseBuilderForIdentifyTest {
     }
 
     @Test
+    fun withFingerprintAndEmptyFaceSteps_shouldBuildAppIdentifyResponseWithFingerprint() {
+        runTest {
+            val modalities = listOf(
+                GeneralConfiguration.Modality.FINGERPRINT,
+                GeneralConfiguration.Modality.FACE
+            )
+            val steps = arrayListOf<Step>()
+            steps.add(mockFingerprintCaptureStep())
+            val fingerprintMatchStep = mockFingerprintMatchStep(true)
+            steps.add(fingerprintMatchStep)
+            steps.add(mockFaceCaptureStep())
+            steps.add(mockEmptyFaceMatchStep())
+
+            val response = responseBuilder.buildAppResponse(
+                modalities, mockRequest(), steps, "sessionId"
+            )
+
+            assertThat(response, instanceOf(AppIdentifyResponse::class.java))
+            val actualGuid = (response as? AppIdentifyResponse)?.identifications?.firstOrNull()?.guidFound
+            val expectedGuid = (fingerprintMatchStep.getResult() as? FingerprintMatchResponse)?.result?.first()?.personId
+            assertThat(actualGuid, (equalTo(expectedGuid)))
+        }
+    }
+
+    @Test
     fun withFaceHigherConfidenceAndFingerprintSteps_shouldBuildAppIdentifyResponseWithFace() {
         runTest {
             val modalities = listOf(
@@ -180,6 +205,31 @@ class AppResponseBuilderForIdentifyTest {
             val steps = arrayListOf<Step>()
             steps.add(mockFingerprintCaptureStep())
             steps.add(mockFingerprintMatchStep(false))
+            steps.add(mockFaceCaptureStep())
+            val faceMatchStep = mockFaceMatchStep(true)
+            steps.add(faceMatchStep)
+
+            val response = responseBuilder.buildAppResponse(
+                modalities, mockRequest(), steps, "sessionId"
+            )
+
+            assertThat(response, instanceOf(AppIdentifyResponse::class.java))
+            val actualGuid = (response as? AppIdentifyResponse)?.identifications?.firstOrNull()?.guidFound
+            val expectedGuid = (faceMatchStep.getResult() as? FaceMatchResponse)?.result?.first()?.guidFound
+            assertThat(actualGuid, (equalTo(expectedGuid)))
+        }
+    }
+
+    @Test
+    fun withFaceAndEmptyFingerprintSteps_shouldBuildAppIdentifyResponseWithFace() {
+        runTest {
+            val modalities = listOf(
+                GeneralConfiguration.Modality.FINGERPRINT,
+                GeneralConfiguration.Modality.FACE
+            )
+            val steps = arrayListOf<Step>()
+            steps.add(mockFingerprintCaptureStep())
+            steps.add(mockEmptyFingerprintMatchStep())
             steps.add(mockFaceCaptureStep())
             val faceMatchStep = mockFaceMatchStep(true)
             steps.add(faceMatchStep)
