@@ -1,12 +1,12 @@
 package com.simprints.id.secure
 
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.eventsystem.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.SimNetwork

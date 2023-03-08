@@ -7,9 +7,6 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.eventsystem.event.remote.exceptions.TooManyRequestsException
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
 import com.simprints.id.services.sync.events.common.SimCoroutineWorker
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
@@ -17,6 +14,9 @@ import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.id.services.sync.events.master.internal.*
+import com.simprints.infra.events.remote.exceptions.TooManyRequestsException
+import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException

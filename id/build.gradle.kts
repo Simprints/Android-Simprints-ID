@@ -106,7 +106,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
     implementation(project(":moduleapi"))
-    implementation(project(":eventsystem"))
+    implementation(project(":infraevents"))
     implementation(project(":infralogin"))
     implementation(project(":clientapi"))
     implementation(project(":face"))
@@ -164,7 +164,7 @@ dependencies {
     // ######################################################
     
     testImplementation(project(":fingerprintscannermock"))
-    testImplementation(project(":eventsystem"))
+    testImplementation(project(":infraevents"))
 
     testImplementation(libs.testing.hilt)
     kaptTest(libs.testing.hilt.kapt)

@@ -1,9 +1,9 @@
 package com.simprints.id.services.sync.events.down.workers
 
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncOperation
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.infra.events.events_sync.down.domain.EventDownSyncOperation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.consumeEach
 import javax.inject.Inject

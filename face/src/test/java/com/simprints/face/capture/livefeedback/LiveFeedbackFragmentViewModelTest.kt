@@ -5,7 +5,6 @@ import android.graphics.RectF
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.otaliastudios.cameraview.frame.Frame
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
 import com.simprints.face.FixtureGenerator.getFace
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -20,10 +19,10 @@ import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.PreviewFrame
 import com.simprints.face.models.Size
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule

@@ -281,15 +281,11 @@ internal val protoProject = ProtoProject.newBuilder()
     .build()
 
 internal val deviceConfiguration =
-    DeviceConfiguration("en", listOf("module1", "module2"), listOf(Finger.LEFT_3RD_FINGER),"instruction")
+    DeviceConfiguration("en", listOf("module1", "module2"), "instruction")
 internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
     .setLanguage(
         ProtoDeviceConfiguration.Language.newBuilder().setLanguage("en").build()
     )
     .addAllModuleSelected(listOf("module1", "module2"))
-    .setFingersToCollect(
-        ProtoDeviceConfiguration.FingersToCollect.newBuilder()
-            .addAllFingersToCollect(listOf(ProtoFinger.LEFT_3RD_FINGER)).build()
-    )
     .setLastInstructionId("instruction")
     .build()

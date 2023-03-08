@@ -2,10 +2,10 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent as Vero2InfoSnapshotEventCore
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo as BatteryInfoCore
-import com.simprints.eventsystem.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version as Vero2VersionCore
 import com.simprints.fingerprint.scanner.domain.BatteryInfo as BatteryInfoDomain
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent as Vero2InfoSnapshotEventCore
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo as BatteryInfoCore
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version as Vero2VersionCore
 
 /**
  * This class represents a snapshot of the current state of the vero 2 scanner, capturing basic info.

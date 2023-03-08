@@ -7,7 +7,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCap
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.infra.config.domain.models.Finger
 import org.junit.Test
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
 
 class FingerprintCaptureEventTest {
 

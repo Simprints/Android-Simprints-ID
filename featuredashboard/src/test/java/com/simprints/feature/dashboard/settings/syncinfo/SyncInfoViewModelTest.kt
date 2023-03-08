@@ -3,16 +3,6 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.eventsystem.event.EventRepository
-import com.simprints.eventsystem.event.domain.EventCount
-import com.simprints.eventsystem.event.domain.models.EventType
-import com.simprints.eventsystem.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.eventsystem.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.eventsystem.events_sync.down.domain.EventDownSyncScope
-import com.simprints.eventsystem.events_sync.down.domain.RemoteEventQuery
-import com.simprints.eventsystem.events_sync.models.EventSyncState
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerState
-import com.simprints.eventsystem.events_sync.models.EventSyncWorkerType
 import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
@@ -22,6 +12,16 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.EventCount
+import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
+import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.events.events_sync.down.domain.EventDownSyncScope
+import com.simprints.infra.events.events_sync.down.domain.RemoteEventQuery
+import com.simprints.infra.events.events_sync.models.EventSyncState
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
+import com.simprints.infra.events.events_sync.models.EventSyncWorkerType
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -29,7 +29,6 @@ import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

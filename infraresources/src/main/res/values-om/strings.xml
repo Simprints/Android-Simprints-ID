@@ -32,7 +32,7 @@
     <string name="preference_device_id_title">ID Meeshaa</string>
     <string name="preference_logout_title">Keessaa Bahi</string>
     <string name="preference_scanner_version_title">Varzinii Iskaanarii</string>
-    <string name="preference_select_fingers_title">Ashaaraa qubaa beekamaa filadhu</string>
+    <string name="preference_view_fingers_title">Ashaaraa qubaa beekamaa filadhu</string>
     <string name="preference_select_language_title">Qooqa</string>
     <string name="preference_select_modules_title">Moojuliiwwan filadhu</string>
     <string name="preference_summary_settings_fingers">Quba ashaaraan isaa fuudhuu barbaaddu filadhu</string>

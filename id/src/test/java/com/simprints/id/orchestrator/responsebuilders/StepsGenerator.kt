@@ -1,7 +1,5 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.eventsystem.event.domain.models.face.FaceTemplateFormat
-import com.simprints.eventsystem.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -19,6 +17,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
 import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
+import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import io.mockk.mockk
 
 fun mockFingerprintCaptureStep(): Step {

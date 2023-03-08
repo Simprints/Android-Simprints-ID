@@ -2,8 +2,8 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.eventsystem.event.domain.models.RefusalEvent as CoreRefusalEvent
-import com.simprints.eventsystem.event.domain.models.RefusalEvent.RefusalPayload.Answer as CoreRefusalAnswer
+import com.simprints.infra.events.event.domain.models.RefusalEvent as CoreRefusalEvent
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer as CoreRefusalAnswer
 
 /**
  * This class represents a event from submission of a Refusal form.

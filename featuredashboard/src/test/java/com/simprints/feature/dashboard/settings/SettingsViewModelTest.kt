@@ -67,7 +67,7 @@ class SettingsViewModelTest {
 
         viewModel.updateLanguagePreference(updatedLanguage)
 
-        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), listOf(), ""))
+        val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
 
         assertThat(updatedConfig.language).isEqualTo(updatedLanguage)
         assertThat(viewModel.languagePreference.value).isEqualTo(updatedLanguage)

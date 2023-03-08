@@ -1,15 +1,14 @@
 package com.simprints.id.services.sync.events.down.workers
 
-import com.simprints.eventsystem.sampledata.SampleDefaults.GUID1
-import com.simprints.eventsystem.sampledata.SampleDefaults.projectDownSyncScope
 import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
 import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.EventDownSyncProgress
 import com.simprints.id.services.sync.events.master.internal.EventSyncCache
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.events.sampledata.SampleDefaults.projectDownSyncScope
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.runBlocking
 import org.junit.Before

@@ -3,8 +3,8 @@ package com.simprints.id.testtools
 import android.location.Location
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.core.domain.face.FaceSample
-import com.simprints.eventsystem.sampledata.SampleDefaults
 import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import java.util.*
 import kotlin.random.Random
