@@ -3,12 +3,8 @@ package com.simprints.id.services.sync.events.master
 import android.content.Context
 import androidx.work.*
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.sync.events.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
-import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
-import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.id.services.sync.events.master.workers.EventSyncSubMasterWorkersBuilder
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.id.testtools.TestTimeHelperImpl
@@ -20,6 +16,10 @@ import com.simprints.infra.config.domain.models.SynchronizationConfiguration.Fre
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
+import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
@@ -215,7 +215,7 @@ class EventSyncMasterWorkerTest {
             every { get() } returns listOf(
                 mockk {
                     every { state } returns workerState
-                    every { tags } returns setOf("${TAG_MASTER_SYNC_ID}${UNIQUE_SYNC_ID}")
+                    every { tags } returns setOf("$TAG_MASTER_SYNC_ID${UNIQUE_SYNC_ID}")
                 }
             )
         }

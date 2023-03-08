@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.events.master.internal
+package com.simprints.infra.eventsync.sync.common
 
 import android.annotation.SuppressLint
 import com.google.android.gms.common.util.VisibleForTesting
@@ -10,12 +10,11 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
-// TODO move into its own module
 @SuppressLint("ApplySharedPref")
 class EventSyncCacheImpl @Inject constructor(
     securityManager: SecurityManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
-) : EventSyncCache, com.simprints.feature.dashboard.main.sync.EventSyncCache {
+) : EventSyncCache {
 
     private val sharedForProgresses =
         securityManager.buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_PROGRESSES_SHARED_PREFS)

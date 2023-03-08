@@ -1,9 +1,7 @@
-package com.simprints.id.services.sync.events.down
+package com.simprints.infra.eventsync.sync.down
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.data.db.subject.domain.SubjectFactoryImpl
-import com.simprints.id.services.sync.events.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -16,6 +14,7 @@ import com.simprints.infra.eventsync.EventSyncRepository
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.*
+import com.simprints.infra.eventsync.sync.down.EventDownSyncHelperImpl.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.EncodingUtilsImplForTests

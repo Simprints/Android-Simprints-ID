@@ -1,8 +1,8 @@
-package com.simprints.id.services.sync.events.master.internal
+package com.simprints.infra.eventsync.sync.common
 
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.services.sync.events.master.internal.EventSyncCacheImpl.Companion.PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY
+import com.simprints.infra.eventsync.sync.common.EventSyncCacheImpl.Companion.PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.every

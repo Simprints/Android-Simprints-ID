@@ -1,10 +1,9 @@
-package com.simprints.id.services.sync.events.master.internal
+package com.simprints.infra.eventsync.sync.common
 
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.simprints.id.services.sync.events.common.getUniqueSyncIdTag
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import dagger.hilt.android.qualifiers.ApplicationContext

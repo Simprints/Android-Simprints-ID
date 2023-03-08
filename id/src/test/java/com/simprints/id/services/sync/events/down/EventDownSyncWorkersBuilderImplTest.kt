@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncDownloaderWorker
@@ -23,6 +22,7 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWN_COUNTER
+import com.simprints.infra.eventsync.sync.common.*
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

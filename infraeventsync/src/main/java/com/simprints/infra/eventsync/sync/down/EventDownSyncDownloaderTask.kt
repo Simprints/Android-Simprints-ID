@@ -1,9 +1,8 @@
-package com.simprints.id.services.sync.events.down.workers
+package com.simprints.infra.eventsync.sync.down
 
-import com.simprints.id.services.sync.events.common.WorkerProgressCountReporter
-import com.simprints.id.services.sync.events.down.EventDownSyncHelper
-import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import kotlinx.coroutines.CoroutineScope
 
 interface EventDownSyncDownloaderTask {

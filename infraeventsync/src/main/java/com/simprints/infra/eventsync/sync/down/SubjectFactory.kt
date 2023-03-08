@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.subject.domain
+package com.simprints.infra.eventsync.sync.down
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample

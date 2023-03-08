@@ -2,7 +2,7 @@ package com.simprints.id.services.sync.events.master.workers
 
 import androidx.work.OneTimeWorkRequest
 import androidx.work.workDataOf
-import com.simprints.id.services.sync.events.common.*
+import com.simprints.infra.eventsync.sync.common.*
 import javax.inject.Inject
 
 class EventSyncSubMasterWorkersBuilderImpl @Inject constructor(): EventSyncSubMasterWorkersBuilder {

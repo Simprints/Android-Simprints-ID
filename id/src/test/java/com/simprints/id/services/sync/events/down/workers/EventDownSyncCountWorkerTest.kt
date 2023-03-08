@@ -8,8 +8,6 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.services.sync.events.common.TAG_MASTER_SYNC_ID
-import com.simprints.id.services.sync.events.down.EventDownSyncHelper
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.id.services.sync.events.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.infra.events.event.domain.EventCount
@@ -18,6 +16,8 @@ import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
+import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -33,7 +33,7 @@ import java.util.*
 class EventDownSyncCountWorkerTest {
 
     private val syncId = UUID.randomUUID().toString()
-    private val tagForMasterSyncId = "${TAG_MASTER_SYNC_ID}$syncId"
+    private val tagForMasterSyncId = "$TAG_MASTER_SYNC_ID$syncId"
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()

@@ -6,14 +6,13 @@ import androidx.work.*
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
-import com.simprints.id.services.sync.events.master.internal.EventSyncCache
 import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
+import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -36,10 +35,6 @@ open class EventSyncMasterWorker @AssistedInject constructor(
 
     companion object {
         const val MIN_BACKOFF_SECS = 15L
-
-        const val MASTER_SYNC_SCHEDULERS = "MASTER_SYNC_SCHEDULERS"
-        const val MASTER_SYNC_SCHEDULER_ONE_TIME = "MASTER_SYNC_SCHEDULER_ONE_TIME"
-        const val MASTER_SYNC_SCHEDULER_PERIODIC_TIME = "MASTER_SYNC_SCHEDULER_PERIODIC_TIME"
 
         const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
     }

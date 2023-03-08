@@ -5,12 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
-import com.simprints.id.services.sync.events.common.SYNC_LOG_TAG
-import com.simprints.id.services.sync.events.common.filterByTags
-import com.simprints.id.services.sync.events.common.sortByScheduledTime
 import com.simprints.id.services.sync.events.down.workers.extractDownSyncProgress
 import com.simprints.id.services.sync.events.down.workers.getDownCountsFromOutput
-import com.simprints.id.services.sync.events.master.internal.*
 import com.simprints.id.services.sync.events.master.workers.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
 import com.simprints.id.services.sync.events.up.workers.extractUpSyncProgress
 import com.simprints.id.services.sync.events.up.workers.getUpCountsFromOutput
@@ -20,6 +16,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Companion.fromWorkInfo
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.*
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 

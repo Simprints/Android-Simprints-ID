@@ -12,6 +12,16 @@ import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationS
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepositoryImpl
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.EventSyncCacheImpl
+import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProvider
+import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProviderImpl
+import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.EventDownSyncHelperImpl
+import com.simprints.infra.eventsync.sync.down.SubjectFactory
+import com.simprints.infra.eventsync.sync.down.SubjectFactoryImpl
+import com.simprints.infra.eventsync.sync.up.EventUpSyncHelper
+import com.simprints.infra.eventsync.sync.up.EventUpSyncHelperImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -41,6 +51,22 @@ abstract class EventSyncModule {
 
     @Binds
     internal abstract fun bindEventSyncRepositoryImpl(impl: EventSyncRepositoryImpl): EventSyncRepository
+
+    @Binds
+    abstract fun provideEventUpSyncHelper(impl: EventUpSyncHelperImpl): EventUpSyncHelper
+
+    @Binds
+    abstract fun provideSubjectFactory(impl: SubjectFactoryImpl): SubjectFactory
+
+    @Binds
+    abstract fun provideEventDownSyncHelper(impl: EventDownSyncHelperImpl): EventDownSyncHelper
+
+    @Binds
+    abstract fun provideEventSyncCache(impl: EventSyncCacheImpl): EventSyncCache
+
+    @Binds
+    abstract fun provideSyncWorkersLiveDataProvider(impl: SyncWorkersLiveDataProviderImpl): SyncWorkersLiveDataProvider
+
 }
 
 @Module

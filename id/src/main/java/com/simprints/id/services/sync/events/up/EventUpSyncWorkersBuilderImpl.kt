@@ -2,7 +2,6 @@ package com.simprints.id.services.sync.events.up
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.services.sync.events.common.*
 import com.simprints.id.services.sync.events.master.workers.EventSyncMasterWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncCountWorker.Companion.INPUT_COUNT_WORKER_UP
@@ -10,6 +9,7 @@ import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorke
 import com.simprints.id.services.sync.events.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
+import com.simprints.infra.eventsync.sync.common.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
