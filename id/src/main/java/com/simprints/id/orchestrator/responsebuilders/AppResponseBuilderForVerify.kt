@@ -8,6 +8,7 @@ import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
+import com.simprints.id.exceptions.unexpected.MissingCaptureResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
@@ -31,7 +32,10 @@ class AppResponseBuilderForVerify(private val projectConfiguration: ProjectConfi
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
-                buildAppVerifyResponseForFingerprintAndFace(fingerprintResponse)
+                buildAppVerifyResponseForFingerprintAndFace(
+                    fingerprintResponse,
+                    faceResponse
+                )
             }
             fingerprintResponse != null -> {
                 buildAppVerifyResponseForFingerprint(fingerprintResponse)
@@ -39,7 +43,7 @@ class AppResponseBuilderForVerify(private val projectConfiguration: ProjectConfi
             faceResponse != null -> {
                 buildAppVerifyResponseForFace(faceResponse)
             }
-            else -> throw Throwable("All responses are null")
+            else -> throw MissingCaptureResponse()
         }
     }
 
@@ -50,9 +54,18 @@ class AppResponseBuilderForVerify(private val projectConfiguration: ProjectConfi
         results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
     private fun buildAppVerifyResponseForFingerprintAndFace(
-        fingerprintResponse: FingerprintMatchResponse
-    ) =
-        AppVerifyResponse(getMatchResultForFingerprintResponse(fingerprintResponse))
+        fingerprintResponse: FingerprintMatchResponse,
+        faceResponse: FaceMatchResponse,
+    ): AppVerifyResponse {
+        val fingerprintMatchResult = getMatchResultForFingerprintResponse(fingerprintResponse)
+        val faceMatchResult = getMatchResultForFaceResponse(faceResponse)
+        val betterMatchResult =
+            if (fingerprintMatchResult.confidence > faceMatchResult.confidence)
+                fingerprintMatchResult
+            else
+                faceMatchResult
+        return AppVerifyResponse(betterMatchResult)
+    }
 
     private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
         AppVerifyResponse(getMatchResultForFingerprintResponse(fingerprintResponse))
@@ -60,7 +73,8 @@ class AppResponseBuilderForVerify(private val projectConfiguration: ProjectConfi
     private fun getMatchResultForFingerprintResponse(fingerprintResponse: FingerprintMatchResponse) =
         fingerprintResponse.result.map {
             MatchResult(
-                it.personId, it.confidenceScore.toInt(),
+                it.personId,
+                it.confidenceScore.toInt(),
                 Tier.computeTier(it.confidenceScore),
                 computeMatchConfidence(
                     it.confidenceScore.toInt(),
@@ -75,7 +89,8 @@ class AppResponseBuilderForVerify(private val projectConfiguration: ProjectConfi
     private fun getMatchResultForFaceResponse(faceResponse: FaceMatchResponse) =
         faceResponse.result.map {
             MatchResult(
-                it.guidFound, it.confidence.toInt(),
+                it.guidFound,
+                it.confidence.toInt(),
                 Tier.computeTier(it.confidence),
                 computeMatchConfidence(
                     it.confidence.toInt(),
