@@ -84,12 +84,13 @@ class EnrolLastBiometricsViewModel @Inject constructor(
         steps: List<Step>
     ): ViewState {
         return when {
-            /**
-             * We would only process the fingerprint response in a multi-modal flow until a
-            proper results combining mechanism is in place
-             */
             fingerprintResponse != null && faceResponse != null -> {
-                if (isAnyResponseWithHighConfidence(configuration, fingerprintResponse)) {
+                if (isAnyResponseWithHighConfidence(
+                        configuration,
+                        fingerprintResponse,
+                        faceResponse
+                    )
+                ) {
                     failWithDuplicateBiometricEnrolmentCheckFailed()
                 } else {
                     buildSubjectAndGetViewState(enrolLastBiometricsRequest, steps)
@@ -134,6 +135,13 @@ class EnrolLastBiometricsViewModel @Inject constructor(
             Failed
         }
     }
+
+    private fun isAnyResponseWithHighConfidence(
+        configuration: ProjectConfiguration,
+        fingerprintResponse: FingerprintMatchResponse,
+        faceResponse: FaceMatchResponse,
+    ) = isAnyResponseWithHighConfidence(configuration, fingerprintResponse) ||
+        isAnyResponseWithHighConfidence(configuration, faceResponse)
 
     private fun isAnyResponseWithHighConfidence(
         configuration: ProjectConfiguration,
