@@ -1,49 +1,19 @@
 package com.simprints.id.services.sync.events.master.workers
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.simprints.core.DispatcherBG
-import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.eventsync.sync.common.EventSyncCache
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import java.util.*
 
-/**
- * It's executed at the end of the sync, when all workers succeed (downloaders and uploaders).
- * It stores the "last successful timestamp"
- */
-@HiltWorker
-class EventEndSyncReporterWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted params: WorkerParameters,
-    private val syncCache: EventSyncCache,
-    @DispatcherBG private val dispatcher: CoroutineDispatcher,
-) : SimCoroutineWorker(appContext, params) {
+@Deprecated(message = "We need to keep this worker until all the devices have updated to" +
+    "the version 2023.1.0, otherwise the app will crash as the work manager will not find the class" +
+    "to run the previous work to fetch the configuration.")
+class EventEndSyncReporterWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
-    override val tag: String = EventEndSyncReporterWorker::class.java.simpleName
+    private val workManager = WorkManager.getInstance(context)
 
-    override suspend fun doWork(): Result =
-        withContext(dispatcher) {
-            try {
-                val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
-                crashlyticsLog("Start - Params: $syncId")
-
-                if (!syncId.isNullOrEmpty()) {
-                    syncCache.storeLastSuccessfulSyncTime(Date())
-                    success()
-                } else {
-                    throw IllegalArgumentException("SyncId missed")
-                }
-            } catch (t: Throwable) {
-                fail(t)
-            }
-        }
-
-    companion object {
-        const val SYNC_ID_TO_MARK_AS_COMPLETED = "SYNC_ID_TO_MARK_AS_COMPLETED"
+    override suspend fun doWork(): Result {
+        workManager.cancelAllWorkByTag("TAG_PEOPLE_SYNC_WORKER_TYPE_END_SYNC_REPORTER")
+        return Result.success()
     }
 }

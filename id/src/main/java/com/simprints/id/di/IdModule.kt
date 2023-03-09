@@ -57,18 +57,8 @@ import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
-import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilder
-import com.simprints.id.services.sync.events.down.EventDownSyncWorkersBuilderImpl
-import com.simprints.infra.eventsync.sync.down.EventDownSyncDownloaderTask
-import com.simprints.infra.eventsync.sync.down.EventDownSyncDownloaderTaskImpl
-import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.id.services.sync.events.master.EventSyncManagerImpl
-import com.simprints.id.services.sync.events.master.EventSyncStateProcessor
-import com.simprints.id.services.sync.events.master.EventSyncStateProcessorImpl
-import com.simprints.id.services.sync.events.master.workers.EventSyncSubMasterWorkersBuilder
-import com.simprints.id.services.sync.events.master.workers.EventSyncSubMasterWorkersBuilderImpl
-import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilder
-import com.simprints.id.services.sync.events.up.EventUpSyncWorkersBuilderImpl
+import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.EventSyncManagerImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
@@ -264,25 +254,6 @@ abstract class IdSyncModule {
 
     @Binds
     abstract fun provideImageUpSyncScheduler(impl: ImageUpSyncSchedulerImpl): ImageUpSyncScheduler
-
-    @Binds
-    abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): EventSyncManager
-
-    @Binds
-    abstract fun provideEventSyncStateProcessor(impl: EventSyncStateProcessorImpl): EventSyncStateProcessor
-
-    @Binds
-    abstract fun provideEventUpSyncWorkersBuilder(impl: EventUpSyncWorkersBuilderImpl): EventUpSyncWorkersBuilder
-
-    @Binds
-    abstract fun provideEventSyncSubMasterWorkersBuilder(impl: EventSyncSubMasterWorkersBuilderImpl): EventSyncSubMasterWorkersBuilder
-
-    @Binds
-    abstract fun provideEventDownSyncWorkersBuilder(impl: EventDownSyncWorkersBuilderImpl): EventDownSyncWorkersBuilder
-
-    @Binds
-    abstract fun provideEventDownSyncDownloaderTask(impl: EventDownSyncDownloaderTaskImpl): EventDownSyncDownloaderTask
-
 }
 
 @Module
@@ -343,9 +314,6 @@ object IdDependenciesModule {
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class TemporaryFeatureDashboardModule {
-    @Binds
-    abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): com.simprints.feature.dashboard.main.sync.EventSyncManager
-
     @Binds
     abstract fun provideDeviceManager(impl: DeviceManagerImpl): com.simprints.feature.dashboard.main.sync.DeviceManager
 

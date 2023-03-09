@@ -1,5 +1,7 @@
 package com.simprints.infra.config.domain.models
 
+import com.simprints.core.domain.modality.Modes
+
 data class GeneralConfiguration(
     val modalities: List<Modality>,
     val languageOptions: List<String>,
@@ -12,5 +14,10 @@ data class GeneralConfiguration(
     enum class Modality {
         FACE,
         FINGERPRINT;
+
+        fun toMode(): Modes = when (this) {
+            FACE -> Modes.FACE
+            FINGERPRINT -> Modes.FINGERPRINT
+        }
     }
 }

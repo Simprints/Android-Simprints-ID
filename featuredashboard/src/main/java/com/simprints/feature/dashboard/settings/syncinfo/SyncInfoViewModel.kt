@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
 import com.simprints.feature.dashboard.main.sync.DeviceManager
-import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.*
@@ -16,6 +15,7 @@ import com.simprints.infra.eventsync.EventSyncRepository
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager

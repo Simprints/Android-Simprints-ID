@@ -1,7 +1,6 @@
 package com.simprints.id.moduleselection
 
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
