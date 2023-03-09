@@ -3,13 +3,12 @@ package com.simprints.id.activities.fetchguid
 import com.simprints.core.DispatcherIO
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
-import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
-import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
+import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.consumeAsFlow

@@ -14,7 +14,7 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
