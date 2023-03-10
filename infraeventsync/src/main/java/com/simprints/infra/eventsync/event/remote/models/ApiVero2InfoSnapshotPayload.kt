@@ -23,7 +23,7 @@ import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.*
     ),
 )
 @Keep
-sealed class ApiVero2InfoSnapshotPayload(
+internal sealed class ApiVero2InfoSnapshotPayload(
     override val startTime: Long,
     override val version: Int,
     open val scannerVersion: ApiVero2Version,
@@ -126,7 +126,7 @@ private fun Vero2Version.toApiVero2Version() = when (this) {
         ApiVero2InfoSnapshotPayload.ApiVero2Version.ApiNewVero2Version(this)
 }
 
-fun toApiVero2InfoSnapshotPayload(domainPayload: Vero2InfoSnapshotPayload): ApiVero2InfoSnapshotPayload =
+internal fun toApiVero2InfoSnapshotPayload(domainPayload: Vero2InfoSnapshotPayload): ApiVero2InfoSnapshotPayload =
     when (domainPayload) {
         is Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi -> {
             ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForNewApi(

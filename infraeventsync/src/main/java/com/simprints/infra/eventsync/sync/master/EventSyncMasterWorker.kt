@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 @HiltWorker
-open class EventSyncMasterWorker @AssistedInject constructor(
+internal class EventSyncMasterWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted params: WorkerParameters,
     private val downSyncWorkerBuilder: EventDownSyncWorkersBuilder,

@@ -2,11 +2,9 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 
 @Keep
-data class ApiGuidSelectionPayload(
+internal data class ApiGuidSelectionPayload(
     override val startTime: Long,
     override val version: Int,
     val selectedId: String,

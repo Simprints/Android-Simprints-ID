@@ -5,7 +5,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.SampleDefaults.TIME1
 import com.simprints.infra.eventsync.SampleSyncScopes.projectUpSyncScope
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
-import com.simprints.infra.eventsync.status.up.domain.getUniqueKey
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.infra.eventsync.status.up.local.DbEventsUpSyncOperationState
 import com.simprints.infra.login.LoginManager
@@ -22,7 +21,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class EventUpSyncScopeRepositoryImplTest {
+internal class EventUpSyncScopeRepositoryImplTest {
 
     @MockK
     lateinit var loginManager: LoginManager
@@ -39,7 +38,7 @@ class EventUpSyncScopeRepositoryImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         eventUpSyncScopeRepository =
-            EventUpSyncScopeRepositoryImpl(
+            EventUpSyncScopeRepository(
                 loginManager,
                 upSyncOperationOperationDao,
             )

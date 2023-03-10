@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 
 @Keep
-data class ApiEnrolmentPayloadV2(
+internal data class ApiEnrolmentPayloadV2(
     override val startTime: Long,
     override val version: Int,
     val subjectId: String,

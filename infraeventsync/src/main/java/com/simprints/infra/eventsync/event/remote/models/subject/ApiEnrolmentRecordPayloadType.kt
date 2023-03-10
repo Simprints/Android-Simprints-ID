@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 
 @Keep
-enum class ApiEnrolmentRecordPayloadType {
+internal enum class ApiEnrolmentRecordPayloadType {
     /* key added: ENROLMENT_RECORD_CREATION_KEY */
     EnrolmentRecordCreation,
 
@@ -21,7 +21,7 @@ enum class ApiEnrolmentRecordPayloadType {
     }
 }
 
-fun ApiEnrolmentRecordPayloadType.fromApiToDomain(): EnrolmentRecordEventType = when (this) {
+internal fun ApiEnrolmentRecordPayloadType.fromApiToDomain(): EnrolmentRecordEventType = when (this) {
     ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation -> EnrolmentRecordEventType.EnrolmentRecordCreation
     ApiEnrolmentRecordPayloadType.EnrolmentRecordDeletion -> EnrolmentRecordEventType.EnrolmentRecordDeletion
     ApiEnrolmentRecordPayloadType.EnrolmentRecordMove -> EnrolmentRecordEventType.EnrolmentRecordMove

@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.AuthenticationEvent.Authen
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayload.ApiResult
 
 @Keep
-data class ApiAuthenticationPayload(
+internal data class ApiAuthenticationPayload(
     override val startTime: Long,
     override val version: Int,
     val endTime: Long,
@@ -41,7 +41,7 @@ data class ApiAuthenticationPayload(
 }
 
 
-fun AuthenticationPayload.Result.fromDomainToApi() =
+internal fun AuthenticationPayload.Result.fromDomainToApi() =
     when (this) {
         AUTHENTICATED -> ApiResult.AUTHENTICATED
         BAD_CREDENTIALS -> ApiResult.BAD_CREDENTIALS

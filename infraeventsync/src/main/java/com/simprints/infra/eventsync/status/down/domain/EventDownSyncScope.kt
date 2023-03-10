@@ -20,7 +20,7 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope.ProjectSc
     JsonSubTypes.Type(value = SubjectModuleScope::class)
 )
 @Keep
-sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation> = mutableListOf()) {
+internal sealed class EventDownSyncScope(open var operations: List<EventDownSyncOperation> = mutableListOf()) {
 
     @Keep
     data class SubjectProjectScope(

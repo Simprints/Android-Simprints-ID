@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.
 
 
 @Keep
-data class ApiConnectivitySnapshotPayload(
+internal data class ApiConnectivitySnapshotPayload(
     override val startTime: Long,
     override val version: Int,
     val connections: List<ApiConnection>) : ApiEventPayload(ApiEventPayloadType.ConnectivitySnapshot, version, startTime) {

@@ -12,7 +12,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Can
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiCandidateReadPayload(
+internal data class ApiCandidateReadPayload(
     override val startTime: Long,
     override val version: Int,
     val endTime: Long,
@@ -41,13 +41,13 @@ data class ApiCandidateReadPayload(
 }
 
 
-fun LocalResult.fromDomainToApi() =
+internal fun LocalResult.fromDomainToApi() =
     when (this) {
         LocalResult.FOUND -> ApiLocalResult.FOUND
         LocalResult.NOT_FOUND -> ApiLocalResult.NOT_FOUND
     }
 
-fun RemoteResult.fromDomainToApi() =
+internal fun RemoteResult.fromDomainToApi() =
     when (this) {
         RemoteResult.FOUND -> ApiRemoteResult.FOUND
         RemoteResult.NOT_FOUND -> ApiRemoteResult.NOT_FOUND

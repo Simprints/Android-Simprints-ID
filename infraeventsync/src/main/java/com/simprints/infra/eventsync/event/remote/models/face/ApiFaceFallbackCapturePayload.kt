@@ -7,7 +7,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Fac
 
 
 @Keep
-data class ApiFaceFallbackCapturePayload(
+internal data class ApiFaceFallbackCapturePayload(
     override val startTime: Long, //Not added on API yet
     val endTime: Long,
     override val version: Int,

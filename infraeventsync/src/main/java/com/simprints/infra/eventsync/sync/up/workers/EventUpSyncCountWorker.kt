@@ -3,9 +3,11 @@ package com.simprints.infra.eventsync.sync.up.workers
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.DispatcherBG
+import com.simprints.core.tools.delegates.lazyVar
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
@@ -19,7 +21,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 @HiltWorker
-class EventUpSyncCountWorker @AssistedInject constructor(
+internal class EventUpSyncCountWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val eventUpSyncHelper: EventUpSyncHelper,
@@ -33,6 +35,10 @@ class EventUpSyncCountWorker @AssistedInject constructor(
     }
 
     override val tag: String = EventUpSyncCountWorker::class.java.simpleName
+
+    var wm: WorkManager by lazyVar {
+        WorkManager.getInstance(context)
+    }
 
     private val upSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_UP)
@@ -73,7 +79,7 @@ class EventUpSyncCountWorker @AssistedInject constructor(
         eventUpSyncHelper.countForUpSync(upSyncScope.operation)
 }
 
-fun WorkInfo.getUpCountsFromOutput(): Int? =
+internal fun WorkInfo.getUpCountsFromOutput(): Int? =
     this.outputData.getInt(OUTPUT_COUNT_WORKER_UP, -1).let {
         if (it > -1) {
             it

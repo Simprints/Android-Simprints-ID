@@ -12,7 +12,7 @@ import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fr
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiEnrolmentRecordMovePayload(
+internal data class ApiEnrolmentRecordMovePayload(
     val enrolmentRecordCreation: ApiEnrolmentRecordCreationInMove,
     val enrolmentRecordDeletion: ApiEnrolmentRecordDeletionInMove
 ) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordMove) {
@@ -38,7 +38,7 @@ data class ApiEnrolmentRecordMovePayload(
 }
 
 
-fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
+internal fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
     EnrolmentRecordMoveEvent.EnrolmentRecordMovePayload(
         with(enrolmentRecordCreation) {
             EnrolmentRecordCreationInMove(

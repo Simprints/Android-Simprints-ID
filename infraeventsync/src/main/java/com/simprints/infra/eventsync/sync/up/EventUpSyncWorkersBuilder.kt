@@ -14,7 +14,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class EventUpSyncWorkersBuilder @Inject constructor(
+internal class EventUpSyncWorkersBuilder @Inject constructor(
     private val upSyncScopeRepository: EventUpSyncScopeRepository,
     private val jsonHelper: JsonHelper
 ) {

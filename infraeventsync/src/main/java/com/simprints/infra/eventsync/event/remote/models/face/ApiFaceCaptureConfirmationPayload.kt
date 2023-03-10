@@ -12,7 +12,7 @@ import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConf
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiFaceCaptureConfirmationPayload(
+internal data class ApiFaceCaptureConfirmationPayload(
     override val startTime: Long, //Not added on API yet
     val endTime: Long,
     override val version: Int,
@@ -32,7 +32,7 @@ data class ApiFaceCaptureConfirmationPayload(
 }
 
 
-fun FaceCaptureConfirmationPayload.Result.fromDomainToApi() = when (this) {
+internal fun FaceCaptureConfirmationPayload.Result.fromDomainToApi() = when (this) {
     CONTINUE -> ApiResult.CONTINUE
     RECAPTURE -> ApiResult.RECAPTURE
 }

@@ -8,7 +8,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 
-object SampleSyncScopes {
+internal object SampleSyncScopes {
 
     val projectUpSyncScope = EventUpSyncScope.ProjectScope(
         DEFAULT_PROJECT_ID

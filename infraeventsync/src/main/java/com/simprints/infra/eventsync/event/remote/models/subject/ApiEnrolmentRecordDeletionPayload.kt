@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
 
 @Keep
-data class ApiEnrolmentRecordDeletionPayload(
+internal data class ApiEnrolmentRecordDeletionPayload(
     val subjectId: String,
     val projectId: String,
     val moduleId: String,
@@ -16,7 +16,7 @@ data class ApiEnrolmentRecordDeletionPayload(
     }
 }
 
-fun ApiEnrolmentRecordDeletionPayload.fromApiToDomain() =
+internal fun ApiEnrolmentRecordDeletionPayload.fromApiToDomain() =
     EnrolmentRecordDeletionEvent.EnrolmentRecordDeletionPayload(
         subjectId,
         projectId,

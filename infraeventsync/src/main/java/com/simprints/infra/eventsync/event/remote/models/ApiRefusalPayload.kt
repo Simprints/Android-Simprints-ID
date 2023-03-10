@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayloa
 import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload.ApiAnswer
 
 @Keep
-data class ApiRefusalPayload(
+internal data class ApiRefusalPayload(
     override val startTime: Long,
     override val version: Int,
     val endTime: Long,
@@ -35,7 +35,7 @@ data class ApiRefusalPayload(
 }
 
 
-fun RefusalPayload.Answer.toApiRefusalEventAnswer() =
+internal fun RefusalPayload.Answer.toApiRefusalEventAnswer() =
     when (this) {
         REFUSED_RELIGION -> ApiAnswer.REFUSED_RELIGION
         REFUSED_DATA_CONCERNS -> ApiAnswer.REFUSED_DATA_CONCERNS

@@ -9,12 +9,13 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class EventDownSyncDownloaderTaskImplTest {
+internal class EventDownSyncDownloaderTaskTest {
 
     @MockK
     private lateinit var syncCache: EventSyncCache
@@ -34,7 +35,7 @@ class EventDownSyncDownloaderTaskImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        eventDownSyncDownloaderTask = EventDownSyncDownloaderTaskImpl()
+        eventDownSyncDownloaderTask = EventDownSyncDownloaderTask()
 
         runBlocking {
             mockProgressEmission(emptyList())
@@ -74,12 +75,6 @@ class EventDownSyncDownloaderTaskImplTest {
     }
 
     private suspend fun mockProgressEmission(progressEvents: List<EventDownSyncProgress>) {
-        downloadProgressChannel = Channel(capacity = Channel.UNLIMITED)
-        coEvery { syncHelper.downSync(any(), any()) } returns downloadProgressChannel
-
-        progressEvents.forEach {
-            downloadProgressChannel.send(it)
-        }
-        downloadProgressChannel.close()
+        coEvery { syncHelper.downSync(any(), any()) } returns progressEvents.asFlow()
     }
 }

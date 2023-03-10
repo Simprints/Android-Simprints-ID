@@ -7,7 +7,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 
 @Keep
-class ApiFaceCaptureBiometricsPayload(
+internal class ApiFaceCaptureBiometricsPayload(
     override val version: Int,
     override val startTime: Long,
     val id: String,

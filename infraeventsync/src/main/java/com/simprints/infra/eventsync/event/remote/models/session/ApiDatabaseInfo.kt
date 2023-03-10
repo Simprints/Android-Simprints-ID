@@ -7,7 +7,7 @@ import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiDatabaseInfo(
+internal data class ApiDatabaseInfo(
     var recordCount: Int?,
     var sessionCount: Int = 0,
 ) {
@@ -16,5 +16,4 @@ data class ApiDatabaseInfo(
         this(databaseInfo.recordCount, databaseInfo.sessionCount)
 }
 
-fun DatabaseInfo.fromDomainToApi() =
-    ApiDatabaseInfo(recordCount, sessionCount)
+internal fun DatabaseInfo.fromDomainToApi() = ApiDatabaseInfo(recordCount, sessionCount)

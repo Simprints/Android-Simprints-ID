@@ -29,7 +29,7 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class EventDownSyncCountWorkerTest {
+internal class EventDownSyncCountWorkerTest {
 
     private val syncId = UUID.randomUUID().toString()
     private val tagForMasterSyncId = "$TAG_MASTER_SYNC_ID$syncId"
@@ -43,7 +43,7 @@ class EventDownSyncCountWorkerTest {
     @MockK
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
-    lateinit var countWorker: EventDownSyncCountWorker
+    private lateinit var countWorker: EventDownSyncCountWorker
 
     @Before
     fun setUp() {

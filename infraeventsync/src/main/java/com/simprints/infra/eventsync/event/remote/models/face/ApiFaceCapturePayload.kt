@@ -12,7 +12,7 @@ import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayl
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiFaceCapturePayload(
+internal data class ApiFaceCapturePayload(
     val id: String,
     override val startTime: Long,
     val endTime: Long,
@@ -55,9 +55,9 @@ data class ApiFaceCapturePayload(
     }
 }
 
-fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(yaw, roll, quality, format)
+internal fun FaceCapturePayload.Face.fromDomainToApi() = ApiFace(yaw, roll, quality, format)
 
-fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
+internal fun FaceCapturePayload.Result.fromDomainToApi() = when (this) {
     FaceCapturePayload.Result.VALID -> VALID
     FaceCapturePayload.Result.INVALID -> INVALID
     FaceCapturePayload.Result.OFF_YAW -> OFF_YAW

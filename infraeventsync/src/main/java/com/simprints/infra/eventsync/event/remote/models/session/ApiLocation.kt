@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.session.Location
 
 @Keep
-data class ApiLocation(
+internal data class ApiLocation(
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
 ) {

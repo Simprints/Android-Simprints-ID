@@ -5,7 +5,7 @@ import androidx.work.workDataOf
 import com.simprints.infra.eventsync.sync.common.*
 import javax.inject.Inject
 
-class EventSyncSubMasterWorkersBuilder @Inject constructor() {
+internal class EventSyncSubMasterWorkersBuilder @Inject constructor() {
 
     fun buildStartSyncReporterWorker(uniqueSyncID: String) =
         OneTimeWorkRequest.Builder(EventStartSyncReporterWorker::class.java)

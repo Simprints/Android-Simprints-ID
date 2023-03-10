@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import com.simprints.infra.events.sampledata.SampleDefaults.TIME1
 import com.simprints.infra.eventsync.SampleSyncScopes.projectUpSyncScope
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
-import com.simprints.infra.eventsync.status.up.domain.getUniqueKey
 import com.simprints.infra.eventsync.status.up.local.DbEventsUpSyncOperationState.Companion.buildFromEventsUpSyncOperationState
 import org.junit.Test
 

@@ -13,10 +13,11 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Cal
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiCalloutPayload(
+internal data class ApiCalloutPayload(
     override val startTime: Long,
     override val version: Int,
-    val callout: ApiCallout) : ApiEventPayload(Callout, version, startTime) {
+    val callout: ApiCallout,
+) : ApiEventPayload(Callout, version, startTime) {
 
     constructor(domainPayload: EnrolmentCalloutPayload) : this(
         domainPayload.createdAt,

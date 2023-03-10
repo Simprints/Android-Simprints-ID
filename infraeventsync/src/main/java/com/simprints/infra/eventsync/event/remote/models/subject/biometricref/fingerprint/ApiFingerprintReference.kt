@@ -8,7 +8,7 @@ import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.Ap
 import java.util.*
 
 @Keep
-data class ApiFingerprintReference(
+internal data class ApiFingerprintReference(
     override val id: String = UUID.randomUUID().toString(),
     val templates: List<ApiFingerprintTemplate>,
     val format: FingerprintTemplateFormat,

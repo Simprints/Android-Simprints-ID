@@ -25,7 +25,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 @HiltWorker
-class EventDownSyncDownloaderWorker @AssistedInject constructor(
+internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val downSyncHelper: EventDownSyncHelper,
@@ -115,7 +115,7 @@ class EventDownSyncDownloaderWorker @AssistedInject constructor(
     }
 }
 
-suspend fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncCache): Int {
+internal suspend fun WorkInfo.extractDownSyncProgress(eventSyncCache: EventSyncCache): Int {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
 

@@ -16,7 +16,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class EventDownSyncWorkersBuilder @Inject constructor(
+internal class EventDownSyncWorkersBuilder @Inject constructor(
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val jsonHelper: JsonHelper,
     private val configManager: ConfigManager,

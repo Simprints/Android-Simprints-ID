@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import java.util.*
 
 @Keep
-data class EventDownSyncOperation(
+internal data class EventDownSyncOperation(
     val queryEvent: RemoteEventQuery,
     val state: DownSyncState? = null,
     val lastEventId: String? = null,
@@ -25,7 +25,7 @@ internal var oldTypes =
     "ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION"
 
 //Unique key: all request params expect for lastEventId
-fun EventDownSyncOperation.getUniqueKey(): String =
+internal fun EventDownSyncOperation.getUniqueKey(): String =
     with(this.queryEvent) {
         UUID.nameUUIDFromBytes(
             (projectId +

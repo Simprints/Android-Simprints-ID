@@ -9,7 +9,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class SyncWorkersLiveDataProviderImpl @Inject constructor(@ApplicationContext ctx: Context) :
+internal class SyncWorkersLiveDataProviderImpl @Inject constructor(@ApplicationContext ctx: Context) :
     SyncWorkersLiveDataProvider {
 
     private val wm = WorkManager.getInstance(ctx)

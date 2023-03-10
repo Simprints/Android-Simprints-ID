@@ -1,27 +1,29 @@
-package com.simprints.infra.eventsync
+package com.simprints.infra.eventsync.sync.up
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.modality.Modes
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.eventsync.event.remote.ApiModes
-import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
+import com.simprints.infra.eventsync.SampleSyncScopes
+import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
-import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
+import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -30,9 +32,14 @@ import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 
-internal class EventSyncRepositoryImplTest {
+internal class EventUpSyncHelperTest {
 
-    private lateinit var eventSyncRepo: EventSyncRepository
+    private val operation = SampleSyncScopes.projectUpSyncScope.operation
+
+    private lateinit var eventUpSyncHelper: EventUpSyncHelper
+
+    @MockK
+    private lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
 
     @MockK
     lateinit var loginManager: LoginManager
@@ -41,46 +48,56 @@ internal class EventSyncRepositoryImplTest {
     lateinit var eventRepo: EventRepository
 
     @MockK
-    private lateinit var eventRemoteDataSource: EventRemoteDataSource
+    lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
-    lateinit var timeHelper: TimeHelper
+    private lateinit var timeHelper: TimeHelper
+
+    @MockK
+    private lateinit var synchronizationConfiguration: SynchronizationConfiguration
+
+    @MockK
+    private lateinit var projectConfiguration: ProjectConfiguration
+
+    @MockK
+    private lateinit var configManager: ConfigManager
 
     @Before
-    fun setup() {
+    fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns NOW
         every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
 
-        eventSyncRepo = EventSyncRepositoryImpl(
+        every { projectConfiguration.synchronization } returns synchronizationConfiguration
+        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
+
+        eventUpSyncHelper = EventUpSyncHelper(
             loginManager,
+            eventUpSyncScopeRepository,
             eventRepo,
             eventRemoteDataSource,
             timeHelper,
+            configManager
         )
     }
 
     @Test
-    fun `call event repository to count upload events`() = runTest {
-        coEvery { eventRepo.observeEventCount(any(), any()) } returns flowOf(3)
+    fun `countForUpSync should invoke event repo`() = runTest {
+        eventUpSyncHelper.countForUpSync(operation)
 
-        assertThat(eventSyncRepo.countEventsToUpload(DEFAULT_PROJECT_ID, null).firstOrNull())
-            .isEqualTo(3)
+        coVerify { eventRepo.observeEventCount(operation.projectId, null) }
     }
 
     @Test
     fun `upload fetches events for all provided closed sessions`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1, GUID2)
         coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(createSessionCaptureEvent(GUID1))
         coEvery { eventRepo.getEventsFromSession(GUID2) } returns listOf(createSessionCaptureEvent(GUID2))
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = false,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify(exactly = 2) { eventRepo.getEventsFromSession(any()) }
     }
@@ -88,18 +105,14 @@ internal class EventSyncRepositoryImplTest {
 
     @Test
     fun `upload should not filter any events on upload`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(any()) } returns listOf(
             createAuthenticationEvent(),
             createEnrolmentEventV2(),
         )
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = true,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify {
             eventRemoteDataSource.post(
@@ -112,6 +125,8 @@ internal class EventSyncRepositoryImplTest {
 
     @Test
     fun `upload should filter biometric events on upload`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(any()) } returns listOf(
             createAuthenticationEvent(),
@@ -123,12 +138,7 @@ internal class EventSyncRepositoryImplTest {
             createFaceCaptureBiometricsEvent(),
         )
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = false,
-            canSyncBiometricDataToSimprints = true,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify {
             eventRemoteDataSource.post(
@@ -141,6 +151,8 @@ internal class EventSyncRepositoryImplTest {
 
     @Test
     fun `upload should filter analytics events on upload`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(any()) } returns listOf(
             createFingerprintCaptureBiometricsEvent(),
@@ -151,12 +163,7 @@ internal class EventSyncRepositoryImplTest {
             createAlertScreenEvent(),
         )
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = false,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = true
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify {
             eventRemoteDataSource.post(
@@ -170,27 +177,19 @@ internal class EventSyncRepositoryImplTest {
     @Test
     fun `should not upload sessions for not signed project`() = runTest {
         shouldThrow<TryToUploadEventsForNotSignedProject> {
-            eventSyncRepo.uploadEvents(
-                randomUUID(),
-                canSyncAllDataToSimprints = false,
-                canSyncBiometricDataToSimprints = false,
-                canSyncAnalyticsDataToSimprints = false
-            ).toList()
+            eventUpSyncHelper.upSync(EventUpSyncOperation(randomUUID())).toList()
         }
     }
 
     @Test
     fun `when upload succeeds it should delete events`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1, GUID2)
         coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(createSessionCaptureEvent(GUID1))
         coEvery { eventRepo.getEventsFromSession(GUID2) } returns listOf(createSessionCaptureEvent(GUID2))
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = true,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify {
             eventRepo.delete(eq(listOf(GUID1)))
@@ -200,6 +199,8 @@ internal class EventSyncRepositoryImplTest {
 
     @Test
     fun `upload in progress should emit progress`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1, GUID2)
         coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(
             createSessionCaptureEvent(GUID1),
@@ -209,36 +210,33 @@ internal class EventSyncRepositoryImplTest {
             createAlertScreenEvent(),
         )
 
-        val progress = eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = false,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        val progress = eventUpSyncHelper.upSync(operation).toList()
 
-        assertThat(progress[0]).isEqualTo(1)
-        assertThat(progress[1]).isEqualTo(2)
+        assertThat(progress[0].progress).isEqualTo(1)
+        assertThat(progress[0].operation.lastState).isEqualTo(UpSyncState.RUNNING)
+        assertThat(progress[1].progress).isEqualTo(2)
+        assertThat(progress[1].operation.lastState).isEqualTo(UpSyncState.RUNNING)
+        assertThat(progress[2].operation.lastState).isEqualTo(UpSyncState.COMPLETE)
     }
 
     @Test
     fun `when upload fails due to generic error should not delete events`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(createSessionCaptureEvent(GUID1))
 
         coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("")
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = false,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify(exactly = 0) { eventRepo.delete(any()) }
     }
 
     @Test
     fun `when upload fails due to network issue should not delete events`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(createSessionCaptureEvent(GUID1))
 
@@ -246,27 +244,19 @@ internal class EventSyncRepositoryImplTest {
             cause = Exception()
         )
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = false,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify(exactly = 0) { eventRepo.delete(any()) }
     }
 
     @Test
     fun `upload should not dump events when fetch fails`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(GUID1) } throws IllegalStateException()
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = true,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
@@ -277,16 +267,13 @@ internal class EventSyncRepositoryImplTest {
 
     @Test
     fun `upload should dump invalid events, emit the progress and delete the events`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(GUID1) } throws JsonParseException(mockk(relaxed = true), "")
         coEvery { eventRepo.getEventsJsonFromSession(GUID1) } returns listOf("{}")
 
-        val progress = eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = true,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        val progress = eventUpSyncHelper.upSync(operation).toList()
 
         coVerify(exactly = 0) { eventRemoteDataSource.post(any(), any()) }
 
@@ -295,11 +282,13 @@ internal class EventSyncRepositoryImplTest {
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
             eventRepo.deleteSessionEvents(GUID1)
         }
-        assertThat(progress[0]).isEqualTo(1)
+        assertThat(progress[0].progress).isEqualTo(1)
     }
 
     @Test
     fun `fail dump of invalid events should not delete the events`() = runTest {
+        setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.ALL)
+
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(GUID1) } throws JsonParseException(mockk(relaxed = true), "")
         coEvery { eventRepo.getEventsJsonFromSession(GUID1) } returns listOf("{}")
@@ -307,12 +296,7 @@ internal class EventSyncRepositoryImplTest {
             Response.error<String>(503, "".toResponseBody(null))
         )
 
-        eventSyncRepo.uploadEvents(
-            DEFAULT_PROJECT_ID,
-            canSyncAllDataToSimprints = true,
-            canSyncBiometricDataToSimprints = false,
-            canSyncAnalyticsDataToSimprints = false
-        ).toList()
+        eventUpSyncHelper.upSync(operation).toList()
 
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
@@ -326,47 +310,16 @@ internal class EventSyncRepositoryImplTest {
     }
 
     @Test
-    fun `download count correctly passes query arguments`() = runTest {
-        coEvery { eventRemoteDataSource.count(any()) } returns emptyList()
+    fun upSync_shouldEmitAFailureIfUploadFails() = runTest {
+        coEvery { eventRepo.getAllClosedSessionIds(any()) } throws IllegalStateException()
 
-        eventSyncRepo.countEventsToDownload(
-            RemoteEventQuery(
-                DEFAULT_PROJECT_ID,
-                modes = listOf(Modes.FACE, Modes.FINGERPRINT),
-            )
-        )
-
-        coVerify {
-            eventRemoteDataSource.count(withArg { query ->
-                assertThat(query.projectId).isEqualTo(DEFAULT_PROJECT_ID)
-                assertThat(query.modes).containsExactly(ApiModes.FACE, ApiModes.FINGERPRINT)
-            })
-        }
+        val progress = eventUpSyncHelper.upSync(operation).toList()
+        assertThat(progress.first().operation.lastState).isEqualTo(UpSyncState.FAILED)
+        coVerify(exactly = 1) { eventUpSyncScopeRepository.insertOrUpdate(any()) }
     }
 
-    @Test
-    fun `download correctly passes query arguments`() = runTest {
-        coEvery {
-            eventRemoteDataSource.getEvents(
-                any(),
-                any()
-            )
-        } returns produce { this@produce.close() }
-
-        eventSyncRepo.downloadEvents(
-            this@runTest,
-            RemoteEventQuery(
-                DEFAULT_PROJECT_ID,
-                modes = listOf(Modes.FACE),
-            )
-        )
-
-        coVerify {
-            eventRemoteDataSource.getEvents(withArg { query ->
-                assertThat(query.projectId).isEqualTo(DEFAULT_PROJECT_ID)
-                assertThat(query.modes).containsExactly(ApiModes.FACE)
-            }, any())
-        }
+    private fun setUpSyncKind(kind: UpSynchronizationConfiguration.UpSynchronizationKind) {
+        every { synchronizationConfiguration.up.simprints.kind } returns kind
     }
 
     companion object {

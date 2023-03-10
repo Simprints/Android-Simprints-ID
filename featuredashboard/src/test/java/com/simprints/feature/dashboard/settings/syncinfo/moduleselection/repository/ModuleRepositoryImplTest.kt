@@ -8,41 +8,53 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.EventSyncManager
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
+
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class ModuleRepositoryImplTest {
 
-    private val downSynchronizationConfiguration = mockk<DownSynchronizationConfiguration>()
-    private val projectConfiguration = mockk<ProjectConfiguration> {
-        every { general } returns mockk {
-            every { modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
-        }
-        every { synchronization } returns mockk {
-            every { down } returns downSynchronizationConfiguration
-        }
-    }
-    private val mockConfigManager: ConfigManager = mockk(relaxed = true)
-    private val enrolmentRecordManager: EnrolmentRecordManager = mockk(relaxed = true)
-    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
+    @MockK
+    lateinit var downSynchronizationConfiguration: DownSynchronizationConfiguration
 
-    private var repository = ModuleRepositoryImpl(
-        mockConfigManager,
-        enrolmentRecordManager,
-        eventDownSyncScopeRepository
-    )
+    @MockK
+    lateinit var projectConfiguration: ProjectConfiguration
+
+    @MockK
+    lateinit var mockConfigManager: ConfigManager
+
+    @MockK
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+
+    @MockK
+    lateinit var eventSyncManager: EventSyncManager
+
+
+    private lateinit var repository: ModuleRepositoryImpl
 
     @Before
     fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { projectConfiguration.general.modalities } returns listOf(GeneralConfiguration.Modality.FINGERPRINT)
+        every { projectConfiguration.synchronization.down } returns downSynchronizationConfiguration
         coEvery { mockConfigManager.getProjectConfiguration() } returns projectConfiguration
 
         every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d")
         coEvery {
             mockConfigManager.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c"), "")
+
+
+        repository = ModuleRepositoryImpl(
+            mockConfigManager,
+            enrolmentRecordManager,
+            eventSyncManager
+        )
     }
 
     @Test
@@ -96,7 +108,7 @@ class ModuleRepositoryImplTest {
         repository.saveModules(modules)
 
         coVerify(exactly = 1) {
-            eventDownSyncScopeRepository.deleteOperations(unselectedModules, listOf(Modes.FINGERPRINT))
+            eventSyncManager.deleteModules(unselectedModules, listOf(Modes.FINGERPRINT))
         }
     }
 

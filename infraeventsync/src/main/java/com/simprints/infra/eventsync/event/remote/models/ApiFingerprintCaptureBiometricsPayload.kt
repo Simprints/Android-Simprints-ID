@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTem
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 @Keep
-data class ApiFingerprintCaptureBiometricsPayload(
+internal data class ApiFingerprintCaptureBiometricsPayload(
     override val version: Int,
     override val startTime: Long,
     val fingerprint: Fingerprint,

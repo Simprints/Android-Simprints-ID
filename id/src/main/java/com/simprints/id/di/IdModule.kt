@@ -57,8 +57,6 @@ import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
-import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.eventsync.EventSyncManagerImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager

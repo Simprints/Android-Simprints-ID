@@ -9,11 +9,9 @@ import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.eventsync.EventSyncRepository
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
-import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -28,10 +26,8 @@ internal class SyncViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val deviceManager: DeviceManager,
     private val configManager: ConfigManager,
-    private val cacheSync: EventSyncCache,
     private val timeHelper: TimeHelper,
     private val loginManager: LoginManager,
-    private val eventSyncRepository: EventSyncRepository,
 ) : ViewModel() {
 
     companion object {
@@ -51,7 +47,7 @@ internal class SyncViewModel @Inject constructor(
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
 
     private suspend fun lastTimeSyncSucceed() = runBlocking {
-        cacheSync.readLastSuccessfulSyncTime()
+        eventSyncManager.getLastSyncTime()
             ?.let { timeHelper.readableBetweenNowAndTime(it) }
     }
 
@@ -74,7 +70,7 @@ internal class SyncViewModel @Inject constructor(
 
     private fun startInitialSyncIfRequired() {
         viewModelScope.launch {
-            val lastUpdate = lastTimeSyncRun ?: cacheSync.readLastSuccessfulSyncTime()
+            val lastUpdate = lastTimeSyncRun ?:  eventSyncManager.getLastSyncTime()
 
             val isRunning = syncStateLiveData.value?.isSyncRunning() ?: false
 
@@ -119,7 +115,7 @@ internal class SyncViewModel @Inject constructor(
             configManager.getProjectConfiguration().also { configuration ->
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
-            eventSyncRepository
+            eventSyncManager
                 .countEventsToUpload(loginManager.getSignedInProjectIdOrEmpty(), EventType.ENROLMENT_V2)
                 .collect { upSyncCountLiveData.postValue(it) }
         }

@@ -58,7 +58,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any(), any())
+            upSyncHelper.upSync(any())
         } returns flowOf(
             EventUpSyncProgress(
                 EventUpSyncOperation(
@@ -85,7 +85,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any(), any())
+            upSyncHelper.upSync(any())
         } throws BackendMaintenanceException(estimatedOutage = null)
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -105,7 +105,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any(), any())
+            upSyncHelper.upSync(any())
         } throws BackendMaintenanceException(estimatedOutage = 600)
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -126,7 +126,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any(), any())
+            upSyncHelper.upSync(any())
         } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -146,7 +146,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any(), any())
+            upSyncHelper.upSync(any())
         } throws Throwable()
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -220,7 +220,7 @@ class EventUpSyncUploaderWorkerTest {
 
         val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
 
-        coVerify(exactly = 1) { upSyncHelper.upSync(any(), expectedScope.operation) }
+        coVerify(exactly = 1) { upSyncHelper.upSync(expectedScope.operation) }
     }
 
     @Test
@@ -236,7 +236,7 @@ class EventUpSyncUploaderWorkerTest {
 
         val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
 
-        coVerify(exactly = 1) { upSyncHelper.upSync(any(), expectedScope.operation) }
+        coVerify(exactly = 1) { upSyncHelper.upSync(expectedScope.operation) }
     }
 
     @Test
@@ -264,7 +264,7 @@ class EventUpSyncUploaderWorkerTest {
         ).build()
 }
 
-class TestWorkerFactory(
+private class TestWorkerFactory(
     private val upSyncHelper: EventUpSyncHelper,
     private val eventSyncCache: EventSyncCache,
     private val loginManager: LoginManager,

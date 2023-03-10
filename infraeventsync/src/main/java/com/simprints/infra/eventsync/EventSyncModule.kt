@@ -6,21 +6,13 @@ import com.simprints.infra.events.local.*
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSourceImpl
 import com.simprints.infra.eventsync.status.EventSyncStatusDatabase
-import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
-import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepositoryImpl
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
-import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepositoryImpl
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
-import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
-import com.simprints.infra.eventsync.sync.EventSyncStateProcessorImpl
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.EventSyncCacheImpl
 import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProvider
 import com.simprints.infra.eventsync.sync.common.SyncWorkersLiveDataProviderImpl
 import com.simprints.infra.eventsync.sync.down.*
-import com.simprints.infra.eventsync.sync.up.EventUpSyncHelper
-import com.simprints.infra.eventsync.sync.up.EventUpSyncHelperImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -39,41 +31,16 @@ import javax.inject.Singleton
 abstract class EventSyncModule {
 
     @Binds
+    internal abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): EventSyncManager
+
+    @Binds
     internal abstract fun bindEventRemoteDataSource(impl: EventRemoteDataSourceImpl): EventRemoteDataSource
 
+    @Binds
+    internal abstract fun provideEventSyncCache(impl: EventSyncCacheImpl): EventSyncCache
 
     @Binds
-    internal abstract fun bindEventUpSyncScopeRepository(impl: EventUpSyncScopeRepositoryImpl): EventUpSyncScopeRepository
-
-    @Binds
-    internal abstract fun bindEventDownSyncScopeRepository(impl: EventDownSyncScopeRepositoryImpl): EventDownSyncScopeRepository
-
-    @Binds
-    internal abstract fun bindEventSyncRepositoryImpl(impl: EventSyncRepositoryImpl): EventSyncRepository
-
-    @Binds
-    abstract fun provideEventUpSyncHelper(impl: EventUpSyncHelperImpl): EventUpSyncHelper
-
-    @Binds
-    abstract fun provideSubjectFactory(impl: SubjectFactoryImpl): SubjectFactory
-
-    @Binds
-    abstract fun provideEventDownSyncHelper(impl: EventDownSyncHelperImpl): EventDownSyncHelper
-
-    @Binds
-    abstract fun provideEventSyncCache(impl: EventSyncCacheImpl): EventSyncCache
-
-    @Binds
-    abstract fun provideSyncWorkersLiveDataProvider(impl: SyncWorkersLiveDataProviderImpl): SyncWorkersLiveDataProvider
-
-    @Binds
-    abstract fun provideEventDownSyncDownloaderTask(impl: EventDownSyncDownloaderTaskImpl): EventDownSyncDownloaderTask
-
-    @Binds
-    abstract fun provideEventSyncManager(impl: EventSyncManagerImpl): EventSyncManager
-
-    @Binds
-    abstract fun provideEventSyncStateProcessor(impl: EventSyncStateProcessorImpl): EventSyncStateProcessor
+    internal abstract fun provideSyncWorkersLiveDataProvider(impl: SyncWorkersLiveDataProviderImpl): SyncWorkersLiveDataProvider
 }
 
 @Module

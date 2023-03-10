@@ -15,7 +15,7 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope as NewEve
         expression = "EventUpSyncScope(input)",
         imports = arrayOf("com.simprints.id.data.db.events_sync.up.domain.EventUpSyncScope"))
 )
-abstract class EventUpSyncScope(var operation: EventUpSyncOperation) {
+internal abstract class EventUpSyncScope(var operation: EventUpSyncOperation) {
 
     @Keep
     @Deprecated(message = "This is used to support old data-upload format, should be replaced with new ProjectScope",
@@ -28,7 +28,7 @@ abstract class EventUpSyncScope(var operation: EventUpSyncOperation) {
     }
 }
 
-fun EventUpSyncScope.toNewScope(): NewEventUpSyncScope {
+internal fun EventUpSyncScope.toNewScope(): NewEventUpSyncScope {
     val newScope =  NewEventUpSyncScope.ProjectScope(
         operation.queryEvent.projectId ?: ""
     )

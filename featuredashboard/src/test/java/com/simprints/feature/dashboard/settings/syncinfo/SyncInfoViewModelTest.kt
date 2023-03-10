@@ -11,14 +11,9 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.eventsync.EventSyncRepository
-import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
-import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
-import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
+import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
@@ -50,9 +45,6 @@ class SyncInfoViewModelTest {
     private lateinit var configManager: ConfigManager
 
     @MockK
-    private lateinit var eventSyncRepository: EventSyncRepository
-
-    @MockK
     private lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
@@ -60,9 +52,6 @@ class SyncInfoViewModelTest {
 
     @MockK
     private lateinit var deviceManager: DeviceManager
-
-    @MockK
-    private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     @MockK
     private lateinit var imageRepository: ImageRepository
@@ -90,10 +79,8 @@ class SyncInfoViewModelTest {
         viewModel = SyncInfoViewModel(
             configManager,
             deviceManager,
-            eventSyncRepository,
             enrolmentRecordManager,
             loginManager,
-            eventDownSyncScopeRepository,
             imageRepository,
             eventSyncManager,
         )
@@ -122,9 +109,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the recordsToUpSync live data correctly`() {
         val number = 10
-        coEvery {
-            eventSyncRepository.countEventsToUpload(PROJECT_ID, EventType.ENROLMENT_V2)
-        } returns flowOf(number)
+        coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, EventType.ENROLMENT_V2) } returns flowOf(number)
 
         viewModel.refreshInformation()
 
@@ -190,49 +175,23 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the recordsToDownSync and recordsToDelete live data to the count otherwise`() {
         val module1 = "module1"
-        val module2 = "module2"
-        val creationForModule1 = 10
-        val deletionForModule1 = 5
-        val creationForModule2 = 20
+        val creationForModules = 10
+        val deletionForModules = 5
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(module1, module2)
+            every { selectedModules } returns listOf(module1)
         }
         coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(any(), listOf(module1, module2), any())
-        } returns EventDownSyncScope.SubjectModuleScope(
-            PROJECT_ID,
-            listOf(module1, module2),
-            listOf()
-        )
-
-        coEvery {
-            eventSyncRepository.countEventsToDownload(
-                RemoteEventQuery(
-                    PROJECT_ID,
-                    moduleIds = listOf(module1),
-                    modes = listOf(),
-                )
+            eventSyncManager.getDownSyncCounts(
+                modes = listOf(),
+                modules = any(),
+                group = any()
             )
-        } returns listOf(
-            EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, creationForModule1),
-            EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, deletionForModule1),
-        )
-        coEvery {
-            eventSyncRepository.countEventsToDownload(
-                RemoteEventQuery(
-                    PROJECT_ID,
-                    moduleIds = listOf(module2),
-                    modes = listOf(),
-                )
-            )
-        } returns listOf(
-            EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, creationForModule2),
-        )
+        } returns DownSyncCounts(creationForModules, deletionForModules)
 
         viewModel.refreshInformation()
 
-        assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(creationForModule1 + creationForModule2)
-        assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isEqualTo(deletionForModule1)
+        assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(creationForModules)
+        assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isEqualTo(deletionForModules)
     }
 
     @Test

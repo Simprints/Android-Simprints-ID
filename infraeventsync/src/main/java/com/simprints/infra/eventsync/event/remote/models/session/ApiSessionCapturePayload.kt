@@ -13,7 +13,7 @@ import java.util.*
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiSessionCapturePayload(
+internal data class ApiSessionCapturePayload(
     override val version: Int,
     val id: String = UUID.randomUUID().toString(),
     val projectId: String,
@@ -46,7 +46,7 @@ data class ApiSessionCapturePayload(
     )
 }
 
-fun Location?.fromDomainToApi() =
+internal fun Location?.fromDomainToApi() =
     this?.let {
         ApiLocation(latitude, longitude)
     }

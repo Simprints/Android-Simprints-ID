@@ -26,7 +26,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class EventSyncMasterWorkerTest {
+internal class EventSyncMasterWorkerTest {
 
     companion object {
         private const val UNIQUE_SYNC_ID = "uniqueId"
