@@ -11,16 +11,9 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCre
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import javax.inject.Inject
 
-interface SubjectFactory {
+internal class SubjectFactory @Inject constructor(private val encodingUtils: EncodingUtils) {
 
-    fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload): Subject
-    fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove): Subject
-}
-
-class SubjectFactoryImpl @Inject constructor(private val encodingUtils: EncodingUtils) :
-    SubjectFactory {
-
-    override fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
+    fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
         with(payload) {
             Subject(
                 subjectId = subjectId,
@@ -32,7 +25,7 @@ class SubjectFactoryImpl @Inject constructor(private val encodingUtils: Encoding
             )
         }
 
-    override fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) =
+    fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) =
         with(payload) {
             Subject(
                 subjectId = subjectId,

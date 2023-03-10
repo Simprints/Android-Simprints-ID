@@ -6,6 +6,6 @@ import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRec
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 
 @Keep
-data class ApiEventCount(val type: ApiEnrolmentRecordPayloadType, val count: Int)
+internal data class ApiEventCount(val type: ApiEnrolmentRecordPayloadType, val count: Int)
 
-fun ApiEventCount.fromApiToDomain() = EventCount(type.fromApiToDomain(), count)
+internal fun ApiEventCount.fromApiToDomain() = EventCount(type.fromApiToDomain(), count)

@@ -18,9 +18,14 @@ class EventSyncWorkerStateTest {
 
     @Test
     fun shouldMapWorkInfoCorrectlyIfNoError() {
-        val state =
-            EventSyncWorkerState.fromWorkInfo(WorkInfo.State.SUCCEEDED)
-
-        assertThat(state).isInstanceOf(EventSyncWorkerState.Succeeded::class.java)
+        mapOf(
+            WorkInfo.State.ENQUEUED to EventSyncWorkerState.Enqueued::class.java,
+            WorkInfo.State.RUNNING to EventSyncWorkerState.Running::class.java,
+            WorkInfo.State.SUCCEEDED to EventSyncWorkerState.Succeeded::class.java,
+            WorkInfo.State.BLOCKED to EventSyncWorkerState.Blocked::class.java,
+            WorkInfo.State.CANCELLED to EventSyncWorkerState.Cancelled::class.java,
+        ).forEach { (state, stateInstance) ->
+            assertThat(EventSyncWorkerState.fromWorkInfo(state)).isInstanceOf(stateInstance)
+        }
     }
 }

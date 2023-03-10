@@ -48,8 +48,8 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayload
-import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.face.*
+import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionCapturePayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
@@ -85,13 +85,13 @@ import com.simprints.infra.eventsync.event.remote.models.face.*
     JsonSubTypes.Type(value = ApiCalloutPayload::class, name = Companion.CALLBACK_KEY)
 )
 @Keep
-abstract class ApiEventPayload(
+internal abstract class ApiEventPayload(
     val type: ApiEventPayloadType,
     open val version: Int,
     open val startTime: Long
 )
 
-fun EventPayload.fromDomainToApi(): ApiEventPayload =
+internal fun EventPayload.fromDomainToApi(): ApiEventPayload =
     when (this.type) {
         ARTIFICIAL_TERMINATION -> ApiArtificialTerminationPayload(this as ArtificialTerminationPayload)
         AUTHENTICATION -> ApiAuthenticationPayload(this as AuthenticationPayload)

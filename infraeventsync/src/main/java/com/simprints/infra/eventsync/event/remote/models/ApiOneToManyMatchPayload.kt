@@ -7,7 +7,7 @@ import com.simprints.infra.eventsync.event.remote.models.face.ApiMatcher
 import com.simprints.infra.eventsync.event.remote.models.face.fromDomainToApi
 
 @Keep
-data class ApiOneToManyMatchPayload(
+internal data class ApiOneToManyMatchPayload(
     override val startTime: Long,
     override val version: Int,
     val endTime: Long,

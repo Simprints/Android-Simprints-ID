@@ -12,7 +12,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiAuthorizationPayload
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiAuthorizationPayload(
+internal data class ApiAuthorizationPayload(
     override val startTime: Long,
     override val version: Int,
     val result: ApiResult,
@@ -39,7 +39,7 @@ data class ApiAuthorizationPayload(
 }
 
 
-fun AuthorizationPayload.AuthorizationResult.fromDomainToApi() =
+internal fun AuthorizationPayload.AuthorizationResult.fromDomainToApi() =
     when (this) {
         AUTHORIZED -> ApiResult.AUTHORIZED
         NOT_AUTHORIZED -> ApiResult.NOT_AUTHORIZED

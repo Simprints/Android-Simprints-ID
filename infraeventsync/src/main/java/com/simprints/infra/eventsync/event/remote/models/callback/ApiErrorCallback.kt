@@ -8,7 +8,7 @@ import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallba
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
 
 @Keep
-data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.Error) {
+internal data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.Error) {
 
     @Keep
     enum class ApiReason {
@@ -30,7 +30,7 @@ data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType
     }
 }
 
-fun Reason.fromDomainToApi() =
+internal fun Reason.fromDomainToApi() =
     when (this) {
         DIFFERENT_PROJECT_ID_SIGNED_IN -> ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN
         DIFFERENT_USER_ID_SIGNED_IN -> ApiReason.DIFFERENT_USER_ID_SIGNED_IN
@@ -47,7 +47,7 @@ fun Reason.fromDomainToApi() =
     }
 
 
-fun ApiReason.fromApiToDomain(): Reason =
+internal fun ApiReason.fromApiToDomain(): Reason =
     when (this) {
         ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
         ApiReason.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN

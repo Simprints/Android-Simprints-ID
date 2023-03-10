@@ -9,7 +9,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Ale
 
 
 @Keep
-data class ApiAlertScreenPayload(
+internal data class ApiAlertScreenPayload(
     override val startTime: Long,
     override val version: Int,
     val alertType: ApiAlertScreenEventType,
@@ -68,7 +68,7 @@ data class ApiAlertScreenPayload(
 }
 
 
-fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
+internal fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
     when (this) {
         AlertScreenEventType.DIFFERENT_PROJECT_ID -> DIFFERENT_PROJECT_ID
         AlertScreenEventType.DIFFERENT_USER_ID -> DIFFERENT_USER_ID

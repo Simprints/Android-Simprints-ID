@@ -5,7 +5,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.session.Device
 
 @Keep
-data class ApiDevice(
+internal data class ApiDevice(
     var androidSdkVersion: String = Build.VERSION.SDK_INT.toString(),
     var deviceModel: String = Build.MANUFACTURER + "_" + Build.MODEL,
     var deviceId: String = "",
@@ -15,5 +15,5 @@ data class ApiDevice(
         this(deviceId.androidSdkVersion, deviceId.deviceModel, deviceId.deviceId)
 }
 
-fun Device.fromDomainToApi() =
+internal fun Device.fromDomainToApi() =
     ApiDevice(androidSdkVersion, deviceModel, deviceId)

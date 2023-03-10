@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.TIMED_OUT
 
 @Keep
-data class ApiArtificialTerminationPayload(
+internal data class ApiArtificialTerminationPayload(
     override val startTime: Long,
     override val version: Int,
     val reason: ApiReason,
@@ -21,7 +21,7 @@ data class ApiArtificialTerminationPayload(
     }
 }
 
-fun ArtificialTerminationPayload.Reason.fromDomainToApi() =
+internal fun ArtificialTerminationPayload.Reason.fromDomainToApi() =
     when (this) {
         TIMED_OUT -> ApiArtificialTerminationPayload.ApiReason.TIMED_OUT
         NEW_SESSION -> ApiArtificialTerminationPayload.ApiReason.NEW_SESSION

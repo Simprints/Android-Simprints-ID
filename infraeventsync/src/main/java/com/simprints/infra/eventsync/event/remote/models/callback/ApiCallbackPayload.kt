@@ -12,13 +12,13 @@ import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEv
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callback
+import com.simprints.infra.eventsync.event.remote.models.callback.*
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackType.*
 import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
-import com.simprints.infra.eventsync.event.remote.models.callback.*
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiCallbackPayload(
+internal data class ApiCallbackPayload(
     override val startTime: Long,
     override val version: Int,
     val callback: ApiCallback
@@ -57,7 +57,7 @@ data class ApiCallbackPayload(
         ApiRefusalCallback(domainPayload.reason, domainPayload.extra))
 }
 
-fun ApiCallbackPayload.fromApiToDomain(): EventPayload =
+internal fun ApiCallbackPayload.fromApiToDomain(): EventPayload =
     when (this.callback.type) {
         Enrolment -> (callback as ApiEnrolmentCallback).let { EnrolmentCallbackPayload(startTime, version, it.guid, type.fromApiToDomain(), 0) }
         Identification -> (callback as ApiIdentificationCallback).let { IdentificationCallbackPayload(startTime, version, it.sessionId, it.scores.map { it.fromApiToDomain() }) }

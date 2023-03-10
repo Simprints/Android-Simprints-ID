@@ -9,7 +9,7 @@ import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fr
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiEnrolmentRecordCreationPayload(
+internal data class ApiEnrolmentRecordCreationPayload(
     val subjectId: String,
     val projectId: String,
     val moduleId: String,
@@ -20,7 +20,7 @@ data class ApiEnrolmentRecordCreationPayload(
 }
 
 
-fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
+internal fun ApiEnrolmentRecordCreationPayload.fromApiToDomain() =
     EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
         subjectId,
         projectId,

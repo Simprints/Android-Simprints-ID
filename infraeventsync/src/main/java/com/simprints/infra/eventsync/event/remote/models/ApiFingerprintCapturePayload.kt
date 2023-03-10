@@ -11,7 +11,7 @@ import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiFingerprintCapturePayload(
+internal data class ApiFingerprintCapturePayload(
     val id: String,
     override val startTime: Long,
     override val version: Int,
@@ -57,7 +57,7 @@ data class ApiFingerprintCapturePayload(
 
 }
 
-fun FingerprintCapturePayload.Result.fromDomainToApi() =
+internal fun FingerprintCapturePayload.Result.fromDomainToApi() =
     when (this) {
         GOOD_SCAN -> ApiResult.GOOD_SCAN
         BAD_QUALITY -> ApiResult.BAD_QUALITY

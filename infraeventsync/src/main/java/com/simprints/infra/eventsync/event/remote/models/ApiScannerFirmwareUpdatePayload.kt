@@ -4,13 +4,11 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent.ScannerFirmwareUpdatePayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiScannerFirmwareUpdatePayload(
+internal data class ApiScannerFirmwareUpdatePayload(
     override val startTime: Long,
     override val version: Int,
     val endTime: Long,

@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent.CompletionCheckPayload
 
 @Keep
-data class ApiCompletionCheckPayload(
+internal data class ApiCompletionCheckPayload(
     override val startTime: Long,
     override val version: Int,
     val completed: Boolean,

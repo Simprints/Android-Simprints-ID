@@ -22,13 +22,13 @@ private const val FINGERPRINT_REFERENCE_KEY = "FingerprintReference"
     JsonSubTypes.Type(value = ApiFaceReference::class, name = FACE_REFERENCE_KEY),
     JsonSubTypes.Type(value = ApiFingerprintReference::class, name = FINGERPRINT_REFERENCE_KEY)
 )
-interface ApiBiometricReference {
+internal interface ApiBiometricReference {
     val type: ApiBiometricReferenceType
     val id: String
 }
 
 @Keep
-enum class ApiBiometricReferenceType {
+internal enum class ApiBiometricReferenceType {
     // a constant key is required to serialise/deserialize
     // ApiBiometricReference correctly with Jackson (see annotation in ApiBiometricReference).
     // Add a key in the companion object for each enum value
@@ -40,7 +40,7 @@ enum class ApiBiometricReferenceType {
     FingerprintReference;
 }
 
-fun BiometricReference.fromDomainToApi() = when (this) {
+internal fun BiometricReference.fromDomainToApi() = when (this) {
     is DomainFaceReference -> {
         ApiFaceReference(id, templates.map { it.fromDomainToApi() }, format, metadata)
     }
@@ -49,23 +49,23 @@ fun BiometricReference.fromDomainToApi() = when (this) {
     }
 }
 
-fun ApiBiometricReference.fromApiToDomain() = when (this.type) {
+internal fun ApiBiometricReference.fromApiToDomain() = when (this.type) {
     ApiBiometricReferenceType.FaceReference -> (this as ApiFaceReference).fromApiToDomain()
     ApiBiometricReferenceType.FingerprintReference -> (this as ApiFingerprintReference).fromApiToDomain()
 }
 
-fun ApiFaceReference.fromApiToDomain() =
+internal fun ApiFaceReference.fromApiToDomain() =
     DomainFaceReference(id, templates.map { it.fromApiToDomain() }, format, metadata)
 
-fun ApiFaceTemplate.fromApiToDomain() = FaceTemplate(template)
+internal fun ApiFaceTemplate.fromApiToDomain() = FaceTemplate(template)
 
-fun FaceTemplate.fromDomainToApi() = ApiFaceTemplate(template)
+internal fun FaceTemplate.fromDomainToApi() = ApiFaceTemplate(template)
 
-fun ApiFingerprintReference.fromApiToDomain() =
+internal fun ApiFingerprintReference.fromApiToDomain() =
     DomainFingerprintReference(id, templates.map { it.fromApiToDomain() }, format, metadata)
 
-fun ApiFingerprintTemplate.fromApiToDomain() =
+internal fun ApiFingerprintTemplate.fromApiToDomain() =
     FingerprintTemplate(quality, template, IFingerIdentifier.valueOf(finger.name))
 
-fun FingerprintTemplate.fromDomainToApi() =
+internal fun FingerprintTemplate.fromDomainToApi() =
     ApiFingerprintTemplate(quality, template, finger)

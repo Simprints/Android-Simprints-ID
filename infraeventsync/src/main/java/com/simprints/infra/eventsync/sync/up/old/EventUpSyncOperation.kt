@@ -10,12 +10,12 @@ import java.util.*
         expression = "EventUpSyncOperation(input)",
         imports = arrayOf("com.simprints.id.data.db.events_sync.up.domain.EventUpSyncOperation"))
 )
-data class EventUpSyncOperation(
+internal data class EventUpSyncOperation(
     val queryEvent: LocalEventQuery,
     var lastState: UpSyncState? = null,
     var lastSyncTime: Long? = null,
 )
 
-fun EventUpSyncOperation.getUniqueKey() = with(this.queryEvent) {
+internal fun EventUpSyncOperation.getUniqueKey() = with(this.queryEvent) {
     UUID.nameUUIDFromBytes("$projectId".toByteArray()).toString()
 }

@@ -2,12 +2,10 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 
 
 @Keep
-data class ApiPersonCreationPayload(
+internal data class ApiPersonCreationPayload(
     override val startTime: Long,
     override val version: Int,
     val fingerprintCaptureIds: List<String>?,

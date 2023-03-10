@@ -7,7 +7,7 @@ import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentP
 import com.simprints.infra.eventsync.event.remote.models.ApiIntentParsingPayload.ApiIntegrationInfo
 
 @Keep
-data class ApiIntentParsingPayload(
+internal data class ApiIntentParsingPayload(
     override val startTime: Long,
     override val version: Int,
     val integration: ApiIntegrationInfo,
@@ -27,7 +27,7 @@ data class ApiIntentParsingPayload(
 }
 
 
-fun IntegrationInfo.fromDomainToApi() =
+internal fun IntegrationInfo.fromDomainToApi() =
     when (this) {
         ODK -> ApiIntegrationInfo.ODK
         STANDARD -> ApiIntegrationInfo.STANDARD

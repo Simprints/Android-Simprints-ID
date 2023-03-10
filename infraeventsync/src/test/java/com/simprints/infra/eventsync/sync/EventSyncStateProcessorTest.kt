@@ -27,7 +27,7 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class EventSyncStateProcessorImplTest {
+internal class EventSyncStateProcessorTest {
 
     companion object {
         const val UNIQUE_SYNC_ID = "UNIQUE_SYNC_ID"
@@ -68,7 +68,7 @@ class EventSyncStateProcessorImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
         eventSyncStateProcessor =
-            EventSyncStateProcessorImpl(eventSyncCache, syncWorkersLiveDataProvider)
+            EventSyncStateProcessor(eventSyncCache, syncWorkersLiveDataProvider)
         mockDependencies()
     }
 

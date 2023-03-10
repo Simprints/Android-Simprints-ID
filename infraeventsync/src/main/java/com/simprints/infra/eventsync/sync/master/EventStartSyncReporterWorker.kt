@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
  * PeopleStartSyncReporterWorker.
  */
 @HiltWorker
-class EventStartSyncReporterWorker @AssistedInject constructor(
+internal class EventStartSyncReporterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,

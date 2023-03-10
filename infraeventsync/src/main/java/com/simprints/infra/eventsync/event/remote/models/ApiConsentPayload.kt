@@ -9,7 +9,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiConsentPayload.ApiRe
 import com.simprints.infra.eventsync.event.remote.models.ApiConsentPayload.ApiType
 
 @Keep
-data class ApiConsentPayload(
+internal data class ApiConsentPayload(
     override val startTime: Long,
     override val version: Int,
     var endTime: Long,
@@ -34,13 +34,13 @@ data class ApiConsentPayload(
             domainPayload.result.fromDomainToApi())
 }
 
-fun ConsentPayload.Type.fromDomainToApi() =
+internal fun ConsentPayload.Type.fromDomainToApi() =
     when (this) {
         INDIVIDUAL -> ApiType.INDIVIDUAL
         PARENTAL -> ApiType.PARENTAL
     }
 
-fun ConsentPayload.Result.fromDomainToApi() =
+internal fun ConsentPayload.Result.fromDomainToApi() =
     when (this) {
         ACCEPTED -> ApiResult.ACCEPTED
         DECLINED -> ApiResult.DECLINED

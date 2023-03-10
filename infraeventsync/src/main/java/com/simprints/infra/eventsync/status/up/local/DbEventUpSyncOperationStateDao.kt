@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface DbEventUpSyncOperationStateDao {
+internal interface DbEventUpSyncOperationStateDao {
 
     @Query("select * from DbEventsUpSyncOperation")
     suspend fun load(): List<DbEventsUpSyncOperationState>

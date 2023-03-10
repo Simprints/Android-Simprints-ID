@@ -2,7 +2,6 @@ package com.simprints.feature.dashboard.tools.di
 
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.EventsModule
-import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent

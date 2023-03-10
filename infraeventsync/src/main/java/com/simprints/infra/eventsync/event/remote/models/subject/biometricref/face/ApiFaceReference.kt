@@ -8,7 +8,7 @@ import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.Ap
 import java.util.*
 
 @Keep
-data class ApiFaceReference(
+internal data class ApiFaceReference(
     override val id: String = UUID.randomUUID().toString(),
     val templates: List<ApiFaceTemplate>,
     val format: FaceTemplateFormat,

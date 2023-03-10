@@ -37,7 +37,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class EventDownSyncScopeRepositoryImplTest {
+internal class EventDownSyncScopeRepositoryImplTest {
 
     companion object {
         private val LAST_EVENT_ID = GUID1
@@ -60,7 +60,7 @@ class EventDownSyncScopeRepositoryImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         eventDownSyncScopeRepository =
-            EventDownSyncScopeRepositoryImpl(
+            EventDownSyncScopeRepository(
                 loginManager,
                 downSyncOperationOperationDao,
             )

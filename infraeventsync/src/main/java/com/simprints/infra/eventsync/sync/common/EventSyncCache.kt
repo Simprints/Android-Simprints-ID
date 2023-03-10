@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.sync.common
 
 import java.util.*
 
-interface EventSyncCache {
+internal interface EventSyncCache {
 
     companion object {
         const val FILENAME_FOR_PROGRESSES_SHARED_PREFS = "CACHE_PROGRESSES"

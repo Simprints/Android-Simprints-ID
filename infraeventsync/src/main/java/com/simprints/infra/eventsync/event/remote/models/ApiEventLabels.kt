@@ -7,7 +7,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventLabels.Companio
 import com.simprints.infra.eventsync.event.remote.models.ApiEventLabels.Companion.SESSION_ID_LABEL_KEY
 
 @Keep
-class ApiEventLabels : HashMap<String, List<String>>() {
+internal class ApiEventLabels : HashMap<String, List<String>>() {
 
     companion object {
         const val PROJECT_ID_LABEL_KEY = "projectId"
@@ -17,14 +17,14 @@ class ApiEventLabels : HashMap<String, List<String>>() {
     }
 }
 
-fun ApiEventLabels.fromApiToDomain() =
+internal fun ApiEventLabels.fromApiToDomain() =
     EventLabels(
         projectId = this[PROJECT_ID_LABEL_KEY]?.firstOrNull(),
         sessionId = this[SESSION_ID_LABEL_KEY]?.firstOrNull(),
         deviceId = this[DEVICE_ID_LABEL_KEY]?.firstOrNull()
     )
 
-fun EventLabels.fromDomainToApi(): ApiEventLabels {
+internal fun EventLabels.fromDomainToApi(): ApiEventLabels {
     val api = ApiEventLabels()
     projectId?.let { api.put(PROJECT_ID_LABEL_KEY, listOf(it)) }
     sessionId?.let { api.put(SESSION_ID_LABEL_KEY, listOf(it)) }

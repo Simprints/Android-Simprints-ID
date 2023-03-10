@@ -4,8 +4,9 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-interface EventDownSyncDownloaderTask {
+internal class EventDownSyncDownloaderTask @Inject constructor() {
 
     suspend fun execute(
         workerId: String,
@@ -14,5 +15,17 @@ interface EventDownSyncDownloaderTask {
         syncCache: EventSyncCache,
         reporter: WorkerProgressCountReporter,
         downloadScope: CoroutineScope
-    ): Int
+    ): Int {
+
+        var progress = syncCache.readProgress(workerId)
+        val totalDownloaded = downSyncHelper.downSync(downloadScope, downSyncOperation)
+
+        totalDownloaded.collect {
+            progress = it.progress
+            syncCache.saveProgress(workerId, progress)
+            reporter.reportCount(progress)
+        }
+
+        return progress
+    }
 }

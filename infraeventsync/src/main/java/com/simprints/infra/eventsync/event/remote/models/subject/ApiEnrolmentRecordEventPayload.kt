@@ -23,6 +23,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         name = ApiEnrolmentRecordPayloadType.ENROLMENT_RECORD_MOVE_KEY
     ),
 )
-abstract class ApiEnrolmentRecordEventPayload(
+internal abstract class ApiEnrolmentRecordEventPayload(
     val type: ApiEnrolmentRecordPayloadType
 )

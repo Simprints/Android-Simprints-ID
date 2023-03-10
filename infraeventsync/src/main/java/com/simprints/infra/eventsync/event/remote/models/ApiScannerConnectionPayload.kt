@@ -12,7 +12,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiScannerConnectionPay
 
 @Keep
 @JsonInclude(Include.NON_NULL)
-data class ApiScannerConnectionPayload(
+internal data class ApiScannerConnectionPayload(
     override val startTime: Long,
     override val version: Int,
     val scannerInfo: ApiScannerInfo,
@@ -42,7 +42,7 @@ data class ApiScannerConnectionPayload(
 }
 
 
-fun ScannerGeneration.toApiScannerGeneration() =
+internal fun ScannerGeneration.toApiScannerGeneration() =
     when (this) {
         VERO_1 -> ApiScannerGeneration.VERO_1
         VERO_2 -> ApiScannerGeneration.VERO_2

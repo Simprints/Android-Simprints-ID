@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 
 @Keep
-enum class ApiTier{
+internal enum class ApiTier{
     TIER_1,
     TIER_2,
     TIER_3,

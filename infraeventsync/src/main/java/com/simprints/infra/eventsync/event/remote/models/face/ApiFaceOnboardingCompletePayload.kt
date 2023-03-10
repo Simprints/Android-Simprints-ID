@@ -6,7 +6,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceOnboardingComplete
 
 @Keep
-data class ApiFaceOnboardingCompletePayload(
+internal data class ApiFaceOnboardingCompletePayload(
     override val startTime: Long, //Not added on API yet
     val endTime: Long,
     override val version: Int,

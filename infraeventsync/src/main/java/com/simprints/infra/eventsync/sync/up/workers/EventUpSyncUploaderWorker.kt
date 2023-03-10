@@ -29,7 +29,7 @@ import kotlinx.coroutines.withContext
 import com.simprints.infra.eventsync.sync.up.old.EventUpSyncScope as OldEventUpSyncScope
 
 @HiltWorker
-class EventUpSyncUploaderWorker @AssistedInject constructor(
+internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val upSyncHelper: EventUpSyncHelper,
@@ -57,31 +57,30 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
         }
     }
 
-    override suspend fun doWork(): Result =
-        withContext(dispatcher) {
-            try {
-                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
+    override suspend fun doWork(): Result = withContext(dispatcher) {
+        try {
+            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Started")
 
-                val workerId = this@EventUpSyncUploaderWorker.id.toString()
-                var count = eventSyncCache.readProgress(workerId)
+            val workerId = this@EventUpSyncUploaderWorker.id.toString()
+            var count = eventSyncCache.readProgress(workerId)
 
-                crashlyticsLog("Start")
-                upSyncHelper.upSync(this, upSyncScope.operation).collect {
-                    count += it.progress
-                    eventSyncCache.saveProgress(workerId, count)
-                    Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
+            crashlyticsLog("Start")
+            upSyncHelper.upSync(upSyncScope.operation).collect {
+                count += it.progress
+                eventSyncCache.saveProgress(workerId, count)
+                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
 
-                    reportCount(count)
-                }
-
-                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
-                success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
-            } catch (t: Throwable) {
-                Simber.d(t)
-                Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
-                retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
+                reportCount(count)
             }
+
+            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
+            success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
+        } catch (t: Throwable) {
+            Simber.d(t)
+            Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
+            retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
         }
+    }
 
     private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable): Result {
         return when (t) {
@@ -126,7 +125,7 @@ class EventUpSyncUploaderWorker @AssistedInject constructor(
     }
 }
 
-suspend fun WorkInfo.extractUpSyncProgress(eventSyncCache: EventSyncCache): Int {
+internal suspend fun WorkInfo.extractUpSyncProgress(eventSyncCache: EventSyncCache): Int {
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
 

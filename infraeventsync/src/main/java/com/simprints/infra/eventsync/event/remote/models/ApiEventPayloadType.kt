@@ -5,7 +5,7 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.*
 
 @Keep
-enum class ApiEventPayloadType {
+internal enum class ApiEventPayloadType {
 
     // a constant key is required to serialise/deserialize
     // ApiEventPayload correctly with Jackson (see annotation in ApiEventPayload).
@@ -135,7 +135,7 @@ enum class ApiEventPayloadType {
     }
 }
 
-fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
+internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     ARTIFICIAL_TERMINATION -> ApiEventPayloadType.ArtificialTermination
     AUTHENTICATION -> ApiEventPayloadType.Authentication
     CONSENT -> ApiEventPayloadType.Consent
@@ -179,7 +179,7 @@ fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
 }
 
 
-fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
+internal fun ApiEventPayloadType.fromApiToDomain(): EventType = when (this) {
     ApiEventPayloadType.ArtificialTermination -> ARTIFICIAL_TERMINATION
     ApiEventPayloadType.Authentication -> AUTHENTICATION
     ApiEventPayloadType.Consent -> CONSENT

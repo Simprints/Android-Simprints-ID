@@ -17,7 +17,7 @@ import java.util.*
  * It stores the "last successful timestamp"
  */
 @HiltWorker
-class EventEndSyncReporterWorker @AssistedInject constructor(
+internal class EventEndSyncReporterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val syncCache: EventSyncCache,

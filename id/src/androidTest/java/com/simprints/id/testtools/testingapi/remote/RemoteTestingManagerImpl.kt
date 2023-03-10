@@ -3,8 +3,6 @@ package com.simprints.id.testtools.testingapi.remote
 import android.content.Context
 import com.simprints.id.testtools.testingapi.exceptions.TestingRemoteApiError
 import com.simprints.id.testtools.testingapi.models.*
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.network.apiclient.SimApiClientImpl
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -56,21 +54,4 @@ class RemoteTestingManagerImpl(ctx: Context) : RemoteTestingManager {
             e.printStackTrace()
             throw wrapError(e)
         }
-
-
-    // Never invoked, but used to enforce that every test class has a test
-    fun enforceThatAnyTestHasATest() {
-        val type: ApiEventPayloadType? = null
-        when (type) {
-            Callout, Callback, ArtificialTermination,
-            Authentication, Consent, Enrolment, Authorization, FingerprintCapture, OneToOneMatch,
-            OneToManyMatch, PersonCreation, AlertScreen, GuidSelection, ConnectivitySnapshot, Refusal, CandidateRead,
-            ScannerConnection, Vero2InfoSnapshot, ScannerFirmwareUpdate, InvalidIntent, SuspiciousIntent, IntentParsing,
-            CompletionCheck, SessionCapture, FaceOnboardingComplete, FaceFallbackCapture, FaceCapture,
-            FaceCaptureConfirmation, FingerprintCaptureBiometrics, FaceCaptureBiometrics,
-            null -> {
-                // ADD TEST FOR NEW EVENT IN THIS CLASS
-            }
-        }
-    }
 }

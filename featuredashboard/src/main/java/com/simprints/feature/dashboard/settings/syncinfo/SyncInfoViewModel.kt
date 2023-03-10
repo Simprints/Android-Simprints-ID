@@ -1,21 +1,20 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
 import androidx.lifecycle.*
-import com.simprints.core.domain.common.GROUP
-import com.simprints.core.domain.modality.Modes
 import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.*
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.infra.eventsync.EventSyncRepository
-import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
@@ -30,10 +29,8 @@ import javax.inject.Inject
 internal class SyncInfoViewModel @Inject constructor(
     private val configManager: ConfigManager,
     deviceManager: DeviceManager,
-    private val eventSyncRepository: EventSyncRepository,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val loginManager: LoginManager,
-    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
 ) : ViewModel() {
@@ -170,7 +167,9 @@ internal class SyncInfoViewModel @Inject constructor(
         enrolmentRecordManager.count(SubjectQuery(projectId = projectId))
 
     private suspend fun getRecordsToUpSync(projectId: String): Int =
-        eventSyncRepository.countEventsToUpload(projectId, EventType.ENROLMENT_V2).firstOrNull() ?: 0
+        eventSyncManager.countEventsToUpload(projectId, EventType.ENROLMENT_V2)
+            .firstOrNull()
+            ?: 0
 
     private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
         if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {
@@ -183,26 +182,12 @@ internal class SyncInfoViewModel @Inject constructor(
         try {
             val projectConfig = configManager.getProjectConfiguration()
             val deviceConfig = configManager.getDeviceConfiguration()
-            val downSyncScope = eventDownSyncScopeRepository.getDownSyncScope(
+
+            eventSyncManager.getDownSyncCounts(
                 projectConfig.general.modalities.map { it.toMode() },
                 deviceConfig.selectedModules,
                 projectConfig.synchronization.down.partitionType.toGroup()
             )
-            var creationsToDownload = 0
-            var deletionsToDownload = 0
-
-            downSyncScope.operations.forEach { syncOperation ->
-                val counts = eventSyncRepository.countEventsToDownload(syncOperation.queryEvent)
-                creationsToDownload += counts
-                    .firstOrNull { it.type == EnrolmentRecordEventType.EnrolmentRecordCreation }
-                    ?.count ?: 0
-                deletionsToDownload += counts
-                    .firstOrNull { it.type == EnrolmentRecordEventType.EnrolmentRecordDeletion }
-                    ?.count ?: 0
-            }
-
-            DownSyncCounts(creationsToDownload, deletionsToDownload)
-
         } catch (t: Throwable) {
             Simber.d(t)
             DownSyncCounts(0, 0)
@@ -216,18 +201,4 @@ internal class SyncInfoViewModel @Inject constructor(
             )
         }
 
-    data class DownSyncCounts(val toCreate: Int, val toDelete: Int)
-
-    private fun GeneralConfiguration.Modality.toMode(): Modes =
-        when (this) {
-            GeneralConfiguration.Modality.FACE -> Modes.FACE
-            GeneralConfiguration.Modality.FINGERPRINT -> Modes.FINGERPRINT
-        }
-
-    private fun DownSynchronizationConfiguration.PartitionType.toGroup(): GROUP =
-        when (this) {
-            DownSynchronizationConfiguration.PartitionType.PROJECT -> GROUP.GLOBAL
-            DownSynchronizationConfiguration.PartitionType.MODULE -> GROUP.MODULE
-            DownSynchronizationConfiguration.PartitionType.USER -> GROUP.USER
-        }
 }

@@ -7,12 +7,12 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 
 @Keep
-class ApiEnrolmentRecordEvent(
+internal class ApiEnrolmentRecordEvent(
     val id: String,
     val payload: ApiEnrolmentRecordEventPayload
 )
 
-fun ApiEnrolmentRecordEvent.fromApiToDomain(): EnrolmentRecordEvent =
+internal fun ApiEnrolmentRecordEvent.fromApiToDomain(): EnrolmentRecordEvent =
     when (payload.type) {
         ApiEnrolmentRecordPayloadType.EnrolmentRecordCreation -> EnrolmentRecordCreationEvent(
             id,

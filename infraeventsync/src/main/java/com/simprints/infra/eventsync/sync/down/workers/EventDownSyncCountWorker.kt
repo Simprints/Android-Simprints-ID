@@ -31,7 +31,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 @HiltWorker
-class EventDownSyncCountWorker @AssistedInject constructor(
+internal class EventDownSyncCountWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val eventDownSyncHelper: EventDownSyncHelper,
@@ -130,7 +130,7 @@ class EventDownSyncCountWorker @AssistedInject constructor(
 
 }
 
-fun WorkInfo.getDownCountsFromOutput(): List<EventCount>? {
+internal fun WorkInfo.getDownCountsFromOutput(): List<EventCount>? {
     val outputJson = this.outputData.getString(OUTPUT_COUNT_WORKER_DOWN)
     return try {
         JsonHelper.fromJson(outputJson!!, object : TypeReference<List<EventCount>>() {})
