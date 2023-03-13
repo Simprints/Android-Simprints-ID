@@ -3,6 +3,8 @@ package com.simprints.fingerprint.activities.collect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.coroutines.DispatcherProvider
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
@@ -156,7 +158,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     @Test
-    fun `test scanner supports imagetransfer then isImageTransferRequired should be true`() {
+    fun `test scanner supports image transfer then isImageTransferRequired should be true`() {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns true
         vm.start(TWO_FINGERS_IDS)
@@ -1169,6 +1171,38 @@ class CollectFingerprintsViewModelTest {
 
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
         vm.launchReconnect.assertEventReceived()
+    }
+
+    @Test
+    @ExperimentalTime
+    fun given3BadScans_whenNoFingerDetected_doesNotAddFingerprintCaptureBiometricsEvent() {
+        mockScannerSetUiIdle()
+        setupCaptureFingerprintResponses(BAD_SCAN, BAD_SCAN, BAD_SCAN, NO_FINGER_DETECTED)
+        noImageTransfer()
+
+        vm.start(TWO_FINGERS_IDS)
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.state().isShowingSplashScreen).isTrue()
+        mockTimer.executeNextTask()
+        assertThat(vm.state().fingerStates.size).isEqualTo(3)
+        mockTimer.executeNextTask()
+        assertThat(vm.state().isShowingSplashScreen).isFalse()
+        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+
+        vm.updateSelectedFinger(0)
+        assertThat(vm.state().currentFingerIndex).isEqualTo(0)
+
+        vm.handleScanButtonPressed()
+
+        assertThat(vm.state().currentCaptureState()).isEqualTo(
+            CaptureState.NotDetected(3)
+        )
+
+        coVerify(exactly = 4) { sessionEventsManager.addEvent(ofType<FingerprintCaptureEvent>()) }
+        coVerify(exactly = 1) { sessionEventsManager.addEvent(ofType<FingerprintCaptureBiometricsEvent>()) }
     }
 
     @ExperimentalTime
