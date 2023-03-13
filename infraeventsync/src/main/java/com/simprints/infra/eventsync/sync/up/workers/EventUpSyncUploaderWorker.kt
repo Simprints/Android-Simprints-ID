@@ -15,7 +15,6 @@ import com.simprints.infra.eventsync.exceptions.MalformedSyncOperationException
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.eventsync.sync.up.EventUpSyncHelper
-import com.simprints.infra.eventsync.sync.up.old.toNewScope
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.infra.logging.Simber

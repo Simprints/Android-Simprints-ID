@@ -38,7 +38,7 @@ import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 
-class EventRemoteDataSourceImplTest {
+class EventRemoteDataSourceTest {
 
     @MockK
     lateinit var loginManager: LoginManager
@@ -70,7 +70,7 @@ class EventRemoteDataSourceImplTest {
         }
 
         coEvery { loginManager.buildClient(EventRemoteInterface::class) } returns simApiClient
-        eventRemoteDataSource = EventRemoteDataSourceImpl(loginManager, JsonHelper)
+        eventRemoteDataSource = EventRemoteDataSource(loginManager, JsonHelper)
     }
 
     @Test
@@ -130,7 +130,7 @@ class EventRemoteDataSourceImplTest {
             val channel = mockk<ProducerScope<EnrolmentRecordEvent>>(relaxed = true)
             excludeRecords { channel.isClosedForSend }
 
-            (eventRemoteDataSource as EventRemoteDataSourceImpl).parseStreamAndEmitEvents(
+            (eventRemoteDataSource as EventRemoteDataSource).parseStreamAndEmitEvents(
                 responseStreamWith6Events,
                 channel
             )
