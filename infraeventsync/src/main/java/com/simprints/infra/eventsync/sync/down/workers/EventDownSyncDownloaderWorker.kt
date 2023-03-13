@@ -12,7 +12,6 @@ import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsExce
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.EventDownSyncDownloaderTask
 import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
@@ -31,7 +30,6 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private val downSyncHelper: EventDownSyncHelper,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val syncCache: EventSyncCache,
-    private val eventDownSyncDownloaderTask: EventDownSyncDownloaderTask,
     private val jsonHelper: JsonHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -60,16 +58,16 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
             try {
                 Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
+                val workerId = this@EventDownSyncDownloaderWorker.id.toString()
+                var count = syncCache.readProgress(workerId)
+
                 crashlyticsLog("Start - Params: $downSyncOperationInput")
 
-                val count = eventDownSyncDownloaderTask.execute(
-                    this@EventDownSyncDownloaderWorker.id.toString(),
-                    getDownSyncOperation(),
-                    downSyncHelper,
-                    syncCache,
-                    this@EventDownSyncDownloaderWorker,
-                    this
-                )
+                downSyncHelper.downSync(this, getDownSyncOperation()).collect {
+                    count = it.progress
+                    syncCache.saveProgress(workerId, count)
+                    reportCount(count)
+                }
 
                 Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
                 success(
