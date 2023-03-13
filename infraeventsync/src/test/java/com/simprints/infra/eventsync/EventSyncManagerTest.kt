@@ -20,7 +20,7 @@ import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -60,7 +60,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var downSyncHelper: EventDownSyncHelper
+    lateinit var downSyncTask: EventDownSyncTask
 
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
@@ -89,7 +89,7 @@ internal class EventSyncManagerTest {
             eventRepository,
             eventUpSyncScopeRepository,
             eventSyncCache,
-            downSyncHelper,
+            downSyncTask,
             eventRemoteDataSource,
             configManager,
             testCoroutineRule.testCoroutineDispatcher,
@@ -219,11 +219,11 @@ internal class EventSyncManagerTest {
 
     @Test
     fun `downSync should call down sync helper`() = runTest {
-        coEvery { downSyncHelper.downSync(any(), any()) } returns emptyFlow()
+        coEvery { downSyncTask.downSync(any(), any()) } returns emptyFlow()
 
         eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId")
 
-        coVerify { downSyncHelper.downSync(any(), any()) }
+        coVerify { downSyncTask.downSync(any(), any()) }
     }
 
     @Test

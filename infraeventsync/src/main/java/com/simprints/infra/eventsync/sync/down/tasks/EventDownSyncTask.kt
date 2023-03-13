@@ -1,4 +1,4 @@
-package com.simprints.infra.eventsync.sync.down
+package com.simprints.infra.eventsync.sync.down.tasks
 
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.tools.time.TimeHelper
@@ -7,7 +7,6 @@ import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
-import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.*
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
@@ -24,7 +23,7 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-internal class EventDownSyncHelper @Inject constructor(
+internal class EventDownSyncTask @Inject constructor(
     private val subjectRepository: EnrolmentRecordManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
@@ -32,9 +31,6 @@ internal class EventDownSyncHelper @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRemoteDataSource: EventRemoteDataSource,
 ) {
-
-    suspend fun countForDownSync(operation: EventDownSyncOperation): List<EventCount> =
-        eventRemoteDataSource.count(operation.queryEvent.fromDomainToApi())
 
     suspend fun downSync(
         scope: CoroutineScope,

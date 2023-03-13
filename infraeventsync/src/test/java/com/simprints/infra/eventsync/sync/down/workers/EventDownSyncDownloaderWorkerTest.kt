@@ -12,7 +12,7 @@ import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
@@ -38,7 +38,7 @@ internal class EventDownSyncDownloaderWorkerTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var downSyncHelper: EventDownSyncHelper
+    lateinit var downSyncTask: EventDownSyncTask
 
     @MockK
     lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -59,7 +59,7 @@ internal class EventDownSyncDownloaderWorkerTest {
                     INPUT_DOWN_SYNC_OPS to JsonHelper.toJson(projectDownSyncScope.operations.first())
                 )
             },
-            downSyncHelper,
+            downSyncTask,
             eventDownSyncScopeRepository,
             syncCache,
             JsonHelper,
@@ -77,7 +77,7 @@ internal class EventDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForCloudIntegration_shouldFail() = runTest {
         coEvery {
-            downSyncHelper.downSync(any(), any())
+            downSyncTask.downSync(any(), any())
         } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -94,7 +94,7 @@ internal class EventDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForBackendMaintenanceError_shouldFail() = runTest {
         coEvery {
-            downSyncHelper.downSync(any(), any())
+            downSyncTask.downSync(any(), any())
         } throws BackendMaintenanceException(estimatedOutage = null)
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -112,7 +112,7 @@ internal class EventDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForTimedBackendMaintenanceError_shouldFail() = runTest {
         coEvery {
-            downSyncHelper.downSync(any(), any())
+            downSyncTask.downSync(any(), any())
         } throws BackendMaintenanceException(estimatedOutage = 600)
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -130,7 +130,7 @@ internal class EventDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForTooManyRequestsError_shouldFail() = runTest {
         coEvery {
-            downSyncHelper.downSync(any(), any())
+            downSyncTask.downSync(any(), any())
         } throws TooManyRequestsException()
 
         val result = eventDownSyncDownloaderWorker.doWork()
@@ -147,7 +147,7 @@ internal class EventDownSyncDownloaderWorkerTest {
     @Test
     fun worker_failForNetworkIssue_shouldRetry() = runTest {
         coEvery {
-            downSyncHelper.downSync(any(), any())
+            downSyncTask.downSync(any(), any())
         } throws Throwable("Network Exception")
 
         val result = eventDownSyncDownloaderWorker.doWork()

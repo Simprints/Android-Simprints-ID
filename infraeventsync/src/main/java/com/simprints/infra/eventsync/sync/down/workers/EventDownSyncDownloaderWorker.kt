@@ -12,7 +12,7 @@ import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsExce
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import com.simprints.infra.logging.Simber
@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
 internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val downSyncHelper: EventDownSyncHelper,
+    private val downSyncTask: EventDownSyncTask,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val syncCache: EventSyncCache,
     private val jsonHelper: JsonHelper,
@@ -53,63 +53,58 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     private suspend fun getDownSyncOperation() =
         eventDownSyncScopeRepository.refreshState(downSyncOperationInput)
 
-    override suspend fun doWork(): Result =
-        withContext(dispatcher) {
-            try {
-                Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
+    override suspend fun doWork(): Result = withContext(dispatcher) {
+        try {
+            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
 
-                val workerId = this@EventDownSyncDownloaderWorker.id.toString()
-                var count = syncCache.readProgress(workerId)
+            val workerId = this@EventDownSyncDownloaderWorker.id.toString()
+            var count = syncCache.readProgress(workerId)
 
-                crashlyticsLog("Start - Params: $downSyncOperationInput")
+            crashlyticsLog("Start - Params: $downSyncOperationInput")
 
-                downSyncHelper.downSync(this, getDownSyncOperation()).collect {
-                    count = it.progress
-                    syncCache.saveProgress(workerId, count)
-                    reportCount(count)
-                }
-
-                Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
-                success(
-                    workDataOf(OUTPUT_DOWN_SYNC to count),
-                    "Total downloaded: $0 for $downSyncOperationInput"
-                )
-            } catch (t: Throwable) {
-                Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
-                retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t)
+            downSyncTask.downSync(this, getDownSyncOperation()).collect {
+                count = it.progress
+                syncCache.saveProgress(workerId, count)
+                reportCount(count)
             }
-        }
 
-    private fun retryOrFailIfCloudIntegrationErrorOrMalformedOperationOrBackendMaintenance(t: Throwable): Result {
-        return when (t) {
-            is BackendMaintenanceException -> fail(
-                t,
-                t.message,
-                workDataOf(
-                    OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                    OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
-                )
+            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
+            success(
+                workDataOf(OUTPUT_DOWN_SYNC to count),
+                "Total downloaded: $0 for $downSyncOperationInput"
             )
-            is SyncCloudIntegrationException -> fail(
-                t,
-                t.message,
-                workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
-            )
-            is TooManyRequestsException -> fail(
-                t,
-                t.message,
-                workDataOf(
-                    OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
-                )
-            )
-            else -> retry(t)
+        } catch (t: Throwable) {
+            Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")
+            handleSyncException(t)
         }
     }
 
-    override suspend fun reportCount(count: Int) {
-        setProgress(
-            workDataOf(PROGRESS_DOWN_SYNC to count)
+    private fun handleSyncException(t: Throwable) = when (t) {
+        is BackendMaintenanceException -> fail(
+            t,
+            t.message,
+            workDataOf(
+                OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+                OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
+            )
         )
+        is SyncCloudIntegrationException -> fail(
+            t,
+            t.message,
+            workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
+        )
+        is TooManyRequestsException -> fail(
+            t,
+            t.message,
+            workDataOf(
+                OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
+            )
+        )
+        else -> retry(t)
+    }
+
+    override suspend fun reportCount(count: Int) {
+        setProgress(workDataOf(PROGRESS_DOWN_SYNC to count))
     }
 }
 
