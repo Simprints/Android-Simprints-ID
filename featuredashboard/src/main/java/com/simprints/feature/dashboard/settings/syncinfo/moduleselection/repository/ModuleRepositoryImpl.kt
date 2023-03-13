@@ -1,8 +1,6 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
-import com.simprints.core.domain.modality.Modes
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.EventSyncManager
@@ -53,17 +51,8 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
         // Delete operations for unselected modules to ensure full sync if they are reselected
         // in the future
-        eventSyncManager.deleteModules(
-            unselectedModules.map { it.name },
-            configManager.getProjectConfiguration().general.modalities.map { it.toMode() }
-        )
+        eventSyncManager.deleteModules(unselectedModules.map { it.name })
     }
-
-    private fun GeneralConfiguration.Modality.toMode(): Modes =
-        when (this) {
-            GeneralConfiguration.Modality.FACE -> Modes.FACE
-            GeneralConfiguration.Modality.FINGERPRINT -> Modes.FINGERPRINT
-        }
 
     private fun setCrashlyticsKeyForModules(modules: List<String>) {
         Simber.tag(MODULE_IDS, true).i(modules.toString())
