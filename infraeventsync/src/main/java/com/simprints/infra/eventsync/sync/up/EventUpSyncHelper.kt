@@ -42,7 +42,7 @@ internal class EventUpSyncHelper @Inject constructor(
     suspend fun countForUpSync(operation: EventUpSyncOperation): Int =
         eventRepository.observeEventCount(operation.projectId, null).firstOrNull() ?: 0
 
-    fun upSync(operation: EventUpSyncOperation) = flow {
+    fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
         if (operation.projectId != loginManager.getSignedInProjectIdOrEmpty()) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
                 Simber.e(it)
