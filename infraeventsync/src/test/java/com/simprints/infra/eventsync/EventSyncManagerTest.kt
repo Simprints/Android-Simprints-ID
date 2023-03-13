@@ -8,6 +8,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
@@ -64,6 +65,9 @@ internal class EventSyncManagerTest {
     @MockK
     lateinit var eventRemoteDataSource: EventRemoteDataSource
 
+    @MockK
+    lateinit var configManager: ConfigManager
+
     private lateinit var eventSyncManagerImpl: EventSyncManagerImpl
 
     @Before
@@ -72,6 +76,11 @@ internal class EventSyncManagerTest {
 
         mockkStatic(WorkManager::class)
         every { WorkManager.getInstance(ctx) } returns workManager
+
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { general.modalities } returns listOf()
+            every { synchronization.down.partitionType.toGroup() } returns GROUP.MODULE
+        }
 
         eventSyncManagerImpl = EventSyncManagerImpl(
             ctx,
@@ -82,6 +91,7 @@ internal class EventSyncManagerTest {
             eventSyncCache,
             downSyncHelper,
             eventRemoteDataSource,
+            configManager,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -90,24 +100,6 @@ internal class EventSyncManagerTest {
     fun `getLastSyncTime should call sync cache`() = runTest {
         eventSyncManagerImpl.getLastSyncTime()
         coVerify { eventSyncCache.readLastSuccessfulSyncTime() }
-    }
-
-    @Test
-    fun `hasSyncEverRunBefore returns false if there were no workers`() = runTest {
-        every { workManager.getWorkInfosByTag(any()).get() } returns emptyList()
-
-        assertThat(eventSyncManagerImpl.hasSyncEverRunBefore()).isFalse()
-
-        coVerify { workManager.getAllSubjectsSyncWorkersInfo() }
-    }
-
-    @Test
-    fun `hasSyncEverRunBefore returns true if there were workers`() = runTest {
-        every { workManager.getWorkInfosByTag(any()).get() } returns listOf(mockk())
-
-        assertThat(eventSyncManagerImpl.hasSyncEverRunBefore()).isTrue()
-
-        coVerify { workManager.getAllSubjectsSyncWorkersInfo() }
     }
 
     @Test
@@ -190,12 +182,11 @@ internal class EventSyncManagerTest {
                 EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 11),
             )
         )
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, SampleDefaults.DEFAULT_MODULE_ID_2)
+        }
 
-        val result = eventSyncManagerImpl.getDownSyncCounts(
-            emptyList(),
-            listOf(DEFAULT_MODULE_ID, SampleDefaults.DEFAULT_MODULE_ID_2),
-            GROUP.MODULE
-        )
+        val result = eventSyncManagerImpl.countEventsToDownload()
 
         assertThat(result.toCreate).isEqualTo(10)
         assertThat(result.toDelete).isEqualTo(16)
@@ -216,12 +207,11 @@ internal class EventSyncManagerTest {
                 EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 5),
             )
         )
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, SampleDefaults.DEFAULT_MODULE_ID_2)
+        }
 
-        val result = eventSyncManagerImpl.getDownSyncCounts(
-            emptyList(),
-            listOf(DEFAULT_MODULE_ID, SampleDefaults.DEFAULT_MODULE_ID_2),
-            GROUP.MODULE
-        )
+        val result = eventSyncManagerImpl.countEventsToDownload()
 
         assertThat(result.toCreate).isEqualTo(3)
         assertThat(result.toDelete).isEqualTo(5)
@@ -231,14 +221,14 @@ internal class EventSyncManagerTest {
     fun `downSync should call down sync helper`() = runTest {
         coEvery { downSyncHelper.downSync(any(), any()) } returns emptyFlow()
 
-        eventSyncManagerImpl.downSync(DEFAULT_PROJECT_ID, "subjectId", emptyList())
+        eventSyncManagerImpl.downSyncSubject(DEFAULT_PROJECT_ID, "subjectId")
 
         coVerify { downSyncHelper.downSync(any(), any()) }
     }
 
     @Test
     fun `deleteModules should call sync scope repo`() = runTest {
-        eventSyncManagerImpl.deleteModules(emptyList(), emptyList())
+        eventSyncManagerImpl.deleteModules(emptyList())
 
         coVerify { eventDownSyncScopeRepository.deleteOperations(any(), any()) }
     }

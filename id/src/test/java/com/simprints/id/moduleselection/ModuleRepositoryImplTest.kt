@@ -101,9 +101,7 @@ class ModuleRepositoryImplTest {
 
         repository.saveModules(modules)
 
-        coVerify(exactly = 1) {
-            eventSyncManager.deleteModules(unselectedModules, any())
-        }
+        coVerify(exactly = 1) { eventSyncManager.deleteModules(unselectedModules) }
     }
 
     @Test

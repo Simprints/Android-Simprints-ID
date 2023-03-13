@@ -14,7 +14,7 @@ import javax.inject.Inject
 internal class EventDownSyncScopeRepository @Inject constructor(
     private val loginManager: LoginManager,
     private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
-)  {
+) {
 
     suspend fun getDownSyncScope(
         modes: List<Modes>,
@@ -25,17 +25,12 @@ internal class EventDownSyncScopeRepository @Inject constructor(
         val possibleUserId = getUserId()
 
         val syncScope = when (syncGroup) {
-            GROUP.GLOBAL ->
-                SubjectProjectScope(projectId, modes)
-            GROUP.USER ->
-                SubjectUserScope(projectId, possibleUserId, modes)
-            GROUP.MODULE ->
-                SubjectModuleScope(projectId, selectedModuleIDs, modes)
+            GROUP.GLOBAL -> SubjectProjectScope(projectId, modes)
+            GROUP.USER -> SubjectUserScope(projectId, possibleUserId, modes)
+            GROUP.MODULE -> SubjectModuleScope(projectId, selectedModuleIDs, modes)
         }
 
-        syncScope.operations = syncScope.operations.map { op ->
-            refreshState(op)
-        }
+        syncScope.operations = syncScope.operations.map { op -> refreshState(op) }
         return syncScope
     }
 
@@ -61,10 +56,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
 
     suspend fun refreshState(syncScopeOperation: EventDownSyncOperation): EventDownSyncOperation {
         val uniqueOpId = syncScopeOperation.getUniqueKey()
-        val state =
-            downSyncOperationOperationDao.load().firstOrNull {
-                it.id == uniqueOpId
-            }
+        val state = downSyncOperationOperationDao.load().firstOrNull { it.id == uniqueOpId }
 
         return syncScopeOperation.copy(
             queryEvent = syncScopeOperation.queryEvent.copy(lastEventId = state?.lastEventId),
