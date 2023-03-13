@@ -15,7 +15,6 @@ import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.*
-import com.simprints.infra.eventsync.status.down.domain.fromDomainToApi
 import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope

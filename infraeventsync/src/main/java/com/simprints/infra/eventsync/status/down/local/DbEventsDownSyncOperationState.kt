@@ -5,7 +5,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState
-import com.simprints.infra.eventsync.status.down.domain.getUniqueKey
 
 @Entity(tableName = "DbEventsDownSyncOperation")
 @Keep

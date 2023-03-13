@@ -6,7 +6,6 @@ import com.simprints.infra.eventsync.exceptions.MissingArgumentForDownSyncScopeE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.*
-import com.simprints.infra.eventsync.status.down.domain.getUniqueKey
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
 import com.simprints.infra.login.LoginManager

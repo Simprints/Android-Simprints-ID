@@ -32,7 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-internal class EventSyncManagerImplTest {
+internal class EventSyncManagerTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()

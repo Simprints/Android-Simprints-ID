@@ -17,16 +17,9 @@ internal data class EventDownSyncOperation(
         COMPLETE,
         FAILED
     }
-}
 
-// We need to keep this old types otherwise the unique key of the down-sync will change
-// and we will need to down-sync again from scratch.
-internal var oldTypes =
-    "ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION"
-
-//Unique key: all request params expect for lastEventId
-internal fun EventDownSyncOperation.getUniqueKey(): String =
-    with(this.queryEvent) {
+    //Unique key: all request params expect for lastEventId
+    internal fun getUniqueKey(): String = with(this.queryEvent) {
         UUID.nameUUIDFromBytes(
             (projectId +
                 (attendantId ?: "") +
@@ -37,3 +30,10 @@ internal fun EventDownSyncOperation.getUniqueKey(): String =
                 ).toByteArray()
         ).toString()
     }
+
+    companion object {
+        // We need to keep this old types otherwise the unique key of the down-sync will change
+        // and we will need to down-sync again from scratch.
+        internal var oldTypes = "ENROLMENT_RECORD_CREATION, ENROLMENT_RECORD_MOVE, ENROLMENT_RECORD_DELETION"
+    }
+}
