@@ -18,7 +18,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -37,7 +37,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
-    private val downSyncHelper: EventDownSyncHelper,
+    private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val configManager: ConfigManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
@@ -152,7 +152,7 @@ internal class EventSyncManagerImpl @Inject constructor(
             subjectId = subjectId,
             modes = getProjectModes(configManager.getProjectConfiguration()),
         ))
-        downSyncHelper.downSync(this, op).toList()
+        downSyncTask.downSync(this, op).toList()
     }
 
     private fun getProjectModes(projectConfiguration: ProjectConfiguration) =

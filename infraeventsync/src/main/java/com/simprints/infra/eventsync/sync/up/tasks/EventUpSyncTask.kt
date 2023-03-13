@@ -1,4 +1,4 @@
-package com.simprints.infra.eventsync.sync.up
+package com.simprints.infra.eventsync.sync.up.tasks
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
@@ -20,17 +20,17 @@ import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.*
 import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import javax.inject.Inject
 
-internal class EventUpSyncHelper @Inject constructor(
+internal class EventUpSyncTask @Inject constructor(
     private val loginManager: LoginManager,
     private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventRepository: EventRepository,
@@ -38,9 +38,6 @@ internal class EventUpSyncHelper @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
 ) {
-
-    suspend fun countForUpSync(operation: EventUpSyncOperation): Int =
-        eventRepository.observeEventCount(operation.projectId, null).firstOrNull() ?: 0
 
     fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
         if (operation.projectId != loginManager.getSignedInProjectIdOrEmpty()) {

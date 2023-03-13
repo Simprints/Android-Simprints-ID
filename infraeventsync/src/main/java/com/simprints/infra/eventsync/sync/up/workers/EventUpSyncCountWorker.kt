@@ -10,21 +10,22 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.delegates.lazyVar
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
-import com.simprints.infra.eventsync.sync.up.EventUpSyncHelper
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 @HiltWorker
 internal class EventUpSyncCountWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val eventUpSyncHelper: EventUpSyncHelper,
+    private val eventRepository: EventRepository,
     private val jsonHelper: JsonHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
@@ -49,34 +50,27 @@ internal class EventUpSyncCountWorker @AssistedInject constructor(
         )
     }
 
-    override suspend fun doWork(): Result =
-        withContext(dispatcher) {
-            try {
-                Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
+    override suspend fun doWork(): Result = withContext(dispatcher) {
+        try {
+            Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
+            crashlyticsLog("Start - $upSyncScope")
 
-                crashlyticsLog("Start - $upSyncScope")
+            val upCount = getUpCount(upSyncScope)
 
-                execute(upSyncScope)
-            } catch (t: Throwable) {
-                Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Failed ${t.message}")
-
-                fail(t)
-            }
+            Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Done $upCount")
+            success(
+                workDataOf(OUTPUT_COUNT_WORKER_UP to upCount),
+                "Total to upload: $upCount"
+            )
+        } catch (t: Throwable) {
+            Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Failed ${t.message}")
+            fail(t)
         }
-
-    private suspend fun execute(upSyncScope: EventUpSyncScope): Result {
-        val upCount = getUpCount(upSyncScope)
-        Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Done $upCount")
-
-        return success(
-            workDataOf(
-                OUTPUT_COUNT_WORKER_UP to upCount
-            ), "Total to upload: $upCount"
-        )
     }
 
-    private suspend fun getUpCount(upSyncScope: EventUpSyncScope) =
-        eventUpSyncHelper.countForUpSync(upSyncScope.operation)
+    private suspend fun getUpCount(upSyncScope: EventUpSyncScope) = eventRepository
+        .observeEventCount(upSyncScope.operation.projectId, null)
+        .firstOrNull() ?: 0
 }
 
 internal fun WorkInfo.getUpCountsFromOutput(): Int? =
