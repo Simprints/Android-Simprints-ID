@@ -1,4 +1,4 @@
-package com.simprints.feature.dashboard
+package com.simprints.testtools.hilt
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint

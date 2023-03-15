@@ -1,19 +1,18 @@
-package com.simprints.feature.dashboard.tools
+package com.simprints.testtools.hilt
 
 import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StyleRes
-import androidx.core.util.Preconditions
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import com.simprints.feature.dashboard.HiltTestActivity
 
 const val FRAGMENT_TAG = "FRAGMENT_TAG"
 
@@ -45,7 +44,7 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
 
     ActivityScenario.launch<HiltTestActivity>(startActivityIntent).onActivity { activity ->
         val fragment: Fragment = activity.supportFragmentManager.fragmentFactory.instantiate(
-            Preconditions.checkNotNull(T::class.java.classLoader),
+            checkNotNull(T::class.java.classLoader),
             T::class.java.name
         )
         fragment.arguments = fragmentArgs
@@ -63,9 +62,16 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     }
 }
 
-internal fun FragmentActivity.moveToState(state: Lifecycle.State) {
+fun FragmentActivity.moveToState(state: Lifecycle.State) {
     val fragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)!!
     supportFragmentManager.commitNow {
         setMaxLifecycle(fragment, state)
     }
+}
+
+fun testNavController(graph: Int, startDestination: Int? = null): TestNavHostController {
+    val navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+    navController.setGraph(graph)
+    startDestination?.also { navController.setCurrentDestination(it) }
+    return navController
 }

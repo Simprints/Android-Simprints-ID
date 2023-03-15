@@ -12,8 +12,8 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.main.dailyactivity.DailyActivityViewModel
 import com.simprints.feature.dashboard.main.projectdetails.ProjectDetailsViewModel
 import com.simprints.feature.dashboard.main.sync.SyncViewModel
-import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
-import com.simprints.feature.dashboard.tools.testNavController
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.testNavController
 import com.simprints.infra.resources.R as IDR
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
