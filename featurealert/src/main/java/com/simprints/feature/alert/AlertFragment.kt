@@ -44,6 +44,9 @@ class AlertFragment : Fragment(R.layout.fragment_alert) {
 
         binding.alertImage.setImageResource(config.image)
         binding.alertMessage.setTextWithFallbacks(config.message, config.messageRes)
+        if (config.messageIcon != null) {
+            binding.alertMessage.setCompoundDrawablesWithIntrinsicBounds(config.messageIcon, 0, 0, 0)
+        }
 
         binding.alertLeftButton.setupButton(config.leftButton)
         binding.alertRightButton.isVisible = config.rightButton != null

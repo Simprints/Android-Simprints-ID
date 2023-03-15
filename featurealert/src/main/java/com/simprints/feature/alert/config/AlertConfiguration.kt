@@ -15,6 +15,7 @@ data class AlertConfiguration(
     @DrawableRes val image: Int,
     val message: String?,
     @StringRes val messageRes: Int?,
+    @DrawableRes val messageIcon: Int?,
     val leftButton: AlertButtonConfig,
     val rightButton: AlertButtonConfig?,
 ) : Parcelable
