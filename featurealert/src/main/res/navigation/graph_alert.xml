@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_alert">
         <argument
             android:name="alertConfiguration"
-            app:argType="com.simprints.feature.alert.AlertConfiguration" />
+            app:argType="com.simprints.feature.alert.config.AlertConfiguration" />
     </fragment>
 
 </navigation>
