@@ -14,8 +14,8 @@ import com.google.common.truth.Truth
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
-import com.simprints.feature.dashboard.tools.testNavController
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.testNavController
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity

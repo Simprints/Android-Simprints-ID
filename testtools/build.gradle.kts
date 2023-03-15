@@ -1,6 +1,8 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
+    kotlin("kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 apply {
@@ -21,8 +23,20 @@ System.setProperty("org.mockito.mock.android", "true")
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":core"))
+    implementation(project(":infraresources"))
 
+    implementation(libs.hilt)
+    kapt(libs.hilt.kapt)
+
+    implementation(libs.testing.androidX.runner)
+    implementation(libs.testing.androidX.navigation)
     implementation(libs.testing.androidX.core.testing)
+    implementation(libs.testing.fragment.testing) {
+        exclude("androidx.test", "core")
+    }
+
+    implementation(libs.testing.espresso.core)
+
     api(libs.androidX.multidex)
     api(libs.androidX.appcompat)
 
