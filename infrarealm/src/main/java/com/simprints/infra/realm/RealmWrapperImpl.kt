@@ -3,6 +3,7 @@ package com.simprints.infra.realm
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.*
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
@@ -26,6 +27,8 @@ class RealmWrapperImpl @Inject constructor(
     private val loginManager: LoginManager
 ) : RealmWrapper {
 
+    private var counter = 0
+
     private lateinit var config: RealmConfiguration
 
     private fun initRealm() {
@@ -41,9 +44,13 @@ class RealmWrapperImpl @Inject constructor(
      */
     override suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(Dispatchers.IO) {
+            counter++
             initRealm()
             Simber.tag(REALM_DB.name).d("[RealmWrapperImpl] getting new realm instance")
             try {
+                if (counter == 1) {
+                    throw RealmFileException(RealmFileException.Kind.ACCESS_ERROR, "123")
+                }
                 Realm.getInstance(config).use(block)
             } catch (ex: RealmFileException) {
                 //DB corruption detected; either DB file or key is corrupt
@@ -86,15 +93,18 @@ class RealmWrapperImpl @Inject constructor(
         }
 
     private fun resetDownSyncState() {
-        //TODO: This is a temporary workaround to avoid a circular module dependency until we
-        // extract syncing in a separate module
+        // This is a workaround to avoid a circular module dependency
         val intent = Intent()
         intent.component = ComponentName(
             "com.simprints.id",
             "com.simprints.infra.events.events_sync.down.temp.ResetDownSyncService"
         )
         try {
-            appContext.startService(intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                appContext.startForegroundService(intent)
+            } else {
+                appContext.startService(intent)
+            }
         } catch (ex: Exception) {
             Simber.e(ex)
         }
