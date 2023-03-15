@@ -15,6 +15,7 @@ data class AlertConfigurationBuilder(
     @DrawableRes var image: Int = IDR.drawable.ic_alert_default,
     var message: String? = null,
     @StringRes var messageRes: Int? = null,
+    @DrawableRes var messageIcon: Int? = null,
     var leftButton: AlertButtonConfig = AlertButtonConfig.Close,
     var rightButton: AlertButtonConfig? = null,
 )
@@ -29,6 +30,7 @@ fun alertConfigurationArgs(block: AlertConfigurationBuilder.() -> Unit): Bundle 
             image = builder.image,
             message = builder.message,
             messageRes = builder.messageRes,
+            messageIcon = builder.messageIcon,
             leftButton = builder.leftButton,
             rightButton = builder.rightButton,
         ))
