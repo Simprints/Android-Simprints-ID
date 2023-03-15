@@ -1,0 +1,20 @@
+package com.simprints.feature.alert.config
+
+import android.os.Parcelable
+import androidx.annotation.DrawableRes
+import androidx.annotation.Keep
+import androidx.annotation.StringRes
+import kotlinx.parcelize.Parcelize
+
+@Keep
+@Parcelize
+data class AlertConfiguration(
+    val color: AlertColor,
+    val title: String?,
+    @StringRes val titleRes: Int?,
+    @DrawableRes val image: Int,
+    val message: String?,
+    @StringRes val messageRes: Int?,
+    val leftButton: AlertButtonConfig,
+    val rightButton: AlertButtonConfig?,
+) : Parcelable
