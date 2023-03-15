@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_alert"
+    app:startDestination="@id/alertFragment">
+
+    <fragment
+        android:id="@+id/alertFragment"
+        android:name="com.simprints.feature.alert.AlertFragment"
+        android:label="AlertFragment"
+        tools:layout="@layout/fragment_alert">
+        <argument
+            android:name="alertConfiguration"
+            app:argType="com.simprints.feature.alert.AlertConfiguration" />
+    </fragment>
+
+</navigation>
