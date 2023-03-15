@@ -27,8 +27,6 @@ class RealmWrapperImpl @Inject constructor(
     private val loginManager: LoginManager
 ) : RealmWrapper {
 
-    private var counter = 0
-
     private lateinit var config: RealmConfiguration
 
     private fun initRealm() {
@@ -44,13 +42,9 @@ class RealmWrapperImpl @Inject constructor(
      */
     override suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
         withContext(Dispatchers.IO) {
-            counter++
             initRealm()
             Simber.tag(REALM_DB.name).d("[RealmWrapperImpl] getting new realm instance")
             try {
-                if (counter == 1) {
-                    throw RealmFileException(RealmFileException.Kind.ACCESS_ERROR, "123")
-                }
                 Realm.getInstance(config).use(block)
             } catch (ex: RealmFileException) {
                 //DB corruption detected; either DB file or key is corrupt
@@ -97,7 +91,7 @@ class RealmWrapperImpl @Inject constructor(
         val intent = Intent()
         intent.component = ComponentName(
             "com.simprints.id",
-            "com.simprints.infra.events.events_sync.down.temp.ResetDownSyncService"
+            "com.simprints.id.services.sync.events.down.EventDownSyncResetService"
         )
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

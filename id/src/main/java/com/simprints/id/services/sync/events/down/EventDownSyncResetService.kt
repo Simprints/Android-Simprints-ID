@@ -1,4 +1,4 @@
-package com.simprints.infra.events.events_sync.down.temp
+package com.simprints.id.services.sync.events.down
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.simprints.core.ExternalScope
+import com.simprints.id.services.sync.events.master.EventSyncManager
 import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
@@ -18,28 +19,29 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO: This is a temporary workaround to avoid a circular module dependency until we
-// extract syncing in a separate module
+// This is implemented as a service so it can be invoked indirectly by class name and avoid a
+// circular module dependency
 @AndroidEntryPoint
-class ResetDownSyncService : Service() {
+class EventDownSyncResetService : Service() {
 
     @Inject
     lateinit var downSyncScopeRepository: EventDownSyncScopeRepository
 
     @Inject
+    lateinit var eventSyncManager: EventSyncManager
+
+    @Inject
     @ExternalScope
     lateinit var externalScope: CoroutineScope
-
-//    override fun onCreate() {
-//        super.onCreate()
-//        startForegroundIfNeeded()
-//    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Simber.tag(SYNC.name).i("Reset downSync")
         externalScope.launch {
             startForegroundIfNeeded()
+            // Reset current downsync state
             downSyncScopeRepository.deleteAll()
+            // Trigger a new sync
+            eventSyncManager.sync()
             stopSelf()
         }
 
@@ -53,21 +55,22 @@ class ResetDownSyncService : Service() {
     private fun startForegroundIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val chan = NotificationChannel(
-                "MyChannelId",
-                "My Foreground Service",
+                CHANNEL_ID,
+                "Maintenance Service",
                 NotificationManager.IMPORTANCE_LOW
             )
-            val manager = (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(chan)
 
-            val notificationBuilder = NotificationCompat.Builder(this, "MyChannelId")
-            val notification: Notification = notificationBuilder
-                .setContentTitle("App is running on foreground")
+            val notification = NotificationCompat.Builder(this, CHANNEL_ID)
                 .setPriority(NotificationManager.IMPORTANCE_LOW)
                 .setCategory(Notification.CATEGORY_SERVICE)
-                .setChannelId("MyChannelId")
                 .build()
             startForeground(1, notification)
         }
+    }
+
+    companion object {
+        private const val CHANNEL_ID = "EventDownSyncResetServiceChannelId"
     }
 }

@@ -98,10 +98,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/ClientApiTheme.NoActionBar" />
 
-        <service
-            android:name="com.simprints.infra.events.events_sync.down.temp.ResetDownSyncService"
-            android:exported="false"/>
-
     </application>
 
 </manifest>
