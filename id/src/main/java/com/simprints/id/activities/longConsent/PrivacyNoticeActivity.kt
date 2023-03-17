@@ -37,9 +37,8 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
     }
 
     private fun initActionBar() {
-        setSupportActionBar(binding.longConsentToolbar)
-
-        supportActionBar?.run {
+        setActionBar(binding.longConsentToolbar)
+        actionBar?.run {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
             title = getString(IDR.string.privacy_notice_title)
@@ -56,7 +55,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
+    override fun onNavigateUp(): Boolean {
         onBackPressed()
         return true
     }

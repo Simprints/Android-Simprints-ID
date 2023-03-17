@@ -39,6 +39,8 @@ dependencies {
     implementation(libs.libsimprints)
 
     api(libs.androidX.appcompat)
+    api(libs.androidX.ui.fragment.kotlin)
+    api(libs.support.material)
     api(libs.androidX.multidex)
     api(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.camera2)
