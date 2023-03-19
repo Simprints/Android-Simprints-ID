@@ -2,8 +2,8 @@ package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -32,7 +32,7 @@ class OrchestratorViewModel @Inject constructor(
     val syncFrequency = MutableLiveData<SynchronizationConfiguration.Frequency>()
     val ongoingStep = orchestratorManager.ongoingStep
 
-    val appResponse = Transformations.map(orchestratorManager.appResponse) {
+    val appResponse = orchestratorManager.appResponse.map{
         it?.let {
             orchestratorEventsHelper.addCallbackEventInSessions(it)
             domainToModuleApiConverter.fromDomainModuleApiAppResponse(it)
