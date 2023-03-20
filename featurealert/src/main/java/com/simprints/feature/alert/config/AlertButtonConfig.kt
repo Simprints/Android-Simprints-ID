@@ -3,7 +3,8 @@ package com.simprints.feature.alert.config
 import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
-import com.simprints.feature.alert.AlertFragment
+import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.screen.AlertFragment
 import kotlinx.parcelize.Parcelize
 import com.simprints.infra.resources.R as IDR
 
@@ -21,7 +22,7 @@ data class AlertButtonConfig(
         val Close = AlertButtonConfig(
             text = null,
             textRes = IDR.string.close,
-            resultKey = AlertFragment.ALERT_BUTTON_PRESSED_BACK,
+            resultKey = AlertContract.ALERT_BUTTON_PRESSED_BACK,
             closeOnClick = true,
         )
     }

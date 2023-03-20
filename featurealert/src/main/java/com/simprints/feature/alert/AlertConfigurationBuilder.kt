@@ -3,9 +3,12 @@ package com.simprints.feature.alert
 import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.config.AlertConfiguration
+import com.simprints.feature.alert.screen.AlertFragmentArgs
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.resources.R as IDR
 
 data class AlertConfigurationBuilder(
@@ -18,24 +21,28 @@ data class AlertConfigurationBuilder(
     @DrawableRes var messageIcon: Int? = null,
     var leftButton: AlertButtonConfig = AlertButtonConfig.Close,
     var rightButton: AlertButtonConfig? = null,
+    var eventType: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType? = null,
+    var payload: Bundle = Bundle(),
 )
 
-fun alertConfigurationArgs(block: AlertConfigurationBuilder.() -> Unit): Bundle = AlertConfigurationBuilder()
-    .apply(block)
-    .let { builder ->
-        AlertFragmentArgs(AlertConfiguration(
-            color = builder.color,
-            title = builder.title,
-            titleRes = builder.titleRes,
-            image = builder.image,
-            message = builder.message,
-            messageRes = builder.messageRes,
-            messageIcon = builder.messageIcon,
-            leftButton = builder.leftButton,
-            rightButton = builder.rightButton,
-        ))
-    }
-    .toBundle()
+fun alertConfiguration(block: AlertConfigurationBuilder.() -> Unit) = AlertConfigurationBuilder().apply(block)
+
+fun AlertConfigurationBuilder.withPayload(vararg pairs: Pair<String, Any?>) =
+    this.also { it.payload = bundleOf(*pairs) }
+
+fun AlertConfigurationBuilder.toArgs() = AlertFragmentArgs(AlertConfiguration(
+    color = this.color,
+    title = this.title,
+    titleRes = this.titleRes,
+    image = this.image,
+    message = this.message,
+    messageRes = this.messageRes,
+    messageIcon = this.messageIcon,
+    leftButton = this.leftButton,
+    rightButton = this.rightButton,
+    eventType = this.eventType,
+    payload = this.payload,
+)).toBundle()
 
 data class AlertButtonBuilder(
     var text: String? = null,
@@ -54,3 +61,4 @@ fun alertButton(block: AlertButtonBuilder.() -> Unit): AlertButtonConfig = Alert
             closeOnClick = builder.closeOnClick,
         )
     }
+
