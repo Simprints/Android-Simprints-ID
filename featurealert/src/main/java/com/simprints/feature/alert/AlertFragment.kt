@@ -56,7 +56,7 @@ class AlertFragment : Fragment(R.layout.fragment_alert) {
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             setPressedButtonResult(ALERT_BUTTON_PRESSED_BACK)
-            findNavController().navigateUp()
+            findNavController().popBackStack()
         }
     }
 
@@ -65,7 +65,7 @@ class AlertFragment : Fragment(R.layout.fragment_alert) {
         setOnClickListener {
             config.resultKey?.let { setPressedButtonResult(it) }
             if (config.closeOnClick) {
-                findNavController().navigateUp()
+                findNavController().popBackStack()
             }
         }
     }
@@ -90,5 +90,7 @@ class AlertFragment : Fragment(R.layout.fragment_alert) {
         const val ALERT_REQUEST = "alert_fragment_request"
         const val ALERT_BUTTON_PRESSED = "alert_fragment_button"
         const val ALERT_BUTTON_PRESSED_BACK = "alert_fragment_back"
+
+        fun hasResponseKey(data: Bundle, key: String) = data.getString(ALERT_BUTTON_PRESSED) == key
     }
 }

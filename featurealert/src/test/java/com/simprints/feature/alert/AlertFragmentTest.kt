@@ -79,8 +79,8 @@ class AlertFragmentTest {
             fragmentArgs = alertConfigurationArgs {
                 title = "Custom title"
                 message = "Custom message"
-                leftButton = alertButton(text = "Custom left")
-                rightButton = alertButton(text = "Custom right")
+                leftButton = alertButton { text = "Custom left" }
+                rightButton = alertButton { text = "Custom right" }
             }
         )
 
@@ -112,8 +112,8 @@ class AlertFragmentTest {
             fragmentArgs = alertConfigurationArgs {
                 titleRes = IDR.string.app_name
                 messageRes = IDR.string.unforeseen_error_message
-                leftButton = alertButton(textRes = IDR.string.login_server_error)
-                rightButton = alertButton(textRes = IDR.string.error_occurred_title)
+                leftButton = alertButton { textRes = IDR.string.login_server_error }
+                rightButton = alertButton { textRes = IDR.string.error_occurred_title }
             }
         )
 
@@ -147,7 +147,10 @@ class AlertFragmentTest {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
             fragmentArgs = alertConfigurationArgs {
-                leftButton = alertButton("Left", resultKey = "test")
+                leftButton = alertButton {
+                    text = "Left"
+                    resultKey = "test"
+                }
             }
         ) {
             setFragmentResultListener(AlertFragment.ALERT_REQUEST) { _, data ->
@@ -165,7 +168,10 @@ class AlertFragmentTest {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
             fragmentArgs = alertConfigurationArgs {
-                rightButton = alertButton("Right", resultKey = "test")
+                rightButton = alertButton {
+                    text = "Right"
+                    resultKey = "test"
+                }
             }
         ) {
             setFragmentResultListener(AlertFragment.ALERT_REQUEST) { _, data ->
@@ -182,7 +188,10 @@ class AlertFragmentTest {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navSpy,
             fragmentArgs = alertConfigurationArgs {
-                leftButton = alertButton("Left", closeOnClick = true)
+                leftButton = alertButton {
+                    text = "Left"
+                    closeOnClick = true
+                }
             }
         ) {
             onView(withId(R.id.alertLeftButton)).perform(click())

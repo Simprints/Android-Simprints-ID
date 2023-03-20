@@ -37,9 +37,20 @@ fun alertConfigurationArgs(block: AlertConfigurationBuilder.() -> Unit): Bundle 
     }
     .toBundle()
 
-fun alertButton(
-    text: String? = null,
-    @StringRes textRes: Int? = null,
-    resultKey: String? = null,
-    closeOnClick: Boolean = false,
-): AlertButtonConfig = AlertButtonConfig(text, textRes, resultKey, closeOnClick)
+data class AlertButtonBuilder(
+    var text: String? = null,
+    @StringRes var textRes: Int? = null,
+    var resultKey: String? = null,
+    var closeOnClick: Boolean = false,
+)
+
+fun alertButton(block: AlertButtonBuilder.() -> Unit): AlertButtonConfig = AlertButtonBuilder()
+    .apply(block)
+    .let { builder ->
+        AlertButtonConfig(
+            text = builder.text,
+            textRes = builder.textRes,
+            resultKey = builder.resultKey,
+            closeOnClick = builder.closeOnClick,
+        )
+    }
