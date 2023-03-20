@@ -27,15 +27,21 @@ internal class ProjectDetailsViewModel @Inject constructor(
     }
 
     fun load() = viewModelScope.launch {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
-        val cachedProject = configManager.getProject(projectId)
-        val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
+        try {
+            val projectId = loginManager.getSignedInProjectIdOrEmpty()
+            val cachedProject = configManager.getProject(projectId)
+            val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
 
-        val state = DashboardProjectState(
-            cachedProject.name,
-            recentUserActivity.lastUserUsed,
-            recentUserActivity.lastScannerUsed
-        )
-        _projectCardStateLiveData.postValue(state)
+            val state = DashboardProjectState(
+                cachedProject.name,
+                recentUserActivity.lastUserUsed,
+                recentUserActivity.lastScannerUsed,
+                true
+            )
+            _projectCardStateLiveData.postValue(state)
+        } catch (_: Throwable) {
+            val state = DashboardProjectState(isLoaded = false)
+            _projectCardStateLiveData.postValue(state)
+        }
     }
 }
