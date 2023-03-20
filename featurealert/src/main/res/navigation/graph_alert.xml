@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/alertFragment"
-        android:name="com.simprints.feature.alert.AlertFragment"
+        android:name="com.simprints.feature.alert.screen.AlertFragment"
         android:label="AlertFragment"
         tools:layout="@layout/fragment_alert">
         <argument

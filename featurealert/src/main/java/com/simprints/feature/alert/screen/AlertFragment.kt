@@ -1,4 +1,4 @@
-package com.simprints.feature.alert
+package com.simprints.feature.alert.screen
 
 import android.os.Bundle
 import android.view.View
@@ -10,9 +10,12 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.R
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.databinding.FragmentAlertBinding
@@ -20,9 +23,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class AlertFragment : Fragment(R.layout.fragment_alert) {
+internal class AlertFragment : Fragment(R.layout.fragment_alert) {
 
     private val args: AlertFragmentArgs by navArgs()
+    private val vm by viewModels<AlertViewModel>()
     private val binding by viewBinding(FragmentAlertBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,30 +52,34 @@ class AlertFragment : Fragment(R.layout.fragment_alert) {
             binding.alertMessage.setCompoundDrawablesWithIntrinsicBounds(config.messageIcon, 0, 0, 0)
         }
 
-        binding.alertLeftButton.setupButton(config.leftButton)
+        binding.alertLeftButton.setupButton(config.leftButton, config.payload)
         binding.alertRightButton.isVisible = config.rightButton != null
         if (config.rightButton != null) {
-            binding.alertRightButton.setupButton(config.rightButton)
+            binding.alertRightButton.setupButton(config.rightButton, config.payload)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            setPressedButtonResult(ALERT_BUTTON_PRESSED_BACK)
+            setPressedButtonResult(AlertContract.ALERT_BUTTON_PRESSED_BACK, config.payload)
             findNavController().popBackStack()
         }
+        config.eventType?.let { vm.saveAlertEvent(it) }
     }
 
-    private fun TextView.setupButton(config: AlertButtonConfig) {
+    private fun TextView.setupButton(config: AlertButtonConfig, payload: Bundle) {
         setTextWithFallbacks(config.text, config.textRes)
         setOnClickListener {
-            config.resultKey?.let { setPressedButtonResult(it) }
+            config.resultKey?.let { setPressedButtonResult(it, payload) }
             if (config.closeOnClick) {
                 findNavController().popBackStack()
             }
         }
     }
 
-    private fun setPressedButtonResult(key: String) {
-        setFragmentResult(ALERT_REQUEST, bundleOf(ALERT_BUTTON_PRESSED to key))
+    private fun setPressedButtonResult(key: String, payload: Bundle) {
+        setFragmentResult(AlertContract.ALERT_REQUEST, bundleOf(
+            AlertContract.ALERT_BUTTON_PRESSED to key,
+            AlertContract.ALERT_PAYLOAD to payload,
+        ))
     }
 
     private fun TextView.setTextWithFallbacks(
@@ -83,14 +91,5 @@ class AlertFragment : Fragment(R.layout.fragment_alert) {
         textFallback != null -> setText(textFallback)
         default != null -> setText(default)
         else -> text = null
-    }
-
-    companion object {
-
-        const val ALERT_REQUEST = "alert_fragment_request"
-        const val ALERT_BUTTON_PRESSED = "alert_fragment_button"
-        const val ALERT_BUTTON_PRESSED_BACK = "alert_fragment_back"
-
-        fun hasResponseKey(data: Bundle, key: String) = data.getString(ALERT_BUTTON_PRESSED) == key
     }
 }

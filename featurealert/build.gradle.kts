@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":infralogging"))
     implementation(project(":infraresources"))
+    implementation(project(":infraevents"))
 
     api(libs.androidX.appcompat)
     api(libs.androidX.ui.constraintlayout)

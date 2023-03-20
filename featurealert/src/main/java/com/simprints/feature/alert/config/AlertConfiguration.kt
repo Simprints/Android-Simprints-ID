@@ -1,9 +1,11 @@
 package com.simprints.feature.alert.config
 
+import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import kotlinx.parcelize.Parcelize
 
 @Keep
@@ -18,4 +20,6 @@ data class AlertConfiguration(
     @DrawableRes val messageIcon: Int?,
     val leftButton: AlertButtonConfig,
     val rightButton: AlertButtonConfig?,
+    val eventType: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType?,
+    val payload: Bundle,
 ) : Parcelable
