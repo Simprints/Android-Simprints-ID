@@ -1,6 +1,5 @@
 package com.simprints.face.controllers.core.events.model
 
-import com.simprints.face.error.ErrorType
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 
 enum class FaceAlertType {
@@ -16,13 +15,4 @@ enum class FaceAlertType {
         BACKEND_MAINTENANCE_ERROR -> AlertScreenEventType.BACKEND_MAINTENANCE_ERROR
     }
 
-    companion object {
-        fun fromErrorType(errorType: ErrorType): FaceAlertType = when (errorType) {
-            ErrorType.LICENSE_MISSING -> FACE_LICENSE_MISSING
-            ErrorType.LICENSE_INVALID -> FACE_LICENSE_INVALID
-            ErrorType.CONFIGURATION_ERROR -> FACE_LICENSE_MISSING
-            ErrorType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-            ErrorType.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
-        }
-    }
 }

@@ -6,7 +6,7 @@
 
     <action
         android:id="@+id/action_global_errorFragment"
-        app:destination="@id/errorFragment"
+        app:destination="@id/graph_alert"
         app:popUpTo="@id/orchestrator_graph"
         app:popUpToInclusive="true" />
 
@@ -21,14 +21,7 @@
             app:popUpToInclusive="true" />
     </fragment>
 
-    <fragment
-        android:id="@+id/errorFragment"
-        android:name="com.simprints.face.error.ErrorFragment"
-        android:label="ErrorFragment">
-        <argument
-            android:name="errorType"
-            app:argType="com.simprints.face.error.ErrorType" />
-    </fragment>
+    <include app:graph="@navigation/graph_alert" />
 
     <fragment
         android:id="@+id/configurationFragment"
