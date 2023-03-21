@@ -1,5 +1,6 @@
 package com.simprints.fingerprint
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.nfc.NfcAdapter
 import com.simprints.fingerprint.activities.alert.AlertContract
@@ -27,6 +28,8 @@ import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import com.simprints.fingerprintmatcher.FingerprintMatcherModule
 import com.simprints.fingerprintmatcher.JNILibAfisModule
+import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -34,6 +37,7 @@ import dagger.assisted.AssistedFactory
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module(
     includes = [
@@ -90,4 +94,18 @@ object FingerprintDependenciesModule {
     @Provides
     fun provideNfcAdapter(@ApplicationContext context: Context): ComponentNfcAdapter =
         AndroidNfcAdapter(NfcAdapter.getDefaultAdapter(context))
+
+    /**
+     * To provide alternative implementation for BT adapter replace
+     * returned instance with any of the mock implementations:
+     *  - DummyBluetoothAdapter()
+     *  - AndroidRecordBluetoothAdapter()
+     *  - SimulatedBluetoothAdapter(SimulatedScannerManager(...))
+     *
+     *  Also change the dependency declaration in build.gradle.kts
+     */
+    @Provides
+    @Singleton
+    fun provideComponentBluetoothAdapter(): ComponentBluetoothAdapter =
+        AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
 }
