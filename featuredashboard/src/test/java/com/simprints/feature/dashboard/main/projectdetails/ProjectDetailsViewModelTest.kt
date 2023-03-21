@@ -57,7 +57,22 @@ class ProjectDetailsViewModelTest {
             recentUserActivityManager,
         )
 
-        val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER, LAST_SCANNER)
+        val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER, LAST_SCANNER, true)
+        assertThat(viewModel.projectCardStateLiveData.value).isEqualTo(expectedState)
+    }
+
+    @Test
+    fun `Should handle exception by producing correct state`() = runTest {
+        val configManager = mockk<ConfigManager> {
+            coEvery { getProject(PROJECT_ID) } throws Exception()
+        }
+        val viewModel = ProjectDetailsViewModel(
+            configManager,
+            loginManager,
+            recentUserActivityManager,
+        )
+
+        val expectedState = DashboardProjectState(isLoaded = false)
         assertThat(viewModel.projectCardStateLiveData.value).isEqualTo(expectedState)
     }
 

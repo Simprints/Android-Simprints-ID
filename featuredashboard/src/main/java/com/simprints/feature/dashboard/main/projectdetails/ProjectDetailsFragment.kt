@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.main.projectdetails
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.simprints.core.tools.viewbinding.viewBinding
@@ -19,6 +20,7 @@ internal class ProjectDetailsFragment : Fragment(R.layout.fragment_dashboard_car
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.projectCardStateLiveData.observe(viewLifecycleOwner) {
+            binding.dashboardProjectDetailsCard.isVisible = it.isLoaded
             binding.dashboardProjectDetailsCardTitle.text = it.title
             binding.dashboardProjectDetailsCardCurrentUser.text = String.format(
                 getString(IDR.string.dashboard_card_current_user),
