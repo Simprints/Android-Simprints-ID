@@ -3,6 +3,7 @@ package com.simprints.infra.realm
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.*
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
@@ -86,15 +87,18 @@ class RealmWrapperImpl @Inject constructor(
         }
 
     private fun resetDownSyncState() {
-        //TODO: This is a temporary workaround to avoid a circular module dependency until we
-        // extract syncing in a separate module
+        // This is a workaround to avoid a circular module dependency
         val intent = Intent()
         intent.component = ComponentName(
             "com.simprints.id",
-            "com.simprints.infra.events.events_sync.down.temp.ResetDownSyncService"
+            "com.simprints.id.services.sync.events.down.EventDownSyncResetService"
         )
         try {
-            appContext.startService(intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                appContext.startForegroundService(intent)
+            } else {
+                appContext.startService(intent)
+            }
         } catch (ex: Exception) {
             Simber.e(ex)
         }
