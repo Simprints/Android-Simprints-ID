@@ -58,6 +58,13 @@ dependencyAnalysis {
                 )
             }
         }
+        project(':clientapi') {
+            onAny {
+                exclude(
+                    'androidx.lifecycle:lifecycle-runtime-ktx'
+                )
+            }
+        }
         project(':fingerprintscanner') {
             onAny {
                 exclude(

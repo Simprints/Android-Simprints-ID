@@ -150,7 +150,6 @@ dependencies {
     implementation(libs.androidX.core)
     implementation(libs.androidX.appcompat)
     implementation(libs.androidX.lifecycle.livedata.ktx)
-    implementation(libs.androidX.lifecycle.scope)
     implementation(libs.androidX.ui.constraintlayout)
     runtimeOnly(libs.kotlin.coroutinesAndroid)
     implementation(libs.androidX.cameraX.core)
