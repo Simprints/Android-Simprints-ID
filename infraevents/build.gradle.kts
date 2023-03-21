@@ -55,7 +55,7 @@ dependencies {
     kapt(libs.androidX.room.compiler)
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
-    api(libs.sqlCipher.core)
+    implementation(libs.sqlCipher.core)
 
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
