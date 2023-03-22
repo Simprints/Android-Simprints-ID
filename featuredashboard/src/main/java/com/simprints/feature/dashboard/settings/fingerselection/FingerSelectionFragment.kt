@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
@@ -25,6 +26,9 @@ internal class FingerSelectionFragment : Fragment(R.layout.fragment_finger_selec
         initRecyclerView()
         listenForItemChanges()
         viewModel.start()
+        binding.settingsToolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 
     private fun initRecyclerView() {
