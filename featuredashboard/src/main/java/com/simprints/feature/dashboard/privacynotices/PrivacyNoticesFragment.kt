@@ -30,6 +30,7 @@ internal class PrivacyNoticesFragment : Fragment(R.layout.fragment_privacy_notic
         binding.privacyNoticeToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
+        viewModel.fetchPrivacyNotice()
     }
 
     private fun observeLiveData() {
