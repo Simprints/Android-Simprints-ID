@@ -16,6 +16,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +35,7 @@ class ConfigRemoteDataSourceImplTest {
     private val loginManager = mockk<LoginManager>()
     private val privacyNoticeDownloader = mockk<(String) -> String>()
     private val configRemoteDataSourceImpl =
-        ConfigRemoteDataSourceImpl(loginManager, privacyNoticeDownloader)
+        ConfigRemoteDataSourceImpl(loginManager, UnconfinedTestDispatcher(), privacyNoticeDownloader)
 
     @Before
     fun setup() {
