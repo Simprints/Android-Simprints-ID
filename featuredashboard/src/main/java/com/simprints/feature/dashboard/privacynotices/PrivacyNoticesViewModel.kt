@@ -22,10 +22,6 @@ internal class PrivacyNoticesViewModel @Inject constructor(
     private val deviceManager: DeviceManager,
 ) : ViewModel() {
 
-    init {
-        fetchPrivacyNotice()
-    }
-
     val privacyNoticeState: LiveData<PrivacyNoticeState>
         get() = _privacyNoticeState
     private val _privacyNoticeState = MutableLiveData<PrivacyNoticeState>()
