@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Client API</string>
     <string name="configuration_error_title">Erreur de configuration</string>
     <string name="close">Fermez</string>
     <string name="different_projectId_message">Une erreur de configuration s\'est produite (Id de projet différent), veuillez vous déconnecter de l\'écran d\'accueil ou contacter votre administrateur système.</string>

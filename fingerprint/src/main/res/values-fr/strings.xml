@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simprints ID</string>
     <string name="bluetooth_error_pair_scanner_and_device_message">1. Vérifiez que le scanner est allumé \\n 2. Cliquez sur réglages \\n 3. Déjumelez tous les scanners jumelés \\n 4. Jumelez votre scanner au téléphone \\n 5. Cliquez sur retour pour repartir à Simprints.</string>
     <string name="bluetooth_error_pair_scanner_and_device_title">Jumelez le scanner au téléphone</string>
     <string name="bluetooth_not_enabled_message">Le bluetooth n\'est pas activé, assurez-vous qu\'il soit activé dans les réglages puis réessayez</string>
