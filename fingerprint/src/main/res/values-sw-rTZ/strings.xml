@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simprints ID</string>
     <string name="bluetooth_error_pair_scanner_and_device_message">1. Angalia skana kama imewashwa \n 2. gusa mpangilio (setting) \n 3. toa skana yoyote iliyounganishwa \n 4. Unganisha sanner na kifaa \n 5. Bonyeza sehemu ya kurudi nyuma ili urudi kwenye Simprints</string>
     <string name="bluetooth_error_pair_scanner_and_device_title">Unganisha skana na kifaa</string>
     <string name="bluetooth_not_enabled_message">Bluetooth haikuwashwa, tafadhali hakikisha imewashwa katika mpangilio na jaribu tena</string>

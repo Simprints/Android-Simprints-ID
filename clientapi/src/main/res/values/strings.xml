@@ -1,8 +1,4 @@
 <resources>
-    <!-- region Module Title -->
-    <string name="dynamic_module_title_clientapi" translatable="false">Client API</string>
-    <string name="app_name" translatable="false">Client API</string>
-    <!-- endregion -->
 
     <!-- region Error Screen Layout -->
     <string name="main_error_graphic" translatable="false">Main Error Graphic</string>
