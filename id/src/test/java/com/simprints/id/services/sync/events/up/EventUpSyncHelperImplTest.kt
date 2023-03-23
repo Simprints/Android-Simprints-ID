@@ -9,7 +9,8 @@ import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.events_sync.up.EventUpSyncScopeRepository
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation.UpSyncState.*
+import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
+import com.simprints.infra.events.events_sync.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
 import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import io.mockk.*
@@ -20,6 +21,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
 
 class EventUpSyncHelperImplTest {
 
@@ -165,7 +167,7 @@ class EventUpSyncHelperImplTest {
         coVerify(exactly = 4) { eventUpSyncScopeRepository.insertOrUpdate(any()) }
     }
 
-    @Test
+    @Test(expected = IOException::class)
     fun upSync_shouldEmitAFailureIfUploadFails() = runTest {
         coEvery {
             eventRepository.uploadEvents(
@@ -174,12 +176,11 @@ class EventUpSyncHelperImplTest {
                 any(),
                 any()
             )
-        } throws Throwable("IO Exception")
+        } throws IOException("IO Exception")
 
         val channel = eventUpSyncHelper.upSync(this, operation)
 
-        val progress = channel.toList()
-        assertThat(progress.first().operation.lastState).isEqualTo(FAILED)
+        channel.toList()
         coVerify(exactly = 1) { eventUpSyncScopeRepository.insertOrUpdate(any()) }
     }
 
