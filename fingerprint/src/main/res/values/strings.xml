@@ -2,8 +2,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- AndroidManifest : activity titles throughout the app -->
-    <!-- App Name -->
-    <string name="app_name" translatable="false">Simprints ID</string>
     <!-- Activity Titles -->
     <string name="register_title">Enrolment</string>
     <string name="identify_title">Identification</string>

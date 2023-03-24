@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Client API</string>
     <string name="configuration_error_title">Kosa la kiufundi</string>
     <string name="guid_selection_data_sent">Taarifa zimetumwa</string>
     <string name="guid_selection_result_sent">Matokeo yametumwa</string>
