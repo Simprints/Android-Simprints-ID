@@ -79,7 +79,10 @@ dependencies {
     implementation(project(":infraresources"))
     api(project(":infrarecentuseractivity"))
     api(project(":moduleapi"))
+
+    // If mock/dummy BT adapter is required test implementation can be switched to regular one
     testImplementation(project(":fingerprintscannermock"))
+    //implementation(project(":fingerprintscannermock"))
 
     api(libs.retrofit.core)
     runtimeOnly(libs.jackson.core)
