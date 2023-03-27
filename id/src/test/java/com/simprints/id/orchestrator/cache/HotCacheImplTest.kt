@@ -134,6 +134,24 @@ class HotCacheImplTest {
     }
 
     @Test
+    fun shouldPreserveStepOrder() {
+        val stepCount = 100
+        val steps = List(stepCount) { mockStep(it) }
+
+        with(hotCache) {
+            save(steps)
+        }
+
+        val cachedSteps = hotCache.load()
+        val cachedStepCount = cachedSteps.size
+
+        assertThat(cachedStepCount).isEqualTo(stepCount)
+        steps.forEachIndexed { index, step ->
+            assertThat(step).isEqualTo(cachedSteps[index])
+        }
+    }
+
+    @Test
     fun shouldClearCache() {
         val step = mockStep()
 
@@ -150,8 +168,8 @@ class HotCacheImplTest {
         assertThat(isStepCached).isFalse()
     }
 
-    private fun mockStep() = Step(
-        requestCode = 123,
+    private fun mockStep(requestCode: Int = 123) = Step(
+        requestCode = requestCode,
         activityName = "com.simprints.id.MyActivity",
         bundleKey = "BUNDLE_KEY",
         request = mockRequest(),
