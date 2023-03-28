@@ -1,7 +1,7 @@
 package com.simprints.clientapi.activities.baserequest
 
 import androidx.annotation.Keep
-import com.simprints.clientapi.activities.errors.ClientApiAlert.*
+import com.simprints.clientapi.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
 import com.simprints.clientapi.clientrequests.validators.*
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager

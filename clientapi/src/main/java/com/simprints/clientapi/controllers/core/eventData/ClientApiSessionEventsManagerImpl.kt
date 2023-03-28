@@ -1,6 +1,5 @@
 package com.simprints.clientapi.controllers.core.eventData
 
-import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
@@ -21,7 +20,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
 class ClientApiSessionEventsManagerImpl @Inject constructor(
     private val coreEventRepository: EventRepository,
@@ -46,17 +44,6 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
         }
 
         return getCurrentSessionId()
-    }
-
-    override suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert) {
-        externalScope.launch {
-            coreEventRepository.addOrUpdateEvent(
-                AlertScreenEvent(
-                    timeHelper.now(),
-                    clientApiAlertType.fromAlertToAlertTypeEvent()
-                )
-            )
-        }
     }
 
     /**
@@ -151,16 +138,4 @@ class ClientApiSessionEventsManagerImpl @Inject constructor(
         coreEventRepository.closeCurrentSession()
     }
 
-    private fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
-        when (this) {
-            ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION -> CoreAlertScreenEventType.INVALID_INTENT_ACTION
-            ClientApiAlert.INVALID_METADATA -> CoreAlertScreenEventType.INVALID_METADATA
-            ClientApiAlert.INVALID_MODULE_ID -> CoreAlertScreenEventType.INVALID_MODULE_ID
-            ClientApiAlert.INVALID_PROJECT_ID -> CoreAlertScreenEventType.INVALID_PROJECT_ID
-            ClientApiAlert.INVALID_SELECTED_ID -> CoreAlertScreenEventType.INVALID_SELECTED_ID
-            ClientApiAlert.INVALID_SESSION_ID -> CoreAlertScreenEventType.INVALID_SESSION_ID
-            ClientApiAlert.INVALID_USER_ID -> CoreAlertScreenEventType.INVALID_USER_ID
-            ClientApiAlert.INVALID_VERIFY_ID -> CoreAlertScreenEventType.INVALID_VERIFY_ID
-            ClientApiAlert.ROOTED_DEVICE -> CoreAlertScreenEventType.UNEXPECTED_ERROR
-        }
 }

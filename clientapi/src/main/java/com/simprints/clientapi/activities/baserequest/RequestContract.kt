@@ -1,6 +1,6 @@
 package com.simprints.clientapi.activities.baserequest
 
-import com.simprints.clientapi.activities.errors.ClientApiAlert
+import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.*
 import com.simprints.clientapi.domain.requests.BaseRequest
