@@ -42,6 +42,7 @@ dependencies {
     api(project(":core"))
     api(project(":infraeventsync"))
     implementation(project(":infraresources"))
+    implementation(project(":featurealert"))
 
     api(libs.libsimprints)
 

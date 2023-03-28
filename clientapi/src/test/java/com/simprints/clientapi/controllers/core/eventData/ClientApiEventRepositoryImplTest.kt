@@ -1,14 +1,12 @@
 package com.simprints.clientapi.controllers.core.eventData
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.*
-import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_PROJECT_ID
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.NFC_NOT_ENABLED
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
@@ -73,21 +71,6 @@ class ClientApiEventRepositoryImplTest {
             coVerify(exactly = 1) {
                 coreEventEventsMgrMock.addOrUpdateEvent(match {
                     it is IntentParsingEvent && it.payload.integration == CoreIntegrationInfo.ODK
-                })
-            }
-        }
-    }
-
-    @Test
-    fun addAlertScreenEvent_shouldAddCoreLibEvent() {
-        runTest {
-            val clientApiAlert = ClientApiAlert.INVALID_PROJECT_ID
-            clientSessionEventsMgr.addAlertScreenEvent(clientApiAlert)
-
-            coVerify(exactly = 1) {
-                coreEventEventsMgrMock.addOrUpdateEvent(match {
-                    println("test ${it is AlertScreenEvent && it.payload.alertType == INVALID_PROJECT_ID}")
-                    it is AlertScreenEvent && it.payload.alertType == INVALID_PROJECT_ID
                 })
             }
         }
