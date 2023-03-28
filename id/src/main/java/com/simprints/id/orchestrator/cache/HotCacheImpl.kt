@@ -3,6 +3,7 @@ package com.simprints.id.orchestrator.cache
 import android.content.SharedPreferences
 import android.os.Parcel
 import android.os.Parcelable
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.id.di.EncryptedSharedPreferences
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -10,8 +11,6 @@ import com.simprints.id.orchestrator.cache.HotCacheImpl.AppRequestWrapper.Compan
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.ParcelableConverter.marshall
 import com.simprints.id.tools.ParcelableConverter.unmarshall
-import com.simprints.id.tools.extensions.getMap
-import com.simprints.id.tools.extensions.putMap
 import com.simprints.id.tools.extensions.save
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
@@ -34,28 +33,23 @@ class HotCacheImpl @Inject constructor(
             } ?: throw IllegalStateException("No AppRequest stored in HotCache")
         }
 
-    private val memoryCache
-        get() = LinkedHashMap(sharedPrefs.getMap(KEY_STEPS, emptyMap()))
-
     override fun save(steps: List<Step>) {
-        clearSteps()
-        val cache = memoryCache
-        steps.forEach { step ->
-            cache[step.id] = stepEncoder.encode(step)
-        }
+        val encodedSteps = steps.map { stepEncoder.encode(it) }
         saveInSharedPrefs {
-            it.putMap(KEY_STEPS, cache)
+            it.putString(KEY_STEPS, JsonHelper.toJson(encodedSteps))
         }
     }
 
-    override fun load(): List<Step> {
-        return memoryCache.values.map {
-            stepEncoder.decode(it)
-        }
+    override fun load(): List<Step> = try {
+        val stepsJson = sharedPrefs.getString(KEY_STEPS, "")
+        val encodedSteps = JsonHelper.fromJson<List<String>>(stepsJson ?: "")
+        encodedSteps.map { stepEncoder.decode(it) }
+    } catch (e: Throwable) {
+        emptyList()
     }
 
     override fun clearSteps() {
-        saveInSharedPrefs { it.putMap(KEY_STEPS, emptyMap()) }
+        saveInSharedPrefs { it.remove(KEY_STEPS) }
     }
 
     private fun saveInSharedPrefs(transaction: (SharedPreferences.Editor) -> Unit) {
