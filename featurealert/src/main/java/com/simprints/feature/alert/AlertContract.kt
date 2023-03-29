@@ -11,5 +11,6 @@ object AlertContract {
 
     fun hasResponseKey(data: Bundle, key: String) = data.getString(ALERT_BUTTON_PRESSED) == key
 
+    fun getResponseKey(data: Bundle): String = data.getString(ALERT_BUTTON_PRESSED, "")
     fun getResponsePayload(data: Bundle) = data.getBundle(ALERT_PAYLOAD) ?: Bundle()
 }

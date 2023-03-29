@@ -69,8 +69,10 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         setTextWithFallbacks(config.text, config.textRes)
         setOnClickListener {
             config.resultKey?.let { setPressedButtonResult(it, payload) }
+
             if (config.closeOnClick) {
-                findNavController().popBackStack()
+                // Close parent activity if back stack is empty after pop
+                if (!findNavController().popBackStack()) activity?.finish()
             }
         }
     }
