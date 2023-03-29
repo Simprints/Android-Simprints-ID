@@ -16,6 +16,5 @@ enum class RequestCode(val value: Int) {
     MATCHING(203),
 
     // Activities that interrupt the flow
-    ALERT(401),
     REFUSAL(402)
 }

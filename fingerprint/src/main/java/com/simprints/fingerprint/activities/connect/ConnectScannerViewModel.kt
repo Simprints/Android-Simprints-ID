@@ -9,8 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
@@ -59,7 +58,7 @@ class ConnectScannerViewModel @Inject constructor(
         MutableLiveData(BackButtonBehaviour.EXIT_FORM)
 
     val connectScannerIssue = MutableLiveData<LiveDataEventWithContent<ConnectScannerIssue>>()
-    val launchAlert = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
+    val launchAlert = MutableLiveData<LiveDataEventWithContent<AlertError>>()
     val scannerConnected = MutableLiveData<LiveDataEventWithContent<Boolean>>()
     val finish = MutableLiveData<LiveDataEvent>()
     val finishAfterError = MutableLiveData<LiveDataEvent>()
@@ -200,11 +199,10 @@ class ConnectScannerViewModel @Inject constructor(
                 connectScannerIssue.postEvent(ConnectScannerIssue.Ota(OtaFragmentRequest(e.availableOtas)))
             }
             is BluetoothNotSupportedException ->
-                launchAlert.postEvent(BLUETOOTH_NOT_SUPPORTED)
+                launchAlert.postEvent(AlertError.BLUETOOTH_NOT_SUPPORTED)
             is ScannerLowBatteryException ->
-                launchAlert.postEvent(LOW_BATTERY)
-            else ->
-                launchAlert.postEvent(UNEXPECTED_ERROR)
+                launchAlert.postEvent(AlertError.LOW_BATTERY)
+            else -> launchAlert.postEvent(AlertError.UNEXPECTED_ERROR)
         }
     }
 

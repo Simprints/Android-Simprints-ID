@@ -15,7 +15,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.alert.AlertActivity
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
@@ -117,14 +117,14 @@ class ConnectScannerActivityAndroidTest {
 
     @Test
     fun receivesAlertEvent_launchesAlertActivity() {
-        val launchAlertLiveData = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
+        val launchAlertLiveData = MutableLiveData<LiveDataEventWithContent<AlertError>>()
         every { viewModelMock.launchAlert } returns launchAlertLiveData
 
         Intents.init()
 
         scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
-        launchAlertLiveData.postEvent(FingerprintAlert.BLUETOOTH_NOT_SUPPORTED)
+        launchAlertLiveData.postEvent(AlertError.BLUETOOTH_NOT_SUPPORTED)
 
         intended(hasComponent(AlertActivity::class.java.name))
 
