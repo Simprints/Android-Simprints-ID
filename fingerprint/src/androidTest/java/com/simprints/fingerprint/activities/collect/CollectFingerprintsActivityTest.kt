@@ -18,7 +18,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivity
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CaptureState
@@ -61,7 +61,7 @@ class CollectFingerprintsActivityTest {
     private val state = MutableLiveData<CollectFingerprintsState>()
     private val vibrate = MutableLiveData<LiveDataEvent>()
     private val noFingersScannedToast = MutableLiveData<LiveDataEvent>()
-    private val launchAlert = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
+    private val launchAlert = MutableLiveData<LiveDataEventWithContent<AlertError>>()
     private val launchReconnect = MutableLiveData<LiveDataEvent>()
     private val finishWithFingerprints =
         MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
@@ -318,7 +318,7 @@ class CollectFingerprintsActivityTest {
         Intents.intending(hasComponent(AlertActivity::class.java.name))
             .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
 
-        launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
+        launchAlert.postEvent(AlertError.UNEXPECTED_ERROR)
 
         Intents.intended(hasComponent(AlertActivity::class.java.name))
 

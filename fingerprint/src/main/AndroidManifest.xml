@@ -30,11 +30,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.alert.AlertActivity"
-            android:label="Alert"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activities.connect.ConnectScannerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"

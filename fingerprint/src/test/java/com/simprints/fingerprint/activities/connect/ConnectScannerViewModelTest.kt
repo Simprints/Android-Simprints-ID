@@ -2,7 +2,7 @@ package com.simprints.fingerprint.activities.connect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Companion.MAX_RETRY_COUNT
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
@@ -142,7 +142,7 @@ class ConnectScannerViewModelTest {
         viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
         viewModel.start()
 
-        launchAlertObserver.assertEventReceivedWithContent(FingerprintAlert.BLUETOOTH_NOT_SUPPORTED)
+        launchAlertObserver.assertEventReceivedWithContent(AlertError.BLUETOOTH_NOT_SUPPORTED)
     }
 
     @Test
@@ -336,7 +336,7 @@ class ConnectScannerViewModelTest {
         viewModel.start()
 
         scannerConnectedObserver.assertEventReceivedWithContent(false)
-        launchAlertObserver.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
+        launchAlertObserver.assertEventReceivedWithContent(AlertError.UNEXPECTED_ERROR)
     }
 
     @Test
