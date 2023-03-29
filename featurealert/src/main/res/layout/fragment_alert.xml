@@ -38,7 +38,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3"
         app:layout_constraintWidth_percent="0.5"
-        tools:src="@drawable/simprints_logo" />
+        tools:src="@drawable/ic_alert_default" />
 
     <TextView
         android:id="@+id/alertMessage"
@@ -54,7 +54,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/alertImage"
         app:layout_constraintWidth_percent="0.8"
-        tools:drawableStart="@drawable/ic_refresh"
+        tools:drawableStart="@drawable/ic_alert_hint_cog"
         tools:text="@tools:sample/lorem/random" />
 
     <View
