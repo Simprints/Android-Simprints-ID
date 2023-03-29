@@ -58,7 +58,15 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
 
     internal lateinit var appRequest: AppRequest
 
-    override suspend fun setup() {
+    override suspend fun onViewCreated(isRestored: Boolean) {
+        setup()
+        // Prevent starting OrchestratorActivity twice when restoring the activity
+        if (!isRestored) {
+            start()
+        }
+    }
+
+    suspend fun setup() {
         try {
             parseAppRequest()
             showConfirmationTextIfPossible()
@@ -170,7 +178,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         }
     }
 
-    override suspend fun start() {
+    suspend fun start() {
         checkSignedInStateIfPossible()
     }
 
