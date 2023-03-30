@@ -24,6 +24,7 @@ import com.simprints.id.tools.extensions.parseAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -45,9 +46,8 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
         setContentView(binding.root)
         title = getString(IDR.string.title_activity_front)
 
-        lifecycleScope.launchWhenCreated {
-            viewPresenter.setup()
-            viewPresenter.start()
+        lifecycleScope.launch {
+            viewPresenter.onViewCreated(savedInstanceState != null)
         }
     }
 
