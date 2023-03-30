@@ -342,6 +342,7 @@ class ScannerWrapperV2(
         catch { ex -> throw wrapErrorFromScanner(ex) }
 
     private fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
+        is NotConnectedException,
         is IOException -> { // Disconnected or timed-out communications with Scanner
             Simber.d(
                 e,
