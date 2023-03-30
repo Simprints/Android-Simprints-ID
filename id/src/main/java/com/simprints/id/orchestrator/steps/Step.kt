@@ -51,6 +51,11 @@ data class Step(
 
     override fun describeContents() = 0
 
+    // Useful when debugging
+    override fun toString(): String {
+        return "$request: $status"
+    }
+
     private fun updateStatusBasedOnResult() {
         if (result != null)
             setStatus(COMPLETED)

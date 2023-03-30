@@ -21,8 +21,7 @@ interface CheckLoginFromIntentContract {
     }
 
     interface Presenter {
-        suspend fun start()
-        suspend fun setup()
+        suspend fun onViewCreated(isRestored: Boolean)
         suspend fun checkSignedInStateIfPossible()
         fun onAlertScreenReturn(alertActResponse: AlertActResponse)
         fun onLoginScreenErrorReturn(appErrorResponse: AppErrorResponse)
