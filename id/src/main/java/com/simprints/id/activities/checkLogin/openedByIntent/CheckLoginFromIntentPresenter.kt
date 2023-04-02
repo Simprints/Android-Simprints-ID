@@ -66,7 +66,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         }
     }
 
-    suspend fun setup() {
+    private suspend fun setup() {
         try {
             parseAppRequest()
             showConfirmationTextIfPossible()
@@ -178,7 +178,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         }
     }
 
-    suspend fun start() {
+    private suspend fun start() {
         checkSignedInStateIfPossible()
     }
 
