@@ -7,8 +7,6 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import java.net.URL
-import javax.inject.Inject
 
 internal class ConfigRemoteDataSourceImpl(
     private val loginManager: LoginManager,
@@ -16,10 +14,6 @@ internal class ConfigRemoteDataSourceImpl(
     private val urlDownloader: (String) -> String
 ) :
     ConfigRemoteDataSource {
-
-    @Inject
-    constructor(loginManager: LoginManager, dispatcherIO: CoroutineDispatcher) :
-        this(loginManager, dispatcherIO, { url -> URL(url).readText() })
 
     override suspend fun getConfiguration(projectId: String): ProjectConfiguration =
         getApiClient().executeCall { it.getConfiguration(projectId) }.toDomain()
