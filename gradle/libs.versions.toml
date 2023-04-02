@@ -97,7 +97,7 @@ playServices-location = { module = "com.google.android.gms:play-services-locatio
 playServices-integrity = { module = "com.google.android.play:integrity", version.ref = "integrity_version" }
 
 #Firebase
-firebase-auth = "com.google.firebase:firebase-auth-ktx:21.1.0"
+firebase-auth = "com.google.firebase:firebase-auth-ktx:21.2.0"
 firebase-storage = "com.google.firebase:firebase-storage-ktx:20.1.0"
 firebase-barcode = "com.google.android.gms:play-services-mlkit-barcode-scanning:18.2.0"
 
