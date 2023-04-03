@@ -30,8 +30,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
                 when (alertType) {
-                    AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
-                    AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
+                    AlertType.DIFFERENT_PROJECT_ID -> DIFFERENT_PROJECT_ID_SIGNED_IN
+                    AlertType.DIFFERENT_USER_ID -> DIFFERENT_USER_ID_SIGNED_IN
                     AlertType.GOOGLE_PLAY_SERVICES_OUTDATED,
                     AlertType.MISSING_GOOGLE_PLAY_SERVICES,
                     AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,

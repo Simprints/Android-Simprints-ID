@@ -5,8 +5,6 @@ import android.content.SharedPreferences
 import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
-import com.simprints.id.activities.alert.AlertContract
-import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentContract
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenter
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
@@ -16,7 +14,6 @@ import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.qrcapture.tools.*
-import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
@@ -110,14 +107,6 @@ annotation class AbsolutePath
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class IdAppModule {
-
-    @AssistedFactory
-    interface AlertPresenterFactory {
-        fun create(
-            view: AlertContract.View,
-            alertType: AlertType,
-        ): AlertPresenter
-    }
 
     @AssistedFactory
     interface CheckLoginFromIntentPresenterFactory {

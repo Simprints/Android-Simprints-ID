@@ -3,7 +3,7 @@ package com.simprints.id.tools.googleapis
 import android.app.Activity
 import com.google.android.gms.common.ConnectionResult.SUCCESS
 import com.google.android.gms.common.GoogleApiAvailability
-import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.AlertType.GOOGLE_PLAY_SERVICES_OUTDATED
 import com.simprints.id.domain.alert.AlertType.MISSING_GOOGLE_PLAY_SERVICES
 import com.simprints.id.exceptions.unexpected.MissingGooglePlayServices
@@ -20,17 +20,20 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
      *
      * @param activity
      */
-    override fun check(activity: Activity) {
+    override fun check(
+        activity: Activity,
+        launchAlert: (AlertType) -> Unit,
+    ) {
         val statusCode = googleApiAvailability.isGooglePlayServicesAvailable(activity)
         when {
             statusCode == SUCCESS -> { // On SUCCESS then does nothing
                 return
             }
             googleApiAvailability.isUserResolvableError(statusCode) -> {
-                showErrorDialog(activity, statusCode)
+                showErrorDialog(activity, statusCode, launchAlert)
             }
             else -> {
-                handleMissingGooglePlayServices(activity, statusCode)
+                handleMissingGooglePlayServices(statusCode, launchAlert)
             }
         }
     }
@@ -42,9 +45,10 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
      * @param activity
      * @param statusCode
      */
-    private fun showErrorDialog(
+    private inline fun showErrorDialog(
         activity: Activity,
-        statusCode: Int
+        statusCode: Int,
+        crossinline launchAlert: (AlertType) -> Unit,
     ) {
         googleApiAvailability.showErrorDialogFragment(
             activity,
@@ -52,7 +56,7 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
             GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
         ) {
             // Throw exception when user cancels the dialog
-            handleCancellation(activity, statusCode)
+            handleCancellation(statusCode, launchAlert)
         }
     }
 
@@ -62,11 +66,11 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
      * @param activity
      * @param statusCode
      */
-    private fun handleMissingGooglePlayServices(
-        activity: Activity,
-        statusCode: Int
+    private inline fun handleMissingGooglePlayServices(
+        statusCode: Int,
+        crossinline launchAlert: (AlertType) -> Unit,
     ) {
-        launchAlert(activity, MISSING_GOOGLE_PLAY_SERVICES)
+        launchAlert(MISSING_GOOGLE_PLAY_SERVICES)
         Simber.e(
             MissingGooglePlayServices(
                 "Error with GooglePlayServices version. Error code=$statusCode"
@@ -74,8 +78,11 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
         )
     }
 
-    private fun handleCancellation(activity: Activity, statusCode: Int) {
-        launchAlert(activity, GOOGLE_PLAY_SERVICES_OUTDATED)
+    private inline fun handleCancellation(
+        statusCode: Int,
+        crossinline launchAlert: (AlertType) -> Unit,
+    ) {
+        launchAlert(GOOGLE_PLAY_SERVICES_OUTDATED)
         Simber.e(
             OutdatedGooglePlayServices(
                 "Error with GooglePlayServices version. Error code=$statusCode"
