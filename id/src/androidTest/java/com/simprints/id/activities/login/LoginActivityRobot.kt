@@ -20,7 +20,6 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
-import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.QrCodeResponse
@@ -195,7 +194,7 @@ class LoginActivityAssertions(
     }
 
     fun alertScreenIsLaunched() {
-        Intents.intended(IntentMatchers.hasComponent(AlertActivity::class.java.name))
+        Intents.intended(IntentMatchers.hasComponent("com.simprints.feature.alert.intent.AlertWrapperActivity"))
     }
 
     fun qrCaptureActivityIsOpened() {

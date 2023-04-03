@@ -14,7 +14,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
@@ -126,7 +125,7 @@ class ConnectScannerActivityAndroidTest {
 
         launchAlertLiveData.postEvent(AlertError.BLUETOOTH_NOT_SUPPORTED)
 
-        intended(hasComponent(AlertActivity::class.java.name))
+        intended(hasComponent("com.simprints.feature.alert.intent.AlertWrapperActivity"))
 
         Intents.release()
     }
