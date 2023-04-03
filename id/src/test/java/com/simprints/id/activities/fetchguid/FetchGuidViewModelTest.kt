@@ -19,8 +19,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import junit.framework.Assert.assertTrue
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -75,7 +74,7 @@ class FetchGuidViewModelTest {
     }
 
     @Test
-    fun fetchGuidSucceedsFromLocal_shouldReturnCorrectSubjectSource() {
+    fun fetchGuidSucceedsFromLocal_shouldReturnCorrectSubjectSource() = runTest {
         coEvery {
             fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(defaultSubject, LOCAL)
@@ -87,7 +86,7 @@ class FetchGuidViewModelTest {
     }
 
     @Test
-    fun fetchGuidSucceedsFromRemote_shouldReturnCorrectSubjectSource() {
+    fun fetchGuidSucceedsFromRemote_shouldReturnCorrectSubjectSource() = runTest {
         coEvery {
             fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(defaultSubject, REMOTE)
@@ -99,7 +98,7 @@ class FetchGuidViewModelTest {
     }
 
     @Test
-    fun fetchGuidFailsFromLocalAndOffline_shouldReturnFailedOfflineSubjectSource() {
+    fun fetchGuidFailsFromLocalAndOffline_shouldReturnFailedOfflineSubjectSource() = runTest {
         coEvery {
             fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
@@ -112,7 +111,7 @@ class FetchGuidViewModelTest {
     }
 
     @Test
-    fun fetchGuidFailsFromLocalAndRemoteOnline_shouldReturnNotFoundSubjectSource() {
+    fun fetchGuidFailsFromLocalAndRemoteOnline_shouldReturnNotFoundSubjectSource() = runTest {
         coEvery {
             fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
@@ -125,97 +124,102 @@ class FetchGuidViewModelTest {
     }
 
     @Test
-    fun fetchGuidInLocal_shouldAddCandidateReadEvent() {
-        runBlocking {
-            coEvery {
-                fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
-            } returns SubjectFetchResult(defaultSubject, LOCAL)
+    fun fetchGuidInLocal_shouldAddCandidateReadEvent() = runTest {
+        coEvery {
+            fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
+        } returns SubjectFetchResult(defaultSubject, LOCAL)
 
-            viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
+        viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
-            coVerify {
-                eventRepository.addOrUpdateEvent(
-                    withArg {
-                        assertTrue(
-                            it is CandidateReadEvent
-                                && it.payload.localResult == LocalResult.FOUND
-                                && it.payload.remoteResult == null
-                        )
-                    }
-                )
-            }
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(
+                        it is CandidateReadEvent
+                            && it.payload.localResult == LocalResult.FOUND
+                            && it.payload.remoteResult == null
+                    ).isTrue()
+                }
+            )
+        }
+    }
+
+
+    @Test
+    fun fetchGuidInRemote_shouldAddCandidateReadEvent() = runTest {
+        coEvery {
+            fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
+        } returns SubjectFetchResult(defaultSubject, REMOTE)
+
+        viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(
+                        it is CandidateReadEvent
+                            && it.payload.localResult == LocalResult.NOT_FOUND
+                            && it.payload.remoteResult == RemoteResult.FOUND
+                    ).isTrue()
+                }
+            )
         }
     }
 
     @Test
-    fun fetchGuidInRemote_shouldAddCandidateReadEvent() {
-        runBlocking {
-            coEvery {
-                fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
-            } returns SubjectFetchResult(defaultSubject, REMOTE)
+    fun localGuidNotFoundAndOffline_shouldAddCandidateReadEvent() = runTest {
+        coEvery {
+            fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
+        } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+        coEvery { deviceManager.isConnected() } returns false
 
-            viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
+        viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
-            coVerify {
-                eventRepository.addOrUpdateEvent(
-                    withArg {
-                        assertTrue(
-                            it is CandidateReadEvent
-                                && it.payload.localResult == LocalResult.NOT_FOUND
-                                && it.payload.remoteResult == RemoteResult.FOUND
-                        )
-                    }
-                )
-            }
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(
+                        it is CandidateReadEvent
+                            && it.payload.localResult == LocalResult.NOT_FOUND
+                            && it.payload.remoteResult == null
+                    ).isTrue()
+                }
+            )
         }
     }
 
     @Test
-    fun localGuidNotFoundAndOffline_shouldAddCandidateReadEvent() {
-        runBlocking {
-            coEvery {
-                fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
-            } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-            coEvery { deviceManager.isConnected() } returns false
+    fun fetchGuidNotFound_shouldAddCandidateReadEvent() = runTest {
+        coEvery {
+            fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
+        } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
+        coEvery { deviceManager.isConnected() } returns true
 
-            viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
+        viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
-            coVerify {
-                eventRepository.addOrUpdateEvent(
-                    withArg {
-                        assertTrue(
-                            it is CandidateReadEvent
-                                && it.payload.localResult == LocalResult.NOT_FOUND
-                                && it.payload.remoteResult == null
-                        )
-                    }
-                )
-            }
+        coVerify {
+            eventRepository.addOrUpdateEvent(
+                withArg {
+                    assertThat(
+                        it is CandidateReadEvent
+                            && it.payload.localResult == LocalResult.NOT_FOUND
+                            && it.payload.remoteResult == RemoteResult.NOT_FOUND
+                    ).isTrue()
+                }
+            )
         }
     }
 
     @Test
-    fun fetchGuidNotFound_shouldAddCandidateReadEvent() {
-        runBlocking {
-            coEvery {
-                fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
-            } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-            coEvery { deviceManager.isConnected() } returns true
+    fun startsExitForm_whenCalled() = runTest {
+        coEvery { configManager.getProjectConfiguration().general.modalities } returns emptyList()
+        every { exitForHelper.getExitFormActivityClassFromModalities(any()) }.returns("test")
 
-            viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
+        viewModel.startExitForm()
 
-            coVerify {
-                eventRepository.addOrUpdateEvent(
-                    withArg {
-                        assertTrue(
-                            it is CandidateReadEvent
-                                && it.payload.localResult == LocalResult.NOT_FOUND
-                                && it.payload.remoteResult == RemoteResult.NOT_FOUND
-                        )
-                    }
-                )
-            }
-        }
+        val result = viewModel.exitForm.getOrAwaitValue()
+        assertThat(result.getContentIfNotHandled()).isEqualTo("test")
+        assertThat(result.hasBeenHandled).isTrue()
     }
 
 

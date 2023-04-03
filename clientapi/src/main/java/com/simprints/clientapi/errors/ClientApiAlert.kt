@@ -1,12 +1,11 @@
 package com.simprints.clientapi.errors
 
-import com.simprints.clientapi.R
 import com.simprints.feature.alert.AlertConfigurationBuilder
 import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
-import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
-import com.simprints.infra.resources.R as IDR
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.infra.resources.R
 
 enum class ClientApiAlert {
     INVALID_STATE_FOR_INTENT_ACTION,
@@ -20,52 +19,55 @@ enum class ClientApiAlert {
     ROOTED_DEVICE,
     ;
 
-    fun toAlertConfig(): AlertConfigurationBuilder = alertConfiguration {
-        color = getBackgroundColor()
-        titleRes = getTitle()
-        image = IDR.drawable.ic_alert_default
-        messageRes = getMessage()
-        messageIcon = getMessageIcon()
-        eventType = getEventType()
-        leftButton = AlertButtonConfig.Close
-    }
+    companion object {
 
-    private fun getBackgroundColor() = when (this) {
-        ROOTED_DEVICE -> AlertColor.Red
-        else -> AlertColor.Yellow
-    }
+        fun ClientApiAlert.toAlertConfig(): AlertConfigurationBuilder = alertConfiguration {
+            color = getBackgroundColor(this@toAlertConfig)
+            titleRes = getTitle(this@toAlertConfig)
+            image = R.drawable.ic_alert_default
+            messageRes = getMessage(this@toAlertConfig)
+            messageIcon = getMessageIcon(this@toAlertConfig)
+            eventType = getEventType(this@toAlertConfig)
+            leftButton = AlertButtonConfig.Close
+        }
 
-    private fun getTitle() = when (this) {
-        ROOTED_DEVICE -> R.string.rooted_device_title
-        else -> R.string.configuration_error_title
-    }
+        private fun getBackgroundColor(clientApiAlert: ClientApiAlert) = when (clientApiAlert) {
+            ROOTED_DEVICE -> AlertColor.Red
+            else -> AlertColor.Yellow
+        }
 
-    private fun getMessage() = when (this) {
-        INVALID_STATE_FOR_INTENT_ACTION -> R.string.invalid_intentAction_message
-        INVALID_METADATA -> R.string.invalid_metadata_message
-        INVALID_MODULE_ID -> R.string.invalid_moduleId_message
-        INVALID_PROJECT_ID -> R.string.invalid_projectId_message
-        INVALID_SELECTED_ID -> R.string.invalid_selectedId_message
-        INVALID_SESSION_ID -> R.string.invalid_sessionId_message
-        INVALID_USER_ID -> R.string.invalid_userId_message
-        INVALID_VERIFY_ID -> R.string.invalid_verifyId_message
-        ROOTED_DEVICE -> R.string.rooted_device_message
-    }
+        private fun getTitle(clientApiAlert: ClientApiAlert) = when (clientApiAlert) {
+            ROOTED_DEVICE -> com.simprints.clientapi.R.string.rooted_device_title
+            else -> com.simprints.clientapi.R.string.configuration_error_title
+        }
 
-    private fun getMessageIcon() = when (this) {
-        ROOTED_DEVICE -> IDR.drawable.ic_alert_hint_cog
-        else -> null
-    }
+        private fun getMessage(clientApiAlert: ClientApiAlert) = when (clientApiAlert) {
+            INVALID_STATE_FOR_INTENT_ACTION -> com.simprints.clientapi.R.string.invalid_intentAction_message
+            INVALID_METADATA -> com.simprints.clientapi.R.string.invalid_metadata_message
+            INVALID_MODULE_ID -> com.simprints.clientapi.R.string.invalid_moduleId_message
+            INVALID_PROJECT_ID -> com.simprints.clientapi.R.string.invalid_projectId_message
+            INVALID_SELECTED_ID -> com.simprints.clientapi.R.string.invalid_selectedId_message
+            INVALID_SESSION_ID -> com.simprints.clientapi.R.string.invalid_sessionId_message
+            INVALID_USER_ID -> com.simprints.clientapi.R.string.invalid_userId_message
+            INVALID_VERIFY_ID -> com.simprints.clientapi.R.string.invalid_verifyId_message
+            ROOTED_DEVICE -> com.simprints.clientapi.R.string.rooted_device_message
+        }
 
-    private fun getEventType(): AlertScreenEventType = when (this) {
-        INVALID_STATE_FOR_INTENT_ACTION -> AlertScreenEventType.INVALID_INTENT_ACTION
-        INVALID_METADATA -> AlertScreenEventType.INVALID_METADATA
-        INVALID_MODULE_ID -> AlertScreenEventType.INVALID_MODULE_ID
-        INVALID_PROJECT_ID -> AlertScreenEventType.INVALID_PROJECT_ID
-        INVALID_SELECTED_ID -> AlertScreenEventType.INVALID_SELECTED_ID
-        INVALID_SESSION_ID -> AlertScreenEventType.INVALID_SESSION_ID
-        INVALID_USER_ID -> AlertScreenEventType.INVALID_USER_ID
-        INVALID_VERIFY_ID -> AlertScreenEventType.INVALID_VERIFY_ID
-        ROOTED_DEVICE -> AlertScreenEventType.UNEXPECTED_ERROR
+        private fun getMessageIcon(clientApiAlert: ClientApiAlert) = when (clientApiAlert) {
+            ROOTED_DEVICE -> R.drawable.ic_alert_hint_cog
+            else -> null
+        }
+
+        private fun getEventType(clientApiAlert: ClientApiAlert) = when (clientApiAlert) {
+            INVALID_STATE_FOR_INTENT_ACTION -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_INTENT_ACTION
+            INVALID_METADATA -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_METADATA
+            INVALID_MODULE_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_MODULE_ID
+            INVALID_PROJECT_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_PROJECT_ID
+            INVALID_SELECTED_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_SELECTED_ID
+            INVALID_SESSION_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_SESSION_ID
+            INVALID_USER_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_USER_ID
+            INVALID_VERIFY_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_VERIFY_ID
+            ROOTED_DEVICE -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
+        }
     }
 }

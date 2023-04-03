@@ -5,11 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
-import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.extractors.*
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.errors.ClientApiAlert
+import com.simprints.clientapi.errors.ClientApiAlert.Companion.toAlertConfig
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
