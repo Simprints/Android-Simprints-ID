@@ -17,7 +17,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
@@ -315,12 +314,12 @@ class CollectFingerprintsActivityTest {
         scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
         Intents.init()
 
-        Intents.intending(hasComponent(AlertActivity::class.java.name))
+        Intents.intending(hasComponent("com.simprints.feature.alert.intent.AlertWrapperActivity"))
             .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
 
         launchAlert.postEvent(AlertError.UNEXPECTED_ERROR)
 
-        Intents.intended(hasComponent(AlertActivity::class.java.name))
+        Intents.intended(hasComponent("com.simprints.feature.alert.intent.AlertWrapperActivity"))
 
         Intents.release()
     }
