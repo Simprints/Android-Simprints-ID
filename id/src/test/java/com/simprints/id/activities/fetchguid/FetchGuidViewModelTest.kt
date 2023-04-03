@@ -5,9 +5,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
+import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.just
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
@@ -43,6 +45,12 @@ class FetchGuidViewModelTest {
     private lateinit var eventRepository: EventRepository
 
     @MockK
+    private lateinit var configManager: ConfigManager
+
+    @MockK
+    private lateinit var exitForHelper: ExitFormHelper
+
+    @MockK
     private lateinit var timeHelper: TimeHelper
 
     @Before
@@ -53,6 +61,8 @@ class FetchGuidViewModelTest {
             deviceManager,
             eventRepository,
             timeHelper,
+            configManager,
+            exitForHelper
         )
 
         configureMocks()

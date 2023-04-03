@@ -1,7 +1,6 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.activities.BaseView
-import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginContract
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -23,7 +22,6 @@ interface CheckLoginFromIntentContract {
     interface Presenter {
         suspend fun onViewCreated(isRestored: Boolean)
         suspend fun checkSignedInStateIfPossible()
-        fun onAlertScreenReturn(alertActResponse: AlertActResponse)
         fun onLoginScreenErrorReturn(appErrorResponse: AppErrorResponse)
     }
 }

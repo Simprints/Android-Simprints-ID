@@ -6,7 +6,6 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
@@ -16,7 +15,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -186,12 +184,6 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         if (!setupFailed) {
             checkSignedInStateAndMoveOn()
         }
-    }
-
-    override fun onAlertScreenReturn(alertActResponse: AlertActResponse) {
-        val domainErrorResponse =
-            AppErrorResponse(Reason.fromDomainAlertTypeToAppErrorType(alertActResponse.alertType))
-        view.setResultErrorAndFinish(fromDomainToModuleApiAppErrorResponse(domainErrorResponse))
     }
 
     override fun onLoginScreenErrorReturn(appErrorResponse: AppErrorResponse) {

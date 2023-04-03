@@ -18,6 +18,7 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.logging.Simber
@@ -54,6 +55,9 @@ class EnrolLastBiometricsViewModel @Inject constructor(
             Failed
         }
     }
+
+    suspend fun getAvailabilityModalities() : List<GeneralConfiguration.Modality> =
+        configManager.getProjectConfiguration().general.modalities
 
     private suspend fun performEnrolmentIfRequiredAndGetViewState(
         configuration: ProjectConfiguration,

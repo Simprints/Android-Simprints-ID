@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.common.ConnectionResult.*
 import com.google.android.gms.common.GoogleApiAvailability
-import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exceptions.unexpected.MissingGooglePlayServices
 import com.simprints.id.exceptions.unexpected.OutdatedGooglePlayServices
@@ -14,7 +13,6 @@ import com.simprints.infra.logging.Simber
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.Assert.*
-
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,14 +26,17 @@ class GooglePlayServicesAvailabilityCheckerTest {
     @MockK
     private lateinit var googleApiAvailability: GoogleApiAvailability
 
+    @MockK
+    private lateinit var launchCallBack: (AlertType) -> Unit
+
     private lateinit var googlePlayServicesAvailabilityChecker: GooglePlayServicesAvailabilityChecker
 
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        mockkObject(AlertActivityHelper)
         mockkObject(Simber)
+
         googlePlayServicesAvailabilityChecker =
             GooglePlayServicesAvailabilityCheckerImpl(googleApiAvailability)
     }
@@ -45,7 +46,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
         //Given
         every { googleApiAvailability.isGooglePlayServicesAvailable(activity) } returns SUCCESS
         //When
-        googlePlayServicesAvailabilityChecker.check(activity)
+        googlePlayServicesAvailabilityChecker.check(activity, launchCallBack)
         //Then
 
         verify(exactly = 0) {
@@ -54,9 +55,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
                 GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
             )
         }
-        verify(exactly = 0) {
-            AlertActivityHelper.launchAlert(activity, any())
-        }
+        verify(exactly = 0) { launchCallBack(any()) }
     }
 
     @Test
@@ -67,7 +66,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
         every { googleApiAvailability.isUserResolvableError(INTERNAL_ERROR) } returns false
 
         //When
-        googlePlayServicesAvailabilityChecker.check(activity)
+        googlePlayServicesAvailabilityChecker.check(activity, launchCallBack)
 
         //Then
         verify(exactly = 0) {
@@ -76,9 +75,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
                 GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
             )
         }
-        verify {
-            AlertActivityHelper.launchAlert(activity, AlertType.MISSING_GOOGLE_PLAY_SERVICES)
-        }
+        verify { launchCallBack(AlertType.MISSING_GOOGLE_PLAY_SERVICES) }
         verify { Simber.e(ofType<MissingGooglePlayServices>()) }
     }
 
@@ -95,7 +92,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
         } returns true
 
         //When
-        googlePlayServicesAvailabilityChecker.check(activity)
+        googlePlayServicesAvailabilityChecker.check(activity, launchCallBack)
 
         //Then
         verify(exactly = 1) {
@@ -104,9 +101,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
                 GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
             )
         }
-        verify(exactly = 0) {
-            AlertActivityHelper.launchAlert(activity, AlertType.GOOGLE_PLAY_SERVICES_OUTDATED)
-        }
+        verify(exactly = 0) { launchCallBack(any()) }
         verify(exactly = 0) { Simber.e(ofType<OutdatedGooglePlayServices>()) }
     }
 
@@ -129,7 +124,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
             true
         }
         //When
-        googlePlayServicesAvailabilityChecker.check(activity)
+        googlePlayServicesAvailabilityChecker.check(activity, launchCallBack)
 
         //Then
         verify(exactly = 1) {
@@ -138,9 +133,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
                 GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
             )
         }
-        verify {
-            AlertActivityHelper.launchAlert(activity, AlertType.GOOGLE_PLAY_SERVICES_OUTDATED)
-        }
+        verify { launchCallBack(AlertType.GOOGLE_PLAY_SERVICES_OUTDATED) }
         verify { Simber.e(ofType<OutdatedGooglePlayServices>()) }
     }
 
