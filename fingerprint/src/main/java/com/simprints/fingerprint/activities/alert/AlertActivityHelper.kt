@@ -15,16 +15,16 @@ internal class AlertActivityHelper {
 
     private val settingsOpenedForPairing = AtomicBoolean(false)
 
-    inline fun handleResume(crossinline retry: () -> Unit) {
+    fun handleResume(retry: () -> Unit) {
         if (settingsOpenedForPairing.getAndSet(false)) {
             retry()
         }
     }
 
-    inline fun handleAlertResult(
+    fun handleAlertResult(
         activity: Activity,
         data: Bundle,
-        crossinline retry: () -> Unit,
+        retry: () -> Unit,
     ) {
         val alertError = AlertContract.getResponsePayload(data)
             .getString(PAYLOAD_KEY)
@@ -50,7 +50,7 @@ internal class AlertActivityHelper {
         }
     }
 
-    fun finishWithError(
+    private fun finishWithError(
         activity: Activity,
         alertError: AlertError = AlertError.UNEXPECTED_ERROR,
     ) {
@@ -64,7 +64,7 @@ internal class AlertActivityHelper {
         activity.startActivityForResult(Intent(activity, RefusalActivity::class.java), RequestCode.REFUSAL.value)
     }
 
-    fun openBluetoothSettings(activity: Activity) {
+    private fun openBluetoothSettings(activity: Activity) {
         activity.startActivity(Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
     }
 
