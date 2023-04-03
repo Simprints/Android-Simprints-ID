@@ -25,8 +25,32 @@ data class AlertConfigurationBuilder(
     var payload: Bundle = Bundle(),
 )
 
+/**
+ * Configuration builder for the alert screen:
+ *
+ * ```
+ * color - One of the pre-defined AlertColor values, default - Simprints blue
+ * title - Pre-formatted title sting
+ * titleRes - Title string resource (used if title is null), default - "Alert"
+ * image - Main icon drawable resource id, default - ic_alert_default
+ * message - Pre-formatted message sting
+ * messageRes - Message string resource (used if message is null), default - empty string
+ * messageIcon - Optional icon to show next to the message, default - view is not visible
+ * leftButton - Left/main button configuration, default - basic "Close" button
+ * rightButton - Optional right button configuration, default - view is not visible
+ * eventType - Event type to be logged on alert opening, default - nothing
+ * payload - Custom bundle that will be provided in result callback
+ * ```
+ */
 fun alertConfiguration(block: AlertConfigurationBuilder.() -> Unit) = AlertConfigurationBuilder().apply(block)
 
+/**
+ * Convenience function to provide payload as pairs of values instead of bundle:
+ *
+ * ```
+ * alertConfiguration { }.withPayload("key" to "value").toArgs()
+ * ```
+ */
 fun AlertConfigurationBuilder.withPayload(vararg pairs: Pair<String, Any?>) =
     this.also { it.payload = bundleOf(*pairs) }
 
@@ -51,6 +75,16 @@ data class AlertButtonBuilder(
     var closeOnClick: Boolean = false,
 )
 
+/**
+ * Configuration builder for the alert screen button:
+ *
+ * ```
+ * text - Pre-formatted text sting
+ * textRes - Text string resource (used if text is null), default - empty string
+ * resultKey - Custom action key to distinguish pressed buttons on callers side, default - null
+ * closeOnClick - If set to true - alert screen will close itself on button click, default - false
+ * ```
+ */
 fun alertButton(block: AlertButtonBuilder.() -> Unit): AlertButtonConfig = AlertButtonBuilder()
     .apply(block)
     .let { builder ->
