@@ -76,31 +76,34 @@ internal data class OldProjectConfig(
         if (faceQualityThreshold == null) null
         else
             FaceConfiguration(
-                nbOfImagesToCapture = faceNbOfFramesCaptured!!.toInt(),
+                nbOfImagesToCapture = faceNbOfFramesCaptured?.toIntOrNull()
+                    ?: DEFAULT_FACE_FRAMES_TO_CAPTURE,
                 qualityThreshold = faceQualityThreshold.toInt(),
                 imageSavingStrategy = if (saveFaceImages.toBoolean()) {
                     FaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN
                 } else {
                     FaceConfiguration.ImageSavingStrategy.NEVER
                 },
-                decisionPolicy = parseDecisionPolicy(faceConfidenceThresholds!!),
+                decisionPolicy = faceConfidenceThresholds?.let { parseDecisionPolicy(it) }
+                    ?: DecisionPolicy(0, 0, 0),
             )
 
     private fun fingerprintConfiguration(): FingerprintConfiguration? =
         if (fingerprintQualityThreshold == null) null
         else
             FingerprintConfiguration(
-                fingersToCapture = fingerprintsToCollect!!.split(",")
-                    .map { Finger.valueOf(it) },
+                fingersToCapture = fingerprintsToCollect?.split(",")
+                    ?.map { Finger.valueOf(it) }
+                    ?: listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER),
                 qualityThreshold = fingerprintQualityThreshold.toInt(),
-                decisionPolicy = parseDecisionPolicy(fingerprintConfidenceThresholds!!),
-                allowedVeroGenerations = scannerGenerations!!.split(",")
-                    .map { FingerprintConfiguration.VeroGeneration.valueOf(it) },
-                comparisonStrategyForVerification = fingerComparisonStrategyForVerification?.let {
-                    FingerprintConfiguration.FingerComparisonStrategy.valueOf(
-                        it
-                    )
-                } ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                decisionPolicy = fingerprintConfidenceThresholds?.let { parseDecisionPolicy(it) }
+                    ?: DecisionPolicy(0, 0, 700),
+                allowedVeroGenerations = scannerGenerations?.split(",")
+                    ?.map { FingerprintConfiguration.VeroGeneration.valueOf(it) }
+                    ?: listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
+                comparisonStrategyForVerification = fingerComparisonStrategyForVerification
+                    ?.let { FingerprintConfiguration.FingerComparisonStrategy.valueOf(it) }
+                    ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 displayHandIcons = fingerImagesExist.toBoolean(),
                 vero2 = vero2Configuration(),
             )
@@ -198,5 +201,10 @@ internal data class OldProjectConfig(
     private inline fun <reified T> fromJson(json: String): T {
         return jacksonObjectMapper().readValue(json, T::class.java)
     }
+
+    companion object {
+        private const val DEFAULT_FACE_FRAMES_TO_CAPTURE = 2
+    }
+
 }
 
