@@ -123,6 +123,57 @@ class ProjectConfigSharedPrefsMigrationTest {
     }
 
     @Test
+    fun `migrate should work when face is present without some fields`() = runTest {
+        val json = concatMapsAsString(
+            JSON_GENERAL_CONFIGURATION,
+            JSON_CONSENT_CONFIGURATION,
+            JSON_IDENTIFICATION_CONFIGURATION,
+            JSON_SYNCHRONIZATION_CONFIGURATION,
+            JSON_FACE_CONFIGURATION_WITHOUT_FIELDS
+        )
+        every { preferences.getString(any(), any()) } returns json
+        every { loginManager.signedInProjectId } returns PROJECT_ID
+
+        val expectedProto = ProtoProjectConfiguration.newBuilder()
+            .setProjectId(PROJECT_ID)
+            .setConsent(PROTO_CONSENT_CONFIGURATION)
+            .setGeneral(PROTO_GENERAL_CONFIGURATION)
+            .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
+            .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION)
+            .setFace(PROTO_FACE_DEFAULT_CONFIGURATION)
+            .build()
+
+        val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
+        assertThat(proto).isEqualTo(expectedProto)
+    }
+
+    @Test
+    fun `migrate should work when fingerprint is present without some fields`() = runTest {
+        val json = concatMapsAsString(
+            JSON_GENERAL_CONFIGURATION,
+            JSON_CONSENT_CONFIGURATION,
+            JSON_IDENTIFICATION_CONFIGURATION,
+            JSON_SYNCHRONIZATION_CONFIGURATION,
+            JSON_FINGERPRINT_CONFIGURATION_WITHOUT_FIELDS
+        )
+        every { preferences.getString(any(), any()) } returns json
+        every { loginManager.signedInProjectId } returns PROJECT_ID
+
+        val expectedProto = ProtoProjectConfiguration.newBuilder()
+            .setProjectId(PROJECT_ID)
+            .setConsent(PROTO_CONSENT_CONFIGURATION)
+            .setGeneral(PROTO_GENERAL_CONFIGURATION)
+            .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
+            .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION)
+            .setFingerprint(PROTO_FINGERPRINT_DEFAULT_CONFIGURATION)
+            .build()
+
+        val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
+        assertThat(proto).isEqualTo(expectedProto)
+    }
+
+
+    @Test
     fun `migrate should work when fingerprint is present without the vero2`() = runTest {
         val json = concatMapsAsString(
             JSON_GENERAL_CONFIGURATION,
@@ -576,6 +627,9 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val JSON_FACE_CONFIGURATION = jacksonObjectMapper().readValue<Map<String, String>>(
             "{\"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
         )
+        private val JSON_FACE_CONFIGURATION_WITHOUT_FIELDS = jacksonObjectMapper().readValue<Map<String, String>>(
+            "{\"FaceQualityThreshold\":\"-1\"}"
+        )
         private val JSON_FACE_CONFIGURATION_WITH_UNEXPECTED_FIELD =
             jacksonObjectMapper().readValue<Map<String, String>>(
                 "{\"FaceMatchThreshold\":30, \"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
@@ -584,9 +638,14 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setNbOfImagesToCapture(2)
             .setQualityThreshold(-1)
             .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN)
-            .setDecisionPolicy(
-                ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
-            )
+            .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build())
+            .build()
+
+        private val PROTO_FACE_DEFAULT_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
+            .setNbOfImagesToCapture(2)
+            .setQualityThreshold(-1)
+            .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
+            .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build())
             .build()
 
         private val JSON_VERO_2_CONFIGURATION =
@@ -610,6 +669,10 @@ class ProjectConfigSharedPrefsMigrationTest {
             jacksonObjectMapper().readValue<Map<String, String>>(
                 "{\"FingerComparisonStrategyForVerification\":\"SAME_FINGER\",\"FingerImagesExist\":\"true\",\"FingerStatus\":\"{\\\"RIGHT_5TH_FINGER\\\":\\\"false\\\",\\\"RIGHT_4TH_FINGER\\\":\\\"false\\\",\\\"RIGHT_3RD_FINGER\\\":\\\"false\\\",\\\"RIGHT_INDEX_FINGER\\\":\\\"false\\\",\\\"RIGHT_THUMB\\\":\\\"false\\\",\\\"LEFT_THUMB\\\":\\\"true\\\",\\\"LEFT_INDEX_FINGER\\\":\\\"true\\\",\\\"LEFT_3RD_FINGER\\\":\\\"false\\\",\\\"LEFT_4TH_FINGER\\\":\\\"false\\\",\\\"LEFT_5TH_FINGER\\\":\\\"false\\\"}\",\"FingerprintConfidenceThresholds\":\"{\\\"LOW\\\":\\\"10\\\",\\\"MEDIUM\\\":\\\"40\\\",\\\"HIGH\\\":\\\"200\\\"}\",\"FingerprintQualityThreshold\":\"60\",\"FingerprintsToCollect\":\"LEFT_INDEX_FINGER,LEFT_INDEX_FINGER,LEFT_THUMB\",\"ScannerGenerations\":\"VERO_1,VERO_2\"}"
             )
+        private val JSON_FINGERPRINT_CONFIGURATION_WITHOUT_FIELDS =
+            jacksonObjectMapper().readValue<Map<String, String>>(
+                "{\"FingerprintQualityThreshold\":\"60\"}"
+            )
         private val PROTO_FINGERPRINT_CONFIGURATION = ProtoFingerprintConfiguration.newBuilder()
             .addAllFingersToCapture(
                 listOf(
@@ -630,6 +693,15 @@ class ProjectConfigSharedPrefsMigrationTest {
             )
             .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
             .setDisplayHandIcons(true)
+            .build()
+
+        private val PROTO_FINGERPRINT_DEFAULT_CONFIGURATION = ProtoFingerprintConfiguration.newBuilder()
+            .addAllFingersToCapture(listOf(ProtoFinger.LEFT_THUMB, ProtoFinger.LEFT_INDEX_FINGER))
+            .setQualityThreshold(60)
+            .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(700).build())
+            .addAllAllowedVeroGenerations(listOf(ProtoFingerprintConfiguration.VeroGeneration.VERO_1))
+            .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
+            .setDisplayHandIcons(false)
             .build()
     }
 }
