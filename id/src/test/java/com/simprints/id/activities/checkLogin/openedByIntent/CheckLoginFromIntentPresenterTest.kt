@@ -1,98 +1,131 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.events.sampledata.createSessionCaptureEvent
+import com.simprints.infra.login.LoginManager
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+
+
 class CheckLoginFromIntentPresenterTest {
 
     //TODO: We will re-enable and fix these tests when it's a VM that doesn't need field injection.
 
-//    @get:Rule
-//    val testCoroutineRule = TestCoroutineRule()
-//
-//    private lateinit var presenter: CheckLoginFromIntentPresenter
-//
-//    @MockK
-//    lateinit var view: CheckLoginFromIntentContract.View
-//
-//    @MockK
-//    lateinit var enrolmentRecordManager: EnrolmentRecordManager
-//
-//    @MockK
-//    lateinit var configManager: ConfigManager
-//
-//    @MockK
-//    lateinit var eventRepositoryMock: EventRepository
-//
-//    @MockK
-//    lateinit var simNetworkUtilsMock: SimNetworkUtils
-//
-//    @MockK
-//    lateinit var recentUserActivityManager: RecentUserActivityManager
-//
-//    private val generalConfiguration = mockk<GeneralConfiguration>()
-//    private val loginManagerMock = mockk<LoginManager>(relaxed = true)
-//
-//    @Before
-//    fun setUp() {
-//        MockKAnnotations.init(this, relaxed = true)
-//
-//        coEvery { enrolmentRecordManager.count(any()) } returns 0
-//        every { simNetworkUtilsMock.connectionsStates } returns emptyList()
-//        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-//        coEvery { configManager.getProjectConfiguration() } returns mockk(relaxed = true) {
-//            every { general } returns generalConfiguration
-//        }
-//        coEvery { configManager.getDeviceConfiguration() } returns mockk(relaxed = true)
-//        coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-//        coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
-//
-//        presenter = CheckLoginFromIntentPresenter(
-//            view,
-//            DEFAULT_DEVICE_ID,
-//            recentUserActivityManager,
-//            eventRepositoryMock,
-//            enrolmentRecordManager,
-//            simNetworkUtilsMock,
-//            testCoroutineRule.testCoroutineDispatcher
-//        ).apply {
-//            appRequest = AppVerifyRequest(
-//                DEFAULT_PROJECT_ID,
-//                DEFAULT_USER_ID,
-//                DEFAULT_MODULE_ID,
-//                DEFAULT_METADATA,
-//                GUID1
-//            )
-//        }
-//    }
-//
-//    @Test
-//    fun presenter_setupIsCalled_shouldParseAppRequest() {
-//        runTest(UnconfinedTestDispatcher()) {
-//
-//            presenter.setup()
-//
-//            coVerify(exactly = 1) { view.parseRequest() }
-//        }
-//    }
-//
-//    @Test
-//    fun presenter_setupIsCalled_shouldSetLastUserId() {
-//        runTest(UnconfinedTestDispatcher()) {
-//            val appRequest = AppEnrolRequest(
-//                DEFAULT_PROJECT_ID,
-//                DEFAULT_USER_ID,
-//                DEFAULT_MODULE_ID,
-//                DEFAULT_METADATA
-//            )
-//            val updateConfigFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
-//            coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateConfigFn)) } returns mockk()
-//            every { view.parseRequest() } returns appRequest
-//
-//            presenter.setup()
-//
-//            val updatedActivity =
-//                updateConfigFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
-//            assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID)
-//        }
-//    }
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private val loginManagerMock = mockk<LoginManager>(relaxed = true)
+    private var configManager: ConfigManager = mockk()
+
+
+    private val dispatcher = testCoroutineRule.testCoroutineDispatcher
+
+    private lateinit var presenter: CheckLoginFromIntentPresenter
+
+    @MockK
+    lateinit var view: CheckLoginFromIntentContract.View
+
+    @MockK
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+
+    @MockK
+    lateinit var eventRepositoryMock: EventRepository
+
+    @MockK
+    lateinit var simNetworkUtilsMock: SimNetworkUtils
+
+    @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    private val generalConfiguration = mockk<GeneralConfiguration>()
+
+    @Before
+    fun setUp() {
+
+        MockKAnnotations.init(this, relaxed = true)
+        coEvery { enrolmentRecordManager.count(any()) } returns 0
+        every { simNetworkUtilsMock.connectionsStates } returns emptyList()
+        every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        coEvery { configManager.getProjectConfiguration() } returns mockk(relaxed = true) {
+            every { general } returns generalConfiguration
+        }
+        coEvery { configManager.getDeviceConfiguration() } returns mockk(relaxed = true)
+        coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
+        coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
+
+        presenter = CheckLoginFromIntentPresenter(
+            view,
+            DEFAULT_DEVICE_ID,
+            recentUserActivityManager,
+            eventRepositoryMock,
+            enrolmentRecordManager,
+            simNetworkUtilsMock,
+            CoroutineScope(dispatcher),
+            dispatcher,
+        ).apply {
+            appRequest = AppVerifyRequest(
+                DEFAULT_PROJECT_ID,
+                DEFAULT_USER_ID,
+                DEFAULT_MODULE_ID,
+                DEFAULT_METADATA,
+                GUID1
+            )
+        }
+    }
+
+    @Test
+    fun presenter_onViewCreatedIsCalled_shouldParseAppRequest() {
+        runTest(UnconfinedTestDispatcher()) {
+
+            presenter.onViewCreated(true)
+
+            coVerify(exactly = 1) { view.parseRequest() }
+        }
+    }
+
+    @Test
+    fun presenter_onViewCreatedIsCalled_shouldSetLastUserId() {
+        runTest(UnconfinedTestDispatcher()) {
+            val appRequest = AppEnrolRequest(
+                DEFAULT_PROJECT_ID,
+                DEFAULT_USER_ID,
+                DEFAULT_MODULE_ID,
+                DEFAULT_METADATA
+            )
+            val updateConfigFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
+            coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateConfigFn)) } returns mockk()
+            every { view.parseRequest() } returns appRequest
+
+            presenter.onViewCreated(false)
+
+            val updatedActivity =
+                updateConfigFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
+            assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID)
+        }
+    }
 //
 //    @Test
 //    fun presenter_setup_shouldAddEnrolmentCallout() {

@@ -20,6 +20,7 @@ import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Captu
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageData
 import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.TemplateData
 import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
+import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.fingerprintscanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.testtools.common.syntax.assertThrows
@@ -30,9 +31,8 @@ import io.reactivex.Maybe
 import io.reactivex.Single
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -412,6 +412,12 @@ class ScannerWrapperV2Test {
     @Test(expected = ScannerDisconnectedException::class)
     fun `should throw ScannerDisconnectedException if getUn20Status throws IO`() = runTest {
         every { scannerV2.getUn20Status() } throws IOException("")
+        scannerWrapper.sensorWakeUp()
+    }
+
+    @Test(expected = ScannerDisconnectedException::class)
+    fun `should throw ScannerDisconnectedException if getUn20Status throws NotConnectedException`() = runTest {
+        every { scannerV2.getUn20Status() } throws NotConnectedException("")
         scannerWrapper.sensorWakeUp()
     }
 
