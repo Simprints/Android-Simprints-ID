@@ -14,13 +14,12 @@ import com.simprints.core.tools.delegates.lazyVar
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.events.event.domain.EventCount
-import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncCountTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -34,9 +33,8 @@ import kotlinx.coroutines.withContext
 internal class EventDownSyncCountWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val eventDownSyncHelper: EventDownSyncHelper,
     private val jsonHelper: JsonHelper,
-    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+    private val eventDownSyncCountTask: EventDownSyncCountTask,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params) {
 
@@ -55,26 +53,15 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)
             ?: throw IllegalArgumentException("input required")
         Simber.d("Received $jsonInput")
-        jsonHelper.fromJson<EventDownSyncScope>(
-            jsonInput
-        )
+        jsonHelper.fromJson<EventDownSyncScope>(jsonInput)
     }
 
-    override suspend fun doWork(): Result =
-        withContext(dispatcher) {
-            Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
-            try {
-                crashlyticsLog("Start - Params: $downSyncScope")
-                execute(downSyncScope)
-            } catch (t: Throwable) {
-                fail(t)
-            }
-        }
+    override suspend fun doWork(): Result = withContext(dispatcher) {
+        Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
+        try {
+            crashlyticsLog("Start - Params: $downSyncScope")
 
-    private suspend fun execute(downSyncScope: EventDownSyncScope): Result {
-        return try {
-
-            val downCount = getDownCount(downSyncScope)
+            val downCount = eventDownSyncCountTask.getCount(downSyncScope)
             val output = jsonHelper.toJson(downCount)
 
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Done $downCount")
@@ -87,24 +74,20 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
                 t is SyncCloudIntegrationException -> {
                     fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
                 }
-                t is BackendMaintenanceException -> {
-                    fail(
-                        t, t.message, workDataOf(
+                t is BackendMaintenanceException -> fail(
+                    t, t.message,
+                    workDataOf(
                         OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
                         OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
                     )
-                    )
-                }
-                isSyncStillRunning() -> {
-                    retry(t)
-                }
+                )
+                isSyncStillRunning() -> retry(t)
                 else -> {
                     Simber.d(t)
                     t.printStackTrace()
                     success(message = "Succeed because count is not required any more.")
                 }
             }
-
         }
     }
 
@@ -121,13 +104,6 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
             }
         } ?: false
     }
-
-    private suspend fun getDownCount(downSyncScope: EventDownSyncScope) =
-        downSyncScope.operations.map {
-            val opWithLastState = eventDownSyncScopeRepository.refreshState(it)
-            eventDownSyncHelper.countForDownSync(opWithLastState)
-        }.flatten()
-
 }
 
 internal fun WorkInfo.getDownCountsFromOutput(): List<EventCount>? {

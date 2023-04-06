@@ -26,15 +26,16 @@ internal abstract class EventUpSyncScope(var operation: EventUpSyncOperation) {
     data class ProjectScope(val projectId: String) :
         EventUpSyncScope(EventUpSyncOperation(LocalEventQuery(projectId = projectId))) {
     }
-}
 
-internal fun EventUpSyncScope.toNewScope(): NewEventUpSyncScope {
-    val newScope =  NewEventUpSyncScope.ProjectScope(
-        operation.queryEvent.projectId ?: ""
-    )
 
-    newScope.operation.lastState = this.operation.lastState
-    newScope.operation.lastSyncTime = this.operation.lastSyncTime
+    internal fun toNewScope(): NewEventUpSyncScope {
+        val newScope = NewEventUpSyncScope.ProjectScope(
+            operation.queryEvent.projectId ?: ""
+        )
 
-    return newScope
+        newScope.operation.lastState = this.operation.lastState
+        newScope.operation.lastSyncTime = this.operation.lastSyncTime
+
+        return newScope
+    }
 }

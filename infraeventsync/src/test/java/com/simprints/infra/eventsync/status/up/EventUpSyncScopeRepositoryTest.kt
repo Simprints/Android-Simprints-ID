@@ -21,7 +21,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-internal class EventUpSyncScopeRepositoryImplTest {
+internal class EventUpSyncScopeRepositoryTest {
 
     @MockK
     lateinit var loginManager: LoginManager

@@ -24,10 +24,9 @@ class FetchGuidHelperImpl @Inject constructor(
             Simber.d("[FETCH_GUID] Guid found in Local")
             subjectResultFromDB
         } else {
-            eventSyncManager.downSync(
+            eventSyncManager.downSyncSubject(
                 projectId = projectId,
                 subjectId = subjectId,
-                modes = configManager.getProjectConfiguration().general.modalities.map { it.toMode() },
             )
 
             Simber.d("[FETCH_GUID] Network request done")

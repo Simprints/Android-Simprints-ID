@@ -19,7 +19,6 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.*
-import com.simprints.infra.eventsync.status.down.domain.getUniqueKey
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.down.local.DbEventsDownSyncOperationState
 import com.simprints.infra.login.LoginManager
@@ -37,7 +36,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-internal class EventDownSyncScopeRepositoryImplTest {
+internal class EventDownSyncScopeRepositoryTest {
 
     companion object {
         private val LAST_EVENT_ID = GUID1
