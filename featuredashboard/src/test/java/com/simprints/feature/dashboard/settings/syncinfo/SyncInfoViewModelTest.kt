@@ -181,11 +181,7 @@ class SyncInfoViewModelTest {
             every { selectedModules } returns listOf(module1)
         }
         coEvery {
-            eventSyncManager.getDownSyncCounts(
-                modes = listOf(),
-                modules = any(),
-                group = any()
-            )
+            eventSyncManager.countEventsToDownload()
         } returns DownSyncCounts(creationForModules, deletionForModules)
 
         viewModel.refreshInformation()

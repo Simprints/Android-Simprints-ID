@@ -1,4 +1,4 @@
-package com.simprints.infra.eventsync.sync.up
+package com.simprints.infra.eventsync.sync.up.tasks
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.google.common.truth.Truth.assertThat
@@ -32,11 +32,11 @@ import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 
-internal class EventUpSyncHelperTest {
+internal class EventUpSyncTaskTest {
 
     private val operation = SampleSyncScopes.projectUpSyncScope.operation
 
-    private lateinit var eventUpSyncHelper: EventUpSyncHelper
+    private lateinit var eventUpSyncTask: EventUpSyncTask
 
     @MockK
     private lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
@@ -72,7 +72,7 @@ internal class EventUpSyncHelperTest {
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
-        eventUpSyncHelper = EventUpSyncHelper(
+        eventUpSyncTask = EventUpSyncTask(
             loginManager,
             eventUpSyncScopeRepository,
             eventRepo,
@@ -83,13 +83,6 @@ internal class EventUpSyncHelperTest {
     }
 
     @Test
-    fun `countForUpSync should invoke event repo`() = runTest {
-        eventUpSyncHelper.countForUpSync(operation)
-
-        coVerify { eventRepo.observeEventCount(operation.projectId, null) }
-    }
-
-    @Test
     fun `upload fetches events for all provided closed sessions`() = runTest {
         setUpSyncKind(UpSynchronizationConfiguration.UpSynchronizationKind.NONE)
 
@@ -97,7 +90,7 @@ internal class EventUpSyncHelperTest {
         coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(createSessionCaptureEvent(GUID1))
         coEvery { eventRepo.getEventsFromSession(GUID2) } returns listOf(createSessionCaptureEvent(GUID2))
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify(exactly = 2) { eventRepo.getEventsFromSession(any()) }
     }
@@ -112,7 +105,7 @@ internal class EventUpSyncHelperTest {
             createEnrolmentEventV2(),
         )
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify {
             eventRemoteDataSource.post(
@@ -138,7 +131,7 @@ internal class EventUpSyncHelperTest {
             createFaceCaptureBiometricsEvent(),
         )
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify {
             eventRemoteDataSource.post(
@@ -163,7 +156,7 @@ internal class EventUpSyncHelperTest {
             createAlertScreenEvent(),
         )
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify {
             eventRemoteDataSource.post(
@@ -177,7 +170,7 @@ internal class EventUpSyncHelperTest {
     @Test
     fun `should not upload sessions for not signed project`() = runTest {
         shouldThrow<TryToUploadEventsForNotSignedProject> {
-            eventUpSyncHelper.upSync(EventUpSyncOperation(randomUUID())).toList()
+            eventUpSyncTask.upSync(EventUpSyncOperation(randomUUID())).toList()
         }
     }
 
@@ -189,7 +182,7 @@ internal class EventUpSyncHelperTest {
         coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(createSessionCaptureEvent(GUID1))
         coEvery { eventRepo.getEventsFromSession(GUID2) } returns listOf(createSessionCaptureEvent(GUID2))
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify {
             eventRepo.delete(eq(listOf(GUID1)))
@@ -210,7 +203,7 @@ internal class EventUpSyncHelperTest {
             createAlertScreenEvent(),
         )
 
-        val progress = eventUpSyncHelper.upSync(operation).toList()
+        val progress = eventUpSyncTask.upSync(operation).toList()
 
         assertThat(progress[0].progress).isEqualTo(1)
         assertThat(progress[0].operation.lastState).isEqualTo(UpSyncState.RUNNING)
@@ -228,7 +221,7 @@ internal class EventUpSyncHelperTest {
 
         coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("")
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify(exactly = 0) { eventRepo.delete(any()) }
     }
@@ -244,7 +237,7 @@ internal class EventUpSyncHelperTest {
             cause = Exception()
         )
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify(exactly = 0) { eventRepo.delete(any()) }
     }
@@ -256,7 +249,7 @@ internal class EventUpSyncHelperTest {
         coEvery { eventRepo.getAllClosedSessionIds(any()) } returns listOf(GUID1)
         coEvery { eventRepo.getEventsFromSession(GUID1) } throws IllegalStateException()
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
@@ -273,7 +266,7 @@ internal class EventUpSyncHelperTest {
         coEvery { eventRepo.getEventsFromSession(GUID1) } throws JsonParseException(mockk(relaxed = true), "")
         coEvery { eventRepo.getEventsJsonFromSession(GUID1) } returns listOf("{}")
 
-        val progress = eventUpSyncHelper.upSync(operation).toList()
+        val progress = eventUpSyncTask.upSync(operation).toList()
 
         coVerify(exactly = 0) { eventRemoteDataSource.post(any(), any()) }
 
@@ -296,7 +289,7 @@ internal class EventUpSyncHelperTest {
             Response.error<String>(503, "".toResponseBody(null))
         )
 
-        eventUpSyncHelper.upSync(operation).toList()
+        eventUpSyncTask.upSync(operation).toList()
 
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
@@ -313,7 +306,7 @@ internal class EventUpSyncHelperTest {
     fun `upSync should emit a failure if upload fails`() = runTest {
         coEvery { eventRepo.getAllClosedSessionIds(any()) } throws IllegalStateException()
 
-        val progress = eventUpSyncHelper.upSync(operation).toList()
+        val progress = eventUpSyncTask.upSync(operation).toList()
         assertThat(progress.first().operation.lastState).isEqualTo(UpSyncState.FAILED)
         coVerify(exactly = 1) { eventUpSyncScopeRepository.insertOrUpdate(any()) }
     }

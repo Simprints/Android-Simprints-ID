@@ -51,10 +51,7 @@ class ModuleRepositoryImpl @Inject constructor(
 
         // Delete operations for unselected modules to ensure full sync if they are reselected
         // in the future
-        eventSyncManager.deleteModules(
-            unselectedModules.map { it.name },
-            configManager.getProjectConfiguration().general.modalities.map { it.toMode() }
-        )
+        eventSyncManager.deleteModules(unselectedModules.map { it.name })
     }
 
     private fun setCrashlyticsKeyForModules(modules: List<String>) {

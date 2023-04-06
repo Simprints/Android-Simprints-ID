@@ -14,8 +14,7 @@ import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.eventsync.exceptions.MalformedSyncOperationException
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.up.EventUpSyncHelper
-import com.simprints.infra.eventsync.sync.up.old.toNewScope
+import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.infra.logging.Simber
@@ -32,7 +31,7 @@ import com.simprints.infra.eventsync.sync.up.old.EventUpSyncScope as OldEventUpS
 internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val upSyncHelper: EventUpSyncHelper,
+    private val upSyncTask: EventUpSyncTask,
     private val eventSyncCache: EventSyncCache,
     private val loginManager: LoginManager,
     private val jsonHelper: JsonHelper,
@@ -65,7 +64,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             var count = eventSyncCache.readProgress(workerId)
 
             crashlyticsLog("Start")
-            upSyncHelper.upSync(upSyncScope.operation).collect {
+            upSyncTask.upSync(upSyncScope.operation).collect {
                 count += it.progress
                 eventSyncCache.saveProgress(workerId, count)
                 Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
