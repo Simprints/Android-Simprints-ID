@@ -180,14 +180,7 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private suspend fun fetchAndUpdateRecordsToDownSyncAndDeleteCount(): DownSyncCounts =
         try {
-            val projectConfig = configManager.getProjectConfiguration()
-            val deviceConfig = configManager.getDeviceConfiguration()
-
-            eventSyncManager.getDownSyncCounts(
-                projectConfig.general.modalities.map { it.toMode() },
-                deviceConfig.selectedModules,
-                projectConfig.synchronization.down.partitionType.toGroup()
-            )
+            eventSyncManager.countEventsToDownload()
         } catch (t: Throwable) {
             Simber.d(t)
             DownSyncCounts(0, 0)

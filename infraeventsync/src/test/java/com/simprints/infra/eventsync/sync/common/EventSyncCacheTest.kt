@@ -2,7 +2,7 @@ package com.simprints.infra.eventsync.sync.common
 
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.eventsync.sync.common.EventSyncCacheImpl.Companion.PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY
+import com.simprints.infra.eventsync.sync.common.EventSyncCache.Companion.PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.every
@@ -13,7 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
-class EventSyncCacheImplTest {
+class EventSyncCacheTest {
 
     companion object {
         private const val WORK_ID = "workID"
@@ -28,7 +28,7 @@ class EventSyncCacheImplTest {
         every { buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_PROGRESSES_SHARED_PREFS) } returns sharedPrefsForProgresses
         every { buildEncryptedSharedPreferences(EventSyncCache.FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS) } returns sharedPrefsForLastSyncTime
     }
-    private val eventSyncCache = EventSyncCacheImpl(securityManager, testCoroutineRule.testCoroutineDispatcher)
+    private val eventSyncCache = EventSyncCache(securityManager, testCoroutineRule.testCoroutineDispatcher)
 
     @Test
     fun `readLastSuccessfulSyncTime should return the date if it's greater than -1`() = runTest {

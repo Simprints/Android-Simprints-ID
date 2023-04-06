@@ -75,7 +75,7 @@ class FetchGuidHelperImplTest {
         fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
         coVerify {
-            eventSyncManager.downSync(DEFAULT_PROJECT_ID, GUID1, any())
+            eventSyncManager.downSyncSubject(DEFAULT_PROJECT_ID, GUID1)
         }
     }
 
@@ -128,7 +128,7 @@ class FetchGuidHelperImplTest {
         coEvery {
             enrolmentRecordManager.load(SubjectQuery(DEFAULT_PROJECT_ID, GUID1))
         } throws Throwable("IO exception")
-        coEvery { eventSyncManager.downSync(any(), any(), any()) } throws IllegalStateException()
+        coEvery { eventSyncManager.downSyncSubject(any(), any()) } throws IllegalStateException()
 
         val result = fetchGuidHelper.loadFromRemoteIfNeeded(DEFAULT_PROJECT_ID, GUID1)
 
