@@ -71,8 +71,6 @@ internal class EventUpSyncHelper @Inject constructor(
             Simber.e(t)
             lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now())
 
-            // Save the last operation and then throw the error to be handled by this flow collectors
-            eventUpSyncScopeRepo.insertOrUpdate(lastOperation)
             emitProgress(lastOperation, count)
         }
     }

@@ -310,7 +310,7 @@ internal class EventUpSyncHelperTest {
     }
 
     @Test
-    fun upSync_shouldEmitAFailureIfUploadFails() = runTest {
+    fun `upSync should emit a failure if upload fails`() = runTest {
         coEvery { eventRepo.getAllClosedSessionIds(any()) } throws IllegalStateException()
 
         val progress = eventUpSyncHelper.upSync(operation).toList()

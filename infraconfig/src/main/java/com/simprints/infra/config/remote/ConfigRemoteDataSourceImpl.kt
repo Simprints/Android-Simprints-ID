@@ -14,12 +14,13 @@ internal class ConfigRemoteDataSourceImpl(
     private val loginManager: LoginManager,
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
     private val urlDownloader: (String) -> String
-) :
-    ConfigRemoteDataSource {
+) : ConfigRemoteDataSource {
 
     @Inject
-    constructor(loginManager: LoginManager, dispatcherIO: CoroutineDispatcher) :
-        this(loginManager, dispatcherIO, { url -> URL(url).readText() })
+    constructor(
+        loginManager: LoginManager,
+        @DispatcherIO dispatcherIO: CoroutineDispatcher
+    ) : this(loginManager, dispatcherIO, { url -> URL(url).readText() })
 
     override suspend fun getConfiguration(projectId: String): ProjectConfiguration =
         getApiClient().executeCall { it.getConfiguration(projectId) }.toDomain()
