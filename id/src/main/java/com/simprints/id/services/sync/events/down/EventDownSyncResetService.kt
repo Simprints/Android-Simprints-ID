@@ -10,8 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.simprints.core.ExternalScope
-import com.simprints.id.services.sync.events.master.EventSyncManager
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,9 +24,6 @@ import javax.inject.Inject
 class EventDownSyncResetService : Service() {
 
     @Inject
-    lateinit var downSyncScopeRepository: EventDownSyncScopeRepository
-
-    @Inject
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
@@ -39,7 +35,7 @@ class EventDownSyncResetService : Service() {
         externalScope.launch {
             startForegroundIfNeeded()
             // Reset current downsync state
-            downSyncScopeRepository.deleteAll()
+            eventSyncManager.resetDownSyncInfo()
             // Trigger a new sync
             eventSyncManager.sync()
             stopSelf()

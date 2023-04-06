@@ -1,11 +1,10 @@
 package com.simprints.id.moduleselection
 
 import com.simprints.id.moduleselection.model.Module
-import com.simprints.id.tools.extensions.toMode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.MODULE_IDS
 import com.simprints.infra.logging.Simber
@@ -14,7 +13,7 @@ import javax.inject.Inject
 class ModuleRepositoryImpl @Inject constructor(
     private val configManager: ConfigManager,
     private val enrolmentRecordManager: EnrolmentRecordManager,
-    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
+    private val eventSyncManager: EventSyncManager,
 ) : ModuleRepository {
 
     override suspend fun getModules(): List<Module> =
@@ -52,7 +51,7 @@ class ModuleRepositoryImpl @Inject constructor(
 
         // Delete operations for unselected modules to ensure full sync if they are reselected
         // in the future
-        eventDownSyncScopeRepository.deleteOperations(
+        eventSyncManager.deleteModules(
             unselectedModules.map { it.name },
             configManager.getProjectConfiguration().general.modalities.map { it.toMode() }
         )

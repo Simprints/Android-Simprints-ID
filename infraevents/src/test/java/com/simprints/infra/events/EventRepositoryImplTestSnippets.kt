@@ -2,8 +2,6 @@ package com.simprints.infra.events
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
@@ -16,16 +14,11 @@ import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
-import com.simprints.infra.events.remote.EventRemoteDataSource
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
-import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
-import com.simprints.testtools.common.syntax.mock
 import io.mockk.coEvery
 import io.mockk.coVerify
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
 
 internal fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): SessionCaptureEvent {
@@ -53,23 +46,6 @@ internal fun EventRepositoryImplTest.mockDbToBeEmpty() {
     } returns flowOf()
 }
 
-internal fun EventRepositoryImplTest.mockDbToLoadSessionWithEvents(
-    sessionId: String,
-    sessionIsClosed: Boolean,
-    nEvents: Int
-): List<Event> {
-    val events = mutableListOf<Event>()
-    events.add(createSessionCaptureEvent(sessionId, isClosed = sessionIsClosed))
-    repeat(nEvents) {
-        events.add(createAlertScreenEvent().copy(labels = EventLabels(sessionId = sessionId)))
-    }
-
-    coEvery {
-        eventLocalDataSource.loadAllFromSession(sessionId = sessionId)
-    } returns events
-
-    return events
-}
 
 fun assertANewSessionCaptureWasAdded(event: Event): Boolean =
     event is SessionCaptureEvent &&
@@ -101,78 +77,6 @@ fun assertThatArtificialTerminationEventWasAdded(event: Event, id: String): Bool
         event.payload.reason == NEW_SESSION &&
         event.payload.createdAt == EventRepositoryImplTest.NOW
 
-internal fun EventRepositoryImplTest.mockDbToLoadTwoClosedSessionsWithEvents(
-    nEventsInTotal: Int,
-    sessionEvent1: String = GUID1,
-    sessionEvent2: String = GUID2
-): List<Event> {
-    val group1 = mockDbToLoadSessionWithEvents(sessionEvent1, true, nEventsInTotal / 2 - 1)
-    val group2 = mockDbToLoadSessionWithEvents(sessionEvent2, true, nEventsInTotal / 2 - 1)
-
-    coEvery {
-        eventLocalDataSource.loadOpenedSessions()
-    } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().asFlow()
-
-    coEvery {
-        eventLocalDataSource.loadAllClosedSessionIds(any())
-    } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().map { it.id }
-
-    return (group1 + group2)
-}
-
-internal fun EventRepositoryImplTest.mockDbToLoadInvalidSessions(
-    nEventsInTotal: Int,
-    sessionEvent1: String = GUID1,
-    sessionEvent2: String = GUID2
-): List<Event> {
-    val group1 = mockDbToLoadSessionWithEvents(sessionEvent1, true, nEventsInTotal / 2 - 1)
-    val group2 = mockDbToLoadSessionWithEvents(sessionEvent2, true, nEventsInTotal / 2 - 1)
-
-    coEvery {
-        eventLocalDataSource.loadOpenedSessions()
-    } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().asFlow()
-
-    coEvery {
-        eventLocalDataSource.loadAllFromSession(GUID2)
-    } throws IllegalArgumentException()
-
-    coEvery {
-        eventLocalDataSource.loadAllClosedSessionIds(any())
-    } returns (group1 + group2).filterIsInstance<SessionCaptureEvent>().map { it.id }
-
-    return (group1 + group2)
-}
-
-internal fun EventRepositoryImplTest.mockDbToLoadTwoSessionsWithInvalidEvent(
-    sessionId1: String = GUID1,
-    sessionId2: String = GUID2,
-): Map<String, List<String>> {
-    val eventsForSession1 = listOf("event1", "event2")
-    val eventsForSession2 = listOf("event3", "event4")
-
-    coEvery {
-        eventLocalDataSource.loadAllClosedSessionIds(any())
-    } returns listOf(GUID1, GUID2)
-
-    coEvery {
-        eventLocalDataSource.loadAllFromSession(sessionId1)
-    } throws JsonParseException(mock(), "")
-
-    coEvery {
-        eventLocalDataSource.loadAllFromSession(sessionId2)
-    } throws JsonMappingException(mock(), "")
-
-    coEvery {
-        eventLocalDataSource.loadAllEventJsonFromSession(sessionId1)
-    } returns eventsForSession1
-
-    coEvery {
-        eventLocalDataSource.loadAllEventJsonFromSession(sessionId2)
-    } returns eventsForSession2
-
-    return mapOf(sessionId1 to eventsForSession1, sessionId2 to eventsForSession2)
-}
-
 internal fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
     val session = createSessionCaptureEvent(id).openSession()
     coEvery { eventLocalDataSource.loadAllFromSession(sessionId = id) } returns listOf(session)
@@ -188,15 +92,6 @@ internal fun EventRepositoryImplTest.verifyArtificialEventWasAdded(
             it.type == ARTIFICIAL_TERMINATION &&
                 it.labels.sessionId == id &&
                 (it as ArtificialTerminationEvent).payload.reason == reason
-        })
-    }
-}
-
-internal fun EventRepositoryImplTest.verifySessionHasNotGotUploaded(id: String, eventRemoteDataSource: EventRemoteDataSource) {
-    coVerify(exactly = 0) { eventLocalDataSource.loadAllFromSession(sessionId = id) }
-    coVerify {
-        eventRemoteDataSource.post(any(), match { event ->
-            event.none { it.id == id }
         })
     }
 }

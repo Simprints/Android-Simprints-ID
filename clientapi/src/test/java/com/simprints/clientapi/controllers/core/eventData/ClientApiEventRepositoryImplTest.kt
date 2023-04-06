@@ -130,7 +130,7 @@ class ClientApiEventRepositoryImplTest {
             every { coSyncConfiguration.kind } returns ALL
             coEvery { clientSessionEventsMgr.getCurrentSessionId() } returns "sessionId"
 
-            coEvery { coreEventEventsMgrMock.getEventsFromSession("sessionId") } returns allEventsFlow
+            coEvery { coreEventEventsMgrMock.observeEventsFromSession("sessionId") } returns allEventsFlow
 
             val events = clientSessionEventsMgr.getAllEventsForSession("sessionId").toList()
             assertThat(events.size).isEqualTo(6)
@@ -142,7 +142,7 @@ class ClientApiEventRepositoryImplTest {
             every { coSyncConfiguration.kind } returns ONLY_BIOMETRICS
             coEvery { clientSessionEventsMgr.getCurrentSessionId() } returns "sessionId"
 
-            coEvery { coreEventEventsMgrMock.getEventsFromSession("sessionId") } returns allEventsFlow
+            coEvery { coreEventEventsMgrMock.observeEventsFromSession("sessionId") } returns allEventsFlow
 
             val events = clientSessionEventsMgr.getAllEventsForSession("sessionId").toList()
             assertThat(events.size).isEqualTo(4)
@@ -155,7 +155,7 @@ class ClientApiEventRepositoryImplTest {
             every { coSyncConfiguration.kind } returns ONLY_ANALYTICS
             coEvery { clientSessionEventsMgr.getCurrentSessionId() } returns "sessionId"
 
-            coEvery { coreEventEventsMgrMock.getEventsFromSession("sessionId") } returns allEventsFlow
+            coEvery { coreEventEventsMgrMock.observeEventsFromSession("sessionId") } returns allEventsFlow
 
             val events = clientSessionEventsMgr.getAllEventsForSession("sessionId").toList()
             assertThat(events.size).isEqualTo(4)
@@ -168,7 +168,7 @@ class ClientApiEventRepositoryImplTest {
             every { coSyncConfiguration.kind } returns NONE
             coEvery { clientSessionEventsMgr.getCurrentSessionId() } returns "sessionId"
 
-            coEvery { coreEventEventsMgrMock.getEventsFromSession("sessionId") } returns allEventsFlow
+            coEvery { coreEventEventsMgrMock.observeEventsFromSession("sessionId") } returns allEventsFlow
 
             val events = clientSessionEventsMgr.getAllEventsForSession("sessionId").toList()
             assertThat(events).isEmpty()

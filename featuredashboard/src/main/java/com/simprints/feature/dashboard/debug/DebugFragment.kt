@@ -14,12 +14,11 @@ import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
-import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.events_sync.down.local.DbEventDownSyncOperationStateDao
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -48,9 +47,6 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
 
     @Inject
     lateinit var enrolmentRecordManager: EnrolmentRecordManager
-
-    @Inject
-    lateinit var dbEventDownSyncOperationStateDao: DbEventDownSyncOperationStateDao
 
     @Inject
     @DispatcherIO
@@ -129,7 +125,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
                 eventSyncManager.cancelScheduledSync()
                 eventSyncManager.stop()
                 eventRepository.deleteAll()
-                dbEventDownSyncOperationStateDao.deleteAll()
+                eventSyncManager.resetDownSyncInfo()
                 enrolmentRecordManager.deleteAll()
                 wm.pruneWork()
             }

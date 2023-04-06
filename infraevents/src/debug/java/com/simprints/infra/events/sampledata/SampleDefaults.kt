@@ -1,8 +1,6 @@
 package com.simprints.infra.events.sampledata
 
 import com.simprints.core.domain.modality.Modes
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncScope.*
-import com.simprints.infra.events.events_sync.up.domain.EventUpSyncScope.ProjectScope
 import java.util.*
 
 object SampleDefaults {
@@ -24,32 +22,8 @@ object SampleDefaults {
     const val STATIC_GUID = "3f0f8e9a-0a0c-456c-846e-577b1440b6fb"
     val GUID1 = UUID.randomUUID().toString()
     val GUID2 = UUID.randomUUID().toString()
-    val GUID3 = UUID.randomUUID().toString()
 
     val TIME1 = System.currentTimeMillis()
-    val TIME2 = System.currentTimeMillis()
 
     val DEFAULT_MODES = listOf(Modes.FINGERPRINT)
-
-    val projectUpSyncScope = ProjectScope(
-        DEFAULT_PROJECT_ID
-    )
-
-    val projectDownSyncScope = SubjectProjectScope(
-        DEFAULT_PROJECT_ID,
-        DEFAULT_MODES
-    )
-
-    val userDownSyncScope = SubjectUserScope(
-        DEFAULT_PROJECT_ID,
-        DEFAULT_USER_ID,
-        DEFAULT_MODES
-    )
-
-    val modulesDownSyncScope = SubjectModuleScope(
-        DEFAULT_PROJECT_ID,
-        listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-        DEFAULT_MODES
-    )
-
 }

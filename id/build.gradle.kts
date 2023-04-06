@@ -107,6 +107,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":moduleapi"))
     implementation(project(":infraevents"))
+    implementation(project(":infraeventsync"))
     implementation(project(":infralogin"))
     implementation(project(":clientapi"))
     implementation(project(":face"))
@@ -164,6 +165,7 @@ dependencies {
     
     testImplementation(project(":fingerprintscannermock"))
     testImplementation(project(":infraevents"))
+    testImplementation(project(":infraeventsync"))
 
     testImplementation(libs.testing.hilt)
     kaptTest(libs.testing.hilt.kapt)

@@ -3,7 +3,7 @@ package com.simprints.id.secure
 import com.simprints.core.DispatcherIO
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.id.services.sync.events.master.EventSyncManager
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber

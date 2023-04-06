@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.main.sync.DeviceManager
-import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -12,16 +11,12 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
-import com.simprints.infra.events.events_sync.down.domain.EventDownSyncScope
-import com.simprints.infra.events.events_sync.down.domain.RemoteEventQuery
-import com.simprints.infra.events.events_sync.models.EventSyncState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType
+import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.status.models.DownSyncCounts
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -29,6 +24,7 @@ import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,9 +45,6 @@ class SyncInfoViewModelTest {
     private lateinit var configManager: ConfigManager
 
     @MockK
-    private lateinit var eventRepository: EventRepository
-
-    @MockK
     private lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
@@ -59,9 +52,6 @@ class SyncInfoViewModelTest {
 
     @MockK
     private lateinit var deviceManager: DeviceManager
-
-    @MockK
-    private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     @MockK
     private lateinit var imageRepository: ImageRepository
@@ -89,10 +79,8 @@ class SyncInfoViewModelTest {
         viewModel = SyncInfoViewModel(
             configManager,
             deviceManager,
-            eventRepository,
             enrolmentRecordManager,
             loginManager,
-            eventDownSyncScopeRepository,
             imageRepository,
             eventSyncManager,
         )
@@ -121,7 +109,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the recordsToUpSync live data correctly`() {
         val number = 10
-        coEvery { eventRepository.localCount(PROJECT_ID, EventType.ENROLMENT_V2) } returns number
+        coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, EventType.ENROLMENT_V2) } returns flowOf(number)
 
         viewModel.refreshInformation()
 
@@ -187,49 +175,23 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the recordsToDownSync and recordsToDelete live data to the count otherwise`() {
         val module1 = "module1"
-        val module2 = "module2"
-        val creationForModule1 = 10
-        val deletionForModule1 = 5
-        val creationForModule2 = 20
+        val creationForModules = 10
+        val deletionForModules = 5
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(module1, module2)
+            every { selectedModules } returns listOf(module1)
         }
         coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(any(), listOf(module1, module2), any())
-        } returns EventDownSyncScope.SubjectModuleScope(
-            PROJECT_ID,
-            listOf(module1, module2),
-            listOf()
-        )
-
-        coEvery {
-            eventRepository.countEventsToDownload(
-                RemoteEventQuery(
-                    PROJECT_ID,
-                    moduleIds = listOf(module1),
-                    modes = listOf(),
-                )
+            eventSyncManager.getDownSyncCounts(
+                modes = listOf(),
+                modules = any(),
+                group = any()
             )
-        } returns listOf(
-            EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, creationForModule1),
-            EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, deletionForModule1),
-        )
-        coEvery {
-            eventRepository.countEventsToDownload(
-                RemoteEventQuery(
-                    PROJECT_ID,
-                    moduleIds = listOf(module2),
-                    modes = listOf(),
-                )
-            )
-        } returns listOf(
-            EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, creationForModule2),
-        )
+        } returns DownSyncCounts(creationForModules, deletionForModules)
 
         viewModel.refreshInformation()
 
-        assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(creationForModule1 + creationForModule2)
-        assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isEqualTo(deletionForModule1)
+        assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isEqualTo(creationForModules)
+        assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isEqualTo(deletionForModules)
     }
 
     @Test

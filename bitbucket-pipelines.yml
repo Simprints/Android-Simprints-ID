@@ -63,6 +63,7 @@ definitions:
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew infraevents:jacocoTestReport
+                    - ./gradlew infraeventsync:jacocoTestReport
                     - ./gradlew infraconfig:jacocoTestReport
                     - ./gradlew infraenrolmentrecords:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
@@ -77,6 +78,7 @@ definitions:
                 artifacts:
                     - core/build/reports/**
                     - infraevents/build/reports/**
+                    - infraeventsync/build/reports/**
                     - infraconfig/build/reports/**
                     - infraenrolmentrecords/build/reports/**
                     - infralogging/build/reports/**
