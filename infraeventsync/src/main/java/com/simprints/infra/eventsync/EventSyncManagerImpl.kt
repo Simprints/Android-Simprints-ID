@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.common.GROUP
-import com.simprints.core.domain.modality.Modes
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
@@ -13,13 +13,12 @@ import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.RemoteEventQuery
-import com.simprints.infra.eventsync.status.down.domain.fromDomainToApi
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -38,8 +37,9 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventRepository: EventRepository,
     private val upSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventSyncCache: EventSyncCache,
-    private val downSyncHelper: EventDownSyncHelper,
+    private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
+    private val configManager: ConfigManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
 
@@ -54,9 +54,6 @@ internal class EventSyncManagerImpl @Inject constructor(
 
     override fun getLastSyncState(): LiveData<EventSyncState> =
         eventSyncStateProcessor.getLastSyncState()
-
-    override fun hasSyncEverRunBefore(): Boolean =
-        wm.getAllSubjectsSyncWorkersInfo().get().size > 0
 
     override fun sync() {
         Simber.tag(SYNC_LOG_TAG).d("[SCHEDULER] One time events master worker")
@@ -119,12 +116,15 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun countEventsToUpload(projectId: String, type: EventType?): Flow<Int> =
         eventRepository.observeEventCount(projectId, type)
 
-    override suspend fun getDownSyncCounts(
-        modes: List<Modes>,
-        modules: List<String>,
-        group: GROUP,
-    ): DownSyncCounts {
-        val downSyncScope = downSyncScopeRepository.getDownSyncScope(modes, modules, group)
+    override suspend fun countEventsToDownload(): DownSyncCounts {
+        val projectConfig = configManager.getProjectConfiguration()
+        val deviceConfig = configManager.getDeviceConfiguration()
+
+        val downSyncScope = downSyncScopeRepository.getDownSyncScope(
+            getProjectModes(projectConfig),
+            deviceConfig.selectedModules,
+            projectConfig.synchronization.down.partitionType.toGroup()
+        )
 
         var creationsToDownload = 0
         var deletionsToDownload = 0
@@ -143,21 +143,26 @@ internal class EventSyncManagerImpl @Inject constructor(
         return DownSyncCounts(creationsToDownload, deletionsToDownload)
     }
 
-    override suspend fun downSync(
+    override suspend fun downSyncSubject(
         projectId: String,
         subjectId: String,
-        modes: List<Modes>,
     ): Unit = withContext(dispatcher) {
         val op = EventDownSyncOperation(RemoteEventQuery(
             projectId = projectId,
             subjectId = subjectId,
-            modes = modes,
+            modes = getProjectModes(configManager.getProjectConfiguration()),
         ))
-        downSyncHelper.downSync(this, op).toList()
+        downSyncTask.downSync(this, op).toList()
     }
 
-    override suspend fun deleteModules(unselectedModules: List<String>, modes: List<Modes>) {
-        downSyncScopeRepository.deleteOperations(unselectedModules, modes)
+    private fun getProjectModes(projectConfiguration: ProjectConfiguration) =
+        projectConfiguration.general.modalities.map { it.toMode() }
+
+    override suspend fun deleteModules(unselectedModules: List<String>) {
+        downSyncScopeRepository.deleteOperations(
+            unselectedModules,
+            modes = getProjectModes(configManager.getProjectConfiguration()),
+        )
     }
 
     override suspend fun deleteSyncInfo() {

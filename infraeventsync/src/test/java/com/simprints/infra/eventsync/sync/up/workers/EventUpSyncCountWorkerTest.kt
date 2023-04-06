@@ -8,16 +8,17 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.SampleSyncScopes.projectUpSyncScope
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
-import com.simprints.infra.eventsync.sync.up.EventUpSyncHelper
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncCountWorker.Companion.INPUT_COUNT_WORKER_UP
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -35,7 +36,7 @@ internal class EventUpSyncCountWorkerTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var eventUpSyncHelper: EventUpSyncHelper
+    lateinit var eventRepository: EventRepository
 
     lateinit var countWorker: EventUpSyncCountWorker
 
@@ -51,7 +52,7 @@ internal class EventUpSyncCountWorkerTest {
                 )
                 every { tags } returns setOf(tagForMasterSyncId)
             },
-            eventUpSyncHelper,
+            eventRepository,
             JsonHelper,
             testCoroutineRule.testCoroutineDispatcher
         )
@@ -61,12 +62,12 @@ internal class EventUpSyncCountWorkerTest {
     fun countWorker_shouldExtractTheUpSyncScopeFromTheRepo() = runTest {
         countWorker.doWork()
 
-        coVerify { eventUpSyncHelper.countForUpSync(any()) }
+        coVerify { eventRepository.observeEventCount(any(), any()) }
     }
 
     @Test
     fun countWorker_shouldExecuteTheTaskSuccessfully() = runTest {
-        coEvery { eventUpSyncHelper.countForUpSync(any()) } returns 1
+        coEvery { eventRepository.observeEventCount(any(), any()) } returns flowOf(1)
 
         val result = countWorker.doWork()
 
@@ -76,7 +77,7 @@ internal class EventUpSyncCountWorkerTest {
 
     @Test
     fun countWorkerFailed_shouldFail() = runTest {
-        coEvery { eventUpSyncHelper.countForUpSync(any()) } throws Throwable("IO Error")
+        coEvery { eventRepository.observeEventCount(any(), any()) } throws Throwable("IO Error")
         mockWorkManagerToReturnDownloaderWorkInfo(WorkInfo.State.RUNNING)
 
         val result = countWorker.doWork()

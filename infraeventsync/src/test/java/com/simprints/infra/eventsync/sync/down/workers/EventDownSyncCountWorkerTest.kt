@@ -11,11 +11,10 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
-import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
-import com.simprints.infra.eventsync.sync.down.EventDownSyncHelper
+import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncCountTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -38,10 +37,8 @@ internal class EventDownSyncCountWorkerTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var eventDownSyncHelper: EventDownSyncHelper
+    lateinit var eventDownSyncCountTask: EventDownSyncCountTask
 
-    @MockK
-    lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
 
     private lateinit var countWorker: EventDownSyncCountWorker
 
@@ -59,9 +56,8 @@ internal class EventDownSyncCountWorkerTest {
                 )
                 every { tags } returns setOf(tagForMasterSyncId)
             },
-            eventDownSyncHelper,
             JsonHelper,
-            eventDownSyncScopeRepository,
+            eventDownSyncCountTask,
             testCoroutineRule.testCoroutineDispatcher
         )
     }
@@ -71,7 +67,7 @@ internal class EventDownSyncCountWorkerTest {
         runTest {
             countWorker.doWork()
 
-            coVerify { eventDownSyncScopeRepository.refreshState(any()) }
+            coVerify { eventDownSyncCountTask.getCount(any()) }
         }
     }
 
@@ -79,7 +75,7 @@ internal class EventDownSyncCountWorkerTest {
     fun countWorker_shouldExecuteTheTaskSuccessfully() {
         runTest {
             val counts = EventCount(EnrolmentRecordEventType.EnrolmentRecordMove, 1)
-            mockDependenciesToSucceed(counts)
+            coEvery { eventDownSyncCountTask.getCount(any()) }  returns listOf(counts)
 
             val result = countWorker.doWork()
 
@@ -92,14 +88,7 @@ internal class EventDownSyncCountWorkerTest {
     @Test
     fun countWorkerFailed_syncStillRunning_shouldRetry() {
         runTest {
-            coEvery { eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
-            coEvery {
-                eventDownSyncScopeRepository.getDownSyncScope(
-                    any(),
-                    any(),
-                    any()
-                )
-            } returns projectDownSyncScope
+            coEvery { eventDownSyncCountTask.getCount(any()) } throws Throwable("IO Error")
             mockDependenciesToHaveSyncStillRunning()
 
             val result = countWorker.doWork()
@@ -111,31 +100,13 @@ internal class EventDownSyncCountWorkerTest {
     @Test
     fun countWorkerFailed_syncIsNotRunning_shouldSucceed() {
         runTest {
-            coEvery { eventDownSyncHelper.countForDownSync(any()) } throws Throwable("IO Error")
-            coEvery {
-                eventDownSyncScopeRepository.getDownSyncScope(
-                    any(),
-                    any(),
-                    any()
-                )
-            } returns projectDownSyncScope
+            coEvery { eventDownSyncCountTask.getCount(any()) } throws Throwable("IO Error")
             mockDependenciesToHaveSyncNotRunning()
 
             val result = countWorker.doWork()
 
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
-    }
-
-    private fun mockDependenciesToSucceed(counts: EventCount) {
-        coEvery { eventDownSyncHelper.countForDownSync(any()) } returns listOf(counts)
-        coEvery {
-            eventDownSyncScopeRepository.getDownSyncScope(
-                any(),
-                any(),
-                any()
-            )
-        } returns projectDownSyncScope
     }
 
     private fun mockDependenciesToHaveSyncStillRunning() {

@@ -16,7 +16,7 @@ import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
 import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
-import com.simprints.infra.eventsync.sync.up.EventUpSyncHelper
+import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import com.simprints.infra.login.LoginManager
@@ -51,14 +51,14 @@ class EventUpSyncUploaderWorkerTest {
     private val loginManager = mockk<LoginManager> {
         every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
     }
-    private val upSyncHelper = mockk<EventUpSyncHelper>()
+    private val upSyncTask = mockk<EventUpSyncTask>()
 
     @Test
     fun worker_shouldExecuteTheTask() = runTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any())
+            upSyncTask.upSync(any())
         } returns flowOf(
             EventUpSyncProgress(
                 EventUpSyncOperation(
@@ -85,7 +85,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any())
+            upSyncTask.upSync(any())
         } throws BackendMaintenanceException(estimatedOutage = null)
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -105,7 +105,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any())
+            upSyncTask.upSync(any())
         } throws BackendMaintenanceException(estimatedOutage = 600)
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -126,7 +126,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any())
+            upSyncTask.upSync(any())
         } throws SyncCloudIntegrationException("Cloud integration", Throwable())
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -146,7 +146,7 @@ class EventUpSyncUploaderWorkerTest {
         val eventUpSyncUploaderWorker = init(projectScope)
 
         coEvery {
-            upSyncHelper.upSync(any())
+            upSyncTask.upSync(any())
         } throws Throwable()
 
         val result = eventUpSyncUploaderWorker.doWork()
@@ -220,7 +220,7 @@ class EventUpSyncUploaderWorkerTest {
 
         val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
 
-        coVerify(exactly = 1) { upSyncHelper.upSync(expectedScope.operation) }
+        coVerify(exactly = 1) { upSyncTask.upSync(expectedScope.operation) }
     }
 
     @Test
@@ -236,7 +236,7 @@ class EventUpSyncUploaderWorkerTest {
 
         val expectedScope = EventUpSyncScope.ProjectScope(PROJECT_ID)
 
-        coVerify(exactly = 1) { upSyncHelper.upSync(expectedScope.operation) }
+        coVerify(exactly = 1) { upSyncTask.upSync(expectedScope.operation) }
     }
 
     @Test
@@ -256,7 +256,7 @@ class EventUpSyncUploaderWorkerTest {
             workDataOf(INPUT_UP_SYNC to scope)
         ).setWorkerFactory(
             TestWorkerFactory(
-                upSyncHelper,
+                upSyncTask,
                 mockk(relaxed = true),
                 loginManager,
                 testCoroutineRule.testCoroutineDispatcher
@@ -265,7 +265,7 @@ class EventUpSyncUploaderWorkerTest {
 }
 
 private class TestWorkerFactory(
-    private val upSyncHelper: EventUpSyncHelper,
+    private val upSyncTask: EventUpSyncTask,
     private val eventSyncCache: EventSyncCache,
     private val loginManager: LoginManager,
     private val dispatcher: CoroutineDispatcher,
@@ -277,7 +277,7 @@ private class TestWorkerFactory(
     ): ListenableWorker = EventUpSyncUploaderWorker(
         appContext,
         workerParameters,
-        upSyncHelper,
+        upSyncTask,
         eventSyncCache,
         loginManager,
         JsonHelper,
