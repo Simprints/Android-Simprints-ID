@@ -22,7 +22,6 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -74,7 +73,7 @@ class CheckLoginFromIntentPresenterTest {
         }
         coEvery { configManager.getDeviceConfiguration() } returns mockk(relaxed = true)
         coEvery { eventRepositoryMock.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-        coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyFlow()
+        coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyList()
 
         presenter = CheckLoginFromIntentPresenter(
             view,
@@ -165,7 +164,7 @@ class CheckLoginFromIntentPresenterTest {
 //    @Test
 //    fun presenter_setup_shouldAddConfirmIdentityCallout() {
 //        runTest(UnconfinedTestDispatcher()) {
-//            val appRequest =
+//            val appRequest =Ō
 //                AppConfirmIdentityRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, GUID1, GUID2)
 //            every { view.parseRequest() } returns appRequest
 //
