@@ -19,6 +19,8 @@ import com.simprints.feature.alert.R
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.databinding.FragmentAlertBinding
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ALERT
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -33,6 +35,7 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         super.onViewCreated(view, savedInstanceState)
 
         val config = args.alertConfiguration
+        Simber.tag(ALERT.name).i("Payload:  ${config.color.name} - ${getPayloadContent(config.payload)}")
 
         binding.root.setBackgroundColor(ResourcesCompat.getColor(
             resources,
@@ -59,16 +62,26 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            Simber.tag(ALERT.name).i("Alert back button clicked")
             setPressedButtonResult(AlertContract.ALERT_BUTTON_PRESSED_BACK, config.payload)
             findNavController().popBackStack()
         }
         config.eventType?.let { vm.saveAlertEvent(it) }
     }
 
+    // Since we do not care about type of the stored value
+    // using deprecated `get(): Any?` method should fine
+    @Suppress("DEPRECATION")
+    private fun getPayloadContent(payload: Bundle) =
+        payload.keySet().joinToString { payload.get(it).toString() }
+
     private fun TextView.setupButton(config: AlertButtonConfig, payload: Bundle) {
         setTextWithFallbacks(config.text, config.textRes)
         setOnClickListener {
-            config.resultKey?.let { setPressedButtonResult(it, payload) }
+            config.resultKey?.let {
+                Simber.tag(ALERT.name).i("Alert button clicked: $it")
+                setPressedButtonResult(it, payload)
+            }
 
             if (config.closeOnClick) {
                 // Close parent activity if back stack is empty after pop
