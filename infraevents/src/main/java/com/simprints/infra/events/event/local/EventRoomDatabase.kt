@@ -7,7 +7,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.simprints.infra.events.BuildConfig
-import com.simprints.infra.events.common.Converters
 import com.simprints.infra.events.event.local.migrations.*
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.local.migrations.*

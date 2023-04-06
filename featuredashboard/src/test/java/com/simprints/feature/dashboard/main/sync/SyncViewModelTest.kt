@@ -11,18 +11,17 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.events_sync.models.EventSyncState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerState
-import com.simprints.infra.events.events_sync.models.EventSyncWorkerType
+import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.login.LoginManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.flowOf
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -40,33 +39,36 @@ class SyncViewModelTest {
 
     private val isConnected = MutableLiveData<Boolean>()
     private val syncState = MutableLiveData<EventSyncState>()
-    private val eventSyncManager = mockk<EventSyncManager>(relaxed = true) {
-        every { getLastSyncState() } returns syncState
-    }
-    private val deviceManager = mockk<DeviceManager> {
-        every { isConnectedLiveData } returns isConnected
-    }
-    private val configManager = mockk<ConfigManager> {
-        coEvery { getProjectConfiguration() } returns mockk {
-            every { synchronization } returns mockk {
-                every { up } returns mockk {
-                    every { simprints } returns SimprintsUpSynchronizationConfiguration(kind = ALL)
-                }
-                every { frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
-                every { down } returns mockk {
-                    every { partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
-                }
-            }
+
+    @MockK
+    lateinit var eventSyncManager: EventSyncManager
+
+    @MockK
+    lateinit var deviceManager: DeviceManager
+
+    @MockK
+    lateinit var configManager: ConfigManager
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+    @MockK
+    lateinit var loginManager: LoginManager
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { eventSyncManager.getLastSyncState() } returns syncState
+        every { deviceManager.isConnectedLiveData } returns isConnected
+        coEvery { configManager.getProjectConfiguration().synchronization } returns mockk {
+            every { up.simprints } returns SimprintsUpSynchronizationConfiguration(kind = ALL)
+            every { frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
+            every { down.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         }
+        every { timeHelper.readableBetweenNowAndTime(any()) } returns DATE
+        every { loginManager.getSignedInProjectIdOrEmpty() } returns "projectId"
     }
-    private val cacheSync = mockk<EventSyncCache>(relaxed = true)
-    private val timeHelper = mockk<TimeHelper>(relaxed = true) {
-        every { readableBetweenNowAndTime(any()) } returns DATE
-    }
-    private val loginManager = mockk<LoginManager>(){
-        every { getSignedInProjectIdOrEmpty() } returns "projectId"
-    }
-    private val eventRepository = mockk<EventRepository>()
 
     @Test
     fun `should initialize the live data syncToBFSIDAllowed correctly`() {
@@ -80,7 +82,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should trigger an initial sync if the sync is not running and there is no last sync`() {
-        coEvery { cacheSync.readLastSuccessfulSyncTime() } returns null
+        coEvery { eventSyncManager.getLastSyncTime() } returns null
         syncState.value = null
         isConnected.value = true
 
@@ -106,11 +108,11 @@ class SyncViewModelTest {
     fun `should not trigger an initial sync if the sync is running`() {
         syncState.value = EventSyncState(
             "", 0, 0, listOf(
-                EventSyncState.SyncWorkerInfo(
-                    EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Running
-                )
-            ), listOf()
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Running
+            )
+        ), listOf()
         )
         isConnected.value = true
 
@@ -182,7 +184,8 @@ class SyncViewModelTest {
         )
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 0, 0, listOf(), listOf(
+            "", 0, 0, listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Succeeded
@@ -201,7 +204,7 @@ class SyncViewModelTest {
             listOf("module 1"),
             ""
         )
-        coEvery { eventRepository.observeLocalCount(any(), any()) }.returns(flowOf(2))
+        coEvery { eventSyncManager.countEventsToUpload(any(), any()) }.returns(flowOf(2))
 
         isConnected.value = true
         syncState.value = EventSyncState(
@@ -226,7 +229,8 @@ class SyncViewModelTest {
         )
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(), listOf(
+            "", 10, 40, listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Running
@@ -247,7 +251,8 @@ class SyncViewModelTest {
         )
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(), listOf(
+            "", 10, 40, listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Enqueued
@@ -269,11 +274,11 @@ class SyncViewModelTest {
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
-                EventSyncState.SyncWorkerInfo(
-                    EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true)
-                )
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true)
             )
+        )
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -290,11 +295,11 @@ class SyncViewModelTest {
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
-                EventSyncState.SyncWorkerInfo(
-                    EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true)
-                )
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true)
             )
+        )
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -310,7 +315,8 @@ class SyncViewModelTest {
         )
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(), listOf(
+            "", 10, 40, listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true)
@@ -332,14 +338,14 @@ class SyncViewModelTest {
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
-                EventSyncState.SyncWorkerInfo(
-                    EventSyncWorkerType.DOWNLOADER,
-                    EventSyncWorkerState.Failed(
-                        failedBecauseBackendMaintenance = true,
-                        estimatedOutage = 30
-                    )
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Failed(
+                    failedBecauseBackendMaintenance = true,
+                    estimatedOutage = 30
                 )
             )
+        )
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -355,7 +361,8 @@ class SyncViewModelTest {
         )
         isConnected.value = true
         syncState.value = EventSyncState(
-            "", 10, 40, listOf(), listOf(
+            "", 10, 40, listOf(),
+            listOf(
                 EventSyncState.SyncWorkerInfo(
                     EventSyncWorkerType.DOWNLOADER,
                     EventSyncWorkerState.Failed()
@@ -367,14 +374,11 @@ class SyncViewModelTest {
         assertThat(syncCardLiveData).isEqualTo(SyncTryAgain(DATE))
     }
 
-    private fun initViewModel(): SyncViewModel =
-        SyncViewModel(
-            eventSyncManager,
-            deviceManager,
-            configManager,
-            cacheSync,
-            timeHelper,
-            loginManager,
-            eventRepository,
-        )
+    private fun initViewModel(): SyncViewModel = SyncViewModel(
+        eventSyncManager,
+        deviceManager,
+        configManager,
+        timeHelper,
+        loginManager,
+    )
 }

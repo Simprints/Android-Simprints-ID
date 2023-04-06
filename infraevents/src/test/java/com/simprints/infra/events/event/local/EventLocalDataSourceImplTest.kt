@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.local.*
 import com.simprints.infra.events.event.local.models.DbEvent
@@ -15,6 +16,7 @@ import com.simprints.infra.events.local.*
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -109,12 +111,26 @@ internal class EventLocalDataSourceImplTest {
         }
 
     @Test
-    fun loadWithAQuery() = runTest {
+    fun loadAll() = runTest {
         eventLocalDataSource.loadAll()
 
-        coVerify {
-            eventDao.loadAll()
-        }
+        coVerify { eventDao.loadAll() }
+    }
+
+    @Test
+    fun loadAllEventJsonFromSession() = runTest {
+        val sessionId = GUID1
+        eventLocalDataSource.loadAllEventJsonFromSession(sessionId)
+
+        coVerify { eventDao.loadEventJsonFromSession(sessionId) }
+    }
+
+    @Test
+    fun loadAllFromSession() = runTest {
+        val sessionId = GUID1
+        eventLocalDataSource.loadAllFromSession(sessionId)
+
+        coVerify { eventDao.loadFromSession(sessionId) }
     }
 
     @Test
@@ -129,39 +145,53 @@ internal class EventLocalDataSourceImplTest {
 
         coVerify { eventDao.loadOpenedSessions() }
         verify { dbSessionCaptureEvent.fromDbToDomain() }
-
     }
 
     @Test
-    fun dumpInvalidEvents() = runTest {
+    fun loadAllClosedSessionIds() = runTest {
         val sessionId = GUID1
-        eventLocalDataSource.loadAllEventJsonFromSession(sessionId)
+        eventLocalDataSource.loadAllClosedSessionIds(sessionId)
+
+        coVerify { eventDao.loadAllClosedSessionIds(sessionId) }
+    }
+
+    @Test
+    fun countWithEventType() = runTest {
+        eventLocalDataSource.count(type = SESSION_CAPTURE)
+
+        coVerify { eventDao.countFromType(type = SESSION_CAPTURE) }
+    }
+
+
+    @Test
+    fun countWithAProjectIdQuery() = runTest {
+        eventLocalDataSource.count(projectId = "PROJECT_ID")
+
+        coVerify { eventDao.countFromProject(projectId = "PROJECT_ID") }
+    }
+
+
+    @Test
+    fun observeCountWithAProjectIdQuery() = runTest {
+        eventLocalDataSource.observeCount(projectId = "PROJECT_ID").toList()
+
+        coVerify { eventDao.observeCount(projectId = "PROJECT_ID") }
+    }
+
+    @Test
+    fun observeCountWithAProjectIdAndTypeQuery() = runTest {
+        eventLocalDataSource.observeCount(
+            projectId = "PROJECT_ID",
+            type = CALLBACK_ENROLMENT,
+        ).toList()
 
         coVerify {
-            eventDao.loadEventJsonFromSession(sessionId)
+            eventDao.observeCountFromType(
+                projectId = "PROJECT_ID",
+                type = CALLBACK_ENROLMENT,
+            )
         }
-    }
 
-    @Test
-    fun countWithATypeQuery() {
-        runBlocking {
-            eventLocalDataSource.count(SESSION_CAPTURE)
-
-            coVerify {
-                eventDao.countFromType(type = SESSION_CAPTURE)
-            }
-        }
-    }
-
-    @Test
-    fun countWithAProjectIdQuery() {
-        runBlocking {
-            eventLocalDataSource.count(projectId = "PROJECT_ID")
-
-            coVerify {
-                eventDao.countFromProject(projectId = "PROJECT_ID")
-            }
-        }
     }
 
     @Test
@@ -174,32 +204,29 @@ internal class EventLocalDataSourceImplTest {
             }
             eventLocalDataSource.insertOrUpdate(event)
 
-            coVerify {
-                eventDao.insertOrUpdate(dbEvent)
-            }
+            coVerify { eventDao.insertOrUpdate(dbEvent) }
         }
     }
 
     @Test
-    fun countWithATypeAndProjectIdQuery() {
-        runBlocking {
-            eventLocalDataSource.count(type = SESSION_CAPTURE, projectId = "PROJECT_ID")
+    fun delete() = runTest {
+        eventLocalDataSource.delete(listOf("1", "2"))
 
-            coVerify {
-                eventDao.countFromProjectByType(type = SESSION_CAPTURE, projectId = "PROJECT_ID")
-            }
-        }
+        coVerify { eventDao.delete(listOf("1", "2")) }
     }
 
     @Test
-    fun deleteWithAQuery() {
-        runBlocking {
-            eventLocalDataSource.deleteAll()
+    fun deleteAllFromSession() = runTest {
+        eventLocalDataSource.deleteAllFromSession(GUID1)
 
-            coVerify {
-                eventDao.deleteAll()
-            }
-        }
+        coVerify { eventDao.deleteAllFromSession(GUID1) }
+    }
+
+    @Test
+    fun deleteAll() = runTest {
+        eventLocalDataSource.deleteAll()
+
+        coVerify { eventDao.deleteAll() }
     }
 
     private fun mockDaoLoadToMakeNothing() {

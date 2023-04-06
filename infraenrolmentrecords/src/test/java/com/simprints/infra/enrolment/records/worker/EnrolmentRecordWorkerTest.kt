@@ -7,6 +7,7 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import io.mockk.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -30,6 +31,7 @@ class EnrolmentRecordWorkerTest {
         params,
         manager,
         configManager,
+        UnconfinedTestDispatcher(),
     )
 
 

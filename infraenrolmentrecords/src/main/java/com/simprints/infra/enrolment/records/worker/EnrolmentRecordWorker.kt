@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.simprints.core.DispatcherIO
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @HiltWorker
@@ -18,7 +18,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val manager: EnrolmentRecordManager,
     private val configManager: ConfigManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result =

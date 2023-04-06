@@ -48,7 +48,6 @@ dependencies {
     api(project(":infraconfig"))
     implementation(project(":infralogging"))
     api(project(":infralogin"))
-    implementation(project(":infranetwork"))
     api(project(":infrasecurity"))
 
     implementation(libs.androidX.room.ktx)
@@ -57,7 +56,6 @@ dependencies {
     runtimeOnly(libs.kotlin.coroutinesAndroid)
     implementation(libs.sqlCipher.core)
 
-    implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
 
     implementation(libs.workManager.work)

@@ -7,31 +7,39 @@ import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.events.events_sync.down.EventDownSyncScopeRepository
+import com.simprints.infra.eventsync.EventSyncManager
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class ModuleRepositoryImplTest {
 
-    private val downSynchronizationConfiguration = mockk<DownSynchronizationConfiguration>()
-    private val projectConfiguration = mockk<ProjectConfiguration> {
-        every { synchronization } returns mockk {
-            every { down } returns downSynchronizationConfiguration
-        }
-    }
-    private val mockConfigManager: ConfigManager = mockk(relaxed = true)
-    private val enrolmentRecordManager: EnrolmentRecordManager = mockk(relaxed = true)
-    private val eventDownSyncScopeRepository: EventDownSyncScopeRepository = mockk(relaxed = true)
+    @MockK
+    lateinit var downSynchronizationConfiguration: DownSynchronizationConfiguration
+
+    @MockK
+    lateinit var projectConfiguration: ProjectConfiguration
+
+    @MockK
+    lateinit var mockConfigManager: ConfigManager
+
+    @MockK
+    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+
+    @MockK
+    lateinit var eventSyncManager: EventSyncManager
 
     private lateinit var repository: ModuleRepositoryImpl
 
     @Before
     fun setUp() {
-        coEvery { mockConfigManager.getProjectConfiguration() } returns projectConfiguration
+        MockKAnnotations.init(this, relaxed = true)
 
         every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d")
+        every { projectConfiguration.synchronization.down } returns downSynchronizationConfiguration
+        coEvery { mockConfigManager.getProjectConfiguration() } returns projectConfiguration
         coEvery {
             mockConfigManager.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c"), "")
@@ -39,7 +47,7 @@ class ModuleRepositoryImplTest {
         repository = ModuleRepositoryImpl(
             mockConfigManager,
             enrolmentRecordManager,
-            eventDownSyncScopeRepository,
+            eventSyncManager,
         )
     }
 
@@ -94,7 +102,7 @@ class ModuleRepositoryImplTest {
         repository.saveModules(modules)
 
         coVerify(exactly = 1) {
-            eventDownSyncScopeRepository.deleteOperations(unselectedModules, any())
+            eventSyncManager.deleteModules(unselectedModules, any())
         }
     }
 

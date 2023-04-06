@@ -48,7 +48,7 @@
 
 # These contain serialised models - TODO: should be more selective?
 -keep class com.simprints.libsimprints.** { *; }
--keep class com.simprints.infra.events.event.remote.models.** { *; }
+-keep class com.simprints.infra.eventsync.event.remote.models.** { *; }
 -keep class com.simprints.infra.events.event.domain.models.** { *; }
 -keep class com.simprints.infra.events.event.local.** { *; }
 

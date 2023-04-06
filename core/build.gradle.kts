@@ -35,6 +35,7 @@ dependencies {
 
     api(project(":moduleapi"))
     implementation(project(":infralogging"))
+    implementation(project(":infranetwork"))
     implementation(libs.libsimprints)
 
     api(libs.androidX.appcompat)
@@ -44,7 +45,7 @@ dependencies {
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
     implementation(libs.jackson.core)
-
+    implementation(libs.workManager.work)
     implementation(libs.kronos.kronos)
 
     // Hilt

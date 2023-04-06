@@ -8,7 +8,6 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -45,7 +44,7 @@ class EnrolmentHelperImplTest {
         enrolmentHelper = EnrolmentHelperImpl(enrolmentRecordManager, eventRepository, timeHelper)
         every { timeHelper.now() } returns CREATED_AT
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
-        coEvery { eventRepository.getEventsFromSession(any()) } returns flowOf(personCreationEvent)
+        coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(personCreationEvent)
 
         mockUUID()
     }
@@ -102,15 +101,6 @@ class EnrolmentHelperImplTest {
                 )
             )
         }
-        coVerify(exactly = 0) {
-            eventRepository.uploadEvents(
-                projectId = DEFAULT_PROJECT_ID,
-                canSyncAllDataToSimprints = false,
-                canSyncBiometricDataToSimprints = false,
-                canSyncAnalyticsDataToSimprints = false
-            )
-        }
-
     }
 
     @After

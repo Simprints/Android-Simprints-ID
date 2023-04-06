@@ -2,8 +2,6 @@ package com.simprints.feature.dashboard.tools.di
 
 import com.simprints.feature.dashboard.debug.SecurityStateScheduler
 import com.simprints.feature.dashboard.main.sync.DeviceManager
-import com.simprints.feature.dashboard.main.sync.EventSyncCache
-import com.simprints.feature.dashboard.main.sync.EventSyncManager
 import com.simprints.feature.dashboard.settings.about.SignerManager
 import dagger.Module
 import dagger.Provides
@@ -23,14 +21,6 @@ object FakeModule {
     @Provides
     @Singleton
     fun provideDeviceManager(): DeviceManager = mockk()
-
-    @Provides
-    @Singleton
-    fun provideEventSyncCache(): EventSyncCache = mockk()
-
-    @Provides
-    @Singleton
-    fun provideEventSyncManager(): EventSyncManager = mockk()
 
     @Provides
     @Singleton
