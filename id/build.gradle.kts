@@ -118,7 +118,6 @@ dependencies {
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infrarecentuseractivity"))
-    implementation(project(":infrasecurity"))
     implementation(project(":infraimages"))
 
     implementation(libs.dagger.core)

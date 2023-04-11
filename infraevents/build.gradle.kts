@@ -42,7 +42,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":infraconfig"))
     implementation(project(":infralogin"))
-    implementation(project(":infrasecurity"))
 
     implementation(libs.androidX.room.ktx)
     kapt(libs.androidX.room.compiler)
