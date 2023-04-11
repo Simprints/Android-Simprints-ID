@@ -9,6 +9,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("dagger.hilt.android.plugin")
+    id("com.vanniktech.dependency.graph.generator")
 }
 
 apply {
@@ -100,7 +101,7 @@ repositories {
 
 dependencies {
     // ######################################################
-    //                     (Dependencies
+    //                     (Dependencies)
     // ######################################################
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))

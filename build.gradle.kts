@@ -91,6 +91,7 @@ tasks.register("clean", Delete::class) {
 
 plugins {
     id("org.gradle.test-retry") version "1.5.2"
+    id("com.vanniktech.dependency.graph.generator") version "0.8.0"
 }
 
 /*
