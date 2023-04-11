@@ -22,32 +22,32 @@ System.setProperty("org.mockito.mock.android", "true")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    api(project(":core"))
+    implementation(project(":core"))
     implementation(project(":infraresources"))
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
-    implementation(libs.testing.androidX.runner)
-    implementation(libs.testing.androidX.navigation)
     implementation(libs.testing.androidX.core.testing)
-    implementation(libs.testing.fragment.testing) {
-        exclude("androidx.test", "core")
-    }
-
-    implementation(libs.testing.espresso.core)
+    implementation(libs.androidX.multidex)
+    implementation(libs.androidX.appcompat)
 
     api(libs.androidX.multidex)
     api(libs.androidX.appcompat)
 
-    api(libs.testing.junit)
+    implementation(libs.testing.junit)
     implementation(libs.testing.mockito.inline)
     implementation(libs.testing.mockito.kotlin)
-
-    implementation(libs.testing.robolectric.core)
-    implementation(libs.rxJava2.android)
-    api(libs.rxJava2.core)
-    implementation(libs.testing.coroutines.test)
     implementation(libs.testing.mockk.core)
+    implementation(libs.testing.truth)
+    implementation(libs.testing.robolectric.core)
+    implementation(libs.testing.coroutines.test)
+    implementation(libs.testing.koTest.kotlin.assert)
+    implementation(libs.testing.fragment.testing) {
+        exclude("androidx.test", "core")
+    }
+    implementation(libs.testing.espresso.core)
 
+    implementation(libs.rxJava2.android)
+    implementation(libs.rxJava2.core)
 }

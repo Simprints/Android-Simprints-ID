@@ -34,17 +34,17 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    api(project(":moduleapi"))
-    api(project(":infraconfig"))
-    api(project(":infraenrolmentrecords"))
-    implementation(project(":infralogging"))
-    api(project(":infrasecurity"))
-    api(project(":core"))
-    api(project(":infraeventsync"))
     implementation(project(":infraresources"))
     implementation(project(":featurealert"))
+    implementation(project(":core"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infrasecurity"))
+    implementation(project(":infraeventsync"))
+    implementation(project(":infraevents"))
+    implementation(project(":featurealert"))
 
-    api(libs.libsimprints)
+    implementation(libs.libsimprints)
 
     // DI
     implementation(libs.hilt)

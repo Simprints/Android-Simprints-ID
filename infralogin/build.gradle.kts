@@ -31,17 +31,14 @@ android {
 }
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":infralogging"))
-    api(project(":infranetwork"))
     implementation(project(":core"))
-
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
     implementation(libs.firebase.auth)
     implementation(libs.kotlin.coroutinesPlayServices)
-    api(libs.playServices.integrity)
+    implementation(libs.playServices.integrity)
     implementation(libs.retrofit.core)
 
     // Unit Tests

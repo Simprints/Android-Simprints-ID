@@ -18,19 +18,17 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    api(project(":core"))
-    api(project(":infraevents"))
-    api(project(":infraeventsync"))
-    api(project(":infraconfig"))
-    api(project(":infraenrolmentrecords"))
-    api(project(":infraimages"))
-    api(project(":infralogin"))
-    implementation(project(":infralogging"))
-    api(project(":infrarecentuseractivity"))
-    implementation(project(":infraresources"))
+    implementation(project(":core"))
+    implementation(project(":infraevents"))
+    implementation(project(":infraeventsync"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infraimages"))
+    implementation(project(":infralogin"))
+    implementation(project(":infrarecentuseractivity"))
 
-    api(libs.androidX.appcompat)
-    api(libs.androidX.ui.constraintlayout)
+    implementation(libs.androidX.appcompat)
+    implementation(libs.androidX.ui.constraintlayout)
 
     implementation(libs.fuzzywuzzy.core)
 
@@ -45,9 +43,9 @@ dependencies {
     implementation(libs.androidX.ui.fragment.kotlin)
 
     // UI
-    api(libs.androidX.ui.preference)
-    api(libs.androidX.ui.cardview)
-    api(libs.support.material)
+    implementation(libs.androidX.ui.preference)
+    implementation(libs.androidX.ui.cardview)
+    implementation(libs.support.material)
 
     implementation(libs.workManager.work)
 

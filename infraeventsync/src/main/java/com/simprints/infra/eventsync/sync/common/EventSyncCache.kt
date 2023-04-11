@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.sync.common
 
 import android.annotation.SuppressLint
-import com.google.android.gms.common.util.VisibleForTesting
+import androidx.annotation.VisibleForTesting
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager

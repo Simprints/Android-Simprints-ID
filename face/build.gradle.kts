@@ -51,32 +51,29 @@ repositories {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    api(project(":infraconfig"))
-    api(project(":infraenrolmentrecords"))
-    implementation(project(":infralogging"))
-    api(project(":core"))
-    api(project(":infraevents"))
-    implementation(project(":infraresources"))
-    api(project(":infralicense"))
-    api(project(":infraimages"))
-    api(project(":moduleapi"))
+    implementation(project(":core"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infraevents"))
+    implementation(project(":infralicense"))
+    implementation(project(":infraimages"))
     implementation(project(":featurealert"))
 
-    api(libs.cameraView)
-    api(libs.circleImageView)
+    implementation(libs.cameraView)
+    implementation(libs.circleImageView)
 
-    api(libs.androidX.navigation.fragment)
-    api(libs.androidX.appcompat)
+    implementation(libs.androidX.navigation.fragment)
+    implementation(libs.androidX.appcompat)
 
     // DI
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
     // Fragment
-    api(libs.androidX.ui.fragment)
+    implementation(libs.androidX.ui.fragment)
 
     // Android X
-    api(libs.androidX.ui.constraintlayout)
+    implementation(libs.androidX.ui.constraintlayout)
     runtimeOnly(libs.androidX.cameraX.core)
 
     // Firebase

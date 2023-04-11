@@ -33,21 +33,19 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
-    implementation(project(":infranetwork"))
-    implementation(project(":infralogging"))
-    api(project(":infralogin"))
-    api(project(":infrarealm"))
+    implementation(project(":infralogin"))
+    implementation(project(":infrarealm"))
 
     implementation(libs.workManager.work)
 
     implementation(libs.datastore)
-    api(libs.protobuf)
+    implementation(libs.protobuf)
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
 
 
     implementation(libs.hilt)
-    api(libs.hilt.work)
+    implementation(libs.hilt.work)
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
 

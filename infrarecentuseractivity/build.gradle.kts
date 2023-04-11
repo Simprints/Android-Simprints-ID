@@ -20,14 +20,13 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    api(project(":core"))
-    implementation(project(":infralogging"))
+    implementation(project(":core"))
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
     implementation(libs.datastore)
-    api(libs.protobuf)
+    implementation(libs.protobuf)
 
     // Unit Tests
     testImplementation(project(":testtools"))

@@ -34,15 +34,17 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     api(project(":moduleapi"))
-    implementation(project(":infralogging"))
-    implementation(project(":infranetwork"))
-    implementation(libs.libsimprints)
+    api(project(":infralogging"))
+    api(project(":infranetwork"))
+    api(project(":infraresources"))
 
     api(libs.androidX.appcompat)
     api(libs.androidX.ui.fragment.kotlin)
     api(libs.support.material)
     api(libs.androidX.multidex)
     api(libs.androidX.cameraX.core)
+
+    implementation(libs.libsimprints)
     implementation(libs.androidX.cameraX.camera2)
 
     runtimeOnly(libs.kotlin.coroutinesAndroid)
@@ -54,10 +56,5 @@ dependencies {
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
-    testImplementation(libs.testing.truth)
-    testImplementation(libs.testing.junit)
-    testImplementation(libs.testing.coroutines.test)
-    testImplementation(libs.testing.koTest.kotlin.assert)
     testImplementation(project(":testtools"))
-    testImplementation(libs.testing.mockk.core)
 }

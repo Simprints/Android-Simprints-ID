@@ -21,11 +21,10 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":infralogging"))
-    api(project(":infralogin"))
-    api(project(":infrasecurity"))
-    api(project(":infraconfig"))
     implementation(project(":core"))
+    implementation(project(":infralogin"))
+    implementation(project(":infrasecurity"))
+    implementation(project(":infraconfig"))
 
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
