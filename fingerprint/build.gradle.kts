@@ -54,26 +54,22 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     // Simprints
-    api(project(":core"))
-    api(project(":infraevents"))
-    api(project(":infraenrolmentrecords"))
-    api(project(":fingerprintmatcher"))
-    api(project(":fingerprintscanner"))
-    api(project(":infraconfig"))
-    api(project(":infralogin"))
-    implementation(project(":infralogging"))
-    api(project(":infranetwork"))
-    api(project(":infraimages"))
-    implementation(project(":infraresources"))
-    api(project(":infrarecentuseractivity"))
-    api(project(":moduleapi"))
+    implementation(project(":core"))
+    implementation(project(":infraevents"))
+    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":fingerprintmatcher"))
+    implementation(project(":fingerprintscanner"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infralogin"))
+    implementation(project(":infraimages"))
+    implementation(project(":infrarecentuseractivity"))
     implementation(project(":featurealert"))
 
     // If mock/dummy BT adapter is required test implementation can be switched to regular one
     testImplementation(project(":fingerprintscannermock"))
     //implementation(project(":fingerprintscannermock"))
 
-    api(libs.retrofit.core)
+    implementation(libs.retrofit.core)
     runtimeOnly(libs.jackson.core)
 
     // Kotlin
@@ -82,16 +78,16 @@ dependencies {
 
     // Android X
     implementation(libs.androidX.core)
-    api(libs.androidX.appcompat)
-    api(libs.androidX.ui.coordinatorlayout)
-    api(libs.androidX.ui.constraintlayout)
-    api(libs.androidX.ui.viewpager2)
+    implementation(libs.androidX.appcompat)
+    implementation(libs.androidX.ui.coordinatorlayout)
+    implementation(libs.androidX.ui.constraintlayout)
+    implementation(libs.androidX.ui.viewpager2)
     implementation(libs.androidX.navigation.fragment)
     implementation(libs.workManager.work)
 
     // DI
     implementation(libs.hilt)
-    api(libs.hilt.work)
+    implementation(libs.hilt.work)
     kapt(libs.hilt.kapt)
     kapt(libs.hilt.compiler)
 

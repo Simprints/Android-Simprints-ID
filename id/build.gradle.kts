@@ -106,7 +106,7 @@ dependencies {
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
-    implementation(project(":moduleapi"))
+
     implementation(project(":infraevents"))
     implementation(project(":infraeventsync"))
     implementation(project(":infralogin"))
@@ -117,12 +117,9 @@ dependencies {
     implementation(project(":fingerprint"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
-    implementation(project(":infralogging"))
-    implementation(project(":infranetwork"))
     implementation(project(":infrarecentuseractivity"))
     implementation(project(":infrasecurity"))
     implementation(project(":infraimages"))
-    implementation(project(":infraresources"))
 
     implementation(libs.dagger.core)
     implementation(libs.splitties.core)

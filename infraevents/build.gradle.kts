@@ -39,12 +39,10 @@ android {
 }
 
 dependencies {
-    api(project(":core"))
-    api(project(":moduleapi"))
-    api(project(":infraconfig"))
-    implementation(project(":infralogging"))
-    api(project(":infralogin"))
-    api(project(":infrasecurity"))
+    implementation(project(":core"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infralogin"))
+    implementation(project(":infrasecurity"))
 
     implementation(libs.androidX.room.ktx)
     kapt(libs.androidX.room.compiler)

@@ -44,10 +44,10 @@ android {
 }
 
 dependencies {
-    api(project(":core"))
-    implementation(project(":infralogging"))
-    api(project(":infraevents"))
-    implementation(project(":infranetwork"))
+    implementation(project(":core"))
+    implementation(project(":infraevents"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infralogin"))
     implementation(project(":infraenrolmentrecords"))
 
     implementation(libs.androidX.room.ktx)
@@ -55,7 +55,7 @@ dependencies {
 
     implementation(libs.androidX.lifecycle.livedata.ktx)
     runtimeOnly(libs.kotlin.coroutinesAndroid)
-    api(libs.sqlCipher.core)
+    implementation(libs.sqlCipher.core)
     implementation(libs.workManager.work)
 
     implementation(libs.retrofit.core)
