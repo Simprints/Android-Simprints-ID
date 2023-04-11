@@ -21,7 +21,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
     implementation(project(":infralogin"))
-    implementation(project(":infrasecurity"))
+
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
     implementation(libs.androidX.security)

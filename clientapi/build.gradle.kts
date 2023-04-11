@@ -39,7 +39,6 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
-    implementation(project(":infrasecurity"))
     implementation(project(":infraeventsync"))
     implementation(project(":infraevents"))
     implementation(project(":featurealert"))

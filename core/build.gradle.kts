@@ -37,6 +37,7 @@ dependencies {
     api(project(":infralogging"))
     api(project(":infranetwork"))
     api(project(":infraresources"))
+    api(project(":infrasecurity"))
 
     api(libs.androidX.appcompat)
     api(libs.androidX.ui.fragment.kotlin)
