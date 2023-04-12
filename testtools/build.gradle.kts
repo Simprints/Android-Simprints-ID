@@ -28,7 +28,7 @@ dependencies {
     implementation(libs.hilt)
     kapt(libs.hilt.kapt)
 
-    implementation(libs.testing.androidX.core.testing)
+    implementation(libs.testing.androidX.core)
     implementation(libs.androidX.multidex)
     implementation(libs.androidX.appcompat)
 
@@ -41,7 +41,7 @@ dependencies {
     implementation(libs.testing.mockk.core)
     implementation(libs.testing.truth)
     implementation(libs.testing.robolectric.core)
-    implementation(libs.testing.coroutines.test)
+    implementation(libs.testing.coroutines)
     implementation(libs.testing.koTest.kotlin.assert)
     implementation(libs.testing.fragment.testing) {
         exclude("androidx.test", "core")

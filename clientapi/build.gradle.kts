@@ -61,15 +61,15 @@ dependencies {
     testImplementation(project(":testtools"))
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core.testing)
+    testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.truth)
-    testImplementation(libs.testing.coroutines.test)
+    testImplementation(libs.testing.coroutines)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.koTest.kotlin.assert)
 
     testImplementation(libs.testing.espresso.intents)
 
-    androidTestImplementation(libs.testing.androidX.core.testing)
+    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestImplementation(libs.testing.androidX.runner)
     androidTestImplementation(libs.testing.mockk.android)

@@ -58,7 +58,7 @@ dependencies {
 
     testImplementation(libs.chuck.release)
 
-    testImplementation(libs.testing.coroutines.test)
+    testImplementation(libs.testing.coroutines)
 
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.mockk.core)

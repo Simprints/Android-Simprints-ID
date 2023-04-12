@@ -39,5 +39,5 @@ dependencies {
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.coroutines.test)
+    testImplementation(libs.testing.coroutines)
 }

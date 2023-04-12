@@ -56,15 +56,15 @@ dependencies {
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.coroutines.test)
+    testImplementation(libs.testing.coroutines)
     testImplementation(libs.testing.robolectric.core)
-    testImplementation(libs.hilt.testing)
+    testImplementation(libs.testing.hilt)
     kaptTest(libs.hilt)
 
     testImplementation(libs.testing.androidX.runner)
     testImplementation(libs.testing.androidX.navigation)
-    testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.testing.fragment.testing) {
+    testImplementation(libs.testing.androidX.core)
+    testImplementation(libs.testing.fragment) {
         exclude("androidx.test", "core")
     }
 
