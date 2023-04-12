@@ -9,6 +9,7 @@ import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
+import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
@@ -34,6 +35,7 @@ import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -47,39 +49,52 @@ class ConnectScannerViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val recentUserActivityManager = mockk<RecentUserActivityManager>(relaxed = true)
-    private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
-    private val configManager = mockk<ConfigManager> {
-        coEvery { getProjectConfiguration() } returns mockk {
-            every { fingerprint } returns fingerprintConfiguration
-        }
-    }
-    private val bluetoothAdapter: ComponentBluetoothAdapter = mockk()
-    private val pairingManager: ScannerPairingManager = mockk()
-    private val nfcManager: NfcManager = mockk()
-    private val scannerFactory: ScannerFactory = mockk()
-    private val scannerManager =
-        ScannerManagerImpl(
-            bluetoothAdapter,
-            scannerFactory,
-            pairingManager,
-            SerialNumberConverter(),
-        )
+    @MockK
+    private lateinit var sessionEventsManager: FingerprintSessionEventsManager
+
+    @MockK
+    private lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @MockK
+    private lateinit var fingerprintConfiguration: FingerprintConfiguration
+
+    @MockK
+    private lateinit var configManager: ConfigManager
+
+    @MockK
+    private lateinit var bluetoothAdapter: ComponentBluetoothAdapter
+
+    @MockK
+    private lateinit var pairingManager: ScannerPairingManager
+
+    @MockK
+    private lateinit var nfcManager: NfcManager
+
+    @MockK
+    private lateinit var scannerFactory: ScannerFactory
+
+    @MockK
+    private lateinit var scannerManager: ScannerManager
+
     private lateinit var viewModel: ConnectScannerViewModel
 
     @Before
     fun setUp() {
-        viewModel =
-            ConnectScannerViewModel(
-                scannerManager,
-                mockk(relaxed = true),
-                sessionEventsManager,
-                recentUserActivityManager,
-                configManager,
-                nfcManager,
-            )
+        MockKAnnotations.init(this, relaxed = true)
+        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(VERO_1, VERO_2)
+        coEvery { configManager.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
+
+        scannerManager = ScannerManagerImpl(bluetoothAdapter, scannerFactory, pairingManager, SerialNumberConverter())
+        viewModel = ConnectScannerViewModel(
+            scannerManager,
+            mockk(relaxed = true),
+            sessionEventsManager,
+            recentUserActivityManager,
+            configManager,
+            nfcManager,
+        )
     }
+
 
     private fun mockScannerWrapper(
         scannerGeneration: FingerprintConfiguration.VeroGeneration,
@@ -171,7 +186,7 @@ class ConnectScannerViewModelTest {
             coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateActivityFn)) } returns mockk()
             var scannerConnectionEvent: ScannerConnectionEvent? = null
             every { sessionEventsManager.addEventInBackground(any()) } answers {
-                if(args[0] is ScannerConnectionEvent) {
+                if (args[0] is ScannerConnectionEvent) {
                     scannerConnectionEvent = args[0] as ScannerConnectionEvent
                 }
             }
@@ -192,6 +207,21 @@ class ConnectScannerViewModelTest {
             assertThat(updatedActivity.lastScannerUsed).isNotEmpty()
             assertThat(updatedActivity.lastScannerVersion).isEqualTo("E-1")
         }
+
+
+    @Test
+    fun start_noScannersPairedWithoutFingerprintConfigAndNfc_sendsSerialEntryIssueEvent() {
+        setupBluetooth(numberOfPairedScanners = 0)
+        setupNfc(doesDeviceHaveNfcCapability = false, isEnabled = true)
+        coEvery { configManager.getProjectConfiguration().fingerprint } returns null
+
+        val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
+
+        viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+        viewModel.start()
+
+        connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.SerialEntryPair)
+    }
 
     @Test
     fun start_noScannersPairedWithVero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() {
@@ -343,6 +373,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
+        viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
         viewModel.handleScannerDisconnectedNoClick()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcPair)
@@ -355,6 +386,7 @@ class ConnectScannerViewModelTest {
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
+        viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
         viewModel.handleIncorrectScanner()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcPair)
