@@ -80,7 +80,7 @@ dependencies {
     //implementation("com.google.firebase:firebase-perf-ktx:20.1.1")
 
     // Android X
-    androidTestImplementation(libs.testing.androidX.core.testing)
+    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestUtil(libs.testing.androidX.orchestrator)
 
@@ -103,14 +103,14 @@ dependencies {
 
     // Android X
     testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core.testing)
+    testImplementation(libs.testing.androidX.core)
 
     // Kotlin
-    testImplementation(libs.testing.coroutines.test)
+    testImplementation(libs.testing.coroutines)
 
     // Navigation
-    androidTestImplementation(libs.testing.navigation.testing)
-    androidTestImplementation(libs.testing.fragment.testing)
+    androidTestImplementation(libs.testing.navigation)
+    androidTestImplementation(libs.testing.fragment)
     // Mockk
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.truth)
@@ -121,7 +121,7 @@ dependencies {
     // ######################################################
 
     //Hilt
-    androidTestImplementation(libs.hilt.testing)
+    androidTestImplementation(libs.testing.hilt)
     kaptAndroidTest(libs.hilt)
 
     // Roboelectic

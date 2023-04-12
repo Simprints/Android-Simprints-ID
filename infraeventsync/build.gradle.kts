@@ -68,18 +68,18 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.testing.coroutines.test)
+    testImplementation(libs.testing.androidX.core)
+    testImplementation(libs.testing.coroutines)
     testImplementation(libs.testing.robolectric.annotation)
     testImplementation(libs.testing.koTest.kotlin.assert)
     testImplementation(libs.testing.androidX.room)
     testImplementation(project(":testtools"))
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.hilt.testing)
+    testImplementation(libs.testing.hilt)
     testImplementation(libs.testing.work)
 
-    androidTestImplementation(libs.testing.androidX.core.testing)
+    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestImplementation(libs.testing.mockk.android)
 

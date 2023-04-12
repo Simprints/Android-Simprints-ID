@@ -120,7 +120,6 @@ dependencies {
     implementation(project(":infrarecentuseractivity"))
     implementation(project(":infraimages"))
 
-    implementation(libs.dagger.core)
     implementation(libs.splitties.core)
     implementation(libs.kotlin.reflect)
     implementation(libs.androidX.ui.cardview)
@@ -174,7 +173,7 @@ dependencies {
     }
     testImplementation(libs.testing.robolectric.core)
     testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core.testing)
+    testImplementation(libs.testing.androidX.core)
     testImplementation(libs.testing.androidX.runner)
     testImplementation(libs.testing.espresso.core)
     testImplementation(libs.testing.espresso.intents)
@@ -185,8 +184,8 @@ dependencies {
 
     testImplementation(libs.testing.mockwebserver)
     testImplementation(libs.testing.work)
-    testImplementation(libs.testing.coroutines.test)
-    kaptTest(libs.dagger.compiler)
+    testImplementation(libs.testing.coroutines)
+    //kaptTest(libs.dagger.compiler)
     testImplementation(project(":infralogging"))
     testImplementation(project(":testtools"))
 
@@ -199,7 +198,7 @@ dependencies {
     }
     androidTestImplementation(libs.testing.robolectric.core)
     androidTestImplementation(libs.testing.retrofit)
-    androidTestImplementation(libs.testing.androidX.core.testing)
+    androidTestImplementation(libs.testing.androidX.core)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestImplementation(libs.testing.work)
@@ -216,7 +215,7 @@ dependencies {
     kaptAndroidTest(libs.testing.hilt.kapt)
 
     androidTestImplementation(libs.testing.mockwebserver)
-    androidTestImplementation(libs.testing.coroutines.test)
+    androidTestImplementation(libs.testing.coroutines)
     androidTestImplementation(libs.rxJava2.kotlin)
     androidTestImplementation(libs.rxJava2.android)
 
@@ -226,12 +225,11 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("com.google.guava")
     }
-    kaptAndroidTest(libs.dagger.compiler)
     androidTestImplementation(project(":testtools")) {
         exclude("org.robolectric")
     }
 
-    androidTestImplementation(libs.testing.fragment.testing)
+    androidTestImplementation(libs.testing.fragment)
 }
 kapt {
     useBuildCache = true

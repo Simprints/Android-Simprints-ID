@@ -103,8 +103,8 @@ dependencies {
 
     // Android X
     testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.testing.coroutines.test)
+    testImplementation(libs.testing.androidX.core)
+    testImplementation(libs.testing.coroutines)
 
     // Espresso
     testImplementation(libs.testing.espresso.core)
@@ -135,11 +135,11 @@ dependencies {
     }
 
     // Android X
-    androidTestImplementation(libs.testing.androidX.core.testing)
+    androidTestImplementation(libs.testing.androidX.core)
     androidTestImplementation(libs.testing.androidX.ext.junit)
     androidTestUtil(libs.testing.androidX.orchestrator)
     androidTestImplementation(libs.testing.live.data)
-    androidTestImplementation(libs.testing.coroutines.test)
+    androidTestImplementation(libs.testing.coroutines)
 
     // Mocking and assertion frameworks
     androidTestImplementation(libs.testing.mockk.core)
@@ -150,7 +150,7 @@ dependencies {
     androidTestImplementation(libs.testing.espresso.intents)
 
     //Hilt
-    androidTestImplementation(libs.hilt.testing)
+    androidTestImplementation(libs.testing.hilt)
     kaptAndroidTest(libs.hilt)
 
     // Truth
