@@ -119,7 +119,7 @@
     <string name="privacy_notice_title">গোপনীয়তা নোটিশ</string>
     <string name="privacy_notice_text"><u>গোপনীয়তা নোটিশ</u></string>
     <string name="launch_consent_accept_button">গ্রহণ করুন</string>
-    <string name="launch_consent_decline_button"> প্রত্যাখ্যান করুন</string>
+    <string name="launch_consent_decline_button">প্রত্যাখ্যান করুন</string>
     <string name="consent_parental_title">মাতা-পিতার সম্মতি</string>
     <string name="consent_general_title">সাধারন সম্মতি</string>
     <string name="refusal_app_not_working">অ্যাপ কাজ করছে না</string>
@@ -214,4 +214,38 @@
     <string name="why_did_you_skip_biometrics">বায়োমেট্রিক তথ্য এড়িয়ে গেলেন কেন\?</string>
     <string name="confirmation_sent">প্রয়োজনীয় ফাইল ডাউনলোড করা হচ্ছে</string>
     <string name="redirecting_you_back">আপনাকে ফিরিয়ে আনছে</string>
+    <string name="confirm_module_selection_cancel">বাতিল করুন</string>
+    <string name="confirm_module_selection_yes">নিশ্চিত করুন</string>
+    <string name="dashboard_card_available_on_phone">ফোন এ সংরক্ষিত</string>
+    <string name="dashboard_card_enrol_title">সর্বশেষ নিবন্ধন</string>
+    <string name="dashboard_card_enrolment_info">নিবন্ধন তথ্য</string>
+    <string name="dashboard_card_identification_title">সর্বশেষ সনাক্তকরন</string>
+    <string name="dashboard_card_lastscanner_used">স্ক্যানার ব্যবহার করা হয়েছে</string>
+    <string name="dashboard_card_to_download">ডাউনলোড করতে</string>
+    <string name="dashboard_card_to_upload">আপলোড করতে</string>
+    <string name="dashboard_card_verification_title">সর্বশেষ যাচাই </string>
+    <string name="safetynet_down_alert_message">৫-১০ মিনিট পর চেষ্টা করুন</string>
+    <string name="id_error_save">সেভ করা যায়নি</string>
+    <string name="id_save_message">১। %1$s রেকর্ড সেভ করা যায়নি 
+২। বন্ধ করুন</string>
+    <string name="id_continue">সামনে আগান</string>
+    <string name="id_enrolment_successful">নিবন্ধন সফল হয়েছে</string>
+    <string name="id_config_error_enrol_last_biometrics">একটি কনফিগারেশন সমস্যা ঘটেছে (অবৈধ সিমপ্রিন্টস এন্ট্রি),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
+    <string name="toast_login_failed">লগ ইন অসফল হয়েছে। আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
+    <string name="calculating_overlay">হিসাাব করা হচ্ছে</string>
+    <string name="long_consent_downloading">গোপনীয়তা বিজ্ঞপ্তি ডাউনলোড করা হচ্ছে</string>
+    <string name="configuration_error_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (%1$s), অনুগ্রহ করে আপনার সিস্টেম অ্যাডমিন এর সাথে যোগাযোগ করুন৷</string>
+    <string name="error_backend_maintenance_message">সিস্টেমটি বর্তমানে রক্ষণাবেক্ষণের জন্য অফলাইনে রয়েছে। অনুগ্রহ করে একটু পরে আবার চেষ্টা করুন.</string>
+    <string name="error_backend_maintenance_with_time_message">সিস্টেমটি বর্তমানে রক্ষণাবেক্ষণের জন্য অফলাইনে রয়েছে। %s পরে আবার চেষ্টা করুন</string>
+    <string name="dashboard_sync_card_records_to_upload">আপলোড করার জন্য %1$d রেকর্ড</string>
+    <string name="dashboard_sync_card_records_uploaded">সমস্ত রেকর্ড আপলোড হয়েছে</string>
+    <string name="outdated_google_play_services_alert_title">পুরানো Google Play Service সংস্করণ</string>
+    <string name="outdated_google_play_services_alert_message">এই ডিভাইসে ইনস্টল করা Google Play Service সংস্করণটি SID অ্যাপ -এর প্রয়োজনীয় সংস্করণের চেয়ে পুরানো</string>
+    <string name="missing_google_play_services_alert_title">Google play service অনুপস্থিত </string>
+    <string name="missing_google_play_services_alert_message">এই ডিভাইসে Google play service  ইনস্টল করা নেই।</string>
+    <string name="password_lock_title_default">আনলক করতে পাসওয়ার্ড লিখুন</string>
+    <string name="password_lock_title_logout">লগ আউট করতে পাসওয়ার্ড লিখুন</string>
+    <string name="password_lock_hint">পাসওয়ার্ড</string>
+    <string name="password_lock_wrong_pin">ভুল পাসওয়ার্ড</string>
+    <string name="password_lock_overlay_title">Unlock করতে চাপুন</string>
 </resources>

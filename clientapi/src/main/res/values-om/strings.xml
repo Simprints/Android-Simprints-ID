@@ -17,4 +17,5 @@
     <string name="invalid_verifyId_message">Dogoggorri \'configuration\' uumameera (GUID\'n mirkanaa\'u sirrii miti) maaloo suppervaayizera kee quunnami.</string>
     <string name="rooted_device_title">Meeshaa barbaadee argachuu</string>
     <string name="rooted_device_message">1. Supparvaayzara kee quunnami-meeshaa barbaaddee argachuuf\n2. Cufi1</string>
+    <string name="configuration_error_message">Dogongorri qindeessaa uumameera (%1$s), maaloo bulchaa sirna kee qunnami</string>
 </resources>
