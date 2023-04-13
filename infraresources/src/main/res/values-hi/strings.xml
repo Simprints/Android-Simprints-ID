@@ -156,4 +156,38 @@
     <string name="dashboard_sync_card_try_again_button">पुनः प्रयास करें</string>
     <string name="confirmation_sent">पुष्टिकरण भेजा गया</string>
     <string name="redirecting_you_back">आपको वापस रीडायरेक्ट कर रहा है</string>
+    <string name="dashboard_card_available_on_phone">फ़ोन पर उपलब्ध है</string>
+    <string name="dashboard_card_current_user">वर्तमान उपयोगकर्ता</string>
+    <string name="dashboard_card_enrol_title">अंतिम बार पंजीकृत</string>
+    <string name="dashboard_card_enrolment_info">पंजीकरण की जानकारी</string>
+    <string name="dashboard_card_identification_title">अंतिम पहचान</string>
+    <string name="dashboard_card_lastscanner_used">स्कैनर का उपयोग किया गया</string>
+    <string name="dashboard_card_to_download">डाउनलोड करने हेतु</string>
+    <string name="dashboard_card_to_upload">अपलोड करने हेतु</string>
+    <string name="dashboard_card_verification_title">अंतिम बार सत्यापन</string>
+    <string name="safetynet_down_alert_message">1. कृपया 5-10 मिनट बात पुनः प्रयास करें 2. बंद करें पर क्लिक करें। </string>
+    <string name="try_again_label">पुनः प्रयास करें</string>
+    <string name="dashboard_sync_card_offline_button">सेटिंग</string>
+    <string name="id_error_save">सेव नहीं किया जा सकता</string>
+    <string name="id_save_message">1. %1$s रिकोर्ड को सेव करने में असफल
+2. बंद करें पर क्लिक करें</string>
+    <string name="id_enrolment_successful">पंजीकरण सफल रहा</string>
+    <string name="id_config_error_enrol_last_biometrics">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य सिंप्रिंट्स इंटेंट), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="toast_login_failed">लॉग-इन असफल रहा। कृपया अपने सुपरवाईज़र से सम्पर्क करें। </string>
+    <string name="enrol_last_biometrics_alert_title">सेव नहीं किया जा सकता</string>
+    <string name="error_backend_maintenance_message">सिस्टम वर्तमान में रखरखाव के लिए ऑफ़लाइन है। कृपया बाद में पुन: प्रयास करें।</string>
+    <string name="error_backend_maintenance_with_time_message">सिस्टम वर्तमान में रखरखाव के लिए ऑफ़लाइन है। कृपया %s के बाद पुन: प्रयास करें</string>
+    <string name="dashboard_sync_card_records_to_upload">अपलोड करने के लिए %1$d रिकॉर्ड</string>
+    <string name="dashboard_sync_card_records_uploaded">सभी रिकॉर्ड अपलोड किए गए</string>
+    <string name="outdated_google_play_services_alert_title">पुरानी Google Play सेवाएं</string>
+    <string name="outdated_google_play_services_alert_message">इस डिवाइस पर इंस्टॉल किया गया google play services संस्करण SID द्वारा आवश्यक संस्करण से पुराना है</string>
+    <string name="missing_google_play_services_alert_title">गूगल प्ले सेवाएं
+अनुपलब्ध</string>
+    <string name="missing_google_play_services_alert_message">इस डिवाइस पर google play सेवाएं इंस्टॉल नहीं हैं।</string>
+    <string name="exit_form_return_to_simprints">चेहरे की फ़ोटो लें</string>
+    <string name="password_lock_title_default">अनलॉक करने के लिए पासवर्ड दर्ज करें</string>
+    <string name="password_lock_title_logout">लॉग आउट करने के लिए पासवर्ड दर्ज करें</string>
+    <string name="password_lock_hint">पासवर्ड</string>
+    <string name="password_lock_wrong_pin">गलत पासवर्ड</string>
+    <string name="password_lock_overlay_title">अनलॉक करने के लिए टैप करें</string>
 </resources>
