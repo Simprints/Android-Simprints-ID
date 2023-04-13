@@ -75,8 +75,6 @@
         <item quantity="other">%d correspondances</item>
     </plurals>
 
-
-
-
-
+    <string name="enrol_last_biometrics_alert_message_face_param">Reconnaissance faciale</string>
+    <string name="exit_form_capture_face">Retourner à Simprints</string>
 </resources>

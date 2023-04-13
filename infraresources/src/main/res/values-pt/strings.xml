@@ -163,4 +163,36 @@
         <item quantity="one">Identificação</item>
         <item quantity="other">Identificações</item>
     </plurals>
+    <string name="dashboard_card_available_on_phone">Disponível no telefone</string>
+    <string name="dashboard_card_enrol_title">Última inscrição</string>
+    <string name="dashboard_card_enrolment_info">Informações de inscrição</string>
+    <string name="dashboard_card_identification_title">Última Identificação</string>
+    <string name="dashboard_card_lastscanner_used">Scanner usado</string>
+    <string name="dashboard_card_to_download">Para baixar</string>
+    <string name="dashboard_card_to_upload">Para fazer o upload</string>
+    <string name="dashboard_card_verification_title">Última Verificação</string>
+    <string name="safetynet_down_alert_message">1. Tente novamente após 5 a 10 minutos \n 2. Toque em fechar</string>
+    <string name="id_error_save">Incapaz de salvar</string>
+    <string name="id_save_message">1. Falha ao salvar registro de %1$s
+2. Toque em Fechar</string>
+    <string name="id_enrolment_successful">Inscrição com sucesso</string>
+    <string name="id_config_error_enrol_last_biometrics">Ocorreu um erro de configuração (intenção Simprints inválida), entre em contacto com o administrador do sistema.</string>
+    <string name="enrol_last_biometrics_alert_message">1. Falha ao salvar o registro %1$s \n 2. Toque em fechar</string>
+    <string name="enrol_last_biometrics_alert_title">Incapaz de salvar</string>
+    <string name="enrol_last_biometrics_success">Inscrição bem-sucedida</string>
+    <string name="configuration_error_message">Ocorreu um erro de configuração (%1$s), entre em contato com o administrador do sistema</string>
+    <string name="error_backend_maintenance_message">O sistema está atualmente offline para manutenção. Por favor, tente novamente mais tarde.</string>
+    <string name="error_backend_maintenance_with_time_message">O sistema está atualmente offline para manutenção. Por favor, tente novamente após %s</string>
+    <string name="dashboard_sync_card_records_to_upload">%1$d registro para carregar</string>
+    <string name="dashboard_sync_card_records_uploaded">Todos os registros enviados</string>
+    <string name="outdated_google_play_services_alert_title">Serviços do Google Play desatualizados</string>
+    <string name="outdated_google_play_services_alert_message">A versão do Google Play Services instalada neste dispositivo é mais antiga que a exigida pelo SID</string>
+    <string name="missing_google_play_services_alert_title">Faltam os serviços do Google Play</string>
+    <string name="missing_google_play_services_alert_message">Os serviços do Google Play não estão instalados neste dispositivo.</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">Face/Impressão digital</string>
+    <string name="password_lock_title_default">Digite a senha para desbloquear</string>
+    <string name="password_lock_title_logout">Digite a senha para sair</string>
+    <string name="password_lock_hint">Senha</string>
+    <string name="password_lock_wrong_pin">Senha incorreta</string>
+    <string name="password_lock_overlay_title">Toque para desbloquear</string>
 </resources>
