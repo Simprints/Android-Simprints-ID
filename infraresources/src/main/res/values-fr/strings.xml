@@ -211,8 +211,7 @@
     <string name="dashboard_card_verification_title">Dernière vérification</string>
     <string name="safetynet_down_alert_message">1. Veuillez réessayer après 5-10 minutes \n 2. Appuyez sur Fermer</string>
     <string name="id_error_save">Impossible d\'enregistrer</string>
-    <string name="id_save_message">1. Échec de la sauvegarde de l\'enregistrement %1$s
-2. Tapez sur Fermer</string>
+    <string name="id_save_message">1. Échec de la sauvegarde de l\'enregistrement %1$s \n 2. Tapez sur Fermer</string>
     <string name="id_continue">Continuer</string>
     <string name="id_enrolment_successful">Inscription réussie</string>
     <string name="id_config_error_enrol_last_biometrics">Une erreur de configuration s\'est produite (invalid Simprints intent), veuillez contacter votre administrateur système.</string>
