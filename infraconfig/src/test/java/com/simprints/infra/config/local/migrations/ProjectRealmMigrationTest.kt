@@ -6,7 +6,12 @@ import com.simprints.infra.config.testtools.protoProject
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbProject
-import io.mockk.*
+import io.mockk.CapturingSlot
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import io.realm.Realm
 import io.realm.RealmQuery
 import kotlinx.coroutines.test.runTest
@@ -92,7 +97,7 @@ class ProjectRealmMigrationTest {
         every { loginManager.signedInProjectId } returns PROJECT_ID
         every { realmQuery.findFirst() } returns dbProject
 
-        val migratedData = projectRealmMigration.migrate(protoProject)
+        val migratedData = projectRealmMigration.migrate(ProtoProject.newBuilder().build())
         assertThat(migratedData).isEqualTo(expectedProtoProject)
     }
 
