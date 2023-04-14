@@ -175,7 +175,7 @@
     <string name="safetynet_down_alert_message">1. እባክዎ ከ5 እስከ 10 ደቂቃ ቆይተው ይሞክሩ</string>
     <string name="why_did_you_skip_biometrics">ለምንየጣት አሻራዉን  ዘለሉ?</string>
     <string name="id_error_save">መመዝገብ አልተቻለም</string>
-    <string name="id_save_message">1 የማህደሩን %1$s  መመዝገብ አልተሳካም                           2 መዝጊያውን ይጫኑ</string>
+    <string name="id_save_message">1 የማህደሩን %1$s  መመዝገብ አልተሳካም \n 2 መዝጊያውን ይጫኑ</string>
     <string name="id_continue">ቀጥል</string>
     <string name="id_enrolment_successful">ምዝገባ ተሳክቷል</string>
     <string name="id_config_error_enrol_last_biometrics">የማዋቀር(configuration) ስህተት አጋጥሟል(የተሳሳተ ሲምፕሪንስ ኢንተንት) እባክዎ ለሲስተም አድሚኒስትሬተር ያሳውቁ</string>

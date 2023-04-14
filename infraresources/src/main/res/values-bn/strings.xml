@@ -226,8 +226,7 @@
     <string name="dashboard_card_verification_title">সর্বশেষ যাচাই </string>
     <string name="safetynet_down_alert_message">৫-১০ মিনিট পর চেষ্টা করুন</string>
     <string name="id_error_save">সেভ করা যায়নি</string>
-    <string name="id_save_message">১। %1$s রেকর্ড সেভ করা যায়নি 
-২। বন্ধ করুন</string>
+    <string name="id_save_message">১। %1$s রেকর্ড সেভ করা যায়নি \n ২। বন্ধ করুন</string>
     <string name="id_continue">সামনে আগান</string>
     <string name="id_enrolment_successful">নিবন্ধন সফল হয়েছে</string>
     <string name="id_config_error_enrol_last_biometrics">একটি কনফিগারেশন সমস্যা ঘটেছে (অবৈধ সিমপ্রিন্টস এন্ট্রি),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>

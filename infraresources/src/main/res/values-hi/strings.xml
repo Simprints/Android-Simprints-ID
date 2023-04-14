@@ -169,8 +169,7 @@
     <string name="try_again_label">पुनः प्रयास करें</string>
     <string name="dashboard_sync_card_offline_button">सेटिंग</string>
     <string name="id_error_save">सेव नहीं किया जा सकता</string>
-    <string name="id_save_message">1. %1$s रिकोर्ड को सेव करने में असफल
-2. बंद करें पर क्लिक करें</string>
+    <string name="id_save_message">1. %1$s रिकोर्ड को सेव करने में असफल \n 2. बंद करें पर क्लिक करें</string>
     <string name="id_enrolment_successful">पंजीकरण सफल रहा</string>
     <string name="id_config_error_enrol_last_biometrics">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य सिंप्रिंट्स इंटेंट), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
     <string name="toast_login_failed">लॉग-इन असफल रहा। कृपया अपने सुपरवाईज़र से सम्पर्क करें। </string>

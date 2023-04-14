@@ -187,7 +187,7 @@
     <string name="safetynet_down_alert_message">Tafadhali jaribu tena baada ya  dakika 5–10 \n2.Gusa funga</string>
     <string name="why_did_you_skip_biometrics">Kwanini umeruka kuchukua alama ya kidole?</string>
     <string name="id_error_save">Imeshindwa kuhifadhi</string>
-    <string name="id_save_message">1. Imeshindwa kuhifadhi rekodi %1$s 2. Gusa funga</string>
+    <string name="id_save_message">1. Imeshindwa kuhifadhi rekodi %1$s \n 2. Gusa funga</string>
     <string name="id_continue">Endelea</string>
     <string name="id_enrolment_successful">Uandikishaji umefanikiwa</string>
     <string name="id_config_error_enrol_last_biometrics">Kosa la kiufundi limetokea (intenti ya Simprints sio sahihi), tafadhali wasiliana na msimamizi wako wa programu</string>

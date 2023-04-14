@@ -169,7 +169,7 @@
     <string name="dashboard_card_to_upload">ለ መጫን</string>
     <string name="dashboard_card_verification_title">የመጨረሻው ማጣሪያ</string>
     <string name="id_error_save">መመዝገብ አልተቻለም</string>
-    <string name="id_save_message">1 የማህደሩን %1$s  መመዝገብ አልተሳካም                           2 መዝጊያውን ይጫኑ</string>
+    <string name="id_save_message">1 የማህደሩን %1$s መመዝገብ አልተሳካም \n 2 መዝጊያውን ይጫኑ</string>
     <string name="id_continue">ቀጥል</string>
     <string name="id_enrolment_successful">ምዝገባ ተሳክቷል</string>
     <string name="id_config_error_enrol_last_biometrics">የተግባቦት ስህተት አጋጥሟል(የተሳሳተ ሲምፕሪንስ ኢንተንት) እባክዎ ለሲስተም አድሚኒስትሬተር ያሳውቁ</string>
