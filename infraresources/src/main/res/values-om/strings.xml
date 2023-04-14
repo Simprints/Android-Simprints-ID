@@ -3,7 +3,7 @@
     <string name="app_name">Simprints ID</string>
     <string name="alert_title">Yaadachiisa</string>
     <string name="alert_try_again">Yeroo gabaabaa keessatti irra deebi\'uun yaali</string>
-    <string name="confirmation_logout_cancel">Addan kuti</string>
+    <string name="confirmation_logout_cancel">Haquu</string>
     <string name="confirmation_logout_message">Keessa bahuu barbaadda?</string>
     <string name="confirmation_logout_title">Keessaa bahi</string>
     <string name="dashboard_card_calculating">Shalagaa jira…</string>
