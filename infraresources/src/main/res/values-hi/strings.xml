@@ -180,8 +180,7 @@
     <string name="dashboard_sync_card_records_uploaded">सभी रिकॉर्ड अपलोड किए गए</string>
     <string name="outdated_google_play_services_alert_title">पुरानी Google Play सेवाएं</string>
     <string name="outdated_google_play_services_alert_message">इस डिवाइस पर इंस्टॉल किया गया google play services संस्करण SID द्वारा आवश्यक संस्करण से पुराना है</string>
-    <string name="missing_google_play_services_alert_title">गूगल प्ले सेवाएं
-अनुपलब्ध</string>
+    <string name="missing_google_play_services_alert_title">गूगल प्ले सेवाएं अनुपलब्ध</string>
     <string name="missing_google_play_services_alert_message">इस डिवाइस पर google play सेवाएं इंस्टॉल नहीं हैं।</string>
     <string name="exit_form_return_to_simprints">चेहरे की फ़ोटो लें</string>
     <string name="password_lock_title_default">अनलॉक करने के लिए पासवर्ड दर्ज करें</string>
