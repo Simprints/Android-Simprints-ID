@@ -9,7 +9,8 @@ internal fun Project.toProto(): ProtoProject =
         .setDescription(description)
         .setName(name)
         .setImageBucket(imageBucket)
+        .setBaseUrl(baseUrl)
         .build()
 
 internal fun ProtoProject.toDomain(): Project =
-    Project(id, name, description, creator, imageBucket)
+    Project(id, name, description, creator, imageBucket, baseUrl)
