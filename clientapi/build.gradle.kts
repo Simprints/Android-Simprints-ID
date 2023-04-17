@@ -17,10 +17,6 @@ sonarqube {
 }
 
 android {
-    packagingOptions {
-        resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
-    }
-
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"

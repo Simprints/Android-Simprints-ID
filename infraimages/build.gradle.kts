@@ -15,10 +15,6 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
-
-    packagingOptions {
-        resources.excludes.add("META-INF/*")
-    }
     namespace = "com.simprints.infra.images"
 
 }

@@ -39,9 +39,7 @@ android {
     }
 
     buildFeatures.viewBinding = true
-    packagingOptions {
-        resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
-    }
+
     namespace = "com.simprints.face"
 }
 repositories {

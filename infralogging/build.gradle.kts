@@ -60,6 +60,4 @@ dependencies {
     // Unit Tests
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.robolectric.core)
-
 }
