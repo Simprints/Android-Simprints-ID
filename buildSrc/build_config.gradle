@@ -10,7 +10,9 @@ android {
         versionCode VERSION_CODE
         versionName VERSION_NAME
     }
-
+    buildFeatures {
+        buildConfig = true
+    }
     buildTypes {
         release {
             debuggable = false
