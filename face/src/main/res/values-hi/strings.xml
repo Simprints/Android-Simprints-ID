@@ -79,4 +79,5 @@
         <item quantity="other">%d मेल खाते हैं</item>
     </plurals>
 
+    <string name="exit_form_capture_face">चेहरे की फ़ोटो लें</string>
 </resources>
