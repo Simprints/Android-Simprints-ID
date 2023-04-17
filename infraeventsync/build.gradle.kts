@@ -41,9 +41,6 @@ android {
         unitTests.isIncludeAndroidResources = true
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
-    packagingOptions {
-        resources.excludes.add("META-INF/*")
-    }
 }
 
 dependencies {
