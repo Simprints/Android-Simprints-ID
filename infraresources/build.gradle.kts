@@ -1,25 +1,21 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-}
-
-apply {
-    from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
+    id("simprints.android.library")
 }
 
 android {
+    namespace = "com.simprints.infra.resources"
+
     defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
-    namespace = "com.simprints.infra.resources"
 }
 
 dependencies {
     implementation(libs.support.material)
     implementation(libs.androidX.appcompat)
     implementation(libs.androidX.ui.constraintlayout)
-    implementation(libs.androidX.ui.preference){
-        exclude("androidx.lifecycle","lifecycle-viewmodel-ktx")
+
+    implementation(libs.androidX.ui.preference) {
+        exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
     }
 }
