@@ -63,6 +63,15 @@ gradlePlugin {
             implementationClass = "AndroidLibraryConventionPlugin"
         }
 
+        // CI related plugin configuration
+        register("pipelineJacoco") {
+            id = "simprints.ci.jacoco"
+            implementationClass = "PipelineJacocoConventionPlugin"
+        }
+        register("pipelineSonar") {
+            id = "simprints.ci.sonar"
+            implementationClass = "PipelineSonarConventionPlugin"
+        }
 
         // Utility plugins for easy build config setup in module
         register("configCloud") {

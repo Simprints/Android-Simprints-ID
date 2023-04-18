@@ -4,7 +4,6 @@ plugins {
     id("simprints.feature")
     id("simprints.testing.android")
     id("kotlin-parcelize")
-    id("org.sonarqube")
 }
 
 sonarqube {
