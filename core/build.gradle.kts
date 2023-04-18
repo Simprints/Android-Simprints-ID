@@ -1,38 +1,22 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
+    id("simprints.android.library")
+    id("simprints.library.hilt")
     id("kotlin-parcelize")
-    kotlin("kapt")
-}
-
-apply {
-    from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
 }
 
 android {
+    namespace = "com.simprints.core"
 
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    testOptions {
-        unitTests.isReturnDefaultValues = true
-        unitTests.isIncludeAndroidResources = true
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
-        animationsDisabled = true
-    }
-
-    buildFeatures {
-        viewBinding = true
-    }
-    namespace = "com.simprints.core"
-
+    viewBinding.enable = true
+    testOptions.unitTests.isReturnDefaultValues = true
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
     api(project(":moduleapi"))
     api(project(":infralogging"))
     api(project(":infranetwork"))
@@ -40,22 +24,20 @@ dependencies {
     api(project(":infrasecurity"))
 
     api(libs.androidX.appcompat)
-    api(libs.androidX.ui.fragment.kotlin)
-    api(libs.support.material)
     api(libs.androidX.multidex)
-    api(libs.androidX.cameraX.core)
+    api(libs.androidX.annotation.annotation)
+    api(libs.androidX.lifecycle.livedata.ktx)
 
-    implementation(libs.libsimprints)
+    api(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.camera2)
 
+    implementation(libs.libsimprints)
+
     runtimeOnly(libs.kotlin.coroutinesAndroid)
+
     implementation(libs.jackson.core)
     implementation(libs.workManager.work)
     implementation(libs.kronos.kronos)
-
-    // Hilt
-    implementation(libs.hilt)
-    kapt(libs.hilt.kapt)
 
     testImplementation(project(":testtools"))
 }

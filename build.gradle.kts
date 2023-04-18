@@ -1,99 +1,49 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+// Lists all plugins used throughout the project without applying them.
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.android.test) apply false
+    alias(libs.plugins.kotlin.android) apply false
+
+    // TODO Uncomment when issue with realm plugin is solved
+    // alias(libs.plugins.realm) apply false
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.protobuf) apply false
+    alias(libs.plugins.navigation.args) apply false
+
+    alias(libs.plugins.gms) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
+    alias(libs.plugins.firebase.perf) apply false
+    alias(libs.plugins.firebase.distribution) apply false
+    alias(libs.plugins.play.publisher) apply false
+
+    alias(libs.plugins.retry) apply false
+    alias(libs.plugins.sonar) apply false
+    alias(libs.plugins.depsAnalysis) apply false
+    alias(libs.plugins.depsGraph) apply false
+}
+
+
+// TODO Due to a bug either in plugin dsl or in the plugin packaging realm-android does not
+//   resolve to correct path when added in plugins block abd build-logic dependencies.
+//   This is temporary workaround until we find a way to add realm plugin or replace it with realm-kotlin.
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath(libs.plugin.realm)
+    }
+}
 
 apply {
     from("ci${File.separator}scanning${File.separator}sonarqube.gradle")
     from("ci${File.separator}scanning${File.separator}dependency_health.gradle")
 }
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven(url = "https://plugins.gradle.org/m2/")
-    }
-
-    dependencies {
-        // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:8.0.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.version.get()}")
-
-        // CI Scanning & Retry
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.5.0.2730")
-
-        classpath("org.jacoco:org.jacoco.core:${libs.versions.jacoco.version.get()}")
-
-        classpath("com.autonomousapps:dependency-analysis-gradle-plugin:1.19.0")
-        classpath("org.gradle:test-retry-gradle-plugin:1.5.2")
-
-        // Firebase
-        classpath("com.google.gms:google-services:4.3.15")
-        classpath("com.google.firebase:perf-plugin:1.4.2")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.5")
-
-        // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.15.1")
-
-        // Android X Navigation components
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
-
-        // Deployment
-        classpath("com.github.triplet.gradle:play-publisher:3.8.1")
-        classpath("com.google.firebase:firebase-appdistribution-gradle:4.0.0")
-
-        // Hilt
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.45")
-    }
-
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            name = "SimMatcherGitHubPackages"
-            url = uri("https://maven.pkg.github.com/simprints/lib-android-simmatcher")
-            credentials {
-                username = gradleLocalProperties(rootDir).getProperty("GITHUB_USERNAME")
-                    ?: System.getenv("GITHUB_USERNAME")
-                password = gradleLocalProperties(rootDir).getProperty("GITHUB_TOKEN")
-                    ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        kotlinOptions.freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
-        kotlinOptions.freeCompilerArgs += "-Xnew-inference"
-    }
-
-    configurations {
-        all {
-            resolutionStrategy {
-                dependencySubstitution {
-
-                    // Due to bug either in AS or explicit fragment dependency does not override transitive
-                    // dependencies and it is not possible to use newest features of both FragmentActivity
-                    // and AppCompatActivity (we use both for screen results API).
-                    // https://issuetracker.google.com/u/0/issues/178403178#comment17
-                    substitute(module("androidx.fragment:fragment:1.0.0"))
-                        .using(module("androidx.fragment:fragment:${libs.versions.fragment.version.get()}"))
-                }
-            }
-        }
-    }
-
-}
-
 tasks.register("clean", Delete::class) {
     delete(rootProject.buildDir)
 }
-
-plugins {
-    id("org.gradle.test-retry") version "1.5.2"
-    id("com.vanniktech.dependency.graph.generator") version "0.8.0"
-}
-
 /*
 Run tests in parallel to speed up tests
 https://docs.gradle.org/nightly/userguide/performance.html#suggestions_for_java_projects

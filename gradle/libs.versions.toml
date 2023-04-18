@@ -2,6 +2,7 @@
 kotlin_version = "1.8.20"
 kotlin_coroutine_version = "1.6.4"
 
+android_gradlePlugin_version = "8.0.0"
 androidx_version = "1.5.2"
 androidx_core_version = "1.10.0"
 androidx_app_compat_version = "1.6.1"
@@ -21,14 +22,26 @@ androidx_preferences_version = "1.2.0"
 androidx_viewpager_version = "1.0.0"
 androidx_security_version = "1.0.0"
 androidx_annotation_version = "1.6.0"
+androidx_arch_core_version = "2.2.0"
 matertial_version = "1.8.0"
+
 hilt_version = "2.45"
 hilt_androidx_version = "1.0.0"
+
 play_location_services_version = "21.0.1"
 play_integrity_version = "1.1.0"
+gsm_plugin_version = "4.3.15"
+play_publisher_version = "3.8.1"
+
 firebase_auth_version = "21.3.0"
 firebase_storage_version = "20.1.0"
 firebase_barcode_version = "18.2.0"
+firebase_crashlytics_version = "18.3.6"
+firebase_analytics_version = "21.2.2"
+firebase_perf_version = "20.3.1"
+firebase_crashlyticsPlugin_version = "2.9.2"
+firebase_perfPlugin_version = "1.4.2"
+firebase_distrtibutionPlugin_version = "4.0.0"
 
 retrofit_version = "2.9.0"
 okttp_version = "4.10.0"
@@ -50,6 +63,7 @@ protobuf_version = "3.22.3"
 cameraview_version = "2.7.2"
 circleImageView_version = "3.1.0"
 splitties_version = "3.0.0"
+timber_version = "5.0.1"
 
 libsimprints_version = "2022.3.0"
 simmatcher_version = "1.0.0"
@@ -58,7 +72,7 @@ junit_version = "4.13.2"
 junit_ext_version = "1.1.5"
 truth_version = "1.1.3"
 livedata_testing_version = "1.3.0"
-koTest_version = "5.5.5"
+koTest_version = "5.6.0"
 mockk_version = "1.13.5"
 mockito_version = "5.2.0"
 mockito_kotlin_version = "2.2.0"
@@ -68,6 +82,13 @@ espresso_accessibility_version = "4.0.0"
 barista_version = "4.3.0"
 uiAutomator_version = "2.2.0"
 jacoco_version = "0.8.9"
+
+sonar_plugin_version = "3.5.0.2730"
+deps_analysis_version = "1.20.0"
+retry_version = "1.5.2"
+realm_version = "10.15.1"
+protobuf_plugin_version = "0.9.1"
+deps_graph_version = "0.8.0"
 
 [libraries]
 
@@ -127,6 +148,9 @@ playServices-integrity = { module = "com.google.android.play:integrity", version
 firebase-auth = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebase_auth_version" }
 firebase-storage = { module = "com.google.firebase:firebase-storage-ktx", version.ref = "firebase_storage_version" }
 firebase-barcode = { module = "com.google.android.gms:play-services-mlkit-barcode-scanning", version.ref = "firebase_barcode_version" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebase_crashlytics_version" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebase_analytics_version" }
+firebase-perf = { module = "com.google.firebase:firebase-perf", version.ref = "firebase_perf_version" }
 
 #SqlCipher
 sqlCipher-core = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlCipher_version" }
@@ -168,6 +192,9 @@ splitties-core = { module = "com.louiscad.splitties:splitties-fun-pack-android-b
 
 #CommonsIO
 commonsIO-commons_io = { module = "commons-io:commons-io", version.ref = "commons_io_version" }
+
+#Timber
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber_version" }
 
 #Kronos
 kronos-kronos = { module = "com.lyft.kronos:kronos-android", version.ref = "kronos_version" }
@@ -221,9 +248,46 @@ testing-Espresso-intents = { module = "androidx.test.espresso:espresso-intents",
 testing-Espresso-barista = { module = "com.adevinta.android:barista", version.ref = "barista_version" } #Used to grant permissions in AndroidTests
 #Testing-AndroidX
 testing-AndroidX-ext-junit = { module = "androidx.test.ext:junit", version.ref = "junit_ext_version" }
-testing-AndroidX-core = { module = "android.arch.core:core-testing", version.ref = "androidx_version" }
+testing-AndroidX-core = { module = "androidx.arch.core:core-testing", version.ref = "androidx_arch_core_version" }
 testing-AndroidX-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx_test_orchestrator_version" }
 testing-AndroidX-runner = { module = "androidx.test:runner", version.ref = "androidx_version" }
 testing-AndroidX-room = { module = "androidx.room:room-testing", version.ref = "androidx_room_version" }
 testing-AndroidX-navigation = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation_version" }
 testing-AndroidX-uiAutomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiAutomator_version" }
+
+# Dependencies of the included build-logic
+plugin-gradle-android = { group = "com.android.tools.build", name = "gradle", version.ref = "android_gradlePlugin_version" }
+plugin-gradle-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin_version" }
+plugin-gms = { group = "com.google.gms", name = "google-services", version.ref = "gsm_plugin_version" }
+plugin-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-gradle", version.ref = "firebase_crashlyticsPlugin_version" }
+plugin-firebase-perf = { group = "com.google.firebase", name = "perf-plugin", version.ref = "firebase_perfPlugin_version" }
+plugin-realm = { group = "io.realm", name = "realm-gradle-plugin", version.ref = "realm_version" }
+plugin-hilt = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt_version" }
+plugin-protobuf = { group = "com.google.protobuf", name = "protobuf-gradle-plugin", version.ref = "protobuf_plugin_version" }
+plugin-navigation = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "androidx_navigation_version" }
+plugin-play-publisher = { group = "com.github.triplet.gradle", name = "play-publisher", version.ref = "play_publisher_version" }
+plugin-firebase-distribution = { group = "com.google.firebase", name = "firebase-appdistribution-gradle", version.ref = "firebase_distrtibutionPlugin_version" }
+plugin-sonar = { group = "org.sonarsource.scanner.gradle", name = "sonarqube-gradle-plugin", version.ref = "sonar_plugin_version" }
+plugin-jacoco = { group = "org.jacoco", name = "org.jacoco.core", version.ref = "jacoco_version" }
+plugin-depsAnalysis = { group = "com.autonomousapps", name = "dependency-analysis-gradle-plugin", version.ref = "deps_analysis_version" }
+plugin-retry = { group = "org.gradle", name = "test-retry-gradle-plugin", version.ref = "retry_version" }
+
+[plugins]
+
+android-application = { id = "com.android.application", version.ref = "android_gradlePlugin_version" }
+android-library = { id = "com.android.library", version.ref = "android_gradlePlugin_version" }
+android-test = { id = "com.android.test", version.ref = "android_gradlePlugin_version" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin_version" }
+gms = { id = "com.google.gms.google-services", version.ref = "gsm_plugin_version" }
+firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebase_perfPlugin_version" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase_crashlyticsPlugin_version" }
+realm = { id = "realm-android", version.ref = "realm_version" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf_plugin_version" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt_version" }
+navigation-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx_navigation_version" }
+firebase-distribution = { id = "com.google.firebase.appdistribution", version.ref = "firebase_distrtibutionPlugin_version" }
+play-publisher = { id = "com.github.triplet.play", version.ref = "play_publisher_version" }
+retry = { id = "org.gradle.test-retry", version.ref = "retry_version" }
+sonar = { id = "org.sonarqube", version.ref = "sonar_plugin_version" }
+depsAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "deps_analysis_version" }
+depsGraph = { id = "com.vanniktech.dependency.graph.generator", version.ref = "deps_graph_version" }

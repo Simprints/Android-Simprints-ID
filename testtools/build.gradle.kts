@@ -1,12 +1,6 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    kotlin("kapt")
-    id("dagger.hilt.android.plugin")
-}
-
-apply {
-    from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
+    id("simprints.android.library")
+    id("simprints.library.hilt")
 }
 
 android {
@@ -21,33 +15,39 @@ android {
 System.setProperty("org.mockito.mock.android", "true")
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(project(":core"))
-    implementation(project(":infraresources"))
+    api(project(":core"))
 
-    implementation(libs.hilt)
-    kapt(libs.hilt.kapt)
-
-    implementation(libs.testing.androidX.core)
-    implementation(libs.androidX.multidex)
-    implementation(libs.androidX.appcompat)
-
+    api(libs.testing.androidX.core)
     api(libs.androidX.multidex)
     api(libs.androidX.appcompat)
+    api(libs.testing.fragment)
+    api(libs.testing.androidX.ext.junit)
+    api(libs.testing.androidX.runner)
+    api(libs.testing.androidX.navigation)
 
-    implementation(libs.testing.junit)
-    implementation(libs.testing.mockito.inline)
-    implementation(libs.testing.mockito.kotlin)
-    implementation(libs.testing.mockk.core)
-    implementation(libs.testing.truth)
-    implementation(libs.testing.robolectric.core)
-    implementation(libs.testing.coroutines)
-    implementation(libs.testing.koTest.kotlin.assert)
-    implementation(libs.testing.fragment.testing) {
-        exclude("androidx.test", "core")
+    api(libs.testing.navigation)
+    api(libs.testing.hilt)
+    api(libs.testing.live.data)
+    api(libs.testing.work)
+
+    api(libs.testing.junit)
+    api(libs.testing.mockito.core)
+    api(libs.testing.mockito.inline)
+    api(libs.testing.mockito.kotlin)
+    api(libs.testing.mockk.core)
+    api(libs.testing.truth)
+    api(libs.testing.robolectric.core)
+    api(libs.testing.coroutines)
+    api(libs.testing.koTest.kotlin.assert) {
+        exclude("org.jetbrains:annotations")
     }
-    implementation(libs.testing.espresso.core)
 
-    implementation(libs.rxJava2.android)
-    implementation(libs.rxJava2.core)
+    api(libs.testing.espresso.core)
+    api(libs.testing.espresso.intents)
+    api(libs.testing.espresso.contrib)
+    api(libs.testing.espresso.accessibility)
+
+    api(libs.rxJava2.android)
+    api(libs.rxJava2.core)
+    api(libs.rxJava2.kotlin)
 }
