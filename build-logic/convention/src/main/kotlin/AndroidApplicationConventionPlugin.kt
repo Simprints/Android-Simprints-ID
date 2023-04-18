@@ -28,6 +28,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("com.google.firebase.firebase-perf")
                 apply("com.google.gms.google-services")
                 apply("com.google.firebase.crashlytics")
+
+                apply("simprints.ci.jacoco")
+                apply("simprints.ci.sonar")
             }
 
             extensions.configure<ApplicationExtension> {

@@ -12,6 +12,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.android")
+
+                apply("simprints.ci.jacoco")
+                apply("simprints.ci.sonar")
             }
 
             extensions.configure<LibraryExtension> {
