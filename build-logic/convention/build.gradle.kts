@@ -72,6 +72,10 @@ gradlePlugin {
             id = "simprints.ci.sonar"
             implementationClass = "PipelineSonarConventionPlugin"
         }
+        register("pipelineDeploy") {
+            id = "simprints.ci.deploy"
+            implementationClass = "PipelineDeployConventionPlugin"
+        }
 
         // Utility plugins for easy build config setup in module
         register("configCloud") {

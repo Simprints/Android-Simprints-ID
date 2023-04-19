@@ -2,14 +2,8 @@ plugins {
     id("simprints.android.application")
     id("kotlin-parcelize")
 
-    id("com.github.triplet.play")
-    id("com.google.firebase.appdistribution")
+    id("simprints.ci.deploy")
     id("com.vanniktech.dependency.graph.generator")
-}
-
-apply {
-    from("${rootDir}${File.separator}buildSrc${File.separator}signing_config.gradle")
-    from("${rootDir}${File.separator}ci${File.separator}deployment${File.separator}deploy_config.gradle")
 }
 
 android {
@@ -37,7 +31,6 @@ android {
         }
     }
 }
-
 
 dependencies {
     // ######################################################

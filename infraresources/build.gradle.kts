@@ -2,6 +2,14 @@ plugins {
     id("simprints.android.library")
 }
 
+sonarqube {
+    /*
+     * We skip the infraresources module because it has no source code to analyse. This should be
+     * removed if that ever changes
+     */
+    isSkipProject = true
+}
+
 android {
     namespace = "com.simprints.infra.resources"
 
