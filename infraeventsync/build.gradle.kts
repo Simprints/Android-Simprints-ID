@@ -10,7 +10,6 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
-    buildFeatures.buildConfig = true
     buildTypes {
         getByName("release") {
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")

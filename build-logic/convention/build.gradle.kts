@@ -78,6 +78,10 @@ gradlePlugin {
             id = "simprints.config.cloud"
             implementationClass = "ConfigCloudConventionPlugin"
         }
+        register("configNetwork") {
+            id = "simprints.config.network"
+            implementationClass = "ConfigNetworkConventionPlugin"
+        }
 
         // Utility plugins for specific library configuration in individual modules
         register("libraryHilt") {

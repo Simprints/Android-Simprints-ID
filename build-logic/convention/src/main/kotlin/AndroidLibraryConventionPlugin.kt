@@ -1,4 +1,6 @@
 import com.android.build.api.dsl.LibraryExtension
+import common.BuildTypes
+import common.configureDebugModeBuildTypes
 import common.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -20,13 +22,26 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
 
-                buildFeatures.buildConfig = true
                 packaging {
                     // remove mockk duplicated files
                     resources.excludes.addAll(listOf(
                         "META-INF/*",
                     ))
                     resources.pickFirsts += setOf("mockito-extensions/org.mockito.plugins.MockMaker")
+                }
+
+                buildFeatures.buildConfig = true
+                buildTypes {
+                    getByName(BuildTypes.release) {
+                        isMinifyEnabled = true
+                    }
+                    create(BuildTypes.staging) {
+                        isMinifyEnabled = true
+                    }
+                    getByName(BuildTypes.debug) {
+                        isMinifyEnabled = false
+                    }
+                    configureDebugModeBuildTypes()
                 }
             }
 

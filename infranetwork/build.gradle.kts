@@ -1,6 +1,7 @@
 plugins {
     id("simprints.android.library")
     id("simprints.library.hilt")
+    id("simprints.config.network")
 }
 
 android {
@@ -13,22 +14,6 @@ android {
 
     testOptions {
         unitTests.isReturnDefaultValues = true
-    }
-
-    buildFeatures.buildConfig = true
-    buildTypes {
-        getByName("release") {
-            buildConfigField("Boolean", "DEBUG_MODE", "false")
-            buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
-        }
-        create("staging") {
-            buildConfigField("Boolean", "DEBUG_MODE", "true")
-            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
-        }
-        getByName("debug") {
-            buildConfigField("Boolean", "DEBUG_MODE", "true")
-            buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
-        }
     }
 }
 

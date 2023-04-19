@@ -80,7 +80,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                         lint.fatal += "StopShip"
                         versionNameSuffix = "+$propVersionCode"
                         buildConfigField("Boolean", "DEBUG_MODE", "false")
-
                     }
 
                     create(BuildTypes.staging) {
