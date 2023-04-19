@@ -29,16 +29,6 @@ class PipelineSonarConventionPlugin : Plugin<Project> {
                     }
                 }
             }
-
-            /*
-             * We skip the infraresources module because it has no source code to analyse. This should be
-             * removed if that ever changes
-             */
-            project(":infraresources") {
-                extensions.configure<SonarExtension> {
-                    isSkipProject = true
-                }
-            }
         }
     }
 
