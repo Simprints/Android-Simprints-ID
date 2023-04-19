@@ -7,6 +7,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
+import org.jetbrains.kotlin.konan.file.File
 
 fun NamedDomainObjectContainer<LibraryBuildType>.configureDebugModeBuildTypes() {
     getByName(BuildTypes.release) {
@@ -21,7 +22,7 @@ fun NamedDomainObjectContainer<LibraryBuildType>.configureDebugModeBuildTypes() 
 }
 
 fun Project.configureDbEncryptionBuild() {
-    apply(from = "${rootDir}/build-logic/build_properties.gradle")
+    apply(from = "${rootDir}${File.separator}build-logic${File.separator}build_properties.gradle")
     val props = extra.properties
     val propDbEncrypted = props["DB_ENCRYPTION"] as Boolean
 
