@@ -1,9 +1,10 @@
-import common.*
+import com.google.protobuf.gradle.ProtobufExtension
+import common.getLibs
+import common.implementation
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import com.google.protobuf.gradle.ProtobufExtension
 
 class LibraryProtobufConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {

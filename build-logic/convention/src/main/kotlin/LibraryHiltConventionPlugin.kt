@@ -1,4 +1,8 @@
-import common.*
+import common.getLibs
+import common.implementation
+import common.kapt
+import common.kaptAndroidTest
+import common.kaptTest
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure

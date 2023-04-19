@@ -12,19 +12,18 @@ android {
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
 
-    buildFeatures.buildConfig = true
     buildTypes {
-        release {
+        getByName("release") {
             proguardFiles("proguard-rules.pro")
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "1440L")
         }
 
-        create("staging") {
+        getByName("staging") {
             proguardFiles("proguard-rules.pro")
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
 
-        debug {
+        getByName("debug") {
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
     }

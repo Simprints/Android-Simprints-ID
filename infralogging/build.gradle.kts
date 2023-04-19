@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
-
 plugins {
     id("simprints.android.library")
 }
@@ -7,14 +5,13 @@ plugins {
 android {
     namespace = "com.simprints.infra.logging"
 
-    buildFeatures.buildConfig = true
     buildTypes {
         getByName("release") {
             extra.set("enableCrashlytics", true)
             manifestPlaceholders["firebase_performance_logcat_enabled"] = false
             manifestPlaceholders["firebase_analytics_collection_enabled"] = true
         }
-        create("staging") {
+        getByName("staging") {
             extra.set("enableCrashlytics", true)
             manifestPlaceholders["firebase_performance_logcat_enabled"] = false
             manifestPlaceholders["firebase_analytics_collection_enabled"] = true

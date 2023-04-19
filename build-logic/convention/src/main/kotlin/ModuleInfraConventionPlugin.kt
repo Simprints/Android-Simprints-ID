@@ -1,5 +1,4 @@
 import com.android.build.api.dsl.LibraryExtension
-import common.getLibs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
