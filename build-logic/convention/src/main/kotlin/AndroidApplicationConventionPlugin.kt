@@ -8,12 +8,13 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.withGroovyBuilder
+import org.jetbrains.kotlin.konan.file.File
 
 class AndroidApplicationConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            apply(from = "${rootDir}/build-logic/build_properties.gradle")
+            apply(from = "${rootDir}${File.separator}build-logic${File.separator}build_properties.gradle")
             val props = extra.properties
             val propVersionCode = props["VERSION_CODE"] as Int
             val propVersionName = props["VERSION_NAME"] as String
