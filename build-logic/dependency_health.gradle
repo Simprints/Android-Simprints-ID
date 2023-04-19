@@ -1,0 +1,90 @@
+apply plugin: "com.autonomousapps.dependency-analysis"
+
+dependencyAnalysis {
+    issues {
+        all {
+            onUsedTransitiveDependencies { severity("ignore") }
+            onUnusedDependencies { severity("fail") }
+            onIncorrectConfiguration { severity("fail") }
+            ignoreKtx(true)
+            onAny {
+                exclude('com.louiscad.splitties:splitties-fun-pack-android-base-with-views-dsl',
+                    'com.google.dagger:hilt-compiler', 'com.google.dagger:hilt-android'
+                )
+            }
+        }
+        project(':infraevents') {
+            onAny {
+                exclude(
+                    'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
+                    'com.fasterxml.jackson.module:jackson-module-kotlin'
+                )
+            }
+        }
+        project(':fingerprint') {
+            onAny {
+                exclude('com.louiscad.splitties:splitties-views')
+            }
+        }
+        project(':infranetwork') {
+            onAny {
+                exclude('com.github.chuckerteam.chucker:library-no-op')
+            }
+        }
+        project(':infrarealm') {
+            onAny {
+                exclude('io.realm:realm-android-kotlin-extensions')
+            }
+        }
+        project(':infralicense') {
+            onAny {
+                exclude('com.fasterxml.jackson.module:jackson-module-kotlin')
+            }
+        }
+        project(':infraenrolmentrecords') {
+            onAny {
+                exclude('com.fasterxml.jackson.module:jackson-module-kotlin')
+            }
+        }
+        project(':infraresources') {
+            onAny {
+                exclude('org.jetbrains.kotlin:kotlin-stdlib-jdk8')
+            }
+        }
+        project(':core') {
+            onAny {
+                exclude(
+                    ':testtools', 'com.simprints:libsimprints'
+                )
+            }
+        }
+        project(':clientapi') {
+            onAny {
+                exclude(
+                    'androidx.lifecycle:lifecycle-runtime-ktx'
+                )
+            }
+        }
+        project(':fingerprintscanner') {
+            onAny {
+                exclude(
+                    // We exclude reflection in the fingerprint scanner because the dependency
+                    // scanner cannot detect reflective global extensions (we should remove these)
+                    'org.jetbrains.kotlin:kotlin-reflect'
+                )
+            }
+        }
+        project(':infralogging') {
+            onAny {
+                exclude(
+                    // We don't want the logging module the expose these via api, even if other
+                    // internal libraries in Simprints use Timber
+                    'com.jakewharton.timber:timber',
+                    'com.google.firebase:firebase-perf',
+                    // False positive
+                    'org.robolectric:robolectric'
+                )
+            }
+        }
+    }
+}

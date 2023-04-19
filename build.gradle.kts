@@ -37,8 +37,7 @@ buildscript {
 }
 
 apply {
-    from("ci${File.separator}scanning${File.separator}sonarqube.gradle")
-    from("ci${File.separator}scanning${File.separator}dependency_health.gradle")
+    from("build-logic${File.separator}dependency_health.gradle")
 }
 
 tasks.register("clean", Delete::class) {
