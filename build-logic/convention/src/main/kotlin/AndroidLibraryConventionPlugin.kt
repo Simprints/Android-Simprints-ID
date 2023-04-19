@@ -16,7 +16,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.android")
 
                 apply("simprints.ci.jacoco")
-                apply("simprints.ci.sonar")
             }
 
             extensions.configure<LibraryExtension> {

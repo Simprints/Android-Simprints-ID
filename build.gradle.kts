@@ -38,6 +38,7 @@ buildscript {
 
 apply {
     from("build-logic${File.separator}dependency_health.gradle")
+    from("build-logic${File.separator}sonarqube.gradle")
 }
 
 tasks.register("clean", Delete::class) {
