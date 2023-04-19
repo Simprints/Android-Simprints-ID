@@ -68,10 +68,6 @@ gradlePlugin {
             id = "simprints.ci.jacoco"
             implementationClass = "PipelineJacocoConventionPlugin"
         }
-        register("pipelineSonar") {
-            id = "simprints.ci.sonar"
-            implementationClass = "PipelineSonarConventionPlugin"
-        }
         register("pipelineDeploy") {
             id = "simprints.ci.deploy"
             implementationClass = "PipelineDeployConventionPlugin"
