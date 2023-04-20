@@ -76,4 +76,8 @@
     <string name="error_configuration_error_message">মুখের মোডালিটি কনফিগার করার সময় সমস্যা হয়েছে। সিস্টেম অ্যাডমিন এর সাথে যোগাযোগ করুন</string>
     <string name="face_configuration_started">মুখের মোডালিটি কনফিগার করা হচ্ছে</string>
     <string name="face_configuration_downloading">প্রয়োজনীয় ফাইল ডাউনলোড করা হচ্ছে</string>
+    <string name="error_close_button">বন্ধ করুন</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">মুখ</string>
+    <string name="error_unexpected_error_title">সমস্যা ঘটেছে</string>
+    <string name="error_unexpected_error_message">আবার চেষ্টা করুন এবং সিমপ্রিন্টস কাজ না করলে আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন।</string>
 </resources>
