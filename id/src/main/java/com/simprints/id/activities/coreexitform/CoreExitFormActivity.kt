@@ -18,11 +18,11 @@ import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResul
 import com.simprints.id.data.exitform.CoreExitFormReason.*
 import com.simprints.id.databinding.ActivityCoreExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.extensions.showKeyboard
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
-import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -174,7 +174,7 @@ class CoreExitFormActivity : BaseSplitActivity() {
         binding.btSubmitExitForm.isEnabled = false
         binding.exitFormText.requestFocus()
         setTextChangeListenerOnExitText()
-        inputMethodManager.showSoftInput(binding.exitFormText, InputMethodManager.SHOW_IMPLICIT)
+        showKeyboard(binding.exitFormText)
     }
 
     private fun setTextChangeListenerOnExitText() {

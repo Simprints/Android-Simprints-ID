@@ -7,11 +7,6 @@ dependencyAnalysis {
             onUnusedDependencies { severity("fail") }
             onIncorrectConfiguration { severity("fail") }
             ignoreKtx(true)
-            onAny {
-                exclude('com.louiscad.splitties:splitties-fun-pack-android-base-with-views-dsl',
-                    'com.google.dagger:hilt-compiler', 'com.google.dagger:hilt-android'
-                )
-            }
         }
         project(':infraevents') {
             onAny {
@@ -19,11 +14,6 @@ dependencyAnalysis {
                     'org.jetbrains.kotlin:kotlin-stdlib-jdk8',
                     'com.fasterxml.jackson.module:jackson-module-kotlin'
                 )
-            }
-        }
-        project(':fingerprint') {
-            onAny {
-                exclude('com.louiscad.splitties:splitties-views')
             }
         }
         project(':infranetwork') {

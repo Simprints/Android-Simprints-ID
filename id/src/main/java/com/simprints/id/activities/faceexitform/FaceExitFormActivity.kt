@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.onLayoutChange
@@ -18,11 +17,11 @@ import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResul
 import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.databinding.ActivityFaceExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.extensions.showKeyboard
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
-import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -147,7 +146,7 @@ class FaceExitFormActivity : BaseSplitActivity() {
         binding.faceBtSubmitExitForm.isEnabled = false
         binding.faceExitFormText.requestFocus()
         setTextChangeListenerOnExitText()
-        inputMethodManager.showSoftInput(binding.faceExitFormText, InputMethodManager.SHOW_IMPLICIT)
+        showKeyboard(binding.faceExitFormText)
     }
 
     private fun setTextChangeListenerOnExitText() {

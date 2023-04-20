@@ -53,13 +53,26 @@ dependencies {
     implementation(project(":infrarecentuseractivity"))
     implementation(project(":infraimages"))
 
-    implementation(libs.splitties.core)
     implementation(libs.kotlin.reflect)
+    runtimeOnly(libs.kotlin.coroutinesAndroid)
+
+    implementation(libs.androidX.core)
+    implementation(libs.androidX.appcompat)
+    implementation(libs.androidX.ui.activity)
+    implementation(libs.androidX.ui.fragment)
+    implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.ui.cardview)
+    implementation(libs.support.material)
+
+    implementation(libs.androidX.lifecycle)
+    implementation(libs.androidX.lifecycle.scope)
+    implementation(libs.androidX.lifecycle.livedata.ktx)
+
+    implementation(libs.androidX.cameraX.core)
     runtimeOnly(libs.androidX.cameraX.camera2)
     implementation(libs.androidX.cameraX.lifecycle)
     implementation(libs.androidX.cameraX.view)
-    implementation(libs.support.material)
+
     implementation(libs.workManager.work)
     implementation(libs.playServices.location)
 
@@ -69,14 +82,6 @@ dependencies {
     // Firebase
     implementation(libs.firebase.storage)
     implementation(libs.firebase.barcode)
-
-    implementation(libs.androidX.core)
-    implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.lifecycle.livedata.ktx)
-    implementation(libs.androidX.ui.constraintlayout)
-    runtimeOnly(libs.kotlin.coroutinesAndroid)
-    implementation(libs.androidX.cameraX.core)
-    runtimeOnly(libs.sqlCipher.core)
 
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
