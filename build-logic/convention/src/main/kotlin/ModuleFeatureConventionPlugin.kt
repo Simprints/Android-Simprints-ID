@@ -37,11 +37,13 @@ class ModuleFeatureConventionPlugin : Plugin<Project> {
 
                 implementation(libs, "androidX.core")
                 implementation(libs, "androidX.appcompat")
+                implementation(libs, "androidX.lifecycle")
                 implementation(libs, "androidX.lifecycle.scope")
 
                 implementation(libs, "support.material")
 
-                implementation(libs, "androidX.uI.fragment.kotlin")
+                implementation(libs, "androidX.uI.activity")
+                implementation(libs, "androidX.uI.fragment")
                 implementation(libs, "androidX.uI.constraintlayout")
                 implementation(libs, "androidX.uI.coordinatorlayout")
                 implementation(libs, "androidX.uI.cardview")

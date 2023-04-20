@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator
 
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.work.WorkManager
@@ -24,10 +25,11 @@ import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import splitties.init.appCtx
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class OrchestratorManagerImpl @Inject constructor(
+    @ApplicationContext private val appContext: Context,
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
     private val hotCache: HotCache,
@@ -115,7 +117,7 @@ class OrchestratorManagerImpl @Inject constructor(
                     buildAppResponseAndUpdateDailyActivity()
                     // Acquiring location info could take long time. so we should cancel StoreUserLocationIntoCurrentSessionWorker
                     // before returning to the caller app to avoid creating empty sessions.
-                    WorkManager.getInstance(appCtx)
+                    WorkManager.getInstance(appContext)
                         .cancelAllWorkByTag(STORE_USER_LOCATION_WORKER_TAG)
                 }
             }

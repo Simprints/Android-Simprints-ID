@@ -23,7 +23,7 @@ dependencies {
     debugImplementation(libs.chuck.debug) {
         exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
     }
-    releaseImplementation(libs.chuck.release)
+    implementation(libs.chuck.release)
 
     implementation(libs.jackson.core)
 
