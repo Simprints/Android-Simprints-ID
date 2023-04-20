@@ -83,4 +83,6 @@
 \n1. Certifique-se estar num espaço bem iluminado. 
 \n2. Certifique-se que a pessoa está olhando directamente. 
 \n3. Fique parado e mantenha a posição.</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
+    <string name="exit_form_capture_face">Capturar rosto</string>
 </resources>
