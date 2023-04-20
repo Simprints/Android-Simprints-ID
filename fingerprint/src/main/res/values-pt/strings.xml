@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="finger_selection_confirm_dialog_no">Cancelar</string>
+    <string name="preference_view_fingers_title">Ver dedos padrão</string>
+    <string name="finger_selection_fragment_title">Ver Dedos</string>
+    <string name="button_submit">Enviar</string>
+    <string name="cancel_button">Cancelar</string>
+    <string name="close">FECHAR</string>
+    <string name="error_occurred_title">Ocorreu um erro</string>
+    <string name="hint_other_reason">Informação Adicional</string>
+    <string name="pair_scanner_label">Definições</string>
+    <string name="refusal_app_not_working">App não funciona</string>
+    <string name="refusal_data_concerns">Não quer dar dados</string>
+    <string name="refusal_does_not_have_permission">Não tem permissão</string>
+    <string name="refusal_other">Outro</string>
+    <string name="refusal_person_not_present">Pessoa não presente</string>
+    <string name="refusal_religious_concerns">Preocupações religiosas</string>
+    <string name="refusal_toast_select_option_submit">Selecione uma opção e envie</string>
+    <string name="refusal_toast_submit">Por favor, envie o formulário</string>
+    <string name="refusal_too_young">Jovem demais</string>
+    <string name="settings_label">Configurações do telefone</string>
+    <string name="try_again_label">Tente novamente</string>
+    <string name="unforeseen_error_message">Por favor, tente novamente e se o Simprints não funcionar entre em contacto com o administrador do sistema</string>
+    <string name="serial_entry_ok">OK</string>
+    <plurals name="returned_results">
+        <item quantity="one">%d resultado retornado.</item>
+    </plurals>
+    <plurals name="returned_result">
+        <item quantity="other">Retornou %d resultados.</item>
+    </plurals>
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">Sem combinações muito boas</item>
+        <item quantity="one">%d combinação muito boa</item>
+        <item quantity="other">%d combinações muito boas</item>
+    </plurals>
+    <plurals name="tier3_matches">
+        <item quantity="zero">Sem boas combinações</item>
+        <item quantity="one">%d boa combinação</item>
+        <item quantity="other">%d boas combinações</item>
+    </plurals>
+    <plurals name="tier4_matches">
+        <item quantity="zero">Sem combinações</item>
+        <item quantity="one">%d combinação</item>
+        <item quantity="other">%d combinações</item>
+    </plurals>
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">%d candidato carregado.</item>
+        <item quantity="other">%d candidatos carregados.</item>
+    </plurals>
+</resources>
