@@ -267,7 +267,6 @@ plugin-play-publisher = { group = "com.github.triplet.gradle", name = "play-publ
 plugin-firebase-distribution = { group = "com.google.firebase", name = "firebase-appdistribution-gradle", version.ref = "firebase_distrtibutionPlugin_version" }
 plugin-sonar = { group = "org.sonarsource.scanner.gradle", name = "sonarqube-gradle-plugin", version.ref = "sonar_plugin_version" }
 plugin-jacoco = { group = "org.jacoco", name = "org.jacoco.core", version.ref = "jacoco_version" }
-plugin-depsAnalysis = { group = "com.autonomousapps", name = "dependency-analysis-gradle-plugin", version.ref = "deps_analysis_version" }
 plugin-retry = { group = "org.gradle", name = "test-retry-gradle-plugin", version.ref = "retry_version" }
 
 [plugins]
@@ -287,5 +286,4 @@ firebase-distribution = { id = "com.google.firebase.appdistribution", version.re
 play-publisher = { id = "com.github.triplet.play", version.ref = "play_publisher_version" }
 retry = { id = "org.gradle.test-retry", version.ref = "retry_version" }
 sonar = { id = "org.sonarqube", version.ref = "sonar_plugin_version" }
-depsAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "deps_analysis_version" }
 depsGraph = { id = "com.vanniktech.dependency.graph.generator", version.ref = "deps_graph_version" }
