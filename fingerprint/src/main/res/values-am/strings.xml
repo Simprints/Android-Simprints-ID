@@ -112,4 +112,49 @@
     <string name="ota_failed_title">ስካነር አፕዴት አልተሳካም</string>
     <string name="ota_failed_instructions">" ለእርዳታ ሱፐርቫይዘሩን አሳዉቅ"</string>
     <string name="continue_button">ቀጥል</string>
+    <string name="biometrics_access_fingerprint">የጣት አሻራ መረጃ</string>
+    <string name="biometrics_access_fingerprint_face">የጣት አሻራ መረጃ፤ፎቶግራፍ</string>
+    <string name="biometrics_general_fingerprint">የጣት አሻራዎትን ይጠቀሙ</string>
+    <string name="biometrics_parental_fingerprint">የልጅዎትን የጣት አሻራ ልውሰድ</string>
+    <string name="preference_select_fingers_title">ለአሻራ የሚሆን ቋሚ እጣት ይምረጡ</string>
+    <string name="preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
+    <string name="finger_selection_confirm_dialog_text">ቅንብሮች ይቀመጡ?</string>
+    <string name="finger_selection_confirm_dialog_yes">አስቀምጥ</string>
+    <string name="finger_selection_confirm_dialog_no">ሰርዝ</string>
+    <string name="finger_selection_finger_label">ጣት</string>
+    <string name="finger_selection_quantity_label">ብዛት</string>
+    <string name="finger_selection_reset">ዳግም አስጀምር</string>
+    <string name="finger_selection_add_finger">ጣት ጨምር</string>
+    <string name="finger_selection_invalid">ልክ ያልሆነ ምርጫ - ከአንድ ጣት ከ 5 በላይ አለ</string>
+    <string name="preference_view_fingers_title">ነባሪ ጣቶችን ይመልከቱ</string>
+    <string name="finger_selection_fragment_title">የእይታ ጣቶች</string>
+    <string name="title_fingerprint">የጣት አሻራ</string>
+    <string name="capture_number_text">ከ%2$s %1$s ይቃኙ</string>
+    <string name="please_scan_again">እባክዎ እንደገና ይቃኙ</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
+    <string name="fingerprint_feature_alert">የጣት አሻራ ፊቸር</string>
+    <string name="finger_selection_activity_title">ጣቶችን ይምረጡ</string>
+    <plurals name="returned_results">
+        <item quantity="one">%d ውጤት ተመልሷል።</item>
+        <item quantity="other">%d ዉጤቶችን ይዟል</item>
+    </plurals>
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">%d ዉጤቶችን ይዟል</item>
+        <item quantity="one">%d በጣም ጥሩ ተመራጭ</item>
+        <item quantity="other">%d በጣም ጥሩ ተመራጮች</item>
+    </plurals>
+    <plurals name="tier3_matches">
+        <item quantity="zero">ጥሩ ተመራጮች የሉም</item>
+        <item quantity="one">%d ጥሩ ተመራጭ</item>
+        <item quantity="other">%d ጥሩ ተመራጮች</item>
+    </plurals>
+    <plurals name="tier4_matches">
+        <item quantity="zero">ተመራጮች የሉም</item>
+        <item quantity="one">%d  ተመራጭ </item>
+        <item quantity="other">%d ተዛምዶ</item>
+    </plurals>
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">%d እጩ ተጭኗል።</item>
+        <item quantity="other">የተጫኑ %d እጩዎች።</item>
+    </plurals>
 </resources>

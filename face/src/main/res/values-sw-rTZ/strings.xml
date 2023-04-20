@@ -27,7 +27,7 @@
     <string name="capture_title_no_face">Uso haujaonekana</string>
     <string name="capture_title_too_close">Karibu sana</string>
     <string name="capture_title_face_too_far">Mbali sana</string>
-    <string name="matching_x_records">Inalinganisha na %s taarifa zilizohifadhiwa</string>
+    <string name="matching_x_records">Inafananisha na %s ya rekodi</string>
     <string name="title_capturing">Picha ya hapohapo</string>
     <string name="btn_recapture">Piga tena</string>
     <string name="face_match_please_wait">Tafadhali subiri tunapoendelea na utambulisho</string>
@@ -68,4 +68,16 @@
     <string name="error_licence_invalid_button">Funga</string>
     <string name="error_licence_missing_title">Leseni haipo</string>
     <string name="error_licence_missing_button">Funga</string>
+    <string name="why_did_you_skip_face_capture">Kwanini umeruka kupiga picha ya uso?</string>
+    <string name="exit_form_return_to_face_capture">Rudi kwenye Simprint</string>
+    <string name="error_close_button">Funga</string>
+    <string name="error_licence_missing_message">Leseni ya uso haipo, tafadhali wasiliana na msimamizi wa mfumo huu</string>
+    <string name="face_configuration_started">Inasanidi muundo wa uso</string>
+    <string name="face_configuration_downloading">Inapakua faili zinazohitajika</string>
+    <string name="error_configuration_error_title">Hitilafu ya usanidi</string>
+    <string name="error_configuration_error_message">Kulikuwa na hitilafu wakati wa kusanidi muundo wa uso, tafadhali wasiliana na msimamizi wa mfumo wako</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">Uso</string>
+    <string name="exit_form_capture_face">Rudi kwenye Simprint</string>
+    <string name="error_unexpected_error_title">Kosa limetokea</string>
+    <string name="error_unexpected_error_message">Tafadhali jaribu tena na iwapo progrmu ya Simprints haitafanya kazi wasiliana na msimamizi wako wa huu mfumo</string>
 </resources>
