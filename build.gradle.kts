@@ -19,7 +19,6 @@ plugins {
 
     alias(libs.plugins.retry) apply false
     alias(libs.plugins.sonar) apply false
-    alias(libs.plugins.depsAnalysis) apply false
     alias(libs.plugins.depsGraph) apply false
 }
 
@@ -37,7 +36,6 @@ buildscript {
 }
 
 apply {
-    from("build-logic${File.separator}dependency_health.gradle")
     from("build-logic${File.separator}sonarqube.gradle")
 }
 
