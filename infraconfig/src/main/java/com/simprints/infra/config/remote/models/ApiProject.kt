@@ -10,7 +10,7 @@ internal data class ApiProject(
     val description: String,
     val creator: String,
     val imageBucket: String,
-    val baseUrl: String,
+    val baseUrl: String?,
 ) {
     fun toDomain(): Project = Project(id, name, description, creator, imageBucket, baseUrl)
 }
