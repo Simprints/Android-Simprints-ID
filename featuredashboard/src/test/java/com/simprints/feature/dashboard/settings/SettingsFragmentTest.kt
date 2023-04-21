@@ -12,8 +12,8 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
-import com.simprints.feature.dashboard.tools.testNavController
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.testNavController
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule

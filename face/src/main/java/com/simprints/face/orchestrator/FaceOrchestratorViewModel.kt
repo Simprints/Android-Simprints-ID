@@ -78,8 +78,8 @@ class FaceOrchestratorViewModel @Inject constructor() : ViewModel() {
 
     fun configurationFinished(
         isSuccess: Boolean,
-        errorCode: String? = null,
-        estimatedOutage: Long? = null
+        errorTitle: String? = null,
+        errorMessage: String? = null,
     ) {
         if (isSuccess) {
             flowFinished.send(
@@ -87,17 +87,18 @@ class FaceOrchestratorViewModel @Inject constructor() : ViewModel() {
                     FaceConfigurationResponse()
                 )
             )
-        } else if (errorCode != null && estimatedOutage == null) {
+        } else if (errorTitle != null && errorMessage == null) {
             Simber.tag(CrashReportTag.FACE_LICENSE.name)
-                .i("Error with configuration download. Error Code = $errorCode")
+                .i("Error with configuration download. Error = $errorTitle")
+
             errorEvent.send(ErrorType.CONFIGURATION_ERROR.apply {
-                this.errorCode = errorCode
+                this.customTitle =  errorTitle
             })
         } else {
             Simber.tag(CrashReportTag.FACE_LICENSE.name)
                 .i("Error with configuration download. The backend is under maintenance")
             errorEvent.send(ErrorType.BACKEND_MAINTENANCE_ERROR.apply {
-                this.estimatedOutage = estimatedOutage
+                this.customMessage = errorMessage
             })
         }
     }

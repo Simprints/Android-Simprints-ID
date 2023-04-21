@@ -8,8 +8,8 @@ import androidx.core.view.isVisible
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
-import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.feature.alert.ShowAlertWrapper
+import com.simprints.feature.alert.toArgs
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
@@ -54,6 +54,11 @@ class LoginActivity : BaseSplitActivity() {
             ?: throw InvalidAppRequest()
     }
 
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) {
+        setResult(RESULT_OK, Intent().apply { putExtras(it) })
+        finish()
+    }
+
     private lateinit var progressDialog: SimProgressDialog
     private val viewModel: LoginViewModel by viewModels()
 
@@ -66,7 +71,10 @@ class LoginActivity : BaseSplitActivity() {
         initUI()
         observeSignInResult()
         // Check if google play services is installed and updated
-        googlePlayServicesAvailabilityChecker.check(this)
+        googlePlayServicesAvailabilityChecker.check(
+            this,
+            launchAlert = { showAlert.launch(it.toAlertConfig().toArgs()) }
+        )
     }
 
     private fun initUI() {
@@ -130,21 +138,16 @@ class LoginActivity : BaseSplitActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(data)
-
-        when {
-            potentialAlertScreenResponse != null -> {
-                setResult(resultCode, data)
-                finish()
+        when (requestCode) {
+            QR_REQUEST_CODE -> {
+                data?.let { handleQrScanResult(resultCode, it) } ?: showErrorForQRCodeFailed()
             }
-            requestCode == QR_REQUEST_CODE -> {
-                data?.let {
-                    handleQrScanResult(resultCode, it)
-                } ?: showErrorForQRCodeFailed()
-            }
-            requestCode == GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE -> {
+            GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE -> {
                 // Check again to make sure that the user did the need actions.
-                googlePlayServicesAvailabilityChecker.check(this)
+                googlePlayServicesAvailabilityChecker.check(
+                    this,
+                    launchAlert = { showAlert.launch(it.toAlertConfig().toArgs()) }
+                )
             }
         }
     }
@@ -266,9 +269,8 @@ class LoginActivity : BaseSplitActivity() {
         binding.apply {
             errorCard.isVisible = true
             errorTextView.text = if (estimatedOutage != null && estimatedOutage != 0L) getString(
-                IDR.string.error_backend_maintenance_with_time_message, getFormattedEstimatedOutage(
-                    estimatedOutage
-                )
+                IDR.string.error_backend_maintenance_with_time_message,
+                getFormattedEstimatedOutage(estimatedOutage)
             ) else getString(IDR.string.error_backend_maintenance_message)
         }
     }
@@ -281,13 +283,13 @@ class LoginActivity : BaseSplitActivity() {
     private fun handleIntegrityError(alertType: AlertType) {
         progressDialog.dismiss()
         binding.errorCard.isVisible = false
-        launchAlert(this, alertType)
+        showAlert.launch(alertType.toAlertConfig().toArgs())
     }
 
     private fun handleSignInFailedUnknownReason() {
         progressDialog.dismiss()
         binding.errorCard.isVisible = false
-        launchAlert(this, AlertType.UNEXPECTED_ERROR)
+        showAlert.launch(AlertType.UNEXPECTED_ERROR.toAlertConfig().toArgs())
     }
 
     @Deprecated("Deprecated in Java")

@@ -14,7 +14,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.tools.clickCloseChipIcon
-import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.feature.dashboard.tools.typeSearchViewText
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.testing.BindValue

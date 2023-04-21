@@ -1,34 +1,20 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent as CoreAlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 
-/**
- * This class represents an event that occurs as a result of an alert screen being presented to the
- * user.
- *
- * @property alertType  the type of fingerprint alert that was shown
- */
-@Keep
-class AlertScreenEvent(startTime: Long,
-                       val alertType: FingerprintAlert) : Event(EventType.ALERT_SCREEN, startTime)
-
-fun AlertScreenEvent.fromDomainToCore() =
-    CoreAlertScreenEvent(startTime, alertType.fromFingerprintAlertToAlertTypeEvent())
-
-fun FingerprintAlert.fromFingerprintAlertToAlertTypeEvent(): CoreAlertScreenEventType =
-    when (this) {
-        FingerprintAlert.BLUETOOTH_NOT_SUPPORTED -> CoreAlertScreenEventType.BLUETOOTH_NOT_SUPPORTED
-        FingerprintAlert.BLUETOOTH_NOT_ENABLED -> CoreAlertScreenEventType.BLUETOOTH_NOT_ENABLED
-        FingerprintAlert.NOT_PAIRED -> CoreAlertScreenEventType.NOT_PAIRED
-        FingerprintAlert.MULTIPLE_PAIRED_SCANNERS -> CoreAlertScreenEventType.MULTIPLE_PAIRED_SCANNERS
-        FingerprintAlert.DISCONNECTED -> CoreAlertScreenEventType.DISCONNECTED
-        FingerprintAlert.LOW_BATTERY -> CoreAlertScreenEventType.LOW_BATTERY
-        FingerprintAlert.UNEXPECTED_ERROR -> CoreAlertScreenEventType.UNEXPECTED_ERROR
-    }
+fun AlertError.fromFingerprintAlertToAlertTypeEvent(): CoreAlertScreenEventType = when (this) {
+    AlertError.BLUETOOTH_NOT_SUPPORTED -> CoreAlertScreenEventType.BLUETOOTH_NOT_SUPPORTED
+    AlertError.BLUETOOTH_NOT_ENABLED -> CoreAlertScreenEventType.BLUETOOTH_NOT_ENABLED
+    AlertError.NOT_PAIRED -> CoreAlertScreenEventType.NOT_PAIRED
+    AlertError.MULTIPLE_PAIRED_SCANNERS -> CoreAlertScreenEventType.MULTIPLE_PAIRED_SCANNERS
+    AlertError.DISCONNECTED -> CoreAlertScreenEventType.DISCONNECTED
+    AlertError.LOW_BATTERY -> CoreAlertScreenEventType.LOW_BATTERY
+    AlertError.UNEXPECTED_ERROR -> CoreAlertScreenEventType.UNEXPECTED_ERROR
+}
 
 /**
  * This class represents an event that occurs as a result of an alert shown for an issue connecting
@@ -37,8 +23,10 @@ fun FingerprintAlert.fromFingerprintAlertToAlertTypeEvent(): CoreAlertScreenEven
  * @property scannerIssue  the connection issue that occurred
  */
 @Keep
-class AlertScreenEventWithScannerIssue(startTime: Long,
-                                       val scannerIssue: ConnectScannerIssue) : Event(EventType.ALERT_SCREEN_WITH_SCANNER_ISSUE, startTime)
+class AlertScreenEventWithScannerIssue(
+    startTime: Long,
+    val scannerIssue: ConnectScannerIssue,
+) : Event(EventType.ALERT_SCREEN_WITH_SCANNER_ISSUE, startTime)
 
 fun AlertScreenEventWithScannerIssue.fromDomainToCore() =
     CoreAlertScreenEvent(startTime, scannerIssue.fromConnectScannerIssueToAlertTypeEvent())

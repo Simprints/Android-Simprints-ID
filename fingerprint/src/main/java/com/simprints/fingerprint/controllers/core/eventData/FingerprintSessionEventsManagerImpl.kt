@@ -41,7 +41,6 @@ class FingerprintSessionEventsManagerImpl @Inject constructor(
             ONE_TO_MANY_MATCH -> (event as OneToManyMatchEvent).fromDomainToCore()
             REFUSAL -> (event as RefusalEvent).fromDomainToCore()
             SCANNER_CONNECTION -> (event as ScannerConnectionEvent).fromDomainToCore()
-            ALERT_SCREEN -> (event as AlertScreenEvent).fromDomainToCore()
             ALERT_SCREEN_WITH_SCANNER_ISSUE -> (event as AlertScreenEventWithScannerIssue).fromDomainToCore()
             VERO_2_INFO_SNAPSHOT -> (event as Vero2InfoSnapshotEvent).fromDomainToCore()
             SCANNER_FIRMWARE_UPDATE -> (event as ScannerFirmwareUpdateEvent).fromDomainToCore()

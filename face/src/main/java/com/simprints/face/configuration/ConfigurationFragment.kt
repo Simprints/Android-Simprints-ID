@@ -7,6 +7,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.databinding.FragmentConfigurationBinding
@@ -22,6 +23,7 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
     private val binding by viewBinding(FragmentConfigurationBinding::bind)
 
     private val args: ConfigurationFragmentArgs by navArgs()
+
     @Inject
     lateinit var sdkInitializer: SdkInitializer
 
@@ -39,7 +41,7 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
                 ConfigurationState.Downloading -> renderDownloading()
                 is ConfigurationState.FinishedWithSuccess -> renderFinishedWithSuccess(it.license)
                 is ConfigurationState.FinishedWithError -> renderFinishedWithError(it.errorCode)
-                is ConfigurationState.FinishedWithBackendMaintenanceError -> renderFinishedWithBackendMaitenanceError(
+                is ConfigurationState.FinishedWithBackendMaintenanceError -> renderFinishedWithBackendMaintenanceError(
                     it.estimatedOutage
                 )
             }
@@ -64,10 +66,16 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
     }
 
     private fun renderFinishedWithError(errorCode: String) {
-        mainVm.configurationFinished(false, errorCode)
+        val errorTitle = "${getString(R.string.error_configuration_error_title)} ($errorCode)"
+        mainVm.configurationFinished(false, errorTitle)
     }
 
-    private fun renderFinishedWithBackendMaitenanceError(estimatedOutage: Long?) {
-        mainVm.configurationFinished(false, estimatedOutage = estimatedOutage)
+    private fun renderFinishedWithBackendMaintenanceError(estimatedOutage: Long?) {
+        val errorMessage =
+            if (estimatedOutage != null && estimatedOutage != 0L) getString(
+                R.string.error_backend_maintenance_with_time_message,
+                TimeUtils.getFormattedEstimatedOutage(estimatedOutage)
+            ) else getString(R.string.error_backend_maintenance_message)
+        mainVm.configurationFinished(false, errorMessage = errorMessage)
     }
 }

@@ -9,7 +9,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.collect.state.*
@@ -106,7 +106,7 @@ class CollectFingerprintsViewModel(
 
     val vibrate = MutableLiveData<LiveDataEvent>()
     val noFingersScannedToast = MutableLiveData<LiveDataEvent>()
-    val launchAlert = MutableLiveData<LiveDataEventWithContent<FingerprintAlert>>()
+    val launchAlert = MutableLiveData<LiveDataEventWithContent<AlertError>>()
     val launchReconnect = MutableLiveData<LiveDataEvent>()
     val finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<List<Fingerprint>>>()
 
@@ -475,7 +475,7 @@ class CollectFingerprintsViewModel(
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)
-                launchAlert.postEvent(FingerprintAlert.UNEXPECTED_ERROR)
+                launchAlert.postEvent(AlertError.UNEXPECTED_ERROR)
             }
         }
     }

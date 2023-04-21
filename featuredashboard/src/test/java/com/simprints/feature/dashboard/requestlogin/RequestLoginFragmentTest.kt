@@ -9,9 +9,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.tools.di.FakeCoreModule
-import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
-import com.simprints.feature.dashboard.tools.moveToState
-import com.simprints.feature.dashboard.tools.testNavController
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.moveToState
+import com.simprints.testtools.hilt.testNavController
 import com.simprints.infra.login.LoginManager
 import dagger.hilt.android.testing.*
 import io.mockk.every

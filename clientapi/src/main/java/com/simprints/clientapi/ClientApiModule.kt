@@ -3,8 +3,6 @@ package com.simprints.clientapi
 import com.simprints.clientapi.activities.commcare.CommCareAction
 import com.simprints.clientapi.activities.commcare.CommCareContract
 import com.simprints.clientapi.activities.commcare.CommCarePresenter
-import com.simprints.clientapi.activities.errors.ErrorContract
-import com.simprints.clientapi.activities.errors.ErrorPresenter
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsContract
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsPresenter
@@ -53,14 +51,6 @@ interface ClientApiModule {
             action: OdkAction
         ): OdkPresenter
     }
-
-    @AssistedFactory
-    interface ErrorPresenterFactory {
-        fun create(
-            view: ErrorContract.View
-        ): ErrorPresenter
-    }
-
 
     @Binds
     fun bindClientApiSessionEventsManager(impl: ClientApiSessionEventsManagerImpl): ClientApiSessionEventsManager

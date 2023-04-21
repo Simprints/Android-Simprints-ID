@@ -8,8 +8,10 @@ import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.feature.alert.ShowAlertWrapper
+import com.simprints.feature.alert.toArgs
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.collect.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.fingerviewpager.FingerViewPagerManager
@@ -53,6 +55,11 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private var confirmDialog: AlertDialog? = null
     private var hasSplashScreenBeenTriggered: Boolean = false
 
+    private val alertHelper = AlertActivityHelper()
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
+        alertHelper.handleAlertResult(this, data, retry = {})
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -78,9 +85,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun initToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.show()
-        supportActionBar?.title = when (masterFlowManager.getCurrentAction()) {
+        setActionBar(binding.toolbar)
+        actionBar?.show()
+        actionBar?.title = when (masterFlowManager.getCurrentAction()) {
             Action.ENROL -> getString(R.string.register_title)
             Action.IDENTIFY -> getString(R.string.identify_title)
             Action.VERIFY -> getString(R.string.verify_title)
@@ -125,7 +132,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
         vm.vibrate.activityObserveEventWith { Vibrate.vibrate(this) }
         vm.noFingersScannedToast.activityObserveEventWith { showToast(getString(R.string.no_fingers_scanned)) }
-        vm.launchAlert.activityObserveEventWith { launchAlert(this, it) }
+        vm.launchAlert.activityObserveEventWith { showAlert.launch(it.toAlertConfig().toArgs()) }
         vm.launchReconnect.activityObserveEventWith { launchConnectScannerActivityForReconnect() }
         vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }
     }

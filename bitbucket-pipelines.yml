@@ -106,8 +106,10 @@ definitions:
                     - source ci/pipeline/setup
                     - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew featuredashboard:jacocoTestReport
+                    - ./gradlew featurealert:jacocoTestReport
                 artifacts:
                     - featuredashboard/build/reports/**
+                    - featurealert/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.

@@ -9,8 +9,8 @@ import com.simprints.clientapi.Constants.RequestIntents.LOGIN_ACTIVITY_REQUEST
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
-import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.feature.alert.ShowAlertWrapper
+import com.simprints.feature.alert.toArgs
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
@@ -18,6 +18,7 @@ import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
 import com.simprints.id.di.IdAppModule
 import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.tools.extensions.parseAppRequest
@@ -41,6 +42,13 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
         presenterFactory.create(this)
     }
 
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) {
+        val alertType = AlertType.fromPayload(it)
+        val response = AppErrorResponse(AppErrorResponse.Reason.fromDomainAlertTypeToAppErrorType(alertType))
+
+        setResultErrorAndFinish(DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse(response))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -54,13 +62,9 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(data)
         val appErrorResponseForLoginScreen = extractAppErrorResponseForLoginScreen(data)
 
         when {
-            potentialAlertScreenResponse != null -> viewPresenter.onAlertScreenReturn(
-                potentialAlertScreenResponse
-            )
             appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(
                 appErrorResponseForLoginScreen
             )
@@ -96,7 +100,7 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
     }
 
     override fun openAlertActivityForError(alertType: AlertType) {
-        launchAlert(this, alertType)
+        showAlert.launch(alertType.toAlertConfig().toArgs())
     }
 
     override fun openLoginActivity(appRequest: AppRequest) {

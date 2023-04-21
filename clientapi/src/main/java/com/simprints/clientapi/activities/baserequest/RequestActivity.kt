@@ -5,17 +5,20 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
-import com.simprints.clientapi.activities.errors.ClientApiAlert
-import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.clientrequests.extractors.*
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.errors.ClientApiAlert
+import com.simprints.clientapi.errors.ClientApiAlert.Companion.toAlertConfig
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
-import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.ShowAlertWrapper
+import com.simprints.feature.alert.toArgs
+import com.simprints.feature.alert.withPayload
 import com.simprints.infra.logging.Simber
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.coroutines.launch
@@ -60,8 +63,18 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
         }
     }
 
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
+        AlertContract.getResponsePayload(data)
+            .getParcelable<ErrorResponse>(AlertContract.ALERT_PAYLOAD)
+            ?.let { presenter.handleResponseError(it) }
+    }
+
     override fun handleClientRequestError(clientApiAlert: ClientApiAlert) {
-        launchAlert(this, clientApiAlert)
+        showAlert.launch(
+            clientApiAlert.toAlertConfig()
+                .withPayload(AlertContract.ALERT_PAYLOAD to ErrorResponse(clientApiAlert))
+                .toArgs()
+        )
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -99,10 +112,7 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
     }
 
     private fun handleResponse(response: Intent) {
-        response.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
-            presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
-        } ?: response.getParcelableExtra<IAppResponse>(IAppResponse.BUNDLE_KEY)
-            ?.let { routeAppResponse(it) }
+        response.getParcelableExtra<IAppResponse>(IAppResponse.BUNDLE_KEY)?.let { routeAppResponse(it) }
     }
 
     private fun routeAppResponse(response: IAppResponse?) = when (response?.type) {

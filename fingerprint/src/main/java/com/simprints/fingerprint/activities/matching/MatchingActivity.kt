@@ -11,8 +11,10 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.feature.alert.ShowAlertWrapper
+import com.simprints.feature.alert.toArgs
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.databinding.ActivityMatchingBinding
@@ -29,9 +31,17 @@ class MatchingActivity : FingerprintActivity() {
 
     private lateinit var matchingRequest: MatchingTaskRequest
 
+    private val alertHelper = AlertActivityHelper()
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
+        alertHelper.handleAlertResult(
+            this,
+            data,
+            retry = { },
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
         matchingRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
@@ -119,7 +129,7 @@ class MatchingActivity : FingerprintActivity() {
     }
 
     private fun observeErrorHandlingCases() {
-        viewModel.alert.observe(this) { launchAlert(this, it) }
+        viewModel.alert.observe(this) { showAlert.launch(it.toAlertConfig().toArgs()) }
 
         viewModel.hasMatchFailed.observe(this) {
             if (it) {

@@ -3,10 +3,13 @@ package com.simprints.id.activities.fetchguid
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
+import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.tools.device.DeviceManager
+import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
@@ -21,9 +24,12 @@ class FetchGuidViewModel @Inject constructor(
     private val deviceManager: DeviceManager,
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper,
+    private val configManager: ConfigManager,
+    private val exitFormHelper: ExitFormHelper,
 ) : ViewModel() {
 
     var subjectFetch = MutableLiveData<SubjectSource>()
+    var exitForm = MutableLiveData<LiveDataEventWithContent<String?>>()
 
     fun fetchGuid(projectId: String, verifyGuid: String) {
         viewModelScope.launch {
@@ -91,4 +97,11 @@ class FetchGuidViewModel @Inject constructor(
             SubjectSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR -> null
         }
 
+    fun startExitForm() {
+        viewModelScope.launch {
+            val modalities = configManager.getProjectConfiguration().general.modalities
+            val formName = exitFormHelper.getExitFormActivityClassFromModalities(modalities)
+            exitForm.postValue(LiveDataEventWithContent(formName))
+        }
+    }
 }
