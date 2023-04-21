@@ -201,4 +201,34 @@
         <item quantity="other">Vérifications</item>
     </plurals>
 
+    <string name="dashboard_card_available_on_phone">Disponible sur le téléphone</string>
+    <string name="dashboard_card_enrol_title">Dernière inscription</string>
+    <string name="dashboard_card_enrolment_info">Informations sur l\'inscription</string>
+    <string name="dashboard_card_identification_title">Dernière identification</string>
+    <string name="dashboard_card_lastscanner_used">Scanner utilisé %1$s</string>
+    <string name="dashboard_card_to_download">Pour télécharger</string>
+    <string name="dashboard_card_to_upload">Pour envoyer</string>
+    <string name="dashboard_card_verification_title">Dernière vérification</string>
+    <string name="safetynet_down_alert_message">1. Veuillez réessayer après 5-10 minutes \n 2. Appuyez sur Fermer</string>
+    <string name="id_error_save">Impossible d\'enregistrer</string>
+    <string name="id_save_message">1. Échec de la sauvegarde de l\'enregistrement %1$s \n 2. Tapez sur Fermer</string>
+    <string name="id_continue">Continuer</string>
+    <string name="id_enrolment_successful">Inscription réussie</string>
+    <string name="id_config_error_enrol_last_biometrics">Une erreur de configuration s\'est produite (invalid Simprints intent), veuillez contacter votre administrateur système.</string>
+    <string name="confirmation_sent">Confirmation envoyée</string>
+    <string name="redirecting_you_back">Vous allez être redirigé</string>
+    <string name="configuration_error_message">Une erreur de configuration est apparue (%1$s), veuillez contactez votre administrateur système</string>
+    <string name="error_backend_maintenance_message">Le système est hors ligne pour maintenance. Réessayez plus tard.</string>
+    <string name="error_backend_maintenance_with_time_message">Le système est hors ligne pour maintenance. Réessayez dans %s</string>
+    <string name="dashboard_sync_card_records_to_upload">%1$d enregistrement a télécharger</string>
+    <string name="dashboard_sync_card_records_uploaded">Tous enregistrements téléchargés</string>
+    <string name="outdated_google_play_services_alert_title">Services Google Play obsolètes</string>
+    <string name="outdated_google_play_services_alert_message">La version de Services Google Play installé sur cette appareil est plus ancienne de celle nécessaire pour démarrer SID</string>
+    <string name="missing_google_play_services_alert_title">Services Google Play manquants</string>
+    <string name="missing_google_play_services_alert_message">Services Google Play ne sont pas installés sur cette appareil</string>
+    <string name="password_lock_title_default">écrire le mot de passe pour déverrouiller</string>
+    <string name="password_lock_title_logout">écrire le mot de passe pour déconnecter</string>
+    <string name="password_lock_hint">Mot de passe</string>
+    <string name="password_lock_wrong_pin">Mot de passe incorrect</string>
+    <string name="password_lock_overlay_title">Appuyez pour déverrouiller</string>
 </resources>

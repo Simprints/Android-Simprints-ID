@@ -13,6 +13,7 @@ apply {
 android {
     buildFeatures.viewBinding = true
     testOptions.unitTests.isIncludeAndroidResources = true
+    namespace = "com.simprints.feature.dashboard"
 }
 
 dependencies {

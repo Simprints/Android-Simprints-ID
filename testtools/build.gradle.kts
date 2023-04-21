@@ -12,9 +12,6 @@ android {
         consumerProguardFiles("proguard-rules.pro")
         testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     }
-    packagingOptions {
-        resources.excludes.add("META-INF/*")
-    }
     namespace = "com.simprints.testtools"
 }
 

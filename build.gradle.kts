@@ -14,7 +14,7 @@ buildscript {
 
     dependencies {
         // Gradle & Kotlin
-        classpath("com.android.tools.build:gradle:7.4.2")
+        classpath("com.android.tools.build:gradle:8.0.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.version.get()}")
 
         // CI Scanning & Retry
@@ -28,10 +28,10 @@ buildscript {
         // Firebase
         classpath("com.google.gms:google-services:4.3.15")
         classpath("com.google.firebase:perf-plugin:1.4.2")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.4")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.5")
 
         // Realm Database
-        classpath("io.realm:realm-gradle-plugin:10.13.3-transformer-api")
+        classpath("io.realm:realm-gradle-plugin:10.14.0-transformer-api")
 
         // Android X Navigation components
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:${libs.versions.androidx.navigation.version.get()}")
