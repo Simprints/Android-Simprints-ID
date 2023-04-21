@@ -2,7 +2,7 @@ package com.simprints.fingerprint.activities.collect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
@@ -998,7 +998,7 @@ class CollectFingerprintsViewModelTest {
         vm.handleScanButtonPressed()
         assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
 
-        vm.launchAlert.assertEventReceivedWithContent(FingerprintAlert.UNEXPECTED_ERROR)
+        vm.launchAlert.assertEventReceivedWithContent(AlertError.UNEXPECTED_ERROR)
     }
 
     @Test

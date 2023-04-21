@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses
 
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertError
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -25,17 +25,17 @@ enum class FingerprintErrorReason {
     BLUETOOTH_NOT_SUPPORTED;
 
     companion object {
-        fun fromFingerprintAlertToErrorResponse(fingerprintAlert: FingerprintAlert): FingerprintErrorResponse =
+        fun fromFingerprintAlertToErrorResponse(fingerprintAlert: AlertError): FingerprintErrorResponse =
             when (fingerprintAlert) {
-                FingerprintAlert.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
-                FingerprintAlert.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+                AlertError.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
+                AlertError.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
 
                 //User can not leave these alerts, so Fingerprint module should not produce any error response for them.
-                FingerprintAlert.BLUETOOTH_NOT_ENABLED,
-                FingerprintAlert.NOT_PAIRED,
-                FingerprintAlert.MULTIPLE_PAIRED_SCANNERS,
-                FingerprintAlert.DISCONNECTED,
-                FingerprintAlert.LOW_BATTERY -> UNEXPECTED_ERROR
+                AlertError.BLUETOOTH_NOT_ENABLED,
+                AlertError.NOT_PAIRED,
+                AlertError.MULTIPLE_PAIRED_SCANNERS,
+                AlertError.DISCONNECTED,
+                AlertError.LOW_BATTERY -> UNEXPECTED_ERROR
             }.run {
                 FingerprintErrorResponse(this)
             }

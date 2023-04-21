@@ -9,8 +9,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
-import com.simprints.feature.dashboard.tools.testNavController
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.testNavController
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

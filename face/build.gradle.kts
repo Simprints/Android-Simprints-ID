@@ -60,6 +60,7 @@ dependencies {
     api(project(":infralicense"))
     api(project(":infraimages"))
     api(project(":moduleapi"))
+    implementation(project(":featurealert"))
 
     api(libs.cameraView)
     api(libs.circleImageView)

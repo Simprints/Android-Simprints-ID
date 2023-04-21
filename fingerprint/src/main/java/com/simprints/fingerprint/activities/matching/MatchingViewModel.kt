@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
@@ -47,7 +47,7 @@ class MatchingViewModel @Inject constructor(
 
     val result = MutableLiveData<FinishResult>()
     val progress = MutableLiveData(0)
-    val alert = MutableLiveData<FingerprintAlert>()
+    val alert = MutableLiveData<AlertError>()
     val hasLoadingBegun = MutableLiveData<Boolean>()
     val matchBeginningSummary = MutableLiveData<IdentificationBeginningSummary>()
     val matchFinishedSummary = MutableLiveData<IdentificationFinishedSummary>()

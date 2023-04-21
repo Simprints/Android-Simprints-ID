@@ -8,15 +8,16 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.viewModels
 import com.simprints.core.tools.extentions.requestPermissionsIfRequired
+import com.simprints.feature.alert.ShowAlertWrapper
+import com.simprints.feature.alert.toArgs
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper
+import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.BackButtonBehaviour.*
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -30,6 +31,15 @@ class ConnectScannerActivity : FingerprintActivity() {
     private val permissionCode = 0
     private val viewModel: ConnectScannerViewModel by viewModels()
 
+    private val alertHelper = AlertActivityHelper()
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
+        alertHelper.handleAlertResult(
+            this,
+            data,
+            retry = { viewModel.retryConnect() },
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect_scanner)
@@ -40,7 +50,7 @@ class ConnectScannerActivity : FingerprintActivity() {
             this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
                 ?: throw InvalidRequestForConnectScannerActivityException()
 
-        viewModel.launchAlert.activityObserveEventWith { launchAlert(this, it) }
+        viewModel.launchAlert.activityObserveEventWith { showAlert.launch(it.toAlertConfig().toArgs()) }
         viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
         viewModel.finishAfterError.activityObserveEventWith { finishWithError() }
         viewModel.init(connectScannerRequest.connectMode)
@@ -55,6 +65,11 @@ class ConnectScannerActivity : FingerprintActivity() {
             )
         )
             viewModel.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        alertHelper.handleResume { viewModel.retryConnect() }
     }
 
     override fun onRequestPermissionsResult(
@@ -74,7 +89,7 @@ class ConnectScannerActivity : FingerprintActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RequestCode.REFUSAL.value || requestCode == RequestCode.ALERT.value) {
+        if (requestCode == RequestCode.REFUSAL.value) {
             when (ResultCode.fromValue(resultCode)) {
                 ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
                 ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
@@ -91,20 +106,12 @@ class ConnectScannerActivity : FingerprintActivity() {
         })
     }
 
-    private fun finishWithError() {
+    private fun finishWithError(
+        alertError: AlertError = AlertError.UNEXPECTED_ERROR,
+    ) {
         setResultAndFinish(ResultCode.ALERT, Intent().apply {
-            putExtra(
-                AlertTaskResult.BUNDLE_KEY,
-                AlertTaskResult(
-                    FingerprintAlert.UNEXPECTED_ERROR,
-                    AlertTaskResult.CloseButtonAction.CLOSE
-                )
-            )
+            putExtra(AlertTaskResult.BUNDLE_KEY, AlertTaskResult(alertError))
         })
-    }
-
-    private fun goToRefusalActivity() {
-        startActivityForResult(Intent(this, RefusalActivity::class.java), RequestCode.REFUSAL.value)
     }
 
     private fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
@@ -116,7 +123,7 @@ class ConnectScannerActivity : FingerprintActivity() {
         when (viewModel.backButtonBehaviour.value) {
             DISABLED -> { /* Do nothing */
             }
-            EXIT_FORM, null -> goToRefusalActivity()
+            EXIT_FORM, null -> alertHelper.goToRefusalActivity(this)
             EXIT_WITH_ERROR -> finishWithError()
         }
     }

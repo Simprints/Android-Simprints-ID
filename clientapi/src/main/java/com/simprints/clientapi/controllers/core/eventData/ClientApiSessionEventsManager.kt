@@ -1,6 +1,5 @@
 package com.simprints.clientapi.controllers.core.eventData
 
-import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.infra.events.event.domain.models.Event
 import kotlinx.coroutines.flow.Flow
@@ -13,8 +12,6 @@ interface ClientApiSessionEventsManager {
     suspend fun addCompletionCheckEvent(complete: Boolean)
 
     suspend fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>)
-
-    suspend fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert)
 
     suspend fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>)
 

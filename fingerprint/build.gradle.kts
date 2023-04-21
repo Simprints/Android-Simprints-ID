@@ -67,6 +67,7 @@ dependencies {
     implementation(project(":infraresources"))
     api(project(":infrarecentuseractivity"))
     api(project(":moduleapi"))
+    implementation(project(":featurealert"))
 
     // If mock/dummy BT adapter is required test implementation can be switched to regular one
     testImplementation(project(":fingerprintscannermock"))

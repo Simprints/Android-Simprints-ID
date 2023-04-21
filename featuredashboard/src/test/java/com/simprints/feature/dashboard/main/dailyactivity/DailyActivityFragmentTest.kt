@@ -6,7 +6,7 @@ import androidx.test.espresso.assertion.ViewAssertions.*
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

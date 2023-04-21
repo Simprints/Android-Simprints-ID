@@ -9,7 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.tools.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.feature.dashboard.privacynotices.PrivacyNoticeState.*
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule

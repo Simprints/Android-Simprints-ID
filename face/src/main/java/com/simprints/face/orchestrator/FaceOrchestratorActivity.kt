@@ -4,20 +4,29 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.face.OrchestratorGraphDirections
+import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
 import com.simprints.face.capture.FaceCaptureActivity
+import com.simprints.face.databinding.ActivityOrchestratorBinding
+import com.simprints.face.error.ErrorType
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchActivity
+import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.toArgs
+import com.simprints.feature.alert.withPayload
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class FaceOrchestratorActivity : FaceActivity() {
+
+    private val binding by viewBinding(ActivityOrchestratorBinding::inflate)
+
     private val viewModel: FaceOrchestratorViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,6 +35,15 @@ class FaceOrchestratorActivity : FaceActivity() {
 
         val iFaceRequest: IFaceRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
             ?: throw InvalidFaceRequestException("No IFaceCaptureRequest found for FaceOrchestratorActivity")
+
+        binding.orchestratorHostFragment.getFragment<Fragment>().childFragmentManager
+            .setFragmentResultListener(AlertContract.ALERT_REQUEST, this) { _, d ->
+                if (AlertContract.hasResponseKey(d, AlertContract.ALERT_BUTTON_PRESSED_BACK)) {
+                    AlertContract.getResponsePayload(d)
+                        .getString(ERROR_TYPE_KEY)
+                        ?.let { viewModel.finishWithError(ErrorType.valueOf(it)) }
+                }
+            }
 
         observeViewModel()
 
@@ -45,12 +63,13 @@ class FaceOrchestratorActivity : FaceActivity() {
             startActivityForResult(FaceMatchActivity.getStartingIntent(this, it), MATCH_REQUEST)
         })
         viewModel.errorEvent.observe(this, LiveDataEventWithContentObserver {
-            findNavController(R.id.orchestrator_host_fragment)
-                .navigate(OrchestratorGraphDirections.actionGlobalErrorFragment(it))
+            findNavController(R.id.orchestrator_host_fragment).navigate(
+                R.id.action_global_errorFragment,
+                it.toAlertConfiguration().withPayload(ERROR_TYPE_KEY to it.name).toArgs(),
+            )
         })
         viewModel.startConfiguration.observe(this, LiveDataEventWithContentObserver {
-            findNavController(R.id.orchestrator_host_fragment)
-                .navigate(
+            findNavController(R.id.orchestrator_host_fragment).navigate(
                     BlankFragmentDirections.actionBlankFragmentToConfigurationFragment(
                         it.projectId,
                         it.deviceId
@@ -74,5 +93,7 @@ class FaceOrchestratorActivity : FaceActivity() {
     companion object {
         const val CAPTURE_REQUEST = 100
         const val MATCH_REQUEST = 101
+
+        private const val ERROR_TYPE_KEY = "error_type"
     }
 }

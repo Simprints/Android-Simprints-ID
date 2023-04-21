@@ -7,17 +7,13 @@ import androidx.lifecycle.Observer
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.R
-import com.simprints.id.activities.alert.AlertActivityHelper
-import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
-import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppErrorResponse
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.moduleapi.app.responses.IAppResponse
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -48,15 +44,9 @@ class OrchestratorActivity : BaseSplitActivity() {
 
     private val observerForFinalResponse = Observer<IAppResponse?> {
         it?.let {
-            if (it is IAppErrorResponse && it.reason == IAppErrorReason.UNEXPECTED_ERROR) {
-                AlertActivityHelper.launchAlert(
-                    this@OrchestratorActivity,
-                    AlertType.UNEXPECTED_ERROR
-                )
-            } else
-                setResult(RESULT_OK, Intent().apply {
-                    putExtra(IAppResponse.BUNDLE_KEY, it)
-                })
+            setResult(RESULT_OK, Intent().apply {
+                putExtra(IAppResponse.BUNDLE_KEY, it)
+            })
             finish()
         }
     }

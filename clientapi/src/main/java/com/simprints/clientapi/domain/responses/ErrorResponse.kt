@@ -1,7 +1,7 @@
 package com.simprints.clientapi.domain.responses
 
 import android.os.Parcelable
-import com.simprints.clientapi.activities.errors.ClientApiAlert
+import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.fromAlertTypeToDomain
 import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.fromModuleApiToDomain
 import com.simprints.moduleapi.app.responses.IAppErrorReason
