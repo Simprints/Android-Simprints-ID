@@ -28,6 +28,7 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.domain.models.FingerprintConfiguration.VeroGeneration
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
@@ -47,14 +48,8 @@ class ConnectScannerViewModel @Inject constructor(
     private val nfcManager: NfcManager,
 ) : ViewModel() {
 
-    lateinit var configuration: FingerprintConfiguration
+    lateinit var allowedGenerations: List<VeroGeneration>
     lateinit var connectMode: ConnectScannerTaskRequest.ConnectMode
-
-    init {
-        viewModelScope.launch {
-            configuration = configManager.getProjectConfiguration().fingerprint!!
-        }
-    }
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
     val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
@@ -75,6 +70,11 @@ class ConnectScannerViewModel @Inject constructor(
 
     fun init(connectMode: ConnectScannerTaskRequest.ConnectMode) {
         this.connectMode = connectMode
+
+        viewModelScope.launch {
+            allowedGenerations = configManager.getProjectConfiguration().fingerprint
+                ?.allowedVeroGenerations.orEmpty()
+        }
     }
 
     fun start() {
@@ -209,8 +209,7 @@ class ConnectScannerViewModel @Inject constructor(
     }
 
     private fun determineAppropriateScannerIssueForPairing(): ConnectScannerIssue {
-        val couldNotBeVero1 =
-            !configuration.allowedVeroGenerations.contains(FingerprintConfiguration.VeroGeneration.VERO_1)
+        val couldNotBeVero1 = !allowedGenerations.contains(VeroGeneration.VERO_1)
 
         return if (couldNotBeVero1 && nfcManager.doesDeviceHaveNfcCapability()) {
             if (nfcManager.isNfcEnabled()) {

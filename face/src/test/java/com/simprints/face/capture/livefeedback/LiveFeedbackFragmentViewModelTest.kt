@@ -24,7 +24,6 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,11 +67,6 @@ class LiveFeedbackFragmentViewModelTest {
     private val rectF: RectF = mockk()
     private val frame: Frame = mockk()
     private val size: Size = mockk()
-
-    @Before
-    fun setup() {
-        mockkStatic(UUID::class)
-    }
 
     @Test
     fun `process valid face correctly`() = runTest {
@@ -169,6 +163,10 @@ class LiveFeedbackFragmentViewModelTest {
         } returns previewFrameMock
         coEvery { faceDetector.analyze(previewFrameMock) } returns validFace
         every { faceTimeHelper.now() } returnsMany (0..100L).toList()
+        mockkStatic(UUID::class)
+        every { UUID.fromString(any()) } answers { mockk{
+            every { this@mockk.toString() } returns args[0] as String
+        }}
         every { UUID.randomUUID() } returnsMany listOf(
             UUID.fromString(faceDetectionId1),
             UUID.fromString(faceFallbackId1),
@@ -331,6 +329,8 @@ class LiveFeedbackFragmentViewModelTest {
                 true
             })
         }
+        unmockkStatic(UUID::class)
+
     }
 
     @Test

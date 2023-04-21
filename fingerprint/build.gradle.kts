@@ -38,21 +38,9 @@ android {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
     }
-    packagingOptions {
-        resources {
-            pickFirsts += setOf("mockito-extensions/org.mockito.plugins.MockMaker")
-        }
-    }
-
-    // https://github.com/mockito/mockito/issues/1376
 
     buildFeatures.viewBinding = true
     namespace = "com.simprints.fingerprint"
-
-    packagingOptions {
-           resources.excludes.add("META-INF/LICENSE*") // remove mockk duplicated files
-    }
-
 }
 
 repositories {

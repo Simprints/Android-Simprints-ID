@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="guid_selection_result_sent">Bu\'aan ergameera</string>
-    <string name="configuration_error_title">Rakkoo sirreeffamaa</string>
+    <string name="configuration_error_title">Dogoggora \'Configuration\'</string>
     <string name="guid_selection_data_sent">Ragaan ergameera</string>
     <string name="close">Cufi</string>
 
@@ -17,4 +17,5 @@
     <string name="invalid_verifyId_message">Dogoggorri \'configuration\' uumameera (GUID\'n mirkanaa\'u sirrii miti) maaloo suppervaayizera kee quunnami.</string>
     <string name="rooted_device_title">Meeshaa barbaadee argachuu</string>
     <string name="rooted_device_message">1. Supparvaayzara kee quunnami-meeshaa barbaaddee argachuuf\n2. Cufi1</string>
+    <string name="configuration_error_message">Dogongorri qindeessaa uumameera (%1$s), maaloo bulchaa sirna kee qunnami</string>
 </resources>

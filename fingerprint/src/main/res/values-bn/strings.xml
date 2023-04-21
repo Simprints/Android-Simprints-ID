@@ -96,14 +96,14 @@
     <string name="please_wait">আঙ্গুলের ছাপ মিলানো হচ্ছে, অপেক্ষা করুন  </string>
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
-    <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
+    <string name="error_occurred_title">সমস্যা ঘটেছে</string>
     <string name="low_battery_title">ব্যাটারি চার্জ করুন</string>
     <!-- Error Message Text -->
     <string name="bluetooth_not_supported_message">আপনার ফোন/যন্ত্র ব্লুটুথ সাপোর্ট করেনা। আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="bluetooth_not_enabled_message">ব্লুটুথ সক্রিয় করা নেই, এটি সেটিংস এ সক্রিয় হয়েছে কিনা তা নিশ্চিত করুন এবং আবার চেষ্টা করুন </string>
     <string name="multiple_scanners_found_message">এক এর অধিক স্ক্যানার সংযুক্ত আছে, অপ্রয়োজনীয় স্ক্যানার বাতিল করুন।</string>
     <string name="low_battery_message">স্ক্যানারের ব্যাটারি চার্জ করুন।</string>
-    <string name="unforeseen_error_message">আবাার চেষ্টা করুন এবং সিমপ্রিন্টস কাজ না করলে আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন।</string>
+    <string name="unforeseen_error_message">আবার চেষ্টা করুন এবং সিমপ্রিন্টস কাজ না করলে আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন।</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">বন্ধ করুন</string>
     <string name="settings_label">ফোন সেটিংস</string>
@@ -113,10 +113,10 @@
     <!-- Setting Labels -->
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
+    <string name="why_did_you_skip_fingerprinting">আপনি কেন আঙ্গুলের ছাপ দেয়া এড়িয়ে গেছেন?</string>
     <!-- Button Labels -->
     <string name="button_submit">জমা দিন</string>
-    <string name="button_scan_prints">আঙুলের ছাপ স্ক্যান করুন</string>
+    <string name="button_scan_prints">আঙ্গুলের ছাপ স্ক্যান করুন</string>
     <!-- Refusal Selection Points -->
     <string name="refusal_other">অন্যান্য</string>
     <!-- Text Prompt -->
@@ -138,14 +138,14 @@
     <string name="missing_finger">আঙ্গুল নেই / কাটা</string>
     <string name="no_finger_detected_message">আঙ্গুল সনাক্ত করা যাচ্ছেনা</string>
     <string name="no_fingers_scanned">অন্তত ১টি আঙ্গুলের ছাপ নিন</string>
-    <string name="pair_scanner_label">স্ক্যানার যোগ করুন</string>
+    <string name="pair_scanner_label">সেটিংস</string>
     <string name="refusal_app_not_working">অ্যাপ কাজ করছে না</string>
     <string name="refusal_data_concerns">তথ্য দিতে আগ্রহী নন</string>
     <string name="refusal_does_not_have_permission">অনুমতি নেই</string>
     <string name="refusal_person_not_present">ব্যক্তি উপস্থিত নয়</string>
     <string name="refusal_religious_concerns">"ধর্মীয় সমস্যা   "</string>
-    <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং সাবমিট করুন</string>
-    <string name="refusal_toast_submit">ফরম সাবমিট করুন</string>
+    <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং জমা দিন</string>
+    <string name="refusal_toast_submit">ফর্ম জমা দিন</string>
     <string name="refusal_too_young">বয়স কম</string>
     <string name="restart">আবার শুরু করুন</string>
     <string name="scanner_confirmation_no">না</string>
@@ -157,4 +157,43 @@
     <string name="please_wait_button">অপেক্ষা করুন</string>
     <string name="transfering_data">তথ্য প্রদান করা হচ্ছে</string>
     <string name="scanner_id_confirmation_message">%1$s কি আপনার স্ক্যানার?</string>
+    <string name="preference_select_fingers_title">নির্ধারিত আঙ্গুল গুলো সমূহ নির্বাচন করুন</string>
+    <string name="preference_summary_settings_fingers">যে আঙ্গুল গুলো স্ক্যান করবেন সেগুলো সিলেক্ট করুন</string>
+    <string name="finger_selection_confirm_dialog_text">সেটিংস সেভ করতে চাচ্ছেন?</string>
+    <string name="finger_selection_confirm_dialog_yes">সেভ করুন</string>
+    <string name="finger_selection_confirm_dialog_no">বাতিল করুন</string>
+    <string name="finger_selection_finger_label">আঙ্গুল </string>
+    <string name="finger_selection_quantity_label">সংখ্যা</string>
+    <string name="finger_selection_reset">পুনরায় নির্বাচন</string>
+    <string name="finger_selection_add_finger">আঙ্গুল যোগ করুন</string>
+    <string name="finger_selection_invalid">অবৈধ নির্বাচন- এক আঙ্গুল ৫ বারের বেশি আছে</string>
+    <string name="preference_view_fingers_title">ডিফল্ট আঙ্গুল দেখুন</string>
+    <string name="finger_selection_fragment_title">আঙ্গুল দেখুন</string>
+    <string name="title_fingerprint">আঙ্গুলের ছাপ</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">আঙ্গুলের ছাপ</string>
+    <string name="fingerprint_feature_alert">আঙ্গুলের ছাপ এর বৈশিষ্ট্য</string>
+    <string name="finger_selection_activity_title">আঙ্গুল নির্বাচন করুন</string>
+    <plurals name="returned_results">
+        <item quantity="one">%d ফলাফল ফিরে এসেছে।</item>
+        <item quantity="other">%d রেজাল্ট ফেরত</item>
+    </plurals>
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">খুব ভালো মিল পাওয়া যায়নি</item>
+        <item quantity="one">%d খুব ভালো মিল</item>
+        <item quantity="other">%d খুব ভালো মিল</item>
+    </plurals>
+    <plurals name="tier3_matches">
+        <item quantity="zero">ভালো মিল পাওয়া যায়নি</item>
+        <item quantity="one">%d ভালো মিল</item>
+        <item quantity="other">%d ভালো মিল</item>
+    </plurals>
+    <plurals name="tier4_matches">
+        <item quantity="zero">কোন মিল পাওয়া যায়নি</item>
+        <item quantity="one">%d মিল</item>
+        <item quantity="other">%d মিল</item>
+    </plurals>
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">%d সদস্য লোড হয়েছে।</item>
+        <item quantity="other">%d সদস্য লোড হয়েছে।</item>
+    </plurals>
 </resources>

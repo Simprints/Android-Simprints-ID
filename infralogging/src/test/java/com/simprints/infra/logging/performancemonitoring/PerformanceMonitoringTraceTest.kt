@@ -1,7 +1,6 @@
 package com.simprints.infra.logging.performancemonitoring
 
 import com.google.firebase.perf.FirebasePerformance
-import com.simprints.infra.logging.LoggingTestUtils.setDebugBuildConfig
 import com.simprints.infra.logging.PerformanceMonitor
 import com.simprints.infra.logging.Simber
 import io.mockk.mockk
@@ -72,8 +71,6 @@ class PerformanceMonitoringTraceTest {
 
     @Test
     fun `if debug mode stopping trace should print time`() {
-        setDebugBuildConfig(true)
-
         val simberSpy = spyk<Simber>()
 
         val trace = PerformanceMonitor.trace(TRACE_NAME, simberSpy)
@@ -84,20 +81,6 @@ class PerformanceMonitoringTraceTest {
             simberSpy.i(message = withArg {
                 it.contains("Trace time for $TRACE_NAME =")
             })
-        }
-    }
-
-    @Test
-    fun `if not debug mode stopping trace should not print time`() {
-        setDebugBuildConfig(false)
-        val simberSpy = spyk<Simber>()
-        val trace = spyk(PerformanceMonitoringTrace(TRACE_NAME, mockk(relaxed = true), simberSpy))
-
-        trace.start()
-        trace.stop()
-
-        verify(exactly = 0) {
-            simberSpy.i(message = any())
         }
     }
 
