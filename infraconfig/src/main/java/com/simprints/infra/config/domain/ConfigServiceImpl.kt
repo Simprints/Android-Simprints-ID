@@ -44,7 +44,7 @@ internal class ConfigServiceImpl @Inject constructor(
         .getProject(projectId)
         .also {
             localDataSource.saveProject(it)
-            if (it.baseUrl.isNotEmpty()) {
+            if (!it.baseUrl.isNullOrBlank()) {
                 simNetwork.setApiBaseUrl(it.baseUrl)
             }
         }

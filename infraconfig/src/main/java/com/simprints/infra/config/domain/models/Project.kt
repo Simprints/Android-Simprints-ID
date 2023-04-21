@@ -6,5 +6,5 @@ data class Project(
     val description: String,
     val creator: String,
     val imageBucket: String,
-    val baseUrl: String,
+    val baseUrl: String?,
 )
