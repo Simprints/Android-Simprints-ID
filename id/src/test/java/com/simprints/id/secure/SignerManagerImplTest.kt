@@ -2,18 +2,22 @@ package com.simprints.id.secure
 
 import com.simprints.id.services.securitystate.SecurityStateScheduler
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
+import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -220,7 +224,8 @@ class SignerManagerImplTest {
                         "local",
                         "",
                         "",
-                        "some_bucket_url"
+                        "some_bucket_url",
+                        ""
                     )
                 )
             } else {

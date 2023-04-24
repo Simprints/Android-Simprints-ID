@@ -3,19 +3,24 @@ package com.simprints.infra.config.domain
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.domain.ConfigServiceImpl.Companion.PRIVACY_NOTICE_FILE
 import com.simprints.infra.config.domain.models.DeviceConfiguration
-import com.simprints.infra.config.domain.models.PrivacyNoticeResult.*
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Failed
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.InProgress
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Succeed
+import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.testtools.deviceConfiguration
 import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import io.mockk.*
+import io.mockk.verify
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -31,6 +36,7 @@ class ConfigServiceImplTest {
 
     private val localDataSource = mockk<ConfigLocalDataSource>(relaxed = true)
     private val remoteDataSource = mockk<ConfigRemoteDataSource>()
+    private val simNetwork = mockk<SimNetwork>(relaxed = true)
 
     private lateinit var configServiceImpl: ConfigServiceImpl
 
@@ -39,6 +45,7 @@ class ConfigServiceImplTest {
         configServiceImpl = ConfigServiceImpl(
             localDataSource,
             remoteDataSource,
+            simNetwork,
         )
     }
 
@@ -81,14 +88,29 @@ class ConfigServiceImplTest {
     }
 
     @Test
-    fun `refresh project should get the project remotely and save it`() = runTest {
-        coEvery { localDataSource.saveProject(project) } returns Unit
-        coEvery { remoteDataSource.getProject(PROJECT_ID) } returns project
+    fun `refresh project should get the project remotely and save it and update the api base url if not empty`() =
+        runTest {
+            coEvery { localDataSource.saveProject(project) } returns Unit
+            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns project
 
-        configServiceImpl.refreshProject(PROJECT_ID)
-        coVerify(exactly = 1) { localDataSource.saveProject(project) }
-        coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
-    }
+            configServiceImpl.refreshProject(PROJECT_ID)
+            coVerify(exactly = 1) { localDataSource.saveProject(project) }
+            coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
+            coVerify(exactly = 1) { simNetwork.setApiBaseUrl(project.baseUrl) }
+        }
+
+    @Test
+    fun `refresh project should get the project remotely and save it and not update the api base url if empty`() =
+        runTest {
+            val project = Project("id", "name", "description", "creator", "url", "")
+            coEvery { localDataSource.saveProject(project) } returns Unit
+            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns project
+
+            configServiceImpl.refreshProject(PROJECT_ID)
+            coVerify(exactly = 1) { localDataSource.saveProject(project) }
+            coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
+            coVerify(exactly = 0) { simNetwork.setApiBaseUrl(project.baseUrl) }
+        }
 
     @Test
     fun `should get the project configuration locally`() = runTest {
