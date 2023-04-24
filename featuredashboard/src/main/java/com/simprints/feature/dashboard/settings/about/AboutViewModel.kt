@@ -18,9 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val signerManager: SignerManager,
     private val recentUserActivityManager: RecentUserActivityManager,
-    @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     val syncAndSearchConfig: LiveData<SyncAndSearchConfig>
@@ -41,10 +39,6 @@ internal class AboutViewModel @Inject constructor(
 
     init {
         load()
-    }
-
-    fun logout() {
-        externalScope.launch { signerManager.signOut() }
     }
 
     private fun load() = viewModelScope.launch {
