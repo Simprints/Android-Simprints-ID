@@ -1,9 +1,44 @@
 package com.simprints.infra.config.testtools
 
-import com.simprints.infra.config.domain.models.*
+import com.simprints.infra.config.domain.models.ConsentConfiguration
+import com.simprints.infra.config.domain.models.DecisionPolicy
+import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.FaceConfiguration
+import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.IdentificationConfiguration
 import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.local.models.*
-import com.simprints.infra.config.remote.models.*
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.local.models.ProtoConsentConfiguration
+import com.simprints.infra.config.local.models.ProtoDecisionPolicy
+import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
+import com.simprints.infra.config.local.models.ProtoDownSynchronizationConfiguration
+import com.simprints.infra.config.local.models.ProtoFaceConfiguration
+import com.simprints.infra.config.local.models.ProtoFinger
+import com.simprints.infra.config.local.models.ProtoFingerprintConfiguration
+import com.simprints.infra.config.local.models.ProtoGeneralConfiguration
+import com.simprints.infra.config.local.models.ProtoIdentificationConfiguration
+import com.simprints.infra.config.local.models.ProtoProject
+import com.simprints.infra.config.local.models.ProtoProjectConfiguration
+import com.simprints.infra.config.local.models.ProtoSynchronizationConfiguration
+import com.simprints.infra.config.local.models.ProtoUpSynchronizationConfiguration
+import com.simprints.infra.config.local.models.ProtoVero2Configuration
+import com.simprints.infra.config.remote.models.ApiConsentConfiguration
+import com.simprints.infra.config.remote.models.ApiDecisionPolicy
+import com.simprints.infra.config.remote.models.ApiFaceConfiguration
+import com.simprints.infra.config.remote.models.ApiFingerprintConfiguration
+import com.simprints.infra.config.remote.models.ApiGeneralConfiguration
+import com.simprints.infra.config.remote.models.ApiIdentificationConfiguration
+import com.simprints.infra.config.remote.models.ApiProject
+import com.simprints.infra.config.remote.models.ApiProjectConfiguration
+import com.simprints.infra.config.remote.models.ApiSynchronizationConfiguration
+import com.simprints.infra.config.remote.models.ApiVero2Configuration
 
 internal val apiConsentConfiguration = ApiConsentConfiguration(
     programName = "programName",
@@ -270,14 +305,15 @@ internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
     .setSynchronization(protoSynchronizationConfiguration)
     .build()
 
-internal val apiProject = ApiProject("id", "name", "description", "creator", "url")
-internal val project = Project("id", "name", "description", "creator", "url")
+internal val apiProject = ApiProject("id", "name", "description", "creator", "url", "baseUrl")
+internal val project = Project("id", "name", "description", "creator", "url", "baseUrl")
 internal val protoProject = ProtoProject.newBuilder()
     .setId("id")
     .setName("name")
     .setDescription("description")
     .setCreator("creator")
     .setImageBucket("url")
+    .setBaseUrl("baseUrl")
     .build()
 
 internal val deviceConfiguration =

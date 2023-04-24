@@ -3,12 +3,12 @@ package com.simprints.infra.config.worker
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.domain.ConfigService
+import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
 import com.simprints.infra.login.LoginManager
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
@@ -19,7 +19,7 @@ class ConfigurationWorkerTest {
     }
 
     private val loginManager = mockk<LoginManager>()
-    private val configService = mockk<ConfigService>()
+    private val configService = mockk<ConfigService>(relaxed = true)
     private val configurationWorker =
         ConfigurationWorker(
             mockk(),
@@ -49,6 +49,7 @@ class ConfigurationWorkerTest {
     fun `should succeed if the config service doesn't throw an exception`() = runTest {
         every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
         coEvery { configService.refreshConfiguration(PROJECT_ID) } returns projectConfiguration
+        coEvery { configService.refreshProject(PROJECT_ID) } returns project
 
         val result = configurationWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.success())

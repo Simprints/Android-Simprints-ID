@@ -3,12 +3,16 @@ package com.simprints.infra.config.domain
 import androidx.annotation.VisibleForTesting
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult
-import com.simprints.infra.config.domain.models.PrivacyNoticeResult.*
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Failed
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.InProgress
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -18,6 +22,7 @@ import javax.inject.Inject
 internal class ConfigServiceImpl @Inject constructor(
     private val localDataSource: ConfigLocalDataSource,
     private val remoteDataSource: ConfigRemoteDataSource,
+    private val simNetwork: SimNetwork,
 ) : ConfigService {
 
     companion object {
@@ -37,7 +42,12 @@ internal class ConfigServiceImpl @Inject constructor(
 
     override suspend fun refreshProject(projectId: String): Project = remoteDataSource
         .getProject(projectId)
-        .also { localDataSource.saveProject(it) }
+        .also {
+            localDataSource.saveProject(it)
+            if (!it.baseUrl.isNullOrBlank()) {
+                simNetwork.setApiBaseUrl(it.baseUrl)
+            }
+        }
 
     override suspend fun getConfiguration(): ProjectConfiguration = localDataSource.getProjectConfiguration()
 

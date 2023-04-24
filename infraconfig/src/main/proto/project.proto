@@ -9,4 +9,5 @@ message ProtoProject {
     string description = 3;
     string creator = 4;
     string imageBucket = 5;
+    string base_url = 6;
 }
