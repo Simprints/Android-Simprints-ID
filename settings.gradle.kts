@@ -64,6 +64,7 @@ include(
 include(
     ":featuredashboard",
     ":featurealert",
+    ":featureexitform",
 )
 
 // Infra modules
