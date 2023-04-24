@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.activity.addCallback
-import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -13,6 +12,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.tools.extentions.setTextWithFallbacks
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.R
@@ -95,16 +95,5 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
             AlertContract.ALERT_BUTTON_PRESSED to key,
             AlertContract.ALERT_PAYLOAD to payload,
         ))
-    }
-
-    private fun TextView.setTextWithFallbacks(
-        rawText: String?,
-        @StringRes textFallback: Int?,
-        @StringRes default: Int? = null,
-    ) = when {
-        rawText != null -> text = rawText
-        textFallback != null -> setText(textFallback)
-        default != null -> setText(default)
-        else -> text = null
     }
 }
