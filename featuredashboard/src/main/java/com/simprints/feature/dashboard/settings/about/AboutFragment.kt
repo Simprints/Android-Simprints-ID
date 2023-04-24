@@ -39,7 +39,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(IDR.string.confirmation_logout_title))
             .setMessage(getString(IDR.string.confirmation_logout_message))
-            .setPositiveButton(getString(IDR.string.logout)) { _, _ -> logOut() }
+            .setPositiveButton(getString(IDR.string.logout)) { _, _ -> navigateToLogout() }
             .setNegativeButton(
                 getString(IDR.string.confirmation_logout_cancel), null
             ).create()
@@ -89,7 +89,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                     SettingsPasswordDialogFragment(
                         title = IDR.string.password_lock_title_logout,
                         passwordToMatch = password,
-                        onSuccess = { logOut() }
+                        onSuccess = { navigateToLogout() }
                     ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
                 } else {
                     confirmationDialogForLogout.show()
@@ -99,10 +99,8 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun logOut() {
-        viewModel.logout()
-        findNavController().navigate(R.id.action_aboutFragment_to_requestLoginFragment)
-    }
+    private fun navigateToLogout() =
+        findNavController().navigate(R.id.action_aboutFragment_to_logout_navigation)
 
     private fun getAppVersionPreference(): Preference? =
         findPreference(getString(R.string.preference_app_version_key))
