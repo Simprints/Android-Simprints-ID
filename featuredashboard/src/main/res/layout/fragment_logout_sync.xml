@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/simprints_blue">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/logoutSyncAppBar"
@@ -25,13 +27,55 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <TextView
+        android:id="@+id/logout_sync_info"
+        style="@style/SimprintsStyle.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/margin_large"
+        android:paddingVertical="@dimen/margin_default"
+        android:text="@string/logout_sync_decline_warning"
+        android:textColor="@color/simprints_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logoutSyncAppBar" />
+
     <com.simprints.feature.dashboard.views.SyncCardView
         android:id="@+id/logoutSyncCard"
         style="@style/DashboardCardStyle"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/margin_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logoutSyncAppBar" />
+        app:layout_constraintTop_toBottomOf="@+id/logout_sync_info" />
+
+    <Button
+        android:id="@+id/logoutButton"
+        style="@style/SimprintsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/margin_large"
+        android:text="@string/logout"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/logoutWithoutSyncButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logoutSyncCard"
+        app:layout_constraintVertical_bias="0"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/logoutWithoutSyncButton"
+        style="@style/SimprintsOrangeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/margin_large"
+        android:layout_marginVertical="@dimen/margin_large"
+        android:text="@string/logout_sync_decline_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
