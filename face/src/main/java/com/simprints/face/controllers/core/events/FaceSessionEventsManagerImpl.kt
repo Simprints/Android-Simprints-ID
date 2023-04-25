@@ -43,6 +43,5 @@ class FaceSessionEventsManagerImpl @Inject constructor(
             FACE_CAPTURE_BIOMETRICS -> (event as FaceCaptureBiometricsEvent).fromDomainToCore()
             ONE_TO_ONE_MATCH -> (event as OneToOneMatchEvent).fromDomainToCore()
             ONE_TO_MANY_MATCH -> (event as OneToManyMatchEvent).fromDomainToCore()
-            REFUSAL -> (event as RefusalEvent).fromDomainToCore()
         }
 }

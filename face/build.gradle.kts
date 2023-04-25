@@ -32,6 +32,7 @@ dependencies {
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))
     implementation(project(":featurealert"))
+    implementation(project(":featureexitform"))
 
     implementation(libs.cameraView)
     implementation(libs.circleImageView)
