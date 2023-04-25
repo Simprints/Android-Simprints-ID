@@ -6,15 +6,8 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
-import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.infra.logging.Simber
-
-fun Activity.launchRefusalActivity(requestCode: Int = RequestCode.REFUSAL.value) {
-    val intent = Intent(this, RefusalActivity::class.java)
-    startActivityForResult(intent, requestCode)
-}
 
 fun Context.showToast(string: String) =
     runOnUiThread {

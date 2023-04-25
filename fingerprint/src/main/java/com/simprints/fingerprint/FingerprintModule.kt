@@ -3,8 +3,6 @@ package com.simprints.fingerprint
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.nfc.NfcAdapter
-import com.simprints.fingerprint.activities.refusal.RefusalContract
-import com.simprints.fingerprint.activities.refusal.RefusalPresenter
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManagerImpl
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -30,7 +28,6 @@ import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluet
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.assisted.AssistedFactory
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
@@ -45,11 +42,6 @@ import javax.inject.Singleton
 )
 @InstallIn(SingletonComponent::class)
 abstract class FingerprintModule {
-
-    @AssistedFactory
-    interface RefusalPresenterFactory {
-        fun create(view: RefusalContract.View): RefusalPresenter
-    }
 
     @Binds
     abstract fun provideMasterFlowManager(impl: MasterFlowManagerImpl): MasterFlowManager

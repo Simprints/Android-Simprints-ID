@@ -6,8 +6,6 @@ import android.os.Bundle
 import com.simprints.feature.alert.AlertContract
 import com.simprints.fingerprint.activities.alert.AlertError.Companion.PAYLOAD_KEY
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
-import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -24,6 +22,7 @@ internal class AlertActivityHelper {
     fun handleAlertResult(
         activity: Activity,
         data: Bundle,
+        showRefusal: () -> Unit,
         retry: () -> Unit,
     ) {
         val alertError = AlertContract.getResponsePayload(data)
@@ -36,15 +35,17 @@ internal class AlertActivityHelper {
                 if (alertError == AlertError.UNEXPECTED_ERROR) {
                     finishWithError(activity, alertError)
                 } else {
-                    goToRefusalActivity(activity)
+                    showRefusal()
                 }
             }
+
             AlertError.ACTION_PAIR -> {
                 settingsOpenedForPairing.set(true)
                 openBluetoothSettings(activity)
             }
+
             AlertError.ACTION_CLOSE -> finishWithError(activity, alertError)
-            AlertError.ACTION_REFUSAL -> goToRefusalActivity(activity)
+            AlertError.ACTION_REFUSAL -> showRefusal()
             AlertError.ACTION_RETRY -> retry()
             AlertError.ACTION_BT_SETTINGS -> openBluetoothSettings(activity)
         }
@@ -58,10 +59,6 @@ internal class AlertActivityHelper {
             putExtra(AlertTaskResult.BUNDLE_KEY, AlertTaskResult(alertError))
         })
         activity.finish()
-    }
-
-    fun goToRefusalActivity(activity: Activity) {
-        activity.startActivityForResult(Intent(activity, RefusalActivity::class.java), RequestCode.REFUSAL.value)
     }
 
     private fun openBluetoothSettings(activity: Activity) {
