@@ -34,6 +34,9 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
         logoutSyncToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
+        logoutWithoutSyncButton.setOnClickListener {
+            findNavController().navigate(R.id.action_logoutSyncFragment_to_logoutSyncDeclineFragment)
+        }
     }
 
     private fun observeLiveData() {
