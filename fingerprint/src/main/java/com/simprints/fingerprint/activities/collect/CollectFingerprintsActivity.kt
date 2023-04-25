@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
+import com.simprints.feature.exitform.ShowExitFormWrapper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper
 import com.simprints.fingerprint.activities.base.FingerprintActivity
@@ -25,6 +26,7 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
+import com.simprints.fingerprint.activities.refusal.RefusalAlertHelper
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
@@ -34,7 +36,6 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
-import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.fingerprint.tools.extensions.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,9 +56,19 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private var confirmDialog: AlertDialog? = null
     private var hasSplashScreenBeenTriggered: Boolean = false
 
+    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { data ->
+        RefusalAlertHelper.handleRefusal(
+            data = data,
+            onSubmit = { setResultAndFinish(ResultCode.REFUSED, it) },
+        )
+    }
+
     private val alertHelper = AlertActivityHelper()
     private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
-        alertHelper.handleAlertResult(this, data, retry = {})
+        alertHelper.handleAlertResult(this, data,
+            showRefusal = { showRefusal.launch(RefusalAlertHelper.refusalArgs()) },
+            retry = {}
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -227,21 +238,10 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         vm.handleOnPause()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (ResultCode.fromValue(resultCode)) {
-            ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
-            ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
-            ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
-            ResultCode.OK -> {
-            }
-        }
-    }
-
     override fun onBackPressed() {
         vm.handleOnBackPressed()
         if (!vm.state().currentCaptureState().isCommunicating()) {
-            launchRefusalActivity()
+            showRefusal.launch(RefusalAlertHelper.refusalArgs())
         }
     }
 

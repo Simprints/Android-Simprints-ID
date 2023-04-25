@@ -13,10 +13,12 @@ import androidx.activity.viewModels
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
+import com.simprints.feature.exitform.ShowExitFormWrapper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
+import com.simprints.fingerprint.activities.refusal.RefusalAlertHelper
 import com.simprints.fingerprint.databinding.ActivityMatchingBinding
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -31,11 +33,19 @@ class MatchingActivity : FingerprintActivity() {
 
     private lateinit var matchingRequest: MatchingTaskRequest
 
+    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { data ->
+        RefusalAlertHelper.handleRefusal(
+            data = data,
+            onSubmit = { setResultAndFinish(REFUSED, it) },
+        )
+    }
+
     private val alertHelper = AlertActivityHelper()
     private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
         alertHelper.handleAlertResult(
             this,
             data,
+            showRefusal = { showRefusal.launch(RefusalAlertHelper.refusalArgs()) },
             retry = { },
         )
     }
@@ -150,17 +160,6 @@ class MatchingActivity : FingerprintActivity() {
                 .setDuration((progress * 10).toLong())
                 .start()
         }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (ResultCode.fromValue(resultCode)) {
-            REFUSED -> setResultAndFinish(REFUSED, data)
-            ALERT -> setResultAndFinish(ALERT, data)
-            CANCELLED -> setResultAndFinish(CANCELLED, data)
-            OK -> {
-            }
-        }
-    }
 
     private fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
         setResult(resultCode.value, resultData)
