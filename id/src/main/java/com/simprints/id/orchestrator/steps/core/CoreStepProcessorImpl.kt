@@ -71,16 +71,10 @@ class CoreStepProcessorImpl @Inject constructor(): CoreStepProcessor {
                 CoreResponseType.CONSENT -> data.getParcelableExtra<AskConsentResponse>(
                     CORE_STEP_BUNDLE
                 )
-                CoreResponseType.FINGERPRINT_EXIT_FORM -> data.getParcelableExtra<CoreFingerprintExitFormResponse>(
-                    CORE_STEP_BUNDLE
-                )
-                CoreResponseType.FACE_EXIT_FORM -> data.getParcelableExtra<CoreFaceExitFormResponse>(
-                    CORE_STEP_BUNDLE
-                )
                 CoreResponseType.FETCH_GUID -> data.getParcelableExtra<FetchGUIDResponse>(
                     CORE_STEP_BUNDLE
                 )
-                CoreResponseType.CORE_EXIT_FORM -> data.getParcelableExtra<CoreExitFormResponse>(
+                CoreResponseType.EXIT_FORM -> data.getParcelableExtra<ExitFormResponse>(
                     CORE_STEP_BUNDLE
                 )
                 CoreResponseType.GUID_SELECTION -> data.getParcelableExtra<GuidSelectionResponse>(

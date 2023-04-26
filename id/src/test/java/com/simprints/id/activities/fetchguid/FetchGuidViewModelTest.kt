@@ -4,7 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.db.SubjectFetchResult
-import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.*
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.LOCAL
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR
+import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.REMOTE
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.id.tools.device.DeviceManager
@@ -17,8 +20,15 @@ import com.simprints.infra.events.event.domain.models.CandidateReadEvent.Candida
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -61,7 +71,7 @@ class FetchGuidViewModelTest {
             eventRepository,
             timeHelper,
             configManager,
-            exitForHelper
+            exitForHelper,
         )
 
         configureMocks()
@@ -213,12 +223,12 @@ class FetchGuidViewModelTest {
     @Test
     fun startsExitForm_whenCalled() = runTest {
         coEvery { configManager.getProjectConfiguration().general.modalities } returns emptyList()
-        every { exitForHelper.getExitFormActivityClassFromModalities(any()) }.returns("test")
+        every { exitForHelper.getExitFormFromModalities(any()) }.returns(mockk())
 
         viewModel.startExitForm()
 
         val result = viewModel.exitForm.getOrAwaitValue()
-        assertThat(result.getContentIfNotHandled()).isEqualTo("test")
+        assertThat(result.getContentIfNotHandled()).isNotNull()
         assertThat(result.hasBeenHandled).isTrue()
     }
 
