@@ -1,5 +1,6 @@
 package com.simprints.id.activities.fetchguid
 
+import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,7 +30,7 @@ class FetchGuidViewModel @Inject constructor(
 ) : ViewModel() {
 
     var subjectFetch = MutableLiveData<SubjectSource>()
-    var exitForm = MutableLiveData<LiveDataEventWithContent<String?>>()
+    var exitForm = MutableLiveData<LiveDataEventWithContent<Bundle?>>()
 
     fun fetchGuid(projectId: String, verifyGuid: String) {
         viewModelScope.launch {
@@ -100,8 +101,8 @@ class FetchGuidViewModel @Inject constructor(
     fun startExitForm() {
         viewModelScope.launch {
             val modalities = configManager.getProjectConfiguration().general.modalities
-            val formName = exitFormHelper.getExitFormActivityClassFromModalities(modalities)
-            exitForm.postValue(LiveDataEventWithContent(formName))
+            val formArgs = exitFormHelper.getExitFormFromModalities(modalities)
+            exitForm.postValue(LiveDataEventWithContent(formArgs))
         }
     }
 }

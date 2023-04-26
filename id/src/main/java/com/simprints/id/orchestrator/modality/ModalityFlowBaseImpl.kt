@@ -8,9 +8,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusa
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
-import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
@@ -87,10 +85,7 @@ abstract class ModalityFlowBaseImpl(
             }
         }
 
-    private fun isExitFormResponse(coreResult: Step.Result?) =
-        coreResult is CoreExitFormResponse ||
-            coreResult is CoreFingerprintExitFormResponse ||
-            coreResult is CoreFaceExitFormResponse
+    private fun isExitFormResponse(coreResult: Step.Result?) = coreResult is ExitFormResponse
 
     private fun isSetupResponseAndSetupIncomplete(coreResult: Step.Result?) =
         coreResult is SetupResponse && !coreResult.isSetupComplete
