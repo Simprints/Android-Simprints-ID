@@ -5,10 +5,6 @@ plugins {
 
 android {
     namespace = "com.simprints.infra.realm"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

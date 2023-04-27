@@ -8,7 +8,6 @@ android {
     namespace = "com.simprints.core"
 
     defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

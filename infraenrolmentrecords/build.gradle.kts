@@ -5,10 +5,6 @@ plugins {
 
 android {
     namespace = "com.simprints.infra.enrolment.records"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

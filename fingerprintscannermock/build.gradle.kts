@@ -4,10 +4,6 @@ plugins {
 
 android {
     namespace = "com.simprints.fingerprintscannermock"
-
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-    }
 }
 
 dependencies {
