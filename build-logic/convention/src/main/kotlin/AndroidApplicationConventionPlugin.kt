@@ -76,6 +76,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 buildTypes {
                     getByName(BuildTypes.release) {
                         isMinifyEnabled = true
+                        isShrinkResources = true
                         isDebuggable = false
                         lint.fatal += "StopShip"
                         versionNameSuffix = "+$propVersionCode"
@@ -84,6 +85,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                     create(BuildTypes.staging) {
                         isMinifyEnabled = true
+                        isShrinkResources = true
                         isDebuggable = propDebuggable
                         lint.fatal += "StopShip"
                         versionNameSuffix = "-{$propVersionSuffix}+$propVersionCode"
@@ -92,6 +94,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                     getByName(BuildTypes.debug) {
                         isMinifyEnabled = false
+                        isShrinkResources = false
                         isDebuggable = propDebuggable
                         versionNameSuffix = "-{$propVersionSuffix}+$propVersionCode"
                         buildConfigField("Boolean", "DEBUG_MODE", "true")
