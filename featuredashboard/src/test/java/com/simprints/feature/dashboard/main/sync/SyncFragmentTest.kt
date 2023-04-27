@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.simprints.feature.dashboard.R
+import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
 import dagger.hilt.android.testing.BindValue
@@ -64,7 +65,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncDefault state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncDefault(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncDefault(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -91,7 +92,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncPendingUpload state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncPendingUpload(LAST_SYNC_TIME, 2))
+        mockSyncCardLiveData(SyncCardState.SyncPendingUpload(LAST_SYNC_TIME, 2))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -119,7 +120,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncFailed state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncFailed(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncFailed(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -141,7 +142,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncFailedBackendMaintenance state without estimated outage`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncFailedBackendMaintenance(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncFailedBackendMaintenance(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -163,7 +164,7 @@ class SyncFragmentTest {
     fun `should display the correct sync card view for the SyncFailedBackendMaintenance state with estimated outage`() {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(
-            DashboardSyncCardState.SyncFailedBackendMaintenance(
+            SyncCardState.SyncFailedBackendMaintenance(
                 LAST_SYNC_TIME,
                 10L
             )
@@ -191,7 +192,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncTooManyRequests state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncTooManyRequests(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncTooManyRequests(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -213,7 +214,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncTryAgain state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncTryAgain(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncTryAgain(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -238,7 +239,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncHasNoModules state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncHasNoModules(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncHasNoModules(LAST_SYNC_TIME))
 
         val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
@@ -266,7 +267,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncOffline state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncOffline(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncOffline(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -290,7 +291,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncProgress state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
+        mockSyncCardLiveData(SyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -325,7 +326,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncConnecting state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncConnecting(LAST_SYNC_TIME, 20, 40))
+        mockSyncCardLiveData(SyncCardState.SyncConnecting(LAST_SYNC_TIME, 20, 40))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -355,7 +356,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncComplete state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncComplete(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncComplete(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
@@ -390,10 +391,10 @@ class SyncFragmentTest {
         }
     }
 
-    private fun mockSyncCardLiveData(state: DashboardSyncCardState) {
+    private fun mockSyncCardLiveData(state: SyncCardState) {
         every { viewModel.syncCardLiveData } returns mockk {
             every { observe(any(), any()) } answers {
-                secondArg<Observer<DashboardSyncCardState>>().onChanged(state)
+                secondArg<Observer<SyncCardState>>().onChanged(state)
             }
         }
     }

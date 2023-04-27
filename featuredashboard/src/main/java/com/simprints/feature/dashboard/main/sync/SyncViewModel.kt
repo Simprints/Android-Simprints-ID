@@ -2,7 +2,8 @@ package com.simprints.feature.dashboard.main.sync
 
 import androidx.lifecycle.*
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.feature.dashboard.main.sync.DashboardSyncCardState.*
+import com.simprints.feature.dashboard.views.SyncCardState
+import com.simprints.feature.dashboard.views.SyncCardState.*
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
@@ -39,9 +40,9 @@ internal class SyncViewModel @Inject constructor(
         get() = _syncToBFSIDAllowed
     private val _syncToBFSIDAllowed = MutableLiveData<Boolean>()
 
-    val syncCardLiveData: LiveData<DashboardSyncCardState>
+    val syncCardLiveData: LiveData<SyncCardState>
         get() = _syncCardLiveData
-    private val _syncCardLiveData = MediatorLiveData<DashboardSyncCardState>()
+    private val _syncCardLiveData = MediatorLiveData<SyncCardState>()
 
     private val upSyncCountLiveData = MutableLiveData(0)
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
@@ -146,7 +147,7 @@ internal class SyncViewModel @Inject constructor(
         }
     }
 
-    private suspend fun processRecentSyncState(syncState: EventSyncState, itemsToUpSync: Int): DashboardSyncCardState {
+    private suspend fun processRecentSyncState(syncState: EventSyncState, itemsToUpSync: Int): SyncCardState {
 
         val downSyncStates = syncState.downSyncWorkersInfo
         val upSyncStates = syncState.upSyncWorkersInfo

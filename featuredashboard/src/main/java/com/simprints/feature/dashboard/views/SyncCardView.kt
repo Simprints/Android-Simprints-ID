@@ -4,15 +4,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.dashboard.databinding.LayoutCardSyncBinding
-import com.simprints.feature.dashboard.main.sync.DashboardSyncCardState
 import com.simprints.infra.resources.R
 import kotlin.math.min
 
@@ -35,23 +32,23 @@ internal class SyncCardView : CardView {
         hideAllViews()
     }
 
-    internal fun render(state: DashboardSyncCardState) {
+    internal fun render(state: SyncCardState) {
         hideAllViews()
         when (state) {
-            is DashboardSyncCardState.SyncDefault -> prepareSyncDefaultStateView()
-            is DashboardSyncCardState.SyncPendingUpload -> prepareSyncDefaultStateView(state.itemsToUpSync)
-            is DashboardSyncCardState.SyncFailed -> prepareSyncFailedStateView()
-            is DashboardSyncCardState.SyncFailedBackendMaintenance -> prepareSyncFailedBecauseBackendMaintenanceView(
+            is SyncCardState.SyncDefault -> prepareSyncDefaultStateView()
+            is SyncCardState.SyncPendingUpload -> prepareSyncDefaultStateView(state.itemsToUpSync)
+            is SyncCardState.SyncFailed -> prepareSyncFailedStateView()
+            is SyncCardState.SyncFailedBackendMaintenance -> prepareSyncFailedBecauseBackendMaintenanceView(
                 state
             )
 
-            is DashboardSyncCardState.SyncTooManyRequests -> prepareSyncTooManyRequestsView()
-            is DashboardSyncCardState.SyncTryAgain -> prepareTryAgainStateView()
-            is DashboardSyncCardState.SyncHasNoModules -> prepareNoModulesStateView()
-            is DashboardSyncCardState.SyncOffline -> prepareSyncOfflineView()
-            is DashboardSyncCardState.SyncProgress -> prepareProgressView(state)
-            is DashboardSyncCardState.SyncConnecting -> prepareSyncConnectingView(state)
-            is DashboardSyncCardState.SyncComplete -> prepareSyncCompleteView()
+            is SyncCardState.SyncTooManyRequests -> prepareSyncTooManyRequestsView()
+            is SyncCardState.SyncTryAgain -> prepareTryAgainStateView()
+            is SyncCardState.SyncHasNoModules -> prepareNoModulesStateView()
+            is SyncCardState.SyncOffline -> prepareSyncOfflineView()
+            is SyncCardState.SyncProgress -> prepareProgressView(state)
+            is SyncCardState.SyncConnecting -> prepareSyncConnectingView(state)
+            is SyncCardState.SyncComplete -> prepareSyncCompleteView()
         }
         updateLastSyncTime(state.lastTimeSyncSucceed)
     }
@@ -85,7 +82,7 @@ internal class SyncCardView : CardView {
             resources.getString(R.string.dashboard_sync_card_failed_message)
     }
 
-    private fun prepareSyncFailedBecauseBackendMaintenanceView(state: DashboardSyncCardState.SyncFailedBackendMaintenance) {
+    private fun prepareSyncFailedBecauseBackendMaintenanceView(state: SyncCardState.SyncFailedBackendMaintenance) {
         binding.dashboardSyncCardFailedMessage.visibility = View.VISIBLE
         binding.dashboardSyncCardFailedMessage.text =
             if (state.estimatedOutage != null && state.estimatedOutage != 0L)
@@ -124,7 +121,7 @@ internal class SyncCardView : CardView {
         }
     }
 
-    private fun prepareProgressView(state: DashboardSyncCardState.SyncProgress) {
+    private fun prepareProgressView(state: SyncCardState.SyncProgress) {
         binding.dashboardSyncCardProgress.visibility = View.VISIBLE
         binding.dashboardSyncCardProgressIndeterminateProgressBar.visibility = View.GONE
 
@@ -141,7 +138,7 @@ internal class SyncCardView : CardView {
         setProgress(state.progress, state.total, R.color.colorPrimaryDark)
     }
 
-    private fun prepareSyncConnectingView(state: DashboardSyncCardState.SyncConnecting) {
+    private fun prepareSyncConnectingView(state: SyncCardState.SyncConnecting) {
         binding.dashboardSyncCardProgress.visibility = View.VISIBLE
         binding.dashboardSyncCardProgressIndeterminateProgressBar.visibility = View.VISIBLE
 
