@@ -4,10 +4,6 @@ plugins {
 }
 
 android {
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
-    }
     namespace = "com.simprints.testtools"
 }
 

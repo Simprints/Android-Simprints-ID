@@ -12,10 +12,6 @@ sonarqube {
 
 android {
     namespace = "com.simprints.infra.resources"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

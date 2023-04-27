@@ -6,10 +6,6 @@ plugins {
 
 android {
     namespace = "com.simprints.moduleapi"
-
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-    }
 }
 
 dependencies {

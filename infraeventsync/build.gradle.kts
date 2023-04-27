@@ -6,10 +6,6 @@ plugins {
 android {
     namespace = "com.simprints.infra.eventsync"
 
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-
     buildTypes {
         getByName("release") {
             buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")

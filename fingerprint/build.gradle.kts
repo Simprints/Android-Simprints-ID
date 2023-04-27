@@ -14,12 +14,10 @@ android {
 
     buildTypes {
         getByName("release") {
-            proguardFiles("proguard-rules.pro")
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "1440L")
         }
 
         getByName("staging") {
-            proguardFiles("proguard-rules.pro")
             buildConfigField("long", "FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES", "15L")
         }
 

@@ -6,10 +6,6 @@ plugins {
 
 android {
     namespace = "com.simprints.infra.login"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 }
 
 dependencies {

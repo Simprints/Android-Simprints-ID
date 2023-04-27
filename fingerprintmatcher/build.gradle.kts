@@ -6,7 +6,7 @@ android {
     namespace = "com.simprints.fingerprintmatcher"
 
     defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
+        consumerProguardFiles("consumer-rules.pro")
     }
 }
 
