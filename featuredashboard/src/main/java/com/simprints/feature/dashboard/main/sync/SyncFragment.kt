@@ -4,21 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
-import android.widget.ProgressBar
-import androidx.core.graphics.BlendModeColorFilterCompat
-import androidx.core.graphics.BlendModeCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDashboardCardSyncBinding
-import com.simprints.feature.dashboard.main.sync.DashboardSyncCardState.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.min
-import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {

@@ -83,6 +83,11 @@
         <action
             android:id="@+id/action_aboutFragment_to_logout_navigation"
             app:destination="@id/logout_navigation"/>
+        <action
+            android:id="@+id/action_aboutFragment_to_requestLoginFragment"
+            app:destination="@id/requestLoginFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true"/>
     </fragment>
     <fragment
         android:id="@+id/syncInfoFragment"
@@ -115,6 +120,11 @@
             <action
                 android:id="@+id/action_logoutSyncFragment_to_logoutSyncDeclineFragment"
                 app:destination="@id/logOutSyncDeclineFragment" />
+            <action
+                android:id="@+id/action_logoutSyncFragment_to_requestLoginFragment"
+                app:destination="@id/requestLoginFragment"
+                app:popUpTo="@id/dashboard_navigation"
+                app:popUpToInclusive="true" />
         </fragment>
         <fragment
             android:id="@+id/logOutSyncDeclineFragment"
