@@ -29,7 +29,7 @@ class LibraryHiltConventionPlugin : Plugin<Project> {
             val libs = getLibs()
             dependencies {
                 implementation(libs, "hilt")
-                implementation(libs, "hilt.work") // TODO move to worker config?
+                implementation(libs, "hilt.work")
 
                 kapt(libs, "hilt.kapt")
                 kapt(libs, "hilt.compiler")

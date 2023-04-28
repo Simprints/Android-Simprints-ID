@@ -40,7 +40,7 @@ composable way.
 
 * Configuration plugins
     * Define some build configurations that could apply in multiple modules.
-    * Examples: `simprints.config.cloud`, `simprints.config.cloud`
+    * Examples: `simprints.config.cloud`, `simprints.config.network`
     * Note: this is a sub-optimal solution and is subject to change.
 
 ## Types of modules in SID
