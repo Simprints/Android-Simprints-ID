@@ -58,10 +58,6 @@ import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
 import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.LocationManagerImpl
-import com.simprints.id.tools.device.ConnectivityHelper
-import com.simprints.id.tools.device.ConnectivityHelperImpl
-import com.simprints.id.tools.device.DeviceManager
-import com.simprints.id.tools.device.DeviceManagerImpl
 import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityChecker
 import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityCheckerImpl
 import com.simprints.infra.security.SecurityManager
@@ -204,12 +200,6 @@ abstract class IdOrchestratorModule {
     @Binds
     abstract fun provideFetchGuidHelper(impl: FetchGuidHelperImpl): FetchGuidHelper
 
-    @Binds
-    abstract fun provideDeviceManager(impl: DeviceManagerImpl): DeviceManager
-
-    @Binds
-    abstract fun provideConnectivityHelper(impl: ConnectivityHelperImpl): ConnectivityHelper
-
     @ModalityFlowEnrolment
     @Binds
     abstract fun provideFlowModalityEnrolment(impl: ModalityFlowEnrol): ModalityFlow
@@ -301,8 +291,6 @@ object IdDependenciesModule {
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class TemporaryFeatureDashboardModule {
-    @Binds
-    abstract fun provideDeviceManager(impl: DeviceManagerImpl): com.simprints.feature.dashboard.main.sync.DeviceManager
 
     @Binds
     abstract fun provideSignerManager(impl: SignerManagerImpl): com.simprints.feature.dashboard.settings.about.SignerManager

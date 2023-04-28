@@ -1,7 +1,10 @@
 package com.simprints.feature.dashboard.settings.syncinfo
 
-import androidx.lifecycle.*
-import com.simprints.feature.dashboard.main.sync.DeviceManager
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -18,6 +21,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -28,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SyncInfoViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    deviceManager: DeviceManager,
+    connectivityTracker: ConnectivityTracker,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val loginManager: LoginManager,
     private val imageRepository: ImageRepository,
@@ -63,7 +67,7 @@ internal class SyncInfoViewModel @Inject constructor(
         get() = _configuration
     private val _configuration = MutableLiveData<ProjectConfiguration>()
 
-    val isConnected: LiveData<Boolean> = deviceManager.isConnectedLiveData
+    val isConnected: LiveData<Boolean> = connectivityTracker.observeIsConnected()
 
     val lastSyncState = eventSyncManager.getLastSyncState()
     private var lastKnownEventSyncState: EventSyncState? = null

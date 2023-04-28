@@ -8,8 +8,8 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.id.databinding.ActivityPrivacyNoticeBinding
-import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.showToast
+import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -18,7 +18,7 @@ import com.simprints.infra.resources.R as IDR
 class PrivacyNoticeActivity : BaseSplitActivity() {
 
     @Inject
-    lateinit var deviceManager: DeviceManager
+    lateinit var connectivityTracker: ConnectivityTracker
 
     private val viewModel: PrivacyNoticeViewModel by viewModels()
     private val binding by viewBinding(ActivityPrivacyNoticeBinding::inflate)
@@ -47,7 +47,7 @@ class PrivacyNoticeActivity : BaseSplitActivity() {
 
     private fun initInUi() {
         binding.longConsentDownloadButton.setOnClickListener {
-            if (deviceManager.isConnected()) {
+            if (connectivityTracker.isConnected()) {
                 viewModel.retrievePrivacyNotice()
             } else {
                 showUserOfflineToast()
