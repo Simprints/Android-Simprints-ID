@@ -10,16 +10,19 @@ import androidx.activity.viewModels
 import com.simprints.core.tools.extentions.requestPermissionsIfRequired
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
+import com.simprints.feature.exitform.ShowExitFormWrapper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
-import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.BackButtonBehaviour.*
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.BackButtonBehaviour.DISABLED
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.BackButtonBehaviour.EXIT_WITH_ERROR
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
+import com.simprints.fingerprint.activities.refusal.RefusalAlertHelper
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
-import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.infra.logging.Simber
@@ -31,11 +34,20 @@ class ConnectScannerActivity : FingerprintActivity() {
     private val permissionCode = 0
     private val viewModel: ConnectScannerViewModel by viewModels()
 
+    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { data ->
+        RefusalAlertHelper.handleRefusal(
+            data = data,
+            onBack = { viewModel.retryConnect() },
+            onSubmit = { setResultAndFinish(ResultCode.REFUSED, it) },
+        )
+    }
+
     private val alertHelper = AlertActivityHelper()
     private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
         alertHelper.handleAlertResult(
             this,
             data,
+            showRefusal = { showRefusal.launch(RefusalAlertHelper.refusalArgs()) },
             retry = { viewModel.retryConnect() },
         )
     }
@@ -87,18 +99,6 @@ class ConnectScannerActivity : FingerprintActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RequestCode.REFUSAL.value) {
-            when (ResultCode.fromValue(resultCode)) {
-                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
-                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
-                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
-                ResultCode.OK -> viewModel.retryConnect()
-            }
-        }
-    }
-
     private fun vibrateAndContinueToNextActivity() {
         Vibrate.vibrate(this)
         setResultAndFinish(ResultCode.OK, Intent().apply {
@@ -123,7 +123,8 @@ class ConnectScannerActivity : FingerprintActivity() {
         when (viewModel.backButtonBehaviour.value) {
             DISABLED -> { /* Do nothing */
             }
-            EXIT_FORM, null -> alertHelper.goToRefusalActivity(this)
+
+            EXIT_FORM, null -> showRefusal.launch(RefusalAlertHelper.refusalArgs())
             EXIT_WITH_ERROR -> finishWithError()
         }
     }

@@ -12,11 +12,11 @@ import com.google.android.material.tabs.TabLayout
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.feature.exitform.ShowExitFormWrapper
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.databinding.ActivityConsentBinding
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
-import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.response.AskConsentResponse
@@ -47,6 +47,13 @@ class ConsentActivity : BaseSplitActivity() {
 
     @Inject
     lateinit var exitFormHelper: ExitFormHelper
+
+    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { data ->
+        exitFormHelper.buildExitFormResponse(data)?.let {
+            viewModel.deleteLocationInfoFromSession()
+            setResultAndFinish(it)
+        }
+    }
 
     private var startConsentEventTime: Long = 0
     private var consentConfiguration: ConsentConfiguration = ConsentConfiguration(
@@ -188,23 +195,7 @@ class ConsentActivity : BaseSplitActivity() {
     }
 
     private fun startExitFormActivity() {
-        val exitFormActivityClass =
-            exitFormHelper.getExitFormActivityClassFromModalities(modalities)
-
-        exitFormActivityClass?.let {
-            startActivityForResult(
-                Intent().setClassName(this, it),
-                CoreRequestCode.EXIT_FORM.value
-            )
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        exitFormHelper.buildExitFormResponseForCore(data)?.let {
-            viewModel.deleteLocationInfoFromSession()
-            setResultAndFinish(it)
-        }
+        showRefusal.launch(exitFormHelper.getExitFormFromModalities(modalities))
     }
 
     private fun setResultAndFinish(coreResponse: CoreResponse) {

@@ -47,6 +47,7 @@ dependencies {
     implementation(project(":face"))
     implementation(project(":featuredashboard"))
     implementation(project(":featurealert"))
+    implementation(project(":featureexitform"))
     implementation(project(":fingerprint"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))

@@ -8,9 +8,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.material.tabs.TabLayout
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
-import com.simprints.id.activities.coreexitform.CoreExitFormActivity
-import com.simprints.id.activities.faceexitform.FaceExitFormActivity
-import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
@@ -19,7 +16,6 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import io.mockk.every
 import io.mockk.mockk
@@ -50,55 +46,6 @@ class ConsentActivityTest {
                 secondArg<Observer<ProjectConfiguration>>().onChanged(configuration)
             }
         }
-    }
-
-    @Test
-    fun consentDeclineOnMultipleModalities_shouldLaunchCoreExitFormActivity() {
-        modalities = listOf(
-            GeneralConfiguration.Modality.FACE,
-            GeneralConfiguration.Modality.FINGERPRINT
-        )
-        val controller = createRoboConsentActivity(getIntentForConsentAct())
-        val activity = controller.get()
-
-        activity.consentDeclineButton.performClick()
-
-        assertActivityStarted(CoreExitFormActivity::class.java, activity)
-    }
-
-    @Test
-    fun consentDeclineOnFingerprintModalityOnly_shouldLaunchFingerprintExitFormActivity() {
-        modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT)
-        val controller = createRoboConsentActivity(getIntentForConsentAct())
-        val activity = controller.get()
-
-        activity.consentDeclineButton.performClick()
-
-        assertActivityStarted(FingerprintExitFormActivity::class.java, activity)
-    }
-
-    @Test
-    fun consentDeclineOnFaceModalityOnly_shouldLaunchCoreExitFormActivity() {
-        modalities = listOf(GeneralConfiguration.Modality.FACE)
-        val controller = createRoboConsentActivity(getIntentForConsentAct())
-        val activity = controller.get()
-
-        activity.consentDeclineButton.performClick()
-
-        assertActivityStarted(FaceExitFormActivity::class.java, activity)
-    }
-
-    @Test
-    fun declining_on_parental_tab_should_still_exit_correctly() {
-        modalities = listOf(GeneralConfiguration.Modality.FACE)
-        every { consentConfiguration.allowParentalConsent } returns true
-        val controller = createRoboConsentActivity(getIntentForConsentAct())
-        val activity = controller.get()
-
-        activity.tabHost.getTabAt(1)!!.select()
-        activity.consentDeclineButton.performClick()
-
-        assertActivityStarted(FaceExitFormActivity::class.java, activity)
     }
 
     @Test

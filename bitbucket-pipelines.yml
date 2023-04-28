@@ -103,9 +103,11 @@ definitions:
                     - source ci/pipeline/setup
                     - ./gradlew featuredashboard:jacocoTestReport
                     - ./gradlew featurealert:jacocoTestReport
+                    - ./gradlew featureexitform:jacocoTestReport
                 artifacts:
                     - featuredashboard/build/reports/**
                     - featurealert/build/reports/**
+                    - featureexitform/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.

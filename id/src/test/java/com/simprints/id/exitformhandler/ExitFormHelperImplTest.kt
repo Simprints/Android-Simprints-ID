@@ -1,29 +1,22 @@
 package com.simprints.id.exitformhandler
 
-import android.content.Intent
+import android.os.Bundle
+import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
-import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
-import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
-import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
-import com.simprints.id.data.exitform.CoreExitFormReason
-import com.simprints.id.data.exitform.FaceExitFormReason
-import com.simprints.id.data.exitform.FingerprintExitFormReason
-import com.simprints.id.orchestrator.steps.CoreStepProcessorImplTest
-import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFaceExitFormResponse
-import com.simprints.id.orchestrator.steps.core.response.CoreFingerprintExitFormResponse
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-
+import com.google.common.truth.Truth.assertThat
+import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.config.ExitFormOption
+import com.simprints.feature.exitform.screen.ExitFormFragmentArgs
+import com.simprints.id.data.exitform.ExitFormReason
+import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.resources.R
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ExitFormHelperImplTest {
 
     private lateinit var exitFormHelper: ExitFormHelper
@@ -34,141 +27,62 @@ class ExitFormHelperImplTest {
     }
 
     @Test
-    fun `test buildExitFormResponseForCore should return null if data is null`() {
-        // Given
-        val exitFormData = null
-        // When
-        val result = exitFormHelper.buildExitFormResponseForCore(exitFormData)
-        // Then
-        Truth.assertThat(result).isNull()
+    fun `getExitFormFromModalities should return generic config if there are no modalities`() {
+        val config = exitFormHelper.getExitFormFromModalities(listOf())
+        assertThat(getTitleResFromConfig(config)).isEqualTo(R.string.why_did_you_skip_biometrics)
     }
 
     @Test
-    fun `test buildExitFormResponseForCore should return null if action is go_back for type CORE_EXIT_FORM`() {
-        // Given
-        val exitFormData = buildCoreExitFormData(CoreExitFormActivityResult.Action.GO_BACK)
-        // When
-        val result = exitFormHelper.buildExitFormResponseForCore(exitFormData)
-        // Then
-        Truth.assertThat(result).isNull()
+    fun `getExitFormFromModalities should return generic config if there are several modalities`() {
+        val config = exitFormHelper.getExitFormFromModalities(listOf(
+            GeneralConfiguration.Modality.FACE,
+            GeneralConfiguration.Modality.FINGERPRINT
+        ))
+        assertThat(getTitleResFromConfig(config)).isEqualTo(R.string.why_did_you_skip_biometrics)
     }
 
     @Test
-    fun `test buildExitFormResponseForCore should return CoreExitFormResponse if action is SUBMIT for type CORE_EXIT_FORM`() {
-        // Given
-        val exitFormData = buildCoreExitFormData(CoreExitFormActivityResult.Action.SUBMIT)
-        // When
-        val result = exitFormHelper.buildExitFormResponseForCore(exitFormData)
-        Truth.assertThat(result).isNotNull()
-        Truth.assertThat((result as CoreExitFormResponse).reason)
-            .isEqualTo(CoreExitFormReason.OTHER)
+    fun `getExitFormFromModalities should return face config for face modality`() {
+        val config = exitFormHelper.getExitFormFromModalities(listOf(GeneralConfiguration.Modality.FACE))
+        assertThat(getTitleResFromConfig(config)).isEqualTo(R.string.why_did_you_skip_face_capture)
     }
 
     @Test
-    fun `test buildExitFormResponseForCore should return null if action is SCAN_FINGERPRINTS for type CORE_FINGERPRINT_EXIT_FROM`() {
-        // Given
-        val exitFormData =
-            buildFingerprintExitFormData(FingerprintExitFormActivityResult.Action.SCAN_FINGERPRINTS)
-        // When
-        val result = exitFormHelper.buildExitFormResponseForCore(exitFormData)
-        Truth.assertThat(result).isNull()
-    }
-    @Test
-    fun `test buildExitFormResponseForCore should return null if action is null`() {
-        // Given
-        val exitFormData =
-            buildFingerprintExitFormData(null)
-        // When
-        val result = exitFormHelper.buildExitFormResponseForCore(exitFormData)
-        Truth.assertThat(result).isNull()
+    fun `getExitFormFromModalities should return fingerprint config for fingerprint modality`() {
+        val config = exitFormHelper.getExitFormFromModalities(listOf(GeneralConfiguration.Modality.FINGERPRINT))
+        assertThat(getTitleResFromConfig(config)).isEqualTo(R.string.why_did_you_skip_fingerprinting)
     }
 
     @Test
-    fun `test buildExitFormResponseForCore should return CoreExitFormResponse if action is SUBMIT for type CORE_FINGERPRINT_EXIT_FROM`() {
-        // Given
-        val exitFormData =
-            buildFingerprintExitFormData(FingerprintExitFormActivityResult.Action.SUBMIT)
-        // When
-        val result = exitFormHelper.buildExitFormResponseForCore(exitFormData)
-        Truth.assertThat(result).isNotNull()
-        Truth.assertThat((result as CoreFingerprintExitFormResponse).reason)
-            .isEqualTo(FingerprintExitFormReason.OTHER)
-    }
-
-
-    @Test
-    fun `test buildExitFormResponseForCore should return null if action is go_back for type CORE_FACE_EXIT_FORM`() {
-        // Given
-        val exitFormData = buildFaceExitFormData(FaceExitFormActivityResult.Action.GO_BACK)
-        // When
-        val result = exitFormHelper.buildExitFormResponseForCore(exitFormData)
-        Truth.assertThat(result).isNull()
+    fun `test buildExitFormResponse should return null if data is empty`() {
+        val exitFormData = Bundle()
+        val result = exitFormHelper.buildExitFormResponse(exitFormData)
+        assertThat(result).isNull()
     }
 
     @Test
-    fun `test buildExitFormResponseForCore should return CoreExitFormResponse if action is SUBMIT for type CORE_FACE_EXIT_FORM`() {
-        // Given
-        val exitFormData = buildFaceExitFormData(FaceExitFormActivityResult.Action.SUBMIT)
-        // When
-        val result = exitFormHelper.buildExitFormResponseForCore(exitFormData)
-        Truth.assertThat(result).isNotNull()
-        Truth.assertThat((result as CoreFaceExitFormResponse).reason)
-            .isEqualTo(FaceExitFormReason.OTHER)
+    fun `test buildExitFormResponse should return null if exit form was not submitted`() {
+        val exitFormData = bundleOf(
+            ExitFormContract.EXIT_FORM_SUBMITTED to false
+        )
+        val result = exitFormHelper.buildExitFormResponse(exitFormData)
+        assertThat(result).isNull()
     }
 
-    private fun buildCoreExitFormData(action: CoreExitFormActivityResult.Action): Intent {
-        return Intent().apply {
-
-            putExtra(
-                CoreStepProcessorImplTest.CORE_STEP_BUNDLE, CoreExitFormResponse(
-                    CoreExitFormReason.OTHER, "optional_text"
-                )
-            )
-            putExtra(
-                ExitFormResult.EXIT_FORM_BUNDLE_KEY, CoreExitFormActivityResult(
-                    action,
-                    CoreExitFormActivityResult.Answer(reason = CoreExitFormReason.OTHER)
-                )
-            )
-        }
+    @Test
+    fun `test buildExitFormResponse should return CoreExitFormResponse if exit form was submitted`() {
+        val exitFormData = bundleOf(
+            ExitFormContract.EXIT_FORM_SUBMITTED to true,
+            ExitFormContract.EXIT_FORM_SELECTED_OPTION to ExitFormOption.Other,
+        )
+        val result = exitFormHelper.buildExitFormResponse(exitFormData)
+        assertThat(result).isNotNull()
+        assertThat((result as ExitFormResponse).reason).isEqualTo(ExitFormReason.OTHER)
     }
 
-    private fun buildFingerprintExitFormData(action: FingerprintExitFormActivityResult.Action?)
-        : Intent {
-        return Intent().apply {
-            putExtra(
-                CoreStepProcessorImplTest.CORE_STEP_BUNDLE, CoreExitFormResponse(
-                    CoreExitFormReason.OTHER, "optional_text"
-                )
-            )
-            action?.let {
+    // Slightly leaking implementation details here,
+    // but there is no other way to check if correct config was made
+    private fun getTitleResFromConfig(config: Bundle): Int? =
+        ExitFormFragmentArgs.fromBundle(config).exitFormConfiguration.titleRes
 
-                putExtra(
-                    ExitFormResult.EXIT_FORM_BUNDLE_KEY, FingerprintExitFormActivityResult(
-                        action,
-                        FingerprintExitFormActivityResult.Answer()
-                    )
-                )
-            }
-        }
-
-    }
-
-    private fun buildFaceExitFormData(action: FaceExitFormActivityResult.Action): Intent {
-
-        return Intent().apply {
-
-            putExtra(
-                CoreStepProcessorImplTest.CORE_STEP_BUNDLE, CoreExitFormResponse(
-                    CoreExitFormReason.OTHER, "optional_text"
-                )
-            )
-            putExtra(
-                ExitFormResult.EXIT_FORM_BUNDLE_KEY, FaceExitFormActivityResult(
-                    action,
-                    FaceExitFormActivityResult.Answer()
-                )
-            )
-        }
-    }
 }
