@@ -60,7 +60,7 @@ internal class AboutViewModel @Inject constructor(
         viewModelScope.launch {
             val projectId = loginManager.getSignedInProjectIdOrEmpty()
             val logoutDestination =
-                when (canSyncDataToSimprints() || hasEventsToUpload(projectId)) {
+                when (canSyncDataToSimprints() && hasEventsToUpload(projectId)) {
                     true -> LogoutDestination.LogoutDataSyncScreen
                     false -> {
                         logout()
@@ -72,7 +72,7 @@ internal class AboutViewModel @Inject constructor(
     }
 
     private suspend fun hasEventsToUpload(projectId: String): Boolean =
-        eventSyncManager.countEventsToUpload(projectId = projectId, type = null).first() < 0
+        eventSyncManager.countEventsToUpload(projectId = projectId, type = null).first() > 0
 
     private suspend fun canSyncDataToSimprints(): Boolean =
         configManager.getProjectConfiguration().canSyncDataToSimprints()
