@@ -7,6 +7,8 @@ import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.login.LoginManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -24,6 +26,7 @@ class AboutViewModelTest {
         private val MODALITIES = listOf(GeneralConfiguration.Modality.FINGERPRINT)
         private val POOL_TYPE = IdentificationConfiguration.PoolType.MODULE
         private val PARTITION_TYPE = DownSynchronizationConfiguration.PartitionType.PROJECT
+        private const val PROJECT_ID = "projectId"
     }
 
     @get:Rule
@@ -41,6 +44,10 @@ class AboutViewModelTest {
         30,
         10000,
     )
+    private val eventSyncManager = mockk<EventSyncManager>()
+    private val loginManager = mockk<LoginManager> {
+        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+    }
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
@@ -66,10 +73,12 @@ class AboutViewModelTest {
     @Test
     fun `should initialize the live data correctly`() {
         val viewModel = AboutViewModel(
-            configManager,
-            signerManager,
-            recentUserActivityManager,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+            configManager = configManager,
+            loginManager = loginManager,
+            eventSyncManager = eventSyncManager,
+            recentUserActivityManager = recentUserActivityManager,
+            signerManager = signerManager,
+            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
@@ -86,13 +95,15 @@ class AboutViewModelTest {
     @Test
     fun `should logout correctly`() {
         val viewModel = AboutViewModel(
-            configManager,
-            signerManager,
-            recentUserActivityManager,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+            configManager = configManager,
+            loginManager = loginManager,
+            eventSyncManager = eventSyncManager,
+            recentUserActivityManager = recentUserActivityManager,
+            signerManager = signerManager,
+            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
 
-        viewModel.logout()
+        viewModel.processLogoutRequest()
 
         coVerify(exactly = 1) { signerManager.signOut() }
     }

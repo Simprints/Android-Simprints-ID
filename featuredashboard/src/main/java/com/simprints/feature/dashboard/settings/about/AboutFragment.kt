@@ -11,15 +11,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.DeviceID
-import com.simprints.core.DispatcherIO
 import com.simprints.core.PackageVersionName
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,10 +37,6 @@ internal class AboutFragment : PreferenceFragmentCompat() {
     @DeviceID
     lateinit var deviceId: String
 
-    @Inject
-    @DispatcherIO
-    lateinit var dispatcher: CoroutineDispatcher
-
     private val viewModel by viewModels<AboutViewModel>()
     private val binding by viewBinding(FragmentSettingsAboutBinding::bind)
 
@@ -49,7 +44,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(IDR.string.confirmation_logout_title))
             .setMessage(getString(IDR.string.confirmation_logout_message))
-            .setPositiveButton(getString(IDR.string.logout)) { _, _ -> processLogoutNavigation() }
+            .setPositiveButton(getString(IDR.string.logout)) { _, _ -> viewModel.processLogoutRequest() }
             .setNegativeButton(
                 getString(IDR.string.confirmation_logout_cancel), null
             ).create()
@@ -87,6 +82,15 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         viewModel.recentUserActivity.observe(viewLifecycleOwner) {
             getScannerVersionPreference()?.summary = it.lastScannerVersion
         }
+        viewModel.logoutDestinationEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                val destination = when (it) {
+                    LogoutDestination.LogoutDataSyncScreen -> R.id.action_aboutFragment_to_logout_navigation
+                    LogoutDestination.LoginScreen -> R.id.action_aboutFragment_to_requestLoginFragment
+                }
+                findNavController().navigate(destination)
+            })
     }
 
     private fun initLayout() {
@@ -99,26 +103,13 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                     SettingsPasswordDialogFragment(
                         title = IDR.string.password_lock_title_logout,
                         passwordToMatch = password,
-                        onSuccess = { processLogoutNavigation() }
+                        onSuccess = { viewModel.processLogoutRequest() }
                     ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
                 } else {
                     confirmationDialogForLogout.show()
                 }
             }
             true
-        }
-    }
-
-    private fun processLogoutNavigation() = lifecycleScope.launch(dispatcher) {
-        val destination = when (viewModel.hasDataToSynchronize()) {
-            true -> R.id.action_aboutFragment_to_logout_navigation
-            false -> {
-                viewModel.logout()
-                R.id.action_aboutFragment_to_requestLoginFragment
-            }
-        }
-        withContext(Dispatchers.Main) {
-            findNavController().navigate(destination)
         }
     }
 

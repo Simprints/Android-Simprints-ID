@@ -5,11 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
+import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.livedata.send
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
-import com.simprints.infra.config.domain.models.isEventDownSyncAllowed
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.login.LoginManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -46,15 +47,28 @@ internal class AboutViewModel @Inject constructor(
         get() = _settingsLocked
     private val _settingsLocked =
         MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
+    val logoutDestinationEvent: LiveData<LiveDataEventWithContent<LogoutDestination>>
+        get() = _logoutDestinationEvent
+    private val _logoutDestinationEvent =
+        MutableLiveData<LiveDataEventWithContent<LogoutDestination>>()
 
     init {
         load()
     }
 
-
-    suspend fun hasDataToSynchronize(): Boolean {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
-        return canSyncDataToSimprints() || hasEventsToUpload(projectId)
+    fun processLogoutRequest() {
+        viewModelScope.launch {
+            val projectId = loginManager.getSignedInProjectIdOrEmpty()
+            val logoutDestination =
+                when (canSyncDataToSimprints() || hasEventsToUpload(projectId)) {
+                    true -> LogoutDestination.LogoutDataSyncScreen
+                    false -> {
+                        logout()
+                        LogoutDestination.LoginScreen
+                    }
+                }
+            _logoutDestinationEvent.send(logoutDestination)
+        }
     }
 
     private suspend fun hasEventsToUpload(projectId: String): Boolean =
@@ -63,7 +77,7 @@ internal class AboutViewModel @Inject constructor(
     private suspend fun canSyncDataToSimprints(): Boolean =
         configManager.getProjectConfiguration().canSyncDataToSimprints()
 
-    fun logout() {
+    private fun logout() {
         externalScope.launch { signerManager.signOut() }
     }
 

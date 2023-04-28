@@ -50,7 +50,7 @@ class SyncFragmentTest {
 
         launchFragmentInHiltContainer<SyncFragment>()
 
-        onView(withId(R.id.dashboard_sync_card)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.dashboardSyncCard)).check(matches(not(isDisplayed())))
     }
 
     @Test
@@ -59,7 +59,7 @@ class SyncFragmentTest {
 
         launchFragmentInHiltContainer<SyncFragment>()
 
-        onView(withId(R.id.dashboard_sync_card)).check(matches(isDisplayed()))
+        onView(withId(R.id.dashboardSyncCard)).check(matches(isDisplayed()))
     }
 
     @Test
