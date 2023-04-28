@@ -1,19 +1,9 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    kotlin("kapt")
-    id("dagger.hilt.android.plugin")
-}
-
-apply {
-    from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
+    id("simprints.android.library")
+    id("simprints.library.hilt")
 }
 
 android {
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
-    }
     namespace = "com.simprints.testtools"
 }
 
@@ -21,33 +11,39 @@ android {
 System.setProperty("org.mockito.mock.android", "true")
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":core"))
-    implementation(project(":infraresources"))
 
-    implementation(libs.hilt)
-    kapt(libs.hilt.kapt)
-
-    implementation(libs.testing.androidX.runner)
-    implementation(libs.testing.androidX.navigation)
-    implementation(libs.testing.androidX.core.testing)
-    implementation(libs.testing.fragment.testing) {
-        exclude("androidx.test", "core")
-    }
-
-    implementation(libs.testing.espresso.core)
-
+    api(libs.testing.androidX.core)
     api(libs.androidX.multidex)
     api(libs.androidX.appcompat)
+    api(libs.testing.fragment)
+    api(libs.testing.androidX.ext.junit)
+    api(libs.testing.androidX.runner)
+    api(libs.testing.androidX.navigation)
+
+    api(libs.testing.navigation)
+    api(libs.testing.hilt)
+    api(libs.testing.live.data)
+    api(libs.testing.work)
 
     api(libs.testing.junit)
-    implementation(libs.testing.mockito.inline)
-    implementation(libs.testing.mockito.kotlin)
+    api(libs.testing.mockito.core)
+    api(libs.testing.mockito.inline)
+    api(libs.testing.mockito.kotlin)
+    api(libs.testing.mockk.core)
+    api(libs.testing.truth)
+    api(libs.testing.robolectric.core)
+    api(libs.testing.coroutines)
+    api(libs.testing.koTest.kotlin.assert) {
+        exclude("org.jetbrains:annotations")
+    }
 
-    implementation(libs.testing.robolectric.core)
-    implementation(libs.rxJava2.android)
+    api(libs.testing.espresso.core)
+    api(libs.testing.espresso.intents)
+    api(libs.testing.espresso.contrib)
+    api(libs.testing.espresso.accessibility)
+
+    api(libs.rxJava2.android)
     api(libs.rxJava2.core)
-    implementation(libs.testing.coroutines.test)
-    implementation(libs.testing.mockk.core)
-
+    api(libs.rxJava2.kotlin)
 }

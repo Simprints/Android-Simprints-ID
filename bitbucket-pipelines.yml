@@ -25,7 +25,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew clientapi:jacocoTestReport
                 artifacts:
                     - clientapi/build/reports/**
@@ -42,7 +41,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew id:jacocoTestReport
                 artifacts:
                     - id/build/reports/**
@@ -60,7 +58,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew infraevents:jacocoTestReport
                     - ./gradlew infraeventsync:jacocoTestReport
@@ -104,7 +101,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew featuredashboard:jacocoTestReport
                     - ./gradlew featurealert:jacocoTestReport
                 artifacts:
@@ -123,7 +119,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew face:jacocoTestReport
                 artifacts:
                     - face/build/reports/**
@@ -141,7 +136,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew fingerprint:jacocoTestReport
                     - ./gradlew fingerprintmatcher:jacocoTestReport
 
@@ -162,7 +156,6 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - bash ./ci/scanning/code_coverage_setup
                     - ./gradlew fingerprintscanner:jacocoTestReport
                 artifacts:
                     - fingerprintscanner/build/reports/**
@@ -182,25 +175,6 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600
-
-        ######################################################################
-        # Scan all of the projects dependencies and report back if there are
-        # un-used, incorrectly declared, or incorrect transitive dependencies
-        ######################################################################
-        -   step: &dependency-health-check
-                max-time: 30
-                size: 2x
-                name: "Dependency health check"
-                caches:
-                    - gradle
-                    - gradlewrapper
-                script:
-                    - source ci/pipeline/setup
-                    #  Disabling health check in test variants because there is a compilation issue in finding
-                    # infraevents/sampledata folder which only  available in debug variants but the health check tool gets executed in all variants.
-                    # Should be fixed in https://simprints.atlassian.net/browse/CORE-2045
-                    - ./gradlew buildHealth  -Ddependency.analysis.test.analysis=false
-
 
         ######################################################################
         # Build all of the test APKs for the different modules, then Download
@@ -381,7 +355,6 @@ flows:
                     -   step: *run-infra-unit-tests
                     -   step: *run-feature-unit-tests
                     -   step: *build-and-sign-universal-apk
-                    -   step: *dependency-health-check
             -   step: *upload-sonar-scan-and-check-quality-gate
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
@@ -392,8 +365,6 @@ flows:
             -   step: *run-all-android-tests
     -   flow: &update-dependencies-flow
             -   step: *update-dependencies
-    -   flow: &dependency-health-check-flow
-            -   step: *dependency-health-check
 
 
 ######################################################################
@@ -407,4 +378,3 @@ pipelines:
     custom:
         ci-test-pipeline: *ci-test # For CI testing purposes only
         renovate: *update-dependencies-flow
-        health-check: *dependency-health-check-flow

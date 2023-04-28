@@ -18,11 +18,11 @@ import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFor
 import com.simprints.id.data.exitform.FingerprintExitFormReason
 import com.simprints.id.databinding.ActivityFingerprintExitFormBinding
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.extensions.showKeyboard
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
-import splitties.systemservices.inputMethodManager
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -147,10 +147,7 @@ class FingerprintExitFormActivity : BaseSplitActivity() {
         binding.fingerprintBtSubmitExitForm.isEnabled = false
         binding.fingerprintExitFormText.requestFocus()
         setTextChangeListenerOnExitText()
-        inputMethodManager.showSoftInput(
-            binding.fingerprintExitFormText,
-            InputMethodManager.SHOW_IMPLICIT
-        )
+        showKeyboard(binding.fingerprintExitFormText)
     }
 
     private fun setTextChangeListenerOnExitText() {
