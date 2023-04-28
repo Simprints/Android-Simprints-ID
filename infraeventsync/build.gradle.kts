@@ -1,20 +1,10 @@
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
-    id("dagger.hilt.android.plugin")
-    kotlin("kapt")
-}
-
-apply {
-    from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
+    id("simprints.infra")
+    id("simprints.library.room")
 }
 
 android {
     namespace = "com.simprints.infra.eventsync"
-
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
 
     buildTypes {
         getByName("release") {
@@ -44,43 +34,13 @@ android {
 }
 
 dependencies {
-    api(project(":core"))
-    implementation(project(":infralogging"))
-    api(project(":infraevents"))
-    implementation(project(":infranetwork"))
+    implementation(project(":infraevents"))
+    implementation(project(":infraconfig"))
+    implementation(project(":infralogin"))
     implementation(project(":infraenrolmentrecords"))
 
-    implementation(libs.androidX.room.ktx)
-    kapt(libs.androidX.room.compiler)
-
-    implementation(libs.androidX.lifecycle.livedata.ktx)
-    runtimeOnly(libs.kotlin.coroutinesAndroid)
-    api(libs.sqlCipher.core)
     implementation(libs.workManager.work)
 
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
-
-    // DI
-    implementation(libs.hilt)
-    implementation(libs.hilt.work)
-    kapt(libs.hilt.kapt)
-    kapt(libs.hilt.compiler)
-
-    testImplementation(libs.testing.androidX.ext.junit)
-    testImplementation(libs.testing.androidX.core.testing)
-    testImplementation(libs.testing.coroutines.test)
-    testImplementation(libs.testing.robolectric.annotation)
-    testImplementation(libs.testing.koTest.kotlin.assert)
-    testImplementation(libs.testing.androidX.room)
-    testImplementation(project(":testtools"))
-    testImplementation(libs.testing.truth)
-    testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.hilt.testing)
-    testImplementation(libs.testing.work)
-
-    androidTestImplementation(libs.testing.androidX.core.testing)
-    androidTestImplementation(libs.testing.androidX.ext.junit)
-    androidTestImplementation(libs.testing.mockk.android)
-
 }

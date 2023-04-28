@@ -1,37 +1,22 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
-    kotlin("kapt")
-}
-
-apply {
-    from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
+    id("simprints.android.library")
+    id("simprints.library.hilt")
+    id("simprints.config.network")
 }
 
 android {
+    namespace = "com.simprints.infra.network"
+
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
-    buildTypes {
-        getByName("release") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"prod\"")
-        }
-        getByName("staging") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"staging\"")
-        }
-        getByName("debug") {
-            buildConfigField("String", "BASE_URL_PREFIX", "\"dev\"")
-        }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
-    namespace = "com.simprints.infra.network"
 }
 
-
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
     implementation(project(":infralogging"))
 
     debugImplementation(libs.chuck.debug) {
@@ -50,20 +35,17 @@ dependencies {
     implementation(libs.retrofit.logging)
     implementation(libs.retrofit.okhttp)
 
-    implementation(libs.hilt)
-    kapt(libs.hilt.kapt)
-
     // Unit Tests
-    testImplementation(project(":testtools"))
-
-    testImplementation(libs.chuck.release)
-
-    testImplementation(libs.testing.coroutines.test)
-
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.mockk.core)
-    testImplementation(libs.testing.mockwebserver)
+    testImplementation(libs.testing.coroutines)
     testImplementation(libs.testing.truth)
+    testImplementation(libs.testing.koTest.kotlin.assert)
+    testImplementation(libs.testing.androidX.runner)
+
+    testImplementation(libs.testing.mockwebserver)
+    testImplementation(libs.chuck.release)
+
 }
 
 configurations {
@@ -71,5 +53,8 @@ configurations {
         // We have two versions of chucker, a dummy one "library-no-op" that is designed for release and staging build types
         // And a full feature version that should be added in debug build types
         exclude("com.github.chuckerteam.chucker", "library-no-op")
+    }
+    testImplementation {
+        exclude("com.github.chuckerteam.chucker", "library")
     }
 }

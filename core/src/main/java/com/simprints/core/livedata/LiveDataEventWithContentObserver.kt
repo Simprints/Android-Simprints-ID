@@ -10,9 +10,7 @@ import androidx.lifecycle.Observer
  * [onEventUnhandledContent] is *only* called if the [LiveDataEventWithContent]'s contents has not been handled.
  */
 class LiveDataEventWithContentObserver<T>(private val onEventUnhandledContent: (T) -> Unit) : Observer<LiveDataEventWithContent<T>> {
-    override fun onChanged(event: LiveDataEventWithContent<T>?) {
-        event?.getContentIfNotHandled()?.let { value ->
-            onEventUnhandledContent(value)
-        }
+    override fun onChanged(value: LiveDataEventWithContent<T>) {
+        value.getContentIfNotHandled()?.let { onEventUnhandledContent(it) }
     }
 }
