@@ -3,9 +3,7 @@ package com.simprints.id.orchestrator.steps
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.exitform.CoreExitFormReason
-import com.simprints.id.data.exitform.FaceExitFormReason
-import com.simprints.id.data.exitform.FingerprintExitFormReason
+import com.simprints.id.data.exitform.ExitFormReason
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
@@ -91,44 +89,12 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
         val exitFormData = Intent().apply {
             putExtra(
                 CORE_STEP_BUNDLE,
-                CoreExitFormResponse(CoreExitFormReason.OTHER, "optional_text")
+                ExitFormResponse(ExitFormReason.OTHER, "optional_text")
             )
         }
         val result = coreStepProcessor.processResult(exitFormData)
 
-        assertThat(result).isInstanceOf(CoreExitFormResponse::class.java)
-    }
-
-    @Test
-    fun stepProcessor_shouldProcessFingerprintExitFormResult() {
-        val fingerprintExitFormData = Intent().apply {
-            putExtra(
-                CORE_STEP_BUNDLE,
-                CoreFingerprintExitFormResponse(
-                    FingerprintExitFormReason.OTHER,
-                    "fingerprint_optional_text"
-                )
-            )
-        }
-        val result = coreStepProcessor
-            .processResult(fingerprintExitFormData)
-
-        assertThat(result).isInstanceOf(CoreFingerprintExitFormResponse::class.java)
-    }
-
-    @Test
-    fun stepProcessor_shouldProcessFaceExitFormResult() {
-        val faceExitFormData = Intent().apply {
-            putExtra(
-                CORE_STEP_BUNDLE, CoreFaceExitFormResponse(
-                    FaceExitFormReason.OTHER,
-                    "face_optional_text"
-                )
-            )
-        }
-        val result = coreStepProcessor.processResult(faceExitFormData)
-
-        assertThat(result).isInstanceOf(CoreFaceExitFormResponse::class.java)
+        assertThat(result).isInstanceOf(ExitFormResponse::class.java)
     }
 
     @Test

@@ -7,7 +7,6 @@ import android.widget.Button
 import androidx.annotation.StringRes
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.pressBackUnconditionally
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -26,7 +25,6 @@ import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
-import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -320,21 +318,6 @@ class CollectFingerprintsActivityTest {
         launchAlert.postEvent(AlertError.UNEXPECTED_ERROR)
 
         Intents.intended(hasComponent("com.simprints.feature.alert.intent.AlertWrapperActivity"))
-
-        Intents.release()
-    }
-
-    @Test
-    fun pressBack_launchesRefusalActivity() {
-        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
-        Intents.init()
-
-        Intents.intending(hasComponent(RefusalActivity::class.java.name))
-            .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
-
-        pressBackUnconditionally()
-
-        Intents.intended(hasComponent(RefusalActivity::class.java.name))
 
         Intents.release()
     }

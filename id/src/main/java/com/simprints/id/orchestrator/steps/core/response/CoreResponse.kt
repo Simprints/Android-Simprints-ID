@@ -13,9 +13,7 @@ open class CoreResponse(val type: CoreResponseType): Parcelable, Step.Result {
 
 enum class CoreResponseType {
     CONSENT,
-    CORE_EXIT_FORM,
-    FINGERPRINT_EXIT_FORM,
-    FACE_EXIT_FORM,
+    EXIT_FORM,
     FETCH_GUID,
     GUID_SELECTION,
     SETUP,

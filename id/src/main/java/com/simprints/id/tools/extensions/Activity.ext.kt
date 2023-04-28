@@ -22,8 +22,3 @@ fun Activity.showToast(stringRes: Int) =
     runOnUiThread {
         Toast.makeText(this, getString(stringRes), Toast.LENGTH_LONG).show()
     }
-
-fun Activity.showKeyboard(target: View) {
-    val ime = getSystemService(AppCompatActivity.INPUT_METHOD_SERVICE) as InputMethodManager
-    ime.showSoftInput(target, InputMethodManager.SHOW_IMPLICIT)
-}

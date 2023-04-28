@@ -11,5 +11,4 @@ enum class EventType {
     FACE_CAPTURE_CONFIRMATION,
     ONE_TO_ONE_MATCH,
     ONE_TO_MANY_MATCH,
-    REFUSAL,
 }
