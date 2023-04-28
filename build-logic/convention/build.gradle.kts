@@ -20,7 +20,6 @@ configurations.all {
     }
 }
 
-// TODO root/build.gradle same as buildscript.dependencies{}
 dependencies {
     // Gradle & Kotlin
     compileOnly(libs.plugin.gradle.android)
