@@ -13,6 +13,7 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -24,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SyncViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
-    private val deviceManager: DeviceManager,
+    private val connectivityTracker: ConnectivityTracker,
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val loginManager: LoginManager,
@@ -82,7 +83,7 @@ internal class SyncViewModel @Inject constructor(
 
     private fun load() =
         viewModelScope.launch {
-            _syncCardLiveData.addSource(deviceManager.isConnectedLiveData) {
+            _syncCardLiveData.addSource(connectivityTracker.observeIsConnected()) {
                 CoroutineScope(coroutineContext + SupervisorJob()).launch {
                     emitNewCardState(
                         it,
@@ -226,7 +227,7 @@ internal class SyncViewModel @Inject constructor(
     private suspend fun isModuleSync() =
         configManager.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
-    private fun isConnected() = deviceManager.isConnectedLiveData.value ?: true
+    private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 
 }
 

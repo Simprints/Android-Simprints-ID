@@ -3,13 +3,19 @@ package com.simprints.feature.dashboard.privacynotices
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.dashboard.main.sync.DeviceManager
+import com.simprints.feature.dashboard.privacynotices.PrivacyNoticeState.Available
+import com.simprints.feature.dashboard.privacynotices.PrivacyNoticeState.DownloadInProgress
+import com.simprints.feature.dashboard.privacynotices.PrivacyNoticeState.NotAvailable
+import com.simprints.feature.dashboard.privacynotices.PrivacyNoticeState.NotAvailableBecauseBackendMaintenance
 import com.simprints.feature.dashboard.privacynotices.PrivacyNoticeState.NotConnectedToInternet
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
-import com.simprints.infra.config.domain.models.PrivacyNoticeResult.*
-import com.simprints.feature.dashboard.privacynotices.PrivacyNoticeState.*
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Failed
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.InProgress
+import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
@@ -43,7 +49,7 @@ class PrivacyNoticesViewModelTest {
     private val loginManager = mockk<LoginManager> {
         every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
     }
-    private val deviceManager = mockk<DeviceManager>()
+    private val connectivityTracker = mockk<ConnectivityTracker>()
 
     @Test
     fun `should return a NotConnectedToInternet if the device is not connected to the internet and the privacy notice is not cached`() {
@@ -53,7 +59,7 @@ class PrivacyNoticesViewModelTest {
                 Exception()
             )
         )
-        every { deviceManager.isConnectedLiveData } returns MutableLiveData(false)
+        every { connectivityTracker.observeIsConnected() } returns MutableLiveData(false)
 
         val viewModel = initViewModel()
         viewModel.fetchPrivacyNotice()
@@ -70,7 +76,7 @@ class PrivacyNoticesViewModelTest {
         coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
             Succeed(LANGUAGE, PRIVACY_NOTICE)
         )
-        every { deviceManager.isConnectedLiveData } returns MutableLiveData(false)
+        every { connectivityTracker.observeIsConnected() } returns MutableLiveData(false)
 
         val viewModel = initViewModel()
         viewModel.fetchPrivacyNotice()
@@ -85,7 +91,7 @@ class PrivacyNoticesViewModelTest {
         coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
             Failed(LANGUAGE, Exception())
         )
-        every { deviceManager.isConnectedLiveData } returns MutableLiveData(true)
+        every { connectivityTracker.observeIsConnected() } returns MutableLiveData(true)
 
         val viewModel = initViewModel()
         viewModel.fetchPrivacyNotice()
@@ -100,7 +106,7 @@ class PrivacyNoticesViewModelTest {
         coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
             FailedBecauseBackendMaintenance(LANGUAGE, Exception(), 10)
         )
-        every { deviceManager.isConnectedLiveData } returns MutableLiveData(true)
+        every { connectivityTracker.observeIsConnected() } returns MutableLiveData(true)
 
         val viewModel = initViewModel()
         viewModel.fetchPrivacyNotice()
@@ -115,7 +121,7 @@ class PrivacyNoticesViewModelTest {
         coEvery { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE) } returns flowOf(
             InProgress(LANGUAGE)
         )
-        every { deviceManager.isConnectedLiveData } returns MutableLiveData(true)
+        every { connectivityTracker.observeIsConnected() } returns MutableLiveData(true)
 
         val viewModel = initViewModel()
         viewModel.fetchPrivacyNotice()
@@ -129,6 +135,6 @@ class PrivacyNoticesViewModelTest {
         PrivacyNoticesViewModel(
             configManager,
             loginManager,
-            deviceManager,
+            connectivityTracker,
         )
 }
