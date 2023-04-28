@@ -1,5 +1,6 @@
 package com.simprints.infra.network
 
+import com.simprints.infra.network.connectivity.ConnectivityTrackerImpl
 import com.simprints.infra.network.url.BaseUrlProvider
 import com.simprints.infra.network.url.BaseUrlProviderImpl
 import dagger.Binds
@@ -16,5 +17,8 @@ abstract class NetworkModule {
 
     @Binds
     internal abstract fun provideBaseUrlProvider(impl: BaseUrlProviderImpl): BaseUrlProvider
+
+    @Binds
+    internal abstract fun provideConnectivityTracker(impl: ConnectivityTrackerImpl): ConnectivityTracker
 
 }
