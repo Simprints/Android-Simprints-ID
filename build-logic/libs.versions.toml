@@ -55,7 +55,7 @@ rx_android_version = "2.1.1"
 rx_kotlin_version = "2.4.0"
 rx_adapter_version = "1.6.4"
 
-sqlCipher_version = "4.5.3"
+sqlCipher_version = "4.5.4"
 fuzzywuzzy_version = "1.4.0"
 rootbeer_version = "0.1.0"
 commons_io_version = "2.11.0"
