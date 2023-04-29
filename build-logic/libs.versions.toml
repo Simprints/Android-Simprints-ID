@@ -40,7 +40,7 @@ firebase_barcode_version = "18.2.0"
 firebase_crashlytics_version = "18.3.6"
 firebase_analytics_version = "21.2.2"
 firebase_perf_version = "20.3.1"
-firebase_crashlyticsPlugin_version = "2.9.2"
+firebase_crashlyticsPlugin_version = "2.9.5"
 firebase_perfPlugin_version = "1.4.2"
 firebase_distrtibutionPlugin_version = "4.0.0"
 
