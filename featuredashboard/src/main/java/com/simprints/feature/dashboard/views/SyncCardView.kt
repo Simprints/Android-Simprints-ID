@@ -54,18 +54,18 @@ internal class SyncCardView : CardView {
     }
 
     private fun hideAllViews() {
-        binding.dashboardSyncCardDefault.visibility = View.GONE
-        binding.dashboardSyncCardFailedMessage.visibility = View.GONE
-        binding.dashboardSyncCardSelectNoModules.visibility = View.GONE
-        binding.dashboardSyncCardOffline.visibility = View.GONE
-        binding.dashboardSyncCardProgress.visibility = View.GONE
-        binding.dashboardSyncCardTryAgain.visibility = View.GONE
+        binding.syncCardDefault.visibility = View.GONE
+        binding.syncCardFailedMessage.visibility = View.GONE
+        binding.syncCardSelectNoModules.visibility = View.GONE
+        binding.syncCardOffline.visibility = View.GONE
+        binding.syncCardProgress.visibility = View.GONE
+        binding.syncCardTryAgain.visibility = View.GONE
     }
 
     private fun prepareSyncDefaultStateView(itemsToSync: Int = 0) {
-        binding.dashboardSyncCardDefault.visibility = View.VISIBLE
-        binding.dashboardSyncCardDefaultStateSyncButton.setOnClickListener { onSyncButtonClick() }
-        binding.dashboardSyncCardDefaultItemsToUpload.text = if (itemsToSync <= 0) {
+        binding.syncCardDefault.visibility = View.VISIBLE
+        binding.syncCardDefaultStateSyncButton.setOnClickListener { onSyncButtonClick() }
+        binding.syncCardDefaultItemsToUpload.text = if (itemsToSync <= 0) {
             resources.getString(R.string.dashboard_sync_card_records_uploaded)
         } else {
             resources.getQuantityString(
@@ -77,14 +77,14 @@ internal class SyncCardView : CardView {
     }
 
     private fun prepareSyncFailedStateView() {
-        binding.dashboardSyncCardFailedMessage.visibility = View.VISIBLE
-        binding.dashboardSyncCardFailedMessage.text =
+        binding.syncCardFailedMessage.visibility = View.VISIBLE
+        binding.syncCardFailedMessage.text =
             resources.getString(R.string.dashboard_sync_card_failed_message)
     }
 
     private fun prepareSyncFailedBecauseBackendMaintenanceView(state: SyncCardState.SyncFailedBackendMaintenance) {
-        binding.dashboardSyncCardFailedMessage.visibility = View.VISIBLE
-        binding.dashboardSyncCardFailedMessage.text =
+        binding.syncCardFailedMessage.visibility = View.VISIBLE
+        binding.syncCardFailedMessage.text =
             if (state.estimatedOutage != null && state.estimatedOutage != 0L)
                 resources.getString(
                     R.string.error_backend_maintenance_with_time_message,
@@ -95,77 +95,77 @@ internal class SyncCardView : CardView {
     }
 
     private fun prepareSyncTooManyRequestsView() {
-        binding.dashboardSyncCardFailedMessage.visibility = View.VISIBLE
-        binding.dashboardSyncCardFailedMessage.text =
+        binding.syncCardFailedMessage.visibility = View.VISIBLE
+        binding.syncCardFailedMessage.text =
             resources.getString(R.string.dashboard_sync_card_too_many_modules_message)
     }
 
     private fun prepareTryAgainStateView() {
-        binding.dashboardSyncCardTryAgain.visibility = View.VISIBLE
-        binding.dashboardSyncCardTryAgainSyncButton.setOnClickListener {
+        binding.syncCardTryAgain.visibility = View.VISIBLE
+        binding.syncCardTryAgainSyncButton.setOnClickListener {
             onSyncButtonClick()
         }
     }
 
     private fun prepareNoModulesStateView() {
-        binding.dashboardSyncCardSelectNoModules.visibility = View.VISIBLE
-        binding.dashboardSyncCardSelectNoModulesButton.setOnClickListener {
+        binding.syncCardSelectNoModules.visibility = View.VISIBLE
+        binding.syncCardSelectNoModulesButton.setOnClickListener {
             onSelectNoModulesButtonClick()
         }
     }
 
     private fun prepareSyncOfflineView() {
-        binding.dashboardSyncCardOffline.visibility = View.VISIBLE
-        binding.dashboardSyncCardOfflineButton.setOnClickListener {
+        binding.syncCardOffline.visibility = View.VISIBLE
+        binding.syncCardOfflineButton.setOnClickListener {
             onOfflineButtonClick()
         }
     }
 
     private fun prepareProgressView(state: SyncCardState.SyncProgress) {
-        binding.dashboardSyncCardProgress.visibility = View.VISIBLE
-        binding.dashboardSyncCardProgressIndeterminateProgressBar.visibility = View.GONE
+        binding.syncCardProgress.visibility = View.VISIBLE
+        binding.syncCardProgressIndeterminateProgressBar.visibility = View.GONE
 
         val percentage = if (state.total != null)
             "${calculatePercentage(state.progress, state.total)}%"
         else
             ""
-        binding.dashboardSyncCardProgressMessage.text = resources.getString(
+        binding.syncCardProgressMessage.text = resources.getString(
             R.string.dashboard_sync_card_progress,
             percentage
         )
-        binding.dashboardSyncCardProgressMessage.setTextColor(getDefaultGrayTextColor())
+        binding.syncCardProgressMessage.setTextColor(getDefaultGrayTextColor())
 
         setProgress(state.progress, state.total, R.color.colorPrimaryDark)
     }
 
     private fun prepareSyncConnectingView(state: SyncCardState.SyncConnecting) {
-        binding.dashboardSyncCardProgress.visibility = View.VISIBLE
-        binding.dashboardSyncCardProgressIndeterminateProgressBar.visibility = View.VISIBLE
+        binding.syncCardProgress.visibility = View.VISIBLE
+        binding.syncCardProgressIndeterminateProgressBar.visibility = View.VISIBLE
 
-        binding.dashboardSyncCardProgressMessage.text =
+        binding.syncCardProgressMessage.text =
             resources.getString(R.string.dashboard_sync_card_connecting)
-        binding.dashboardSyncCardProgressMessage.setTextColor(getDefaultGrayTextColor())
+        binding.syncCardProgressMessage.setTextColor(getDefaultGrayTextColor())
 
         setProgress(state.progress, state.total, R.color.colorPrimaryDark)
     }
 
     private fun prepareSyncCompleteView() {
-        binding.dashboardSyncCardProgress.visibility = View.VISIBLE
-        binding.dashboardSyncCardProgressIndeterminateProgressBar.visibility = View.GONE
+        binding.syncCardProgress.visibility = View.VISIBLE
+        binding.syncCardProgressIndeterminateProgressBar.visibility = View.GONE
 
-        binding.dashboardSyncCardProgressMessage.text =
+        binding.syncCardProgressMessage.text =
             resources.getString(R.string.dashboard_sync_card_complete)
-        binding.dashboardSyncCardProgressMessage.setTextColor(context?.getColorStateList(R.color.simprints_green_dark))
+        binding.syncCardProgressMessage.setTextColor(context?.getColorStateList(R.color.simprints_green_dark))
 
         setProgress(100, 100, R.color.simprints_green_dark)
     }
 
     private fun updateLastSyncTime(lastSync: String?) {
         if (lastSync == null) {
-            binding.dashboardSyncCardLastSync.visibility = View.GONE
+            binding.syncCardLastSync.visibility = View.GONE
         } else {
-            binding.dashboardSyncCardLastSync.visibility = View.VISIBLE
-            binding.dashboardSyncCardLastSync.text = String.format(
+            binding.syncCardLastSync.visibility = View.VISIBLE
+            binding.syncCardLastSync.text = String.format(
                 resources.getString(R.string.dashboard_card_sync_last_sync),
                 lastSync
             )
@@ -173,7 +173,7 @@ internal class SyncCardView : CardView {
     }
 
     private fun setProgress(progress: Int, total: Int?, color: Int) {
-        with(binding.dashboardSyncCardProgressSyncProgressBar) {
+        with(binding.syncCardProgressSyncProgressBar) {
             if (total != null) {
                 setProgressBarIndeterminate(this, false)
                 this.progress = calculatePercentage(progress, total)
@@ -215,6 +215,6 @@ internal class SyncCardView : CardView {
     // The card's title has always the same color - the default one.
     // Hacky way to extract the color from the title and use for the other TextViews
     private fun getDefaultGrayTextColor(): Int =
-        binding.dashboardSyncCardTitle.textColors.defaultColor
+        binding.syncCardTitle.textColors.defaultColor
 
 }
