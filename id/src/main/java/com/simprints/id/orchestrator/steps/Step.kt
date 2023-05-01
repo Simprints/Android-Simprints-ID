@@ -2,20 +2,15 @@ package com.simprints.id.orchestrator.steps
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
-import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
-import com.simprints.id.orchestrator.steps.core.requests.CoreRequest
-import java.util.*
+import java.util.UUID
 
 data class Step(
     val id: String = UUID.randomUUID().toString(),
     val requestCode: Int,
     val activityName: String,
     val bundleKey: String,
-    val request: Request,
+    val request: Parcelable,
     private var result: Result? = null,
     private var status: Status
 ) : Parcelable {
@@ -85,11 +80,3 @@ data class Step(
 
     interface Result : Parcelable
 }
-
-fun Step.Request.fromDomainToModuleApi(): Parcelable =
-    when (this) {
-        is FingerprintRequest -> fromDomainToModuleApi()
-        is FaceRequest -> fromDomainToModuleApi()
-        is CoreRequest -> this
-        else -> throw Throwable("Invalid Request $this")
-    }
