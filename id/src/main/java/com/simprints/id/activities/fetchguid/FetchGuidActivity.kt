@@ -14,6 +14,7 @@ import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
+import com.simprints.feature.exitform.ShowExitFormWrapper
 import com.simprints.id.R
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
@@ -47,15 +48,12 @@ class FetchGuidActivity : BaseSplitActivity() {
         }
     ) { tryToFetchGuid() }
 
-    private val openExitForm = registerForActivityResult(
-        object : ActivityResultContract<String, CoreResponse?>() {
-            override fun createIntent(context: Context, input: String) =
-                Intent().setClassName(this@FetchGuidActivity, input)
-
-            override fun parseResult(resultCode: Int, intent: Intent?) =
-                exitFormHelper.buildExitFormResponseForCore(intent)
-        }
-    ) { if (it != null) setResultAndFinish(it) else finish() }
+    private val openExitForm = registerForActivityResult(ShowExitFormWrapper()) { data ->
+        val result = exitFormHelper.buildExitFormResponse(data)
+        if (result != null) {
+            setResultAndFinish(result)
+        } else finish()
+    }
 
     private val showAlert = registerForActivityResult(ShowAlertWrapper()) {
         val alertType = AlertType.fromPayload(it)
@@ -89,8 +87,8 @@ class FetchGuidActivity : BaseSplitActivity() {
 
     private fun setupObserversForUi() {
         viewModel.subjectFetch.observe(this) { launchAlertIfPersonFetchFailedOrFinish(it) }
-        viewModel.exitForm.observe(this, LiveDataEventWithContentObserver { exitFormActivityClass ->
-            exitFormActivityClass?.let { openExitForm.launch(it) }
+        viewModel.exitForm.observe(this, LiveDataEventWithContentObserver { exitFormArgs ->
+            exitFormArgs?.let { openExitForm.launch(it) }
         })
     }
 

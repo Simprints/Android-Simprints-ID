@@ -4,12 +4,9 @@ import android.content.Intent
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
@@ -17,7 +14,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
@@ -126,23 +122,6 @@ class ConnectScannerActivityAndroidTest {
         launchAlertLiveData.postEvent(AlertError.BLUETOOTH_NOT_SUPPORTED)
 
         intended(hasComponent("com.simprints.feature.alert.intent.AlertWrapperActivity"))
-
-        Intents.release()
-    }
-
-    @Test
-    fun pressBack_launchesRefusalActivity() {
-        val backButtonBehaviourLiveData =
-            MutableLiveData(ConnectScannerViewModel.BackButtonBehaviour.EXIT_FORM)
-        every { viewModelMock.backButtonBehaviour } returns backButtonBehaviourLiveData
-
-        Intents.init()
-
-        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
-
-        onView(isRoot()).perform(ViewActions.pressBack())
-
-        intended(hasComponent(RefusalActivity::class.java.name))
 
         Intents.release()
     }

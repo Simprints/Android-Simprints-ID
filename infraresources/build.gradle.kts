@@ -1,17 +1,16 @@
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
+    id("simprints.android.library")
 }
 
-apply {
-    from("${rootDir}${File.separator}buildSrc${File.separator}build_config.gradle")
+sonarqube {
+    /*
+     * We skip the infraresources module because it has no source code to analyse. This should be
+     * removed if that ever changes
+     */
+    isSkipProject = true
 }
 
 android {
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
-    }
     namespace = "com.simprints.infra.resources"
 }
 
@@ -19,7 +18,8 @@ dependencies {
     implementation(libs.support.material)
     implementation(libs.androidX.appcompat)
     implementation(libs.androidX.ui.constraintlayout)
-    implementation(libs.androidX.ui.preference){
-        exclude("androidx.lifecycle","lifecycle-viewmodel-ktx")
+
+    implementation(libs.androidX.ui.preference) {
+        exclude("androidx.lifecycle", "lifecycle-viewmodel-ktx")
     }
 }

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.network.FakeRetrofitInterface
 import com.simprints.infra.network.exceptions.*
-import com.simprints.testtools.common.syntax.assertThrows
+import io.kotest.assertions.throwables.shouldThrow
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -58,7 +59,7 @@ class SimApiClientImplTest {
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
 
-            val exception = assertThrows<BackendMaintenanceException> {
+            val exception = shouldThrow<BackendMaintenanceException> {
                 simApiClientImpl.executeCall { it.get() }
             }
             assertThat(exception.estimatedOutage).isNull()
@@ -77,7 +78,7 @@ class SimApiClientImplTest {
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
 
-            val exception = assertThrows<BackendMaintenanceException> {
+            val exception = shouldThrow<BackendMaintenanceException> {
                 simApiClientImpl.executeCall { it.get() }
             }
             assertThat(exception.estimatedOutage).isEqualTo(estimatedOutage)
@@ -95,7 +96,7 @@ class SimApiClientImplTest {
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
 
-            val exception = assertThrows<SyncCloudIntegrationException> {
+            val exception = shouldThrow<SyncCloudIntegrationException> {
                 simApiClientImpl.executeCall { it.get() }
             }
             assertThat(exception.cause).isInstanceOf(HttpException::class.java)
@@ -113,7 +114,7 @@ class SimApiClientImplTest {
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
 
-            val exception = assertThrows<SyncCloudIntegrationException> {
+            val exception = shouldThrow<SyncCloudIntegrationException> {
                 simApiClientImpl.executeCall { it.get() }
             }
             assertThat(exception.cause).isInstanceOf(HttpException::class.java)
@@ -132,7 +133,7 @@ class SimApiClientImplTest {
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
 
-            val exception = assertThrows<SyncCloudIntegrationException> {
+            val exception = shouldThrow<SyncCloudIntegrationException> {
                 simApiClientImpl.executeCall { it.get() }
             }
             assertThat(exception.cause).isInstanceOf(HttpException::class.java)
@@ -151,7 +152,7 @@ class SimApiClientImplTest {
             mockWebServer.enqueue(response)
             mockWebServer.enqueue(response)
 
-            val exception = assertThrows<SyncCloudIntegrationException> {
+            val exception = shouldThrow<SyncCloudIntegrationException> {
                 simApiClientImpl.executeCall { it.get() }
             }
             assertThat(exception.cause).isInstanceOf(HttpException::class.java)
@@ -170,7 +171,7 @@ class SimApiClientImplTest {
             val successfulResponse = MockResponse()
             mockWebServer.enqueue(successfulResponse)
 
-            val exception = assertThrows<NetworkConnectionException> {
+            val exception = shouldThrow<NetworkConnectionException> {
                 simApiClientImpl.executeCall { it.get() }
             }
             assertThat(exception.cause).isInstanceOf(IOException::class.java)
