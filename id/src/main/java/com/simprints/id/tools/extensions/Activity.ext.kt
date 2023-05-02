@@ -1,7 +1,10 @@
 package com.simprints.id.tools.extensions
 
 import android.app.Activity
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
 fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit) {
     runOnUiThreadIfStillRunning(then) {}

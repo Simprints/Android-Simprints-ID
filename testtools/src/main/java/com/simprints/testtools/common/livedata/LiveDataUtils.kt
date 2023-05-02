@@ -7,7 +7,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-class TestObserver<T> : Observer<T> {
+class TestObserver<T> : Observer<T?> {
 
     val observedValues = mutableListOf<T?>()
 
@@ -40,7 +40,7 @@ fun <T> LiveData<T>.getOrAwaitValue(
     var data: T? = null
     val latch = CountDownLatch(1)
     val observer = object : Observer<T> {
-        override fun onChanged(o: T?) {
+        override fun onChanged(o: T) {
             data = o
             latch.countDown()
             this@getOrAwaitValue.removeObserver(this)

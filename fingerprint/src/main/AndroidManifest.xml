@@ -37,11 +37,6 @@
         <activity
             android:name=".activities.collect.tryagainsplash.SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
-        <activity
-            android:name=".activities.refusal.RefusalActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"

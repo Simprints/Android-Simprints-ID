@@ -15,7 +15,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.core.response.CoreExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -141,7 +141,7 @@ fun mockCoreExitFormResponse() = Step(
         activityName = "",
         bundleKey = "",
         request = mockk(),
-        result = CoreExitFormResponse(),
+        result = ExitFormResponse(),
         status = Step.Status.COMPLETED
     )
 

@@ -27,6 +27,7 @@ internal class ConfigurationWorker @AssistedInject constructor(
        if (projectId.isEmpty()) {
            Result.failure()
        } else {
+           configService.refreshProject(projectId)
            configService.refreshConfiguration(projectId)
            Simber.tag(tag).i("Successfully refresh the project configuration")
            Result.success()

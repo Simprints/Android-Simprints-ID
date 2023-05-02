@@ -602,7 +602,10 @@ class CollectFingerprintsViewModel(
     }
 
     fun handleOnResume() {
-        updateState { /* refresh */ }
+        updateState {
+            /* refresh */
+            isShowingSplashScreen = false
+        }
         runOnScannerOrReconnectScanner { registerTriggerListener(scannerTriggerListener) }
     }
 

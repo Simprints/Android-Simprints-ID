@@ -40,7 +40,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import splitties.init.appCtx
 
 @RunWith(AndroidJUnit4::class)
 class OrchestratorManagerImplTest {
@@ -86,8 +85,6 @@ class OrchestratorManagerImplTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         mockkStatic(WorkManager::class)
-        mockkStatic("splitties.init.AppCtxKt")
-        every { appCtx } returns mockk()
 
         every { WorkManager.getInstance(any()) } returns workManagerMock
 
@@ -364,6 +361,7 @@ class OrchestratorManagerImplTest {
             )
         } returns mockk()
         return OrchestratorManagerImpl(
+            mockk(),
             modalityFlowFactoryMock,
             appResponseFactoryMock,
             hotCache,

@@ -1,28 +1,13 @@
 plugins {
-    id("com.android.library")
-    kotlin("android")
-}
-
-apply {
-    from("$rootDir${File.separator}buildSrc${File.separator}build_config.gradle")
+    id("simprints.android.library")
+    id("simprints.library.hilt")
+    id("simprints.testing.unit")
 }
 
 android {
-
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
-        testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
-    }
     namespace = "com.simprints.moduleapi"
-
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
     implementation(libs.androidX.annotation.annotation)
-
-    testImplementation(libs.testing.junit)
-    androidTestImplementation(libs.testing.androidX.runner)
-    androidTestImplementation(libs.testing.espresso.core)
 }
