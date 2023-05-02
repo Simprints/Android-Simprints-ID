@@ -1,9 +1,9 @@
 package com.simprints.id.activities.consent
 
 import android.content.Context
+import com.simprints.feature.consent.ConsentType
 import com.simprints.infra.resources.R
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
-import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 
