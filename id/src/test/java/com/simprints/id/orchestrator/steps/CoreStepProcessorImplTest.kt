@@ -3,11 +3,11 @@ package com.simprints.id.orchestrator.steps
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.feature.consent.ConsentType
 import com.simprints.id.data.exitform.ExitFormReason
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.requests.AskConsentRequest
-import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.testtools.TestApplication
