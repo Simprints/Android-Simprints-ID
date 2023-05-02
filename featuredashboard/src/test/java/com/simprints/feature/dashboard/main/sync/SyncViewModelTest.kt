@@ -16,6 +16,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.*
@@ -44,7 +45,7 @@ class SyncViewModelTest {
     lateinit var eventSyncManager: EventSyncManager
 
     @MockK
-    lateinit var deviceManager: DeviceManager
+    lateinit var connectivityTracker: ConnectivityTracker
 
     @MockK
     lateinit var configManager: ConfigManager
@@ -60,7 +61,7 @@ class SyncViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { eventSyncManager.getLastSyncState() } returns syncState
-        every { deviceManager.isConnectedLiveData } returns isConnected
+        every { connectivityTracker.observeIsConnected() } returns isConnected
         coEvery { configManager.getProjectConfiguration().synchronization } returns mockk {
             every { up.simprints } returns SimprintsUpSynchronizationConfiguration(kind = ALL)
             every { frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
@@ -376,7 +377,7 @@ class SyncViewModelTest {
 
     private fun initViewModel(): SyncViewModel = SyncViewModel(
         eventSyncManager,
-        deviceManager,
+        connectivityTracker,
         configManager,
         timeHelper,
         loginManager,

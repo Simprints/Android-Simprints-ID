@@ -1,4 +1,4 @@
-package com.simprints.id.tools.device
+package com.simprints.infra.network.connectivity
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -8,8 +8,9 @@ import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-
-class ConnectivityHelperImpl @Inject constructor(@ApplicationContext private val ctx: Context) : ConnectivityHelper {
+internal class ConnectivityManagerWrapper @Inject constructor(
+    @ApplicationContext private val ctx: Context
+) {
 
     private val connectivityManager by lazy {
         ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -24,7 +25,7 @@ class ConnectivityHelperImpl @Inject constructor(@ApplicationContext private val
      *  connectivity on this network was successfully validated
      * False: otherwise.
      */
-    override fun isNetworkAvailable(): Boolean {
+    fun isNetworkAvailable(): Boolean {
         val network = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(network);
 
@@ -33,7 +34,7 @@ class ConnectivityHelperImpl @Inject constructor(@ApplicationContext private val
             && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
     }
 
-    override fun registerNetworkCallback(networkCallback: ConnectivityManager.NetworkCallback) {
+    fun registerNetworkCallback(networkCallback: ConnectivityManager.NetworkCallback) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             connectivityManager.registerDefaultNetworkCallback(networkCallback)
         } else {
@@ -42,7 +43,7 @@ class ConnectivityHelperImpl @Inject constructor(@ApplicationContext private val
         }
     }
 
-    override fun unregisterNetworkCallback(networkCallback: ConnectivityManager.NetworkCallback) {
+    fun unregisterNetworkCallback(networkCallback: ConnectivityManager.NetworkCallback) {
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }

@@ -3,7 +3,6 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.dashboard.main.sync.DeviceManager
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -19,11 +18,17 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import com.simprints.testtools.common.livedata.getOrAwaitValues
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
@@ -51,7 +56,7 @@ class SyncInfoViewModelTest {
     private lateinit var loginManager: LoginManager
 
     @MockK
-    private lateinit var deviceManager: DeviceManager
+    private lateinit var connectivityTracker: ConnectivityTracker
 
     @MockK
     private lateinit var imageRepository: ImageRepository
@@ -71,14 +76,14 @@ class SyncInfoViewModelTest {
         every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
 
         connectionLiveData = MutableLiveData<Boolean>()
-        every { deviceManager.isConnectedLiveData } returns connectionLiveData
+        every { connectivityTracker.observeIsConnected() } returns connectionLiveData
 
         stateLiveData = MutableLiveData<EventSyncState>()
         every { eventSyncManager.getLastSyncState() } returns stateLiveData
 
         viewModel = SyncInfoViewModel(
             configManager,
-            deviceManager,
+            connectivityTracker,
             enrolmentRecordManager,
             loginManager,
             imageRepository,

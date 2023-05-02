@@ -1,4 +1,4 @@
-package com.simprints.id.tools.device
+package com.simprints.infra.network.connectivity
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -9,16 +9,21 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
-internal class ConnectivityHelperImplTest {
+internal class ConnectivityManagerWrapperImplTest {
 
     @MockK
     lateinit var context: Context
-    private lateinit var connectivityHelper: ConnectivityHelper
-    private var mockedNetworkCapabilities: NetworkCapabilities? = null
+
+    @MockK
+    lateinit var connectivityManager: ConnectivityManager
+
+    @MockK
+    lateinit var networkCapabilities: NetworkCapabilities
+
+    private lateinit var connectivityManagerWrapper: ConnectivityManagerWrapper
 
     @Before
     fun setup() {
@@ -28,10 +33,9 @@ internal class ConnectivityHelperImplTest {
     @Test
     fun `test isNetworkAvailable should be false if capabilities is null`() {
         //Given
-        val networkCapabilities = null
-        setupNetworkCapabilities(networkCapabilities)
+        setupNetworkCapabilities(null)
         //When
-        val actual = connectivityHelper.isNetworkAvailable()
+        val actual = connectivityManagerWrapper.isNetworkAvailable()
         //Then
         assertThat(actual).isEqualTo(false)
     }
@@ -39,10 +43,10 @@ internal class ConnectivityHelperImplTest {
     @Test
     fun `test isNetworkAvailable should be false if network can't reach internet`() {
         //Given
-        setupNetworkCapabilities()
-        every { mockedNetworkCapabilities?.hasCapability(NET_CAPABILITY_INTERNET) } returns false
+        every { networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET) } returns false
+        setupNetworkCapabilities(networkCapabilities)
         //When
-        val actual = connectivityHelper.isNetworkAvailable()
+        val actual = connectivityManagerWrapper.isNetworkAvailable()
         //Then
         assertThat(actual).isEqualTo(false)
     }
@@ -50,35 +54,31 @@ internal class ConnectivityHelperImplTest {
     @Test
     fun `test isNetworkAvailable should be false if network connection not yet validated`() {
         //Given
-        setupNetworkCapabilities()
-        mockedNetworkCapabilities?.apply {
-            every { hasCapability(NET_CAPABILITY_INTERNET) } returns true
-            every { hasCapability(NET_CAPABILITY_VALIDATED) } returns false
-        }
+        every { networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET) } returns true
+        every { networkCapabilities.hasCapability(NET_CAPABILITY_VALIDATED) } returns false
+        setupNetworkCapabilities(networkCapabilities)
         //When
-        val actual = connectivityHelper.isNetworkAvailable()
+        val actual = connectivityManagerWrapper.isNetworkAvailable()
         //Then
         assertThat(actual).isEqualTo(false)
     }
+
     @Test
     fun `test isNetworkAvailable success`() {
         //Given
-        setupNetworkCapabilities()
-        mockedNetworkCapabilities?.apply {
-            every { hasCapability(NET_CAPABILITY_INTERNET) } returns true
-            every { hasCapability(NET_CAPABILITY_VALIDATED) } returns true
-        }
+        every { networkCapabilities.hasCapability(NET_CAPABILITY_INTERNET) } returns true
+        every { networkCapabilities.hasCapability(NET_CAPABILITY_VALIDATED) } returns true
+        setupNetworkCapabilities(networkCapabilities)
         //When
-        val actual = connectivityHelper.isNetworkAvailable()
+        val actual = connectivityManagerWrapper.isNetworkAvailable()
         //Then
         assertThat(actual).isEqualTo(true)
     }
 
-    private fun setupNetworkCapabilities(networkCapabilities: NetworkCapabilities? = mockk()) {
-        mockedNetworkCapabilities = networkCapabilities
-        val connectivityManager: ConnectivityManager = mockk()
+    private fun setupNetworkCapabilities(mockedNetworkCapabilities: NetworkCapabilities?) {
         every { context.getSystemService(Context.CONNECTIVITY_SERVICE) } returns connectivityManager
         every { connectivityManager.getNetworkCapabilities(any()) } returns mockedNetworkCapabilities
-        connectivityHelper = ConnectivityHelperImpl(context)
+
+        connectivityManagerWrapper = ConnectivityManagerWrapper(context)
     }
 }
