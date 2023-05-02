@@ -42,6 +42,8 @@ dependencies {
     testImplementation(libs.testing.truth)
     testImplementation(libs.testing.koTest.kotlin.assert)
     testImplementation(libs.testing.androidX.runner)
+    testImplementation(libs.testing.androidX.core)
+    testImplementation(libs.testing.live.data)
 
     testImplementation(libs.testing.mockwebserver)
     testImplementation(libs.chuck.release)

@@ -1,11 +1,12 @@
-package com.simprints.id.tools.device
+package com.simprints.infra.network.connectivity
 
 import android.net.ConnectivityManager
 import android.net.Network
 import androidx.lifecycle.LiveData
 
-
-class ConnectivityLiveData(private val connectivityHelper: ConnectivityHelper) : LiveData<Boolean>() {
+internal class ConnectivityLiveData(
+    private val connectivityManagerWrapper: ConnectivityManagerWrapper,
+) : LiveData<Boolean>() {
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
 
@@ -24,13 +25,13 @@ class ConnectivityLiveData(private val connectivityHelper: ConnectivityHelper) :
 
     override fun onActive() {
         super.onActive()
-        connectivityHelper.registerNetworkCallback(networkCallback)
+        connectivityManagerWrapper.registerNetworkCallback(networkCallback)
 
-        postValue(connectivityHelper.isNetworkAvailable())
+        postValue(connectivityManagerWrapper.isNetworkAvailable())
     }
 
     override fun onInactive() {
         super.onInactive()
-        connectivityHelper.unregisterNetworkCallback(networkCallback)
+        connectivityManagerWrapper.unregisterNetworkCallback(networkCallback)
     }
 }
