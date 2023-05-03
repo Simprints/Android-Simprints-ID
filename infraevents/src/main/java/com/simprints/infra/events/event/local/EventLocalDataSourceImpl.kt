@@ -1,5 +1,6 @@
 package com.simprints.infra.events.event.local
 
+import android.database.sqlite.SQLiteException
 import com.simprints.core.DispatcherIO
 import com.simprints.core.NonCancellableIO
 import com.simprints.infra.events.event.domain.models.Event
@@ -14,7 +15,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import net.sqlcipher.database.SQLiteException
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 

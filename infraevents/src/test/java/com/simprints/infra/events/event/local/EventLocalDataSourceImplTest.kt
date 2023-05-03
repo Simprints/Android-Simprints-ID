@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.local
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabaseCorruptException
+import android.database.sqlite.SQLiteException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import net.sqlcipher.database.SQLiteException
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
