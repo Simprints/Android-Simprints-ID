@@ -34,7 +34,7 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
         logoutSyncCard.onOfflineButtonClick =
             { startActivity(Intent(Settings.ACTION_WIRELESS_SETTINGS)) }
         logoutSyncCard.onSelectNoModulesButtonClick =
-            { findNavController().navigate(R.id.action_mainFragment_to_moduleSelectionFragment) }
+            { findNavController().navigate(R.id.action_logoutSyncFragment_to_moduleSelectionFragment) }
         logoutSyncToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
