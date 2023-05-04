@@ -293,7 +293,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncHasNoModules(LAST_SYNC_TIME))
 
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
+        val navController = testNavController(R.navigation.graph_dashboard, R.id.logOutSyncFragment)
 
         launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 

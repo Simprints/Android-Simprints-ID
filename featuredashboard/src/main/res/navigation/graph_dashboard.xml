@@ -125,6 +125,9 @@
                 app:destination="@id/requestLoginFragment"
                 app:popUpTo="@id/dashboard_navigation"
                 app:popUpToInclusive="true" />
+            <action
+                android:id="@+id/action_logoutSyncFragment_to_moduleSelectionFragment"
+                app:destination="@id/moduleSelectionFragment" />
         </fragment>
         <fragment
             android:id="@+id/logOutSyncDeclineFragment"
