@@ -89,7 +89,7 @@
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginVertical="@dimen/margin_large"
         android:text="@string/logout_sync_decline_button"
-        android:textSize="@dimen/text_size_default"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
