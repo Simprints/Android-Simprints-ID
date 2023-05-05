@@ -85,6 +85,7 @@
         style="@style/DialogButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:textColor="@color/simprints_grey"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginVertical="@dimen/margin_large"
         android:text="@string/logout_sync_decline_button"
