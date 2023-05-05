@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
                 android:layout_marginVertical="@dimen/margin_large"
-                android:background="@drawable/button_rounded_corners_gray"
+                android:background="@drawable/button_rounded_corners_red"
                 android:text="@string/logout_sync_decline_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
