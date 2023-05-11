@@ -5,15 +5,18 @@ import android.graphics.Rect
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
-import com.simprints.face.models.PreviewFrame
-import io.rankone.rocsdk.embedded.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.rankone.rocsdk.embedded.SWIGTYPE_p_float
+import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char
+import io.rankone.rocsdk.embedded.roc
+import io.rankone.rocsdk.embedded.roc_color_space
+import io.rankone.rocsdk.embedded.roc_detection
+import io.rankone.rocsdk.embedded.roc_embedded_landmark
+import io.rankone.rocsdk.embedded.roc_image
 import java.nio.ByteBuffer
 import javax.inject.Inject
-import kotlin.experimental.and
 
-class RankOneFaceDetector @Inject constructor(): FaceDetector {
+
+class RankOneFaceDetector @Inject constructor() : FaceDetector {
     private val maxFaces = 1
     private val falseDetectionRate = 0.1f
     private val relativeMinSize = 0.2f
@@ -33,13 +36,10 @@ class RankOneFaceDetector @Inject constructor(): FaceDetector {
         }
     }
 
-    override fun analyze(previewFrame: PreviewFrame): Face? {
-        val bytes = yuv420ToY888(previewFrame.bytes, previewFrame.width, previewFrame.height)
-        val rocImage = getRocImage(bytes, previewFrame.width, previewFrame.height)
-        return analyze(rocImage, previewFrame.width, previewFrame.height)
-    }
 
-    override suspend fun analyze(bitmap: Bitmap): Face? = withContext(Dispatchers.Default) {
+
+
+     override fun analyze(bitmap: Bitmap): Face? {
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
 
@@ -57,7 +57,7 @@ class RankOneFaceDetector @Inject constructor(): FaceDetector {
 
         roc.roc_free_image(rocColorImage)
 
-        return@withContext analyze(rocGrayImage, bitmap.width, bitmap.height)
+        return analyze(rocGrayImage, bitmap.width, bitmap.height)
     }
 
     /**
@@ -121,26 +121,6 @@ class RankOneFaceDetector @Inject constructor(): FaceDetector {
         return rocImage
     }
 
-    /**
-     * Converts YUV420 NV21 to Y888 (RGB8888). The grayscale image still holds 3 bytes on the pixel.
-     *
-     * @param pixels output array with the converted array o grayscale pixels
-     * @param data byte array on YUV420 NV21 format.
-     * @param width pixels width
-     * @param height pixels height
-     */
-    private fun yuv420ToY888(data: ByteArray, width: Int, height: Int): ByteArray {
-        val size = width * height
-        val pixels = ByteArray(size)
-        var p: Int
-
-        for (i in 0 until size) {
-            p = (data[i] and 0xFF.toByte()).toInt()
-            pixels[i] = (-0x1000000 or (p shl 16) or (p shl 8) or p).toByte()
-        }
-
-        return pixels
-    }
 
     private fun getRocTemplateFromImage(image: roc_image, rocFace: ROCFace): Boolean {
         val adaptiveMinimumSize = roc.new_size_t()

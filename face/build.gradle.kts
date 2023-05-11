@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
 plugins {
     id("simprints.feature")
     id("simprints.testing.android")
@@ -14,13 +12,6 @@ sonarqube {
 
 android {
     namespace = "com.simprints.face"
-
-    ndkVersion = gradleLocalProperties(rootDir).getProperty("ndk.Version")
-        ?: System.getenv("ndk.Version")
-
-    externalNativeBuild {
-        ndkBuild.path("jni/Application.mk")
-    }
 }
 
 dependencies {
@@ -34,7 +25,11 @@ dependencies {
     implementation(project(":featurealert"))
     implementation(project(":featureexitform"))
 
-    implementation(libs.cameraView)
+    implementation(libs.androidX.cameraX.core)
+    implementation(libs.androidX.cameraX.lifecycle)
+    implementation(libs.androidX.cameraX.view)
+    implementation(libs.workManager.work)
+
     implementation(libs.circleImageView)
 
     runtimeOnly(libs.androidX.cameraX.core)

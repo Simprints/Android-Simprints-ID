@@ -58,7 +58,7 @@ class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
     }
 
     private fun setImageBitmapAndButtonClickListener(binding: FragmentConfirmationBinding) {
-        binding.confirmationImg.setImageBitmap(mainVM.faceDetections.first().frame.toBitmap())
+        binding.confirmationImg.setImageBitmap(mainVM.faceDetections.first().bitmap)
         binding.confirmationBtn.setOnClickListener {
             sendConfirmationEvent(CONTINUE)
             mainVM.flowFinished()
