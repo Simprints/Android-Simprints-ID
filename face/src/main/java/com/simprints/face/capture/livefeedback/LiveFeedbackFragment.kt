@@ -1,24 +1,36 @@
 package com.simprints.face.capture.livefeedback
 
+import android.graphics.PixelFormat
 import android.os.Bundle
+import android.util.Size
 import android.view.View
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.otaliastudios.cameraview.frame.Frame
-import com.otaliastudios.cameraview.frame.FrameProcessor
+import androidx.work.await
 import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.models.FaceDetection
-import com.simprints.face.models.Size
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 
 /**
  * This is the class presented as the user is capturing theface, they are presented with this fragment, which displays
@@ -27,34 +39,82 @@ import dagger.hilt.android.AndroidEntryPoint
  * [com.simprints.face.capture.confirmation.ConfirmationFragment]
  */
 @AndroidEntryPoint
-class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FrameProcessor {
+class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAnalysis.Analyzer {
+    private lateinit var camera: Camera
+    private lateinit var imageAnalyzer: ImageAnalysis
+    private lateinit var cameraProvider: ProcessCameraProvider
+
+    /** Blocking camera operations are performed using this executor */
+    private lateinit var cameraExecutor: ExecutorService
+
+
     private val mainVm: FaceCaptureViewModel by activityViewModels()
     private val vm: LiveFeedbackFragmentViewModel by viewModels()
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
+    private lateinit var screenSize: Size
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.faceCaptureCamera.setLifecycleOwner(viewLifecycleOwner)
+        screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
+        // Initialize our background executor
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
+        binding.faceCaptureCamera.post {
+            vm.initFrameProcessing(
+                mainVm.samplesToCapture,
+                mainVm.attemptNumber,
+                binding.captureOverlay.rectInCanvas
+            )
+            // Set up the camera and its use cases
+            lifecycleScope.launch {
+                setUpCamera()
+            }
+        }
         bindViewModel()
         binding.captureFeedbackTxtTitle.setOnClickListener { vm.startCapture() }
         binding.captureProgress.max = mainVm.samplesToCapture
     }
 
-    override fun onResume() {
-        binding.faceCaptureCamera.addFrameProcessor(this)
-        super.onResume()
+    /** Initialize CameraX, and prepare to bind the camera use cases  */
+    private suspend fun setUpCamera() {
+        cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
+        // Build and bind the camera use cases
+        bindCameraUseCases()
+    }
+
+    private fun bindCameraUseCases() {
+        // ImageAnalysis
+        val targetResolution =
+            Size(binding.faceCaptureCamera.width, binding.faceCaptureCamera.height)
+        imageAnalyzer = ImageAnalysis
+            .Builder().setTargetResolution(targetResolution)
+            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
+            .build()
+        imageAnalyzer.setAnalyzer(cameraExecutor, this)
+        // Preview
+        val preview = Preview.Builder().setTargetResolution(targetResolution).build()
+        // Must unbind the use-cases before rebinding them
+        cameraProvider.unbindAll()
+        // A variable number of use-cases can be passed here -
+        // camera provides access to CameraControl & CameraInfo
+        camera =
+            cameraProvider.bindToLifecycle(this, DEFAULT_BACK_CAMERA, preview, imageAnalyzer)
+
+        // Attach the view's surface provider to preview use case
+        preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
     }
 
     override fun onStop() {
-        binding.faceCaptureCamera.removeFrameProcessor(this)
+        // Shut down our background executor
+        cameraExecutor.shutdown()
+
         super.onStop()
     }
 
     private fun bindViewModel() {
         vm.currentDetection.observe(viewLifecycleOwner) {
             renderCurrentDetection(it)
-//            renderDebugInfo(it.face)
         }
 
         vm.capturingState.observe(viewLifecycleOwner) {
@@ -80,15 +140,15 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
      *
      * Also the frame sometimes throws IllegalStateException for null width and height
      */
-    override fun process(frame: Frame) {
+    override fun analyze(image: ImageProxy) {
         try {
-            vm.process(
-                frame,
-                binding.captureOverlay.rectInCanvas,
-                Size(binding.captureOverlay.width, binding.captureOverlay.height),
-                mainVm.samplesToCapture,
-                mainVm.attemptNumber
-            )
+            Simber.tag("faceddd").i("${image.format}")
+            if (image.format == PixelFormat.RGBA_8888) {
+                Simber.tag("faceddd").i("analyze ${image.width} ${image.height}")
+                Simber.tag("faceddd")
+                    .i("binding.captureOverlay.rectInCanvas ${binding.captureOverlay.rectInCanvas.width()} ${binding.captureOverlay.rectInCanvas.height()}")
+                vm.process(image)
+            }
 
         } catch (t: Throwable) {
             Simber.e(t)

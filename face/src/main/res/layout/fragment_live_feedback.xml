@@ -9,16 +9,11 @@
     tools:background="#66000000"
     tools:ignore="ContentDescription">
 
-    <com.otaliastudios.cameraview.CameraView
+    <androidx.camera.view.PreviewView
         android:id="@+id/face_capture_camera"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:keepScreenOn="true"
-        app:cameraAudio="off"
-        app:cameraEngine="camera1"
-        app:cameraFrameProcessingExecutors="1"
-        app:cameraFrameProcessingPoolSize="1"
-        app:cameraPreviewFrameRate="10" />
+        android:keepScreenOn="true" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/capture_guide_frame"
