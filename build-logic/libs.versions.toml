@@ -61,7 +61,6 @@ rootbeer_version = "0.1.0"
 commons_io_version = "2.11.0"
 kronos_version = "0.0.1-alpha11"
 protobuf_version = "3.22.3"
-cameraview_version = "2.7.2"
 circleImageView_version = "3.1.0"
 timber_version = "5.0.1"
 
@@ -181,9 +180,6 @@ fuzzywuzzy-core = { module = "me.xdrop:fuzzywuzzy", version.ref = "fuzzywuzzy_ve
 
 #Rootbeer
 rootbeer-core = { module = "com.scottyab:rootbeer-lib", version.ref = "rootbeer_version" }
-
-#cameraView
-cameraView = { module = "com.otaliastudios:cameraview", version.ref = "cameraview_version" }
 
 #circleImageView
 circleImageView = { module = "de.hdodenhof:circleimageview", version.ref = "circleImageView_version" }

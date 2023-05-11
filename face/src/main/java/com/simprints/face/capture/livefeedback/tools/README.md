@@ -12,7 +12,7 @@ The most important piece of code, this class:
 - create a rotated rectangle based on the current orientation of the camera
 - resize the new rectangle if the image on the screen has some crop in it
 - create a new box based on the new rectangle
-- crop the frame using just the new rectangle (using LibYuv)
+- crop the frame using just the new rectangle
 
 All those steps are necessary because cameras on Android are usually rotated or even flipped (front face camera). Also, what is shown on the screen and the real frame are not the same image, sometimes some cropping might be occuring (e.g. the phone has 16:9 aspect ratio but the photo is 16:10).
 

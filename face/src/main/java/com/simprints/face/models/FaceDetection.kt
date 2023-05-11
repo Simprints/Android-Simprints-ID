@@ -1,5 +1,6 @@
 package com.simprints.face.models
 
+import android.graphics.Bitmap
 import com.simprints.face.controllers.core.events.model.FaceCaptureBiometricsEvent
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
@@ -7,10 +8,10 @@ import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.face.detection.Face
 import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import java.util.*
+import java.util.UUID
 
 data class FaceDetection(
-    val frame: PreviewFrame,
+    val bitmap: Bitmap?,
     val face: Face?,
     val status: Status,
     var securedImageRef: SecuredImageRef? = null,
