@@ -2,6 +2,7 @@ package com.simprints.face.capture.livefeedback
 
 import android.graphics.Bitmap
 import android.graphics.RectF
+import android.util.Size
 import androidx.camera.core.ImageProxy
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -87,14 +88,14 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     }
 
     //Todo rename this method
-    fun initFrameProcessing(
+    fun initFrameProcessor(
         samplesToCapture: Int,
         attemptNumber: Int,
-        cropRect: RectF
-    ) {
+        cropRect: RectF,
+        screenSize: Size) {
         this.samplesToCapture = samplesToCapture
         this.attemptNumber = attemptNumber
-        frameProcessor.init( cropRect)
+        frameProcessor.init(screenSize, cropRect)
     }
 
     fun startCapture() {
