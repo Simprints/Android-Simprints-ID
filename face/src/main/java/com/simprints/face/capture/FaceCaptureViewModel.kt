@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.core.tools.extentions.toByteArray
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext
 import com.simprints.face.capture.FaceCaptureActivity.BackButtonContext.CAPTURE
 import com.simprints.face.controllers.core.image.FaceImageManager
