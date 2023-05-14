@@ -1,6 +1,5 @@
 package com.simprints.face.capture.livefeedback
 
-import android.graphics.PixelFormat
 import android.os.Bundle
 import android.util.Size
 import android.view.View
@@ -61,10 +60,11 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         binding.faceCaptureCamera.post {
-            vm.initFrameProcessing(
+            vm.initFrameProcessor(
                 mainVm.samplesToCapture,
                 mainVm.attemptNumber,
-                binding.captureOverlay.rectInCanvas
+                binding.captureOverlay.rectInCanvas,
+                Size(binding.captureOverlay.width, binding.captureOverlay.height),
             )
             // Set up the camera and its use cases
             lifecycleScope.launch {
@@ -85,22 +85,17 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
 
     private fun bindCameraUseCases() {
         // ImageAnalysis
-        val targetResolution =
-            Size(binding.faceCaptureCamera.width, binding.faceCaptureCamera.height)
-        imageAnalyzer = ImageAnalysis
-            .Builder().setTargetResolution(targetResolution)
+        imageAnalyzer = ImageAnalysis.Builder()
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
             .build()
         imageAnalyzer.setAnalyzer(cameraExecutor, this)
         // Preview
-        val preview = Preview.Builder().setTargetResolution(targetResolution).build()
+        val preview = Preview.Builder().build()
         // Must unbind the use-cases before rebinding them
         cameraProvider.unbindAll()
         // A variable number of use-cases can be passed here -
         // camera provides access to CameraControl & CameraInfo
-        camera =
-            cameraProvider.bindToLifecycle(this, DEFAULT_BACK_CAMERA, preview, imageAnalyzer)
-
+        camera =cameraProvider.bindToLifecycle(this, DEFAULT_BACK_CAMERA, preview, imageAnalyzer)
         // Attach the view's surface provider to preview use case
         preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
     }
@@ -108,7 +103,6 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
     override fun onStop() {
         // Shut down our background executor
         cameraExecutor.shutdown()
-
         super.onStop()
     }
 
@@ -142,14 +136,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
      */
     override fun analyze(image: ImageProxy) {
         try {
-            Simber.tag("faceddd").i("${image.format}")
-            if (image.format == PixelFormat.RGBA_8888) {
-                Simber.tag("faceddd").i("analyze ${image.width} ${image.height}")
-                Simber.tag("faceddd")
-                    .i("binding.captureOverlay.rectInCanvas ${binding.captureOverlay.rectInCanvas.width()} ${binding.captureOverlay.rectInCanvas.height()}")
-                vm.process(image)
-            }
-
+            vm.process(image)
         } catch (t: Throwable) {
             Simber.e(t)
             mainVm.submitError(t)
