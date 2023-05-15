@@ -56,28 +56,25 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
-        // Initialize our background executor
-        cameraExecutor = Executors.newSingleThreadExecutor()
-
-        binding.faceCaptureCamera.post {
-            vm.initFrameProcessor(
-                mainVm.samplesToCapture,
-                mainVm.attemptNumber,
-                binding.captureOverlay.rectInCanvas,
-                Size(binding.captureOverlay.width, binding.captureOverlay.height),
-            )
-            // Set up the camera and its use cases
-            lifecycleScope.launch {
-                setUpCamera()
-            }
-        }
         bindViewModel()
         binding.captureFeedbackTxtTitle.setOnClickListener { vm.startCapture() }
         binding.captureProgress.max = mainVm.samplesToCapture
+
+        //Wait till the views gets its final size then init frame processor and setup the camera
+        binding.faceCaptureCamera.post {
+            // Initialize our background executor
+            cameraExecutor = Executors.newSingleThreadExecutor()
+            vm.initFrameProcessor(
+                mainVm.samplesToCapture, mainVm.attemptNumber,
+                binding.captureOverlay.rectInCanvas,
+                Size(binding.captureOverlay.width, binding.captureOverlay.height),
+            )
+            setUpCamera()
+        }
     }
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
-    private suspend fun setUpCamera() {
+    private fun setUpCamera() = lifecycleScope.launch {
         cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
         // Build and bind the camera use cases
         bindCameraUseCases()
@@ -91,11 +88,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
         imageAnalyzer.setAnalyzer(cameraExecutor, this)
         // Preview
         val preview = Preview.Builder().build()
-        // Must unbind the use-cases before rebinding them
-        cameraProvider.unbindAll()
-        // A variable number of use-cases can be passed here -
-        // camera provides access to CameraControl & CameraInfo
-        camera =cameraProvider.bindToLifecycle(this, DEFAULT_BACK_CAMERA, preview, imageAnalyzer)
+        camera = cameraProvider.bindToLifecycle(this, DEFAULT_BACK_CAMERA, preview, imageAnalyzer)
         // Attach the view's surface provider to preview use case
         preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
     }
@@ -116,8 +109,10 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
             when (it) {
                 LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED ->
                     renderCapturingNotStarted()
+
                 LiveFeedbackFragmentViewModel.CapturingState.CAPTURING ->
                     renderCapturing()
+
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigate(R.id.action_liveFeedbackFragment_to_confirmationFragment)
@@ -127,19 +122,15 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
         }
     }
 
-    /**
-     * This method  needs to block because frame is a singleton which cannot be released until it's
-     * converted into a preview frame. Although it's blocking, this is running in a background thread.
-     * https://natario1.github.io/CameraView/docs/frame-processing
-     *
-     * Also the frame sometimes throws IllegalStateException for null width and height
-     */
     override fun analyze(image: ImageProxy) {
         try {
             vm.process(image)
         } catch (t: Throwable) {
             Simber.e(t)
-            mainVm.submitError(t)
+            // Image analysis is running in bg thread
+            lifecycleScope.launch {
+                mainVm.submitError(t)
+            }
         }
     }
 
