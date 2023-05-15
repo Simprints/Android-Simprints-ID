@@ -1,16 +1,11 @@
 package com.simprints.face.utils
 
+import android.graphics.Bitmap
 import com.simprints.face.models.FaceDetection
 
 val mockFaceDetectionList = listOf(
     FaceDetection(
-        frame = PreviewFrame(
-            width = 100,
-            height = 100,
-            format = 0,
-            mirrored = false,
-            bytes = byteArrayOf()
-        ),
+        Bitmap.createBitmap(100,100,Bitmap.Config.ARGB_8888),
         face = null,
         status = FaceDetection.Status.VALID,
         securedImageRef = null,
