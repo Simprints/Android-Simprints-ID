@@ -14,16 +14,33 @@ import javax.inject.Inject
 
 class FrameProcessor @Inject constructor() {
 
-    private lateinit var screenSize: Size
+    private var screenWidth: Int = 0
+    private var screenHeight: Int = 0
+
     private lateinit var boxOnTheScreen: RectF
     private lateinit var cropRect: Rect
     private lateinit var rotationMatrix: Matrix
 
+    /**
+     * Init the frame processor
+     *
+     * @param screenSize the camera preview view size
+     * @param boxOnTheScreen the circle target indicator coordinates.
+     * we will use this coordinates to compute the area to be cropped for processing
+     */
     fun init(screenSize: Size, boxOnTheScreen: RectF) {
-        this.screenSize = screenSize
+        screenWidth = screenSize.width
+        screenHeight = screenSize.height
         this.boxOnTheScreen = boxOnTheScreen
     }
 
+    /**
+     * Extracts part of the image that lays inside
+     * the cropRect
+     *
+     * @param image
+     * @return Bitmap
+     */
     fun cropRotateFrame(image: ImageProxy): Bitmap {
         if (!this::cropRect.isInitialized) {
             // The cropRect should be calculated once as its value will be the same for all images.
@@ -32,15 +49,11 @@ class FrameProcessor @Inject constructor() {
             rotationMatrix.postRotate(image.imageInfo.rotationDegrees.toFloat())
         }
         return image.toBitmap(cropRect, rotationMatrix)
-
     }
 
     private fun calcRotatedCropRect(image: ImageProxy) {
         val cameraWidth = image.width
         val cameraHeight = image.height
-
-        val screenWidth = screenSize.width
-        val screenHeight = screenSize.height
 
         val (rotatedCameraWidth, rotatedCameraHeight) = getCameraRotatedPair(image)
 

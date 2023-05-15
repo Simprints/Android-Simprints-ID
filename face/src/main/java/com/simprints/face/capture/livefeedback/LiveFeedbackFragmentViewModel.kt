@@ -87,12 +87,9 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
         image.close()
     }
 
-    //Todo rename this method
     fun initFrameProcessor(
-        samplesToCapture: Int,
-        attemptNumber: Int,
-        cropRect: RectF,
-        screenSize: Size) {
+        samplesToCapture: Int, attemptNumber: Int, cropRect: RectF,screenSize: Size
+    ) {
         this.samplesToCapture = samplesToCapture
         this.attemptNumber = attemptNumber
         frameProcessor.init(screenSize, cropRect)
