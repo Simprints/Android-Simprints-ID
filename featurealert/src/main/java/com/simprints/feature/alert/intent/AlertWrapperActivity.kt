@@ -3,12 +3,12 @@ package com.simprints.feature.alert.intent
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.R
 import com.simprints.feature.alert.databinding.ActivityAlertWrapperBinding
+import com.simprints.infra.uibase.navigation.handleResult
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,18 +20,13 @@ internal class AlertWrapperActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        binding.alertHostFragment.getFragment<Fragment>().childFragmentManager
-            .setFragmentResultListener(AlertContract.ALERT_REQUEST, this) { _, d ->
-                // Pass the fragment results directly into activity results
-                setResult(RESULT_OK, Intent().also {
-                    it.putExtra(AlertContract.ALERT_PAYLOAD, AlertContract.getResponsePayload(d))
-                    it.putExtra(AlertContract.ALERT_BUTTON_PRESSED, d.getString(AlertContract.ALERT_BUTTON_PRESSED))
-                })
+        binding.alertHostFragment.handleResult<AlertResult>(this, R.id.alertFragment) { result ->
+            setResult(RESULT_OK, Intent().also { it.putExtra(ALERT_RESULT, result) })
 
-                if (AlertContract.hasResponseKey(d, AlertContract.ALERT_BUTTON_PRESSED_BACK)) {
-                    finish()
-                }
+            if (result.isBackButtonPress()) {
+                finish()
             }
+        }
     }
 
     override fun onResume() {
@@ -48,5 +43,6 @@ internal class AlertWrapperActivity : AppCompatActivity() {
     companion object {
 
         internal const val ALERT_ARGS_EXTRA = "alert_args"
+        internal const val ALERT_RESULT = "alert_fragment_result"
     }
 }

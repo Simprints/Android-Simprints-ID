@@ -54,8 +54,8 @@ class LoginActivity : BaseSplitActivity() {
             ?: throw InvalidAppRequest()
     }
 
-    private val showAlert = registerForActivityResult(ShowAlertWrapper()) {
-        setResult(RESULT_OK, Intent().apply { putExtras(it) })
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { result ->
+        setResult(RESULT_OK, Intent().apply { putExtra(LoginActivityResponse.BUNDLE_KEY, result.payload) })
         finish()
     }
 

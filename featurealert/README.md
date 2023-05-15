@@ -45,14 +45,18 @@ implementation(project(":featurealert"))
 3. Call navigate on the modules nav controller
 
 ```kotlin
-// In orchestrator fragment/activity
-
 // Handle action button clicks
-childFragmentManager.setFragmentResultListener(AlertContract.ALERT_REQUEST, this@lifecycleOwner) { _, d ->
-    val key = AlertContract.getResponseKey(d)
-    val payload = AlertContract.getResponsePayload(d)
-    val hasExactKey = AlertContract.hasResponseKey(d, "action_key")
-}
+
+// In orchestrator activity
+binding.orchestratorHostFragment
+    .handleResult<AlertResult>(this, AlertContract.ALERT_DESTINATION_ID) { }
+
+// In fragment within navigation graph
+findNavController().handleResult<AlertResult>(
+    this, 
+    R.id.currentScreen,
+    AlertContract.ALERT_DESTINATION_ID,
+) { }
 
 // Navigate to screen
 findNavController(R.id.host_fragment).navigate(
