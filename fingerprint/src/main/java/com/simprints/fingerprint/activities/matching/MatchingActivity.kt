@@ -33,9 +33,9 @@ class MatchingActivity : FingerprintActivity() {
 
     private lateinit var matchingRequest: MatchingTaskRequest
 
-    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { data ->
+    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { result ->
         RefusalAlertHelper.handleRefusal(
-            data = data,
+            result = result,
             onSubmit = { setResultAndFinish(REFUSED, it) },
         )
     }

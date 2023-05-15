@@ -34,9 +34,9 @@ class ConnectScannerActivity : FingerprintActivity() {
     private val permissionCode = 0
     private val viewModel: ConnectScannerViewModel by viewModels()
 
-    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { data ->
+    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { result ->
         RefusalAlertHelper.handleRefusal(
-            data = data,
+            result = result,
             onBack = { viewModel.retryConnect() },
             onSubmit = { setResultAndFinish(ResultCode.REFUSED, it) },
         )

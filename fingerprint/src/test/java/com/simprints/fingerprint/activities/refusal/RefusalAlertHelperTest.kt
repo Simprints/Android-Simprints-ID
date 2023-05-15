@@ -1,9 +1,8 @@
 package com.simprints.fingerprint.activities.refusal
 
-import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.config.ExitFormOption
 import org.junit.Assert.fail
 import org.junit.Test
@@ -19,7 +18,7 @@ class RefusalAlertHelperTest {
         var backCalled = false
 
         helper.handleRefusal(
-            bundleOf(),
+            ExitFormResult(false),
             onBack = { backCalled = true },
             onSubmit = { fail("Should not call submit") }
         )
@@ -31,7 +30,7 @@ class RefusalAlertHelperTest {
         var backCalled = false
 
         helper.handleRefusal(
-            bundleOf(ExitFormContract.EXIT_FORM_SUBMITTED to false),
+            ExitFormResult(false),
             onBack = { backCalled = true },
             onSubmit = { fail("Should not call submit") }
         )
@@ -43,7 +42,7 @@ class RefusalAlertHelperTest {
         var backCalled = false
 
         helper.handleRefusal(
-            bundleOf(ExitFormContract.EXIT_FORM_SUBMITTED to true),
+            ExitFormResult(true),
             onBack = { backCalled = true },
             onSubmit = { fail("Should not call submit") }
         )
@@ -55,10 +54,7 @@ class RefusalAlertHelperTest {
         var submitCalled = false
 
         helper.handleRefusal(
-            bundleOf(
-                ExitFormContract.EXIT_FORM_SUBMITTED to true,
-                ExitFormContract.EXIT_FORM_SELECTED_OPTION to ExitFormOption.Other,
-            ),
+            ExitFormResult(true, ExitFormOption.Other),
             onBack = { fail("Should not call back") },
             onSubmit = { submitCalled = true }
         )

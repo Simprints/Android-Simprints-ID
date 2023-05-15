@@ -24,14 +24,17 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
             results.any { it is ExitFormResponse } -> {
                 buildAppExitFormResponse(results.find { it is ExitFormResponse } as ExitFormResponse)
             }
+            results.any { it is FaceExitFormResponse} -> {
+                buildAppExitFormResponse(results.find { it is FaceExitFormResponse } as FaceExitFormResponse)
+            }
+            results.any { it is FingerprintRefusalFormResponse } -> {
+                buildAppRefusalResponse(results.find { it is FingerprintRefusalFormResponse } as FingerprintRefusalFormResponse)
+            }
             results.any { it is FingerprintErrorResponse } -> {
                 buildAppErrorResponse(results.find { it is FingerprintErrorResponse } as FingerprintErrorResponse)
             }
             results.any { it is FaceErrorResponse } -> {
                 buildAppErrorResponse(results.find { it is FaceErrorResponse } as FaceErrorResponse)
-            }
-            results.any { it is FingerprintRefusalFormResponse } -> {
-                buildAppRefusalResponse(results.find { it is FingerprintRefusalFormResponse } as FingerprintRefusalFormResponse)
             }
             results.any { it is FetchGUIDResponse } -> {
                 buildAppErrorResponse(results.find { it is FetchGUIDResponse } as FetchGUIDResponse)
