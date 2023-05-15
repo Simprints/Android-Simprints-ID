@@ -2,15 +2,15 @@ package com.simprints.feature.dashboard.logout.syncdecline
 
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
-import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncBinding
 import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncDeclineBinding
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
-import com.simprints.feature.dashboard.settings.about.AboutViewModel
+import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,6 +23,16 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
         initViews()
     }
 
+    private val confirmationDialogForLogout: AlertDialog by lazy {
+        AlertDialog.Builder(requireContext())
+            .setTitle(getString(com.simprints.infra.resources.R.string.confirmation_logout_title))
+            .setMessage(getString(com.simprints.infra.resources.R.string.confirmation_logout_message))
+            .setPositiveButton(getString(com.simprints.infra.resources.R.string.logout)) { _, _ -> processLogoutConfirmation() }
+            .setNegativeButton(
+                getString(com.simprints.infra.resources.R.string.confirmation_logout_cancel), null
+            ).create()
+    }
+
     private fun initViews() = with(binding) {
         logoutSyncDeclineToolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
@@ -31,9 +41,21 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
             findNavController().popBackStack()
         }
         logoutWithoutSyncConfirmButton.setOnClickListener {
-            viewModel.logout()
-            //TODO find out what kind of password needs to be entered in order to log out
-            findNavController().navigate(R.id.action_logoutSyncDeclineFragment_to_requestLoginFragment)
+            val password = viewModel.settingsLocked.value?.getNullablePassword()
+            if (password != null) {
+                SettingsPasswordDialogFragment(
+                    title = com.simprints.infra.resources.R.string.password_lock_title_logout,
+                    passwordToMatch = password,
+                    onSuccess = { processLogoutConfirmation() }
+                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+            } else {
+                confirmationDialogForLogout.show()
+            }
         }
+    }
+
+    private fun processLogoutConfirmation() {
+        viewModel.logout()
+        findNavController().navigate(R.id.action_logoutSyncDeclineFragment_to_requestLoginFragment)
     }
 }
