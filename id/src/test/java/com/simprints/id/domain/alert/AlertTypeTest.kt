@@ -2,10 +2,9 @@ package com.simprints.id.domain.alert
 
 
 import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.AlertResult
 import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.domain.alert.AlertType.Companion.fromAlertToAlertTypeEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
@@ -17,13 +16,13 @@ class AlertTypeTest {
 
     @Test
     fun alertTypeFromPayload() {
-        val alertData = bundleOf(AlertContract.ALERT_PAYLOAD to GUID_NOT_FOUND_ONLINE.toAlertConfig().payload)
+        val alertData = AlertResult("key", GUID_NOT_FOUND_ONLINE.toAlertConfig().payload)
         assertThat(AlertType.fromPayload(alertData)).isEqualTo(GUID_NOT_FOUND_ONLINE)
     }
 
     @Test
     fun defaultAlertTypeFromEmptyPayload() {
-        assertThat(AlertType.fromPayload(Bundle())).isEqualTo(UNEXPECTED_ERROR)
+        assertThat(AlertType.fromPayload(AlertResult("key", Bundle()))).isEqualTo(UNEXPECTED_ERROR)
     }
 
     @Test

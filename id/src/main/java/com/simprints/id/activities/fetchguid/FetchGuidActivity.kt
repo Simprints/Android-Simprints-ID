@@ -55,10 +55,10 @@ class FetchGuidActivity : BaseSplitActivity() {
         } else finish()
     }
 
-    private val showAlert = registerForActivityResult(ShowAlertWrapper()) {
-        val alertType = AlertType.fromPayload(it)
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { result ->
+        val alertType = AlertType.fromPayload(result)
 
-        when (AlertContract.getResponseKey(it)) {
+        when (result.buttonKey) {
             AlertType.ACTION_CLOSE -> setResultAndFinish(FetchGUIDResponse(false))
             AlertType.ACTION_WIFI_SETTINGS -> openWifiSettings.launch(Unit)
             AlertType.ACTION_RETRY -> tryToFetchGuid()

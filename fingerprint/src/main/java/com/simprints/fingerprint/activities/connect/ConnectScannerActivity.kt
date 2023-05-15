@@ -43,10 +43,10 @@ class ConnectScannerActivity : FingerprintActivity() {
     }
 
     private val alertHelper = AlertActivityHelper()
-    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
+    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { result ->
         alertHelper.handleAlertResult(
             this,
-            data,
+            result,
             showRefusal = { showRefusal.launch(RefusalAlertHelper.refusalArgs()) },
             retry = { viewModel.retryConnect() },
         )
