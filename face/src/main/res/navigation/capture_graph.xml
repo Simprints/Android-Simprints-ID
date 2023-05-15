@@ -49,6 +49,5 @@
     <action
         android:id="@+id/action_global_refusalFragment"
         app:destination="@+id/graph_exit_form"
-        app:popUpTo="@+id/capture_graph"
-        app:popUpToInclusive="true" />
+        app:popUpTo="@+id/capture_graph" />
 </navigation>

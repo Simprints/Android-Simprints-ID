@@ -12,8 +12,7 @@ import com.simprints.feature.exitform.screen.ExitFormWrapperActivity
  *
  * Usage in activity:
  * ```
- * private val showExitForm = registerForActivityResult(ShowExitFormWrapper()) { d ->
- *   val isSubmitted = ExitFormContract.isFormSubmitted(d)
+ * private val showExitForm = registerForActivityResult(ShowExitFormWrapper()) { result ->
  * }
  *
  * showExitForm.launch(exitFormConfiguration { /* configuration */ }.toArgs())
@@ -22,10 +21,12 @@ import com.simprints.feature.exitform.screen.ExitFormWrapperActivity
  * Input is the same configuration args bundle that is used in fragment navigation.
  * Output is the same response bundle that is returned in fragment result listener.
  */
-class ShowExitFormWrapper : ActivityResultContract<Bundle, Bundle>() {
+class ShowExitFormWrapper : ActivityResultContract<Bundle, ExitFormResult>() {
     override fun createIntent(context: Context, input: Bundle): Intent =
         Intent(context, ExitFormWrapperActivity::class.java)
             .also { it.putExtra(ExitFormWrapperActivity.EXIT_FORM_ARGS_EXTRA, input) }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): Bundle = intent?.extras ?: Bundle()
+    override fun parseResult(resultCode: Int, intent: Intent?): ExitFormResult = intent
+        ?.getParcelableExtra(ExitFormWrapperActivity.EXIT_FORM_RESULT)
+        ?: ExitFormResult(false)
 }
