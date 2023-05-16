@@ -14,8 +14,19 @@ fun Bitmap.toByteArray(): ByteArray {
     return byteArrayOutputStream.toByteArray()
 }
 
-fun ImageProxy.toBitmap(cropRect: Rect, rotationMatrix: Matrix): Bitmap {
-    require(format == PixelFormat.RGBA_8888)
+/**
+ * Convert ImageProxy image To bitmap then crop and rotate it.
+ * Image format should be RGBA_8888
+ *
+ * @param cropRect
+ * @param rotationMatrix
+ * @return
+ */
+
+fun ImageProxy.toBitmap(cropRect: Rect ): Bitmap {
+    require(format == PixelFormat.RGBA_8888){
+        "$format is not supported. RGBA_8888 is the only supported image format"
+    }
     val buffer = planes[0].buffer
     val pixelStride = planes[0].pixelStride
     val rowStride = planes[0].rowStride
@@ -24,6 +35,8 @@ fun ImageProxy.toBitmap(cropRect: Rect, rotationMatrix: Matrix): Bitmap {
         width + rowPadding / pixelStride, height, Bitmap.Config.ARGB_8888
     )
     bitmap.copyPixelsFromBuffer(buffer)
+    val rotationMatrix = Matrix()
+    rotationMatrix.postRotate(imageInfo.rotationDegrees.toFloat())
     val croppedRotatedBitmap = Bitmap.createBitmap(
         bitmap,
         cropRect.left,
@@ -36,16 +49,3 @@ fun ImageProxy.toBitmap(cropRect: Rect, rotationMatrix: Matrix): Bitmap {
     bitmap.recycle()
     return croppedRotatedBitmap
 }
-/*
-return with(cropRect) {
-            Bitmap.createBitmap(
-                image.toBitmap(),
-                left,
-                top,
-                width(),
-                height(),
-                rotationMatrix,
-                true
-            )
-        }
- */
