@@ -67,7 +67,7 @@ class LiveFeedbackFragmentViewModelTest {
     )
 
     private val rectF: RectF = mockk()
-    private val frame: ImageProxy = mockk(){
+    private val frame: ImageProxy = mockk{
         justRun { close() }
     }
     private val size: Size = mockk()
