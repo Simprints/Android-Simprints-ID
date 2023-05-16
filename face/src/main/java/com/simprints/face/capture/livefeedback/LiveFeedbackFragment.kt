@@ -3,7 +3,6 @@ package com.simprints.face.capture.livefeedback
 import android.os.Bundle
 import android.util.Size
 import android.view.View
-import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
@@ -38,10 +37,7 @@ import java.util.concurrent.Executors
  * [com.simprints.face.capture.confirmation.ConfirmationFragment]
  */
 @AndroidEntryPoint
-class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAnalysis.Analyzer {
-    private lateinit var camera: Camera
-    private lateinit var imageAnalyzer: ImageAnalysis
-    private lateinit var cameraProvider: ProcessCameraProvider
+class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -62,8 +58,6 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
 
         //Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
-            // Initialize our background executor
-            cameraExecutor = Executors.newSingleThreadExecutor()
             vm.initFrameProcessor(
                 mainVm.samplesToCapture, mainVm.attemptNumber,
                 binding.captureOverlay.rectInCanvas,
@@ -75,20 +69,22 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
 
     /** Initialize CameraX, and prepare to bind the camera use cases  */
     private fun setUpCamera() = lifecycleScope.launch {
-        cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
-        // Build and bind the camera use cases
-        bindCameraUseCases()
-    }
-
-    private fun bindCameraUseCases() {
+        // Initialize our background executor
+        cameraExecutor = Executors.newSingleThreadExecutor()
         // ImageAnalysis
-        imageAnalyzer = ImageAnalysis.Builder()
-            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
-            .build()
-        imageAnalyzer.setAnalyzer(cameraExecutor, this)
+        val imageAnalyzer = ImageAnalysis.Builder()
+            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888).build()
+        imageAnalyzer.setAnalyzer(cameraExecutor, ::analyze)
         // Preview
         val preview = Preview.Builder().build()
-        camera = cameraProvider.bindToLifecycle(this, DEFAULT_BACK_CAMERA, preview, imageAnalyzer)
+
+        val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
+        cameraProvider.bindToLifecycle(
+            this@LiveFeedbackFragment,
+            DEFAULT_BACK_CAMERA,
+            preview,
+            imageAnalyzer
+        )
         // Attach the view's surface provider to preview use case
         preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
     }
@@ -122,7 +118,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), ImageAna
         }
     }
 
-    override fun analyze(image: ImageProxy) {
+    private fun analyze(image: ImageProxy) {
         try {
             vm.process(image)
         } catch (t: Throwable) {

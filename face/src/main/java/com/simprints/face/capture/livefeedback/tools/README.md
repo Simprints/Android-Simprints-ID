@@ -14,6 +14,6 @@ The most important piece of code, this class:
 - create a new box based on the new rectangle
 - crop the frame using just the new rectangle
 
-All those steps are necessary because cameras on Android are usually rotated or even flipped (front face camera). Also, what is shown on the screen and the real frame are not the same image, sometimes some cropping might be occuring (e.g. the phone has 16:9 aspect ratio but the photo is 16:10).
+All those steps are necessary because cameras on Android are usually rotated or even flipped (front face camera). Also, what is shown on the screen and the real frame are not the same image, sometimes some cropping might be occurring (e.g. the phone has 16:9 aspect ratio but the photo is 16:10).
 
 Note that this class uses `CameraTargetOverlay.rectForPlane`, which internally uses `percentFromTop`. If the overlay is changed (or a new one is used), the FrameProcessor might need to be adjusted. This was done because there is no way of knowing where the overlay is on the screen by other means.
