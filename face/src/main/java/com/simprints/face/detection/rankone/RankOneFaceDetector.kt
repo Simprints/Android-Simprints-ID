@@ -8,7 +8,6 @@ import com.simprints.face.models.FaceDetection
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_float
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import io.rankone.rocsdk.embedded.roc
-import io.rankone.rocsdk.embedded.roc_color_space
 import io.rankone.rocsdk.embedded.roc_detection
 import io.rankone.rocsdk.embedded.roc_embedded_landmark
 import io.rankone.rocsdk.embedded.roc_image
@@ -35,9 +34,6 @@ class RankOneFaceDetector @Inject constructor() : FaceDetector {
             roc.delete_float(quality)
         }
     }
-
-
-
 
      override fun analyze(bitmap: Bitmap): Face? {
         val rocColorImage = roc_image()
@@ -104,21 +100,6 @@ class RankOneFaceDetector @Inject constructor() : FaceDetector {
         rocFace.cleanup()
 
         return face
-    }
-
-    private fun getRocImage(bytes: ByteArray, imageWidth: Int, imageHeight: Int): roc_image {
-        val rocImage = roc_image()
-
-        with(rocImage) {
-            color_space = roc_color_space.ROC_GRAY8
-            step = imageWidth.toLong()
-            width = imageWidth.toLong()
-            height = imageHeight.toLong()
-            data = roc.new_uint8_t_array(bytes.size)
-            roc.memmove(roc.roc_cast(rocImage.data), bytes)
-        }
-
-        return rocImage
     }
 
 
