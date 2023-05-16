@@ -1,7 +1,6 @@
 package com.simprints.face.capture.livefeedback.tools
 
 import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.Size
@@ -19,7 +18,6 @@ class FrameProcessor @Inject constructor() {
 
     private lateinit var boxOnTheScreen: RectF
     private lateinit var cropRect: Rect
-    private lateinit var rotationMatrix: Matrix
 
     /**
      * Init the frame processor
@@ -45,10 +43,8 @@ class FrameProcessor @Inject constructor() {
         if (!this::cropRect.isInitialized) {
             // The cropRect should be calculated once as its value will be the same for all images.
             calcRotatedCropRect(image)
-            rotationMatrix = Matrix()
-            rotationMatrix.postRotate(image.imageInfo.rotationDegrees.toFloat())
         }
-        return image.toBitmap(cropRect, rotationMatrix)
+        return image.toBitmap(cropRect)
     }
 
     private fun calcRotatedCropRect(image: ImageProxy) {
