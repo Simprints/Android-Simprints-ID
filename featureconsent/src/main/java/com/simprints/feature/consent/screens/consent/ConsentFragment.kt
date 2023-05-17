@@ -73,7 +73,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
     }
 
     private fun openPrivacyNotice() {
-        // TODO open privacy notice
+        findNavController().navigate(R.id.action_consentFragment_to_privacyNoticeFragment)
     }
 
     private fun updateUiWithState(state: ConsentViewState) {

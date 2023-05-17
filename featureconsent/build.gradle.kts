@@ -9,6 +9,7 @@ android {
 
 dependencies {
     implementation(project(":infraconfig"))
+    implementation(project(":infralogin"))
     implementation(project(":infraevents"))
     implementation(project(":featureexitform"))
 }
