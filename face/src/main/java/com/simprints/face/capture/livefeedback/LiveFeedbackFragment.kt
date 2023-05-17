@@ -72,18 +72,17 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
         // ImageAnalysis
-        val imageAnalyzer = ImageAnalysis.Builder()
+        //Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
+        val targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
+        val imageAnalyzer = ImageAnalysis.Builder().setTargetResolution(targetResolution)
             .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888).build()
         imageAnalyzer.setAnalyzer(cameraExecutor, ::analyze)
         // Preview
-        val preview = Preview.Builder().build()
-
+        val preview = Preview.Builder().setTargetResolution(targetResolution).build()
         val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
-        cameraProvider.bindToLifecycle(
+       cameraProvider.bindToLifecycle(
             this@LiveFeedbackFragment,
-            DEFAULT_BACK_CAMERA,
-            preview,
-            imageAnalyzer
+            DEFAULT_BACK_CAMERA,preview,imageAnalyzer
         )
         // Attach the view's surface provider to preview use case
         preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
@@ -130,15 +129,18 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
         }
     }
 
-    private fun renderCurrentDetection(faceDetection: FaceDetection) {
-        when (faceDetection.status) {
-            FaceDetection.Status.NOFACE -> renderNoFace()
-            FaceDetection.Status.OFFYAW -> renderFaceNotStraight()
-            FaceDetection.Status.OFFROLL -> renderFaceNotStraight()
-            FaceDetection.Status.TOOCLOSE -> renderFaceTooClose()
-            FaceDetection.Status.TOOFAR -> renderFaceTooFar()
-            FaceDetection.Status.VALID -> renderValidFace()
-            FaceDetection.Status.VALID_CAPTURING -> renderValidCapturingFace()
+    private fun renderCurrentDetection(faceDetection: FaceDetection?) {
+        if (faceDetection == null) {
+            renderNoFace()
+        } else {
+            when (faceDetection.status) {
+                FaceDetection.Status.OFFYAW -> renderFaceNotStraight()
+                FaceDetection.Status.OFFROLL -> renderFaceNotStraight()
+                FaceDetection.Status.TOOCLOSE -> renderFaceTooClose()
+                FaceDetection.Status.TOOFAR -> renderFaceTooFar()
+                FaceDetection.Status.VALID -> renderValidFace()
+                FaceDetection.Status.VALID_CAPTURING -> renderValidCapturingFace()
+            }
         }
     }
 

@@ -74,7 +74,7 @@ class BitmapExtTest {
     fun `toByteArray() should return a compressed JPG Bitmap bytes`() {
 
         // When
-        bitmapMock.toByteArray()
+        bitmapMock.toJPGCompressedByteArray()
 
         // Then
         verify {
