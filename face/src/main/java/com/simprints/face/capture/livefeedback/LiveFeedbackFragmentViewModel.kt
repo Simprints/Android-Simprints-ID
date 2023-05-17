@@ -53,7 +53,7 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     lateinit var fallbackCapture: FaceDetection
     val userCaptures = mutableListOf<FaceDetection>()
     var sortedQualifyingCaptures = listOf<FaceDetection>()
-    val currentDetection = MutableLiveData<FaceDetection?>()
+    val currentDetection = MutableLiveData<FaceDetection>()
     val capturingState = MutableLiveData(CapturingState.NOT_STARTED)
 
     /**
@@ -67,21 +67,21 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
         val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
-        faceDetection?.detectionStartTime = captureStartTime
-        faceDetection?.detectionEndTime = faceTimeHelper.now()
+        faceDetection.detectionStartTime = captureStartTime
+        faceDetection.detectionEndTime = faceTimeHelper.now()
 
         currentDetection.postValue(faceDetection)
-        if (faceDetection != null) {
-            when (capturingState.value) {
-                CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
-                CapturingState.CAPTURING -> {
-                    userCaptures += faceDetection
-                    if (userCaptures.size == samplesToCapture) {
-                        finishCapture(attemptNumber)
-                    }
+
+        when (capturingState.value) {
+            CapturingState.NOT_STARTED -> updateFallbackCaptureIfValid(faceDetection)
+            CapturingState.CAPTURING -> {
+                userCaptures += faceDetection
+                if (userCaptures.size == samplesToCapture) {
+                    finishCapture(attemptNumber)
                 }
-                else -> {//no-op
-                }
+            }
+
+            else -> {//no-op
             }
         }
         image.close()
@@ -119,10 +119,10 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     private fun getFaceDetectionFromPotentialFace(
         bitmap: Bitmap,
         potentialFace: Face?
-    ): FaceDetection? {
+    ): FaceDetection {
         return if (potentialFace == null) {
             bitmap.recycle()
-            null
+            FaceDetection(bitmap, null, FaceDetection.Status.NOFACE)
         } else {
             getFaceDetection(bitmap, potentialFace)
         }

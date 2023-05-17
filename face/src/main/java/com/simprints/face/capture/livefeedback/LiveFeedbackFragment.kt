@@ -129,18 +129,15 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
         }
     }
 
-    private fun renderCurrentDetection(faceDetection: FaceDetection?) {
-        if (faceDetection == null) {
-            renderNoFace()
-        } else {
-            when (faceDetection.status) {
-                FaceDetection.Status.OFFYAW -> renderFaceNotStraight()
-                FaceDetection.Status.OFFROLL -> renderFaceNotStraight()
-                FaceDetection.Status.TOOCLOSE -> renderFaceTooClose()
-                FaceDetection.Status.TOOFAR -> renderFaceTooFar()
-                FaceDetection.Status.VALID -> renderValidFace()
-                FaceDetection.Status.VALID_CAPTURING -> renderValidCapturingFace()
-            }
+    private fun renderCurrentDetection(faceDetection: FaceDetection) {
+        when (faceDetection.status) {
+            FaceDetection.Status.NOFACE -> renderNoFace()
+            FaceDetection.Status.OFFYAW -> renderFaceNotStraight()
+            FaceDetection.Status.OFFROLL -> renderFaceNotStraight()
+            FaceDetection.Status.TOOCLOSE -> renderFaceTooClose()
+            FaceDetection.Status.TOOFAR -> renderFaceTooFar()
+            FaceDetection.Status.VALID -> renderValidFace()
+            FaceDetection.Status.VALID_CAPTURING -> renderValidCapturingFace()
         }
     }
 
