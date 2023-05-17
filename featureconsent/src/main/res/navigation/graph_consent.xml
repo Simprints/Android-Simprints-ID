@@ -13,6 +13,10 @@
         <argument
             android:name="consentType"
             app:argType="com.simprints.feature.consent.ConsentType" />
+
+        <action
+            android:id="@+id/action_consentFragment_to_privacyNoticeFragment"
+            app:destination="@id/privacyNoticeFragment" />
     </fragment>
 
     <include app:graph="@navigation/graph_exit_form" />
@@ -22,6 +26,10 @@
         app:destination="@id/graph_exit_form"
         app:popUpToInclusive="true" />
 
-    <!-- TODO Privacy notice -->
+    <fragment
+        android:id="@+id/privacyNoticeFragment"
+        android:name="com.simprints.feature.consent.screens.privacy.PrivacyNoticeFragment"
+        android:label="PrivacyNoticeFragment"
+        tools:layout="@layout/fragment_privacy" />
 
 </navigation>
