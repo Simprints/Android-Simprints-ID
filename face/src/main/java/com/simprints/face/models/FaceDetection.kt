@@ -11,7 +11,7 @@ import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import java.util.UUID
 
 data class FaceDetection(
-    val bitmap: Bitmap?,
+    val bitmap: Bitmap,
     val face: Face?,
     val status: Status,
     var securedImageRef: SecuredImageRef? = null,
@@ -23,7 +23,6 @@ data class FaceDetection(
     enum class Status {
         VALID,
         VALID_CAPTURING,
-        NOFACE,
         OFFYAW,
         OFFROLL,
         TOOCLOSE,

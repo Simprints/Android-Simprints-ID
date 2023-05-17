@@ -37,7 +37,7 @@ class FaceCaptureViewModelTest {
             mockkStatic("com.simprints.face.capture.BitmapExtKt")
             every { id } returns "FAKE_ID"
             every { bitmap } returns mockk {
-                every { toByteArray() } returns byteArrayOf()
+                every { toJPGCompressedByteArray() } returns byteArrayOf()
             }
         }
     )
