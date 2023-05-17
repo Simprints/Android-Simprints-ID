@@ -82,6 +82,7 @@ class FaceCaptureEvent(
             fun fromFaceDetectionStatus(status: FaceDetection.Status): Result = when (status) {
                 FaceDetection.Status.VALID -> VALID
                 FaceDetection.Status.VALID_CAPTURING -> VALID
+                FaceDetection.Status.NOFACE -> INVALID
                 FaceDetection.Status.OFFYAW -> OFF_YAW
                 FaceDetection.Status.OFFROLL -> OFF_ROLL
                 FaceDetection.Status.TOOCLOSE -> TOO_CLOSE

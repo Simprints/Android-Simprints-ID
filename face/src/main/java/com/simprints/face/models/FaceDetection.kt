@@ -23,6 +23,7 @@ data class FaceDetection(
     enum class Status {
         VALID,
         VALID_CAPTURING,
+        NOFACE,
         OFFYAW,
         OFFROLL,
         TOOCLOSE,

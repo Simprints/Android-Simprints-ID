@@ -52,8 +52,8 @@ class LiveFeedbackFragmentViewModelTest {
         }
     }
     private val faceDetector: FaceDetector = mockk()
-    private val screenSize: Size =Size(100,100)
-    private val frameProcessor: FrameProcessor = mockk{ justRun { init(any(),any()) } }
+    private val screenSize: Size = Size(100, 100)
+    private val frameProcessor: FrameProcessor = mockk { justRun { init(any(), any()) } }
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
     private val faceTimeHelper: FaceTimeHelper = mockk {
         every { now() } returns 0
@@ -67,14 +67,13 @@ class LiveFeedbackFragmentViewModelTest {
     )
 
     private val rectF: RectF = mockk()
-    private val frame: ImageProxy = mockk{
+    private val frame: ImageProxy = mockk {
         justRun { close() }
     }
-    private val size: Size = mockk()
+    private val previewFrameMock: Bitmap = mockk { justRun { recycle() } }
 
     @Test
     fun `process valid face correctly`() = runTest {
-        val previewFrameMock: Bitmap = mockk()
         val validFace: Face = getFace()
         every { frameProcessor.cropRotateFrame(frame) } returns previewFrameMock
         coEvery { faceDetector.analyze(previewFrameMock) } returns validFace
@@ -83,7 +82,7 @@ class LiveFeedbackFragmentViewModelTest {
         every { faceSessionEventsManager.addEventInBackground(capture(eventCapture)) } just Runs
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
-        viewModel.initFrameProcessor(2, 0, rectF,screenSize)
+        viewModel.initFrameProcessor(2, 0, rectF, screenSize)
 
         viewModel.process(frame)
 
@@ -102,7 +101,6 @@ class LiveFeedbackFragmentViewModelTest {
 
     @Test
     fun `process invalid faces correctly`() = runTest {
-        val previewFrameMock: Bitmap = mockk()
         val smallFace: Face = getFace(Rect(0, 0, 30, 30))
         val bigFace: Face = getFace(Rect(0, 0, 80, 80))
         val noFace = null
@@ -115,7 +113,7 @@ class LiveFeedbackFragmentViewModelTest {
         )
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
-        viewModel.initFrameProcessor(2, 0, rectF,screenSize)
+        viewModel.initFrameProcessor(2, 0, rectF, screenSize)
 
         viewModel.process(frame)
         viewModel.process(frame)
@@ -143,7 +141,6 @@ class LiveFeedbackFragmentViewModelTest {
         val faceCaptureId3 = "8a2e1bc8-32c4-4318-a111-a9c14cab69fd"
         val faceCaptureBiometricId3 = "6b883ffe-8227-47e9-af47-07abc09ae395"
 
-        val previewFrameMock: Bitmap = mockk()
         val validFace: Face = getFace()
         every { frameProcessor.cropRotateFrame(frame) } returns previewFrameMock
         every { faceDetector.analyze(previewFrameMock) } returns validFace
@@ -169,7 +166,7 @@ class LiveFeedbackFragmentViewModelTest {
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
-        viewModel.initFrameProcessor(2, 0, rectF,screenSize)
+        viewModel.initFrameProcessor(2, 0, rectF, screenSize)
         viewModel.process(frame)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -323,7 +320,6 @@ class LiveFeedbackFragmentViewModelTest {
     @Test
     fun `save at least one valid captures without fallback image`() =
         runTest {
-            val previewFrameMock: Bitmap = mockk()
             val validFace: Face = getFace()
             val noFace = null
             every { frameProcessor.cropRotateFrame(any()) } returns previewFrameMock
@@ -336,11 +332,11 @@ class LiveFeedbackFragmentViewModelTest {
 
             val currentDetectionObserver = viewModel.currentDetection.testObserver()
             val capturingStateObserver = viewModel.capturingState.testObserver()
-            viewModel.initFrameProcessor(2, 0, rectF,screenSize)
+            viewModel.initFrameProcessor(2, 0, rectF, screenSize)
 
             viewModel.process(frame)
             viewModel.startCapture()
-            viewModel.process(frame, )
+            viewModel.process(frame)
             viewModel.process(frame)
 
             currentDetectionObserver.observedValues.let {
@@ -387,7 +383,6 @@ class LiveFeedbackFragmentViewModelTest {
      */
     @Test
     fun `use fallback image if all captures are invalid`() = runTest {
-        val previewFrameMock: Bitmap = mockk()
         val validFace: Face = getFace()
         val tooFarFace = getFace(Rect(0, 0, 30, 30))
         val noFace = null

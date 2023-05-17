@@ -52,17 +52,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/capture_guide_frame" />
 
-    <TextView
-        android:id="@+id/capture_feedback_txt_debug"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="#80000000"
-        android:textColor="#fff"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <CheckedTextView
         android:id="@+id/capture_feedback_txt_title"
         android:layout_width="wrap_content"
