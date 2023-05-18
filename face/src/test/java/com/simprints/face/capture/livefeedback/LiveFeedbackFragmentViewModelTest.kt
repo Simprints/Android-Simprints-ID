@@ -52,7 +52,7 @@ class LiveFeedbackFragmentViewModelTest {
         }
     }
     private val faceDetector: FaceDetector = mockk()
-    private val screenSize: Size = Size(100, 100)
+    private val previewViewSize: Size = Size(100, 100)
     private val frameProcessor: FrameProcessor = mockk { justRun { init(any(), any()) } }
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
     private val faceTimeHelper: FaceTimeHelper = mockk {
@@ -82,7 +82,7 @@ class LiveFeedbackFragmentViewModelTest {
         every { faceSessionEventsManager.addEventInBackground(capture(eventCapture)) } just Runs
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
-        viewModel.initFrameProcessor(2, 0, rectF, screenSize)
+        viewModel.initFrameProcessor(2, 0, rectF, previewViewSize)
 
         viewModel.process(frame)
 
@@ -113,7 +113,7 @@ class LiveFeedbackFragmentViewModelTest {
         )
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
-        viewModel.initFrameProcessor(2, 0, rectF, screenSize)
+        viewModel.initFrameProcessor(2, 0, rectF, previewViewSize)
 
         viewModel.process(frame)
         viewModel.process(frame)
@@ -166,7 +166,7 @@ class LiveFeedbackFragmentViewModelTest {
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
-        viewModel.initFrameProcessor(2, 0, rectF, screenSize)
+        viewModel.initFrameProcessor(2, 0, rectF, previewViewSize)
         viewModel.process(frame)
         viewModel.startCapture()
         viewModel.process(frame)
@@ -332,7 +332,7 @@ class LiveFeedbackFragmentViewModelTest {
 
             val currentDetectionObserver = viewModel.currentDetection.testObserver()
             val capturingStateObserver = viewModel.capturingState.testObserver()
-            viewModel.initFrameProcessor(2, 0, rectF, screenSize)
+            viewModel.initFrameProcessor(2, 0, rectF, previewViewSize)
 
             viewModel.process(frame)
             viewModel.startCapture()
@@ -396,7 +396,7 @@ class LiveFeedbackFragmentViewModelTest {
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
-        viewModel.initFrameProcessor(2, 0, rectF,screenSize)
+        viewModel.initFrameProcessor(2, 0, rectF,previewViewSize)
 
         // This means the button turned green, the user clicked and then moved the camera away
         viewModel.process(frame)
