@@ -80,9 +80,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
         // Preview
         val preview = Preview.Builder().setTargetResolution(targetResolution).build()
         val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
-       cameraProvider.bindToLifecycle(
-            this@LiveFeedbackFragment,
-            DEFAULT_BACK_CAMERA,preview,imageAnalyzer
+        cameraProvider.bindToLifecycle(
+            this@LiveFeedbackFragment, DEFAULT_BACK_CAMERA, preview, imageAnalyzer
         )
         // Attach the view's surface provider to preview use case
         preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
@@ -100,13 +99,10 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
         }
 
         vm.capturingState.observe(viewLifecycleOwner) {
-            @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
-            when (it) {
-                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED ->
-                    renderCapturingNotStarted()
+            @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA") when (it) {
+                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> renderCapturingNotStarted()
 
-                LiveFeedbackFragmentViewModel.CapturingState.CAPTURING ->
-                    renderCapturing()
+                LiveFeedbackFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
 
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
@@ -179,8 +175,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
             captureFeedbackTxtExplanation.text = null
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
-                true,
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
+                true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
         toggleCaptureButtons(true)
@@ -192,8 +187,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
             captureFeedbackTxtExplanation.text = getString(R.string.capture_hold)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
-                true,
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
+                true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
 
@@ -250,13 +244,11 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
 
     private fun renderProgressBar(valid: Boolean) {
         binding.apply {
-            val progressColor =
-                if (valid) R.color.capture_green
-                else R.color.capture_grey
+            val progressColor = if (valid) R.color.capture_green
+            else R.color.capture_grey
 
             captureProgress.progressColor = ContextCompat.getColor(
-                requireContext(),
-                progressColor
+                requireContext(), progressColor
             )
 
             captureProgress.value = vm.userCaptures.size.toFloat()

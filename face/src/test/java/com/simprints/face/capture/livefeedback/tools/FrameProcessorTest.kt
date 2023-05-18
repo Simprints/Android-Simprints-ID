@@ -45,8 +45,8 @@ class FrameProcessorTest {
         frameProcessor.cropRotateFrame(image)
 
         // Then
-        Truth.assertThat(Rect(100, 100, 200, 200).toString())
-            .isEqualTo(cropRectCapture.captured.toString())
+        Truth.assertThat(cropRectCapture.captured.toString())
+            .isEqualTo(Rect(100, 100, 200, 200).toString())
     }
 
     @Test
@@ -64,8 +64,8 @@ class FrameProcessorTest {
         frameProcessor.cropRotateFrame(image)
 
         // Then
-        Truth.assertThat(Rect(200, 100, 100, 200).toString())
-            .isEqualTo(cropRectCapture.captured.toString())
+        Truth.assertThat(cropRectCapture.captured.toString())
+            .isEqualTo(Rect(200, 100, 100, 200).toString())
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -99,8 +99,8 @@ class FrameProcessorTest {
         // When
         frameProcessor.cropRotateFrame(image)
         // Then
-        Truth.assertThat(Rect(100, 100, 200, 200).toString())
-            .isEqualTo(cropRectCapture.captured.toString())
+        Truth.assertThat(cropRectCapture.captured.toString())
+            .isEqualTo(Rect(100, 100, 200, 200).toString())
     }
 
     @Test
@@ -117,7 +117,7 @@ class FrameProcessorTest {
         // When
         frameProcessor.cropRotateFrame(image)
         // Then
-        Truth.assertThat(Rect(100, 100, 200, 200).toString())
-            .isEqualTo(cropRectCapture.captured.toString())
+        Truth.assertThat(cropRectCapture.captured.toString())
+            .isEqualTo(Rect(100, 100, 200, 200).toString())
     }
 }

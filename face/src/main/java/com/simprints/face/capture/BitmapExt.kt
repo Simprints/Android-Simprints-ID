@@ -8,7 +8,7 @@ import androidx.camera.core.ImageProxy
 import java.io.ByteArrayOutputStream
 
 
-fun Bitmap.toJPGCompressedByteArray(): ByteArray {
+fun Bitmap.toJpgCompressedByteArray(): ByteArray {
     val byteArrayOutputStream = ByteArrayOutputStream()
     compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
     return byteArrayOutputStream.toByteArray()

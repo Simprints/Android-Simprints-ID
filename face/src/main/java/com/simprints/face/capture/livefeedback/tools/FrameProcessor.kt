@@ -13,8 +13,8 @@ import javax.inject.Inject
 
 class FrameProcessor @Inject constructor() {
 
-    private var screenWidth: Int = 0
-    private var screenHeight: Int = 0
+    private var previewViewWidth: Int = 0
+    private var previewViewHeight: Int = 0
 
     private lateinit var boxOnTheScreen: RectF
     private lateinit var cropRect: Rect
@@ -22,13 +22,13 @@ class FrameProcessor @Inject constructor() {
     /**
      * Init the frame processor
      *
-     * @param screenSize the camera preview view size
+     * @param previewViewSize the camera preview view size
      * @param boxOnTheScreen the circle target indicator coordinates.
      * we will use this coordinates to compute the area to be cropped for processing
      */
-    fun init(screenSize: Size, boxOnTheScreen: RectF) {
-        screenWidth = screenSize.width
-        screenHeight = screenSize.height
+    fun init(previewViewSize: Size, boxOnTheScreen: RectF) {
+        previewViewWidth = previewViewSize.width
+        previewViewHeight = previewViewSize.height
         this.boxOnTheScreen = boxOnTheScreen
     }
 
@@ -54,8 +54,8 @@ class FrameProcessor @Inject constructor() {
         val (rotatedCameraWidth, rotatedCameraHeight) = getCameraRotatedPair(image)
 
         val newRectSize = getRectSizeBasedOnCameraCropping(
-            screenWidth,
-            screenHeight,
+            previewViewWidth,
+            previewViewHeight,
             rotatedCameraWidth,
             rotatedCameraHeight,
             boxOnTheScreen
