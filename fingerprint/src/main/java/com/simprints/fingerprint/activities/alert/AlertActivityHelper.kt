@@ -2,8 +2,8 @@ package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
 import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.AlertResult
 import com.simprints.fingerprint.activities.alert.AlertError.Companion.PAYLOAD_KEY
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -21,16 +21,16 @@ internal class AlertActivityHelper {
 
     fun handleAlertResult(
         activity: Activity,
-        data: Bundle,
+        result: AlertResult,
         showRefusal: () -> Unit,
         retry: () -> Unit,
     ) {
-        val alertError = AlertContract.getResponsePayload(data)
+        val alertError = result.payload
             .getString(PAYLOAD_KEY)
             ?.let { AlertError.valueOf(it) }
             ?: AlertError.UNEXPECTED_ERROR
 
-        when (AlertContract.getResponseKey(data)) {
+        when (result.buttonKey) {
             AlertContract.ALERT_BUTTON_PRESSED_BACK -> {
                 if (alertError == AlertError.UNEXPECTED_ERROR) {
                     finishWithError(activity, alertError)
@@ -51,10 +51,7 @@ internal class AlertActivityHelper {
         }
     }
 
-    private fun finishWithError(
-        activity: Activity,
-        alertError: AlertError = AlertError.UNEXPECTED_ERROR,
-    ) {
+    private fun finishWithError(activity: Activity, alertError: AlertError) {
         activity.setResult(ResultCode.ALERT.value, Intent().apply {
             putExtra(AlertTaskResult.BUNDLE_KEY, AlertTaskResult(alertError))
         })

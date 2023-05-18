@@ -1,10 +1,9 @@
 package com.simprints.id.domain.alert
 
-import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
-import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.alertButton
 import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertButtonConfig
@@ -131,7 +130,7 @@ enum class AlertType(
 
     companion object {
 
-        fun fromPayload(data: Bundle) = AlertContract.getResponsePayload(data)
+        fun fromPayload(result: AlertResult) = result.payload
             .getString(PAYLOAD_KEY)
             ?.let { AlertType.valueOf(it) }
             ?: UNEXPECTED_ERROR

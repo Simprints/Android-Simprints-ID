@@ -1,13 +1,13 @@
 package com.simprints.id.exitformhandler
 
 import android.os.Bundle
-import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
 import com.simprints.id.data.exitform.ExitFormReason.Companion.fromExitFormOption
-import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
+import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.resources.R
 import javax.inject.Inject
@@ -32,15 +32,6 @@ class ExitFormHelperImpl @Inject constructor() : ExitFormHelper {
         }
     }.toArgs()
 
-    override fun buildExitFormResponse(data: Bundle): CoreResponse? {
-        val isSubmitted = ExitFormContract.isFormSubmitted(data)
-        val option = ExitFormContract.getFormOption(data)
-        val reason = ExitFormContract.getFormReason(data).orEmpty()
-
-        return if (isSubmitted && option != null) {
-            ExitFormResponse(fromExitFormOption(option), reason)
-        } else {
-            null
-        }
-    }
+    override fun buildExitFormResponse(result: ExitFormResult): CoreResponse? = result.submittedOption()
+        ?.let { ExitFormResponse(fromExitFormOption(it), result.reason.orEmpty()) }
 }

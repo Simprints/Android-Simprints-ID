@@ -48,8 +48,8 @@ class ConsentActivity : BaseSplitActivity() {
     @Inject
     lateinit var exitFormHelper: ExitFormHelper
 
-    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { data ->
-        exitFormHelper.buildExitFormResponse(data)?.let {
+    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { result ->
+        exitFormHelper.buildExitFormResponse(result)?.let {
             viewModel.deleteLocationInfoFromSession()
             setResultAndFinish(it)
         }

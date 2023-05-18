@@ -5,20 +5,20 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.addCallback
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.tools.extentions.setTextWithFallbacks
 import com.simprints.core.tools.extentions.showToast
 import com.simprints.core.tools.extentions.textWatcherOnChange
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.R
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.exitform.databinding.FragmentExitFormBinding
+import com.simprints.infra.uibase.navigation.finishWithResult
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -81,9 +81,7 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
             binding.exitFormInputField.isEnabled = true
         }
         binding.exitFormGoBack.setOnClickListener {
-            setFragmentResult(ExitFormContract.EXIT_FORM_REQUEST, bundleOf(
-                ExitFormContract.EXIT_FORM_SUBMITTED to false,
-            ))
+            findNavController().finishWithResult(this, ExitFormResult(false))
         }
         binding.exitFormSubmit.setOnClickListener {
             viewModel.submitClicked(binding.exitFormInputField.text.toString())
@@ -119,12 +117,9 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         }
         viewModel.finishEvent.observe(viewLifecycleOwner) {
             val (answer, reason) = it.peekContent()
-
-            setFragmentResult(ExitFormContract.EXIT_FORM_REQUEST, bundleOf(
-                ExitFormContract.EXIT_FORM_SUBMITTED to true,
-                ExitFormContract.EXIT_FORM_SELECTED_OPTION to answer,
-                ExitFormContract.EXIT_FORM_REASON to reason,
-            ))
+            findNavController().finishWithResult(this,
+                ExitFormResult(true, answer, reason)
+            )
         }
     }
 
