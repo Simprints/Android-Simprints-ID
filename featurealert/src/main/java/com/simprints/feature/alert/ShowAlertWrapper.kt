@@ -27,7 +27,7 @@ import com.simprints.feature.alert.intent.AlertWrapperActivity
 class ShowAlertWrapper : ActivityResultContract<Bundle, AlertResult>() {
     override fun createIntent(context: Context, input: Bundle): Intent =
         Intent(context, AlertWrapperActivity::class.java)
-            .also { it.putExtra(AlertWrapperActivity.ALERT_ARGS_EXTRA, input) }
+            .putExtra(AlertWrapperActivity.ALERT_ARGS_EXTRA, input)
 
     override fun parseResult(resultCode: Int, intent: Intent?): AlertResult = intent
         ?.getParcelableExtra(AlertWrapperActivity.ALERT_RESULT)

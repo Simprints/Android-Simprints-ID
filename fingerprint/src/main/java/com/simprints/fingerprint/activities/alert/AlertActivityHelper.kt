@@ -51,10 +51,7 @@ internal class AlertActivityHelper {
         }
     }
 
-    private fun finishWithError(
-        activity: Activity,
-        alertError: AlertError = AlertError.UNEXPECTED_ERROR,
-    ) {
+    private fun finishWithError(activity: Activity, alertError: AlertError) {
         activity.setResult(ResultCode.ALERT.value, Intent().apply {
             putExtra(AlertTaskResult.BUNDLE_KEY, AlertTaskResult(alertError))
         })

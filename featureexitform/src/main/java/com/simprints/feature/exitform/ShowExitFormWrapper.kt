@@ -24,7 +24,7 @@ import com.simprints.feature.exitform.screen.ExitFormWrapperActivity
 class ShowExitFormWrapper : ActivityResultContract<Bundle, ExitFormResult>() {
     override fun createIntent(context: Context, input: Bundle): Intent =
         Intent(context, ExitFormWrapperActivity::class.java)
-            .also { it.putExtra(ExitFormWrapperActivity.EXIT_FORM_ARGS_EXTRA, input) }
+            .putExtra(ExitFormWrapperActivity.EXIT_FORM_ARGS_EXTRA, input)
 
     override fun parseResult(resultCode: Int, intent: Intent?): ExitFormResult = intent
         ?.getParcelableExtra(ExitFormWrapperActivity.EXIT_FORM_RESULT)
