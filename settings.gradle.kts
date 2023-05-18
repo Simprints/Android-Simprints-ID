@@ -82,6 +82,7 @@ include(
     ":infrarecentuseractivity",
     ":infraresources",
     ":infrasecurity",
+    ":infrauibase",
 )
 
 // Tooling modules

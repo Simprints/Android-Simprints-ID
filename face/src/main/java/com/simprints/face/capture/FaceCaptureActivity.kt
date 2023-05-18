@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -20,9 +19,11 @@ import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.face.databinding.ActivityFaceCaptureBinding
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.toArgs
+import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,19 +43,14 @@ class FaceCaptureActivity : FaceActivity() {
             this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
                 ?: throw InvalidFaceRequestException("No IFaceRequest found for FaceCaptureActivity")
 
-        binding.captureHostFragment.getFragment<Fragment>().childFragmentManager
-            .setFragmentResultListener(ExitFormContract.EXIT_FORM_REQUEST, this) { _, data ->
-                val formSubmitted = ExitFormContract.isFormSubmitted(data)
-                val option = ExitFormContract.getFormOption(data)
-                val reason = ExitFormContract.getFormReason(data).orEmpty()
-
-                if (formSubmitted && option != null) {
-                    setResultAndFinish(option, reason)
-                } else {
-                    findNavController(R.id.capture_host_fragment).navigate(R.id.action_global_liveFeedback)
-                }
+        binding.captureHostFragment.handleResult<ExitFormResult>(this, ExitFormContract.DESTINATION_ID) { result ->
+            val option = result.submittedOption()
+            if (option != null) {
+                setResultAndFinish(option, result.reason.orEmpty())
+            } else {
+                findNavController(R.id.capture_host_fragment).navigate(R.id.action_global_liveFeedback)
             }
-
+        }
         vm.setupCapture(faceRequest)
     }
 

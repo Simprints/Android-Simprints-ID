@@ -1,10 +1,9 @@
 package com.simprints.id.exitformhandler
 
 import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.exitform.screen.ExitFormFragmentArgs
 import com.simprints.id.data.exitform.ExitFormReason
@@ -55,26 +54,21 @@ class ExitFormHelperImplTest {
 
     @Test
     fun `test buildExitFormResponse should return null if data is empty`() {
-        val exitFormData = Bundle()
+        val exitFormData = ExitFormResult(false)
         val result = exitFormHelper.buildExitFormResponse(exitFormData)
         assertThat(result).isNull()
     }
 
     @Test
     fun `test buildExitFormResponse should return null if exit form was not submitted`() {
-        val exitFormData = bundleOf(
-            ExitFormContract.EXIT_FORM_SUBMITTED to false
-        )
+        val exitFormData = ExitFormResult(false)
         val result = exitFormHelper.buildExitFormResponse(exitFormData)
         assertThat(result).isNull()
     }
 
     @Test
     fun `test buildExitFormResponse should return CoreExitFormResponse if exit form was submitted`() {
-        val exitFormData = bundleOf(
-            ExitFormContract.EXIT_FORM_SUBMITTED to true,
-            ExitFormContract.EXIT_FORM_SELECTED_OPTION to ExitFormOption.Other,
-        )
+        val exitFormData = ExitFormResult(true, ExitFormOption.Other)
         val result = exitFormHelper.buildExitFormResponse(exitFormData)
         assertThat(result).isNotNull()
         assertThat((result as ExitFormResponse).reason).isEqualTo(ExitFormReason.OTHER)

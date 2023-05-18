@@ -15,7 +15,6 @@ import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.alert.withPayload
@@ -64,15 +63,13 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
     }
 
     private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
-        AlertContract.getResponsePayload(data)
-            .getParcelable<ErrorResponse>(AlertContract.ALERT_PAYLOAD)
-            ?.let { presenter.handleResponseError(it) }
+        data.payload.getParcelable<ErrorResponse>(ERROR_TYPE_KEY)?.let { presenter.handleResponseError(it) }
     }
 
     override fun handleClientRequestError(clientApiAlert: ClientApiAlert) {
         showAlert.launch(
             clientApiAlert.toAlertConfig()
-                .withPayload(AlertContract.ALERT_PAYLOAD to ErrorResponse(clientApiAlert))
+                .withPayload(ERROR_TYPE_KEY to ErrorResponse(clientApiAlert))
                 .toArgs()
         )
     }
@@ -128,5 +125,9 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
             )
         )
         IAppResponseType.ERROR, null -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
+    }
+
+    companion object {
+        private const val ERROR_TYPE_KEY = "error_type"
     }
 }

@@ -1,8 +1,7 @@
 package com.simprints.fingerprint.activities.refusal
 
 import android.content.Intent
-import android.os.Bundle
-import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
@@ -21,15 +20,12 @@ object RefusalAlertHelper {
         visibleOptions = scannerOptions()
     }.toArgs()
 
-    fun handleRefusal(data: Bundle, onBack: () -> Unit = {}, onSubmit: (Intent) -> Unit = {}) {
-        val isSubmitted = ExitFormContract.isFormSubmitted(data)
-        val option = ExitFormContract.getFormOption(data)
-        val reason = ExitFormContract.getFormReason(data).orEmpty()
-
-        if (isSubmitted && option != null) {
+    fun handleRefusal(result: ExitFormResult, onBack: () -> Unit = {}, onSubmit: (Intent) -> Unit = {}) {
+        val option = result.submittedOption()
+        if (option != null) {
             onSubmit(getIntentForResultData(RefusalTaskResult(
                 RefusalTaskResult.Action.SUBMIT,
-                RefusalTaskResult.Answer(RefusalFormReason.fromExitFormOption(option), reason)
+                RefusalTaskResult.Answer(RefusalFormReason.fromExitFormOption(option), result.reason.orEmpty())
             )))
         } else {
             onBack()
