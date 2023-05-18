@@ -9,7 +9,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import io.mockk.mockkStatic
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -34,9 +34,10 @@ class FaceCaptureViewModelTest {
 
     private val faceDetections = listOf<FaceDetection>(
         mockk(relaxed = true) {
+            mockkStatic("com.simprints.face.capture.BitmapExtKt")
             every { id } returns "FAKE_ID"
-            every { frame } returns mockk {
-                every { toByteArray(any()) } returns byteArrayOf()
+            every { bitmap } returns mockk {
+                every { toJpgCompressedByteArray() } returns byteArrayOf()
             }
         }
     )
