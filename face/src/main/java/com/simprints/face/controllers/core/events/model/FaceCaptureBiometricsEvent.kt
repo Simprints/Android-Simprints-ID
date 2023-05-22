@@ -2,8 +2,7 @@ package com.simprints.face.controllers.core.events.model
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.utils.EncodingUtilsImpl
-import com.simprints.face.detection.Face
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
+import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent as CoreFaceCaptureBiometricsEventFace
 
 @Keep
@@ -26,7 +25,7 @@ class FaceCaptureBiometricsEvent(
         var roll: Float,
         val template: String,
         val quality: Float,
-        val format: FaceTemplateFormat
+        val format: String
     ) {
         fun fromDomainToCore() =
             CoreFaceCaptureBiometricsEventFace.FaceCaptureBiometricsPayload.Face(
@@ -45,7 +44,7 @@ class FaceCaptureBiometricsEvent(
                         roll = it.roll,
                         template = EncodingUtilsImpl.byteArrayToBase64(it.template),
                         quality = it.quality,
-                        format = it.format.fromDomainToCore()
+                        format = it.format
                     )
                 }
         }

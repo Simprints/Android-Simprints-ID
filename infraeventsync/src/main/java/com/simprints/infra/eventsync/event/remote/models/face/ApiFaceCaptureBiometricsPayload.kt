@@ -2,7 +2,6 @@ package com.simprints.infra.eventsync.event.remote.models.face
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 
@@ -20,7 +19,7 @@ internal class ApiFaceCaptureBiometricsPayload(
         val roll: Float,
         val template: String,
         val quality: Float,
-        val format: FaceTemplateFormat
+        val format: String
     ) {
         constructor(face: FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face) : this(
             yaw = face.yaw,
