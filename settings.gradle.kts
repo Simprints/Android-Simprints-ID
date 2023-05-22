@@ -63,6 +63,7 @@ include(
 
 // Feature modules
 include(
+    ":feature:login",
     ":featuredashboard",
     ":featurealert",
     ":featureexitform",
