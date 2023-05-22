@@ -230,8 +230,8 @@ class SubjectLocalDataSourceImplTest {
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
         faceSamples: Array<FaceSample> = arrayOf(
-            FaceSample(Random.nextBytes(64), "RANK_ONE_1_23"),
-            FaceSample(Random.nextBytes(64), "RANK_ONE_1_23")
+            FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
+            FaceSample(Random.nextBytes(64), "faceTemplateFormat")
         )
     ): Subject =
         Subject(

@@ -15,7 +15,7 @@ class FaceCaptureBiometricsEventTest {
                 yaw = 0.0f,
                 template = "",
                 quality = 2.0f,
-                format = "RANK_ONE_1_23"
+                format = "template format"
             ),
             payloadId = "someId"
         )
