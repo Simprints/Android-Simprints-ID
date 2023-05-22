@@ -1,7 +1,5 @@
-package com.simprints.face.match
+package com.simprints.infra.facebiosdk.matching
 
-import com.simprints.face.data.db.person.FaceIdentity
-import com.simprints.face.data.db.person.FaceSample
 
 abstract class FaceMatcher {
     /**

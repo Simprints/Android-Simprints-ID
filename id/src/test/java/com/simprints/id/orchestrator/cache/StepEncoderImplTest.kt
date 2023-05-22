@@ -13,8 +13,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.testtools.common.mock.mockTemplate
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.hamcrest.CoreMatchers
@@ -146,7 +146,7 @@ class StepEncoderImplTest {
                         "face_id",
                         mockTemplate(),
                         null,
-                        FaceTemplateFormat.RANK_ONE_1_23
+                        FACE_TEMPLATE_FORMAT
                     )
                 )
             )
@@ -224,7 +224,7 @@ class StepEncoderImplTest {
                     }
                     MatcherAssert.assertThat(
                         sample.format,
-                        CoreMatchers.`is`(FaceTemplateFormat.RANK_ONE_1_23)
+                        CoreMatchers.`is`(FACE_TEMPLATE_FORMAT)
                     )
                 }
             }

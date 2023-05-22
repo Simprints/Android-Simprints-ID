@@ -16,7 +16,8 @@ import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 
 private const val TAG = "ENROLMENT"
@@ -169,7 +170,7 @@ class EnrolmentHelperImpl @Inject constructor(
     private fun extractFaceSamples(faceResponse: FaceCaptureResponse) =
         faceResponse.capturingResult.mapNotNull { captureResult ->
             captureResult.result?.let { sample ->
-                FaceSample(sample.template, sample.format.fromDomainToModuleApi())
+                FaceSample(sample.template, sample.format)
             }
         }
 }

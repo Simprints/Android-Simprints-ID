@@ -1,12 +1,11 @@
 package com.simprints.face
 
 import android.graphics.Rect
-import com.simprints.face.data.db.person.FaceIdentity
-import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
-import com.simprints.face.detection.Face
-import com.simprints.face.models.FaceDetection
-import java.util.*
+import com.simprints.infra.facebiosdk.detection.Face
+import com.simprints.infra.facebiosdk.matching.FaceIdentity
+import com.simprints.infra.facebiosdk.matching.FaceSample
+import java.util.UUID
 import kotlin.random.Random
 
 object FixtureGenerator {
@@ -25,8 +24,9 @@ object FixtureGenerator {
     fun getFaceMatchResult(): FaceMatchResult =
         FaceMatchResult(UUID.randomUUID().toString(), Random.nextFloat() * 100)
 
-    fun getFace(rect: Rect = Rect(0, 0, 60, 60), quality: Float = 1f): Face =
-        Face(
+    const val FACE_TEMPLATE_FORMAT = "format"
+    fun getFace(rect: Rect = Rect(0, 0, 60, 60), quality: Float = 1f): Face {
+        return Face(
             100,
             100,
             rect,
@@ -34,8 +34,9 @@ object FixtureGenerator {
             0f,
             quality,
             Random.nextBytes(20),
-            FaceDetection.TemplateFormat.MOCK
+            FACE_TEMPLATE_FORMAT
         )
+    }
 
     fun <T : Any> generateSequenceN(n: Int, f: () -> T) = generateSequence(f).take(n)
 }

@@ -1,21 +1,25 @@
-package com.simprints.face.detection.rankone
+package com.simprints.feature.rocwrapper.detection
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import com.simprints.face.detection.Face
-import com.simprints.face.detection.FaceDetector
-import com.simprints.face.models.FaceDetection
+import com.simprints.infra.facebiosdk.detection.Face
+import com.simprints.infra.facebiosdk.detection.FaceDetector
+
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_float
 import io.rankone.rocsdk.embedded.SWIGTYPE_p_unsigned_char
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_detection
 import io.rankone.rocsdk.embedded.roc_embedded_landmark
 import io.rankone.rocsdk.embedded.roc_image
+
 import java.nio.ByteBuffer
 import javax.inject.Inject
 
 
 class RankOneFaceDetector @Inject constructor() : FaceDetector {
+    companion object{
+        const val RANK_ONE_1_23 ="RANK_ONE_1_23"
+    }
     private val maxFaces = 1
     private val falseDetectionRate = 0.1f
     private val relativeMinSize = 0.2f
@@ -92,7 +96,7 @@ class RankOneFaceDetector @Inject constructor() : FaceDetector {
             rocFace.face.rotation,
             qualityValue,
             roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt()),
-            FaceDetection.TemplateFormat.RANK_ONE_1_23
+            RANK_ONE_1_23
         )
 
         // Free all resources after getting the face

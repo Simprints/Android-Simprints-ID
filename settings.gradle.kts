@@ -36,7 +36,8 @@ dependencyResolutionManagement {
             name = "SimMatcherGitHubPackages"
             url = uri("https://maven.pkg.github.com/simprints/lib-android-simmatcher")
             credentials {
-                username = properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                username =
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
                 password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
             }
         }
@@ -66,6 +67,7 @@ include(
     ":featurealert",
     ":featureexitform",
     ":featureconsent",
+    ":featurerocwrapper",
 )
 
 // Infra modules
@@ -84,6 +86,7 @@ include(
     ":infraresources",
     ":infrasecurity",
     ":infrauibase",
+    "infrafacebiosdk",
 )
 
 // Tooling modules
