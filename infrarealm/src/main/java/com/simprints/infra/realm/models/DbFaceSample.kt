@@ -14,9 +14,6 @@ open class DbFaceSample(
     @Required
     var template: ByteArray = byteArrayOf(),
 
-    /**
-     * Realm doesn't accept enums, we need to save the formats as Strings. This is a [FaceTemplateFormat].
-     */
     @Required
     var format: String = ""
 ) : RealmObject()

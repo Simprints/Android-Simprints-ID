@@ -336,7 +336,7 @@ class EventMigration7To8Test {
                 QUALITY_THRESHOLD.toFloat(),
                 FaceCaptureEvent.FaceCapturePayload.Result.VALID,
                 false,
-                FaceCaptureEvent.FaceCapturePayload.Face(YAW, ROLL, QUALITY.toFloat()),
+                FaceCaptureEvent.FaceCapturePayload.Face(YAW, ROLL, QUALITY.toFloat(), FORMAT),
             ),
             type = EventType.FACE_CAPTURE,
         )
@@ -366,7 +366,8 @@ class EventMigration7To8Test {
                     YAW,
                     ROLL,
                     TEMPLATE,
-                    QUALITY.toFloat()
+                    QUALITY.toFloat(),
+                    FORMAT
                 ),
                 0,
             ),
@@ -411,7 +412,7 @@ class EventMigration7To8Test {
                 QUALITY_THRESHOLD.toFloat(),
                 FaceCaptureEvent.FaceCapturePayload.Result.INVALID,
                 false,
-                FaceCaptureEvent.FaceCapturePayload.Face(YAW, ROLL, QUALITY.toFloat()),
+                FaceCaptureEvent.FaceCapturePayload.Face(YAW, ROLL, QUALITY.toFloat(), FORMAT),
             ),
             type = EventType.FACE_CAPTURE,
         )
@@ -601,7 +602,7 @@ class EventMigration7To8Test {
                             "roll":$ROLL,
                             "quality":$QUALITY,
                             "template":"$TEMPLATE",
-                            "format":"RANK_ONE_1_23"
+                            "format":"$FORMAT"
                         },"""
                     else ","
                 } + """
@@ -635,6 +636,8 @@ class EventMigration7To8Test {
         private const val QUALITY_THRESHOLD = 60
         private const val YAW = 1.2f
         private const val ROLL = 2.3f
+        private const val FORMAT = "format"
+
     }
 }
 

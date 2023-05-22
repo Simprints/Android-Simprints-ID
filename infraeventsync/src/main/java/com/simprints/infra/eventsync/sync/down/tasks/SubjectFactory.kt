@@ -4,11 +4,14 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.domain.models.Subject
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.infra.events.event.domain.models.subject.*
+import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
+import com.simprints.infra.events.event.domain.models.subject.FaceReference
+import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
+import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
+import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import javax.inject.Inject
 
 internal class SubjectFactory @Inject constructor(private val encodingUtils: EncodingUtils) {
@@ -68,6 +71,6 @@ internal class SubjectFactory @Inject constructor(private val encodingUtils: Enc
             ?.let { reference -> reference.templates.map { buildFaceSample(it, reference.format) } }
             ?: emptyList()
 
-    private fun buildFaceSample(template: FaceTemplate, format: FaceTemplateFormat) =
-        FaceSample(encodingUtils.base64ToBytes(template.template), format.fromDomainToModuleApi())
+    private fun buildFaceSample(template: FaceTemplate, format: String) =
+        FaceSample(encodingUtils.base64ToBytes(template.template), format)
 }

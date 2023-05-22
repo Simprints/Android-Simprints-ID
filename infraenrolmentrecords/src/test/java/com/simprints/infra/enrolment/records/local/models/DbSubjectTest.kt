@@ -4,11 +4,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.infra.enrolment.records.domain.models.Subject
-import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import org.junit.Test
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import kotlin.random.Random
 
 class DbSubjectTest {
@@ -28,7 +28,7 @@ class DbSubjectTest {
             30,
             IFingerprintTemplateFormat.NEC_1,
         )
-        val faceSample = FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23)
+        val faceSample = FaceSample(Random.nextBytes(64), "RANK_ONE_1_23")
 
         val domainSubject = Subject(
             GUID, PROJECT_ID, ATTENDANT_ID, MODULE_ID, Date(0), Date(1),

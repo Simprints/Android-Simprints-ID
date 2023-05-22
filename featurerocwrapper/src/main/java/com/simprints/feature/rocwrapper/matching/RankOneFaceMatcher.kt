@@ -1,6 +1,6 @@
-package com.simprints.face.match.rankone
+package com.simprints.feature.rocwrapper.matching
 
-import com.simprints.face.match.FaceMatcher
+import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.rocConstants.ROC_FAST_FV_SIZE
 import javax.inject.Inject

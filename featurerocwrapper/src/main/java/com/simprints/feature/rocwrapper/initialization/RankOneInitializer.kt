@@ -1,11 +1,12 @@
-package com.simprints.face.initializers
+package com.simprints.feature.rocwrapper.initialization
 
 import android.app.Activity
+import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
 import javax.inject.Inject
 
-class RankOneInitializer @Inject constructor(): SdkInitializer {
+class RankOneInitializer @Inject constructor(): FaceBioSdkInitializer {
     /**
      * This will try to load ROC library from jniLibs and then initialize using the [license].
      *

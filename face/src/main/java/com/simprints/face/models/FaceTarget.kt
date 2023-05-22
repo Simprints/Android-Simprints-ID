@@ -1,6 +1,6 @@
 package com.simprints.face.models
 
-import com.simprints.face.detection.Face
+import com.simprints.infra.facebiosdk.detection.Face
 import kotlin.math.abs
 
 data class FaceTarget(

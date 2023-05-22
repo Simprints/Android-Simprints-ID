@@ -271,7 +271,7 @@ package com.simprints.infra.eventsync.remote
 //                    yaw = 30f,
 //                    roll = 40f,
 //                    quality = 100f,
-//                    format = FaceTemplateFormat.RANK_ONE_1_23
+//                    format = RANK_ONE_1_23
 //                )
 //
 //            val event = FaceCaptureEvent(
@@ -299,7 +299,7 @@ package com.simprints.infra.eventsync.remote
 //                yaw = 0.0f,
 //                template = template,
 //                quality = 1.0f,
-//                format = FaceTemplateFormat.RANK_ONE_1_23
+//                format = RANK_ONE_1_23
 //            )
 //
 //        val event = FaceCaptureBiometricsEvent(
