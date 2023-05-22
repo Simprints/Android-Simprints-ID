@@ -1,14 +1,13 @@
 package com.simprints.core.domain.face
 
 import android.os.Parcelable
-import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import kotlinx.parcelize.Parcelize
-import java.util.*
+import java.util.UUID
 
 @Parcelize
 data class FaceSample(
     val template: ByteArray,
-    val format: IFaceTemplateFormat,
+    val format: String,
     val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
 

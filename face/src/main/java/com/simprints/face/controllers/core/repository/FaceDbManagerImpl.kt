@@ -1,8 +1,8 @@
 package com.simprints.face.controllers.core.repository
 
-import com.simprints.face.data.db.person.FaceIdentity
-import com.simprints.face.data.db.person.FaceSample
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.facebiosdk.matching.FaceIdentity
+import com.simprints.infra.facebiosdk.matching.FaceSample
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.Serializable

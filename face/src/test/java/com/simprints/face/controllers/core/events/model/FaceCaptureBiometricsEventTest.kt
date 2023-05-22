@@ -1,7 +1,6 @@
 package com.simprints.face.controllers.core.events.model
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import org.junit.Test
 
 class FaceCaptureBiometricsEventTest {
@@ -16,7 +15,7 @@ class FaceCaptureBiometricsEventTest {
                 yaw = 0.0f,
                 template = "",
                 quality = 2.0f,
-                format = FaceTemplateFormat.RANK_ONE_1_23
+                format = "RANK_ONE_1_23"
             ),
             payloadId = "someId"
         )

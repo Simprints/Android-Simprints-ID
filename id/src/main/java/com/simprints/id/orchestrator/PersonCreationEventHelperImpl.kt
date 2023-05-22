@@ -66,7 +66,7 @@ class PersonCreationEventHelperImpl(
         responses.map {
             it.capturingResult.mapNotNull { captureResult ->
                 captureResult.result?.let { sample ->
-                    FaceSample(sample.template, sample.format.fromDomainToModuleApi())
+                    FaceSample(sample.template, sample.format)
                 }
             }
         }.flatten()

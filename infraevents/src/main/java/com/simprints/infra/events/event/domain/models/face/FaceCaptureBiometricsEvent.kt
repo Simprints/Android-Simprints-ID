@@ -49,7 +49,7 @@ data class FaceCaptureBiometricsEvent(
             var roll: Float,
             val template: String,
             val quality: Float,
-            val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23
+            val format:String
         )
     }
 

@@ -3,14 +3,14 @@ package com.simprints.face.match
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.FixtureGenerator
 import com.simprints.face.FixtureGenerator.generateSequenceN
-import com.simprints.face.match.mock.MockFaceMatcher
+import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import io.mockk.coEvery
 import io.mockk.spyk
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 
 class FaceMatcherTest {
-    private val faceMatcher = spyk(MockFaceMatcher())
+    private val faceMatcher = spyk<FaceMatcher>()
     private val candidate1 = FixtureGenerator.getFaceIdentity(2)
     private val probes = generateSequenceN(2) { FixtureGenerator.getFaceSample() }.toList()
 

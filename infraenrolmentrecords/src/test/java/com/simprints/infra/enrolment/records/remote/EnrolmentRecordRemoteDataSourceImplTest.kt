@@ -9,7 +9,6 @@ import com.simprints.infra.enrolment.records.remote.models.ApiEnrolmentRecord
 import com.simprints.infra.enrolment.records.remote.models.ApiEnrolmentRecords
 import com.simprints.infra.enrolment.records.remote.models.face.ApiFaceReference
 import com.simprints.infra.enrolment.records.remote.models.face.ApiFaceTemplate
-import com.simprints.infra.enrolment.records.remote.models.face.ApiFaceTemplateFormat
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFinger
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFingerprintReference
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFingerprintTemplate
@@ -18,7 +17,6 @@ import com.simprints.infra.login.LoginManager
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import com.simprints.testtools.common.alias.InterfaceInvocation
@@ -83,12 +81,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     IFingerprintTemplateFormat.ISO_19794_2
                 )
             ),
-            faceSamples = listOf(
-                FaceSample(
-                    FACE_TEMPLATE,
-                    IFaceTemplateFormat.RANK_ONE_1_23
-                )
-            )
+            faceSamples = listOf(FaceSample(FACE_TEMPLATE, "faceTemplateFormat"))
         )
         val expectedRecord = ApiEnrolmentRecord(
             subjectId = SUBJECT_ID,
@@ -108,12 +101,8 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                 ),
                 ApiFaceReference(
                     id = "b4a3ba90-6413-32b4-a4ea-a841a5a400ec",
-                    templates = listOf(
-                        ApiFaceTemplate(
-                            template = BASE64_FACE_TEMPLATE,
-                        )
-                    ),
-                    format = ApiFaceTemplateFormat.RANK_ONE_1_23,
+                    templates = listOf(ApiFaceTemplate(template = BASE64_FACE_TEMPLATE)),
+                    format = "faceTemplateFormat",
                 )
             )
         )
