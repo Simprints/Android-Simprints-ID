@@ -5,9 +5,9 @@ import android.graphics.RectF
 
 // All values are after rotation of the source image
 open class Face(
-    val sourceWidth: Int,
-    val sourceHeight: Int,
-    val absoluteBoundingBox: Rect,
+    private val sourceWidth: Int,
+    private val sourceHeight: Int,
+    private val absoluteBoundingBox: Rect,
     val yaw: Float,
     var roll: Float,
     val quality: Float,

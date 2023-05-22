@@ -17,6 +17,7 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
+import com.simprints.feature.rocwrapper.matching.RankOneFaceMatcher
 import com.simprints.infra.facebiosdk.matching.FaceIdentity
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.infra.facebiosdk.matching.FaceSample
@@ -173,7 +174,7 @@ class FaceMatchViewModel @Inject constructor(
         )
 
     private fun FaceMatcher.getEventMatcher(): Matcher =
-        if (this is com.simprints.feature.rocwrapper.matching.RankOneFaceMatcher) Matcher.RANK_ONE else Matcher.UNKNOWN
+        if (this is RankOneFaceMatcher) Matcher.RANK_ONE else Matcher.UNKNOWN
 
     sealed class MatchState {
         object NotStarted : MatchState()

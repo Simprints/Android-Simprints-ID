@@ -19,7 +19,7 @@ sealed class BiometricReference(open val id: String,
 
 data class FaceReference(override val id: String,
                          val templates: List<FaceTemplate>,
-                         val format:String                         = FACE_TEMPLATE_FORMAT,
+                         val format: String = FACE_TEMPLATE_FORMAT,
                          val metadata: HashMap<String, String>? = null) : BiometricReference(id, BiometricReferenceType.FACE_REFERENCE)
 
 data class FingerprintReference(override val id: String,

@@ -85,7 +85,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
 
-const val FACE_TEMPLATE_FORMAT = "FaceTemplateFormat"
+const val FACE_TEMPLATE_FORMAT = "RANK_ONE_1_23"
 val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = DEFAULT_PROJECT_ID)
 
 fun createConfirmationCallbackEvent() = ConfirmationCallbackEvent(CREATED_AT, true, eventLabels)

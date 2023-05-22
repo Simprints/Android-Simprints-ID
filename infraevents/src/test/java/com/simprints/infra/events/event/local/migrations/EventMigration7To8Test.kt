@@ -637,7 +637,6 @@ class EventMigration7To8Test {
         private const val YAW = 1.2f
         private const val ROLL = 2.3f
         private const val FORMAT = "format"
-
     }
 }
 
