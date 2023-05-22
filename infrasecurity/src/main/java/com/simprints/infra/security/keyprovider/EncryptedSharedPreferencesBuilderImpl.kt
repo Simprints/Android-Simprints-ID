@@ -4,14 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.BuildSdk
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import javax.inject.Inject
-
 
 internal class EncryptedSharedPreferencesBuilderImpl @Inject constructor(
     @ApplicationContext private val ctx: Context,
