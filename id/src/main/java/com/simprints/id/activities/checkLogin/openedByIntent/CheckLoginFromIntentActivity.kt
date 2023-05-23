@@ -13,6 +13,7 @@ import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.login.LoginContract
+import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.ShowLoginWrapper
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
@@ -56,11 +57,16 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
                     viewPresenter.checkSignedInStateIfPossible()
                 }
             }
-        } else {
-            // TODO Handle different error cases
-            //   viewPresenter.onLoginScreenErrorReturn(result.error)
+        } else handleLoginFormErrors(it.error)
+    }
+
+    private fun handleLoginFormErrors(error: LoginError?) = when (error) {
+        null, LoginError.LoginNotCompleted -> {
             viewPresenter.onLoginScreenErrorReturn(AppErrorResponse(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE))
         }
+
+        LoginError.MissingPlayServices -> showAlert.launch(AlertType.MISSING_GOOGLE_PLAY_SERVICES.toAlertConfig().toArgs())
+        LoginError.OutdatedPlayServices -> showAlert.launch(AlertType.GOOGLE_PLAY_SERVICES_OUTDATED.toAlertConfig().toArgs())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

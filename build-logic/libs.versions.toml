@@ -29,6 +29,7 @@ matertial_version = "1.9.0"
 hilt_version = "2.46.1"
 hilt_androidx_version = "1.0.0"
 
+play_base_services_version = "18.2.0"
 play_location_services_version = "21.0.1"
 play_integrity_version = "1.1.0"
 gsm_plugin_version = "4.3.15"
@@ -141,6 +142,7 @@ support-material = { module = "com.google.android.material:material", version.re
 workManager-work = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx_work_version" }
 
 #PlayServices
+playServices-base = { module = "com.google.android.gms:play-services-base", version.ref = "play_base_services_version" }
 playServices-location = { module = "com.google.android.gms:play-services-location", version.ref = "play_location_services_version" }
 playServices-integrity = { module = "com.google.android.play:integrity", version.ref = "play_integrity_version" }
 

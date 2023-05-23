@@ -1,39 +1,38 @@
-package com.simprints.id.tools.googleapis
+package com.simprints.feature.login.tools.play
 
 import android.app.Activity
 import com.google.android.gms.common.ConnectionResult.SUCCESS
 import com.google.android.gms.common.GoogleApiAvailability
-import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.alert.AlertType.GOOGLE_PLAY_SERVICES_OUTDATED
-import com.simprints.id.domain.alert.AlertType.MISSING_GOOGLE_PLAY_SERVICES
-import com.simprints.id.exceptions.unexpected.MissingGooglePlayServices
-import com.simprints.id.exceptions.unexpected.OutdatedGooglePlayServices
+import com.simprints.feature.login.LoginError
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
+// TODO make internal when id.LoginActivity is deleted
+class GooglePlayServicesAvailabilityChecker @Inject constructor(
     private val googleApiAvailability: GoogleApiAvailability
-) : GooglePlayServicesAvailabilityChecker {
+) {
 
     /**
      * Check the availability of the google play services.
      *
      * @param activity
      */
-    override fun check(
+    fun check(
         activity: Activity,
-        launchAlert: (AlertType) -> Unit,
+        errorCallback: (LoginError) -> Unit,
     ) {
         val statusCode = googleApiAvailability.isGooglePlayServicesAvailable(activity)
         when {
             statusCode == SUCCESS -> { // On SUCCESS then does nothing
                 return
             }
+
             googleApiAvailability.isUserResolvableError(statusCode) -> {
-                showErrorDialog(activity, statusCode, launchAlert)
+                showErrorDialog(activity, statusCode, errorCallback)
             }
+
             else -> {
-                handleMissingGooglePlayServices(statusCode, launchAlert)
+                handleMissingGooglePlayServices(statusCode, errorCallback)
             }
         }
     }
@@ -48,7 +47,7 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
     private inline fun showErrorDialog(
         activity: Activity,
         statusCode: Int,
-        crossinline launchAlert: (AlertType) -> Unit,
+        crossinline errorCallback: (LoginError) -> Unit,
     ) {
         googleApiAvailability.showErrorDialogFragment(
             activity,
@@ -56,7 +55,7 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
             GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
         ) {
             // Throw exception when user cancels the dialog
-            handleCancellation(statusCode, launchAlert)
+            handleCancellation(statusCode, errorCallback)
         }
     }
 
@@ -68,26 +67,22 @@ class GooglePlayServicesAvailabilityCheckerImpl @Inject constructor(
      */
     private inline fun handleMissingGooglePlayServices(
         statusCode: Int,
-        crossinline launchAlert: (AlertType) -> Unit,
+        crossinline errorCallback: (LoginError) -> Unit,
     ) {
-        launchAlert(MISSING_GOOGLE_PLAY_SERVICES)
-        Simber.e(
-            MissingGooglePlayServices(
-                "Error with GooglePlayServices version. Error code=$statusCode"
-            )
-        )
+        errorCallback(LoginError.MissingPlayServices)
+        Simber.e(MissingGooglePlayServices(
+            "Error with GooglePlayServices version. Error code=$statusCode"
+        ))
     }
 
     private inline fun handleCancellation(
         statusCode: Int,
-        crossinline launchAlert: (AlertType) -> Unit,
+        crossinline errorCallback: (LoginError) -> Unit,
     ) {
-        launchAlert(GOOGLE_PLAY_SERVICES_OUTDATED)
-        Simber.e(
-            OutdatedGooglePlayServices(
-                "Error with GooglePlayServices version. Error code=$statusCode"
-            )
-        )
+        errorCallback(LoginError.OutdatedPlayServices)
+        Simber.e(OutdatedGooglePlayServices(
+            "Error with GooglePlayServices version. Error code=$statusCode"
+        ))
     }
 
     // Should be any number we user to check if the user updated
