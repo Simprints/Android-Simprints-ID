@@ -9,4 +9,6 @@ android {
 
 dependencies {
 
+    implementation(project(":infra:auth-store"))
+    implementation(project(":infra:auth-logic"))
 }

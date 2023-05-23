@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":clientapi"))
     implementation(project(":face"))
+    implementation(project(":feature:login"))
     implementation(project(":featuredashboard"))
     implementation(project(":featurealert"))
     implementation(project(":featureexitform"))
