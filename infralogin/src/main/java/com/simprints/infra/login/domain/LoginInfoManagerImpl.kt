@@ -22,13 +22,6 @@ internal class LoginInfoManagerImpl @Inject constructor(@ApplicationContext ctx:
 
     private val prefs: SharedPreferences = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
-    override var encryptedProjectSecret: String = ""
-        get() = prefs.getString(ENCRYPTED_PROJECT_SECRET, "").orEmpty()
-        set(value) {
-            field = value
-            prefs.edit().putString(ENCRYPTED_PROJECT_SECRET, field).apply()
-        }
-
     override var signedInProjectId: String = ""
         get() = prefs.getString(PROJECT_ID, "").orEmpty()
         set(value) {
@@ -78,22 +71,14 @@ internal class LoginInfoManagerImpl @Inject constructor(@ApplicationContext ctx:
             prefs.edit().putString(USER_ID_CLAIM, field ?: "").apply()
         }
 
-    override fun getEncryptedProjectSecretOrEmpty(): String =
-        encryptedProjectSecret
-
-    override fun getSignedInProjectIdOrEmpty(): String =
-        signedInProjectId
-
-    override fun getSignedInUserIdOrEmpty(): String =
-        signedInUserId
-
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
-        getSignedInProjectIdOrEmpty().isNotEmpty() && getSignedInProjectIdOrEmpty() == possibleProjectId
+        signedInProjectId.isNotEmpty() && signedInProjectId == possibleProjectId
 
     override fun cleanCredentials() {
         signedInProjectId = ""
         signedInUserId = ""
-        encryptedProjectSecret = ""
+        prefs.edit().putString(ENCRYPTED_PROJECT_SECRET, "").apply()
+
         clearCachedTokenClaims()
     }
 

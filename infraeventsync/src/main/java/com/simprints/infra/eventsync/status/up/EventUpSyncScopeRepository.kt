@@ -13,7 +13,7 @@ internal class EventUpSyncScopeRepository @Inject constructor(
 ) {
 
     suspend fun getUpSyncScope(): ProjectScope {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.signedInProjectId
         val syncScope = ProjectScope(projectId)
 
         syncScope.operation = refreshState(syncScope.operation)

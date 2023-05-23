@@ -19,7 +19,7 @@ internal class EnrolmentRecordRemoteDataSourceImpl(
     constructor(loginManager: LoginManager) : this(loginManager, EncodingUtilsImpl)
 
     override suspend fun uploadRecords(subjects: List<Subject>) {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.signedInProjectId
 
         return getClient().executeCall { apiInterface ->
             apiInterface.uploadRecords(

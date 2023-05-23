@@ -28,7 +28,7 @@ internal class ProjectDetailsViewModel @Inject constructor(
 
     fun load() = viewModelScope.launch {
         val state = try {
-            val projectId = loginManager.getSignedInProjectIdOrEmpty()
+            val projectId = loginManager.signedInProjectId
             val cachedProject = configManager.getProject(projectId)
             val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
             DashboardProjectState(

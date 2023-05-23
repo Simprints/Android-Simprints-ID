@@ -38,7 +38,7 @@ class ImageRemoteDataSourceImplTest {
         val loginManagerMock = mockk<LoginManager>(relaxed = true) {
             every { getLegacyAppFallback() } returns mockk(relaxed = true)
             every { getLegacyAppFallback().options.projectId } returns "projectId"
-            every { getSignedInProjectIdOrEmpty() } returns "projectId"
+            every { signedInProjectId } returns "projectId"
         }
 
         val storageMock = setupStorageMock()

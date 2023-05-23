@@ -41,21 +41,6 @@ class LoginInfoManagerImplTest {
     }
 
     @Test
-    fun `getting the encrypted project secret should returns it`() {
-        every { sharedPreferences.getString(any(), any()) } returns "secret"
-
-        assertThat(loginInfoManagerImpl.encryptedProjectSecret).isEqualTo("secret")
-    }
-
-    @Test
-    fun `setting the encrypted project secret should set in the shared preferences`() {
-        loginInfoManagerImpl.encryptedProjectSecret = "secret"
-
-        verify(exactly = 1) { editor.putString("ENCRYPTED_PROJECT_SECRET", "secret") }
-        verify(exactly = 1) { editor.apply() }
-    }
-
-    @Test
     fun `getting the signed in user id should returns it`() {
         every { sharedPreferences.getString(any(), any()) } returns "userId"
 
@@ -142,28 +127,14 @@ class LoginInfoManagerImplTest {
     fun `getSignedInProjectIdOrEmpty should return an empty string if null`() {
         every { sharedPreferences.getString(any(), any()) } returns null
 
-        assertThat(loginInfoManagerImpl.getSignedInProjectIdOrEmpty()).isEqualTo("")
+        assertThat(loginInfoManagerImpl.signedInProjectId).isEqualTo("")
     }
 
     @Test
     fun `getSignedInProjectIdOrEmpty should return the signed in project id`() {
         every { sharedPreferences.getString(any(), any()) } returns "project"
 
-        assertThat(loginInfoManagerImpl.getSignedInProjectIdOrEmpty()).isEqualTo("project")
-    }
-
-    @Test
-    fun `getSignedInUserIdOrEmpty should return an empty string if null`() {
-        every { sharedPreferences.getString(any(), any()) } returns null
-
-        assertThat(loginInfoManagerImpl.getSignedInUserIdOrEmpty()).isEqualTo("")
-    }
-
-    @Test
-    fun `getSignedInUserIdOrEmpty should return the signed in project id`() {
-        every { sharedPreferences.getString(any(), any()) } returns "user"
-
-        assertThat(loginInfoManagerImpl.getSignedInUserIdOrEmpty()).isEqualTo("user")
+        assertThat(loginInfoManagerImpl.signedInProjectId).isEqualTo("project")
     }
 
     @Test

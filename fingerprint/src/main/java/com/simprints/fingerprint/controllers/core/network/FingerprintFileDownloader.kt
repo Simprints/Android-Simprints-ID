@@ -21,7 +21,7 @@ class FingerprintFileDownloader @Inject constructor(
 
 
     private val projectId by lazy {
-        loginManager.getSignedInProjectIdOrEmpty()
+        loginManager.signedInProjectId
     }
 
     /**

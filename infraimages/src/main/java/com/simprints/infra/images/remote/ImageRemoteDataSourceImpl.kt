@@ -22,7 +22,7 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
         val firebaseProjectName = loginManager.getLegacyAppFallback().options.projectId
 
         return if (firebaseProjectName != null) {
-            val projectId = loginManager.getSignedInProjectIdOrEmpty()
+            val projectId = loginManager.signedInProjectId
 
             if (projectId.isEmpty())
                 return UploadResult(imageRef, UploadResult.Status.FAILED)

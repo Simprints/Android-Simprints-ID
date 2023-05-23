@@ -48,7 +48,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val validators = validatorsFactory.build()
 
     private val currentProject: String
-        get() = loginManager.getSignedInProjectIdOrEmpty().ifEmpty {
+        get() = loginManager.signedInProjectId.ifEmpty {
             PROJECT_ID_FOR_NOT_SIGNED_IN
         }
 

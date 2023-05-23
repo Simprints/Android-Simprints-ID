@@ -49,7 +49,7 @@ internal class PrivacyNoticeViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(LANGUAGE, listOf(), "")
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { loginManager.signedInProjectId } returns PROJECT_ID
 
         privacyNoticeViewModel = PrivacyNoticeViewModel(
             connectivityTracker,

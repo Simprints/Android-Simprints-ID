@@ -43,7 +43,7 @@ internal class EventUpSyncScopeRepositoryTest {
                 upSyncOperationOperationDao,
             )
 
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns SampleDefaults.DEFAULT_PROJECT_ID
+        every { loginManager.signedInProjectId } returns SampleDefaults.DEFAULT_PROJECT_ID
         coEvery { upSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
 

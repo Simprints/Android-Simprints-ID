@@ -30,7 +30,7 @@ class ConfigurationWorkerTest {
 
     @Test
     fun `should fail if the signed in project id is empty`() = runTest {
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
+        every { loginManager.signedInProjectId } returns ""
 
         val result = configurationWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -38,7 +38,7 @@ class ConfigurationWorkerTest {
 
     @Test
     fun `should fail if the config service throws an exception`() = runTest {
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { loginManager.signedInProjectId } returns PROJECT_ID
         coEvery { configService.refreshConfiguration(PROJECT_ID) } throws Exception()
 
         val result = configurationWorker.doWork()
@@ -47,7 +47,7 @@ class ConfigurationWorkerTest {
 
     @Test
     fun `should succeed if the config service doesn't throw an exception`() = runTest {
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { loginManager.signedInProjectId } returns PROJECT_ID
         coEvery { configService.refreshConfiguration(PROJECT_ID) } returns projectConfiguration
         coEvery { configService.refreshProject(PROJECT_ID) } returns project
 

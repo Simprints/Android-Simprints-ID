@@ -38,54 +38,6 @@ class LoginManagerImplTest {
     )
 
     @Test
-    fun `get projectIdTokenClaim should call the correct method`() {
-        every { loginInfoManager.projectIdTokenClaim } returns PROJECT_ID
-        val receivedProjectId = loginManagerManagerImpl.projectIdTokenClaim
-
-        assertThat(receivedProjectId).isEqualTo(PROJECT_ID)
-    }
-
-    @Test
-    fun `set projectIdTokenClaim should call the correct method`() {
-        every { loginInfoManager.projectIdTokenClaim } returns PROJECT_ID
-        loginManagerManagerImpl.projectIdTokenClaim = PROJECT_ID
-
-        verify { loginInfoManager.setProperty("projectIdTokenClaim").value(PROJECT_ID) }
-    }
-
-    @Test
-    fun `get userIdTokenClaim should call the correct method`() {
-        every { loginInfoManager.userIdTokenClaim } returns USER_ID
-        val receivedProjectId = loginManagerManagerImpl.userIdTokenClaim
-
-        assertThat(receivedProjectId).isEqualTo(USER_ID)
-    }
-
-    @Test
-    fun `set userIdTokenClaim should call the correct method`() {
-        every { loginInfoManager.userIdTokenClaim } returns USER_ID
-        loginManagerManagerImpl.userIdTokenClaim = USER_ID
-
-        verify { loginInfoManager.setProperty("userIdTokenClaim").value(USER_ID) }
-    }
-
-    @Test
-    fun `get encryptedProjectSecret should call the correct method`() {
-        every { loginInfoManager.encryptedProjectSecret } returns SECRET
-        val receivedProjectId = loginManagerManagerImpl.encryptedProjectSecret
-
-        assertThat(receivedProjectId).isEqualTo(SECRET)
-    }
-
-    @Test
-    fun `set encryptedProjectSecret should call the correct method`() {
-        every { loginInfoManager.encryptedProjectSecret } returns SECRET
-        loginManagerManagerImpl.encryptedProjectSecret = SECRET
-
-        verify { loginInfoManager.setProperty("encryptedProjectSecret").value(SECRET) }
-    }
-
-    @Test
     fun `get signedInProjectId should call the correct method`() {
         every { loginInfoManager.signedInProjectId } returns PROJECT_ID
         val receivedProjectId = loginManagerManagerImpl.signedInProjectId
@@ -115,54 +67,6 @@ class LoginManagerImplTest {
         loginManagerManagerImpl.signedInUserId = USER_ID
 
         verify { loginInfoManager.setProperty("signedInUserId").value(USER_ID) }
-    }
-
-    @Test
-    fun `get coreFirebaseProjectId should call the correct method`() {
-        every { loginInfoManager.coreFirebaseProjectId } returns FIREBASE_PROJECT_ID
-        val receivedProjectId = loginManagerManagerImpl.coreFirebaseProjectId
-
-        assertThat(receivedProjectId).isEqualTo(FIREBASE_PROJECT_ID)
-    }
-
-    @Test
-    fun `set coreFirebaseProjectId should call the correct method`() {
-        every { loginInfoManager.coreFirebaseProjectId } returns FIREBASE_PROJECT_ID
-        loginManagerManagerImpl.coreFirebaseProjectId = FIREBASE_PROJECT_ID
-
-        verify { loginInfoManager.setProperty("coreFirebaseProjectId").value(FIREBASE_PROJECT_ID) }
-    }
-
-    @Test
-    fun `get coreFirebaseApplicationId should call the correct method`() {
-        every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
-        val receivedProjectId = loginManagerManagerImpl.coreFirebaseApplicationId
-
-        assertThat(receivedProjectId).isEqualTo(APPLICATION_ID)
-    }
-
-    @Test
-    fun `set coreFirebaseApplicationId should call the correct method`() {
-        every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
-        loginManagerManagerImpl.coreFirebaseApplicationId = APPLICATION_ID
-
-        verify { loginInfoManager.setProperty("coreFirebaseApplicationId").value(APPLICATION_ID) }
-    }
-
-    @Test
-    fun `get coreFirebaseApiKey should call the correct method`() {
-        every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
-        val receivedProjectId = loginManagerManagerImpl.coreFirebaseApiKey
-
-        assertThat(receivedProjectId).isEqualTo(API_KEY)
-    }
-
-    @Test
-    fun `set coreFirebaseApiKey should call the correct method`() {
-        every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
-        loginManagerManagerImpl.coreFirebaseApiKey = API_KEY
-
-        verify { loginInfoManager.setProperty("coreFirebaseApiKey").value(API_KEY) }
     }
 
     @Test
@@ -208,25 +112,17 @@ class LoginManagerImplTest {
     }
 
     @Test
-    fun `getEncryptedProjectSecretOrEmpty should call the correct method`() {
-        every { loginInfoManager.getEncryptedProjectSecretOrEmpty() } returns SECRET
-        val receivedSecret = loginManagerManagerImpl.getEncryptedProjectSecretOrEmpty()
-
-        assertThat(receivedSecret).isEqualTo(SECRET)
-    }
-
-    @Test
     fun `getSignedInProjectIdOrEmpty should call the correct method`() {
-        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
-        val receivedProjectId = loginManagerManagerImpl.getSignedInProjectIdOrEmpty()
+        every { loginInfoManager.signedInProjectId } returns PROJECT_ID
+        val receivedProjectId = loginManagerManagerImpl.signedInProjectId
 
         assertThat(receivedProjectId).isEqualTo(PROJECT_ID)
     }
 
     @Test
     fun `getSignedInUserIdOrEmpty should call the correct method`() {
-        every { loginInfoManager.getSignedInUserIdOrEmpty() } returns USER_ID
-        val receivedUserId = loginManagerManagerImpl.getSignedInUserIdOrEmpty()
+        every { loginInfoManager.signedInUserId } returns USER_ID
+        val receivedUserId = loginManagerManagerImpl.signedInUserId
 
         assertThat(receivedUserId).isEqualTo(USER_ID)
     }
@@ -244,13 +140,6 @@ class LoginManagerImplTest {
         loginManagerManagerImpl.cleanCredentials()
 
         verify(exactly = 1) { loginInfoManager.cleanCredentials() }
-    }
-
-    @Test
-    fun `clearCachedTokenClaims should call the correct method`() {
-        loginManagerManagerImpl.clearCachedTokenClaims()
-
-        verify(exactly = 1) { loginInfoManager.clearCachedTokenClaims() }
     }
 
     @Test
@@ -283,14 +172,6 @@ class LoginManagerImplTest {
     }
 
     @Test
-    fun `getCurrentToken should call the correct method`() = runTest(UnconfinedTestDispatcher()) {
-        coEvery { remoteDbManager.getCurrentToken() } returns TOKEN_STRING
-        val receivedToken = loginManagerManagerImpl.getCurrentToken()
-
-        assertThat(receivedToken).isEqualTo(TOKEN_STRING)
-    }
-
-    @Test
     fun `getCoreApp should call the correct method`() {
         every { remoteDbManager.getCoreApp() } returns FIREBASE_APP
         val receivedApp = loginManagerManagerImpl.getCoreApp()
@@ -314,30 +195,16 @@ class LoginManagerImplTest {
         assertThat(receivedClient).isEqualTo(SIM_API_CLIENT)
     }
 
-    @Test
-    fun `buildUnauthenticatedClient should call the correct method`() =
-        runTest(UnconfinedTestDispatcher()) {
-            coEvery { simApiClientFactory.buildUnauthenticatedClient(SimRemoteInterface::class) } returns SIM_API_CLIENT
-            val receivedClient =
-                loginManagerManagerImpl.buildUnauthenticatedClient(SimRemoteInterface::class)
-
-            assertThat(receivedClient).isEqualTo(SIM_API_CLIENT)
-        }
-
     companion object {
         private const val INTEGRITY_TOKEN = "token"
         private const val NONCE = "nonce"
         private const val PROJECT_ID = "projectId"
         private const val DEVICE_ID = "deviceId"
         private const val USER_ID = "userId"
-        private const val SECRET = "secret"
         private const val FIREBASE_PROJECT_ID = "project"
-        private const val API_KEY = "apiKey"
-        private const val APPLICATION_ID = "applicationId"
         private val AUTHENTICATION_DATA = AuthenticationData("public_key", "nonce")
         private val AUTH_REQUEST = AuthRequest("secret", "token", "deviceId")
         private val TOKEN = Token("token", "projectId", "apiKey", "application")
-        private const val TOKEN_STRING = "token"
         private val FIREBASE_APP = mockk<FirebaseApp>()
         private val SIM_API_CLIENT = mockk<SimNetwork.SimApiClient<SimRemoteInterface>>()
     }

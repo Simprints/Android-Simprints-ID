@@ -47,7 +47,7 @@ class FingerprintFileDownloaderTest {
         coEvery { fingerprintApiClientFactory.buildClient<FileUrlRemoteInterface>(any()) } returns apiClient
         every { apiClient.api } returns api
         coEvery { api.getFileUrl(any(), any()) } returns FileUrl(FirmwareTestData.SOME_URL)
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns "projectId"
+        every { loginManager.signedInProjectId } returns "projectId"
         // When
         val result = fingerprintFileDownloader.getFileUrl("Any fileId")
         // Then

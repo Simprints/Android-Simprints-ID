@@ -221,9 +221,9 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
 
     /** @throws DifferentProjectIdSignedInException */
     override fun isProjectIdStoredAndMatches(): Boolean =
-        loginManager.getSignedInProjectIdOrEmpty().isNotEmpty() &&
+        loginManager.signedInProjectId.isNotEmpty() &&
             matchProjectIdsOrThrow(
-                loginManager.getSignedInProjectIdOrEmpty(),
+                loginManager.signedInProjectId,
                 appRequest.projectId
             )
 
@@ -240,7 +240,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     //else
         /** Hack to support multiple users: we do not check if the signed UserId
         matches the userId from the Intent */
-        loginManager.getSignedInUserIdOrEmpty().isNotEmpty()
+        loginManager.signedInUserId.isNotEmpty()
 
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
@@ -281,7 +281,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private suspend fun updateProjectInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
-        val signedProjectId = loginManager.getSignedInProjectIdOrEmpty()
+        val signedProjectId = loginManager.signedInProjectId
         if (signedProjectId != currentSessionEvent.payload.projectId) {
             val projectConfiguration = configManager.getProjectConfiguration()
             currentSessionEvent.updateProjectId(signedProjectId)
@@ -310,8 +310,8 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private suspend fun initAnalyticsKeyInCrashManager() {
         val projectConfiguration = configManager.getProjectConfiguration()
         val deviceConfiguration = configManager.getDeviceConfiguration()
-        Simber.tag(PROJECT_ID, true).i(loginManager.getSignedInProjectIdOrEmpty())
-        Simber.tag(USER_ID, true).i(loginManager.getSignedInUserIdOrEmpty())
+        Simber.tag(PROJECT_ID, true).i(loginManager.signedInProjectId)
+        Simber.tag(USER_ID, true).i(loginManager.signedInUserId)
         Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(projectConfiguration.synchronization.frequency.toString())
@@ -323,10 +323,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             timeHelper.now(),
             result,
             if (result == AuthorizationResult.AUTHORIZED) {
-                UserInfo(
-                    loginManager.getSignedInProjectIdOrEmpty(),
-                    loginManager.getSignedInUserIdOrEmpty()
-                )
+                UserInfo(loginManager.signedInProjectId, loginManager.signedInUserId)
             } else {
                 null
             }

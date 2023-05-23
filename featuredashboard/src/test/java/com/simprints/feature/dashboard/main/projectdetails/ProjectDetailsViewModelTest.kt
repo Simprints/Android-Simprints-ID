@@ -32,7 +32,7 @@ class ProjectDetailsViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val loginManager = mockk<LoginManager> {
-        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { signedInProjectId } returns PROJECT_ID
     }
     private val configManager = mockk<ConfigManager> {
         coEvery { getProject(PROJECT_ID) } returns project

@@ -67,7 +67,7 @@ internal class EventUpSyncTaskTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns NOW
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { loginManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration

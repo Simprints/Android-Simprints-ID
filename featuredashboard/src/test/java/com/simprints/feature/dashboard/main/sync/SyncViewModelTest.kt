@@ -68,7 +68,7 @@ class SyncViewModelTest {
             every { down.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         }
         every { timeHelper.readableBetweenNowAndTime(any()) } returns DATE
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns "projectId"
+        every { loginManager.signedInProjectId } returns "projectId"
     }
 
     @Test

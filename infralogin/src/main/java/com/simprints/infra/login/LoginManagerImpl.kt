@@ -23,21 +23,6 @@ internal class LoginManagerImpl @Inject constructor(
     private val simApiClientFactory: SimApiClientFactory,
 ) : LoginManager {
 
-    override var projectIdTokenClaim: String?
-        get() = loginInfoManager.projectIdTokenClaim
-        set(value) {
-            loginInfoManager.projectIdTokenClaim = value
-        }
-    override var userIdTokenClaim: String?
-        get() = loginInfoManager.userIdTokenClaim
-        set(value) {
-            loginInfoManager.userIdTokenClaim = value
-        }
-    override var encryptedProjectSecret: String
-        get() = loginInfoManager.encryptedProjectSecret
-        set(value) {
-            loginInfoManager.encryptedProjectSecret = value
-        }
     override var signedInProjectId: String
         get() = loginInfoManager.signedInProjectId
         set(value) {
@@ -47,21 +32,6 @@ internal class LoginManagerImpl @Inject constructor(
         get() = loginInfoManager.signedInUserId
         set(value) {
             loginInfoManager.signedInUserId = value
-        }
-    override var coreFirebaseProjectId: String
-        get() = loginInfoManager.coreFirebaseProjectId
-        set(value) {
-            loginInfoManager.coreFirebaseProjectId = value
-        }
-    override var coreFirebaseApplicationId: String
-        get() = loginInfoManager.coreFirebaseApplicationId
-        set(value) {
-            loginInfoManager.coreFirebaseApplicationId = value
-        }
-    override var coreFirebaseApiKey: String
-        get() = loginInfoManager.coreFirebaseApiKey
-        set(value) {
-            loginInfoManager.coreFirebaseApiKey = value
         }
 
     override suspend fun requestIntegrityToken(nonce: String): String =
@@ -80,24 +50,11 @@ internal class LoginManagerImpl @Inject constructor(
         credentials: AuthRequest
     ): Token = authenticationRemoteDataSource.requestAuthToken(projectId, userId, credentials)
 
-    override fun getEncryptedProjectSecretOrEmpty(): String =
-        loginInfoManager.getEncryptedProjectSecretOrEmpty()
-
-    override fun getSignedInProjectIdOrEmpty(): String =
-        loginInfoManager.getSignedInProjectIdOrEmpty()
-
-    override fun getSignedInUserIdOrEmpty(): String =
-        loginInfoManager.getSignedInUserIdOrEmpty()
-
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
         loginInfoManager.isProjectIdSignedIn(possibleProjectId)
 
     override fun cleanCredentials() {
         loginInfoManager.cleanCredentials()
-    }
-
-    override fun clearCachedTokenClaims() {
-        loginInfoManager.clearCachedTokenClaims()
     }
 
     override fun storeCredentials(projectId: String, userId: String) {
@@ -115,9 +72,6 @@ internal class LoginManagerImpl @Inject constructor(
     override fun isSignedIn(projectId: String, userId: String): Boolean =
         remoteDbManager.isSignedIn(projectId, userId)
 
-    override suspend fun getCurrentToken(): String =
-        remoteDbManager.getCurrentToken()
-
     override fun getCoreApp(): FirebaseApp =
         remoteDbManager.getCoreApp()
 
@@ -127,7 +81,4 @@ internal class LoginManagerImpl @Inject constructor(
     override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
         simApiClientFactory.buildClient(remoteInterface)
 
-
-    override fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
-        simApiClientFactory.buildUnauthenticatedClient(remoteInterface)
 }

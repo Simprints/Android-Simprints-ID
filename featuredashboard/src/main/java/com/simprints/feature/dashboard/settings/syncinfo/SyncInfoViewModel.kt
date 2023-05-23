@@ -136,7 +136,7 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.signedInProjectId
 
         awaitAll(
             async { _configuration.postValue(configManager.getProjectConfiguration()) },

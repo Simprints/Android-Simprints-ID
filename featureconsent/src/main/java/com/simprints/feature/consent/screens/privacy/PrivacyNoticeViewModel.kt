@@ -45,7 +45,7 @@ internal class PrivacyNoticeViewModel @Inject constructor(
     fun retrievePrivacyNotice() = viewModelScope.launch {
         val deviceConfiguration = configManager.getDeviceConfiguration()
         configManager.getPrivacyNotice(
-            loginManager.getSignedInProjectIdOrEmpty(),
+            loginManager.signedInProjectId,
             deviceConfiguration.language
         )
             .map { it.toPrivacyNoticeViewState() }

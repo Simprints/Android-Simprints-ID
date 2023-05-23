@@ -73,7 +73,7 @@ class SyncInfoViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { loginManager.signedInProjectId } returns PROJECT_ID
 
         connectionLiveData = MutableLiveData<Boolean>()
         every { connectivityTracker.observeIsConnected() } returns connectionLiveData

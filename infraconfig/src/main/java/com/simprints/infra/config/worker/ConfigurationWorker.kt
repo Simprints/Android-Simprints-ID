@@ -21,7 +21,7 @@ internal class ConfigurationWorker @AssistedInject constructor(
     private val tag = ConfigurationWorker::class.java.name
 
     override suspend fun doWork(): Result = try {
-       val projectId = loginManager.getSignedInProjectIdOrEmpty()
+       val projectId = loginManager.signedInProjectId
 
        // if the user is not signed in, we shouldn't try again
        if (projectId.isEmpty()) {

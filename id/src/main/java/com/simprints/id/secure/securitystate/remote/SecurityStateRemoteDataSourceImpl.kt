@@ -16,7 +16,7 @@ class SecurityStateRemoteDataSourceImpl @Inject constructor(
 ) : SecurityStateRemoteDataSource {
 
     override suspend fun getSecurityState(): SecurityState {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.signedInProjectId
         val deviceConfiguration = configManager.getDeviceConfiguration()
 
         return getClient().executeCall {

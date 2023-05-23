@@ -24,7 +24,7 @@ class ImageUpSyncWorkerTest {
 
     private val imageRepository = mockk<ImageRepository>()
     private val loginManager = mockk<LoginManager> {
-        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { signedInProjectId } returns PROJECT_ID
     }
 
     private val imageUpSyncWorker = ImageUpSyncWorker(

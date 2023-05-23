@@ -62,7 +62,7 @@ internal class EventRepositoryImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns NOW
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { loginManager.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
         coEvery { configManager.getProjectConfiguration() } returns mockk {
@@ -106,7 +106,7 @@ internal class EventRepositoryImplTest {
     @Test
     fun `create session for empty project id`() {
         runBlocking {
-            every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
+            every { loginManager.signedInProjectId } returns ""
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
 
             val session = eventRepo.createSession()
@@ -292,7 +292,7 @@ internal class EventRepositoryImplTest {
         runTest {
             //Given
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
-            every { loginManager.getSignedInProjectIdOrEmpty() } returns "projectId"
+            every { loginManager.signedInProjectId } returns "projectId"
             //When
             val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
             //Then
@@ -467,7 +467,7 @@ internal class EventRepositoryImplTest {
     }
 
     private fun mockSignedId() =
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { loginManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
     companion object {
         const val DEVICE_ID = "DEVICE_ID"
