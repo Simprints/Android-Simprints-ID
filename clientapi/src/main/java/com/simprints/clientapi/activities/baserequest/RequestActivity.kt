@@ -5,22 +5,37 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.simprints.clientapi.R
-import com.simprints.clientapi.clientrequests.extractors.*
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
+import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.errors.ClientApiAlert.Companion.toAlertConfig
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.core.tools.activity.BaseSplitActivity
-import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.alert.withPayload
 import com.simprints.infra.logging.Simber
-import com.simprints.moduleapi.app.responses.*
+import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
+import com.simprints.moduleapi.app.responses.IAppEnrolResponse
+import com.simprints.moduleapi.app.responses.IAppErrorResponse
+import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
+import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
+import com.simprints.moduleapi.app.responses.IAppResponse
+import com.simprints.moduleapi.app.responses.IAppResponseType
+import com.simprints.moduleapi.app.responses.IAppVerifyResponse
 import kotlinx.coroutines.launch
 
 abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestView {
@@ -64,15 +79,13 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
     }
 
     private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
-        AlertContract.getResponsePayload(data)
-            .getParcelable<ErrorResponse>(AlertContract.ALERT_PAYLOAD)
-            ?.let { presenter.handleResponseError(it) }
+        data.payload.getParcelable<ErrorResponse>(ERROR_TYPE_KEY)?.let { presenter.handleResponseError(it) }
     }
 
     override fun handleClientRequestError(clientApiAlert: ClientApiAlert) {
         showAlert.launch(
             clientApiAlert.toAlertConfig()
-                .withPayload(AlertContract.ALERT_PAYLOAD to ErrorResponse(clientApiAlert))
+                .withPayload(ERROR_TYPE_KEY to ErrorResponse(clientApiAlert))
                 .toArgs()
         )
     }
@@ -128,5 +141,9 @@ abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestVie
             )
         )
         IAppResponseType.ERROR, null -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
+    }
+
+    companion object {
+        private const val ERROR_TYPE_KEY = "error_type"
     }
 }

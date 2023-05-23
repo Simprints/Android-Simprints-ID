@@ -65,6 +65,7 @@ include(
     ":featuredashboard",
     ":featurealert",
     ":featureexitform",
+    ":featureconsent",
 )
 
 // Infra modules
@@ -82,6 +83,7 @@ include(
     ":infrarecentuseractivity",
     ":infraresources",
     ":infrasecurity",
+    ":infrauibase",
 )
 
 // Tooling modules

@@ -1,10 +1,12 @@
 package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity
+import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.AlertResult
 import io.mockk.clearMocks
 import io.mockk.mockk
 import io.mockk.verify
@@ -32,11 +34,9 @@ internal class AlertActivityHelperTest {
         var refuseCalled = false
         helper.handleAlertResult(
             activity,
-            bundleOf(
-                AlertContract.ALERT_BUTTON_PRESSED to AlertContract.ALERT_BUTTON_PRESSED_BACK,
-                AlertContract.ALERT_PAYLOAD to bundleOf(
-                    AlertError.PAYLOAD_KEY to AlertError.LOW_BATTERY.name,
-                ),
+            result = AlertResult(
+                AlertContract.ALERT_BUTTON_PRESSED_BACK,
+                bundleOf(AlertError.PAYLOAD_KEY to AlertError.LOW_BATTERY.name)
             ),
             showRefusal = { refuseCalled = true },
             retry = {}
@@ -49,11 +49,9 @@ internal class AlertActivityHelperTest {
     fun finishes_whenHandlingBackFromUnexpectedError() {
         helper.handleAlertResult(
             activity,
-            bundleOf(
-                AlertContract.ALERT_BUTTON_PRESSED to AlertContract.ALERT_BUTTON_PRESSED_BACK,
-                AlertContract.ALERT_PAYLOAD to bundleOf(
-                    AlertError.PAYLOAD_KEY to AlertError.UNEXPECTED_ERROR.name,
-                ),
+            result = AlertResult(
+                AlertContract.ALERT_BUTTON_PRESSED_BACK,
+                bundleOf(AlertError.PAYLOAD_KEY to AlertError.UNEXPECTED_ERROR.name)
             ),
             showRefusal = {},
             retry = {}
@@ -65,7 +63,7 @@ internal class AlertActivityHelperTest {
     fun finishes_whenHandlingBackFromMalformedError() {
         helper.handleAlertResult(
             activity,
-            bundleOf(AlertContract.ALERT_BUTTON_PRESSED to AlertContract.ALERT_BUTTON_PRESSED_BACK),
+            result = AlertResult(AlertContract.ALERT_BUTTON_PRESSED_BACK, Bundle()),
             showRefusal = {},
             retry = {}
         )
@@ -78,7 +76,7 @@ internal class AlertActivityHelperTest {
 
         helper.handleAlertResult(
             mockk(relaxed = true),
-            bundleOf(AlertContract.ALERT_BUTTON_PRESSED to AlertError.ACTION_PAIR),
+            result = AlertResult(AlertError.ACTION_PAIR, Bundle()),
             showRefusal = {},
             retry = {}
         )
@@ -94,7 +92,7 @@ internal class AlertActivityHelperTest {
 
         helper.handleAlertResult(
             mockk(relaxed = true),
-            bundleOf(AlertContract.ALERT_BUTTON_PRESSED to AlertError.ACTION_CLOSE),
+            result = AlertResult(AlertError.ACTION_CLOSE, Bundle()),
             showRefusal = {},
             retry = {}
         )
@@ -106,7 +104,7 @@ internal class AlertActivityHelperTest {
     fun finishes_whenHandlingCloseAction() {
         helper.handleAlertResult(
             activity,
-            bundleOf(AlertContract.ALERT_BUTTON_PRESSED to AlertError.ACTION_CLOSE),
+            result = AlertResult(AlertError.ACTION_CLOSE, Bundle()),
             showRefusal = {},
             retry = {}
         )
@@ -118,7 +116,7 @@ internal class AlertActivityHelperTest {
         var refuseCalled = false
         helper.handleAlertResult(
             activity,
-            bundleOf(AlertContract.ALERT_BUTTON_PRESSED to AlertError.ACTION_REFUSAL),
+            result = AlertResult(AlertError.ACTION_REFUSAL, Bundle()),
             showRefusal = { refuseCalled = true },
             retry = {}
         )
@@ -131,7 +129,7 @@ internal class AlertActivityHelperTest {
         var retryCalled = false
         helper.handleAlertResult(
             activity,
-            bundleOf(AlertContract.ALERT_BUTTON_PRESSED to AlertError.ACTION_RETRY),
+            result = AlertResult(AlertError.ACTION_RETRY, Bundle()),
             showRefusal = {},
             retry = { retryCalled = true }
         )
@@ -144,7 +142,7 @@ internal class AlertActivityHelperTest {
     fun opensSettings_whenHandlingSettingsAction() {
         helper.handleAlertResult(
             activity,
-            bundleOf(AlertContract.ALERT_BUTTON_PRESSED to AlertError.ACTION_BT_SETTINGS),
+            result = AlertResult(AlertError.ACTION_BT_SETTINGS, Bundle()),
             showRefusal = {},
             retry = {}
         )

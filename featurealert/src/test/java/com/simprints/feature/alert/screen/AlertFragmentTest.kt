@@ -1,6 +1,5 @@
 package com.simprints.feature.alert.screen
 
-import androidx.fragment.app.setFragmentResultListener
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
@@ -11,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.feature.alert.*
 import com.simprints.feature.alert.config.AlertColor
+import com.simprints.infra.uibase.navigation.handleResultDirectly
 import com.simprints.testtools.common.syntax.hasAnyCompoundDrawable
 import com.simprints.testtools.common.syntax.hasBackgroundColor
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
@@ -132,8 +132,8 @@ class AlertFragmentTest {
             navController = navController,
             fragmentArgs = alertConfiguration {}.toArgs()
         ) {
-            setFragmentResultListener(AlertContract.ALERT_REQUEST) { _, data ->
-                resultKey = data.getString(AlertContract.ALERT_BUTTON_PRESSED)
+            handleResultDirectly<AlertResult>(AlertContract.ALERT_DESTINATION_ID) { result ->
+                resultKey = result.buttonKey
             }
         }
         pressBack()
@@ -149,8 +149,8 @@ class AlertFragmentTest {
             navController = navController,
             fragmentArgs = alertConfiguration {}.withPayload("testKey" to 42).toArgs()
         ) {
-            setFragmentResultListener(AlertContract.ALERT_REQUEST) { _, data ->
-                payload = AlertContract.getResponsePayload(data).getInt("testKey")
+            handleResultDirectly<AlertResult>(AlertContract.ALERT_DESTINATION_ID) { result ->
+                payload = result.payload.getInt("testKey")
             }
         }
         pressBack()
@@ -165,8 +165,8 @@ class AlertFragmentTest {
             navController = navController,
             fragmentArgs = alertConfiguration {}.withPayload("testKey" to 42).toArgs()
         ) {
-            setFragmentResultListener(AlertContract.ALERT_REQUEST) { _, data ->
-                payload = AlertContract.getResponsePayload(data).getInt("testKey")
+            handleResultDirectly<AlertResult>(AlertContract.ALERT_DESTINATION_ID) { result ->
+                payload = result.payload.getInt("testKey")
             }
         }
         onView(withId(R.id.alertLeftButton)).perform(click())
@@ -185,8 +185,8 @@ class AlertFragmentTest {
                 }
             }.withPayload("testKey" to 42).toArgs()
         ) {
-            setFragmentResultListener(AlertContract.ALERT_REQUEST) { _, data ->
-                payload = AlertContract.getResponsePayload(data).getInt("testKey")
+            handleResultDirectly<AlertResult>(AlertContract.ALERT_DESTINATION_ID) { result ->
+                payload = result.payload.getInt("testKey")
             }
         }
         onView(withId(R.id.alertRightButton)).perform(click())
@@ -195,7 +195,7 @@ class AlertFragmentTest {
 
     @Test
     fun `notifies caller about left button press`() {
-        var correctResultKey = false
+        var resultKey = ""
 
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
@@ -206,17 +206,17 @@ class AlertFragmentTest {
                 }
             }.toArgs()
         ) {
-            setFragmentResultListener(AlertContract.ALERT_REQUEST) { _, data ->
-                correctResultKey = AlertContract.hasResponseKey(data, "test")
+            handleResultDirectly<AlertResult>(AlertContract.ALERT_DESTINATION_ID) { result ->
+                resultKey = result.buttonKey
             }
         }
         onView(withId(R.id.alertLeftButton)).perform(click())
-        Truth.assertThat(correctResultKey).isTrue()
+        Truth.assertThat(resultKey).isEqualTo("test")
     }
 
     @Test
     fun `notifies caller about right button press`() {
-        var correctResultKey = false
+        var resultKey = ""
 
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
@@ -227,12 +227,33 @@ class AlertFragmentTest {
                 }
             }.toArgs()
         ) {
-            setFragmentResultListener(AlertContract.ALERT_REQUEST) { _, data ->
-                correctResultKey = AlertContract.hasResponseKey(data, "test")
+            handleResultDirectly<AlertResult>(AlertContract.ALERT_DESTINATION_ID) { result ->
+                resultKey = result.buttonKey
             }
         }
         onView(withId(R.id.alertRightButton)).perform(click())
-        Truth.assertThat(correctResultKey).isTrue()
+        Truth.assertThat(resultKey).isEqualTo("test")
+    }
+
+
+    @Test
+    fun `button does not close screen if not configured`() {
+        val navSpy = spyk(navController)
+        launchFragmentInHiltContainer<AlertFragment>(
+            navController = navSpy,
+            fragmentArgs = alertConfiguration {
+                leftButton = alertButton {
+                    text = "Left"
+                    closeOnClick = false
+                }
+            }.toArgs()
+        ) {
+            onView(withId(R.id.alertLeftButton)).perform(click())
+        }
+
+        // Since there is no "up" in alert graph, this is the only way to make sure
+        // navigation has been called
+        verify(exactly = 0) { navSpy.popBackStack() }
     }
 
     @Test

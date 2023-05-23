@@ -96,7 +96,7 @@ class FaceCaptureViewModel @Inject constructor(
     private fun saveImage(faceDetection: FaceDetection, captureEventId: String) {
         runBlocking {
             faceDetection.securedImageRef =
-                faceImageManager.save(faceDetection.frame.toByteArray(), captureEventId)
+                faceImageManager.save(faceDetection.bitmap.toJpgCompressedByteArray(), captureEventId)
         }
     }
 

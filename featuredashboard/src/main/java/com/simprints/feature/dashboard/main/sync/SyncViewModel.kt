@@ -1,9 +1,23 @@
 package com.simprints.feature.dashboard.main.sync
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.views.SyncCardState
-import com.simprints.feature.dashboard.views.SyncCardState.*
+import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
+import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
+import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailed
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedBackendMaintenance
+import com.simprints.feature.dashboard.views.SyncCardState.SyncHasNoModules
+import com.simprints.feature.dashboard.views.SyncCardState.SyncOffline
+import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
+import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
+import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
+import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
@@ -14,18 +28,19 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
-    private val deviceManager: DeviceManager,
+    private val connectivityTracker: ConnectivityTracker,
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val loginManager: LoginManager,
@@ -83,7 +98,7 @@ internal class SyncViewModel @Inject constructor(
 
     private fun load() =
         viewModelScope.launch {
-            _syncCardLiveData.addSource(deviceManager.isConnectedLiveData) {
+            _syncCardLiveData.addSource(connectivityTracker.observeIsConnected()) {
                 CoroutineScope(coroutineContext + SupervisorJob()).launch {
                     emitNewCardState(
                         it,
@@ -227,7 +242,7 @@ internal class SyncViewModel @Inject constructor(
     private suspend fun isModuleSync() =
         configManager.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
-    private fun isConnected() = deviceManager.isConnectedLiveData.value ?: true
+    private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 
 }
 

@@ -44,9 +44,6 @@
             android:id="@+id/action_mainFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
         <action
-            android:id="@+id/action_mainFragment_to_privacyNoticesFragment"
-            app:destination="@id/privacyNoticesFragment" />
-        <action
             android:id="@+id/action_mainFragment_to_moduleSelectionFragment"
             app:destination="@id/moduleSelectionFragment" />
     </fragment>
@@ -70,11 +67,6 @@
             android:id="@+id/action_settingsFragment_to_fingerSelectionFragment"
             app:destination="@id/fingerSelectionFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/privacyNoticesFragment"
-        android:name="com.simprints.feature.dashboard.privacynotices.PrivacyNoticesFragment"
-        android:label="PrivacyNoticesFragment"
-        tools:layout="@layout/fragment_privacy_notices" />
     <fragment
         android:id="@+id/aboutFragment"
         android:name="com.simprints.feature.dashboard.settings.about.AboutFragment"
@@ -108,6 +100,12 @@
         android:name="com.simprints.feature.dashboard.settings.fingerselection.FingerSelectionFragment"
         android:label="FingerSelectionFragment"
         tools:layout="@layout/fragment_finger_selection"/>
+
+    <include app:graph="@navigation/graph_privacy" />
+    <action
+        android:id="@+id/action_mainFragment_to_privacyNoticesFragment"
+        app:destination="@id/graph_privacy" />
+
     <navigation
         android:id="@+id/logout_navigation"
         android:label="logoutNavigation"

@@ -1,6 +1,4 @@
 import com.android.build.api.dsl.LibraryExtension
-import common.getLibs
-import common.implementation
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -28,28 +26,12 @@ class ModuleFeatureConventionPlugin : Plugin<Project> {
                 }
             }
 
-            val libs = getLibs()
-
             dependencies {
+                add("implementation", project(":infrauibase"))
                 add("implementation", project(":core"))
+
                 add("testImplementation", project(":testtools"))
                 add("androidTestImplementation", project(":testtools"))
-
-                implementation(libs, "androidX.core")
-                implementation(libs, "androidX.appcompat")
-                implementation(libs, "androidX.lifecycle")
-                implementation(libs, "androidX.lifecycle.scope")
-
-                implementation(libs, "support.material")
-
-                implementation(libs, "androidX.uI.activity")
-                implementation(libs, "androidX.uI.fragment")
-                implementation(libs, "androidX.uI.constraintlayout")
-                implementation(libs, "androidX.uI.coordinatorlayout")
-                implementation(libs, "androidX.uI.cardview")
-
-                implementation(libs, "androidX.navigation.fragment")
-
             }
         }
     }

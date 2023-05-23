@@ -1,10 +1,12 @@
 package com.simprints.face.capture.livefeedback
 
+import android.graphics.Bitmap
 import android.graphics.RectF
+import android.util.Size
+import androidx.camera.core.ImageProxy
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.otaliastudios.cameraview.frame.Frame
 import com.simprints.core.tools.extentions.area
 import com.simprints.face.capture.livefeedback.tools.FrameProcessor
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
@@ -13,10 +15,17 @@ import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.detection.Face
 import com.simprints.face.detection.FaceDetector
-import com.simprints.face.models.*
+import com.simprints.face.models.FaceDetection
+import com.simprints.face.models.FaceTarget
+import com.simprints.face.models.FloatRange
+import com.simprints.face.models.SymmetricTarget
 import com.simprints.infra.config.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -28,6 +37,10 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     private val faceSessionEventsManager: FaceSessionEventsManager,
     private val faceTimeHelper: FaceTimeHelper,
 ) : ViewModel() {
+
+
+    private var attemptNumber: Int = 1
+    private var samplesToCapture: Int = 1
 
     private val faceTarget = FaceTarget(
         SymmetricTarget(VALID_YAW_DELTA),
@@ -46,23 +59,14 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     /**
      * Processes the image
      *
-     * @param frame is the camera frame
-     * @param faceRectF is the box on the screen
-     * @param size is the screen size
+     * @param image is the camera frame
      */
-    fun process(
-        frame: Frame,
-        faceRectF: RectF,
-        size: Size,
-        samplesToCapture: Int,
-        attemptNumber: Int
-    ) {
+    fun process(image: ImageProxy) {
         val captureStartTime = faceTimeHelper.now()
-        val previewFrame = frameProcessor.previewFrameFrom(frame, faceRectF, size, false)
+        val croppedBitmap = frameProcessor.cropRotateFrame(image)
+        val potentialFace = faceDetector.analyze(croppedBitmap)
 
-        val potentialFace = faceDetector.analyze(previewFrame)
-
-        val faceDetection = getFaceDetectionFromPotentialFace(potentialFace, previewFrame)
+        val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
         faceDetection.detectionEndTime = faceTimeHelper.now()
 
@@ -76,9 +80,22 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
                     finishCapture(attemptNumber)
                 }
             }
+
             else -> {//no-op
             }
         }
+        image.close()
+    }
+
+    fun initFrameProcessor(
+        samplesToCapture: Int,
+        attemptNumber: Int,
+        cropRect: RectF,
+        previewSize: Size
+    ) {
+        this.samplesToCapture = samplesToCapture
+        this.attemptNumber = attemptNumber
+        frameProcessor.init(previewSize, cropRect)
     }
 
     fun startCapture() {
@@ -103,42 +120,43 @@ class LiveFeedbackFragmentViewModel @Inject constructor(
     }
 
     private fun getFaceDetectionFromPotentialFace(
-        potentialFace: Face?,
-        previewFrame: PreviewFrame
+        bitmap: Bitmap,
+        potentialFace: Face?
     ): FaceDetection {
         return if (potentialFace == null) {
-            FaceDetection(previewFrame, null, FaceDetection.Status.NOFACE)
+            bitmap.recycle()
+            FaceDetection(bitmap, null, FaceDetection.Status.NOFACE)
         } else {
-            getFaceDetection(potentialFace, previewFrame)
+            getFaceDetection(bitmap, potentialFace)
         }
     }
 
-    private fun getFaceDetection(potentialFace: Face, previewFrame: PreviewFrame): FaceDetection {
+    private fun getFaceDetection(bitmap: Bitmap, potentialFace: Face): FaceDetection {
         val areaOccupied = potentialFace.relativeBoundingBox.area()
         return when {
             areaOccupied < faceTarget.areaRange.start -> FaceDetection(
-                previewFrame,
+                bitmap,
                 potentialFace,
                 FaceDetection.Status.TOOFAR
             )
+
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
-                previewFrame,
-                potentialFace,
+                bitmap, potentialFace,
                 FaceDetection.Status.TOOCLOSE
             )
+
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
-                previewFrame,
-                potentialFace,
+                bitmap, potentialFace,
                 FaceDetection.Status.OFFYAW
             )
+
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
-                previewFrame,
-                potentialFace,
+                bitmap, potentialFace,
                 FaceDetection.Status.OFFROLL
             )
+
             else -> FaceDetection(
-                previewFrame,
-                potentialFace,
+                bitmap, potentialFace,
                 if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
             )
         }

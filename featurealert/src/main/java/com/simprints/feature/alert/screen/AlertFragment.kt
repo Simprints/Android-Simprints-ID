@@ -5,22 +5,22 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.tools.extentions.setTextWithFallbacks
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.R
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.databinding.FragmentAlertBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ALERT
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.navigation.setResult
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -91,9 +91,6 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
     }
 
     private fun setPressedButtonResult(key: String, payload: Bundle) {
-        setFragmentResult(AlertContract.ALERT_REQUEST, bundleOf(
-            AlertContract.ALERT_BUTTON_PRESSED to key,
-            AlertContract.ALERT_PAYLOAD to payload,
-        ))
+        findNavController().setResult(this, AlertResult(key, payload))
     }
 }

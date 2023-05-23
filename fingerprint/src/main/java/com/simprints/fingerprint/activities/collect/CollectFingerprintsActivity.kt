@@ -56,9 +56,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private var confirmDialog: AlertDialog? = null
     private var hasSplashScreenBeenTriggered: Boolean = false
 
-    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { data ->
+    private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { result ->
         RefusalAlertHelper.handleRefusal(
-            data = data,
+            result = result,
             onSubmit = { setResultAndFinish(ResultCode.REFUSED, it) },
         )
     }

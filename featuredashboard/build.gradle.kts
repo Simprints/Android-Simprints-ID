@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":infraimages"))
     implementation(project(":infralogin"))
     implementation(project(":infrarecentuseractivity"))
+    implementation(project(":featureconsent"))
 
     implementation(libs.fuzzywuzzy.core)
 

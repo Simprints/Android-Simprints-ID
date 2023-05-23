@@ -1,34 +1,61 @@
 package com.simprints.face.capture.livefeedback.tools
 
-import android.graphics.ImageFormat
+import android.graphics.Bitmap
+import android.graphics.Rect
 import android.graphics.RectF
+import android.util.Size
+import androidx.camera.core.ImageProxy
 import androidx.core.graphics.toRect
-import com.otaliastudios.cameraview.frame.Frame
-import com.simprints.face.models.PreviewFrame
-import com.simprints.face.models.Size
-import com.simprints.face.imageTools.LibYuvJni
+import com.simprints.face.capture.toBitmap
+import java.lang.Float.min
 import javax.inject.Inject
-import kotlin.math.min
 
-class FrameProcessor @Inject constructor(private val libYuvJni: LibYuvJni) {
 
-    fun previewFrameFrom(
-        cameraFrame: Frame,
-        boxOnTheScreen: RectF,
-        screenSize: Size,
-        facingFront: Boolean
-    ): PreviewFrame {
-        val cameraWidth = cameraFrame.size.width
-        val cameraHeight = cameraFrame.size.height
+class FrameProcessor @Inject constructor() {
 
-        val screenWidth = screenSize.width
-        val screenHeight = screenSize.height
+    private var previewViewWidth: Int = 0
+    private var previewViewHeight: Int = 0
 
-        val (rotatedCameraWidth, rotatedCameraHeight) = getCameraRotatedPair(cameraFrame)
+    private lateinit var boxOnTheScreen: RectF
+    private lateinit var cropRect: Rect
+
+    /**
+     * Init the frame processor
+     *
+     * @param previewViewSize the camera preview view size
+     * @param boxOnTheScreen the circle target indicator coordinates.
+     * we will use this coordinates to compute the area to be cropped for processing
+     */
+    fun init(previewViewSize: Size, boxOnTheScreen: RectF) {
+        previewViewWidth = previewViewSize.width
+        previewViewHeight = previewViewSize.height
+        this.boxOnTheScreen = boxOnTheScreen
+    }
+
+    /**
+     * Extracts part of the image that lays inside
+     * the cropRect
+     *
+     * @param image
+     * @return Bitmap
+     */
+    fun cropRotateFrame(image: ImageProxy): Bitmap {
+        if (!this::cropRect.isInitialized) {
+            // The cropRect should be calculated once as its value will be the same for all images.
+            calcRotatedCropRect(image)
+        }
+        return image.toBitmap(cropRect)
+    }
+
+    private fun calcRotatedCropRect(image: ImageProxy) {
+        val cameraWidth = image.width
+        val cameraHeight = image.height
+
+        val (rotatedCameraWidth, rotatedCameraHeight) = getCameraRotatedPair(image)
 
         val newRectSize = getRectSizeBasedOnCameraCropping(
-            screenWidth,
-            screenHeight,
+            previewViewWidth,
+            previewViewHeight,
             rotatedCameraWidth,
             rotatedCameraHeight,
             boxOnTheScreen
@@ -37,46 +64,21 @@ class FrameProcessor @Inject constructor(private val libYuvJni: LibYuvJni) {
         val newBoundingBox =
             CameraTargetOverlay.rectForPlane(rotatedCameraWidth, rotatedCameraHeight, newRectSize)
 
-        val rotatedTargetBoundingBox =
-            getRotatedBoundingBox(cameraFrame, newBoundingBox, cameraWidth, cameraHeight)
-
-        require(cameraFrame.format == ImageFormat.NV21)
-        val (croppedFrameSize, croppedFrameBytes) = getCroppedFrameAndBytes(
+        cropRect = getRotatedBoundingBox(
+            image.imageInfo.rotationDegrees,
+            newBoundingBox,
             cameraWidth,
-            cameraHeight,
-            cameraFrame,
-            rotatedTargetBoundingBox
-        )
-
-        return PreviewFrame(
-            croppedFrameSize.width,
-            croppedFrameSize.height,
-            cameraFrame.format,
-            facingFront,
-            croppedFrameBytes
-        )
-    }
-
-    private fun getCroppedFrameAndBytes(
-        cameraWidth: Int,
-        cameraHeight: Int,
-        cameraFrame: Frame,
-        rotatedTargetBoundingBox: RectF
-    ): Pair<Size, ByteArray> {
-        return libYuvJni.cropRotateYuvNV21(
-            Size(cameraWidth, cameraHeight), cameraFrame.getData(),
-            rect = rotatedTargetBoundingBox.toRect(),
-            rotation = cameraFrame.rotationToUser
-        )
+            cameraHeight
+        ).toRect()
     }
 
     private fun getRotatedBoundingBox(
-        cameraFrame: Frame,
+        rotation: Int,
         newBoundingBox: RectF,
         cameraWidth: Int,
         cameraHeight: Int
     ): RectF {
-        return when (360 - cameraFrame.rotationToUser) {
+        return when (360 - rotation) {
             0, 360 -> newBoundingBox
             90 -> RectF(
                 cameraWidth - newBoundingBox.bottom,
@@ -84,19 +86,22 @@ class FrameProcessor @Inject constructor(private val libYuvJni: LibYuvJni) {
                 cameraWidth - newBoundingBox.top,
                 newBoundingBox.right
             )
+
             180 -> RectF(
                 cameraWidth - newBoundingBox.right,
                 cameraHeight - newBoundingBox.bottom,
                 cameraWidth - newBoundingBox.left,
                 cameraHeight - newBoundingBox.top
             )
+
             270 -> RectF(
                 newBoundingBox.top,
                 cameraHeight - newBoundingBox.right,
                 newBoundingBox.bottom,
                 cameraHeight - newBoundingBox.left
             )
-            else -> throw IllegalArgumentException("Unsupported rotation angle: ${cameraFrame.rotationToUser}")
+
+            else -> throw IllegalArgumentException("Unsupported rotation angle: ${rotation}")
         }
     }
 
@@ -135,14 +140,14 @@ class FrameProcessor @Inject constructor(private val libYuvJni: LibYuvJni) {
         }
     }
 
-    private fun getCameraRotatedPair(cameraFrame: Frame): Pair<Int, Int> =
-        if (cameraRotatedPortrait(cameraFrame)) {
-            Pair(cameraFrame.size.height, cameraFrame.size.width)
+    private fun getCameraRotatedPair(image: ImageProxy): Pair<Int, Int> =
+        if (cameraRotatedPortrait(image.imageInfo.rotationDegrees)) {
+            Pair(image.height, image.width)
         } else {
-            Pair(cameraFrame.size.width, cameraFrame.size.height)
+            Pair(image.width, image.height)
         }
 
-    private fun cameraRotatedPortrait(cameraFrame: Frame) = cameraFrame.rotationToUser in arrayOf(90, 270)
+    private fun cameraRotatedPortrait(rotation: Int) = rotation in arrayOf(90, 270)
 
     private fun sizeFromMinRatio(
         cameraWidth: Int,
@@ -156,5 +161,4 @@ class FrameProcessor @Inject constructor(private val libYuvJni: LibYuvJni) {
         val minRatio = min(widthRatio, heightRatio)
         return currentWidth * minRatio
     }
-
 }

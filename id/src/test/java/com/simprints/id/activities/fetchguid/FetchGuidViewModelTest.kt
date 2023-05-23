@@ -10,7 +10,6 @@ import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.NOT_FOUND_IN_LO
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource.REMOTE
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.testtools.TestData.defaultSubject
-import com.simprints.id.tools.device.DeviceManager
 import com.simprints.id.tools.extensions.just
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.events.EventRepository
@@ -18,6 +17,7 @@ import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
+import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -27,8 +27,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -48,7 +46,7 @@ class FetchGuidViewModelTest {
     private lateinit var fetchGuidHelper: FetchGuidHelper
 
     @MockK
-    private lateinit var deviceManager: DeviceManager
+    private lateinit var connectivityTracker: ConnectivityTracker
 
     @MockK
     private lateinit var eventRepository: EventRepository
@@ -67,7 +65,7 @@ class FetchGuidViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
         viewModel = FetchGuidViewModel(
             fetchGuidHelper,
-            deviceManager,
+            connectivityTracker,
             eventRepository,
             timeHelper,
             configManager,
@@ -112,7 +110,7 @@ class FetchGuidViewModelTest {
         coEvery {
             fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-        coEvery { deviceManager.isConnected() } returns false
+        coEvery { connectivityTracker.isConnected() } returns false
 
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
@@ -125,7 +123,7 @@ class FetchGuidViewModelTest {
         coEvery {
             fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-        coEvery { deviceManager.isConnected() } returns true
+        coEvery { connectivityTracker.isConnected() } returns true
 
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
@@ -181,7 +179,7 @@ class FetchGuidViewModelTest {
         coEvery {
             fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-        coEvery { deviceManager.isConnected() } returns false
+        coEvery { connectivityTracker.isConnected() } returns false
 
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
@@ -203,7 +201,7 @@ class FetchGuidViewModelTest {
         coEvery {
             fetchGuidHelper.loadFromRemoteIfNeeded(any(), any())
         } returns SubjectFetchResult(null, NOT_FOUND_IN_LOCAL_AND_REMOTE)
-        coEvery { deviceManager.isConnected() } returns true
+        coEvery { connectivityTracker.isConnected() } returns true
 
         viewModel.fetchGuid(PROJECT_ID, VERIFY_GUID)
 
