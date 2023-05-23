@@ -2,7 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_MANY_MATCH
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class OneToManyMatchEvent(
@@ -16,7 +16,7 @@ data class OneToManyMatchEvent(
         createdAt: Long,
         endTime: Long,
         pool: OneToManyMatchPayload.MatchPool,
-        matcher: Matcher,
+        matcher: String,
         result: List<MatchEntry>?,
         labels: EventLabels = EventLabels()
     ) : this(
@@ -31,7 +31,7 @@ data class OneToManyMatchEvent(
         override val eventVersion: Int,
         override var endedAt: Long,
         val pool: MatchPool,
-        val matcher: Matcher,
+        val matcher: String,
         val result: List<MatchEntry>?,
         override val type: EventType = ONE_TO_MANY_MATCH
     ) : EventPayload() {

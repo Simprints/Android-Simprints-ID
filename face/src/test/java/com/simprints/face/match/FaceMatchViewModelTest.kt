@@ -7,7 +7,6 @@ import com.simprints.face.FixtureGenerator.generateSequenceN
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.Event
 import com.simprints.face.controllers.core.events.model.MatchEntry
-import com.simprints.face.controllers.core.events.model.Matcher
 import com.simprints.face.controllers.core.events.model.OneToManyMatchEvent
 import com.simprints.face.controllers.core.events.model.OneToOneMatchEvent
 import com.simprints.face.controllers.core.flow.Action
@@ -37,6 +36,9 @@ import org.junit.Test
 import java.io.Serializable
 
 class FaceMatchViewModelTest {
+    companion object{
+        const val MATCHER_NAME = "any matcher"
+    }
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -51,7 +53,9 @@ class FaceMatchViewModelTest {
 
     private val masterFlowManager: MasterFlowManager = mockk()
     private val faceDbManager: FaceDbManager = mockk()
-    private val faceMatcher: FaceMatcher = spyk()
+    private val faceMatcher: FaceMatcher = spyk{
+        every { matcherName } returns MATCHER_NAME
+    }
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
     private val faceTimeHelper: FaceTimeHelper = mockk {
         every { now() } returns 0
@@ -110,7 +114,7 @@ class FaceMatchViewModelTest {
             assertThat(startTime).isEqualTo(0)
             assertThat(endTime).isEqualTo(1)
             assertThat(count).isEqualTo(5)
-            assertThat(matcher).isEqualTo(Matcher.UNKNOWN)
+            assertThat(matcher).isEqualTo(MATCHER_NAME)
             assertThat(query).isEqualTo(mockQuery)
             assertThat(result).isEqualTo(eventEntries)
         }
@@ -169,7 +173,7 @@ class FaceMatchViewModelTest {
             assertThat(startTime).isEqualTo(0)
             assertThat(endTime).isEqualTo(1)
             assertThat(count).isEqualTo(5)
-            assertThat(matcher).isEqualTo(Matcher.UNKNOWN)
+            assertThat(matcher).isEqualTo(MATCHER_NAME)
             assertThat(query).isEqualTo(mockQuery)
             assertThat(result).isEqualTo(eventEntries)
         }
@@ -210,7 +214,7 @@ class FaceMatchViewModelTest {
         with(eventCapture.captured as OneToOneMatchEvent) {
             assertThat(startTime).isEqualTo(0)
             assertThat(endTime).isEqualTo(1)
-            assertThat(matcher).isEqualTo(Matcher.UNKNOWN)
+            assertThat(matcher).isEqualTo(MATCHER_NAME)
             assertThat(query).isEqualTo(mockQuery)
             assertThat(result).isEqualTo(eventEntry)
         }
