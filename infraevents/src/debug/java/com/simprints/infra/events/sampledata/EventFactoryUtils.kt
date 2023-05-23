@@ -31,8 +31,6 @@ import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
 import com.simprints.infra.events.event.domain.models.MatchEntry
-import com.simprints.infra.events.event.domain.models.Matcher.RANK_ONE
-import com.simprints.infra.events.event.domain.models.Matcher.SIM_AFIS
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
@@ -324,7 +322,7 @@ fun createInvalidIntentEvent() =
 fun createOneToManyMatchEvent(): OneToManyMatchEvent {
     val poolArg = MatchPool(PROJECT, 100)
     val resultArg = listOf(MatchEntry(GUID1, 0F))
-    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg, eventLabels)
+    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, "RANK_ONE", resultArg, eventLabels)
 }
 
 fun createOneToOneMatchEvent(): OneToOneMatchEvent {
@@ -333,7 +331,7 @@ fun createOneToOneMatchEvent(): OneToOneMatchEvent {
         CREATED_AT,
         ENDED_AT,
         GUID1,
-        SIM_AFIS,
+        "SIM_AFIS",
         matchEntry,
         FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
         eventLabels
