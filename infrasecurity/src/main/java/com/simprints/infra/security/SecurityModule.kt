@@ -1,12 +1,11 @@
 package com.simprints.infra.security
 
+import android.content.Context
 import android.os.Build
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilder
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesBuilderImpl
 import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesProvider
-import com.simprints.infra.security.keyprovider.EncryptedSharedPreferencesProviderImpl
 import com.simprints.infra.security.keyprovider.MasterKeyProvider
-import com.simprints.infra.security.keyprovider.MasterKeyProviderImpl
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProvider
 import com.simprints.infra.security.keyprovider.SecureLocalDbKeyProviderImpl
 import com.simprints.infra.security.random.RandomGenerator
@@ -17,6 +16,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
 
@@ -27,7 +27,17 @@ abstract class SecurityModule {
     companion object {
         @BuildSdk
         @Provides
-        fun provideBuildSdk(): Int = Build.VERSION.SDK_INT
+        internal fun provideBuildSdk(): Int = Build.VERSION.SDK_INT
+
+        @Provides
+        internal fun bindEncryptedSharedPreferences(
+            @ApplicationContext context: Context
+        ): EncryptedSharedPreferencesProvider =
+            EncryptedSharedPreferencesProvider(ctx = context)
+
+
+        @Provides
+        internal fun bindMasterKeyProvider(): MasterKeyProvider = MasterKeyProvider()
     }
 
     @Binds
@@ -44,13 +54,6 @@ abstract class SecurityModule {
 
     @Binds
     internal abstract fun bindSecurityManager(impl: SecurityManagerImpl): SecurityManager
-
-    @Binds
-    internal abstract fun bindMasterKeyProvider(impl: MasterKeyProviderImpl): MasterKeyProvider
-
-    @Binds
-    internal abstract fun bindEncryptedSharedPreferences(impl: EncryptedSharedPreferencesProviderImpl): EncryptedSharedPreferencesProvider
-
 }
 
 @Qualifier
