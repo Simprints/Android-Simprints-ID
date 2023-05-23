@@ -3,11 +3,26 @@ package com.simprints.infra.facebiosdk.matching
 
 abstract class FaceMatcher {
     /**
-     * Returns a comparison score from 0.0 - 100.0
+     * The matching SDK name
+     */
+    abstract val matcherName: String
+
+    /**
+     * Returns a comparison score of two templates  from 0.0 - 100.0
      */
     abstract suspend fun getComparisonScore(probe: ByteArray, matchAgainst: ByteArray): Float
 
-    suspend fun getHighestComparisonScoreForCandidate(probes: List<FaceSample>, candidate: FaceIdentity): Float {
+    /**
+     * Get highest comparison score for matching candidate template against all probes
+     *
+     * @param probes
+     * @param candidate
+     * @return the highest comparison score
+     */
+    suspend fun getHighestComparisonScoreForCandidate(
+        probes: List<FaceSample>,
+        candidate: FaceIdentity
+    ): Float {
         var highestScore = 0f
         probes.forEach { probe ->
             candidate.faces.forEach { face ->
