@@ -13,7 +13,7 @@ data class FaceTarget(
                 face.yaw in yawTarget
 }
 
-interface Target {
+fun interface Target {
     operator fun contains(actualValue: Float): Boolean
 }
 
