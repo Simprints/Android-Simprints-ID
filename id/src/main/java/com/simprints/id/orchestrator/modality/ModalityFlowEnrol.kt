@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.core.DeviceID
+import com.simprints.feature.consent.ConsentType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -12,7 +13,6 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
-import com.simprints.id.orchestrator.steps.core.requests.ConsentType.ENROL
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
@@ -43,7 +43,7 @@ class ModalityFlowEnrol @Inject constructor (
     override suspend fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppEnrolRequest)
         addModalityConfigurationSteps()
-        addCoreConsentStepIfRequired(ENROL)
+        addCoreConsentStepIfRequired(ConsentType.ENROL)
         addModalitiesStepsList()
     }
 
