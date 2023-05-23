@@ -88,6 +88,7 @@ definitions:
                     - infralicense/build/reports/**
                     - infraimages/build/reports/**
                     - infraresources/build/reports/**
+                    - infrafacebiosdk/build/reports/**
 
         ######################################################################
         # Run the feature unit tests with coverage and upload report to
@@ -111,6 +112,7 @@ definitions:
                     - featuredashboard/build/reports/**
                     - featurealert/build/reports/**
                     - featureexitform/build/reports/**
+                    - featurerocwrapper/build/reports/**
                     - featureconsent/build/reports/**
 
         ######################################################################
