@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 
 
-internal class EncryptedSharedPreferencesProviderImplTest {
+internal class EncryptedSharedPreferencesProviderTest {
 
     @MockK
     lateinit var context: Context
@@ -25,7 +25,7 @@ internal class EncryptedSharedPreferencesProviderImplTest {
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
-        provider = EncryptedSharedPreferencesProviderImpl(ctx = context)
+        provider = EncryptedSharedPreferencesProvider(ctx = context)
     }
 
     @After
