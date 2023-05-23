@@ -9,9 +9,12 @@ and then let your new module provide and implement the operations in
 3. [`FaceMatcher`](./src/main/java/com/simprints/infra/facebiosdk/matching/FaceMatcher.kt)
 
 Here is an example on how to provide the there implemented classes
+```kotlin
     @Binds
     abstract fun provideSdkInitializer(impl: YourBioSdkInitializer): FaceBioSdkInitializer
     @Binds
     abstract fun provideFaceDetector(impl: YourBioSdkFaceDetector): FaceDetector
     @Binds
     abstract fun provideFaceMatcher(impl: YourBioSdkFaceMatcher): FaceMatcher
+```
+Once providing the classes the Face module will detect it and use them.

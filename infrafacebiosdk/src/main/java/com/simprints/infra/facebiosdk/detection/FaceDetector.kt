@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 
 fun interface FaceDetector {
     /**
-     * Analyze captured bitmap and returns the detected face data
+     * Analyze an ARGB_8888 bitmap and return the detected face data
      *
      * @param bitmap
      * @return Face object or null if no face is detected
