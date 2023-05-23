@@ -10,6 +10,9 @@ import com.simprints.core.tools.utils.TimeUtils.getFormattedEstimatedOutage
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
+import com.simprints.feature.login.LoginError
+import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker
+import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
@@ -25,8 +28,6 @@ import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.PERMISS
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
-import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityChecker
-import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityCheckerImpl.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
 import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
@@ -73,8 +74,16 @@ class LoginActivity : BaseSplitActivity() {
         // Check if google play services is installed and updated
         googlePlayServicesAvailabilityChecker.check(
             this,
-            launchAlert = { showAlert.launch(it.toAlertConfig().toArgs()) }
+            errorCallback = { error -> showLoginAlert(error) }
         )
+    }
+
+    private fun showLoginAlert(error: LoginError) {
+        when (error) {
+            LoginError.OutdatedPlayServices -> AlertType.GOOGLE_PLAY_SERVICES_OUTDATED
+            LoginError.MissingPlayServices -> AlertType.MISSING_GOOGLE_PLAY_SERVICES
+            else -> null
+        }?.let { showAlert.launch(it.toAlertConfig().toArgs()) }
     }
 
     private fun initUI() {
@@ -119,12 +128,14 @@ class LoginActivity : BaseSplitActivity() {
             is AuthenticateDataResult.BackendMaintenanceError -> handleSignInFailedBackendMaintenanceError(
                 result.estimatedOutage
             )
+
             AuthenticateDataResult.BadCredentials -> handleSignInFailedInvalidCredentials()
             AuthenticateDataResult.Offline -> handleSignInFailedNoConnection()
             AuthenticateDataResult.IntegrityException -> handleIntegrityError(AlertType.INTEGRITY_SERVICE_ERROR)
             AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp -> handleIntegrityError(
                 AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
             )
+
             AuthenticateDataResult.IntegrityServiceTemporaryDown -> handleIntegrityServiceTemporaryDownError()
             AuthenticateDataResult.TechnicalFailure -> handleSignInFailedServerError()
             AuthenticateDataResult.Unknown -> handleSignInFailedUnknownReason()
@@ -142,11 +153,12 @@ class LoginActivity : BaseSplitActivity() {
             QR_REQUEST_CODE -> {
                 data?.let { handleQrScanResult(resultCode, it) } ?: showErrorForQRCodeFailed()
             }
+
             GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE -> {
                 // Check again to make sure that the user did the need actions.
                 googlePlayServicesAvailabilityChecker.check(
                     this,
-                    launchAlert = { showAlert.launch(it.toAlertConfig().toArgs()) }
+                    errorCallback = { error -> showLoginAlert(error) }
                 )
             }
         }

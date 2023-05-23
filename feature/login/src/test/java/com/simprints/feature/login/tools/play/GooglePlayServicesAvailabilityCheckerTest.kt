@@ -1,14 +1,12 @@
-package com.simprints.id.tools.googleapis
+package com.simprints.feature.login.tools.play
 
 import android.app.Activity
 import android.content.DialogInterface
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.common.ConnectionResult.*
 import com.google.android.gms.common.GoogleApiAvailability
-import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.exceptions.unexpected.MissingGooglePlayServices
-import com.simprints.id.exceptions.unexpected.OutdatedGooglePlayServices
-import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityCheckerImpl.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
+import com.simprints.feature.login.LoginError
+import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
 import com.simprints.infra.logging.Simber
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -18,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class GooglePlayServicesAvailabilityCheckerTest {
+internal class GooglePlayServicesAvailabilityCheckerTest {
 
     @MockK
     private lateinit var activity: Activity
@@ -27,7 +25,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
     private lateinit var googleApiAvailability: GoogleApiAvailability
 
     @MockK
-    private lateinit var launchCallBack: (AlertType) -> Unit
+    private lateinit var launchCallBack: (LoginError) -> Unit
 
     private lateinit var googlePlayServicesAvailabilityChecker: GooglePlayServicesAvailabilityChecker
 
@@ -37,8 +35,8 @@ class GooglePlayServicesAvailabilityCheckerTest {
         MockKAnnotations.init(this)
         mockkObject(Simber)
 
-        googlePlayServicesAvailabilityChecker =
-            GooglePlayServicesAvailabilityCheckerImpl(googleApiAvailability)
+        every { launchCallBack.invoke(any()) } returns Unit
+        googlePlayServicesAvailabilityChecker = GooglePlayServicesAvailabilityChecker(googleApiAvailability)
     }
 
     @Test
@@ -75,7 +73,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
                 GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
             )
         }
-        verify { launchCallBack(AlertType.MISSING_GOOGLE_PLAY_SERVICES) }
+        verify { launchCallBack(LoginError.MissingPlayServices) }
         verify { Simber.e(ofType<MissingGooglePlayServices>()) }
     }
 
@@ -133,7 +131,7 @@ class GooglePlayServicesAvailabilityCheckerTest {
                 GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
             )
         }
-        verify { launchCallBack(AlertType.GOOGLE_PLAY_SERVICES_OUTDATED) }
+        verify { launchCallBack(LoginError.OutdatedPlayServices) }
         verify { Simber.e(ofType<OutdatedGooglePlayServices>()) }
     }
 

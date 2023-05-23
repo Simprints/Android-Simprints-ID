@@ -45,8 +45,6 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.LocationManagerImpl
-import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityChecker
-import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityCheckerImpl
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Binds
@@ -180,9 +178,6 @@ abstract class IdOrchestratorModule {
 
     @Binds
     abstract fun provideLoginActivityHelper(impl: LoginActivityHelperImpl): LoginActivityHelper
-
-    @Binds
-    abstract fun provideGooglePlayServicesAvailabilityChecker(impl: GooglePlayServicesAvailabilityCheckerImpl): GooglePlayServicesAvailabilityChecker
 
     @Binds
     abstract fun provideFetchGuidHelper(impl: FetchGuidHelperImpl): FetchGuidHelper
