@@ -1,24 +1,34 @@
 package com.simprints.face.capture.livefeedback
 
 import android.os.Bundle
+import android.util.Size
 import android.view.View
+import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.otaliastudios.cameraview.frame.Frame
-import com.otaliastudios.cameraview.frame.FrameProcessor
+import androidx.work.await
 import com.simprints.core.tools.extentions.setCheckedWithLeftDrawable
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.models.FaceDetection
-import com.simprints.face.models.Size
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
 
 /**
  * This is the class presented as the user is capturing theface, they are presented with this fragment, which displays
@@ -27,43 +37,73 @@ import dagger.hilt.android.AndroidEntryPoint
  * [com.simprints.face.capture.confirmation.ConfirmationFragment]
  */
 @AndroidEntryPoint
-class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FrameProcessor {
+class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
+
+    /** Blocking camera operations are performed using this executor */
+    private lateinit var cameraExecutor: ExecutorService
+
+
     private val mainVm: FaceCaptureViewModel by activityViewModels()
     private val vm: LiveFeedbackFragmentViewModel by viewModels()
     private val binding by viewBinding(FragmentLiveFeedbackBinding::bind)
 
+    private lateinit var screenSize: Size
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.faceCaptureCamera.setLifecycleOwner(viewLifecycleOwner)
+        screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
         bindViewModel()
         binding.captureFeedbackTxtTitle.setOnClickListener { vm.startCapture() }
         binding.captureProgress.max = mainVm.samplesToCapture
+
+        //Wait till the views gets its final size then init frame processor and setup the camera
+        binding.faceCaptureCamera.post {
+            vm.initFrameProcessor(
+                mainVm.samplesToCapture, mainVm.attemptNumber,
+                binding.captureOverlay.rectInCanvas,
+                Size(binding.captureOverlay.width, binding.captureOverlay.height),
+            )
+            setUpCamera()
+        }
     }
 
-    override fun onResume() {
-        binding.faceCaptureCamera.addFrameProcessor(this)
-        super.onResume()
+    /** Initialize CameraX, and prepare to bind the camera use cases  */
+    private fun setUpCamera() = lifecycleScope.launch {
+        // Initialize our background executor
+        cameraExecutor = Executors.newSingleThreadExecutor()
+        // ImageAnalysis
+        //Todo choose accurate output image resolution that respects quality,performance and face analysis SDKs https://simprints.atlassian.net/browse/CORE-2569
+        val targetResolution = Size(binding.captureOverlay.width, binding.captureOverlay.height)
+        val imageAnalyzer = ImageAnalysis.Builder().setTargetResolution(targetResolution)
+            .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888).build()
+        imageAnalyzer.setAnalyzer(cameraExecutor, ::analyze)
+        // Preview
+        val preview = Preview.Builder().setTargetResolution(targetResolution).build()
+        val cameraProvider = ProcessCameraProvider.getInstance(requireContext()).await()
+        cameraProvider.bindToLifecycle(
+            this@LiveFeedbackFragment, DEFAULT_BACK_CAMERA, preview, imageAnalyzer
+        )
+        // Attach the view's surface provider to preview use case
+        preview.setSurfaceProvider(binding.faceCaptureCamera.surfaceProvider)
     }
 
     override fun onStop() {
-        binding.faceCaptureCamera.removeFrameProcessor(this)
+        // Shut down our background executor
+        cameraExecutor.shutdown()
         super.onStop()
     }
 
     private fun bindViewModel() {
         vm.currentDetection.observe(viewLifecycleOwner) {
             renderCurrentDetection(it)
-//            renderDebugInfo(it.face)
         }
 
         vm.capturingState.observe(viewLifecycleOwner) {
-            @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA")
-            when (it) {
-                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED ->
-                    renderCapturingNotStarted()
-                LiveFeedbackFragmentViewModel.CapturingState.CAPTURING ->
-                    renderCapturing()
+            @Suppress("WHEN_ENUM_CAN_BE_NULL_IN_JAVA") when (it) {
+                LiveFeedbackFragmentViewModel.CapturingState.NOT_STARTED -> renderCapturingNotStarted()
+
+                LiveFeedbackFragmentViewModel.CapturingState.CAPTURING -> renderCapturing()
+
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
                     findNavController().navigate(R.id.action_liveFeedbackFragment_to_confirmationFragment)
@@ -73,26 +113,15 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
         }
     }
 
-    /**
-     * This method  needs to block because frame is a singleton which cannot be released until it's
-     * converted into a preview frame. Although it's blocking, this is running in a background thread.
-     * https://natario1.github.io/CameraView/docs/frame-processing
-     *
-     * Also the frame sometimes throws IllegalStateException for null width and height
-     */
-    override fun process(frame: Frame) {
+    private fun analyze(image: ImageProxy) {
         try {
-            vm.process(
-                frame,
-                binding.captureOverlay.rectInCanvas,
-                Size(binding.captureOverlay.width, binding.captureOverlay.height),
-                mainVm.samplesToCapture,
-                mainVm.attemptNumber
-            )
-
+            vm.process(image)
         } catch (t: Throwable) {
             Simber.e(t)
-            mainVm.submitError(t)
+            // Image analysis is running in bg thread
+            lifecycleScope.launch {
+                mainVm.submitError(t)
+            }
         }
     }
 
@@ -146,8 +175,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
             captureFeedbackTxtExplanation.text = null
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
-                true,
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
+                true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
         toggleCaptureButtons(true)
@@ -159,8 +187,7 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
             captureFeedbackTxtExplanation.text = getString(R.string.capture_hold)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
-                true,
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
+                true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
             )
         }
 
@@ -217,13 +244,11 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback), FramePro
 
     private fun renderProgressBar(valid: Boolean) {
         binding.apply {
-            val progressColor =
-                if (valid) R.color.capture_green
-                else R.color.capture_grey
+            val progressColor = if (valid) R.color.capture_green
+            else R.color.capture_grey
 
             captureProgress.progressColor = ContextCompat.getColor(
-                requireContext(),
-                progressColor
+                requireContext(), progressColor
             )
 
             captureProgress.value = vm.userCaptures.size.toFloat()

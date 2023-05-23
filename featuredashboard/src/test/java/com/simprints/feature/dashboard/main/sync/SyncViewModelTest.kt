@@ -4,7 +4,17 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.feature.dashboard.views.SyncCardState.*
+import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
+import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
+import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailed
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedBackendMaintenance
+import com.simprints.feature.dashboard.views.SyncCardState.SyncHasNoModules
+import com.simprints.feature.dashboard.views.SyncCardState.SyncOffline
+import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
+import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
+import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
+import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -16,10 +26,15 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.login.LoginManager
+import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
@@ -44,7 +59,7 @@ class SyncViewModelTest {
     lateinit var eventSyncManager: EventSyncManager
 
     @MockK
-    lateinit var deviceManager: DeviceManager
+    lateinit var connectivityTracker: ConnectivityTracker
 
     @MockK
     lateinit var configManager: ConfigManager
@@ -60,7 +75,7 @@ class SyncViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { eventSyncManager.getLastSyncState() } returns syncState
-        every { deviceManager.isConnectedLiveData } returns isConnected
+        every { connectivityTracker.observeIsConnected() } returns isConnected
         coEvery { configManager.getProjectConfiguration().synchronization } returns mockk {
             every { up.simprints } returns SimprintsUpSynchronizationConfiguration(kind = ALL)
             every { frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START
@@ -376,7 +391,7 @@ class SyncViewModelTest {
 
     private fun initViewModel(): SyncViewModel = SyncViewModel(
         eventSyncManager,
-        deviceManager,
+        connectivityTracker,
         configManager,
         timeHelper,
         loginManager,

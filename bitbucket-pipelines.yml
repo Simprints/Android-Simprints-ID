@@ -104,10 +104,12 @@ definitions:
                     - ./gradlew featuredashboard:jacocoTestReport
                     - ./gradlew featurealert:jacocoTestReport
                     - ./gradlew featureexitform:jacocoTestReport
+                    - ./gradlew featureconsent:jacocoTestReport
                 artifacts:
                     - featuredashboard/build/reports/**
                     - featurealert/build/reports/**
                     - featureexitform/build/reports/**
+                    - featureconsent/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.

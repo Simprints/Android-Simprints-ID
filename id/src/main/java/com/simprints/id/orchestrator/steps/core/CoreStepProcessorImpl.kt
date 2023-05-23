@@ -1,6 +1,14 @@
 package com.simprints.id.orchestrator.steps.core
 
 import android.content.Intent
+import android.os.Bundle
+import android.os.Parcelable
+import com.simprints.feature.consent.ConsentContract
+import com.simprints.feature.consent.ConsentResult
+import com.simprints.feature.consent.ConsentType
+import com.simprints.feature.consent.screens.ConsentWrapperActivity
+import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.id.data.exitform.ExitFormReason.Companion.fromExitFormOption
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.*
 import com.simprints.id.orchestrator.steps.core.requests.*
@@ -8,10 +16,10 @@ import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import javax.inject.Inject
 
-class CoreStepProcessorImpl @Inject constructor(): CoreStepProcessor {
+class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
 
     companion object {
-        const val CONSENT_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
+        const val CONSENT_ACTIVITY_NAME = "com.simprints.feature.consent.screens.ConsentWrapperActivity"
         const val FETCH_GUID_ACTIVITY_NAME =
             "com.simprints.id.activities.fetchguid.FetchGuidActivity"
         const val GUID_SELECTION_ACTIVITY_NAME =
@@ -26,8 +34,8 @@ class CoreStepProcessorImpl @Inject constructor(): CoreStepProcessor {
     private fun buildConsentStep(consentType: ConsentType) = Step(
         requestCode = CONSENT.value,
         activityName = CONSENT_ACTIVITY_NAME,
-        bundleKey = CORE_STEP_BUNDLE,
-        request = AskConsentRequest(consentType),
+        bundleKey = ConsentWrapperActivity.CONSENT_ARGS_EXTRA,
+        request = ConsentContract.getArgs(consentType),
         status = Step.Status.NOT_STARTED
     )
 
@@ -65,25 +73,29 @@ class CoreStepProcessorImpl @Inject constructor(): CoreStepProcessor {
         status = Step.Status.NOT_STARTED
     )
 
-    override fun processResult(data: Intent?): Step.Result? =
-        data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)?.also { coreResponse ->
+    override fun processResult(data: Intent?): Step.Result? {
+        val coreResponse = data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)
+
+        return if (coreResponse != null) {
             when (coreResponse.type) {
-                CoreResponseType.CONSENT -> data.getParcelableExtra<AskConsentResponse>(
-                    CORE_STEP_BUNDLE
-                )
-                CoreResponseType.FETCH_GUID -> data.getParcelableExtra<FetchGUIDResponse>(
-                    CORE_STEP_BUNDLE
-                )
-                CoreResponseType.EXIT_FORM -> data.getParcelableExtra<ExitFormResponse>(
-                    CORE_STEP_BUNDLE
-                )
-                CoreResponseType.GUID_SELECTION -> data.getParcelableExtra<GuidSelectionResponse>(
-                    CORE_STEP_BUNDLE
-                )
+                CoreResponseType.CONSENT -> null // Handled by else branch
+                CoreResponseType.FETCH_GUID -> data.getParcelableExtra<FetchGUIDResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.EXIT_FORM -> data.getParcelableExtra<ExitFormResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.GUID_SELECTION -> data.getParcelableExtra<GuidSelectionResponse>(CORE_STEP_BUNDLE)
                 CoreResponseType.SETUP -> data.getParcelableExtra<SetupResponse>(CORE_STEP_BUNDLE)
-                CoreResponseType.ENROL_LAST_BIOMETRICS -> data.getParcelableExtra<EnrolLastBiometricsResponse>(
-                    CORE_STEP_BUNDLE
-                )
+                CoreResponseType.ENROL_LAST_BIOMETRICS -> data.getParcelableExtra<EnrolLastBiometricsResponse>(CORE_STEP_BUNDLE)
             }
+        } else {
+            data?.extras?.let { handleFeatureModuleResponses(it) }
         }
+    }
+
+    private fun handleFeatureModuleResponses(data: Bundle): Step.Result? =
+        if (data.containsKey(ConsentContract.CONSENT_RESULT)) {
+            when (val result = data.getParcelable<Parcelable>(ConsentContract.CONSENT_RESULT)) {
+                is ConsentResult -> AskConsentResponse(if (result.accepted) ConsentResponse.ACCEPTED else ConsentResponse.DECLINED)
+                is ExitFormResult -> result.submittedOption()?.let { ExitFormResponse(fromExitFormOption(it), result.reason.orEmpty()) }
+                else -> null
+            }
+        } else null
 }

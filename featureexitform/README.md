@@ -33,23 +33,25 @@ implementation(project(":featurexitform"))
     <include app:graph="@navigation/graph_exit_form" />
 
     <action android:id="@+id/action_global_refusalFragment" app:destination="@id/graph_exit_form"
-        app:popUpTo="@id/root_graph" app:popUpToInclusive="true" />
+        app:popUpTo="@id/root_graph" />
 </navigation>
 ```
 
 3. Call navigate on the modules nav controller.
 
 ```kotlin
-// In orchestrator fragment/activity
+// Handle result
 
-// Handle action button clicks
-childFragmentManager.setFragmentResultListener(ExitFormContract.EXIT_FORM_REQUEST, this@lifecycleOwner) { _, d ->
-    val formSubmitted = ExitFormContract.isFormSubmitted(d)
-    val option = ExitFormContract.getFormOption(d)
-    val reason = ExitFormContract.getFormReason(d).orEmpty()
+// In orchestrator activity
+binding.orchestratorHostFragment
+    .handleResult<ExitFormResult>(this, ExitFormContract.DESTINATION_ID) { }
 
-    // Note that caller is responsible for resuming the flow even if form was not submitted
-}
+// In fragment within navigation graph
+findNavController().handleResult<ExitFormResult>(
+    this,
+    R.id.currentScreen,
+    ExitFormContract.DESTINATION_ID,
+) { }
 
 // Navigate to screen
 findNavController(R.id.host_fragment).navigate(

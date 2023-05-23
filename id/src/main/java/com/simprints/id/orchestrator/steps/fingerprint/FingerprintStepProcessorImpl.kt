@@ -3,13 +3,16 @@ package com.simprints.id.orchestrator.steps.fingerprint
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CAPTURE
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CONFIGURATION
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -30,9 +33,7 @@ class FingerprintStepProcessorImpl @Inject constructor(
     override suspend fun buildStepToCapture(): Step {
         val config = configManager.getProjectConfiguration()
         return fingerprintRequestFactory.buildFingerprintCaptureRequest(config.fingerprint!!.fingersToCapture)
-            .run {
-                buildStep(CAPTURE, this)
-            }
+            .run { buildStep(CAPTURE, this) }
     }
 
     override fun buildStepToMatch(
@@ -48,7 +49,7 @@ class FingerprintStepProcessorImpl @Inject constructor(
             requestCode = requestCode.value,
             activityName = ACTIVITY_CLASS_NAME,
             bundleKey = IFingerprintRequest.BUNDLE_KEY,
-            request = request,
+            request = request.fromDomainToModuleApi(),
             status = NOT_STARTED
         )
     }
@@ -59,8 +60,7 @@ class FingerprintStepProcessorImpl @Inject constructor(
         data: Intent?
     ): FingerprintResponse? =
         if (isFingerprintResult(requestCode)) {
-            data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)
-                ?.fromModuleApiToDomain()
+            data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)?.fromModuleApiToDomain()
         } else {
             null
         }

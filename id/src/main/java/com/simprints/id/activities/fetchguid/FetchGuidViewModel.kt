@@ -9,12 +9,12 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.data.db.SubjectFetchResult
 import com.simprints.id.data.db.SubjectFetchResult.SubjectSource
 import com.simprints.id.exitformhandler.ExitFormHelper
-import com.simprints.id.tools.device.DeviceManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
+import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FetchGuidViewModel @Inject constructor(
     private val fetchGuidHelper: FetchGuidHelper,
-    private val deviceManager: DeviceManager,
+    private val connectivityTracker: ConnectivityTracker,
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
@@ -50,7 +50,7 @@ class FetchGuidViewModel @Inject constructor(
     }
 
     private fun getSubjectFetchResultForError() =
-        if (deviceManager.isConnected()) {
+        if (connectivityTracker.isConnected()) {
             SubjectFetchResult(null, SubjectSource.NOT_FOUND_IN_LOCAL_AND_REMOTE)
         } else {
             SubjectFetchResult(null, SubjectSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR)
