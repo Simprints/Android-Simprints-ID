@@ -4,7 +4,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 
 // All values are after rotation of the source image
-open class Face(
+data class Face(
     private val sourceWidth: Int,
     private val sourceHeight: Int,
     private val absoluteBoundingBox: Rect,
@@ -16,7 +16,7 @@ open class Face(
 ) {
 
     // Relative = coordinates are fractions of the source image dimensions
-    val relativeBoundingBox: RectF
+    val relativeBoundingBox
         get() = RectF(
             absoluteBoundingBox.left.toFloat() / sourceWidth,
             absoluteBoundingBox.top.toFloat() / sourceHeight,

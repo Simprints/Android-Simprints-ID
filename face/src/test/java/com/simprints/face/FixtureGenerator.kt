@@ -15,16 +15,16 @@ object FixtureGenerator {
             generateSequenceN(numFaces) { getFaceSample() }.toList()
         )
 
-    fun getFaceSample(): FaceSample =
+    private fun getFaceSample(): FaceSample =
         FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
 
     fun generateFaceMatchResults(n: Int): List<FaceMatchResult> =
         generateSequenceN(n) { getFaceMatchResult() }.toList()
 
-    fun getFaceMatchResult(): FaceMatchResult =
+    private fun getFaceMatchResult(): FaceMatchResult =
         FaceMatchResult(UUID.randomUUID().toString(), Random.nextFloat() * 100)
 
-    const val FACE_TEMPLATE_FORMAT = "format"
+    private const val FACE_TEMPLATE_FORMAT = "format"
     fun getFace(rect: Rect = Rect(0, 0, 60, 60), quality: Float = 1f): Face {
         return Face(
             100,
