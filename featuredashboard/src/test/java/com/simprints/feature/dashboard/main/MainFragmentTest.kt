@@ -15,6 +15,7 @@ import com.simprints.feature.dashboard.main.sync.SyncViewModel
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
 import com.simprints.infra.resources.R as IDR
+import com.simprints.feature.consent.R as PrivacyR
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -93,7 +94,7 @@ class MainFragmentTest {
 
         openContextualActionModeOverflowMenu()
         onView(withText(IDR.string.menu_privacy_notice)).perform(click())
-        assertThat(navController.currentDestination?.id).isEqualTo(R.id.privacyNoticesFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(PrivacyR.id.privacyNoticeFragment)
     }
 
     @Test

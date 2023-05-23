@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simprints_blue"
+    tools:context="com.simprints.feature.consent.screens.ConsentWrapperActivity">
+
+    <ImageView
+        android:id="@+id/consentLogo"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/consent_image_height"
+        android:layout_marginTop="8dp"
+        android:layout_weight="3"
+        android:contentDescription="@string/launch_background_description"
+        android:scaleType="fitCenter"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@+id/consentTabHost"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="160dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="600dp"
+        app:srcCompat="@drawable/ic_simprints_logo_white_vertical" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/consentTabHost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/simprints_white"
+        app:layout_constraintBottom_toTopOf="@+id/consentTextHolderView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/consentLogo">
+
+        <!-- Tabs are created programmatically -->
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <TextView
+        android:id="@+id/consentTextHolderView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center_horizontal"
+        android:paddingLeft="8dp"
+        android:paddingTop="8dp"
+        android:paddingRight="8dp"
+        android:scrollbars="vertical"
+        android:text=""
+        android:textColor="@color/simprints_white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/consentTabHost"
+        app:layout_constraintWidth_max="600dp"
+        tools:text="@tools:sample/lorem/random" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <Button
+        android:id="@+id/consentDeclineButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/button_rounded_corners_orange"
+        android:fontFamily="@font/muli"
+        android:text="@string/launch_consent_decline_button"
+        android:textColor="@color/simprints_white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/consentPrivacyNotice"
+        app:layout_constraintEnd_toStartOf="@+id/consentAcceptButton"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/guideline"
+        app:layout_constraintWidth_max="200dp" />
+
+    <Button
+        android:id="@+id/consentAcceptButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="72dp"
+        android:background="@drawable/button_rounded_corners_orange"
+        android:fontFamily="@font/muli"
+        android:text="@string/launch_consent_accept_button"
+        android:textColor="@color/simprints_white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/consentDeclineButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/consentDeclineButton"
+        app:layout_constraintTop_toTopOf="@+id/consentDeclineButton"
+        app:layout_constraintWidth_max="200dp" />
+
+    <TextView
+        android:id="@+id/consentPrivacyNotice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="10dp"
+        android:text="@string/privacy_notice_text"
+        android:textColor="@color/simprints_white"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/consentDeclineButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,7 +17,7 @@ class ExitFormHelperImpl @Inject constructor() : ExitFormHelper {
     override fun getExitFormFromModalities(modalities: List<GeneralConfiguration.Modality>): Bundle = when {
         modalities.size != 1 -> exitFormConfiguration {
             titleRes = R.string.why_did_you_skip_biometrics
-            backButtonRes = R.string.exit_form_return_to_simprints
+            backButtonRes = R.string.button_scan_prints
         }
 
         modalities.first() == GeneralConfiguration.Modality.FACE -> exitFormConfiguration {
