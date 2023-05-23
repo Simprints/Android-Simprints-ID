@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
 import com.google.common.truth.Truth
+import com.simprints.fingerprint.activities.matching.MatchTask.Companion.MATCHER_NAME
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
-import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
@@ -19,7 +19,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy as CoreFingerComparisonStrategy
-import com.simprints.infra.events.event.domain.models.Matcher as CoreMatcher
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent as CoreOneToOneMatchEvent
 
 class FingerprintSessionEventsManagerImplTest {
@@ -43,7 +42,7 @@ class FingerprintSessionEventsManagerImplTest {
             1L,
             1L,
             mockk<SubjectQuery>(relaxed = true),
-            Matcher.SIM_AFIS,
+            MATCHER_NAME,
             MatchEntry("candidateId", 1F),
             FingerComparisonStrategy.SAME_FINGER
         )
@@ -56,7 +55,7 @@ class FingerprintSessionEventsManagerImplTest {
             Truth.assertThat(fingerComparisonStrategy)
                 .isEqualTo(CoreFingerComparisonStrategy.SAME_FINGER)
             Truth.assertThat(this.matcher)
-                .isEqualTo(CoreMatcher.SIM_AFIS)
+                .isEqualTo(MATCHER_NAME)
         }
     }
 }

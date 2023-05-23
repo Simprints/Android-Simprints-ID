@@ -1,16 +1,16 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.content.Intent
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.fingerprint.activities.matching.MatchTask.Companion.MATCHER_NAME
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
-import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 
 class IdentificationTask(
@@ -59,7 +59,7 @@ class IdentificationTask(
                 timeHelper.now(),
                 matchingRequest.queryForCandidates,
                 candidateSize,
-                Matcher.SIM_AFIS,
+                MATCHER_NAME,
                 topCandidates.map { MatchEntry(it.guid, it.confidence) }))
     }
 
