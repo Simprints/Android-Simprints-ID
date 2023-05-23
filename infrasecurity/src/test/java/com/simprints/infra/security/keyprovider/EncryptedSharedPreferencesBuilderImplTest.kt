@@ -14,7 +14,7 @@ import org.junit.Before
 import org.junit.Test
 
 
-class EncryptedSharedPreferencesBuilderImplTest {
+internal class EncryptedSharedPreferencesBuilderImplTest {
 
     @MockK
     lateinit var context: Context
