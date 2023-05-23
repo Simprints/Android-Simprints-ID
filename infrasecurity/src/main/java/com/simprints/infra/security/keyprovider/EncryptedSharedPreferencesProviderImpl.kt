@@ -6,7 +6,9 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-internal class EncryptedSharedPreferencesProviderImpl @Inject constructor(@ApplicationContext private val ctx: Context) :
+internal class EncryptedSharedPreferencesProviderImpl @Inject constructor(
+    @ApplicationContext private val ctx: Context
+) :
     EncryptedSharedPreferencesProvider {
     override fun provideEncryptedSharedPreferences(
         filename: String,
