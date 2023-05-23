@@ -6,7 +6,6 @@ internal interface LoginInfoManager {
     var projectIdTokenClaim: String?
     var userIdTokenClaim: String?
 
-    var encryptedProjectSecret: String
     var signedInProjectId: String
     var signedInUserId: String
 
@@ -15,10 +14,6 @@ internal interface LoginInfoManager {
     var coreFirebaseApplicationId: String
     var coreFirebaseApiKey: String
 
-    fun getEncryptedProjectSecretOrEmpty(): String
-    fun getSignedInProjectIdOrEmpty(): String
-
-    fun getSignedInUserIdOrEmpty(): String
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
     fun cleanCredentials()
     fun clearCachedTokenClaims()

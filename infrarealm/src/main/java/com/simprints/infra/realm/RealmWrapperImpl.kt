@@ -69,7 +69,7 @@ class RealmWrapperImpl @Inject constructor(
     }
 
     private fun getLocalDbKey(): LocalDbKey =
-        loginManager.getSignedInProjectIdOrEmpty().let {
+        loginManager.signedInProjectId.let {
             return if (it.isNotEmpty()) {
                 securityManager.getLocalDbKeyOrThrow(it)
             } else {
@@ -78,7 +78,7 @@ class RealmWrapperImpl @Inject constructor(
         }
 
     private fun recreateLocalDbKey() =
-        loginManager.getSignedInProjectIdOrEmpty().let {
+        loginManager.signedInProjectId.let {
             if (it.isNotEmpty()) {
                 securityManager.recreateLocalDatabaseKey(it)
             } else {

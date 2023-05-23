@@ -35,7 +35,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     }
 
     private fun getProjectId(): String {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+        val projectId = loginManager.signedInProjectId
         if (projectId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("ProjectId required")
         }
@@ -43,7 +43,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     }
 
     private fun getUserId(): String {
-        val possibleUserId: String = loginManager.getSignedInUserIdOrEmpty()
+        val possibleUserId: String = loginManager.signedInUserId
         if (possibleUserId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }

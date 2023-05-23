@@ -8,5 +8,6 @@ import com.google.android.play.core.integrity.model.IntegrityErrorCode
  *
  * @property errorCode is one of the integrity api error codes listed in [IntegrityErrorCode]
  */
-class MissingOrOutdatedGooglePlayStoreApp(val errorCode: Int) :
-    RuntimeException("Integrity API error $errorCode")
+class MissingOrOutdatedGooglePlayStoreApp(
+    val errorCode: Int
+) : RuntimeException("Integrity API error $errorCode")

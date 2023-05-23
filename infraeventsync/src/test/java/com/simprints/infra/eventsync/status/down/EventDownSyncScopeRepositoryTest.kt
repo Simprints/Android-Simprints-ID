@@ -64,8 +64,8 @@ internal class EventDownSyncScopeRepositoryTest {
                 downSyncOperationOperationDao,
             )
 
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-        every { loginManager.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
+        every { loginManager.signedInProjectId } returns DEFAULT_PROJECT_ID
+        every { loginManager.signedInUserId } returns DEFAULT_USER_ID
         coEvery { downSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
 
@@ -112,7 +112,7 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun throwWhenProjectIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
-            every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
+            every { loginManager.signedInProjectId } returns ""
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
                 eventDownSyncScopeRepository.getDownSyncScope(
@@ -127,7 +127,7 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun throwWhenUserIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
-            every { loginManager.getSignedInUserIdOrEmpty() } returns ""
+            every { loginManager.signedInUserId } returns ""
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
                 eventDownSyncScopeRepository.getDownSyncScope(

@@ -27,7 +27,7 @@ class RealmWrapperImplTest {
     }
 
     private val loginManagerMock = mockk<LoginManager> {
-        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { signedInProjectId } returns PROJECT_ID
     }
 
     private val secureLocalDbKeyProviderMock = mockk<SecurityManager> {
@@ -78,7 +78,7 @@ class RealmWrapperImplTest {
     @Test(expected = RealmUninitialisedException::class)
     fun `test useRealmInstance creates realm instance should throw if no signed in project is null`() =
         runTest {
-            every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
+            every { loginManagerMock.signedInProjectId } returns ""
             realmWrapper = RealmWrapperImpl(
                 ApplicationProvider.getApplicationContext(),
                 secureLocalDbKeyProviderMock,

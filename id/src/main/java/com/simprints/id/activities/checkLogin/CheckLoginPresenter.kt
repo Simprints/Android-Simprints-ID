@@ -74,7 +74,7 @@ abstract class CheckLoginPresenter(
     private fun checkSignedInOrThrow() {
         val isUserSignedIn =
             isProjectIdStoredAndMatches() &&
-                isLocalKeyValid(loginManager.getSignedInProjectIdOrEmpty()) &&
+                isLocalKeyValid(loginManager.signedInProjectId) &&
                 isUserIdStoredAndMatches() &&
                 isFirebaseTokenValid()
 
@@ -84,8 +84,8 @@ abstract class CheckLoginPresenter(
     }
 
     private fun isFirebaseTokenValid(): Boolean = loginManager.isSignedIn(
-        loginManager.getSignedInProjectIdOrEmpty(),
-        loginManager.getSignedInUserIdOrEmpty()
+        loginManager.signedInProjectId,
+        loginManager.signedInUserId
     )
 
     private fun isLocalKeyValid(projectId: String): Boolean = try {

@@ -1,4 +1,5 @@
 package com.simprints.infra.login.exceptions
 
-class RemoteDbNotSignedInException(message: String = "RemoteDbNotSignedInException") :
-    RuntimeException(message)
+class RemoteDbNotSignedInException(
+    message: String = "RemoteDbNotSignedInException"
+) : RuntimeException(message)

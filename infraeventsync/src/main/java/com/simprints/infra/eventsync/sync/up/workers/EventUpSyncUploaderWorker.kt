@@ -49,7 +49,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             jsonHelper.fromJson(jsonInput)
         } catch (t: Throwable) {
             if (t is JsonParseException || t is JsonMappingException) {
-                EventUpSyncScope.ProjectScope(loginManager.getSignedInProjectIdOrEmpty())
+                EventUpSyncScope.ProjectScope(loginManager.signedInProjectId)
             } else {
                 throw MalformedSyncOperationException(t.message ?: "")
             }

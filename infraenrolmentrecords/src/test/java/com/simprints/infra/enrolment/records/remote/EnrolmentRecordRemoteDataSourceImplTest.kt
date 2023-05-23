@@ -49,7 +49,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
         every { byteArrayToBase64(FACE_TEMPLATE) } returns BASE64_FACE_TEMPLATE
     }
     private val loginManager = mockk<LoginManager> {
-        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { signedInProjectId } returns PROJECT_ID
         coEvery { buildClient(EnrolmentRecordApiInterface::class) } returns simApiClient
     }
     private val enrolmentRecordRemoteDataSourceImpl =

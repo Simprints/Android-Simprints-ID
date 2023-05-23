@@ -46,7 +46,7 @@ class GuidSelectionManagerImplTest {
         guidSelectionManager =
             GuidSelectionManagerImpl(loginManager, timerHelper, eventRepository, scope)
         every { timerHelper.now() } returns CREATED_AT
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { loginManager.signedInProjectId } returns DEFAULT_PROJECT_ID
     }
 
     @Test

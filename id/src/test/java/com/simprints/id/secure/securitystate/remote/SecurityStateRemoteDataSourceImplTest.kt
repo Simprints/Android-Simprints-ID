@@ -54,7 +54,7 @@ class SecurityStateRemoteDataSourceImplTest {
             )
         }
         coEvery { loginManager.buildClient(SecureApiInterface::class) } returns simApiClient
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { loginManager.signedInProjectId } returns PROJECT_ID
     }
 
     @Test

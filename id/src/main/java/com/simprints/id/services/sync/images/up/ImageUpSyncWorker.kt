@@ -28,7 +28,7 @@ class ImageUpSyncWorker @AssistedInject constructor(
             crashlyticsLog("Start")
 
             try {
-                if (imageRepository.uploadStoredImagesAndDelete(loginManager.getSignedInProjectIdOrEmpty())) {
+                if (imageRepository.uploadStoredImagesAndDelete(loginManager.signedInProjectId)) {
                     success()
                 } else {
                     retry()

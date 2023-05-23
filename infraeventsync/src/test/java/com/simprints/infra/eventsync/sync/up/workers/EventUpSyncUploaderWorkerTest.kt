@@ -49,7 +49,7 @@ class EventUpSyncUploaderWorkerTest {
 
     private val projectScope = JsonHelper.toJson(EventUpSyncScope.ProjectScope(PROJECT_ID))
     private val loginManager = mockk<LoginManager> {
-        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { signedInProjectId } returns PROJECT_ID
     }
     private val upSyncTask = mockk<EventUpSyncTask>()
 

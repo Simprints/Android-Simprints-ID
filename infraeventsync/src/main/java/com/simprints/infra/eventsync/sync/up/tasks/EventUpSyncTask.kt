@@ -40,7 +40,7 @@ internal class EventUpSyncTask @Inject constructor(
 ) {
 
     fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
-        if (operation.projectId != loginManager.getSignedInProjectIdOrEmpty()) {
+        if (operation.projectId != loginManager.signedInProjectId) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
                 Simber.e(it)
             }

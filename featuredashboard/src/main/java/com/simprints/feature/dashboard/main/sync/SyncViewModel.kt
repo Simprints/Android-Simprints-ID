@@ -117,7 +117,7 @@ internal class SyncViewModel @Inject constructor(
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
             eventSyncManager
-                .countEventsToUpload(loginManager.getSignedInProjectIdOrEmpty(), EventType.ENROLMENT_V2)
+                .countEventsToUpload(loginManager.signedInProjectId, EventType.ENROLMENT_V2)
                 .collect { upSyncCountLiveData.postValue(it) }
         }
 
