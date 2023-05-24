@@ -54,6 +54,6 @@ internal class LogoutSyncViewModelTest {
             configManager = configManager
         )
         val resultConfig = viewModel.settingsLocked.getOrAwaitValue()
-        assertThat(resultConfig).isEqualTo(config)
+        assertThat(resultConfig.peekContent()).isEqualTo(config)
     }
 }

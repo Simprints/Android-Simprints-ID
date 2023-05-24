@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncDeclineBinding
@@ -41,16 +42,20 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
             findNavController().popBackStack()
         }
         logoutWithoutSyncConfirmButton.setOnClickListener {
-            val password = viewModel.settingsLocked.value?.getNullablePassword()
-            if (password != null) {
-                SettingsPasswordDialogFragment(
-                    title = com.simprints.infra.resources.R.string.password_lock_title_logout,
-                    passwordToMatch = password,
-                    onSuccess = { processLogoutConfirmation() }
-                ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
-            } else {
-                confirmationDialogForLogout.show()
-            }
+            viewModel.settingsLocked.observe(
+                viewLifecycleOwner,
+                LiveDataEventWithContentObserver { config ->
+                    val password = config.getNullablePassword()
+                    if (password != null) {
+                        SettingsPasswordDialogFragment(
+                            title = com.simprints.infra.resources.R.string.password_lock_title_logout,
+                            passwordToMatch = password,
+                            onSuccess = { processLogoutConfirmation() }
+                        ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
+                    } else {
+                        confirmationDialogForLogout.show()
+                    }
+                })
         }
     }
 
