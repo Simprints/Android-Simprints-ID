@@ -79,6 +79,7 @@ include(
     ":infralicense",
     ":infralogging",
     ":infra:auth-store",
+    ":infra:auth-logic",
     ":infranetwork",
     ":infrarealm",
     ":infrarecentuseractivity",
