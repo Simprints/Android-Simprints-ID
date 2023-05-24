@@ -4,14 +4,14 @@ import com.google.firebase.storage.FirebaseStorage
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import kotlinx.coroutines.tasks.await
 import java.io.FileInputStream
 import javax.inject.Inject
 
 internal class ImageRemoteDataSourceImpl @Inject constructor(
     private val imageUrlProvider: ConfigManager,
-    private val loginManager: LoginManager
+    private val authStore: AuthStore
 ) : ImageRemoteDataSource {
 
     override suspend fun uploadImage(
@@ -19,10 +19,10 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
         imageRef: SecuredImageRef
     ): UploadResult {
 
-        val firebaseProjectName = loginManager.getLegacyAppFallback().options.projectId
+        val firebaseProjectName = authStore.getLegacyAppFallback().options.projectId
 
         return if (firebaseProjectName != null) {
-            val projectId = loginManager.signedInProjectId
+            val projectId = authStore.signedInProjectId
 
             if (projectId.isEmpty())
                 return UploadResult(imageRef, UploadResult.Status.FAILED)
@@ -30,7 +30,7 @@ internal class ImageRemoteDataSourceImpl @Inject constructor(
             val bucketUrl = imageUrlProvider.getProject(projectId).imageBucket
 
             val rootRef = FirebaseStorage.getInstance(
-                loginManager.getLegacyAppFallback(),
+                authStore.getLegacyAppFallback(),
                 bucketUrl
             ).reference
 

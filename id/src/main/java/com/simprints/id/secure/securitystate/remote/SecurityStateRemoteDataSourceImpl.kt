@@ -5,18 +5,18 @@ import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.models.SecurityState
 import com.simprints.id.secure.models.remote.fromApiToDomain
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import javax.inject.Inject
 
 class SecurityStateRemoteDataSourceImpl @Inject constructor(
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val configManager: ConfigManager,
     @DeviceID private val deviceId: String
 ) : SecurityStateRemoteDataSource {
 
     override suspend fun getSecurityState(): SecurityState {
-        val projectId = loginManager.signedInProjectId
+        val projectId = authStore.signedInProjectId
         val deviceConfiguration = configManager.getDeviceConfiguration()
 
         return getClient().executeCall {
@@ -29,6 +29,6 @@ class SecurityStateRemoteDataSourceImpl @Inject constructor(
     }
 
     private suspend fun getClient(): SimNetwork.SimApiClient<SecureApiInterface> {
-        return loginManager.buildClient(SecureApiInterface::class)
+        return authStore.buildClient(SecureApiInterface::class)
     }
 }

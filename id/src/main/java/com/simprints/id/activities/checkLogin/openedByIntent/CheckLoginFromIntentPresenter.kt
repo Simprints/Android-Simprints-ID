@@ -221,9 +221,9 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
 
     /** @throws DifferentProjectIdSignedInException */
     override fun isProjectIdStoredAndMatches(): Boolean =
-        loginManager.signedInProjectId.isNotEmpty() &&
+        authStore.signedInProjectId.isNotEmpty() &&
             matchProjectIdsOrThrow(
-                loginManager.signedInProjectId,
+                authStore.signedInProjectId,
                 appRequest.projectId
             )
 
@@ -240,7 +240,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     //else
         /** Hack to support multiple users: we do not check if the signed UserId
         matches the userId from the Intent */
-        loginManager.signedInUserId.isNotEmpty()
+        authStore.signedInUserId.isNotEmpty()
 
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
@@ -254,7 +254,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
          *  user otherwise will be set to "" and the following requests would fail.
          *  */
         if (appRequest.userId.isNotEmpty()) {
-            loginManager.signedInUserId = appRequest.userId
+            authStore.signedInUserId = appRequest.userId
         }
 
         updateProjectInCurrentSession()
@@ -281,7 +281,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private suspend fun updateProjectInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
-        val signedProjectId = loginManager.signedInProjectId
+        val signedProjectId = authStore.signedInProjectId
         if (signedProjectId != currentSessionEvent.payload.projectId) {
             val projectConfiguration = configManager.getProjectConfiguration()
             currentSessionEvent.updateProjectId(signedProjectId)
@@ -310,8 +310,8 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private suspend fun initAnalyticsKeyInCrashManager() {
         val projectConfiguration = configManager.getProjectConfiguration()
         val deviceConfiguration = configManager.getDeviceConfiguration()
-        Simber.tag(PROJECT_ID, true).i(loginManager.signedInProjectId)
-        Simber.tag(USER_ID, true).i(loginManager.signedInUserId)
+        Simber.tag(PROJECT_ID, true).i(authStore.signedInProjectId)
+        Simber.tag(USER_ID, true).i(authStore.signedInUserId)
         Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(projectConfiguration.synchronization.frequency.toString())
@@ -323,7 +323,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             timeHelper.now(),
             result,
             if (result == AuthorizationResult.AUTHORIZED) {
-                UserInfo(loginManager.signedInProjectId, loginManager.signedInUserId)
+                UserInfo(authStore.signedInProjectId, authStore.signedInUserId)
             } else {
                 null
             }

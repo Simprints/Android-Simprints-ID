@@ -20,7 +20,7 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FACE
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -73,7 +73,7 @@ class ModalityFlowEnrolImplTest {
             }
         }
     }
-    private val loginManager = mockk<LoginManager> {
+    private val authStore = mockk<com.simprints.infra.authstore.AuthStore> {
         every { signedInProjectId } returns PROJECT_ID
     }
 
@@ -263,7 +263,7 @@ class ModalityFlowEnrolImplTest {
             faceStepProcessor,
             coreStepProcessor,
             configManager,
-            loginManager,
+            authStore,
             "deviceId"
         )
     }

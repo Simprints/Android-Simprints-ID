@@ -78,7 +78,7 @@ include(
     ":infraimages",
     ":infralicense",
     ":infralogging",
-    ":infralogin",
+    ":infra:auth-store",
     ":infranetwork",
     ":infrarealm",
     ":infrarecentuseractivity",

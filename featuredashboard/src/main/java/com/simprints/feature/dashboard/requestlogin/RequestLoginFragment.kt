@@ -9,7 +9,7 @@ import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentRequestLoginBinding
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -28,7 +28,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
     lateinit var deviceId: String
 
     @Inject
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -39,7 +39,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
 
     override fun onResume() {
         super.onResume()
-        if (loginManager.signedInProjectId.isNotEmpty() && loginManager.signedInUserId.isNotEmpty())
+        if (authStore.signedInProjectId.isNotEmpty() && authStore.signedInUserId.isNotEmpty())
             findNavController().navigate(R.id.action_requestLoginFragment_to_mainFragment)
     }
 }

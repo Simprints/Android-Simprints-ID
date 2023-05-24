@@ -18,7 +18,7 @@ import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import dagger.assisted.Assisted
@@ -33,7 +33,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val upSyncTask: EventUpSyncTask,
     private val eventSyncCache: EventSyncCache,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val jsonHelper: JsonHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -49,7 +49,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             jsonHelper.fromJson(jsonInput)
         } catch (t: Throwable) {
             if (t is JsonParseException || t is JsonMappingException) {
-                EventUpSyncScope.ProjectScope(loginManager.signedInProjectId)
+                EventUpSyncScope.ProjectScope(authStore.signedInProjectId)
             } else {
                 throw MalformedSyncOperationException(t.message ?: "")
             }

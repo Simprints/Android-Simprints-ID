@@ -13,7 +13,7 @@ import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFinger
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFingerprintReference
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFingerprintTemplate
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFingerprintTemplateFormat
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -48,12 +48,12 @@ class EnrolmentRecordRemoteDataSourceImplTest {
         every { byteArrayToBase64(FINGERPRINT_TEMPLATE) } returns BASE64_FINGERPRINT_TEMPLATE
         every { byteArrayToBase64(FACE_TEMPLATE) } returns BASE64_FACE_TEMPLATE
     }
-    private val loginManager = mockk<LoginManager> {
+    private val authStore = mockk<AuthStore> {
         every { signedInProjectId } returns PROJECT_ID
         coEvery { buildClient(EnrolmentRecordApiInterface::class) } returns simApiClient
     }
     private val enrolmentRecordRemoteDataSourceImpl =
-        EnrolmentRecordRemoteDataSourceImpl(loginManager, encodingUtils)
+        EnrolmentRecordRemoteDataSourceImpl(authStore, encodingUtils)
 
     @Before
     fun setup() {

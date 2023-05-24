@@ -9,7 +9,7 @@ import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.security.SecurityManager
 import javax.inject.Inject
 
@@ -24,7 +24,7 @@ abstract class CheckLoginPresenter(
     lateinit var timeHelper: TimeHelper
 
     @Inject
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     @Inject
     lateinit var secureDataManager: SecurityManager
@@ -74,7 +74,7 @@ abstract class CheckLoginPresenter(
     private fun checkSignedInOrThrow() {
         val isUserSignedIn =
             isProjectIdStoredAndMatches() &&
-                isLocalKeyValid(loginManager.signedInProjectId) &&
+                isLocalKeyValid(authStore.signedInProjectId) &&
                 isUserIdStoredAndMatches() &&
                 isFirebaseTokenValid()
 
@@ -83,9 +83,9 @@ abstract class CheckLoginPresenter(
         }
     }
 
-    private fun isFirebaseTokenValid(): Boolean = loginManager.isSignedIn(
-        loginManager.signedInProjectId,
-        loginManager.signedInUserId
+    private fun isFirebaseTokenValid(): Boolean = authStore.isSignedIn(
+        authStore.signedInProjectId,
+        authStore.signedInUserId
     )
 
     private fun isLocalKeyValid(projectId: String): Boolean = try {

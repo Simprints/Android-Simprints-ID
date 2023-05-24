@@ -7,13 +7,13 @@ import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class GuidSelectionManagerImpl @Inject constructor(
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val timerHelper: TimeHelper,
     private val eventRepository: EventRepository,
     @ExternalScope private val externalScope: CoroutineScope
@@ -29,7 +29,7 @@ class GuidSelectionManagerImpl @Inject constructor(
     }
 
     private fun checkRequest(request: GuidSelectionRequest) {
-        if (!loginManager.isProjectIdSignedIn(request.projectId)) throw NotSignedInException()
+        if (!authStore.isProjectIdSignedIn(request.projectId)) throw NotSignedInException()
     }
 
     private fun saveGuidSelectionEvent(request: GuidSelectionRequest) {

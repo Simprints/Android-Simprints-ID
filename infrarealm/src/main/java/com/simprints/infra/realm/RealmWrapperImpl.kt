@@ -6,7 +6,7 @@ import android.content.Intent
 import android.os.Build
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.*
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.realm.config.RealmConfig
 import com.simprints.infra.realm.exceptions.RealmUninitialisedException
 import com.simprints.infra.security.SecurityManager
@@ -24,7 +24,7 @@ import javax.inject.Singleton
 class RealmWrapperImpl @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val securityManager: SecurityManager,
-    private val loginManager: LoginManager
+    private val authStore: AuthStore
 ) : RealmWrapper {
 
     private lateinit var config: RealmConfiguration
@@ -69,7 +69,7 @@ class RealmWrapperImpl @Inject constructor(
     }
 
     private fun getLocalDbKey(): LocalDbKey =
-        loginManager.signedInProjectId.let {
+        authStore.signedInProjectId.let {
             return if (it.isNotEmpty()) {
                 securityManager.getLocalDbKeyOrThrow(it)
             } else {
@@ -78,7 +78,7 @@ class RealmWrapperImpl @Inject constructor(
         }
 
     private fun recreateLocalDbKey() =
-        loginManager.signedInProjectId.let {
+        authStore.signedInProjectId.let {
             if (it.isNotEmpty()) {
                 securityManager.recreateLocalDatabaseKey(it)
             } else {

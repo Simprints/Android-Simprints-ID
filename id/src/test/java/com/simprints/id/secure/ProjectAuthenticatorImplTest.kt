@@ -5,10 +5,10 @@ import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.login.LoginManager
-import com.simprints.infra.login.domain.models.AuthenticationData
-import com.simprints.infra.login.domain.models.Token
-import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.domain.models.AuthenticationData
+import com.simprints.infra.authstore.domain.models.Token
+import com.simprints.infra.authstore.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -38,7 +38,7 @@ class ProjectAuthenticatorImplTest {
     private lateinit var signerManager: SignerManager
 
     @MockK
-    private lateinit var loginManager: LoginManager
+    private lateinit var authStore: AuthStore
 
     private lateinit var authenticator: ProjectAuthenticator
 
@@ -59,7 +59,7 @@ class ProjectAuthenticatorImplTest {
     @Test
     fun offline_authenticationShouldThrowException() = runTest(StandardTestDispatcher()) {
         coEvery {
-            loginManager.requestAuthToken(
+            authStore.requestAuthToken(
                 PROJECT_ID,
                 USER_ID,
                 any()
@@ -75,7 +75,7 @@ class ProjectAuthenticatorImplTest {
     fun maintenance_authenticationShouldThrowMaintenanceException() =
         runTest(StandardTestDispatcher()) {
             coEvery {
-                loginManager.requestAuthToken(
+                authStore.requestAuthToken(
                     PROJECT_ID,
                     USER_ID,
                     any()
@@ -100,7 +100,7 @@ class ProjectAuthenticatorImplTest {
             authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
 
             coVerify(exactly = 1) {
-                loginManager.requestAuthenticationData(
+                authStore.requestAuthenticationData(
                     PROJECT_ID,
                     USER_ID,
                     DEVICE_ID,
@@ -135,7 +135,7 @@ class ProjectAuthenticatorImplTest {
 
     @Test
     fun integrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
-        coEvery { loginManager.requestIntegrityToken(any()) } throws RequestingIntegrityTokenException(
+        coEvery { authStore.requestIntegrityToken(any()) } throws RequestingIntegrityTokenException(
             IntegrityErrorCode.API_NOT_AVAILABLE
         )
 
@@ -146,7 +146,7 @@ class ProjectAuthenticatorImplTest {
 
     private fun buildProjectAuthenticator(): ProjectAuthenticatorImpl {
         return ProjectAuthenticatorImpl(
-            loginManager,
+            authStore,
             projectSecretManager,
             secureDataManager,
             configManager,
@@ -156,7 +156,7 @@ class ProjectAuthenticatorImplTest {
 
     private fun mockManagers() {
         coEvery {
-            loginManager.requestAuthenticationData(
+            authStore.requestAuthenticationData(
                 any(),
                 any(),
                 any()
@@ -166,7 +166,7 @@ class ProjectAuthenticatorImplTest {
             ""
         )
         coEvery {
-            loginManager.requestAuthToken(
+            authStore.requestAuthToken(
                 PROJECT_ID,
                 USER_ID,
                 any()
@@ -188,7 +188,7 @@ class ProjectAuthenticatorImplTest {
             mockk(),
             mockk(),
         )
-        coEvery { loginManager.requestIntegrityToken(any()) } returns "token"
+        coEvery { authStore.requestIntegrityToken(any()) } returns "token"
     }
 
     private companion object {
