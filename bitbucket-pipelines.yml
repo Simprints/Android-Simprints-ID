@@ -106,11 +106,13 @@ definitions:
                     - ./gradlew featuredashboard:jacocoTestReport
                     - ./gradlew featurealert:jacocoTestReport
                     - ./gradlew featureexitform:jacocoTestReport
+                    - ./gradlew featurerocwrapper:jacocoTestReport
                     - ./gradlew featureconsent:jacocoTestReport
                 artifacts:
                     - featuredashboard/build/reports/**
                     - featurealert/build/reports/**
                     - featureexitform/build/reports/**
+                    - featurerocwrapper/build/reports/**
                     - featureconsent/build/reports/**
 
         ######################################################################
