@@ -3,9 +3,9 @@ package com.simprints.infra.login
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
-import com.simprints.infra.login.db.RemoteDbManager
+import com.simprints.infra.login.db.FirebaseAuthManager
 import com.simprints.infra.login.domain.IntegrityTokenRequester
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoStore
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
@@ -25,21 +25,21 @@ class LoginManagerImplTest {
     private val authenticationRemoteDataSource =
         mockk<AuthenticationRemoteDataSource>(relaxed = true)
     private val integrityTokenRequester = mockk<IntegrityTokenRequester>(relaxed = true)
-    private val loginInfoManager = mockk<LoginInfoManager>(relaxed = true)
-    private val remoteDbManager = mockk<RemoteDbManager>(relaxed = true)
+    private val loginInfoStore = mockk<LoginInfoStore>(relaxed = true)
+    private val firebaseAuthManager = mockk<FirebaseAuthManager>(relaxed = true)
     private val simApiClientFactory = mockk<SimApiClientFactory>(relaxed = true)
 
     private val loginManagerManagerImpl = LoginManagerImpl(
         authenticationRemoteDataSource,
         integrityTokenRequester,
-        loginInfoManager,
-        remoteDbManager,
+        loginInfoStore,
+        firebaseAuthManager,
         simApiClientFactory
     )
 
     @Test
     fun `get signedInProjectId should call the correct method`() {
-        every { loginInfoManager.signedInProjectId } returns PROJECT_ID
+        every { loginInfoStore.signedInProjectId } returns PROJECT_ID
         val receivedProjectId = loginManagerManagerImpl.signedInProjectId
 
         assertThat(receivedProjectId).isEqualTo(PROJECT_ID)
@@ -47,15 +47,15 @@ class LoginManagerImplTest {
 
     @Test
     fun `set signedInProjectId should call the correct method`() {
-        every { loginInfoManager.signedInProjectId } returns PROJECT_ID
+        every { loginInfoStore.signedInProjectId } returns PROJECT_ID
         loginManagerManagerImpl.signedInProjectId = PROJECT_ID
 
-        verify { loginInfoManager.setProperty("signedInProjectId").value(PROJECT_ID) }
+        verify { loginInfoStore.setProperty("signedInProjectId").value(PROJECT_ID) }
     }
 
     @Test
     fun `get signedInUserId should call the correct method`() {
-        every { loginInfoManager.signedInUserId } returns USER_ID
+        every { loginInfoStore.signedInUserId } returns USER_ID
         val receivedProjectId = loginManagerManagerImpl.signedInUserId
 
         assertThat(receivedProjectId).isEqualTo(USER_ID)
@@ -63,10 +63,10 @@ class LoginManagerImplTest {
 
     @Test
     fun `set signedInUserId should call the correct method`() {
-        every { loginInfoManager.signedInUserId } returns USER_ID
+        every { loginInfoStore.signedInUserId } returns USER_ID
         loginManagerManagerImpl.signedInUserId = USER_ID
 
-        verify { loginInfoManager.setProperty("signedInUserId").value(USER_ID) }
+        verify { loginInfoStore.setProperty("signedInUserId").value(USER_ID) }
     }
 
     @Test
@@ -113,7 +113,7 @@ class LoginManagerImplTest {
 
     @Test
     fun `getSignedInProjectIdOrEmpty should call the correct method`() {
-        every { loginInfoManager.signedInProjectId } returns PROJECT_ID
+        every { loginInfoStore.signedInProjectId } returns PROJECT_ID
         val receivedProjectId = loginManagerManagerImpl.signedInProjectId
 
         assertThat(receivedProjectId).isEqualTo(PROJECT_ID)
@@ -121,7 +121,7 @@ class LoginManagerImplTest {
 
     @Test
     fun `getSignedInUserIdOrEmpty should call the correct method`() {
-        every { loginInfoManager.signedInUserId } returns USER_ID
+        every { loginInfoStore.signedInUserId } returns USER_ID
         val receivedUserId = loginManagerManagerImpl.signedInUserId
 
         assertThat(receivedUserId).isEqualTo(USER_ID)
@@ -129,7 +129,7 @@ class LoginManagerImplTest {
 
     @Test
     fun `isProjectIdSignedIn should call the correct method`() {
-        every { loginInfoManager.isProjectIdSignedIn(PROJECT_ID) } returns true
+        every { loginInfoStore.isProjectIdSignedIn(PROJECT_ID) } returns true
         val receivedIsSignedIn = loginManagerManagerImpl.isProjectIdSignedIn(PROJECT_ID)
 
         assertThat(receivedIsSignedIn).isTrue()
@@ -139,33 +139,33 @@ class LoginManagerImplTest {
     fun `cleanCredentials should call the correct method`() {
         loginManagerManagerImpl.cleanCredentials()
 
-        verify(exactly = 1) { loginInfoManager.cleanCredentials() }
+        verify(exactly = 1) { loginInfoStore.cleanCredentials() }
     }
 
     @Test
     fun `storeCredentials should call the correct method`() {
         loginManagerManagerImpl.storeCredentials(PROJECT_ID, USER_ID)
 
-        verify(exactly = 1) { loginInfoManager.storeCredentials(PROJECT_ID, USER_ID) }
+        verify(exactly = 1) { loginInfoStore.storeCredentials(PROJECT_ID, USER_ID) }
     }
 
     @Test
     fun `signIn should call the correct method`() = runTest(UnconfinedTestDispatcher()) {
         loginManagerManagerImpl.signIn(TOKEN)
 
-        coVerify(exactly = 1) { remoteDbManager.signIn(TOKEN) }
+        coVerify(exactly = 1) { firebaseAuthManager.signIn(TOKEN) }
     }
 
     @Test
     fun `signOut should call the correct method`() {
         loginManagerManagerImpl.signOut()
 
-        verify(exactly = 1) { remoteDbManager.signOut() }
+        verify(exactly = 1) { firebaseAuthManager.signOut() }
     }
 
     @Test
     fun `isSignedIn should call the correct method`() {
-        every { remoteDbManager.isSignedIn(PROJECT_ID, USER_ID) } returns true
+        every { firebaseAuthManager.isSignedIn(PROJECT_ID, USER_ID) } returns true
         val receivedIsSignedIn = loginManagerManagerImpl.isSignedIn(PROJECT_ID, USER_ID)
 
         assertThat(receivedIsSignedIn).isTrue()
@@ -173,7 +173,7 @@ class LoginManagerImplTest {
 
     @Test
     fun `getCoreApp should call the correct method`() {
-        every { remoteDbManager.getCoreApp() } returns FIREBASE_APP
+        every { firebaseAuthManager.getCoreApp() } returns FIREBASE_APP
         val receivedApp = loginManagerManagerImpl.getCoreApp()
 
         assertThat(receivedApp).isEqualTo(FIREBASE_APP)
@@ -181,7 +181,7 @@ class LoginManagerImplTest {
 
     @Test
     fun `getLegacyAppFallback should call the correct method`() {
-        every { remoteDbManager.getLegacyAppFallback() } returns FIREBASE_APP
+        every { firebaseAuthManager.getLegacyAppFallback() } returns FIREBASE_APP
         val receivedApp = loginManagerManagerImpl.getLegacyAppFallback()
 
         assertThat(receivedApp).isEqualTo(FIREBASE_APP)

@@ -11,7 +11,7 @@ import com.google.firebase.ktx.initialize
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.login.domain.JwtTokenHelper.Companion.extractTokenPayloadAsJson
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoStore
 import com.simprints.infra.login.domain.models.Token
 import com.simprints.infra.login.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -21,13 +21,13 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-internal class FirebaseManagerImpl @Inject constructor(
-    private val loginInfoManager: LoginInfoManager,
+internal class FirebaseAuthManager @Inject constructor(
+    private val loginInfoStore: LoginInfoStore,
     @ApplicationContext private val context: Context,
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher
-) : RemoteDbManager {
+) {
 
-    override suspend fun signIn(token: Token) {
+    suspend fun signIn(token: Token) {
         cacheTokenClaims(token.value)
         cacheFirebaseOptions(token)
         val result = try {
@@ -38,7 +38,7 @@ internal class FirebaseManagerImpl @Inject constructor(
         Simber.d("Signed in with: ${result.user?.uid}")
     }
 
-    override fun signOut() {
+    fun signOut() {
         clearCachedTokenClaims()
         // On legacy projects they may not have a separate Core Firebase Project, so we try to
         // log out on both just in case.
@@ -50,8 +50,8 @@ internal class FirebaseManagerImpl @Inject constructor(
         tryToDeleteCoreApp()
     }
 
-    override fun isSignedIn(projectId: String, userId: String): Boolean {
-        val lastProjectIdClaim = loginInfoManager.projectIdTokenClaim
+    fun isSignedIn(projectId: String, userId: String): Boolean {
+        val lastProjectIdClaim = loginInfoStore.projectIdTokenClaim
         return if (!lastProjectIdClaim.isNullOrEmpty()) {
             lastProjectIdClaim == projectId
         } else {
@@ -62,7 +62,7 @@ internal class FirebaseManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCurrentToken(): String =
+    suspend fun getCurrentToken(): String =
         withContext(dispatcherIO) {
             // Projects that were signed in and then updated to 2021.2.0 need to check the
             // previous Firebase project until they login again.
@@ -85,19 +85,19 @@ internal class FirebaseManagerImpl @Inject constructor(
     private fun cacheTokenClaims(claim: String) {
         extractTokenPayloadAsJson(claim)?.let {
             if (it.has(TOKEN_PROJECT_ID_CLAIM)) {
-                loginInfoManager.projectIdTokenClaim = it.getString(TOKEN_PROJECT_ID_CLAIM)
+                loginInfoStore.projectIdTokenClaim = it.getString(TOKEN_PROJECT_ID_CLAIM)
             }
 
             if (it.has(TOKEN_USER_ID_CLAIM)) {
-                loginInfoManager.userIdTokenClaim = it.getString(TOKEN_USER_ID_CLAIM)
+                loginInfoStore.userIdTokenClaim = it.getString(TOKEN_USER_ID_CLAIM)
             }
         }
     }
 
     private fun cacheFirebaseOptions(token: Token) {
-        loginInfoManager.coreFirebaseProjectId = token.projectId
-        loginInfoManager.coreFirebaseApplicationId = token.applicationId
-        loginInfoManager.coreFirebaseApiKey = token.apiKey
+        loginInfoStore.coreFirebaseProjectId = token.projectId
+        loginInfoStore.coreFirebaseApplicationId = token.applicationId
+        loginInfoStore.coreFirebaseApiKey = token.apiKey
     }
 
     private fun getFirebaseOptions(token: Token): FirebaseOptions = FirebaseOptions.Builder()
@@ -134,10 +134,17 @@ internal class FirebaseManagerImpl @Inject constructor(
     }
 
     private fun clearCachedTokenClaims() {
-        loginInfoManager.clearCachedTokenClaims()
+        loginInfoStore.clearCachedTokenClaims()
     }
 
-    override fun getCoreApp() = try {
+    /**
+     * Get the FirebaseApp that corresponds with the core backend. This FirebaseApp is only
+     * initialized once the client has logged in.
+     * @see signIn
+     * @return FirebaseApp
+     * @throws IllegalStateException if not initialized
+     */
+    fun getCoreApp() = try {
         getCoreFirebaseApp()
     } catch (ex: IllegalStateException) {
         getCoreAppOrAttemptInit()
@@ -152,19 +159,24 @@ internal class FirebaseManagerImpl @Inject constructor(
     } catch (ex: IllegalStateException) {
         val token = Token(
             "",
-            loginInfoManager.coreFirebaseProjectId,
-            loginInfoManager.coreFirebaseApiKey,
-            loginInfoManager.coreFirebaseApplicationId
+            loginInfoStore.coreFirebaseProjectId,
+            loginInfoStore.coreFirebaseApiKey,
+            loginInfoStore.coreFirebaseApplicationId
         )
 
-        if (token.projectId.isEmpty() || token.apiKey.isEmpty() || token.applicationId.isEmpty())
-            throw IllegalStateException("Core Firebase App options are not stored")
+        check(!(token.projectId.isEmpty() || token.apiKey.isEmpty() || token.applicationId.isEmpty())) {
+            "Core Firebase App options are not stored"
+        }
 
         initializeCoreProject(token, context)
         getCoreFirebaseApp()
     }
 
-    override fun getLegacyAppFallback() = try {
+    @Deprecated(
+        message = "Since 2021.2.0. Can be removed once all projects are on 2021.2.0+",
+        replaceWith = ReplaceWith("getCoreApp()")
+    )
+    fun getLegacyAppFallback() = try {
         getCoreApp()
     } catch (ex: IllegalStateException) {
         // CORE_BACKEND_PROJECT doesn't exist

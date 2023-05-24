@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GetTokenResult
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoStore
 import com.simprints.infra.login.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.syntax.assertThrows
@@ -27,7 +27,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class FirebaseManagerImplTest {
+class FirebaseAuthManagerTest {
 
     companion object {
         private const val GCP_PROJECT_ID = "GCP_PROJECT_ID"
@@ -38,10 +38,10 @@ class FirebaseManagerImplTest {
     private val firebaseAuth = mockk<FirebaseAuth>(relaxed = true)
     private val firebaseApp = mockk<FirebaseApp>(relaxed = true)
     private val firebaseUser = mockk<FirebaseUser>(relaxed = true)
-    private val loginInfoManager = mockk<LoginInfoManager>(relaxed = true)
+    private val loginInfoStore = mockk<LoginInfoStore>(relaxed = true)
     private val context = mockk<Context>(relaxed = true)
     private val firebaseOptionsBuilder = mockk<FirebaseOptions.Builder>(relaxed = true)
-    private val firebaseManagerImpl = FirebaseManagerImpl(loginInfoManager, context, UnconfinedTestDispatcher())
+    private val firebaseAuthManager = FirebaseAuthManager(loginInfoStore, context, UnconfinedTestDispatcher())
 
     @Before
     fun setUp() {
@@ -64,7 +64,7 @@ class FirebaseManagerImplTest {
             every { firebaseAuth.signInWithCustomToken(any()) } throws FirebaseNetworkException("Failed")
 
             assertThrows<NetworkConnectionException> {
-                firebaseManagerImpl.signIn(mockk(relaxed = true))
+                firebaseAuthManager.signIn(mockk(relaxed = true))
             }
         }
 
@@ -74,17 +74,17 @@ class FirebaseManagerImplTest {
             every { firebaseAuth.signInWithCustomToken(any()) } throws ApiException(Status.RESULT_TIMEOUT)
 
             assertThrows<NetworkConnectionException> {
-                firebaseManagerImpl.signIn(mockk(relaxed = true))
+                firebaseAuthManager.signIn(mockk(relaxed = true))
             }
         }
 
     @Test
     fun `signOut should succeed`() = runTest(UnconfinedTestDispatcher()) {
-        firebaseManagerImpl.signOut()
+        firebaseAuthManager.signOut()
 
         verify(exactly = 1) { firebaseAuth.signOut() }
         verify(exactly = 1) { firebaseApp.delete() }
-        verify(exactly = 1) { loginInfoManager.clearCachedTokenClaims() }
+        verify(exactly = 1) { loginInfoStore.clearCachedTokenClaims() }
     }
 
     @Test
@@ -93,7 +93,7 @@ class FirebaseManagerImplTest {
             every { firebaseAuth.signOut() } throws FirebaseNetworkException("Failed")
 
             assertThrows<NetworkConnectionException> {
-                firebaseManagerImpl.signOut()
+                firebaseAuthManager.signOut()
             }
         }
 
@@ -103,26 +103,26 @@ class FirebaseManagerImplTest {
             every { firebaseAuth.signOut() } throws ApiException(Status.RESULT_TIMEOUT)
 
             assertThrows<NetworkConnectionException> {
-                firebaseManagerImpl.signOut()
+                firebaseAuthManager.signOut()
             }
         }
 
     @Test
     fun `isSignedIn should return true if the project id claim is null`() {
-        every { loginInfoManager.projectIdTokenClaim } returns null
-        assertThat(firebaseManagerImpl.isSignedIn("", "")).isTrue()
+        every { loginInfoStore.projectIdTokenClaim } returns null
+        assertThat(firebaseAuthManager.isSignedIn("", "")).isTrue()
     }
 
     @Test
     fun `isSignedIn should return true if the project id claim is the same as the project id`() {
-        every { loginInfoManager.projectIdTokenClaim } returns "project id"
-        assertThat(firebaseManagerImpl.isSignedIn("project id", "")).isTrue()
+        every { loginInfoStore.projectIdTokenClaim } returns "project id"
+        assertThat(firebaseAuthManager.isSignedIn("project id", "")).isTrue()
     }
 
     @Test
     fun `isSignedIn should return true if the project id claim is not the same as the project id`() {
-        every { loginInfoManager.projectIdTokenClaim } returns "project id"
-        assertThat(firebaseManagerImpl.isSignedIn("another project id", "")).isFalse()
+        every { loginInfoStore.projectIdTokenClaim } returns "project id"
+        assertThat(firebaseAuthManager.isSignedIn("another project id", "")).isFalse()
     }
 
     @Test
@@ -130,7 +130,7 @@ class FirebaseManagerImplTest {
         runTest(UnconfinedTestDispatcher()) {
             every { firebaseAuth.currentUser } returns firebaseUser
             every { firebaseUser.getIdToken(any()) } throws FirebaseNetworkException("Failed")
-            assertThrows<NetworkConnectionException> { firebaseManagerImpl.getCurrentToken() }
+            assertThrows<NetworkConnectionException> { firebaseAuthManager.getCurrentToken() }
         }
     }
 
@@ -139,7 +139,7 @@ class FirebaseManagerImplTest {
         runTest(UnconfinedTestDispatcher()) {
             every { firebaseAuth.currentUser } returns firebaseUser
             every { firebaseUser.getIdToken(any()) } throws ApiException(Status.RESULT_TIMEOUT)
-            assertThrows<NetworkConnectionException> { firebaseManagerImpl.getCurrentToken() }
+            assertThrows<NetworkConnectionException> { firebaseAuthManager.getCurrentToken() }
         }
     }
 
@@ -147,7 +147,7 @@ class FirebaseManagerImplTest {
     fun `getCurrentToken throws RemoteDbNotSignedInException if FirebaseNoSignedInUserException`() {
         runTest(UnconfinedTestDispatcher()) {
             every { firebaseAuth.currentUser } returns null
-            assertThrows<RemoteDbNotSignedInException> { firebaseManagerImpl.getCurrentToken() }
+            assertThrows<RemoteDbNotSignedInException> { firebaseAuthManager.getCurrentToken() }
         }
     }
 
@@ -156,19 +156,19 @@ class FirebaseManagerImplTest {
         every { firebaseAuth.currentUser } returns firebaseUser
         every { firebaseUser.getIdToken(any()) } returns Tasks.forResult(GetTokenResult("Token", HashMap()))
 
-        val result = firebaseManagerImpl.getCurrentToken()
+        val result = firebaseAuthManager.getCurrentToken()
         assertThat(result).isEqualTo("Token")
     }
 
     @Test
     fun `getCoreApp should init the app if the Firebase getInstance() throws an IllegalStateException`() {
         every { FirebaseApp.getInstance(any()) } throws IllegalStateException() andThenThrows IllegalStateException() andThen firebaseApp
-        every { loginInfoManager.coreFirebaseProjectId } returns GCP_PROJECT_ID
-        every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
-        every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
+        every { loginInfoStore.coreFirebaseProjectId } returns GCP_PROJECT_ID
+        every { loginInfoStore.coreFirebaseApplicationId } returns APPLICATION_ID
+        every { loginInfoStore.coreFirebaseApiKey } returns API_KEY
         every { Firebase.initialize(any(), any(), any()) } returns mockk()
 
-        firebaseManagerImpl.getCoreApp()
+        firebaseAuthManager.getCoreApp()
 
         verify(exactly = 1) {
             Firebase.initialize(any(), match {
@@ -180,20 +180,20 @@ class FirebaseManagerImplTest {
     @Test
     fun `getCoreApp should throw an IllegalStateException the app if the Firebase getInstance() throws an IllegalStateException and the coreFirebaseProjectId is empty`() {
         every { FirebaseApp.getInstance(any()) } throws IllegalStateException() andThenThrows IllegalStateException() andThen firebaseApp
-        every { loginInfoManager.coreFirebaseProjectId } returns ""
-        every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
-        every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
+        every { loginInfoStore.coreFirebaseProjectId } returns ""
+        every { loginInfoStore.coreFirebaseApplicationId } returns APPLICATION_ID
+        every { loginInfoStore.coreFirebaseApiKey } returns API_KEY
         every { Firebase.initialize(any(), any(), any()) } returns mockk()
 
-        assertThrows<IllegalStateException> { firebaseManagerImpl.getCoreApp() }
+        assertThrows<IllegalStateException> { firebaseAuthManager.getCoreApp() }
     }
 
     @Test
     fun `getCoreApp should init the app and recreate the app if the Firebase getInstance() throws an IllegalStateException and the initialization failed`() {
         every { FirebaseApp.getInstance(any()) } throws IllegalStateException() andThenThrows IllegalStateException() andThen firebaseApp
-        every { loginInfoManager.coreFirebaseProjectId } returns GCP_PROJECT_ID
-        every { loginInfoManager.coreFirebaseApplicationId } returns APPLICATION_ID
-        every { loginInfoManager.coreFirebaseApiKey } returns API_KEY
+        every { loginInfoStore.coreFirebaseProjectId } returns GCP_PROJECT_ID
+        every { loginInfoStore.coreFirebaseApplicationId } returns APPLICATION_ID
+        every { loginInfoStore.coreFirebaseApiKey } returns API_KEY
         every {
             Firebase.initialize(
                 any(),
@@ -202,7 +202,7 @@ class FirebaseManagerImplTest {
             )
         } throws IllegalStateException() andThen mockk<FirebaseApp>()
 
-        firebaseManagerImpl.getCoreApp()
+        firebaseAuthManager.getCoreApp()
 
         verify(exactly = 1) { firebaseApp.delete() }
         verify(exactly = 2) {

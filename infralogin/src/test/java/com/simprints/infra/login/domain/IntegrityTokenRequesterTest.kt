@@ -27,7 +27,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class IntegrityTokenRequesterImplTest {
+class IntegrityTokenRequesterTest {
 
     companion object {
         private const val NONCE = "nonce"
@@ -41,8 +41,8 @@ class IntegrityTokenRequesterImplTest {
     private val integrityManager = mockk<IntegrityManager>()
     private val integrityTokenResponseTask = mockk<Task<IntegrityTokenResponse>>()
     private val integrityTokenResponse = mockk<IntegrityTokenResponse>()
-    private val integrityTokenRequesterImpl =
-        IntegrityTokenRequesterImpl(integrityManager, testCoroutineRule.testCoroutineDispatcher)
+    private val integrityTokenRequester =
+        IntegrityTokenRequester(integrityManager, testCoroutineRule.testCoroutineDispatcher)
 
     @Before
     fun setup() {
@@ -62,7 +62,7 @@ class IntegrityTokenRequesterImplTest {
         every { integrityTokenResponse.token() } returns VALID_INTEGRITY_TOKEN
 
 
-        val token = integrityTokenRequesterImpl.getToken(NONCE)
+        val token = integrityTokenRequester.getToken(NONCE)
         assertThat(token).isEqualTo(VALID_INTEGRITY_TOKEN)
     }
 
@@ -80,7 +80,7 @@ class IntegrityTokenRequesterImplTest {
                 every { cause } returns null
             }
             val exception = assertThrows<RequestingIntegrityTokenException> {
-                integrityTokenRequesterImpl.getToken(NONCE)
+                integrityTokenRequester.getToken(NONCE)
             }
             assertThat(exception.errorCode).isEqualTo(CLOUD_PROJECT_NUMBER_IS_INVALID)
         }
@@ -99,7 +99,7 @@ class IntegrityTokenRequesterImplTest {
                 every { cause } returns null
             }
             val exception = assertThrows<MissingOrOutdatedGooglePlayStoreApp> {
-                integrityTokenRequesterImpl.getToken(NONCE)
+                integrityTokenRequester.getToken(NONCE)
             }
             assertThat(exception.errorCode).isEqualTo(PLAY_STORE_NOT_FOUND)
         }
@@ -118,7 +118,7 @@ class IntegrityTokenRequesterImplTest {
                 every { cause } returns null
             }
             val exception = assertThrows<IntegrityServiceTemporaryDown> {
-                integrityTokenRequesterImpl.getToken(NONCE)
+                integrityTokenRequester.getToken(NONCE)
             }
             assertThat(exception.errorCode).isEqualTo(GOOGLE_SERVER_UNAVAILABLE)
         }
@@ -137,7 +137,7 @@ class IntegrityTokenRequesterImplTest {
                 every { cause } returns null
             }
             val exception = assertThrows<NetworkConnectionException> {
-                integrityTokenRequesterImpl.getToken(NONCE)
+                integrityTokenRequester.getToken(NONCE)
             }
         }
 

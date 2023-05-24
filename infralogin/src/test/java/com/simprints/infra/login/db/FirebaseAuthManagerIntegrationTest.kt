@@ -6,7 +6,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoStore
 import com.simprints.infra.login.domain.models.Token
 import io.mockk.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class FirebaseManagerImplIntegrationTest {
+class FirebaseAuthManagerIntegrationTest {
 
     companion object {
         private const val GCP_PROJECT_ID = "GCP_PROJECT_ID"
@@ -28,9 +28,9 @@ class FirebaseManagerImplIntegrationTest {
 
     private val firebaseAuth = mockk<FirebaseAuth>(relaxed = true)
     private val firebaseApp = mockk<FirebaseApp>(relaxed = true)
-    private val loginInfoManager = mockk<LoginInfoManager>(relaxed = true)
+    private val loginInfoStore = mockk<LoginInfoStore>(relaxed = true)
     private val context = mockk<Context>()
-    private val firebaseManagerImpl = FirebaseManagerImpl(loginInfoManager, context, UnconfinedTestDispatcher())
+    private val firebaseAuthManager = FirebaseAuthManager(loginInfoStore, context, UnconfinedTestDispatcher())
 
     @Before
     fun setUp() {
@@ -49,13 +49,13 @@ class FirebaseManagerImplIntegrationTest {
             )
         )
         val token = Token(TOKEN_VALUE, GCP_PROJECT_ID, API_KEY, APPLICATION_ID)
-        firebaseManagerImpl.signIn(token)
+        firebaseAuthManager.signIn(token)
 
         verify(exactly = 1) { firebaseAuth.signInWithCustomToken(TOKEN_VALUE) }
-        verify(exactly = 1) { loginInfoManager.projectIdTokenClaim = "project" }
-        verify(exactly = 1) { loginInfoManager.userIdTokenClaim = "user" }
-        verify(exactly = 1) { loginInfoManager.coreFirebaseProjectId = GCP_PROJECT_ID }
-        verify(exactly = 1) { loginInfoManager.coreFirebaseApplicationId = APPLICATION_ID }
-        verify(exactly = 1) { loginInfoManager.coreFirebaseApiKey = API_KEY }
+        verify(exactly = 1) { loginInfoStore.projectIdTokenClaim = "project" }
+        verify(exactly = 1) { loginInfoStore.userIdTokenClaim = "user" }
+        verify(exactly = 1) { loginInfoStore.coreFirebaseProjectId = GCP_PROJECT_ID }
+        verify(exactly = 1) { loginInfoStore.coreFirebaseApplicationId = APPLICATION_ID }
+        verify(exactly = 1) { loginInfoStore.coreFirebaseApiKey = API_KEY }
     }
 }
