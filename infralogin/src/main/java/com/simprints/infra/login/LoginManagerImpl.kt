@@ -1,9 +1,9 @@
 package com.simprints.infra.login
 
 import com.google.firebase.FirebaseApp
-import com.simprints.infra.login.db.RemoteDbManager
+import com.simprints.infra.login.db.FirebaseAuthManager
 import com.simprints.infra.login.domain.IntegrityTokenRequester
-import com.simprints.infra.login.domain.LoginInfoManager
+import com.simprints.infra.login.domain.LoginInfoStore
 import com.simprints.infra.login.domain.models.AuthRequest
 import com.simprints.infra.login.domain.models.AuthenticationData
 import com.simprints.infra.login.domain.models.Token
@@ -18,20 +18,20 @@ import kotlin.reflect.KClass
 internal class LoginManagerImpl @Inject constructor(
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
     private val integrityTokenRequester: IntegrityTokenRequester,
-    private val loginInfoManager: LoginInfoManager,
-    private val remoteDbManager: RemoteDbManager,
+    private val loginInfoStore: LoginInfoStore,
+    private val firebaseAuthManager: FirebaseAuthManager,
     private val simApiClientFactory: SimApiClientFactory,
 ) : LoginManager {
 
     override var signedInProjectId: String
-        get() = loginInfoManager.signedInProjectId
+        get() = loginInfoStore.signedInProjectId
         set(value) {
-            loginInfoManager.signedInProjectId = value
+            loginInfoStore.signedInProjectId = value
         }
     override var signedInUserId: String
-        get() = loginInfoManager.signedInUserId
+        get() = loginInfoStore.signedInUserId
         set(value) {
-            loginInfoManager.signedInUserId = value
+            loginInfoStore.signedInUserId = value
         }
 
     override suspend fun requestIntegrityToken(nonce: String): String =
@@ -51,32 +51,32 @@ internal class LoginManagerImpl @Inject constructor(
     ): Token = authenticationRemoteDataSource.requestAuthToken(projectId, userId, credentials)
 
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
-        loginInfoManager.isProjectIdSignedIn(possibleProjectId)
+        loginInfoStore.isProjectIdSignedIn(possibleProjectId)
 
     override fun cleanCredentials() {
-        loginInfoManager.cleanCredentials()
+        loginInfoStore.cleanCredentials()
     }
 
     override fun storeCredentials(projectId: String, userId: String) {
-        loginInfoManager.storeCredentials(projectId, userId)
+        loginInfoStore.storeCredentials(projectId, userId)
     }
 
     override suspend fun signIn(token: Token) {
-        remoteDbManager.signIn(token)
+        firebaseAuthManager.signIn(token)
     }
 
     override fun signOut() {
-        remoteDbManager.signOut()
+        firebaseAuthManager.signOut()
     }
 
     override fun isSignedIn(projectId: String, userId: String): Boolean =
-        remoteDbManager.isSignedIn(projectId, userId)
+        firebaseAuthManager.isSignedIn(projectId, userId)
 
     override fun getCoreApp(): FirebaseApp =
-        remoteDbManager.getCoreApp()
+        firebaseAuthManager.getCoreApp()
 
     override fun getLegacyAppFallback(): FirebaseApp =
-        remoteDbManager.getLegacyAppFallback()
+        firebaseAuthManager.getLegacyAppFallback()
 
     override suspend fun <T : SimRemoteInterface> buildClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> =
         simApiClientFactory.buildClient(remoteInterface)

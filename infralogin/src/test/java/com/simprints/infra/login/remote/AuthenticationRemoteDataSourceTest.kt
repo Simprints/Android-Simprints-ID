@@ -24,7 +24,7 @@ import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 
-class AuthenticationRemoteDataSourceImplTest {
+class AuthenticationRemoteDataSourceTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
@@ -39,8 +39,8 @@ class AuthenticationRemoteDataSourceImplTest {
     private val remoteInterface = mockk<AuthenticationRemoteInterface>()
     private val simApiClient = mockk<SimNetwork.SimApiClient<AuthenticationRemoteInterface>>()
     private val simApiClientFactory = mockk<SimApiClientFactory>()
-    private val authenticationRemoteDataSourceImpl =
-        AuthenticationRemoteDataSourceImpl(simApiClientFactory)
+    private val authenticationRemoteDataSource =
+        AuthenticationRemoteDataSource(simApiClientFactory)
 
     @Before
     fun setUp() {
@@ -66,7 +66,7 @@ class AuthenticationRemoteDataSourceImplTest {
             } returns ApiAuthenticationData(PUBLIC_KEY, NONCE)
 
             val actualAuthenticationData =
-                authenticationRemoteDataSourceImpl.requestAuthenticationData(
+                authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
                     USER_ID,
                     DEVICE_ID
@@ -88,7 +88,7 @@ class AuthenticationRemoteDataSourceImplTest {
             } throws exception
 
             val receivedException = assertThrows<BackendMaintenanceException> {
-                authenticationRemoteDataSourceImpl.requestAuthenticationData(
+                authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
                     USER_ID,
                     DEVICE_ID
@@ -110,7 +110,7 @@ class AuthenticationRemoteDataSourceImplTest {
             } throws exception
 
             val receivedException = assertThrows<SyncCloudIntegrationException> {
-                authenticationRemoteDataSourceImpl.requestAuthenticationData(
+                authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
                     USER_ID,
                     DEVICE_ID
@@ -139,7 +139,7 @@ class AuthenticationRemoteDataSourceImplTest {
             } throws exception
 
             assertThrows<AuthRequestInvalidCredentialsException> {
-                authenticationRemoteDataSourceImpl.requestAuthenticationData(
+                authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
                     USER_ID,
                     DEVICE_ID
@@ -158,7 +158,7 @@ class AuthenticationRemoteDataSourceImplTest {
                 remoteInterface.requestCustomTokens(PROJECT_ID, USER_ID, API_AUTH_REQUEST_BODY)
             } returns apiToken
 
-            val actualToken = authenticationRemoteDataSourceImpl.requestAuthToken(
+            val actualToken = authenticationRemoteDataSource.requestAuthToken(
                 PROJECT_ID,
                 USER_ID,
                 AUTH_REQUEST
@@ -176,7 +176,7 @@ class AuthenticationRemoteDataSourceImplTest {
             } throws exception
 
             val receivedException = assertThrows<BackendMaintenanceException> {
-                authenticationRemoteDataSourceImpl.requestAuthToken(
+                authenticationRemoteDataSource.requestAuthToken(
                     PROJECT_ID,
                     USER_ID,
                     AUTH_REQUEST
@@ -194,7 +194,7 @@ class AuthenticationRemoteDataSourceImplTest {
             } throws exception
 
             val receivedException = assertThrows<SyncCloudIntegrationException> {
-                authenticationRemoteDataSourceImpl.requestAuthToken(
+                authenticationRemoteDataSource.requestAuthToken(
                     PROJECT_ID,
                     USER_ID,
                     AUTH_REQUEST
@@ -219,7 +219,7 @@ class AuthenticationRemoteDataSourceImplTest {
             } throws exception
 
             assertThrows<AuthRequestInvalidCredentialsException> {
-                authenticationRemoteDataSourceImpl.requestAuthToken(
+                authenticationRemoteDataSource.requestAuthToken(
                     PROJECT_ID,
                     USER_ID,
                     AUTH_REQUEST

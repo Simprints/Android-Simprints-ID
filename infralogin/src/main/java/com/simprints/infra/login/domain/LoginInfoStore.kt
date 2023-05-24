@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-internal class LoginInfoManagerImpl @Inject constructor(@ApplicationContext ctx: Context) : LoginInfoManager {
+internal class LoginInfoStore @Inject constructor(
+    @ApplicationContext ctx: Context,
+) {
 
     companion object {
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
@@ -20,61 +22,65 @@ internal class LoginInfoManagerImpl @Inject constructor(@ApplicationContext ctx:
         private const val CORE_FIREBASE_API_KEY = "CORE_FIREBASE_API_KEY"
     }
 
+    // TODO Move data to an encrypted version - CORE-2590
     private val prefs: SharedPreferences = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
 
-    override var signedInProjectId: String = ""
+    var signedInProjectId: String = ""
         get() = prefs.getString(PROJECT_ID, "").orEmpty()
         set(value) {
             field = value
             prefs.edit().putString(PROJECT_ID, field).apply()
         }
 
-    override var signedInUserId: String = ""
+    var signedInUserId: String = ""
         get() = prefs.getString(USER_ID, "").orEmpty()
         set(value) {
             field = value
             prefs.edit().putString(USER_ID, field).apply()
         }
 
-    override var coreFirebaseProjectId: String = ""
+    // Core Firebase Project details. We store them to initialize the core Firebase project.
+    var coreFirebaseProjectId: String = ""
         get() = prefs.getString(CORE_FIREBASE_PROJECT_ID, "").orEmpty()
         set(value) {
             field = value
             prefs.edit().putString(CORE_FIREBASE_PROJECT_ID, field).apply()
         }
 
-    override var coreFirebaseApplicationId: String = ""
+    var coreFirebaseApplicationId: String = ""
         get() = prefs.getString(CORE_FIREBASE_APPLICATION_ID, "").orEmpty()
         set(value) {
             field = value
             prefs.edit().putString(CORE_FIREBASE_APPLICATION_ID, field).apply()
         }
 
-    override var coreFirebaseApiKey: String = ""
+    var coreFirebaseApiKey: String = ""
         get() = prefs.getString(CORE_FIREBASE_API_KEY, "").orEmpty()
         set(value) {
             field = value
             prefs.edit().putString(CORE_FIREBASE_API_KEY, field).apply()
         }
 
-    override var projectIdTokenClaim: String? = ""
+    // Cached claims in the auth token. We used them to check whether the user is signed or not
+    // in without reading the token from Firebase (async operation)
+    var projectIdTokenClaim: String? = ""
         get() = prefs.getString(PROJECT_ID_CLAIM, "")
         set(value) {
             field = value
             prefs.edit().putString(PROJECT_ID_CLAIM, field ?: "").apply()
         }
 
-    override var userIdTokenClaim: String? = ""
+    var userIdTokenClaim: String? = ""
         get() = prefs.getString(USER_ID_CLAIM, "")
         set(value) {
             field = value
             prefs.edit().putString(USER_ID_CLAIM, field ?: "").apply()
         }
 
-    override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
+    fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
         signedInProjectId.isNotEmpty() && signedInProjectId == possibleProjectId
 
-    override fun cleanCredentials() {
+    fun cleanCredentials() {
         signedInProjectId = ""
         signedInUserId = ""
         prefs.edit().putString(ENCRYPTED_PROJECT_SECRET, "").apply()
@@ -82,7 +88,7 @@ internal class LoginInfoManagerImpl @Inject constructor(@ApplicationContext ctx:
         clearCachedTokenClaims()
     }
 
-    override fun clearCachedTokenClaims() {
+    fun clearCachedTokenClaims() {
         projectIdTokenClaim = ""
         userIdTokenClaim = ""
         coreFirebaseProjectId = ""
@@ -90,7 +96,7 @@ internal class LoginInfoManagerImpl @Inject constructor(@ApplicationContext ctx:
         coreFirebaseApiKey = ""
     }
 
-    override fun storeCredentials(projectId: String, userId: String) {
+    fun storeCredentials(projectId: String, userId: String) {
         signedInProjectId = projectId
         signedInUserId = userId
     }
