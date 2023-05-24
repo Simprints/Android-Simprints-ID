@@ -7,10 +7,8 @@ import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
 import javax.inject.Inject
 
-// Ignore this class from test coverage calculations
-// because it uses jni native code which is hard to test
-@ExcludedFromGeneratedReports
 class RankOneInitializer @Inject constructor() : FaceBioSdkInitializer {
+
     /**
      * This will try to load ROC library from jniLibs and then initialize using the [license].
      *
@@ -19,6 +17,7 @@ class RankOneInitializer @Inject constructor() : FaceBioSdkInitializer {
      *
      * @return true if initializing was successful, false otherwise
      */
+    @ExcludedFromGeneratedReports
     override fun tryInitWithLicense(activity: Activity, license: String): Boolean {
         System.loadLibrary("roc_embedded")
         System.loadLibrary("_roc_embedded")
