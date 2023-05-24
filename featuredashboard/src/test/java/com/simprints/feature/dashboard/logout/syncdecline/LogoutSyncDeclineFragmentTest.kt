@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
@@ -136,7 +137,7 @@ internal class LogoutSyncDeclineFragmentTest {
 
     private fun mockSettingsPassword(lock: SettingsPasswordConfig) {
         every { viewModel.settingsLocked } returns mockk {
-            every { value } returns lock
+            every { value } returns LiveDataEventWithContent(lock)
         }
     }
 }

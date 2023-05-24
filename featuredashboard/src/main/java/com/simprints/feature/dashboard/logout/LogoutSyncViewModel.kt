@@ -1,10 +1,11 @@
 package com.simprints.feature.dashboard.logout
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.settings.about.SignerManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
@@ -20,17 +21,11 @@ class LogoutSyncViewModel @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
-    val settingsLocked: LiveData<SettingsPasswordConfig>
-        get() = _settingsLocked
-    private val _settingsLocked =
-        MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
-
-    init {
-        viewModelScope.launch {
-            val configuration = configManager.getProjectConfiguration()
-            _settingsLocked.postValue(configuration.general.settingsPassword)
+    val settingsLocked: LiveData<LiveDataEventWithContent<SettingsPasswordConfig>>
+        get() = liveData(context = viewModelScope.coroutineContext) {
+            emit(LiveDataEventWithContent(configManager.getProjectConfiguration().general.settingsPassword))
         }
-    }
+
 
     fun logout() {
         externalScope.launch { signerManager.signOut() }
