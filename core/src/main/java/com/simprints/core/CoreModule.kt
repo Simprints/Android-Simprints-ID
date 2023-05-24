@@ -126,3 +126,11 @@ annotation class NonCancellableIO
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class ExternalScope
+
+/*
+Use this annotation to ignore a class or function from test coverage reports.
+ */
+@MustBeDocumented
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+annotation class Generated
