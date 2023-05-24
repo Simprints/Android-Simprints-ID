@@ -1,6 +1,6 @@
 package com.simprints.id.secure
 
-import com.simprints.infra.login.domain.models.Token
+import com.simprints.infra.authstore.domain.models.Token
 
 interface SignerManager {
 

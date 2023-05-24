@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.infra.config.domain.ConfigService
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -14,14 +14,14 @@ import dagger.assisted.AssistedInject
 internal class ConfigurationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val configService: ConfigService,
 ) : CoroutineWorker(context, params) {
 
     private val tag = ConfigurationWorker::class.java.name
 
     override suspend fun doWork(): Result = try {
-       val projectId = loginManager.signedInProjectId
+       val projectId = authStore.signedInProjectId
 
        // if the user is not signed in, we shouldn't try again
        if (projectId.isEmpty()) {

@@ -20,7 +20,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -34,7 +34,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val configManager: ConfigManager,
     connectivityTracker: ConnectivityTracker,
     private val enrolmentRecordManager: EnrolmentRecordManager,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
 ) : ViewModel() {
@@ -136,7 +136,7 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
-        val projectId = loginManager.signedInProjectId
+        val projectId = authStore.signedInProjectId
 
         awaitAll(
             async { _configuration.postValue(configManager.getProjectConfiguration()) },

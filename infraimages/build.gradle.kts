@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":infralogin"))
+    implementation(project(":infra:auth-store"))
     implementation(project(":infraconfig"))
 
     // Firebase

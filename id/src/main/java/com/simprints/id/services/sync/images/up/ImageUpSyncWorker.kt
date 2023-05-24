@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,7 +17,7 @@ class ImageUpSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val imageRepository: ImageRepository,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     @DispatcherBG private val dispatcher: CoroutineDispatcher
 ) : SimCoroutineWorker(context, params) {
 
@@ -28,7 +28,7 @@ class ImageUpSyncWorker @AssistedInject constructor(
             crashlyticsLog("Start")
 
             try {
-                if (imageRepository.uploadStoredImagesAndDelete(loginManager.signedInProjectId)) {
+                if (imageRepository.uploadStoredImagesAndDelete(authStore.signedInProjectId)) {
                     success()
                 } else {
                     retry()

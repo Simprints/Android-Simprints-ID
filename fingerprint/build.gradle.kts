@@ -35,7 +35,7 @@ dependencies {
     implementation(project(":fingerprintmatcher"))
     implementation(project(":fingerprintscanner"))
     implementation(project(":infraconfig"))
-    implementation(project(":infralogin"))
+    implementation(project(":infra:auth-store"))
     implementation(project(":infraimages"))
     implementation(project(":infrarecentuseractivity"))
     implementation(project(":featurealert"))

@@ -19,7 +19,7 @@ import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventV
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
@@ -37,7 +37,7 @@ internal class EventRepositoryImplTest {
     private lateinit var eventRepo: EventRepository
 
     @MockK
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     @MockK
     lateinit var eventLocalDataSource: EventLocalDataSource
@@ -62,7 +62,7 @@ internal class EventRepositoryImplTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns NOW
-        every { loginManager.signedInProjectId } returns DEFAULT_PROJECT_ID
+        every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
         coEvery { configManager.getProjectConfiguration() } returns mockk {
@@ -78,7 +78,7 @@ internal class EventRepositoryImplTest {
             DEVICE_ID,
             APP_VERSION_NAME,
             LIB_VERSION_NAME,
-            loginManager,
+            authStore,
             eventLocalDataSource,
             timeHelper,
             sessionEventValidatorsFactory,
@@ -106,7 +106,7 @@ internal class EventRepositoryImplTest {
     @Test
     fun `create session for empty project id`() {
         runBlocking {
-            every { loginManager.signedInProjectId } returns ""
+            every { authStore.signedInProjectId } returns ""
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
 
             val session = eventRepo.createSession()
@@ -292,7 +292,7 @@ internal class EventRepositoryImplTest {
         runTest {
             //Given
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
-            every { loginManager.signedInProjectId } returns "projectId"
+            every { authStore.signedInProjectId } returns "projectId"
             //When
             val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
             //Then
@@ -467,7 +467,7 @@ internal class EventRepositoryImplTest {
     }
 
     private fun mockSignedId() =
-        every { loginManager.signedInProjectId } returns DEFAULT_PROJECT_ID
+        every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
     companion object {
         const val DEVICE_ID = "DEVICE_ID"

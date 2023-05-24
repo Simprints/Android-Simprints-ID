@@ -19,7 +19,7 @@ import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INT
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -48,7 +48,7 @@ class EventUpSyncUploaderWorkerTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val projectScope = JsonHelper.toJson(EventUpSyncScope.ProjectScope(PROJECT_ID))
-    private val loginManager = mockk<LoginManager> {
+    private val authStore = mockk<AuthStore> {
         every { signedInProjectId } returns PROJECT_ID
     }
     private val upSyncTask = mockk<EventUpSyncTask>()
@@ -258,7 +258,7 @@ class EventUpSyncUploaderWorkerTest {
             TestWorkerFactory(
                 upSyncTask,
                 mockk(relaxed = true),
-                loginManager,
+                authStore,
                 testCoroutineRule.testCoroutineDispatcher
             )
         ).build()
@@ -267,7 +267,7 @@ class EventUpSyncUploaderWorkerTest {
 private class TestWorkerFactory(
     private val upSyncTask: EventUpSyncTask,
     private val eventSyncCache: EventSyncCache,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val dispatcher: CoroutineDispatcher,
 ) : WorkerFactory() {
     override fun createWorker(
@@ -279,7 +279,7 @@ private class TestWorkerFactory(
         workerParameters,
         upSyncTask,
         eventSyncCache,
-        loginManager,
+        authStore,
         JsonHelper,
         dispatcher
     )

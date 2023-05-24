@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -31,7 +31,7 @@ class ProjectDetailsViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val loginManager = mockk<LoginManager> {
+    private val authStore = mockk<com.simprints.infra.authstore.AuthStore> {
         every { signedInProjectId } returns PROJECT_ID
     }
     private val configManager = mockk<ConfigManager> {
@@ -53,7 +53,7 @@ class ProjectDetailsViewModelTest {
     fun `should initialize the live data correctly`() = runTest {
         val viewModel = ProjectDetailsViewModel(
             configManager,
-            loginManager,
+            authStore,
             recentUserActivityManager,
         )
 
@@ -68,7 +68,7 @@ class ProjectDetailsViewModelTest {
         }
         val viewModel = ProjectDetailsViewModel(
             configManager,
-            loginManager,
+            authStore,
             recentUserActivityManager,
         )
 

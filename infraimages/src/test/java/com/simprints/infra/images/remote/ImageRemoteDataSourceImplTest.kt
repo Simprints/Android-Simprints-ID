@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -35,7 +35,7 @@ class ImageRemoteDataSourceImplTest {
             coEvery { getProject(any()).imageBucket } returns "gs://`simprints-dev.appspot.com"
         }
 
-        val loginManagerMock = mockk<LoginManager>(relaxed = true) {
+        val authStoreMock = mockk<com.simprints.infra.authstore.AuthStore>(relaxed = true) {
             every { getLegacyAppFallback() } returns mockk(relaxed = true)
             every { getLegacyAppFallback().options.projectId } returns "projectId"
             every { signedInProjectId } returns "projectId"
@@ -45,7 +45,7 @@ class ImageRemoteDataSourceImplTest {
 
         every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
 
-        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, loginManagerMock)
+        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, authStoreMock)
         val imageStreamMock = mockk<FileInputStream>(relaxed = true)
 
         val securedImageRefMock = mockk<SecuredImageRef>(relaxed = true) {
@@ -62,11 +62,11 @@ class ImageRemoteDataSourceImplTest {
 
         val imgUrlProviderMock = mockk<ConfigManager>()
 
-        val loginManagerMock = mockk<LoginManager>(relaxed = true) {
+        val authStoreMock = mockk<com.simprints.infra.authstore.AuthStore>(relaxed = true) {
             every { getLegacyAppFallback().options.projectId } returns null
         }
 
-        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, loginManagerMock)
+        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, authStoreMock)
         val rtn = remoteDataSource.uploadImage(mockk(), mockk())
 
         assert(!rtn.isUploadSuccessful())
@@ -79,11 +79,11 @@ class ImageRemoteDataSourceImplTest {
             coEvery { getProject(any()).imageBucket } returns ""
         }
 
-        val loginManagerMock = mockk<LoginManager>(relaxed = true) {
+        val authStoreMock = mockk<com.simprints.infra.authstore.AuthStore>(relaxed = true) {
             every { getLegacyAppFallback().options.projectId } returns "projectId"
         }
 
-        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, loginManagerMock)
+        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, authStoreMock)
         val rtn = remoteDataSource.uploadImage(mockk(), mockk())
 
         assert(!rtn.isUploadSuccessful())

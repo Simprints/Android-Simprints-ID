@@ -42,7 +42,7 @@ dependencies {
 
     implementation(project(":infraevents"))
     implementation(project(":infraeventsync"))
-    implementation(project(":infralogin"))
+    implementation(project(":infra:auth-store"))
     implementation(project(":clientapi"))
     implementation(project(":face"))
     implementation(project(":featuredashboard"))

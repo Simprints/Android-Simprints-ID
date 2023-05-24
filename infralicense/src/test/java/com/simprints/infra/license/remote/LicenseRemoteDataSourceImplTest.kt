@@ -2,7 +2,7 @@ package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -29,9 +29,9 @@ class LicenseRemoteDataSourceImplTest {
 
     private val remoteInterface = mockk<LicenseRemoteInterface>()
     private val simApiClient = mockk<SimNetwork.SimApiClient<LicenseRemoteInterface>>()
-    private val loginManager = mockk<LoginManager>()
+    private val authStore = mockk<com.simprints.infra.authstore.AuthStore>()
     private val licenseRemoteDataSourceImpl =
-        LicenseRemoteDataSourceImpl(loginManager, JsonHelper)
+        LicenseRemoteDataSourceImpl(authStore, JsonHelper)
 
     @Before
     fun setup() {
@@ -43,7 +43,7 @@ class LicenseRemoteDataSourceImplTest {
             )
         }
 
-        coEvery { loginManager.buildClient(LicenseRemoteInterface::class) } returns simApiClient
+        coEvery { authStore.buildClient(LicenseRemoteInterface::class) } returns simApiClient
 
         coEvery { remoteInterface.getLicense("validProject", any(), any()) } returns ApiLicense(
             RankOneLicense(

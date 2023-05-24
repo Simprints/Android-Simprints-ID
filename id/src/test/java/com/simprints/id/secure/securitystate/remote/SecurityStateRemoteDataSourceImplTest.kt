@@ -8,7 +8,7 @@ import com.simprints.id.secure.models.remote.ApiSecurityState
 import com.simprints.id.secure.models.remote.ApiUpSyncEnrolmentRecords
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -30,7 +30,7 @@ class SecurityStateRemoteDataSourceImplTest {
         private const val PREVIOUS_INSTRUCTION_ID = "id"
     }
 
-    private val loginManager = mockk<LoginManager>()
+    private val authStore = mockk<com.simprints.infra.authstore.AuthStore>()
     private val remoteInterface = mockk<SecureApiInterface>()
     private val configManager = mockk<ConfigManager> {
         coEvery { getDeviceConfiguration() } returns DeviceConfiguration(
@@ -41,7 +41,7 @@ class SecurityStateRemoteDataSourceImplTest {
     }
     private val simApiClient = mockk<SimNetwork.SimApiClient<SecureApiInterface>>()
     private val securityStateRemoteDataSource =
-        SecurityStateRemoteDataSourceImpl(loginManager, configManager, DEVICE_ID)
+        SecurityStateRemoteDataSourceImpl(authStore, configManager, DEVICE_ID)
 
 
     @Before
@@ -53,8 +53,8 @@ class SecurityStateRemoteDataSourceImplTest {
                 remoteInterface
             )
         }
-        coEvery { loginManager.buildClient(SecureApiInterface::class) } returns simApiClient
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        coEvery { authStore.buildClient(SecureApiInterface::class) } returns simApiClient
+        every { authStore.signedInProjectId } returns PROJECT_ID
     }
 
     @Test

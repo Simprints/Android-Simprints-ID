@@ -15,7 +15,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -36,7 +36,7 @@ class CheckLoginFromIntentPresenterTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val loginManagerMock = mockk<LoginManager>(relaxed = true)
+    private val authStoreMock = mockk<AuthStore>(relaxed = true)
     private var configManager: ConfigManager = mockk()
 
 
@@ -67,7 +67,7 @@ class CheckLoginFromIntentPresenterTest {
         MockKAnnotations.init(this, relaxed = true)
         coEvery { enrolmentRecordManager.count(any()) } returns 0
         every { simNetworkUtilsMock.connectionsStates } returns emptyList()
-        every { loginManagerMock.signedInProjectId } returns DEFAULT_PROJECT_ID
+        every { authStoreMock.signedInProjectId } returns DEFAULT_PROJECT_ID
         coEvery { configManager.getProjectConfiguration() } returns mockk(relaxed = true) {
             every { general } returns generalConfiguration
         }

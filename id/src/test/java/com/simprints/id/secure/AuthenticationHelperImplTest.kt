@@ -5,11 +5,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.login.LoginManager
-import com.simprints.infra.login.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.login.exceptions.IntegrityServiceTemporaryDown
-import com.simprints.infra.login.exceptions.MissingOrOutdatedGooglePlayStoreApp
-import com.simprints.infra.login.exceptions.RequestingIntegrityTokenException
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
+import com.simprints.infra.authstore.exceptions.IntegrityServiceTemporaryDown
+import com.simprints.infra.authstore.exceptions.MissingOrOutdatedGooglePlayStoreApp
+import com.simprints.infra.authstore.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -23,7 +23,7 @@ import java.io.IOException
 class AuthenticationHelperImplTest {
 
     private lateinit var authenticationHelperImpl: AuthenticationHelperImpl
-    private val loginManager: LoginManager = mockk(relaxed = true)
+    private val authStore: AuthStore = mockk(relaxed = true)
     private val timeHelper: TimeHelper = mockk(relaxed = true)
     private val projectAuthenticator: ProjectAuthenticator = mockk(relaxed = true)
     private val eventRepository: EventRepository = mockk(relaxed = true)
@@ -31,7 +31,7 @@ class AuthenticationHelperImplTest {
     @Before
     fun setUp() {
         authenticationHelperImpl = AuthenticationHelperImpl(
-            loginManager,
+            authStore,
             timeHelper,
             projectAuthenticator,
             eventRepository,

@@ -4,7 +4,7 @@ import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
@@ -23,7 +23,7 @@ class ImageUpSyncWorkerTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val imageRepository = mockk<ImageRepository>()
-    private val loginManager = mockk<LoginManager> {
+    private val authStore = mockk<com.simprints.infra.authstore.AuthStore> {
         every { signedInProjectId } returns PROJECT_ID
     }
 
@@ -31,7 +31,7 @@ class ImageUpSyncWorkerTest {
         mockk(relaxed = true),
         mockk(relaxed = true),
         imageRepository,
-        loginManager,
+        authStore,
         testCoroutineRule.testCoroutineDispatcher,
     )
 

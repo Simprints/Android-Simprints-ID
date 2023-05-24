@@ -2,16 +2,16 @@ package com.simprints.id.secure
 
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.login.LoginManager
-import com.simprints.infra.login.domain.models.AuthRequest
-import com.simprints.infra.login.domain.models.AuthenticationData
-import com.simprints.infra.login.domain.models.Token
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.domain.models.AuthRequest
+import com.simprints.infra.authstore.domain.models.AuthenticationData
+import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.security.SecurityManager
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 class ProjectAuthenticatorImpl @Inject constructor(
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val projectSecretManager: ProjectSecretManager,
     private val secureDataManager: SecurityManager,
     private val configManager: ConfigManager,
@@ -45,14 +45,14 @@ class ProjectAuthenticatorImpl @Inject constructor(
         projectSecret: String,
         deviceId: String
     ): AuthRequest {
-        val authenticationData = loginManager.requestAuthenticationData(
+        val authenticationData = authStore.requestAuthenticationData(
             nonceScope.projectId,
             nonceScope.userId,
             deviceId
         )
         return buildAuthRequest(
             getEncryptedProjectSecret(projectSecret, authenticationData),
-            loginManager.requestIntegrityToken(authenticationData.nonce),
+            authStore.requestIntegrityToken(authenticationData.nonce),
             deviceId
         )
     }
@@ -74,7 +74,7 @@ class ProjectAuthenticatorImpl @Inject constructor(
 
 
     private suspend fun AuthRequest.makeAuthRequest(nonceScope: NonceScope): Token =
-        loginManager.requestAuthToken(
+        authStore.requestAuthToken(
             nonceScope.projectId,
             nonceScope.userId,
             this

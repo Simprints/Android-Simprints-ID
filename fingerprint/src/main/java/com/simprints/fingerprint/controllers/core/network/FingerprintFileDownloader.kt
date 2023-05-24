@@ -2,7 +2,7 @@ package com.simprints.fingerprint.controllers.core.network
 
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -15,13 +15,13 @@ import javax.inject.Inject
  */
 class FingerprintFileDownloader @Inject constructor(
     private val fingerprintApiClientFactory: FingerprintApiClientFactory,
-    private val loginManager: LoginManager,
-   @DispatcherIO private val dispatcher: CoroutineDispatcher,
+    private val authStore: AuthStore,
+    @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
 
 
     private val projectId by lazy {
-        loginManager.signedInProjectId
+        authStore.signedInProjectId
     }
 
     /**

@@ -14,7 +14,7 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FACE
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -68,7 +68,7 @@ class ModalityFlowVerifyImplTest {
             every { consent } returns consentConfiguration
         }
     }
-    private val loginManager = mockk<LoginManager> {
+    private val authStore = mockk<com.simprints.infra.authstore.AuthStore> {
         every { signedInProjectId } returns ModalityFlowEnrolImplTest.PROJECT_ID
     }
 
@@ -218,7 +218,7 @@ class ModalityFlowVerifyImplTest {
             faceStepProcessor,
             coreStepProcessor,
             configManager,
-            loginManager,
+            authStore,
             "deviceId"
         )
     }
