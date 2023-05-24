@@ -2,7 +2,7 @@ package com.simprints.feature.rocwrapper.detection
 
 import android.graphics.Bitmap
 import android.graphics.Rect
-import com.simprints.core.Generated
+import com.simprints.core.ExcludedFromGeneratedReports
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 // Ignore this class from test coverage calculations
 // because it uses jni native code which is hard to test
-@Generated
+@ExcludedFromGeneratedReports
 class RankOneFaceDetector @Inject constructor() : FaceDetector {
     companion object{
         const val RANK_ONE_1_23 ="RANK_ONE_1_23"

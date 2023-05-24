@@ -1,7 +1,7 @@
 package com.simprints.feature.rocwrapper.initialization
 
 import android.app.Activity
-import com.simprints.core.Generated
+import com.simprints.core.ExcludedFromGeneratedReports
 import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 // Ignore this class from test coverage calculations
 // because it uses jni native code which is hard to test
-@Generated
+@ExcludedFromGeneratedReports
 class RankOneInitializer @Inject constructor() : FaceBioSdkInitializer {
     /**
      * This will try to load ROC library from jniLibs and then initialize using the [license].
