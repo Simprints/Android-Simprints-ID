@@ -20,14 +20,18 @@ import javax.inject.Inject
 // because it uses jni native code which is hard to test
 @ExcludedFromGeneratedReports
 class RankOneFaceDetector @Inject constructor() : FaceDetector {
-    companion object{
-        const val RANK_ONE_1_23 ="RANK_ONE_1_23"
+    companion object {
+        const val RANK_ONE_1_23 = "RANK_ONE_1_23"
     }
+
     private val maxFaces = 1
     private val falseDetectionRate = 0.1f
     private val relativeMinSize = 0.2f
     private val absoluteMinSize = 36L
 
+    // Ignore this class from test coverage calculations
+    // because it uses jni native code which is hard to test
+    @ExcludedFromGeneratedReports
     data class ROCFace(
         var face: roc_detection,
         var template: SWIGTYPE_p_unsigned_char,
@@ -42,7 +46,7 @@ class RankOneFaceDetector @Inject constructor() : FaceDetector {
         }
     }
 
-     override fun analyze(bitmap: Bitmap): Face? {
+    override fun analyze(bitmap: Bitmap): Face? {
         val rocColorImage = roc_image()
         val rocGrayImage = roc_image()
 
