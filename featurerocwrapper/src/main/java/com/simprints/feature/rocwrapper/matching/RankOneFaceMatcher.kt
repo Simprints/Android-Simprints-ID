@@ -1,6 +1,6 @@
 package com.simprints.feature.rocwrapper.matching
 
-import com.simprints.core.Generated
+import com.simprints.core.ExcludedFromGeneratedReports
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.rocConstants.ROC_FAST_FV_SIZE
@@ -8,7 +8,7 @@ import javax.inject.Inject
 
 // Ignore this class from test coverage calculations
 // because it uses jni native code which is hard to test
-@Generated
+@ExcludedFromGeneratedReports
 class RankOneFaceMatcher @Inject constructor() : FaceMatcher() {
     override val matcherName
         get() = "RANK_ONE"
