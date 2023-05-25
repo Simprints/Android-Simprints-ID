@@ -2,7 +2,6 @@ package com.simprints.feature.dashboard.settings.about
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
@@ -53,7 +52,7 @@ class AboutViewModelTest {
     private val eventSyncManager = mockk<EventSyncManager>()
 
     private val loginManager = mockk<LoginManager> {
-        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { signedInProjectId } returns PROJECT_ID
     }
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns buildProjectConfigurationMock()
