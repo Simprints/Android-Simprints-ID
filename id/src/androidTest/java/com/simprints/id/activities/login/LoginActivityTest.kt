@@ -11,8 +11,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
-import com.simprints.id.secure.AuthenticationHelper
-import com.simprints.id.secure.models.AuthenticateDataResult
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createAndStartActivity
@@ -34,7 +34,7 @@ class LoginActivityTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val authenticationHelper: AuthenticationHelper = mockk(relaxed = true)
+    private val authenticationHelper: AuthManager = mockk(relaxed = true)
 
     @Test
     fun withSuccessConfirmViews() {

@@ -31,15 +31,4 @@ internal class SimApiClientFactory @Inject constructor(
             firebaseAuthManager.getCurrentToken(),
         )
     }
-
-    fun <T : SimRemoteInterface> buildUnauthenticatedClient(remoteInterface: KClass<T>): SimNetwork.SimApiClient<T> {
-        return simNetwork.getSimApiClient(
-            remoteInterface,
-            ctx,
-            simNetwork.getApiBaseUrl(),
-            deviceId,
-            versionName,
-            null,
-        )
-    }
 }

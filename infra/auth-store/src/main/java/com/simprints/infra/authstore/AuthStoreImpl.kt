@@ -2,13 +2,9 @@ package com.simprints.infra.authstore
 
 import com.google.firebase.FirebaseApp
 import com.simprints.infra.authstore.db.FirebaseAuthManager
-import com.simprints.infra.authstore.domain.IntegrityTokenRequester
 import com.simprints.infra.authstore.domain.LoginInfoStore
-import com.simprints.infra.authstore.domain.models.AuthRequest
-import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.network.SimApiClientFactory
-import com.simprints.infra.authstore.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import javax.inject.Inject
@@ -16,8 +12,6 @@ import kotlin.reflect.KClass
 
 
 internal class AuthStoreImpl @Inject constructor(
-    private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
-    private val integrityTokenRequester: IntegrityTokenRequester,
     private val loginInfoStore: LoginInfoStore,
     private val firebaseAuthManager: FirebaseAuthManager,
     private val simApiClientFactory: SimApiClientFactory,
@@ -33,22 +27,6 @@ internal class AuthStoreImpl @Inject constructor(
         set(value) {
             loginInfoStore.signedInUserId = value
         }
-
-    override suspend fun requestIntegrityToken(nonce: String): String =
-        integrityTokenRequester.getToken(nonce)
-
-    override suspend fun requestAuthenticationData(
-        projectId: String,
-        userId: String,
-        deviceId: String
-    ): AuthenticationData =
-        authenticationRemoteDataSource.requestAuthenticationData(projectId, userId, deviceId)
-
-    override suspend fun requestAuthToken(
-        projectId: String,
-        userId: String,
-        credentials: AuthRequest
-    ): Token = authenticationRemoteDataSource.requestAuthToken(projectId, userId, credentials)
 
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
         loginInfoStore.isProjectIdSignedIn(possibleProjectId)

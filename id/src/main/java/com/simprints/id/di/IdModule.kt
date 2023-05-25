@@ -39,19 +39,8 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.secure.*
-import com.simprints.id.secure.securitystate.SecurityStateProcessor
-import com.simprints.id.secure.securitystate.SecurityStateProcessorImpl
-import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSource
-import com.simprints.id.secure.securitystate.local.SecurityStateLocalDataSourceImpl
-import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSource
-import com.simprints.id.secure.securitystate.remote.SecurityStateRemoteDataSourceImpl
-import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
-import com.simprints.id.secure.securitystate.repository.SecurityStateRepositoryImpl
 import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
-import com.simprints.id.services.securitystate.SecurityStateScheduler
-import com.simprints.id.services.securitystate.SecurityStateSchedulerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
@@ -235,35 +224,6 @@ abstract class IdSyncModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class IdSecurityModule {
-
-    @Binds
-    abstract fun provideSecurityStateRepository(impl: SecurityStateRepositoryImpl): SecurityStateRepository
-
-    @Binds
-    abstract fun provideSecurityStateRemoteDataSource(impl: SecurityStateRemoteDataSourceImpl): SecurityStateRemoteDataSource
-
-    @Binds
-    abstract fun provideSecurityStateLocalDataSource(impl: SecurityStateLocalDataSourceImpl): SecurityStateLocalDataSource
-
-    @Binds
-    abstract fun provideSecurityStateProcessor(impl: SecurityStateProcessorImpl): SecurityStateProcessor
-
-    @Binds
-    abstract fun provideSignerManager(impl: SignerManagerImpl): SignerManager
-
-    @Binds
-    abstract fun provideSecurityStateScheduler(impl: SecurityStateSchedulerImpl): SecurityStateScheduler
-
-    @Binds
-    abstract fun provideProjectAuthenticator(impl: ProjectAuthenticatorImpl): ProjectAuthenticator
-
-    @Binds
-    abstract fun provideAuthenticationHelper(impl: AuthenticationHelperImpl): AuthenticationHelper
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
 object IdDependenciesModule {
 
     @AbsolutePath
@@ -285,16 +245,4 @@ object IdDependenciesModule {
 
     @Provides
     fun provideGoogleApiAvailability() = GoogleApiAvailability.getInstance()
-}
-
-// TODO remove when the interfaces have been moved into its one module
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class TemporaryFeatureDashboardModule {
-
-    @Binds
-    abstract fun provideSignerManager(impl: SignerManagerImpl): com.simprints.feature.dashboard.settings.about.SignerManager
-
-    @Binds
-    abstract fun provideSecurityStateScheduler(impl: SecurityStateSchedulerImpl): com.simprints.feature.dashboard.debug.SecurityStateScheduler
 }

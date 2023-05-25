@@ -1,15 +1,17 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.domain.alert.AlertType.*
+import com.simprints.id.domain.alert.AlertType.DIFFERENT_PROJECT_ID
+import com.simprints.id.domain.alert.AlertType.DIFFERENT_USER_ID
+import com.simprints.id.domain.alert.AlertType.UNEXPECTED_ERROR
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
-import com.simprints.id.secure.securitystate.repository.SecurityStateRepository
 import com.simprints.id.services.sync.SyncManager
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.security.SecurityManager
 import javax.inject.Inject
 
@@ -33,7 +35,7 @@ abstract class CheckLoginPresenter(
     lateinit var syncManager: SyncManager
 
     @Inject
-    lateinit var securityStateRepository: SecurityStateRepository
+    lateinit var authManager: AuthManager
 
     protected suspend fun checkSignedInStateAndMoveOn() {
         try {
@@ -59,7 +61,7 @@ abstract class CheckLoginPresenter(
     }
 
     private fun checkStatusForDeviceAndProject() {
-        val status = securityStateRepository.getSecurityStatusFromLocal()
+        val status = authManager.getSecurityStatusFromLocal()
         if (status.isCompromisedOrProjectEnded())
             handleNotSignedInUser()
     }

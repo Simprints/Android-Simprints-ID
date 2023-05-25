@@ -1,30 +1,12 @@
 package com.simprints.infra.authstore
 
 import com.google.firebase.FirebaseApp
-import com.simprints.infra.authstore.domain.models.AuthRequest
-import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import kotlin.reflect.KClass
 
 interface AuthStore {
-    // TODO move to authenticator module
-    suspend fun requestIntegrityToken(nonce: String): String
-
-    // TODO move to authenticator module
-    suspend fun requestAuthenticationData(
-        projectId: String,
-        userId: String,
-        deviceId: String
-    ): AuthenticationData
-
-    // TODO move to authenticator module
-    suspend fun requestAuthToken(
-        projectId: String,
-        userId: String,
-        credentials: AuthRequest
-    ): Token
 
     var signedInProjectId: String
     var signedInUserId: String
