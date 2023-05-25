@@ -7,25 +7,36 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 
 internal class LogoutSyncViewModelTest {
 
-    private val signerManager = mockk<SignerManager>(relaxed = true)
-    private val configManager = mockk<ConfigManager>(relaxed = true)
+    @MockK
+    lateinit var signerManager: SignerManager
+
+    @MockK
+    lateinit var configManager: ConfigManager
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+
+    @Before
+    fun setup() {
+        MockKAnnotations.init(this, relaxed = true)
+    }
 
     @Test
     fun `should logout correctly`() {
