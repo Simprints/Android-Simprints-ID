@@ -1,5 +1,6 @@
 package com.simprints.feature.dashboard.logout.syncdecline
 
+import androidx.lifecycle.Observer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
@@ -137,7 +138,10 @@ internal class LogoutSyncDeclineFragmentTest {
 
     private fun mockSettingsPassword(lock: SettingsPasswordConfig) {
         every { viewModel.settingsLocked } returns mockk {
-            every { value } returns LiveDataEventWithContent(lock)
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<LiveDataEventWithContent<SettingsPasswordConfig>?>>()
+                    .onChanged(LiveDataEventWithContent(lock))
+            }
         }
     }
 }
