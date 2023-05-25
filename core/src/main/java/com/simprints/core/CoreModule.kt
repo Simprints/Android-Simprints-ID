@@ -140,4 +140,4 @@ Use this annotation to ignore a class or function from test coverage reports.
     AnnotationTarget.FIELD,
     AnnotationTarget.TYPE
 )
-annotation class ExcludedFromGeneratedReports
+annotation class ExcludedFromGeneratedTestCoverageReports(val reason: String)

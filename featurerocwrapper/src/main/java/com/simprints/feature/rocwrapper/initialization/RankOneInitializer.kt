@@ -1,7 +1,7 @@
 package com.simprints.feature.rocwrapper.initialization
 
 import android.app.Activity
-import com.simprints.core.ExcludedFromGeneratedReports
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.roc_embedded_error
@@ -17,7 +17,9 @@ class RankOneInitializer @Inject constructor() : FaceBioSdkInitializer {
      *
      * @return true if initializing was successful, false otherwise
      */
-    @ExcludedFromGeneratedReports
+    @ExcludedFromGeneratedTestCoverageReports(
+        reason = "This function uses roc class that has native functions and can't be mocked"
+    )
     override fun tryInitWithLicense(activity: Activity, license: String): Boolean {
         System.loadLibrary("roc_embedded")
         System.loadLibrary("_roc_embedded")
