@@ -1,6 +1,6 @@
 package com.simprints.feature.rocwrapper.matching
 
-import com.simprints.core.ExcludedFromGeneratedReports
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import io.rankone.rocsdk.embedded.roc
 import io.rankone.rocsdk.embedded.rocConstants.ROC_FAST_FV_SIZE
@@ -13,7 +13,9 @@ class RankOneFaceMatcher @Inject constructor() : FaceMatcher() {
 
     // Ignore this method from test coverage calculations
     // because it uses jni native code which is hard to test
-    @ExcludedFromGeneratedReports
+    @ExcludedFromGeneratedTestCoverageReports(
+        reason = "This function uses roc class that has native functions and can't be mocked"
+    )
     override suspend fun getComparisonScore(probe: ByteArray, matchAgainst: ByteArray): Float {
         val probeTemplate = roc.new_uint8_t_array(ROC_FAST_FV_SIZE.toInt())
         roc.memmove(roc.roc_cast(probeTemplate), probe)
