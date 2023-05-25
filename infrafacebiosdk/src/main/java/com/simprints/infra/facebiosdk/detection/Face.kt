@@ -3,7 +3,19 @@ package com.simprints.infra.facebiosdk.detection
 import android.graphics.Rect
 import android.graphics.RectF
 
-// All values are after rotation of the source image
+/**
+ * Face that represents a detected biometric target after
+ *
+ * @property sourceWidth bounding rectangle width
+ * @property sourceHeight bounding rectangle hegith
+ * @property absoluteBoundingBox Rect for the absolute coordinates of the detected face
+ * @property yaw rotation around the y access
+ * @property roll rotation around the x access
+ * @property quality image quality
+ * @property template
+ * @property format
+ *
+ */
 data class Face(
     private val sourceWidth: Int,
     private val sourceHeight: Int,
