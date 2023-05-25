@@ -58,7 +58,7 @@ internal class AboutViewModel @Inject constructor(
 
     fun processLogoutRequest() {
         viewModelScope.launch {
-            val projectId = loginManager.getSignedInProjectIdOrEmpty()
+            val projectId = loginManager.signedInProjectId
             val logoutDestination =
                 when (canSyncDataToSimprints() && hasEventsToUpload(projectId)) {
                     true -> LogoutDestination.LogoutDataSyncScreen
