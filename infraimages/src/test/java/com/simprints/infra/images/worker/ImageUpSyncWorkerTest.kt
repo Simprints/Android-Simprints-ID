@@ -1,10 +1,8 @@
-package com.simprints.id.services.sync.images
+package com.simprints.infra.images.worker
 
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.services.sync.images.up.ImageUpSyncWorker
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every

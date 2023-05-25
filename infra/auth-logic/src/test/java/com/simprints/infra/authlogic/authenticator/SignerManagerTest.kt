@@ -8,6 +8,7 @@ import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -40,6 +41,9 @@ internal class SignerManagerTest {
     lateinit var mockRecentUserActivityManager: RecentUserActivityManager
 
     @MockK
+    lateinit var mockImageUpSyncScheduler: ImageUpSyncScheduler
+
+    @MockK
     lateinit var mockSimNetwork: SimNetwork
 
     private lateinit var signerManager: SignerManager
@@ -61,6 +65,7 @@ internal class SignerManagerTest {
             mockEventSyncManager,
             mockSecurityStateScheduler,
             mockRecentUserActivityManager,
+            mockImageUpSyncScheduler,
             mockSimNetwork,
             UnconfinedTestDispatcher(),
         )
@@ -164,7 +169,7 @@ internal class SignerManagerTest {
         signerManager.signOut()
 
         coVerify { mockEventSyncManager.cancelScheduledSync() }
-        // TODO image sync cancel
+        verify { mockImageUpSyncScheduler.cancelImageUpSync() }
         coVerify { mockConfigManager.cancelScheduledSyncConfiguration() }
     }
 

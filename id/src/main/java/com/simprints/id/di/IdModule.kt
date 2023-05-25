@@ -43,8 +43,6 @@ import com.simprints.id.services.guidselection.GuidSelectionManager
 import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
-import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
-import com.simprints.id.services.sync.images.up.ImageUpSyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
 import com.simprints.id.tools.LocationManagerImpl
 import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityChecker
@@ -218,8 +216,6 @@ abstract class IdSyncModule {
     @Binds
     abstract fun provideSyncScheduler(impl: SyncSchedulerImpl): SyncManager
 
-    @Binds
-    abstract fun provideImageUpSyncScheduler(impl: ImageUpSyncSchedulerImpl): ImageUpSyncScheduler
 }
 
 @Module
