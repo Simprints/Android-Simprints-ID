@@ -14,12 +14,13 @@ import com.simprints.core.DispatcherIO
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
-import com.simprints.infra.authstore.AuthStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.toList
@@ -40,7 +41,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var authStore: AuthStore
 
     @Inject
-    lateinit var securityStateScheduler: SecurityStateScheduler
+    lateinit var authManager: AuthManager
 
     @Inject
     lateinit var eventRepository: EventRepository
@@ -102,7 +103,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncDevice.setOnClickListener {
-            securityStateScheduler.getSecurityStateCheck()
+            authManager.startSecurityStateCheck()
         }
 
         binding.printRoomDb.setOnClickListener {

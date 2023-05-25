@@ -3,8 +3,8 @@ package com.simprints.id.activities.login.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.secure.AuthenticationHelper
-import com.simprints.id.secure.models.AuthenticateDataResult
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -21,7 +21,7 @@ class LoginViewModelTest {
     private lateinit var loginViewModel: LoginViewModel
 
     @MockK
-    lateinit var authenticationHelper: AuthenticationHelper
+    lateinit var authenticationHelper: AuthManager
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()

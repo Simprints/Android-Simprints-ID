@@ -4,13 +4,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
 import com.simprints.infra.authstore.db.FirebaseAuthManager
-import com.simprints.infra.authstore.domain.IntegrityTokenRequester
 import com.simprints.infra.authstore.domain.LoginInfoStore
 import com.simprints.infra.authstore.domain.models.AuthRequest
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.network.SimApiClientFactory
-import com.simprints.infra.authstore.remote.AuthenticationRemoteDataSource
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import io.mockk.*
@@ -22,16 +20,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AuthStoreImplTest {
 
-    private val authenticationRemoteDataSource =
-        mockk<AuthenticationRemoteDataSource>(relaxed = true)
-    private val integrityTokenRequester = mockk<IntegrityTokenRequester>(relaxed = true)
     private val loginInfoStore = mockk<LoginInfoStore>(relaxed = true)
     private val firebaseAuthManager = mockk<FirebaseAuthManager>(relaxed = true)
     private val simApiClientFactory = mockk<SimApiClientFactory>(relaxed = true)
 
     private val loginManagerManagerImpl = AuthStoreImpl(
-        authenticationRemoteDataSource,
-        integrityTokenRequester,
         loginInfoStore,
         firebaseAuthManager,
         simApiClientFactory
@@ -67,48 +60,6 @@ class AuthStoreImplTest {
         loginManagerManagerImpl.signedInUserId = USER_ID
 
         verify { loginInfoStore.setProperty("signedInUserId").value(USER_ID) }
-    }
-
-    @Test
-    fun `requestIntegrityToken should call the correct method`() = runTest {
-        coEvery { integrityTokenRequester.getToken(NONCE) } returns INTEGRITY_TOKEN
-        val receivedToken = loginManagerManagerImpl.requestIntegrityToken(NONCE)
-
-        assertThat(receivedToken).isEqualTo(INTEGRITY_TOKEN)
-    }
-
-    @Test
-    fun `requestAuthenticationData should call the correct method`() = runTest(
-        UnconfinedTestDispatcher()
-    ) {
-        coEvery {
-            authenticationRemoteDataSource.requestAuthenticationData(
-                PROJECT_ID,
-                USER_ID,
-                DEVICE_ID
-            )
-        } returns AUTHENTICATION_DATA
-        val receivedAuthenticationData =
-            loginManagerManagerImpl.requestAuthenticationData(PROJECT_ID, USER_ID, DEVICE_ID)
-
-        assertThat(receivedAuthenticationData).isEqualTo(AUTHENTICATION_DATA)
-    }
-
-    @Test
-    fun `requestAuthToken should call the correct method`() = runTest(
-        UnconfinedTestDispatcher()
-    ) {
-        coEvery {
-            authenticationRemoteDataSource.requestAuthToken(
-                PROJECT_ID,
-                USER_ID,
-                AUTH_REQUEST
-            )
-        } returns TOKEN
-        val receivedToken =
-            loginManagerManagerImpl.requestAuthToken(PROJECT_ID, USER_ID, AUTH_REQUEST)
-
-        assertThat(receivedToken).isEqualTo(TOKEN)
     }
 
     @Test

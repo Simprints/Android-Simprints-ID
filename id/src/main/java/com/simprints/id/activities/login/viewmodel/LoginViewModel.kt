@@ -4,15 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.id.secure.AuthenticationHelper
-import com.simprints.id.secure.models.AuthenticateDataResult
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authenticationHelper: AuthenticationHelper,
+    private val authenticationHelper: AuthManager,
 ) : ViewModel() {
 
     private val signInResultLiveData = MutableLiveData<AuthenticateDataResult>()

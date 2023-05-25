@@ -20,7 +20,6 @@ import com.simprints.id.databinding.ActivityLoginBinding
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.secure.models.AuthenticateDataResult
 import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.CAMERA_NOT_AVAILABLE
 import com.simprints.id.tools.InternalConstants.QrCapture.QrCaptureError.PERMISSION_NOT_GRANTED
 import com.simprints.id.tools.SimProgressDialog
@@ -28,6 +27,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityChecker
 import com.simprints.id.tools.googleapis.GooglePlayServicesAvailabilityCheckerImpl.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
+import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
