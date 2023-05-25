@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.images.up
+package com.simprints.infra.images.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 @HiltWorker
-class ImageUpSyncWorker @AssistedInject constructor(
+internal class ImageUpSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val imageRepository: ImageRepository,

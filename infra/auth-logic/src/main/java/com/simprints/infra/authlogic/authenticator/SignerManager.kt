@@ -14,12 +14,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+import com.simprints.infra.images.ImageUpSyncScheduler
+
 internal class SignerManager @Inject constructor(
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
     private val eventSyncManager: EventSyncManager,
     private val securityStateScheduler: SecurityStateScheduler,
     private val recentUserActivityManager: RecentUserActivityManager,
+    private val imageUpSyncScheduler: ImageUpSyncScheduler,
     private val simNetwork: SimNetwork,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
@@ -38,7 +41,7 @@ internal class SignerManager @Inject constructor(
 
         // Cancel all background sync
         eventSyncManager.cancelScheduledSync()
-        // TODO imageUpSyncScheduler.cancelImageUpSync()
+        imageUpSyncScheduler.cancelImageUpSync()
         configManager.cancelScheduledSyncConfiguration()
 
         eventSyncManager.deleteSyncInfo()

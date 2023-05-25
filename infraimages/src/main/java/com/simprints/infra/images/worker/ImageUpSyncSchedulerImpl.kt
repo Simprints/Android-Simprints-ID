@@ -1,18 +1,21 @@
-package com.simprints.id.services.sync.images.up
+package com.simprints.infra.images.worker
 
 import android.content.Context
 import androidx.work.*
 import androidx.work.WorkRequest.Companion.MIN_BACKOFF_MILLIS
-import com.simprints.id.BuildConfig
+import com.simprints.infra.images.BuildConfig
+import com.simprints.infra.images.ImageUpSyncScheduler
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class ImageUpSyncSchedulerImpl @Inject constructor(@ApplicationContext context: Context) : ImageUpSyncScheduler {
+internal class ImageUpSyncSchedulerImpl @Inject constructor(
+    @ApplicationContext context: Context
+): ImageUpSyncScheduler {
 
     private val workManager = WorkManager.getInstance(context)
 
-    override fun scheduleImageUpSync() {
+     override fun scheduleImageUpSync() {
         workManager.enqueueUniquePeriodicWork(
             WORK_NAME,
             ExistingPeriodicWorkPolicy.KEEP,
@@ -20,7 +23,7 @@ class ImageUpSyncSchedulerImpl @Inject constructor(@ApplicationContext context: 
         )
     }
 
-    override fun cancelImageUpSync() {
+     override fun cancelImageUpSync() {
         workManager.cancelUniqueWork(WORK_NAME)
     }
 

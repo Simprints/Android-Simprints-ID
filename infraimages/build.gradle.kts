@@ -5,6 +5,18 @@ plugins {
 
 android {
     namespace = "com.simprints.infra.images"
+
+    buildTypes {
+        getByName("release") {
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
+        }
+        getByName("staging") {
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+        }
+        getByName("debug") {
+            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
+        }
+    }
 }
 
 dependencies {
@@ -17,5 +29,6 @@ dependencies {
 
     implementation(libs.androidX.security)
     implementation(libs.kotlin.coroutinesPlayServices)
+    implementation(libs.workManager.work)
 
 }

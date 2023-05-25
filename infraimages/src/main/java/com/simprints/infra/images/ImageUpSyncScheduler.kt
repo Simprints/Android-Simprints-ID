@@ -1,4 +1,4 @@
-package com.simprints.id.services.sync.images.up
+package com.simprints.infra.images
 
 interface ImageUpSyncScheduler {
 

@@ -1,8 +1,6 @@
-package com.simprints.infra.images.repository
+package com.simprints.infra.images
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.images.ImageRepositoryImpl
 import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
