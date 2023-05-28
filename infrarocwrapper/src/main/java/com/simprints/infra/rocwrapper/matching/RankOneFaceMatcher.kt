@@ -1,4 +1,4 @@
-package com.simprints.feature.rocwrapper.matching
+package com.simprints.infra.rocwrapper.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.facebiosdk.matching.FaceMatcher

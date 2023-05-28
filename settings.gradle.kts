@@ -67,7 +67,6 @@ include(
     ":featurealert",
     ":featureexitform",
     ":featureconsent",
-    ":featurerocwrapper",
 )
 
 // Infra modules
@@ -86,7 +85,8 @@ include(
     ":infraresources",
     ":infrasecurity",
     ":infrauibase",
-    "infrafacebiosdk",
+    ":infrafacebiosdk",
+    ":infrarocwrapper",
 )
 
 // Tooling modules

@@ -1,5 +1,5 @@
 plugins {
-    id("simprints.feature")
+    id("simprints.infra")
 }
 
 android {

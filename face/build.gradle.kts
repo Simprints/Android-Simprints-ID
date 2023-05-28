@@ -26,8 +26,8 @@ dependencies {
     implementation(project(":featureexitform"))
 
     //BIO SDK
-    implementation(project(":featurerocwrapper"))
     implementation(project(":infrafacebiosdk"))
+    implementation(project(":infrarocwrapper"))
 
     implementation(libs.androidX.cameraX.core)
     implementation(libs.androidX.cameraX.lifecycle)
