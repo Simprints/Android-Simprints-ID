@@ -1,4 +1,4 @@
-package com.simprints.feature.rocwrapper.detection
+package com.simprints.infra.rocwrapper.detection
 
 import android.graphics.Bitmap
 import android.graphics.Rect

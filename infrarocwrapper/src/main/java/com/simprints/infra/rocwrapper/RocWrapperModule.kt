@@ -1,11 +1,11 @@
-package com.simprints.feature.rocwrapper
+package com.simprints.infra.rocwrapper
 
-import com.simprints.feature.rocwrapper.detection.RankOneFaceDetector
-import com.simprints.feature.rocwrapper.initialization.RankOneInitializer
-import com.simprints.feature.rocwrapper.matching.RankOneFaceMatcher
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
+import com.simprints.infra.rocwrapper.detection.RankOneFaceDetector
+import com.simprints.infra.rocwrapper.initialization.RankOneInitializer
+import com.simprints.infra.rocwrapper.matching.RankOneFaceMatcher
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
