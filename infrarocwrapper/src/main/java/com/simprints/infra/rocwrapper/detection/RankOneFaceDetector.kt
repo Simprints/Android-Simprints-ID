@@ -22,7 +22,7 @@ import javax.inject.Inject
 )
 class RankOneFaceDetector @Inject constructor() : FaceDetector {
     companion object {
-        const val RANK_ONE_1_23 = "RANK_ONE_1_23"
+        const val RANK_ONE_TEMPLATE_FORMAT_1_23 = "RANK_ONE_1_23"
     }
 
     private val maxFaces = 1
@@ -106,7 +106,7 @@ class RankOneFaceDetector @Inject constructor() : FaceDetector {
             rocFace.face.rotation,
             qualityValue,
             roc.cdata(roc.roc_cast(rocFace.template), roc.ROC_FAST_FV_SIZE.toInt()),
-            RANK_ONE_1_23
+            RANK_ONE_TEMPLATE_FORMAT_1_23
         )
 
         // Free all resources after getting the face

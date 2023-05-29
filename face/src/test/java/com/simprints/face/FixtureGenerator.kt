@@ -24,7 +24,6 @@ object FixtureGenerator {
     private fun getFaceMatchResult(): FaceMatchResult =
         FaceMatchResult(UUID.randomUUID().toString(), Random.nextFloat() * 100)
 
-    private const val FACE_TEMPLATE_FORMAT = "format"
     fun getFace(rect: Rect = Rect(0, 0, 60, 60), quality: Float = 1f): Face {
         return Face(
             100,
@@ -34,7 +33,7 @@ object FixtureGenerator {
             0f,
             quality,
             Random.nextBytes(20),
-            FACE_TEMPLATE_FORMAT
+           "format"
         )
     }
 
