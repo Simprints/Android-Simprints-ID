@@ -24,14 +24,21 @@ import com.simprints.feature.login.screens.form.SignInState.MissingCredential
 import com.simprints.feature.login.screens.form.SignInState.MissingOrOutdatedGooglePlayStoreApp
 import com.simprints.feature.login.screens.form.SignInState.Offline
 import com.simprints.feature.login.screens.form.SignInState.ProjectIdMismatch
+import com.simprints.feature.login.screens.form.SignInState.QrCameraUnavailable
+import com.simprints.feature.login.screens.form.SignInState.QrCodeValid
+import com.simprints.feature.login.screens.form.SignInState.QrGenericError
+import com.simprints.feature.login.screens.form.SignInState.QrInvalidCode
+import com.simprints.feature.login.screens.form.SignInState.QrNoCameraPermission
 import com.simprints.feature.login.screens.form.SignInState.Success
 import com.simprints.feature.login.screens.form.SignInState.TechnicalFailure
 import com.simprints.feature.login.screens.form.SignInState.Unknown
+import com.simprints.feature.login.screens.qrscanner.QrScannerResult
 import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker
 import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.navigation.handleResult
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -53,6 +60,12 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             finishWithError(LoginError.LoginNotCompleted)
         }
 
+        findNavController().handleResult<QrScannerResult>(
+            viewLifecycleOwner,
+            R.id.loginFormFragment,
+            R.id.loginQrScanner
+        ) { viewModel.handleQrResult(it) }
+
         initUi()
         observeUiState()
         viewModel.init()
@@ -70,7 +83,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
         binding.loginUserId.setText(args.loginParams.userId)
         binding.loginButtonScanQr.setOnClickListener {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Scan QR button clicked")
-            // TODO open QR scanner screen for result
+            findNavController().navigate(R.id.action_loginFormFragment_to_loginQrScanner)
         }
         binding.loginButtonSignIn.setOnClickListener {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Login button clicked")
@@ -102,9 +115,16 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             Offline -> showToast(IDR.string.login_no_network)
             IntegrityServiceTemporaryDown -> showToast(IDR.string.integrity_service_down)
             TechnicalFailure -> showToast(IDR.string.login_server_error)
+            QrCameraUnavailable -> showToast(IDR.string.login_qr_code_scanning_camera_unavailable_error)
+            QrGenericError -> showToast(IDR.string.login_qr_code_scanning_problem)
+            QrInvalidCode -> showToast(IDR.string.login_invalid_qr_code)
+            QrNoCameraPermission -> showToast(IDR.string.login_qr_code_scanning_camera_permission_error)
 
             // Showing error card
             is BackendMaintenanceError -> showOutageErrorCard(result.estimatedOutage)
+
+            // Fill input fields
+            is QrCodeValid -> updateFields(result)
 
             // Terminal cases
             Success -> finishWithSuccess()
@@ -112,6 +132,11 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             MissingOrOutdatedGooglePlayStoreApp -> finishWithError(LoginError.MissingOrOutdatedPlayServices)
             Unknown -> finishWithError(LoginError.Unknown)
         }
+    }
+
+    private fun updateFields(result: QrCodeValid) {
+        binding.loginProjectId.setText(result.projectId)
+        binding.loginProjectSecret.setText(result.projectSecret)
     }
 
     private fun showOutageErrorCard(estimatedOutage: String?) {

@@ -6,6 +6,17 @@ internal sealed class SignInState {
 
     object MissingCredential : SignInState()
     object ProjectIdMismatch : SignInState()
+
+    data class QrCodeValid(
+        val projectId: String,
+        val projectSecret: String,
+    ) : SignInState()
+
+    object QrNoCameraPermission : SignInState()
+    object QrCameraUnavailable : SignInState()
+    object QrInvalidCode : SignInState()
+    object QrGenericError : SignInState()
+
     object BadCredentials : SignInState()
     object Offline : SignInState()
     object TechnicalFailure : SignInState()

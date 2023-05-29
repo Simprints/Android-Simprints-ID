@@ -2,7 +2,11 @@ package com.simprints.feature.login.screens.form
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.login.LoginParams
+import com.simprints.feature.login.screens.qrscanner.QrCodeContent
+import com.simprints.feature.login.screens.qrscanner.QrScannerResult
+import com.simprints.feature.login.screens.qrscanner.QrScannerResult.QrScannerError
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.network.SimNetwork
@@ -11,6 +15,7 @@ import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.clearMocks
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import org.junit.Before
@@ -32,6 +37,10 @@ internal class LoginFormViewModelTest {
     @MockK
     private lateinit var authManager: AuthManager
 
+    @MockK
+    private lateinit var jsonHelper: JsonHelper
+
+
     private lateinit var viewModel: LoginFormViewModel
 
     @Before
@@ -42,6 +51,7 @@ internal class LoginFormViewModelTest {
             DEVICE_ID,
             simNetwork,
             authManager,
+            jsonHelper,
         )
     }
 
@@ -124,11 +134,68 @@ internal class LoginFormViewModelTest {
             .isEqualTo("01 minutes, 40 seconds")
     }
 
+    @Test
+    fun `returns correct SignInState on QR error`() {
+        mapOf(
+            QrScannerError.NoPermission to SignInState.QrNoCameraPermission::class.java,
+            QrScannerError.CameraNotAvailable to SignInState.QrCameraUnavailable::class.java,
+            QrScannerError.UnknownError to SignInState.QrGenericError::class.java,
+        ).forEach { (error, expected) ->
+            viewModel.handleQrResult(QrScannerResult(null, error))
+            val result = viewModel.signInState.getOrAwaitValue()
+
+            assertThat(result.getContentIfNotHandled()).isInstanceOf(expected)
+        }
+    }
+
+    @Test
+    fun `returns correct SignInState when empty QR result`() {
+        viewModel.handleQrResult(QrScannerResult(null, null))
+        val result = viewModel.signInState.getOrAwaitValue()
+
+        assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.QrInvalidCode::class.java)
+    }
+
+    @Test
+    fun `returns correct SignInState when QR code parsing fails`() {
+        every { jsonHelper.fromJson<QrCodeContent>(any()) } throws RuntimeException("parsing fail")
+
+        viewModel.handleQrResult(QrScannerResult(QR_CONTENT, null))
+        val result = viewModel.signInState.getOrAwaitValue()
+
+        assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.QrInvalidCode::class.java)
+    }
+
+    @Test
+    fun `returns correct SignInState when QR code parsing success`() {
+        every { jsonHelper.fromJson<QrCodeContent>(eq(QR_CONTENT)) } returns QrCodeContent(PROJECT_ID, PROJECT_SECRET)
+
+        viewModel.handleQrResult(QrScannerResult(QR_CONTENT, null))
+        val result = viewModel.signInState.getOrAwaitValue()
+
+        assertThat(result.getContentIfNotHandled()).isInstanceOf(SignInState.QrCodeValid::class.java)
+        assertThat((result.peekContent() as SignInState.QrCodeValid).projectId).isEqualTo(PROJECT_ID)
+        assertThat((result.peekContent() as SignInState.QrCodeValid).projectSecret).isEqualTo(PROJECT_SECRET)
+    }
+
+    @Test
+    fun `updates base API url when QR code parsing success`() {
+        every { jsonHelper.fromJson<QrCodeContent>(eq(QR_CONTENT)) } returns QrCodeContent(PROJECT_ID, PROJECT_SECRET, URL)
+
+        viewModel.handleQrResult(QrScannerResult(QR_CONTENT, null))
+
+        verify { simNetwork.setApiBaseUrl(eq(URL)) }
+    }
+
     companion object {
+
 
         private const val DEVICE_ID = "deviceId"
         private const val PROJECT_ID = "projectId"
         private const val USER_ID = "userId"
+
+        private const val QR_CONTENT = "qrCodeContents"
         private const val PROJECT_SECRET = "projectSecret"
+        private const val URL = "projectUrl"
     }
 }
