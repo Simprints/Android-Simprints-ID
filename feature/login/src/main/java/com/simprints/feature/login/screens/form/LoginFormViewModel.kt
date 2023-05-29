@@ -7,10 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.DeviceID
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.login.LoginParams
+import com.simprints.feature.login.screens.qrscanner.QrCodeContent
+import com.simprints.feature.login.screens.qrscanner.QrScannerResult
+import com.simprints.feature.login.screens.qrscanner.QrScannerResult.QrScannerError
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authlogic.model.AuthenticateDataResult
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,6 +27,7 @@ internal class LoginFormViewModel @Inject constructor(
     @DeviceID private val deviceId: String,
     private val simNetwork: SimNetwork,
     private val authManager: AuthManager,
+    private val jsonHelper: JsonHelper,
 ) : ViewModel() {
 
     val signInState: LiveData<LiveDataEventWithContent<SignInState>>
@@ -67,5 +74,31 @@ internal class LoginFormViewModel @Inject constructor(
         projectSecret: String,
         userId: String
     ) = projectId.isNotEmpty() && projectSecret.isNotEmpty() && userId.isNotEmpty()
+
+    fun handleQrResult(result: QrScannerResult) {
+        if (result.error != null) {
+            _signInState.send(mapQrError(result.error))
+        } else if (!result.content.isNullOrEmpty()) {
+            try {
+                val qrContent = jsonHelper.fromJson<QrCodeContent>(result.content)
+
+                Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning successful")
+                qrContent.apiBaseUrl?.let { simNetwork.setApiBaseUrl(it) }
+                _signInState.send(SignInState.QrCodeValid(qrContent.projectId, qrContent.projectSecret))
+            } catch (e: Exception) {
+                Simber.tag(CrashReportTag.LOGIN.name).i("QR scanning unsuccessful")
+                _signInState.send(SignInState.QrInvalidCode)
+            }
+        } else {
+            Simber.tag(CrashReportTag.LOGIN.name).i("QR code missing")
+            _signInState.send(SignInState.QrInvalidCode)
+        }
+    }
+
+    private fun mapQrError(error: QrScannerError): SignInState = when (error) {
+        QrScannerError.NoPermission -> SignInState.QrNoCameraPermission
+        QrScannerError.CameraNotAvailable -> SignInState.QrCameraUnavailable
+        QrScannerError.UnknownError -> SignInState.QrGenericError
+    }
 
 }

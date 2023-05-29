@@ -6,7 +6,6 @@ import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import com.simprints.core.tools.viewbinding.viewBinding
-import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.ActivityLoginWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult
@@ -27,8 +26,8 @@ internal class LoginWrapperActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         val args = intent.extras?.getBundle(LOGIN_ARGS_EXTRA)
         if (args == null) {
             finish()

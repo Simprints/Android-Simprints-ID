@@ -13,6 +13,16 @@
         <argument
             android:name="loginParams"
             app:argType="com.simprints.feature.login.LoginParams" />
+
+        <action
+            android:id="@+id/action_loginFormFragment_to_loginQrScanner"
+            app:destination="@id/loginQrScanner" />
     </fragment>
+
+    <fragment
+        android:id="@+id/loginQrScanner"
+        android:name="com.simprints.feature.login.screens.qrscanner.QrScannerFragment"
+        android:label="LoginQrScanner"
+        tools:layout="@layout/fragment_qr_scanner" />
 
 </navigation>
