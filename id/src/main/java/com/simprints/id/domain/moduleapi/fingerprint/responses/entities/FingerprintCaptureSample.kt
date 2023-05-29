@@ -15,7 +15,7 @@ import com.simprints.moduleapi.fingerprint.IFingerprintSample
 import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
-import java.util.*
+import java.util.UUID
 
 @Parcelize
 open class FingerprintCaptureSample(

@@ -3,8 +3,6 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
-import com.simprints.infra.eventsync.event.remote.models.face.ApiMatcher
-import com.simprints.infra.eventsync.event.remote.models.face.fromDomainToApi
 
 @Keep
 internal data class ApiOneToManyMatchPayload(
@@ -12,7 +10,7 @@ internal data class ApiOneToManyMatchPayload(
     override val version: Int,
     val endTime: Long,
     val pool: ApiMatchPool,
-    val matcher: ApiMatcher,
+    val matcher: String,
     val result: List<ApiMatchEntry>?,
 ) : ApiEventPayload(ApiEventPayloadType.OneToManyMatch, version, startTime) {
 
@@ -34,6 +32,6 @@ internal data class ApiOneToManyMatchPayload(
             domainPayload.eventVersion,
             domainPayload.endedAt,
             ApiMatchPool(domainPayload.pool),
-            domainPayload.matcher.fromDomainToApi(),
+            domainPayload.matcher,
             domainPayload.result?.map { ApiMatchEntry(it) })
 }

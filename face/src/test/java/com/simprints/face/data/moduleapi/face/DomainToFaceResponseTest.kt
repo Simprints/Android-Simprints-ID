@@ -2,12 +2,28 @@ package com.simprints.face.data.moduleapi.face
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
-import com.simprints.face.data.moduleapi.face.responses.*
-import com.simprints.face.data.moduleapi.face.responses.entities.*
-import com.simprints.moduleapi.face.responses.*
-import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
+import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceConfigurationResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
+import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
+import com.simprints.face.data.moduleapi.face.responses.entities.Path
+import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
+import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
+import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
+import com.simprints.moduleapi.face.responses.IFaceConfigurationResponse
+import com.simprints.moduleapi.face.responses.IFaceErrorReason
+import com.simprints.moduleapi.face.responses.IFaceErrorResponse
+import com.simprints.moduleapi.face.responses.IFaceExitFormResponse
+import com.simprints.moduleapi.face.responses.IFaceExitReason
+import com.simprints.moduleapi.face.responses.IFaceMatchResponse
+import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class DomainToFaceResponseTest {
 
@@ -31,7 +47,7 @@ class DomainToFaceResponseTest {
             val sample = first.sample
             assertThat(sample?.imageRef?.path).isEqualTo(path)
 
-            assertThat(sample?.format).isEqualTo(IFaceTemplateFormat.RANK_ONE_1_23)
+            assertThat(sample?.format).isEqualTo(FACE_TEMPLATE_FORMAT)
         }
     }
 
@@ -136,7 +152,7 @@ class DomainToFaceResponseTest {
     private fun generateCaptureResult(): FaceCaptureResult {
         val securedImageRef = SecuredImageRef(path)
         val sample =
-            FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef, IFaceTemplateFormat.RANK_ONE_1_23)
+            FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef, FACE_TEMPLATE_FORMAT)
         return FaceCaptureResult(0, sample)
     }
 

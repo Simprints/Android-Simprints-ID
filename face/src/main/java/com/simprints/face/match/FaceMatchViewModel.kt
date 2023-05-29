@@ -7,19 +7,18 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.MatchEntry
-import com.simprints.face.controllers.core.events.model.Matcher
 import com.simprints.face.controllers.core.events.model.OneToManyMatchEvent
 import com.simprints.face.controllers.core.events.model.OneToOneMatchEvent
 import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
-import com.simprints.face.data.db.person.FaceIdentity
-import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
-import com.simprints.face.match.rankone.RankOneFaceMatcher
+import com.simprints.infra.facebiosdk.matching.FaceIdentity
+import com.simprints.infra.facebiosdk.matching.FaceMatcher
+import com.simprints.infra.facebiosdk.matching.FaceSample
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -154,7 +153,7 @@ class FaceMatchViewModel @Inject constructor(
             endTime,
             queryForCandidates,
             candidatesCount,
-            faceMatcher.getEventMatcher(),
+            faceMatcher.matcherName,
             matchEntries
         )
 
@@ -168,12 +167,9 @@ class FaceMatchViewModel @Inject constructor(
             startTime,
             endTime,
             queryForCandidates,
-            faceMatcher.getEventMatcher(),
+            faceMatcher.matcherName,
             matchEntry
         )
-
-    private fun FaceMatcher.getEventMatcher(): Matcher =
-        if (this is RankOneFaceMatcher) Matcher.RANK_ONE else Matcher.UNKNOWN
 
     sealed class MatchState {
         object NotStarted : MatchState()

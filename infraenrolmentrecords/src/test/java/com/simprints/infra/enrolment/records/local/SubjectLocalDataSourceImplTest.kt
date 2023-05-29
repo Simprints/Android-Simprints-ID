@@ -10,9 +10,12 @@ import com.simprints.infra.enrolment.records.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.local.models.fromDomainToDb
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbSubject
-import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
 import com.simprints.testtools.common.syntax.assertThrows
-import io.mockk.*
+import io.mockk.CapturingSlot
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
 import io.realm.Realm
 import io.realm.RealmQuery
 import io.realm.RealmResults
@@ -20,7 +23,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 import kotlin.random.Random
 
 class SubjectLocalDataSourceImplTest {
@@ -227,8 +230,8 @@ class SubjectLocalDataSourceImplTest {
         userId: String = UUID.randomUUID().toString(),
         moduleId: String = UUID.randomUUID().toString(),
         faceSamples: Array<FaceSample> = arrayOf(
-            FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23),
-            FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23)
+            FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
+            FaceSample(Random.nextBytes(64), "faceTemplateFormat")
         )
     ): Subject =
         Subject(
