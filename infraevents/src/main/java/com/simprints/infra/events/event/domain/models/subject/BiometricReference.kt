@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
-import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes(
@@ -19,7 +18,7 @@ sealed class BiometricReference(open val id: String,
 
 data class FaceReference(override val id: String,
                          val templates: List<FaceTemplate>,
-                         val format: String = FACE_TEMPLATE_FORMAT,
+                         val format: String,
                          val metadata: HashMap<String, String>? = null) : BiometricReference(id, BiometricReferenceType.FACE_REFERENCE)
 
 data class FingerprintReference(override val id: String,
