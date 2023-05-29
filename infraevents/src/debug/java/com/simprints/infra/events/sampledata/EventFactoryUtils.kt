@@ -4,32 +4,67 @@ import android.os.Build
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
-import com.simprints.infra.events.event.domain.models.*
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
+import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
+import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
+import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult.FOUND
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
+import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
+import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
+import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
+import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
+import com.simprints.infra.events.event.domain.models.EventLabels
+import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
+import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
+import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
-import com.simprints.infra.events.event.domain.models.Matcher.RANK_ONE
-import com.simprints.infra.events.event.domain.models.Matcher.SIM_AFIS
+import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
+import com.simprints.infra.events.event.domain.models.MatchEntry
+import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
+import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
+import com.simprints.infra.events.event.domain.models.PersonCreationEvent
+import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
+import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
+import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
+import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
-import com.simprints.infra.events.event.domain.models.callback.*
+import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
-import com.simprints.infra.events.event.domain.models.callout.*
-import com.simprints.infra.events.event.domain.models.face.*
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent
+import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -48,6 +83,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
 
+const val FACE_TEMPLATE_FORMAT = "RANK_ONE_1_23"
 val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = DEFAULT_PROJECT_ID)
 
 fun createConfirmationCallbackEvent() = ConfirmationCallbackEvent(CREATED_AT, true, eventLabels)
@@ -118,7 +154,7 @@ fun createFaceCaptureBiometricsEvent(): FaceCaptureBiometricsEvent {
         roll = 0.0f,
         template = "template",
         quality = 1.0f,
-        format = FaceTemplateFormat.RANK_ONE_1_23
+        format = FACE_TEMPLATE_FORMAT
     )
     return FaceCaptureBiometricsEvent(
         startTime = CREATED_AT,
@@ -132,7 +168,7 @@ fun createFaceCaptureConfirmationEvent() =
 
 fun createFaceCaptureEvent(): FaceCaptureEvent {
     val faceArg =
-        FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
+        FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT)
     return FaceCaptureEvent(
         startTime = CREATED_AT,
         endTime = ENDED_AT,
@@ -286,7 +322,7 @@ fun createInvalidIntentEvent() =
 fun createOneToManyMatchEvent(): OneToManyMatchEvent {
     val poolArg = MatchPool(PROJECT, 100)
     val resultArg = listOf(MatchEntry(GUID1, 0F))
-    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, RANK_ONE, resultArg, eventLabels)
+    return OneToManyMatchEvent(CREATED_AT, ENDED_AT, poolArg, "RANK_ONE", resultArg, eventLabels)
 }
 
 fun createOneToOneMatchEvent(): OneToOneMatchEvent {
@@ -295,7 +331,7 @@ fun createOneToOneMatchEvent(): OneToOneMatchEvent {
         CREATED_AT,
         ENDED_AT,
         GUID1,
-        SIM_AFIS,
+        "SIM_AFIS",
         matchEntry,
         FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX,
         eventLabels

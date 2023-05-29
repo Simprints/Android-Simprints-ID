@@ -72,6 +72,8 @@ definitions:
                     - ./gradlew infralicense:jacocoTestReport
                     - ./gradlew infraimages:jacocoTestReport
                     - ./gradlew infraresources:jacocoTestReport
+                    - ./gradlew infrafacebiosdk:jacocoTestReport
+                    - ./gradlew infrarocwrapper:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - infraevents/build/reports/**
@@ -87,6 +89,8 @@ definitions:
                     - infralicense/build/reports/**
                     - infraimages/build/reports/**
                     - infraresources/build/reports/**
+                    - infrafacebiosdk/build/reports/**
+                    - infrarocwrapper/build/reports/**
 
         ######################################################################
         # Run the feature unit tests with coverage and upload report to

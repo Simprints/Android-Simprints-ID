@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCapture
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiFace
@@ -41,7 +40,7 @@ internal data class ApiFaceCapturePayload(
         val yaw: Float,
         var roll: Float,
         val quality: Float,
-        val format: FaceTemplateFormat
+        val format: String
     )
 
     @Keep
