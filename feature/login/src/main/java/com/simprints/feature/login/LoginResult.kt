@@ -16,8 +16,11 @@ enum class LoginError {
 
     LoginNotCompleted,
 
+    IntegrityServiceError,
     MissingPlayServices,
     OutdatedPlayServices,
+    MissingOrOutdatedPlayServices,
+    Unknown,
     ;
 
 }

@@ -14,6 +14,7 @@ import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginError
+import com.simprints.feature.login.LoginError.*
 import com.simprints.feature.login.ShowLoginWrapper
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
@@ -61,12 +62,15 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
     }
 
     private fun handleLoginFormErrors(error: LoginError?) = when (error) {
-        null, LoginError.LoginNotCompleted -> {
+        null, LoginNotCompleted -> {
             viewPresenter.onLoginScreenErrorReturn(AppErrorResponse(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE))
         }
 
-        LoginError.MissingPlayServices -> showAlert.launch(AlertType.MISSING_GOOGLE_PLAY_SERVICES.toAlertConfig().toArgs())
-        LoginError.OutdatedPlayServices -> showAlert.launch(AlertType.GOOGLE_PLAY_SERVICES_OUTDATED.toAlertConfig().toArgs())
+        MissingPlayServices -> showAlert.launch(AlertType.MISSING_GOOGLE_PLAY_SERVICES.toAlertConfig().toArgs())
+        OutdatedPlayServices -> showAlert.launch(AlertType.GOOGLE_PLAY_SERVICES_OUTDATED.toAlertConfig().toArgs())
+        IntegrityServiceError -> showAlert.launch(AlertType.INTEGRITY_SERVICE_ERROR.toAlertConfig().toArgs())
+        MissingOrOutdatedPlayServices -> showAlert.launch(AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP.toAlertConfig().toArgs())
+        Unknown -> showAlert.launch(AlertType.UNEXPECTED_ERROR.toAlertConfig().toArgs())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

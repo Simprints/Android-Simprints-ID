@@ -3,30 +3,69 @@ package com.simprints.feature.login.screens.form
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.simprints.core.DeviceID
+import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.livedata.send
+import com.simprints.core.tools.utils.TimeUtils
+import com.simprints.feature.login.LoginParams
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.network.SimNetwork
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class LoginFormViewModel @Inject constructor(
+    @DeviceID private val deviceId: String,
     private val simNetwork: SimNetwork,
+    private val authManager: AuthManager,
 ) : ViewModel() {
 
-    // TODO change to proper result class
-    val signInResult: LiveData<Boolean?>
-        get() = _signInResult
-    private val _signInResult = MutableLiveData<Boolean?>(null)
+    val signInState: LiveData<LiveDataEventWithContent<SignInState>>
+        get() = _signInState
+    private val _signInState = MutableLiveData<LiveDataEventWithContent<SignInState>>(null)
 
     fun init() {
         simNetwork.resetApiBaseUrl()
-
-        // TODO check google play availability
-
     }
 
-    fun signInClicked() {
-        // TODO process sign in
-        _signInResult.postValue(false)
+    fun signInClicked(
+        loginParams: LoginParams,
+        projectId: String,
+        projectSecret: String,
+    ) {
+        if (!areMandatoryCredentialsPresent(projectId, projectSecret, loginParams.userId)) {
+            _signInState.send(SignInState.MissingCredential)
+        } else if (projectId != loginParams.projectId) {
+            _signInState.send(SignInState.ProjectIdMismatch)
+        } else {
+            viewModelScope.launch {
+                val result = authManager.authenticateSafely(loginParams.userId, projectId, projectSecret, deviceId)
+                _signInState.send(mapAuthDataResult(result))
+            }
+        }
     }
+
+    private fun mapAuthDataResult(result: AuthenticateDataResult): SignInState = when (result) {
+        AuthenticateDataResult.Authenticated -> SignInState.Success
+        AuthenticateDataResult.BadCredentials -> SignInState.BadCredentials
+        AuthenticateDataResult.IntegrityException -> SignInState.IntegrityException
+        AuthenticateDataResult.IntegrityServiceTemporaryDown -> SignInState.IntegrityServiceTemporaryDown
+        AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp -> SignInState.MissingOrOutdatedGooglePlayStoreApp
+        AuthenticateDataResult.Offline -> SignInState.Offline
+        AuthenticateDataResult.TechnicalFailure -> SignInState.TechnicalFailure
+        AuthenticateDataResult.Unknown -> SignInState.Unknown
+        is AuthenticateDataResult.BackendMaintenanceError -> SignInState.BackendMaintenanceError(
+            result.estimatedOutage?.let { TimeUtils.getFormattedEstimatedOutage(it) }
+        )
+    }
+
+    private fun areMandatoryCredentialsPresent(
+        projectId: String,
+        projectSecret: String,
+        userId: String
+    ) = projectId.isNotEmpty() && projectSecret.isNotEmpty() && userId.isNotEmpty()
 
 }
