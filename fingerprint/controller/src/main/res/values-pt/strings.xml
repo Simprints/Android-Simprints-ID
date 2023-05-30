@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <string name="finger_selection_confirm_dialog_no">Cancelar</string>
     <string name="preference_view_fingers_title">Ver dedos padrão</string>
     <string name="finger_selection_fragment_title">Ver Dedos</string>

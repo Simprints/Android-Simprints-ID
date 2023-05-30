@@ -49,12 +49,16 @@ rootProject.name = "android-simprints-id"
 // Main application module
 include(":id")
 
+//Fingerprint modality modules
+include(
+    ":fingerprint:controller",
+    ":fingerprint:matcher",
+    ":fingerprint:scanner",
+    ":fingerprint:scannermock",
+)
+
 // Modules to be refactored
 include(
-    ":fingerprint",
-    ":fingerprintmatcher",
-    ":fingerprintscanner",
-    ":fingerprintscannermock",
     ":face",
     ":clientapi",
     ":moduleapi",

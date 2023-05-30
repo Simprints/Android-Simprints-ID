@@ -49,7 +49,7 @@ dependencies {
     implementation(project(":featurealert"))
     implementation(project(":featureexitform"))
     implementation(project(":featureconsent"))
-    implementation(project(":fingerprint"))
+    implementation(project(":fingerprint:controller"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infrarecentuseractivity"))
@@ -93,7 +93,6 @@ dependencies {
     // ######################################################
 
     testImplementation(project(":testtools"))
-    testImplementation(project(":fingerprintscannermock"))
     testImplementation(project(":infraevents"))
     testImplementation(project(":infraeventsync"))
     testImplementation(project(":infralogging"))
@@ -105,7 +104,7 @@ dependencies {
     // ######################################################
 
     androidTestImplementation(project(":testtools"))
-    androidTestImplementation(project(":fingerprintscannermock")) {
+    androidTestImplementation(project(":fingerprint:scannermock")) {
         exclude("org.robolectric")
     }
     androidTestUtil(libs.testing.androidX.orchestrator)
