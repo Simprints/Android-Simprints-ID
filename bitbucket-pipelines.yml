@@ -337,7 +337,6 @@ flows:
                     -   step: *run-id-unit-tests
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
                     -   step: *run-infra-unit-tests
                     -   step: *run-feature-unit-tests
                     -   step: *build-and-sign-universal-apk
@@ -348,7 +347,6 @@ flows:
                     -   step: *run-id-unit-tests
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
                     -   step: *run-infra-unit-tests
                     -   step: *run-feature-unit-tests
                     -   step: *build-and-sign-universal-apk
