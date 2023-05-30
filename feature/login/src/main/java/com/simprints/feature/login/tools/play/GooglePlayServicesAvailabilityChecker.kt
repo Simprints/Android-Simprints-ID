@@ -7,8 +7,7 @@ import com.simprints.feature.login.LoginError
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-// TODO make internal when id.LoginActivity is deleted
-class GooglePlayServicesAvailabilityChecker @Inject constructor(
+internal class GooglePlayServicesAvailabilityChecker @Inject constructor(
     private val googleApiAvailability: GoogleApiAvailability
 ) {
 
