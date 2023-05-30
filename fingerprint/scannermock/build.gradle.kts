@@ -8,7 +8,7 @@ android {
 
 dependencies {
     // Simprints
-    api(project(":fingerprintscanner"))
+    api(project(":fingerprint:scanner"))
 
     // Reactive
     api(libs.rxJava2.core)
