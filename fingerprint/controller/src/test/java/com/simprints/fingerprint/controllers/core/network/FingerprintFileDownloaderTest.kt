@@ -2,7 +2,7 @@ package com.simprints.fingerprint.controllers.core.network
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.scanner.data.FirmwareTestData
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -23,7 +23,7 @@ class FingerprintFileDownloaderTest {
     lateinit var fingerprintApiClientFactory: FingerprintApiClientFactory
 
     @MockK
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
@@ -34,7 +34,7 @@ class FingerprintFileDownloaderTest {
         fingerprintFileDownloader =
             FingerprintFileDownloader(
                 fingerprintApiClientFactory,
-                loginManager,
+                authStore,
                 testCoroutineRule.testCoroutineDispatcher
             )
     }
@@ -47,7 +47,7 @@ class FingerprintFileDownloaderTest {
         coEvery { fingerprintApiClientFactory.buildClient<FileUrlRemoteInterface>(any()) } returns apiClient
         every { apiClient.api } returns api
         coEvery { api.getFileUrl(any(), any()) } returns FileUrl(FirmwareTestData.SOME_URL)
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns "projectId"
+        every { authStore.signedInProjectId } returns "projectId"
         // When
         val result = fingerprintFileDownloader.getFileUrl("Any fileId")
         // Then

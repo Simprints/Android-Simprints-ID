@@ -5,7 +5,7 @@ import com.google.common.truth.Truth
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -39,7 +39,7 @@ internal class PrivacyNoticeViewModelTest {
     lateinit var configManager: ConfigManager
 
     @MockK
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
 
     private lateinit var privacyNoticeViewModel: PrivacyNoticeViewModel
@@ -49,12 +49,12 @@ internal class PrivacyNoticeViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(LANGUAGE, listOf(), "")
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         privacyNoticeViewModel = PrivacyNoticeViewModel(
             connectivityTracker,
             configManager,
-            loginManager,
+            authStore,
         )
     }
 

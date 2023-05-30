@@ -7,5 +7,5 @@ interface IFaceSample: Parcelable {
     val faceId: String
     val template: ByteArray
     val imageRef: ISecuredImageRef?
-    val format: IFaceTemplateFormat
+    val format: String
 }

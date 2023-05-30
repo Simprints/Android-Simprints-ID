@@ -8,8 +8,8 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import com.simprints.id.R
 import com.simprints.id.activities.login.tools.LoginActivityHelper
-import com.simprints.id.secure.AuthenticationHelper
-import com.simprints.id.secure.models.AuthenticateDataResult
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class LoginActivityAndroidTest {
 
     @Inject
-    lateinit var mockAuthenticationHelper: AuthenticationHelper
+    lateinit var mockAuthenticationHelper: AuthManager
 
     @MockK
     lateinit var mockLoginActivityHelper: LoginActivityHelper

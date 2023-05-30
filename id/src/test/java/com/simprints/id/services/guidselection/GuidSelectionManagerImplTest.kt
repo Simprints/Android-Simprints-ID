@@ -8,7 +8,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
@@ -28,7 +28,7 @@ class GuidSelectionManagerImplTest {
     private val guidSelectionRequest = GuidSelectionRequest(DEFAULT_PROJECT_ID, GUID1, GUID2)
 
     @MockK
-    private lateinit var loginManager: LoginManager
+    private lateinit var authStore: AuthStore
 
     @MockK
     private lateinit var timerHelper: TimeHelper
@@ -44,9 +44,9 @@ class GuidSelectionManagerImplTest {
         MockKAnnotations.init(this, relaxed = true)
         val scope = CoroutineScope(testCoroutineRule. testCoroutineDispatcher)
         guidSelectionManager =
-            GuidSelectionManagerImpl(loginManager, timerHelper, eventRepository, scope)
+            GuidSelectionManagerImpl(authStore, timerHelper, eventRepository, scope)
         every { timerHelper.now() } returns CREATED_AT
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
     }
 
     @Test
@@ -54,14 +54,14 @@ class GuidSelectionManagerImplTest {
         runBlocking {
             guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
 
-            verify(exactly = 1) { loginManager.isProjectIdSignedIn(DEFAULT_PROJECT_ID) }
+            verify(exactly = 1) { authStore.isProjectIdSignedIn(DEFAULT_PROJECT_ID) }
         }
     }
 
     @Test
     fun handleConfirmIdentityRequest_shouldAddAnEvent() {
         runBlocking {
-            every { loginManager.isProjectIdSignedIn(any()) } returns true
+            every { authStore.isProjectIdSignedIn(any()) } returns true
 
             guidSelectionManager.handleConfirmIdentityRequest(guidSelectionRequest)
 

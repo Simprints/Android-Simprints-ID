@@ -4,9 +4,10 @@ import android.location.Location
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults
-import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
-import java.util.*
+import java.util.Date
+import java.util.UUID
 import kotlin.random.Random
 
 object TestData {
@@ -19,7 +20,7 @@ object TestData {
         Date(SampleDefaults.CREATED_AT),
         Date(SampleDefaults.CREATED_AT),
         listOf(FingerprintGeneratorUtils.generateRandomFingerprint()),
-        listOf(FaceSample(Random.nextBytes(64), IFaceTemplateFormat.RANK_ONE_1_23)),
+        listOf(FaceSample(Random.nextBytes(64), FACE_TEMPLATE_FORMAT)),
         false
     )
     private const val PROVIDER = "flp"

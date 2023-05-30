@@ -13,7 +13,8 @@ dependencies {
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infraimages"))
-    implementation(project(":infralogin"))
+    implementation(project(":infra:auth-store"))
+    implementation(project(":infra:auth-logic"))
     implementation(project(":infrarecentuseractivity"))
     implementation(project(":featureconsent"))
 

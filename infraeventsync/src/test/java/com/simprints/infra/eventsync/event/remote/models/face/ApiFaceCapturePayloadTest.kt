@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.face
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
+import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import org.junit.Test
 
 class ApiFaceCapturePayloadTest {
@@ -14,7 +14,7 @@ class ApiFaceCapturePayloadTest {
             yaw = 1.0f,
             roll = 2.3f,
             quality = 12f,
-            format = FaceTemplateFormat.RANK_ONE_1_23
+            format = FACE_TEMPLATE_FORMAT
         )
         val payload = ApiFaceCapturePayload(
             id = randomUUID(),
@@ -82,10 +82,10 @@ class ApiFaceCapturePayloadTest {
             yaw = 2.0f,
             roll = 1.0f,
             quality = 3.0f,
-            format = FaceTemplateFormat.RANK_ONE_1_23
+            format = FACE_TEMPLATE_FORMAT
         ).fromDomainToApi()
         assertThat(face).isInstanceOf(ApiFaceCapturePayload.ApiFace::class.java)
-        assertThat(face.format).isEqualTo(FaceTemplateFormat.RANK_ONE_1_23)
+        assertThat(face.format).isEqualTo(FACE_TEMPLATE_FORMAT)
         assertThat(face.yaw).isEqualTo(2.0f)
         assertThat(face.roll).isEqualTo(1.0f)
         assertThat(face.quality).isEqualTo(3.0f)

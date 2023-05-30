@@ -1,7 +1,7 @@
 package com.simprints.feature.dashboard.tools.di
 
-import com.simprints.infra.login.LoginManager
-import com.simprints.infra.login.LoginManagerModule
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.AuthStoreModule
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
@@ -12,11 +12,11 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [LoginManagerModule::class]
+    replaces = [AuthStoreModule::class]
 )
 object FakeLoginModule {
 
     @Provides
     @Singleton
-    fun provideLoginManager(): LoginManager = mockk()
+    fun provideAuthStore(): AuthStore = mockk()
 }
