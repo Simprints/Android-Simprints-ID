@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ProjectDetailsViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val recentUserActivityManager: RecentUserActivityManager,
 ) : ViewModel() {
 
@@ -28,7 +28,7 @@ internal class ProjectDetailsViewModel @Inject constructor(
 
     fun load() = viewModelScope.launch {
         val state = try {
-            val projectId = loginManager.getSignedInProjectIdOrEmpty()
+            val projectId = authStore.signedInProjectId
             val cachedProject = configManager.getProject(projectId)
             val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
             DashboardProjectState(

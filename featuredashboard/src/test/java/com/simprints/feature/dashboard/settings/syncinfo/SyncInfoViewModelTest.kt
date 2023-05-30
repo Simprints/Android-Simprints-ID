@@ -17,7 +17,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -53,7 +53,7 @@ class SyncInfoViewModelTest {
     private lateinit var enrolmentRecordManager: EnrolmentRecordManager
 
     @MockK
-    private lateinit var loginManager: LoginManager
+    private lateinit var authStore: AuthStore
 
     @MockK
     private lateinit var connectivityTracker: ConnectivityTracker
@@ -73,7 +73,7 @@ class SyncInfoViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         connectionLiveData = MutableLiveData<Boolean>()
         every { connectivityTracker.observeIsConnected() } returns connectionLiveData
@@ -85,7 +85,7 @@ class SyncInfoViewModelTest {
             configManager,
             connectivityTracker,
             enrolmentRecordManager,
-            loginManager,
+            authStore,
             imageRepository,
             eventSyncManager,
         )

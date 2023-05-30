@@ -7,8 +7,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":infralogin"))
 
+    implementation(project(":infra:auth-store"))
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
     implementation(libs.androidX.security)

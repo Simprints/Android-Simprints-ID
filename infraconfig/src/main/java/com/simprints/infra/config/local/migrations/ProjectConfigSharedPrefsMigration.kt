@@ -11,7 +11,7 @@ import com.simprints.infra.config.local.migrations.models.OldProjectConfig
 import com.simprints.infra.config.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.local.models.toProto
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -20,7 +20,7 @@ import javax.inject.Inject
  */
 internal class ProjectConfigSharedPrefsMigration @Inject constructor(
     @ApplicationContext ctx: Context,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
 ) : DataMigration<ProtoProjectConfiguration> {
 
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
@@ -42,12 +42,12 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
             jacksonObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .readValue<OldProjectConfig>(projectSettingsJson)
-                .toDomain(loginManager.signedInProjectId)
+                .toDomain(authStore.signedInProjectId)
                 .toProto()
         } catch (e: Exception) {
             if (e is JacksonException) {
                 // Return default value
-                Simber.i("Invalid old configuration for project ${loginManager.signedInProjectId}: $e")
+                Simber.i("Invalid old configuration for project ${authStore.signedInProjectId}: $e")
                 ProtoProjectConfiguration.getDefaultInstance()
             } else {
                 Simber.e(e)

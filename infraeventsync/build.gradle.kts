@@ -36,7 +36,7 @@ android {
 dependencies {
     implementation(project(":infraevents"))
     implementation(project(":infraconfig"))
-    implementation(project(":infralogin"))
+    implementation(project(":infra:auth-store"))
     implementation(project(":infraenrolmentrecords"))
 
     implementation(libs.workManager.work)

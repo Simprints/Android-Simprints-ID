@@ -2,7 +2,7 @@ package com.simprints.infra.license.remote
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -13,7 +13,7 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 internal class LicenseRemoteDataSourceImpl @Inject constructor(
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val jsonHelper: JsonHelper
 ) : LicenseRemoteDataSource {
 
@@ -76,5 +76,5 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     }
 
     private suspend fun getProjectApiClient(): SimNetwork.SimApiClient<LicenseRemoteInterface> =
-        loginManager.buildClient(LicenseRemoteInterface::class)
+        authStore.buildClient(LicenseRemoteInterface::class)
 }
