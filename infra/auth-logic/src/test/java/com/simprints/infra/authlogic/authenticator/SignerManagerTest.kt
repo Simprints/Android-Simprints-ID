@@ -78,7 +78,7 @@ internal class SignerManagerTest {
 
         signIn()
 
-        coVerify { mockAuthStore.signIn(token) }
+        coVerify { mockAuthStore.storeFirebaseToken(token) }
     }
 
     @Test
@@ -206,7 +206,7 @@ internal class SignerManagerTest {
         }
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
-        coEvery { mockAuthStore.signIn(token) }.apply {
+        coEvery { mockAuthStore.storeFirebaseToken(token) }.apply {
             if (error) {
                 this.throws(Throwable("Failed to store credentials"))
             } else {
@@ -235,6 +235,6 @@ internal class SignerManagerTest {
     private fun verifyStoredCredentialsGotCleaned() =
         verify { mockAuthStore.cleanCredentials() }
 
-    private fun verifyRemoteManagerGotSignedOut() = verify { mockAuthStore.signOut() }
+    private fun verifyRemoteManagerGotSignedOut() = verify { mockAuthStore.clearFirebaseToken() }
     private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
 }

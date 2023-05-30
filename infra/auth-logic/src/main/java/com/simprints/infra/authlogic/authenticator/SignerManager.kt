@@ -28,7 +28,7 @@ internal class SignerManager @Inject constructor(
 ) {
 
     suspend fun signIn(projectId: String, userId: String, token: Token) = withContext(dispatcher) {
-        authStore.signIn(token)
+        authStore.storeFirebaseToken(token)
         authStore.storeCredentials(projectId, userId)
         configManager.refreshProject(projectId)
         securityStateScheduler.scheduleSecurityStateCheck()
@@ -37,7 +37,7 @@ internal class SignerManager @Inject constructor(
     suspend fun signOut() = withContext(dispatcher) {
         securityStateScheduler.cancelSecurityStateCheck()
         authStore.cleanCredentials()
-        authStore.signOut()
+        authStore.clearFirebaseToken()
 
         // Cancel all background sync
         eventSyncManager.cancelScheduledSync()

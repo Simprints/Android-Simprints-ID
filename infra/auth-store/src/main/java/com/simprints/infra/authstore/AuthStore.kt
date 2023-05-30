@@ -15,15 +15,15 @@ interface AuthStore {
     fun cleanCredentials()
     fun storeCredentials(projectId: String, userId: String)
 
-    suspend fun signIn(token: Token)
-    fun signOut()
+    suspend fun storeFirebaseToken(token: Token)
+    fun clearFirebaseToken()
 
     fun isSignedIn(projectId: String, userId: String): Boolean
 
     /**
      * Get the FirebaseApp that corresponds with the core backend. This FirebaseApp is only
      * initialized once the client has logged in.
-     * @see signIn
+     * @see storeFirebaseToken
      * @return FirebaseApp
      * @throws IllegalStateException if not initialized
      */

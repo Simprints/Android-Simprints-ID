@@ -102,14 +102,14 @@ class AuthStoreImplTest {
 
     @Test
     fun `signIn should call the correct method`() = runTest(UnconfinedTestDispatcher()) {
-        loginManagerManagerImpl.signIn(TOKEN)
+        loginManagerManagerImpl.storeFirebaseToken(TOKEN)
 
         coVerify(exactly = 1) { firebaseAuthManager.signIn(TOKEN) }
     }
 
     @Test
     fun `signOut should call the correct method`() {
-        loginManagerManagerImpl.signOut()
+        loginManagerManagerImpl.clearFirebaseToken()
 
         verify(exactly = 1) { firebaseAuthManager.signOut() }
     }
