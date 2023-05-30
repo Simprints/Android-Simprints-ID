@@ -11,8 +11,8 @@ import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.databinding.FragmentConfigurationBinding
-import com.simprints.face.initializers.SdkInitializer
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel
+import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
     private val args: ConfigurationFragmentArgs by navArgs()
 
     @Inject
-    lateinit var sdkInitializer: SdkInitializer
+    lateinit var faceBioSdkInitializer: FaceBioSdkInitializer
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -57,7 +57,7 @@ class ConfigurationFragment : Fragment(R.layout.fragment_configuration) {
     }
 
     private fun renderFinishedWithSuccess(license: String) {
-        if (sdkInitializer.tryInitWithLicense(requireActivity(), license)) {
+        if (faceBioSdkInitializer.tryInitWithLicense(requireActivity(), license)) {
             mainVm.configurationFinished(true)
         } else {
             viewModel.deleteInvalidLicense()

@@ -7,13 +7,20 @@ import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
-import com.simprints.infra.events.event.domain.models.subject.*
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.infra.events.event.domain.models.subject.FaceReference
+import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
-import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.*
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -42,7 +49,7 @@ class EventDownSyncTaskTest {
             "projectId",
             "moduleId",
             "attendantId",
-            listOf(FaceReference("id", listOf(FaceTemplate("template"))))
+            listOf(FaceReference("id", listOf(FaceTemplate("template")),"format")),
         )
         val ENROLMENT_RECORD_MOVE = EnrolmentRecordMoveEvent(
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
@@ -50,7 +57,7 @@ class EventDownSyncTaskTest {
                 "projectId",
                 DEFAULT_MODULE_ID_2,
                 "attendantId",
-                listOf(FaceReference("id", listOf(FaceTemplate("template"))))
+                listOf(FaceReference("id", listOf(FaceTemplate("template")),"format"))
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",

@@ -64,7 +64,8 @@ definitions:
                     - ./gradlew infraconfig:jacocoTestReport
                     - ./gradlew infraenrolmentrecords:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
-                    - ./gradlew infralogin:jacocoTestReport
+                    - ./gradlew infra:auth-store:jacocoTestReport
+                    - ./gradlew infra:auth-logic:jacocoTestReport
                     - ./gradlew infranetwork:jacocoTestReport
                     - ./gradlew infrarealm:jacocoTestReport
                     - ./gradlew infrarecentuseractivity:jacocoTestReport
@@ -72,6 +73,8 @@ definitions:
                     - ./gradlew infralicense:jacocoTestReport
                     - ./gradlew infraimages:jacocoTestReport
                     - ./gradlew infraresources:jacocoTestReport
+                    - ./gradlew infrafacebiosdk:jacocoTestReport
+                    - ./gradlew infrarocwrapper:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
                     - infraevents/build/reports/**
@@ -79,7 +82,8 @@ definitions:
                     - infraconfig/build/reports/**
                     - infraenrolmentrecords/build/reports/**
                     - infralogging/build/reports/**
-                    - infralogin/build/reports/**
+                    - infra/auth-store/build/reports/**
+                    - infra/auth-logic/build/reports/**
                     - infranetwork/build/reports/**
                     - infrarealm/build/reports/**
                     - infrarecentuseractivity/build/reports/**
@@ -87,6 +91,8 @@ definitions:
                     - infralicense/build/reports/**
                     - infraimages/build/reports/**
                     - infraresources/build/reports/**
+                    - infrafacebiosdk/build/reports/**
+                    - infrarocwrapper/build/reports/**
 
         ######################################################################
         # Run the feature unit tests with coverage and upload report to

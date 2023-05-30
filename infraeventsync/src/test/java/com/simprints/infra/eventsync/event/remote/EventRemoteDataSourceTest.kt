@@ -18,7 +18,7 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -41,7 +41,7 @@ import retrofit2.Response
 class EventRemoteDataSourceTest {
 
     @MockK
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     @MockK
     private lateinit var simApiClient: SimNetwork.SimApiClient<EventRemoteInterface>
@@ -69,8 +69,8 @@ class EventRemoteDataSourceTest {
             (args[0] as InterfaceInvocation<EventRemoteInterface, Int>).invoke(eventRemoteInterface)
         }
 
-        coEvery { loginManager.buildClient(EventRemoteInterface::class) } returns simApiClient
-        eventRemoteDataSource = EventRemoteDataSource(loginManager, JsonHelper)
+        coEvery { authStore.buildClient(EventRemoteInterface::class) } returns simApiClient
+        eventRemoteDataSource = EventRemoteDataSource(authStore, JsonHelper)
     }
 
     @Test

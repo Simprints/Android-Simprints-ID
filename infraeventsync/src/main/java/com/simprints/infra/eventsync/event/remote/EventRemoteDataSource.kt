@@ -15,7 +15,7 @@ import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +26,7 @@ import java.io.InputStream
 import javax.inject.Inject
 
 internal class EventRemoteDataSource @Inject constructor(
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val jsonHelper: JsonHelper,
 ) {
 
@@ -124,7 +124,7 @@ internal class EventRemoteDataSource @Inject constructor(
         getEventsApiClient().executeCall { block(it) }
 
     private suspend fun getEventsApiClient(): SimApiClient<EventRemoteInterface> =
-        loginManager.buildClient(EventRemoteInterface::class)
+        authStore.buildClient(EventRemoteInterface::class)
 
     companion object {
         private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000

@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.settings.about
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
@@ -58,7 +59,7 @@ class AboutViewModelTest {
         }
     }
 
-    private val signerManager = mockk<SignerManager>(relaxed = true)
+    private val authManager = mockk<AuthManager>(relaxed = true)
     private val recentUserActivityManager = mockk<RecentUserActivityManager> {
         coEvery { getRecentUserActivity() } returns recentUserActivity
     }
@@ -67,7 +68,7 @@ class AboutViewModelTest {
     fun `should initialize the live data correctly`() {
         val viewModel = AboutViewModel(
             configManager,
-            signerManager,
+            authManager,
             recentUserActivityManager,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
@@ -87,13 +88,13 @@ class AboutViewModelTest {
     fun `should logout correctly`() {
         val viewModel = AboutViewModel(
             configManager,
-            signerManager,
+            authManager,
             recentUserActivityManager,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
 
         viewModel.logout()
 
-        coVerify(exactly = 1) { signerManager.signOut() }
+        coVerify(exactly = 1) { authManager.signOut() }
     }
 }

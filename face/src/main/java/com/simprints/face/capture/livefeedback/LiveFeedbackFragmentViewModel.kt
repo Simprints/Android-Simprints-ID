@@ -13,13 +13,13 @@ import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
-import com.simprints.face.detection.Face
-import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.FaceTarget
 import com.simprints.face.models.FloatRange
 import com.simprints.face.models.SymmetricTarget
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.facebiosdk.detection.Face
+import com.simprints.infra.facebiosdk.detection.FaceDetector
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
