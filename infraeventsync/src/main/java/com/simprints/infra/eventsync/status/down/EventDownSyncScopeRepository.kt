@@ -8,11 +8,11 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.*
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import javax.inject.Inject
 
 internal class EventDownSyncScopeRepository @Inject constructor(
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
 ) {
 
@@ -35,7 +35,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     }
 
     private fun getProjectId(): String {
-        val projectId = loginManager.getSignedInProjectIdOrEmpty()
+        val projectId = authStore.signedInProjectId
         if (projectId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("ProjectId required")
         }
@@ -43,7 +43,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     }
 
     private fun getUserId(): String {
-        val possibleUserId: String = loginManager.getSignedInUserIdOrEmpty()
+        val possibleUserId: String = authStore.signedInUserId
         if (possibleUserId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }

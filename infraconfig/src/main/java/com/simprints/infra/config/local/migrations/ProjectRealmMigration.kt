@@ -3,7 +3,7 @@ package com.simprints.infra.config.local.migrations
 import androidx.datastore.core.DataMigration
 import com.simprints.infra.config.local.models.ProtoProject
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbProject
 import javax.inject.Inject
@@ -12,7 +12,7 @@ import javax.inject.Inject
  * Can be removed once all the devices have been updated to 2022.4.0
  */
 internal class ProjectRealmMigration @Inject constructor(
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val realmWrapper: RealmWrapper,
 ) :
     DataMigration<ProtoProject> {
@@ -35,7 +35,7 @@ internal class ProjectRealmMigration @Inject constructor(
             Simber.i("Start migration of project to Datastore")
             val dbProject = realm
                 .where(DbProject::class.java)
-                .equalTo(PROJECT_ID_FIELD, loginManager.signedInProjectId)
+                .equalTo(PROJECT_ID_FIELD, authStore.signedInProjectId)
                 .findFirst() ?: return@useRealmInstance currentData
 
             currentData
@@ -49,7 +49,7 @@ internal class ProjectRealmMigration @Inject constructor(
         }
 
     override suspend fun shouldMigrate(currentData: ProtoProject): Boolean =
-        loginManager.signedInProjectId.isNotEmpty() && currentData.id.isEmpty()
+        authStore.signedInProjectId.isNotEmpty() && currentData.id.isEmpty()
 
 }
 

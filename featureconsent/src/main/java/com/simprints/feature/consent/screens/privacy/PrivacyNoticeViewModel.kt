@@ -13,7 +13,7 @@ import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Failed
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult.InProgress
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Succeed
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.catch
@@ -25,7 +25,7 @@ import javax.inject.Inject
 internal class PrivacyNoticeViewModel @Inject constructor(
     private val connectivityTracker: ConnectivityTracker,
     private val configManager: ConfigManager,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
 ) : ViewModel() {
 
     private val _viewState = MutableLiveData<PrivacyNoticeState>()
@@ -45,7 +45,7 @@ internal class PrivacyNoticeViewModel @Inject constructor(
     fun retrievePrivacyNotice() = viewModelScope.launch {
         val deviceConfiguration = configManager.getDeviceConfiguration()
         configManager.getPrivacyNotice(
-            loginManager.getSignedInProjectIdOrEmpty(),
+            authStore.signedInProjectId,
             deviceConfiguration.language
         )
             .map { it.toPrivacyNoticeViewState() }

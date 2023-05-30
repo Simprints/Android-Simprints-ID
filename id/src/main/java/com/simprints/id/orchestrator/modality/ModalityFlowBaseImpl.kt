@@ -14,14 +14,14 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 
 abstract class ModalityFlowBaseImpl(
     private val coreStepProcessor: CoreStepProcessor,
     private val fingerprintStepProcessor: FingerprintStepProcessor,
     private val faceStepProcessor: FaceStepProcessor,
     private val configManager: ConfigManager,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val deviceId: String
 ) : ModalityFlow {
 
@@ -63,7 +63,7 @@ abstract class ModalityFlowBaseImpl(
         when (it) {
             Modality.FINGERPRINT -> fingerprintStepProcessor.buildConfigurationStep()
             Modality.FACE -> faceStepProcessor.buildConfigurationStep(
-                loginManager.signedInProjectId,
+                authStore.signedInProjectId,
                 deviceId
             )
         }

@@ -1,6 +1,6 @@
 package com.simprints.id.services.sync
 
-import com.simprints.id.services.sync.images.up.ImageUpSyncScheduler
+import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import io.mockk.MockKAnnotations

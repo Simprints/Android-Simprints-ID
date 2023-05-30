@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
+import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
@@ -18,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val signerManager: SignerManager,
+    private val authManager: AuthManager,
     private val recentUserActivityManager: RecentUserActivityManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
@@ -44,7 +45,7 @@ internal class AboutViewModel @Inject constructor(
     }
 
     fun logout() {
-        externalScope.launch { signerManager.signOut() }
+        externalScope.launch { authManager.signOut() }
     }
 
     private fun load() = viewModelScope.launch {
