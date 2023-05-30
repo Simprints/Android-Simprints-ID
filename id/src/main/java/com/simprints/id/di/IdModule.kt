@@ -9,11 +9,8 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenter
 import com.simprints.id.activities.fetchguid.FetchGuidHelper
 import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
-import com.simprints.id.activities.login.tools.LoginActivityHelper
-import com.simprints.id.activities.login.tools.LoginActivityHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
-import com.simprints.id.activities.qrcapture.tools.*
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
@@ -118,21 +115,6 @@ abstract class IdAppModule {
     abstract fun provideWorkflowCacheClearer(impl: HotCacheImpl): WorkflowCacheClearer
 
     @Binds
-    abstract fun provideQrCodeDetector(impl: QrCodeDetectorImpl): QrCodeDetector
-
-    @Binds
-    abstract fun provideQrCodeProducer(impl: QrCodeProducerImpl): QrCodeProducer
-
-    @Binds
-    abstract fun provideCameraHelper(impl: CameraHelperImpl): CameraHelper
-
-    @Binds
-    abstract fun provideQrPreviewBuilder(impl: QrPreviewBuilderImpl): QrPreviewBuilder
-
-    @Binds
-    abstract fun provideCameraFocusManager(impl: CameraFocusManagerImpl): CameraFocusManager
-
-    @Binds
     abstract fun provideExitFormHelper(impl: ExitFormHelperImpl): ExitFormHelper
 
     @Binds
@@ -175,9 +157,6 @@ abstract class IdOrchestratorModule {
 
     @Binds
     abstract fun provideOrchestratorEventsHelper(impl: OrchestratorEventsHelperImpl): OrchestratorEventsHelper
-
-    @Binds
-    abstract fun provideLoginActivityHelper(impl: LoginActivityHelperImpl): LoginActivityHelper
 
     @Binds
     abstract fun provideFetchGuidHelper(impl: FetchGuidHelperImpl): FetchGuidHelper
