@@ -39,11 +39,11 @@ internal class AuthStoreImpl @Inject constructor(
         loginInfoStore.storeCredentials(projectId, userId)
     }
 
-    override suspend fun signIn(token: Token) {
+    override suspend fun storeFirebaseToken(token: Token) {
         firebaseAuthManager.signIn(token)
     }
 
-    override fun signOut() {
+    override fun clearFirebaseToken() {
         firebaseAuthManager.signOut()
     }
 
