@@ -4,6 +4,7 @@ import com.simprints.infra.images.local.ImageLocalDataSource
 import com.simprints.infra.images.local.ImageLocalDataSourceImpl
 import com.simprints.infra.images.remote.ImageRemoteDataSource
 import com.simprints.infra.images.remote.ImageRemoteDataSourceImpl
+import com.simprints.infra.images.worker.ImageUpSyncSchedulerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,6 +16,9 @@ abstract class ImagesModule {
 
     @Binds
     internal abstract fun bindImageRepository(impl: ImageRepositoryImpl): ImageRepository
+
+    @Binds
+    internal abstract fun bindImageUpSyncScheduler(impl: ImageUpSyncSchedulerImpl): ImageUpSyncScheduler
 
     @Binds
     internal abstract fun bindImageLocalDataSource(impl: ImageLocalDataSourceImpl): ImageLocalDataSource

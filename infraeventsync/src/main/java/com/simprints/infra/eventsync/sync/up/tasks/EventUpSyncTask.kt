@@ -22,7 +22,7 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyn
 import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -31,7 +31,7 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 internal class EventUpSyncTask @Inject constructor(
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val eventUpSyncScopeRepo: EventUpSyncScopeRepository,
     private val eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
@@ -40,7 +40,7 @@ internal class EventUpSyncTask @Inject constructor(
 ) {
 
     fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
-        if (operation.projectId != loginManager.getSignedInProjectIdOrEmpty()) {
+        if (operation.projectId != authStore.signedInProjectId) {
             throw TryToUploadEventsForNotSignedProject("Only events for the signed in project can be uploaded").also {
                 Simber.e(it)
             }

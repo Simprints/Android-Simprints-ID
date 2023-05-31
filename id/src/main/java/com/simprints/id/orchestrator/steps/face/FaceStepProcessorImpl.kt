@@ -3,6 +3,7 @@ package com.simprints.id.orchestrator.steps.face
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
+import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
@@ -43,15 +44,14 @@ class FaceStepProcessorImpl @Inject constructor(
             requestCode = requestCode.value,
             activityName = ACTIVITY_CLASS_NAME,
             bundleKey = IFaceRequest.BUNDLE_KEY,
-            request = request,
+            request = request.fromDomainToModuleApi(),
             status = Step.Status.NOT_STARTED
         )
     }
 
     override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Step.Result? =
         if (isFaceResult(requestCode)) {
-            data?.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)
-                ?.fromModuleApiToDomain()
+            data?.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)?.fromModuleApiToDomain()
         } else {
             null
         }

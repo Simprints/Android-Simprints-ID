@@ -6,7 +6,7 @@ import com.simprints.infra.config.testtools.apiProject
 import com.simprints.infra.config.testtools.apiProjectConfiguration
 import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -32,14 +32,14 @@ class ConfigRemoteDataSourceImplTest {
 
     private val remoteInterface = mockk<ConfigRemoteInterface>()
     private val simApiClient = mockk<SimNetwork.SimApiClient<ConfigRemoteInterface>>()
-    private val loginManager = mockk<LoginManager>()
+    private val authStore = mockk<AuthStore>()
     private val privacyNoticeDownloader = mockk<(String) -> String>()
     private val configRemoteDataSourceImpl =
-        ConfigRemoteDataSourceImpl(loginManager, UnconfinedTestDispatcher(), privacyNoticeDownloader)
+        ConfigRemoteDataSourceImpl(authStore, UnconfinedTestDispatcher(), privacyNoticeDownloader)
 
     @Before
     fun setup() {
-        coEvery { loginManager.buildClient<ConfigRemoteInterface>(any()) } returns simApiClient
+        coEvery { authStore.buildClient<ConfigRemoteInterface>(any()) } returns simApiClient
         coEvery { simApiClient.executeCall<Any>(any()) } coAnswers {
             val args = this.args
             @Suppress("UNCHECKED_CAST")

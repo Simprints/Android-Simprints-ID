@@ -15,7 +15,7 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -54,7 +54,7 @@ class SyncViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     @Before
     fun setUp() {
@@ -68,7 +68,7 @@ class SyncViewModelTest {
             every { down.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         }
         every { timeHelper.readableBetweenNowAndTime(any()) } returns DATE
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns "projectId"
+        every { authStore.signedInProjectId } returns "projectId"
     }
 
     @Test
@@ -380,6 +380,6 @@ class SyncViewModelTest {
         connectivityTracker,
         configManager,
         timeHelper,
-        loginManager,
+        authStore,
     )
 }

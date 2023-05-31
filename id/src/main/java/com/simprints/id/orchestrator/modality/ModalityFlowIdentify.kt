@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.core.DeviceID
+import com.simprints.feature.consent.ConsentType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -12,7 +13,6 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
-import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
@@ -20,7 +20,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.IdentificationConfiguration.PoolType
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import javax.inject.Inject
 
 class ModalityFlowIdentify @Inject constructor(
@@ -28,7 +28,7 @@ class ModalityFlowIdentify @Inject constructor(
     private val faceStepProcessor: FaceStepProcessor,
     private val coreStepProcessor: CoreStepProcessor,
     private val configManager: ConfigManager,
-    loginManager: LoginManager,
+    authStore: AuthStore,
     @DeviceID deviceId: String
 ) :
     ModalityFlowBaseImpl(
@@ -36,7 +36,7 @@ class ModalityFlowIdentify @Inject constructor(
         fingerprintStepProcessor,
         faceStepProcessor,
         configManager,
-        loginManager,
+        authStore,
         deviceId
     ) {
 

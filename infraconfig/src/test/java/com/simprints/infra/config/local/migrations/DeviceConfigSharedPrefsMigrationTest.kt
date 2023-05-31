@@ -12,7 +12,7 @@ import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigrat
 import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration.Companion.SELECTED_MODULES_KEY
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.config.testtools.protoDeviceConfiguration
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -27,20 +27,20 @@ class DeviceConfigSharedPrefsMigrationTest {
     private val preferences = mockk<SharedPreferences>(relaxed = true) {
         every { edit() } returns editor
     }
-    private val loginManager = mockk<LoginManager>()
+    private val authStore = mockk<AuthStore>()
     private lateinit var deviceConfigSharedPrefsMigration: DeviceConfigSharedPrefsMigration
 
     @Before
     fun setup() {
         every { ctx.getSharedPreferences(any(), any()) } returns preferences
-        deviceConfigSharedPrefsMigration = DeviceConfigSharedPrefsMigration(ctx, loginManager)
+        deviceConfigSharedPrefsMigration = DeviceConfigSharedPrefsMigration(ctx, authStore)
         LanguageHelper.init(mockk(relaxed = true))
     }
 
     @Test
     fun `shouldMigrate should return true only if the project is signed in and the language preference is not empty`() =
         runTest {
-            every { loginManager.signedInProjectId } returns "project_id"
+            every { authStore.signedInProjectId } returns "project_id"
             every { preferences.getString(LANGUAGE_KEY, "") } returns "en"
 
             val shouldMigrate =
@@ -51,7 +51,7 @@ class DeviceConfigSharedPrefsMigrationTest {
     @Test
     fun `shouldMigrate should return false if the project is not signed in`() =
         runTest {
-            every { loginManager.signedInProjectId } returns ""
+            every { authStore.signedInProjectId } returns ""
             every { preferences.getString(LANGUAGE_KEY, "") } returns "en"
 
             val shouldMigrate =
@@ -62,7 +62,7 @@ class DeviceConfigSharedPrefsMigrationTest {
     @Test
     fun `shouldMigrate should return false if the preference language is empty`() =
         runTest {
-            every { loginManager.signedInProjectId } returns "project_id"
+            every { authStore.signedInProjectId } returns "project_id"
             every { preferences.getString(LANGUAGE_KEY, "") } returns ""
 
             val shouldMigrate = deviceConfigSharedPrefsMigration.shouldMigrate(

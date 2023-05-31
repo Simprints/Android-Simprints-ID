@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_consent"
+    app:startDestination="@id/consentFragment">
+
+    <fragment
+        android:id="@+id/consentFragment"
+        android:name="com.simprints.feature.consent.screens.consent.ConsentFragment"
+        android:label="ConsentFragment"
+        tools:layout="@layout/fragment_consent">
+        <argument
+            android:name="consentType"
+            app:argType="com.simprints.feature.consent.ConsentType" />
+
+        <action
+            android:id="@+id/action_consentFragment_to_privacyNoticeFragment"
+            app:destination="@id/privacyNoticeFragment" />
+    </fragment>
+
+    <include app:graph="@navigation/graph_exit_form" />
+
+    <action
+        android:id="@+id/action_consentFragment_to_refusalFragment"
+        app:destination="@id/graph_exit_form"
+        app:popUpToInclusive="true" />
+
+    <fragment
+        android:id="@+id/privacyNoticeFragment"
+        android:name="com.simprints.feature.consent.screens.privacy.PrivacyNoticeFragment"
+        android:label="PrivacyNoticeFragment"
+        tools:layout="@layout/fragment_privacy" />
+
+</navigation>

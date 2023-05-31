@@ -19,7 +19,7 @@ import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedPro
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
@@ -42,7 +42,7 @@ internal class EventUpSyncTaskTest {
     private lateinit var eventUpSyncScopeRepository: EventUpSyncScopeRepository
 
     @MockK
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     @MockK
     lateinit var eventRepo: EventRepository
@@ -67,13 +67,13 @@ internal class EventUpSyncTaskTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { timeHelper.now() } returns NOW
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
+        every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
         eventUpSyncTask = EventUpSyncTask(
-            loginManager,
+            authStore,
             eventUpSyncScopeRepository,
             eventRepo,
             eventRemoteDataSource,
