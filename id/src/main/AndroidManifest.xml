@@ -17,6 +17,7 @@
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="31" />
 
+    <!-- usesCleartextTraffic ensures that it is also disabled on version that do not support security config -->
     <application
         android:name=".Application"
         android:allowBackup="false"
@@ -24,6 +25,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_config"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
