@@ -3,6 +3,7 @@ package com.simprints.infra.events.event.domain.models.face
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test
 
@@ -16,7 +17,7 @@ class FaceCaptureBiometricsEventTest {
             roll = 1.0f,
             template = "template",
             quality = 1.0f,
-            format = FaceTemplateFormat.RANK_ONE_1_23
+            format = FACE_TEMPLATE_FORMAT
         )
         val event = FaceCaptureBiometricsEvent(
             startTime = SampleDefaults.CREATED_AT,

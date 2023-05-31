@@ -18,7 +18,7 @@ class OneToOneMatchEvent(
     startTime: Long,
     endTime: Long,
     val query: Serializable,
-    val matcher: Matcher,
+    val matcher: String,
     val result: MatchEntry?,
     val fingerComparisonStrategy: FingerComparisonStrategy,
 ) : Event(EventType.ONE_TO_ONE_MATCH, startTime, endTime)
@@ -28,7 +28,7 @@ fun OneToOneMatchEvent.fromDomainToCore() =
         startTime,
         endTime,
         (query as SubjectQuery).extractVerifyId(),
-        matcher.fromDomainToCore(),
+        matcher,
         result?.fromDomainToCore(),
         fingerComparisonStrategy.fromDomainToCore()
     )

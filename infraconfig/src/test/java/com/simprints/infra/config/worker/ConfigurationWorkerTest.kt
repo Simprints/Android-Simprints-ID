@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.domain.ConfigService
 import com.simprints.infra.config.testtools.project
 import com.simprints.infra.config.testtools.projectConfiguration
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -18,19 +18,19 @@ class ConfigurationWorkerTest {
         private const val PROJECT_ID = "projectId"
     }
 
-    private val loginManager = mockk<LoginManager>()
+    private val authStore = mockk<AuthStore>()
     private val configService = mockk<ConfigService>(relaxed = true)
     private val configurationWorker =
         ConfigurationWorker(
             mockk(),
             mockk(relaxed = true),
-            loginManager,
+            authStore,
             configService,
         )
 
     @Test
     fun `should fail if the signed in project id is empty`() = runTest {
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
+        every { authStore.signedInProjectId } returns ""
 
         val result = configurationWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -38,7 +38,7 @@ class ConfigurationWorkerTest {
 
     @Test
     fun `should fail if the config service throws an exception`() = runTest {
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
         coEvery { configService.refreshConfiguration(PROJECT_ID) } throws Exception()
 
         val result = configurationWorker.doWork()
@@ -47,7 +47,7 @@ class ConfigurationWorkerTest {
 
     @Test
     fun `should succeed if the config service doesn't throw an exception`() = runTest {
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
         coEvery { configService.refreshConfiguration(PROJECT_ID) } returns projectConfiguration
         coEvery { configService.refreshProject(PROJECT_ID) } returns project
 

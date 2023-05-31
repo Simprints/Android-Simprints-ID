@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.core.DeviceID
+import com.simprints.feature.consent.ConsentType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -12,7 +13,6 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
-import com.simprints.id.orchestrator.steps.core.requests.ConsentType.VERIFY
 import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
@@ -20,7 +20,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Co
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import javax.inject.Inject
 
 class ModalityFlowVerify @Inject constructor(
@@ -28,7 +28,7 @@ class ModalityFlowVerify @Inject constructor(
     private val faceStepProcessor: FaceStepProcessor,
     private val coreStepProcessor: CoreStepProcessor,
     configManager: ConfigManager,
-    loginManager: LoginManager,
+    authStore: AuthStore,
     @DeviceID deviceId: String
 ) :
     ModalityFlowBaseImpl(
@@ -36,7 +36,7 @@ class ModalityFlowVerify @Inject constructor(
         fingerprintStepProcessor,
         faceStepProcessor,
         configManager,
-        loginManager,
+        authStore,
         deviceId
     ) {
 
@@ -44,7 +44,7 @@ class ModalityFlowVerify @Inject constructor(
         require(appRequest is AppVerifyRequest)
         addModalityConfigurationSteps()
         addCoreFetchGuidStep(appRequest.projectId, appRequest.verifyGuid)
-        addCoreConsentStepIfRequired(VERIFY)
+        addCoreConsentStepIfRequired(ConsentType.VERIFY)
         addModalitiesStepsList()
     }
 

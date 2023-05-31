@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.realm.config.RealmConfig
 import com.simprints.infra.realm.exceptions.RealmUninitialisedException
 import com.simprints.infra.security.SecurityManager
@@ -26,8 +26,8 @@ class RealmWrapperImplTest {
         private const val PROJECT_ID = "projectId"
     }
 
-    private val loginManagerMock = mockk<LoginManager> {
-        every { getSignedInProjectIdOrEmpty() } returns PROJECT_ID
+    private val authStoreMock = mockk<com.simprints.infra.authstore.AuthStore> {
+        every { signedInProjectId } returns PROJECT_ID
     }
 
     private val secureLocalDbKeyProviderMock = mockk<SecurityManager> {
@@ -62,7 +62,7 @@ class RealmWrapperImplTest {
         realmWrapper = RealmWrapperImpl(
             context,
             secureLocalDbKeyProviderMock,
-            loginManagerMock,
+            authStoreMock,
         )
     }
 
@@ -78,11 +78,11 @@ class RealmWrapperImplTest {
     @Test(expected = RealmUninitialisedException::class)
     fun `test useRealmInstance creates realm instance should throw if no signed in project is null`() =
         runTest {
-            every { loginManagerMock.getSignedInProjectIdOrEmpty() } returns ""
+            every { authStoreMock.signedInProjectId } returns ""
             realmWrapper = RealmWrapperImpl(
                 ApplicationProvider.getApplicationContext(),
                 secureLocalDbKeyProviderMock,
-                loginManagerMock,
+                authStoreMock,
             )
             realmWrapper.useRealmInstance { }
             // Then should throw RealmUninitialisedException

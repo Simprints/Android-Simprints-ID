@@ -41,7 +41,8 @@ object CoreModule {
 
     @Provides
     @Singleton
-    fun provideSimNetworkUtils(@ApplicationContext ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
+    fun provideSimNetworkUtils(@ApplicationContext ctx: Context): SimNetworkUtils =
+        SimNetworkUtilsImpl(ctx)
 
     @Provides
     @Singleton
@@ -126,3 +127,17 @@ annotation class NonCancellableIO
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class ExternalScope
+
+/*
+Use this annotation to ignore a class or function from test coverage reports.
+ */
+@MustBeDocumented
+@Retention(AnnotationRetention.BINARY)
+@Target(
+    AnnotationTarget.CLASS,
+    AnnotationTarget.CONSTRUCTOR,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.FIELD,
+    AnnotationTarget.TYPE
+)
+annotation class ExcludedFromGeneratedTestCoverageReports(val reason: String)

@@ -1,27 +1,27 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
+import com.simprints.feature.consent.ConsentType
 import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
-import com.simprints.id.orchestrator.steps.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 
 abstract class ModalityFlowBaseImpl(
     private val coreStepProcessor: CoreStepProcessor,
     private val fingerprintStepProcessor: FingerprintStepProcessor,
     private val faceStepProcessor: FaceStepProcessor,
     private val configManager: ConfigManager,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val deviceId: String
 ) : ModalityFlow {
 
@@ -63,7 +63,7 @@ abstract class ModalityFlowBaseImpl(
         when (it) {
             Modality.FINGERPRINT -> fingerprintStepProcessor.buildConfigurationStep()
             Modality.FACE -> faceStepProcessor.buildConfigurationStep(
-                loginManager.signedInProjectId,
+                authStore.signedInProjectId,
                 deviceId
             )
         }

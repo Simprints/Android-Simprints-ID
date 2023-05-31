@@ -1,18 +1,18 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.content.Intent
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag
+import com.simprints.fingerprint.activities.matching.MatchTask.Companion.MATCHER_NAME
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy.SAME_FINGER
-import com.simprints.fingerprint.controllers.core.eventData.model.Matcher
+import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 
 class VerificationTask(
@@ -44,7 +44,7 @@ class VerificationTask(
                 matchStartTime,
                 timeHelper.now(),
                 matchingRequest.queryForCandidates,
-                Matcher.SIM_AFIS,
+                MATCHER_NAME,
                 verificationResult,
                 isCrossFingerMatchingEnabled.toMatchingStrategy()
             )
