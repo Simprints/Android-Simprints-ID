@@ -8,7 +8,7 @@ import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.events.event.domain.models.face.fromModuleApiToDomain
 import com.simprints.infra.events.event.domain.models.fingerprint.fromModuleApiToDomain
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class EnrolmentRecordCreationEvent(
@@ -33,6 +33,7 @@ data class EnrolmentRecordCreationEvent(
         )
     )
 
+    @Keep
     data class EnrolmentRecordCreationPayload(
         val subjectId: String,
         val projectId: String,
