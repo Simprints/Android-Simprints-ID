@@ -3,7 +3,6 @@
 
     <application
         android:icon="@mipmap/ic_debug_launcher"
-        android:usesCleartextTraffic="true"
         tools:replace="android:icon" />
 
 </manifest>
