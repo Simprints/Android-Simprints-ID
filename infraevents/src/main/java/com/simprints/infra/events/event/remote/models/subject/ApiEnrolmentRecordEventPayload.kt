@@ -2,6 +2,7 @@ package com.simprints.infra.events.remote.models.subject
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.infra.events.event.remote.models.subject.ApiEnrolmentRecordMovePayload
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,

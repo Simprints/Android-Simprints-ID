@@ -1,4 +1,4 @@
-package com.simprints.infra.events.remote.models.subject
+package com.simprints.infra.events.event.remote.models.subject
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -7,6 +7,8 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMov
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.infra.events.event.domain.models.subject.fromApiToDomain
+import com.simprints.infra.events.remote.models.subject.ApiEnrolmentRecordEventPayload
+import com.simprints.infra.events.remote.models.subject.ApiEnrolmentRecordPayloadType
 import com.simprints.infra.events.remote.models.subject.biometricref.ApiBiometricReference
 
 
@@ -17,6 +19,7 @@ data class ApiEnrolmentRecordMovePayload(
     val enrolmentRecordDeletion: ApiEnrolmentRecordDeletionInMove
 ) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordMove) {
 
+    @Keep
     data class ApiEnrolmentRecordDeletionInMove(
         val subjectId: String,
         val projectId: String,
@@ -24,6 +27,7 @@ data class ApiEnrolmentRecordMovePayload(
         val attendantId: String
     )
 
+    @Keep
     data class ApiEnrolmentRecordCreationInMove(
         val subjectId: String,
         val projectId: String,

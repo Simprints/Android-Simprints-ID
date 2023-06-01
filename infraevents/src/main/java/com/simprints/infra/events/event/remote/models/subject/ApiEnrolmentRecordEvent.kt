@@ -5,6 +5,8 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCre
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
+import com.simprints.infra.events.event.remote.models.subject.ApiEnrolmentRecordMovePayload
+import com.simprints.infra.events.event.remote.models.subject.fromApiToDomain
 
 @Keep
 class ApiEnrolmentRecordEvent(
