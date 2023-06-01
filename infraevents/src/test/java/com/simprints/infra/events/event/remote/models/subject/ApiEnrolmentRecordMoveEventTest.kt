@@ -5,8 +5,10 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTem
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
+import com.simprints.infra.events.remote.models.subject.ApiEnrolmentRecordMovePayload
 import com.simprints.infra.events.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 import com.simprints.infra.events.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
+import com.simprints.infra.events.remote.models.subject.fromApiToDomain
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Test
 
