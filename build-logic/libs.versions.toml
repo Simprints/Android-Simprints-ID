@@ -2,7 +2,7 @@
 kotlin_version = "1.8.21"
 kotlin_coroutine_version = "1.6.4"
 
-android_gradlePlugin_version = "8.0.0"
+android_gradlePlugin_version = "8.0.2"
 androidx_version = "1.5.2"
 androidx_core_version = "1.10.0"
 androidx_app_compat_version = "1.6.1"
