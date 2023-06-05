@@ -27,19 +27,31 @@ internal class ConfigServiceImpl @Inject constructor(
 
     override suspend fun getProject(projectId: String): Project = try {
         localDataSource.getProject()
-    } catch (e: Exception) {
-        if (e is NoSuchElementException) {
-            refreshProject(projectId)
-        } else {
-            throw e
-        }
+    } catch (e: NoSuchElementException) {
+        refreshProject(projectId)
     }
 
     override suspend fun refreshProject(projectId: String): Project = remoteDataSource
         .getProject(projectId)
         .also { localDataSource.saveProject(it) }
 
-    override suspend fun getConfiguration(): ProjectConfiguration = localDataSource.getProjectConfiguration()
+    override suspend fun getConfiguration(): ProjectConfiguration {
+        val localConfig = localDataSource.getProjectConfiguration()
+        // If projectId is empty, configuration hasn't been downloaded yet
+        return if (localConfig.projectId.isEmpty()) {
+            try {
+                // Try to refresh it with logged in projectId (if any)
+                refreshConfiguration(localDataSource.getProject().id)
+            } catch (e: Exception) {
+                // If not logged in the above will fail. However we still depend on the 'default'
+                // configuration to create the session when login is attempted. Possibly in other
+                // places, too.
+                localConfig
+            }
+        } else {
+            localConfig
+        }
+    }
 
     override suspend fun refreshConfiguration(projectId: String): ProjectConfiguration = remoteDataSource
         .getConfiguration(projectId)
