@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":clientapi"))
     implementation(project(":face"))
+    implementation(project(":feature:login"))
     implementation(project(":featuredashboard"))
     implementation(project(":featurealert"))
     implementation(project(":featureexitform"))
@@ -65,23 +66,10 @@ dependencies {
     implementation(libs.androidX.lifecycle.scope)
     implementation(libs.androidX.lifecycle.livedata.ktx)
 
-    implementation(libs.androidX.cameraX.core)
-    runtimeOnly(libs.androidX.cameraX.camera2)
-    implementation(libs.androidX.cameraX.lifecycle)
-    implementation(libs.androidX.cameraX.view)
-
     implementation(libs.workManager.work)
     implementation(libs.playServices.location)
 
     implementation(libs.rxJava2.core)
-    implementation(libs.jackson.core)
-
-    // Firebase
-    implementation(libs.firebase.storage)
-    implementation(libs.firebase.barcode)
-
-    implementation(libs.retrofit.core)
-    implementation(libs.jackson.core)
 
     // ######################################################
     //                      Unit test
@@ -91,8 +79,6 @@ dependencies {
     testImplementation(project(":infraevents"))
     testImplementation(project(":infraeventsync"))
     testImplementation(project(":infralogging"))
-
-    testImplementation(libs.playServices.integrity)
 
     // ######################################################
     //                      Android test

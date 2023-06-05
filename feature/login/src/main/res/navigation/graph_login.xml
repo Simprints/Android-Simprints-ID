@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_login"
+    app:startDestination="@id/loginFormFragment">
+
+    <fragment
+        android:id="@+id/loginFormFragment"
+        android:name="com.simprints.feature.login.screens.form.LoginFormFragment"
+        android:label="LoginFormFragment"
+        tools:layout="@layout/fragment_login_form">
+        <argument
+            android:name="loginParams"
+            app:argType="com.simprints.feature.login.LoginParams" />
+
+        <action
+            android:id="@+id/action_loginFormFragment_to_loginQrScanner"
+            app:destination="@id/loginQrScanner" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/loginQrScanner"
+        android:name="com.simprints.feature.login.screens.qrscanner.QrScannerFragment"
+        android:label="LoginQrScanner"
+        tools:layout="@layout/fragment_qr_scanner" />
+
+</navigation>
