@@ -32,6 +32,7 @@ data class EnrolmentRecordCreationEvent(
         )
     )
 
+    @Keep
     data class EnrolmentRecordCreationPayload(
         val subjectId: String,
         val projectId: String,

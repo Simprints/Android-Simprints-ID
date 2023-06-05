@@ -17,6 +17,7 @@ internal data class ApiEnrolmentRecordMovePayload(
     val enrolmentRecordDeletion: ApiEnrolmentRecordDeletionInMove
 ) : ApiEnrolmentRecordEventPayload(ApiEnrolmentRecordPayloadType.EnrolmentRecordMove) {
 
+    @Keep
     data class ApiEnrolmentRecordDeletionInMove(
         val subjectId: String,
         val projectId: String,
@@ -24,6 +25,7 @@ internal data class ApiEnrolmentRecordMovePayload(
         val attendantId: String
     )
 
+    @Keep
     data class ApiEnrolmentRecordCreationInMove(
         val subjectId: String,
         val projectId: String,
