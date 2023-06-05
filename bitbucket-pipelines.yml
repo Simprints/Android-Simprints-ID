@@ -146,29 +146,16 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew fingerprint:jacocoTestReport
-                    - ./gradlew fingerprintmatcher:jacocoTestReport
+                    - ./gradlew fingerprint:controller:jacocoTestReport
+                    - ./gradlew fingerprint:matcher:jacocoTestReport
+                    - ./gradlew fingerprint:scanner:jacocoTestReport
+
 
                 artifacts:
-                    - fingerprint/build/reports/**
-                    - fingerprintmatcher/build/reports/**
+                    - fingerprint/controller/build/reports/**
+                    - fingerprint/matcher/build/reports/**
+                    - fingerprint/scanner/build/reports/**
 
-        ######################################################################
-        # Run the Fingerprint Scanner unit tests with coverage and upload
-        # report to artifacts.
-        ######################################################################
-        -   step: &run-fingerprintscanner-unit-tests
-                name: "Run Fingerprint Scanner unit tests"
-                max-time: 30
-                size: 2x
-                caches:
-                    - gradle
-                    - gradlewrapper
-                script:
-                    - source ci/pipeline/setup
-                    - ./gradlew fingerprintscanner:jacocoTestReport
-                artifacts:
-                    - fingerprintscanner/build/reports/**
 
         ######################################################################
         # Get all of the test and coverage reports from artifacts, upload
@@ -350,7 +337,6 @@ flows:
                     -   step: *run-id-unit-tests
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
                     -   step: *run-infra-unit-tests
                     -   step: *run-feature-unit-tests
                     -   step: *build-and-sign-universal-apk
@@ -361,7 +347,6 @@ flows:
                     -   step: *run-id-unit-tests
                     -   step: *run-face-unit-tests
                     -   step: *run-fingerprint-unit-tests
-                    -   step: *run-fingerprintscanner-unit-tests
                     -   step: *run-infra-unit-tests
                     -   step: *run-feature-unit-tests
                     -   step: *build-and-sign-universal-apk
