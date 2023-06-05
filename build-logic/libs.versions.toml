@@ -29,14 +29,15 @@ matertial_version = "1.9.0"
 hilt_version = "2.46.1"
 hilt_androidx_version = "1.0.0"
 
+play_base_services_version = "18.2.0"
 play_location_services_version = "21.0.1"
 play_integrity_version = "1.1.0"
 gsm_plugin_version = "4.3.15"
 play_publisher_version = "3.8.3"
+play_barcode_version = "18.2.0"
 
 firebase_auth_version = "22.0.0"
 firebase_storage_version = "20.2.0"
-firebase_barcode_version = "18.2.0"
 firebase_crashlytics_version = "18.3.7"
 firebase_analytics_version = "21.3.0"
 firebase_perf_version = "20.3.2"
@@ -141,13 +142,14 @@ support-material = { module = "com.google.android.material:material", version.re
 workManager-work = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx_work_version" }
 
 #PlayServices
+playServices-base = { module = "com.google.android.gms:play-services-base", version.ref = "play_base_services_version" }
 playServices-location = { module = "com.google.android.gms:play-services-location", version.ref = "play_location_services_version" }
 playServices-integrity = { module = "com.google.android.play:integrity", version.ref = "play_integrity_version" }
+playServices-barcode = { module = "com.google.android.gms:play-services-mlkit-barcode-scanning", version.ref = "play_barcode_version" }
 
 #Firebase
 firebase-auth = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebase_auth_version" }
 firebase-storage = { module = "com.google.firebase:firebase-storage-ktx", version.ref = "firebase_storage_version" }
-firebase-barcode = { module = "com.google.android.gms:play-services-mlkit-barcode-scanning", version.ref = "firebase_barcode_version" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebase_crashlytics_version" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebase_analytics_version" }
 firebase-perf = { module = "com.google.firebase:firebase-perf", version.ref = "firebase_perf_version" }

@@ -4,16 +4,18 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View.VISIBLE
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.simprints.clientapi.Constants.RequestIntents.LOGIN_ACTIVITY_REQUEST
+import androidx.lifecycle.repeatOnLifecycle
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
-import com.simprints.id.activities.login.LoginActivity
-import com.simprints.id.activities.login.request.LoginActivityRequest
-import com.simprints.id.activities.login.response.LoginActivityResponse
+import com.simprints.feature.login.LoginContract
+import com.simprints.feature.login.LoginError
+import com.simprints.feature.login.LoginError.*
+import com.simprints.feature.login.ShowLoginWrapper
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
 import com.simprints.id.di.IdAppModule
@@ -49,6 +51,28 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
         setResultErrorAndFinish(DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse(response))
     }
 
+    private val showLoginFlow = registerForActivityResult(ShowLoginWrapper()) {
+        if (it.isSuccess) {
+            lifecycleScope.launch {
+                lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    viewPresenter.checkSignedInStateIfPossible()
+                }
+            }
+        } else handleLoginFormErrors(it.error)
+    }
+
+    private fun handleLoginFormErrors(error: LoginError?) = when (error) {
+        null, LoginNotCompleted -> {
+            viewPresenter.onLoginScreenErrorReturn(AppErrorResponse(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE))
+        }
+
+        MissingPlayServices -> showAlert.launch(AlertType.MISSING_GOOGLE_PLAY_SERVICES.toAlertConfig().toArgs())
+        OutdatedPlayServices -> showAlert.launch(AlertType.GOOGLE_PLAY_SERVICES_OUTDATED.toAlertConfig().toArgs())
+        IntegrityServiceError -> showAlert.launch(AlertType.INTEGRITY_SERVICE_ERROR.toAlertConfig().toArgs())
+        MissingOrOutdatedPlayServices -> showAlert.launch(AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP.toAlertConfig().toArgs())
+        Unknown -> showAlert.launch(AlertType.UNEXPECTED_ERROR.toAlertConfig().toArgs())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -58,25 +82,6 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
             viewPresenter.onViewCreated(savedInstanceState != null)
         }
     }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        val appErrorResponseForLoginScreen = extractAppErrorResponseForLoginScreen(data)
-
-        when {
-            appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(
-                appErrorResponseForLoginScreen
-            )
-            else -> lifecycleScope.launchWhenCreated {
-                viewPresenter.checkSignedInStateIfPossible()
-            }
-        }
-    }
-
-    private fun extractAppErrorResponseForLoginScreen(data: Intent?): AppErrorResponse? =
-        data?.getParcelableExtra(LoginActivityResponse.BUNDLE_KEY)
-
 
     override fun setResultErrorAndFinish(appResponse: IAppErrorResponse) {
         setResult(Activity.RESULT_OK, Intent().apply {
@@ -104,12 +109,7 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
     }
 
     override fun openLoginActivity(appRequest: AppRequest) {
-        val loginIntent = Intent(this, LoginActivity::class.java)
-        loginIntent.putExtra(
-            LoginActivityRequest.BUNDLE_KEY,
-            LoginActivityRequest(appRequest.projectId, appRequest.userId)
-        )
-        startActivityForResult(loginIntent, LOGIN_ACTIVITY_REQUEST)
+        showLoginFlow.launch(LoginContract.toArgs(appRequest.projectId, appRequest.userId))
     }
 
     override fun openOrchestratorActivity(appRequest: AppRequest) {
