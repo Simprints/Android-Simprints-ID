@@ -8,4 +8,13 @@ android {
 }
 
 dependencies {
+
+    implementation(project(":featurealert"))
+    implementation(project(":featureexitform"))
+
+    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infraeventsync"))
+    implementation(project(":infraevents"))
+    implementation(project(":infraconfig"))
+
 }
