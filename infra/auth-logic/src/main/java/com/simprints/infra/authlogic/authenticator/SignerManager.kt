@@ -28,10 +28,24 @@ internal class SignerManager @Inject constructor(
 ) {
 
     suspend fun signIn(projectId: String, userId: String, token: Token) = withContext(dispatcher) {
-        authStore.storeFirebaseToken(token)
-        authStore.storeCredentials(projectId, userId)
-        configManager.refreshProject(projectId)
-        securityStateScheduler.scheduleSecurityStateCheck()
+        try {
+            // Store Firebase token so it can be used by ConfigManager
+            authStore.storeFirebaseToken(token)
+            configManager.refreshProject(projectId)
+            configManager.refreshProjectConfiguration(projectId)
+            securityStateScheduler.scheduleSecurityStateCheck()
+            // Only store credentials if all other calls succeeded. This avoids the undefined state
+            // where credentials are store (i.e. user is considered logged in) but project configuration
+            // is missing
+            authStore.storeCredentials(projectId, userId)
+        } catch (e: Exception) {
+            authStore.clearFirebaseToken()
+            configManager.clearData()
+            securityStateScheduler.cancelSecurityStateCheck()
+            authStore.cleanCredentials()
+
+            throw e
+        }
     }
 
     suspend fun signOut() = withContext(dispatcher) {

@@ -17,6 +17,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -75,6 +76,7 @@ internal class SignerManagerTest {
     fun signIn_shouldSignInToRemoteDb() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockFetchingProjectInfo()
+        mockFetchingProjectConfiguration()
 
         signIn()
 
@@ -93,6 +95,7 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
+        mockFetchingProjectConfiguration()
 
         signIn()
 
@@ -112,6 +115,7 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
+        mockFetchingProjectConfiguration()
 
         signIn()
 
@@ -119,12 +123,33 @@ internal class SignerManagerTest {
     }
 
     @Test
-    fun loadAndRefreshCacheFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
+    fun refreshProjectInfoFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo(true)
+        mockFetchingProjectConfiguration()
 
         assertThrows<Throwable> { signIn() }
+
+        verify { mockAuthStore.clearFirebaseToken() }
+        coVerify { mockConfigManager.clearData() }
+        verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
+        verify { mockAuthStore.cleanCredentials() }
+    }
+
+    @Test
+    fun refreshProjectConfigurationFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
+        mockRemoteSignedIn()
+        mockStoreCredentialsLocally()
+        mockFetchingProjectInfo()
+        mockFetchingProjectConfiguration(true)
+
+        assertThrows<Throwable> { signIn() }
+
+        verify { mockAuthStore.clearFirebaseToken() }
+        coVerify { mockConfigManager.clearData() }
+        verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
+        verify { mockAuthStore.cleanCredentials() }
     }
 
     @Test
@@ -132,6 +157,7 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
+        mockFetchingProjectConfiguration()
 
         signIn()
     }
@@ -141,6 +167,7 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
+        mockFetchingProjectConfiguration()
 
         signIn()
 
@@ -228,7 +255,16 @@ internal class SignerManagerTest {
                     )
                 )
             } else {
-                this.throws(Throwable("Failed to fetch project info"))
+                this.throws(Exception("Failed to fetch project info"))
+            }
+        }
+
+    private fun mockFetchingProjectConfiguration(error: Boolean = false) =
+        coEvery { mockConfigManager.refreshProjectConfiguration(any()) }.apply {
+            if (!error) {
+                this.returns(mockk())
+            } else {
+                this.throws(Exception("Failed to fetch project configuration"))
             }
         }
 

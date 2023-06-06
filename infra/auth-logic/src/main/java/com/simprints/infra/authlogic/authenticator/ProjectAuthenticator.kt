@@ -42,9 +42,8 @@ internal class ProjectAuthenticator @Inject constructor(
         makeAuthRequest(prepareAuthRequestParameters(nonceScope, projectSecret, deviceId), nonceScope)
             .signIn(nonceScope.projectId, nonceScope.userId)
 
-        val config = configManager.refreshProjectConfiguration(nonceScope.projectId)
-
-        fetchProjectLongConsentTexts(config.general.languageOptions, nonceScope.projectId)
+        val config = configManager.getProjectConfiguration()
+        fetchProjectLongConsentTexts(config.general.languageOptions, config.projectId)
     }
 
     private suspend fun prepareAuthRequestParameters(
