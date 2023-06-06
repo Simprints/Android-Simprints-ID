@@ -76,16 +76,16 @@ internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
 
     private fun FingerIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier =
         when (this) {
-            RIGHT_5TH_FINGER -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.RIGHT_5TH_FINGER
-            RIGHT_4TH_FINGER -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.RIGHT_4TH_FINGER
-            RIGHT_3RD_FINGER -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.RIGHT_3RD_FINGER
-            RIGHT_INDEX_FINGER -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
-            RIGHT_THUMB -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.RIGHT_THUMB
-            LEFT_THUMB -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.LEFT_THUMB
-            LEFT_INDEX_FINGER -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.LEFT_INDEX_FINGER
-            LEFT_3RD_FINGER -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.LEFT_3RD_FINGER
-            LEFT_4TH_FINGER -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.LEFT_4TH_FINGER
-            LEFT_5TH_FINGER -> com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfisFingerIdentifier.LEFT_5TH_FINGER
+            RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
+            RIGHT_4TH_FINGER -> SimAfisFingerIdentifier.RIGHT_4TH_FINGER
+            RIGHT_3RD_FINGER -> SimAfisFingerIdentifier.RIGHT_3RD_FINGER
+            RIGHT_INDEX_FINGER -> SimAfisFingerIdentifier.RIGHT_INDEX_FINGER
+            RIGHT_THUMB -> SimAfisFingerIdentifier.RIGHT_THUMB
+            LEFT_THUMB -> SimAfisFingerIdentifier.LEFT_THUMB
+            LEFT_INDEX_FINGER -> SimAfisFingerIdentifier.LEFT_INDEX_FINGER
+            LEFT_3RD_FINGER -> SimAfisFingerIdentifier.LEFT_3RD_FINGER
+            LEFT_4TH_FINGER -> SimAfisFingerIdentifier.LEFT_4TH_FINGER
+            LEFT_5TH_FINGER -> SimAfisFingerIdentifier.LEFT_5TH_FINGER
         }
 
     private fun crossFingerMatch(
