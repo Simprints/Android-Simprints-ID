@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.activities.collect
 
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,7 +14,11 @@ import com.simprints.core.tools.utils.randomUUID
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
-import com.simprints.fingerprint.activities.collect.state.*
+import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
+import com.simprints.fingerprint.activities.collect.state.FingerState
+import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
+import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
@@ -21,7 +27,11 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.toDomain
-import com.simprints.fingerprint.data.domain.images.*
+import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
+import com.simprints.fingerprint.data.domain.images.deduceFileExtension
+import com.simprints.fingerprint.data.domain.images.isEager
+import com.simprints.fingerprint.data.domain.images.isImageTransferRequired
+import com.simprints.fingerprint.data.domain.images.toDomain
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
@@ -38,7 +48,11 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTem
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import kotlin.concurrent.schedule
 import kotlin.math.min
@@ -81,11 +95,14 @@ class CollectFingerprintsViewModel(
     lateinit var configuration: FingerprintConfiguration
 
     val state = MutableLiveData<CollectFingerprintsState>()
+    private val mainHandler = Handler(Looper.getMainLooper())
     fun state() = state.value
         ?: throw IllegalStateException("No state available in CollectFingerprintsViewModel")
 
     private fun updateState(block: CollectFingerprintsState.() -> Unit) {
-        state.postValue(state.value?.apply { block() })
+        mainHandler.post {
+            state.value = state.value?.apply { block() }
+        }
     }
 
     private fun updateFingerState(block: FingerState.() -> Unit) {
