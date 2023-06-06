@@ -38,6 +38,6 @@ this module are:
 - [`fingerprintscannermock`](../fingerprintscannermock/README.md) -
   which is a utility package providing mocking and simulation options
   for the fingerprint scanner for testing and debugging.
-- [`fingerprintmatcher`](../fingerprintmatcher/README.md) - which houses
+- [`fingerprintmatcher`](../infra/matcher/README.md) - which houses
   the algorithms for matching fingerprints and provides an interface for
   their use.
