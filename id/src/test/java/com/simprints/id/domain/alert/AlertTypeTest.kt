@@ -16,8 +16,8 @@ class AlertTypeTest {
 
     @Test
     fun alertTypeFromPayload() {
-        val alertData = AlertResult("key", GUID_NOT_FOUND_ONLINE.toAlertConfig().payload)
-        assertThat(AlertType.fromPayload(alertData)).isEqualTo(GUID_NOT_FOUND_ONLINE)
+        val alertData = AlertResult("key", DIFFERENT_USER_ID.toAlertConfig().payload)
+        assertThat(AlertType.fromPayload(alertData)).isEqualTo(DIFFERENT_USER_ID)
     }
 
     @Test
@@ -31,8 +31,6 @@ class AlertTypeTest {
         DIFFERENT_USER_ID to AlertScreenEventType.DIFFERENT_USER_ID,
         INTEGRITY_SERVICE_ERROR to AlertScreenEventType.INTEGRITY_SERVICE_ERROR,
         UNEXPECTED_ERROR to AlertScreenEventType.UNEXPECTED_ERROR,
-        GUID_NOT_FOUND_ONLINE to AlertScreenEventType.GUID_NOT_FOUND_ONLINE,
-        GUID_NOT_FOUND_OFFLINE to AlertScreenEventType.GUID_NOT_FOUND_OFFLINE,
         ENROLMENT_LAST_BIOMETRICS_FAILED to AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED,
         GOOGLE_PLAY_SERVICES_OUTDATED to AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED,
         MISSING_GOOGLE_PLAY_SERVICES to AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES,
