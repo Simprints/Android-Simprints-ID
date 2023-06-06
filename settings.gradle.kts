@@ -53,9 +53,9 @@ include(":id")
 //Fingerprint modality modules
 include(
     ":fingerprint:controller",
-    ":fingerprint:matcher",
     ":fingerprint:scanner",
     ":fingerprint:scannermock",
+    ":fingerprint:infra:matcher",
 )
 
 // Modules to be refactored

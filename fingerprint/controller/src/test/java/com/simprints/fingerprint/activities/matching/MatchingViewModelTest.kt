@@ -13,16 +13,15 @@ import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
+import com.simprints.fingerprint.infra.matcher.FingerprintMatcher
+import com.simprints.fingerprint.infra.matcher.domain.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.FingerprintGenerator
-import com.simprints.fingerprintmatcher.FingerprintMatcher
-import com.simprints.fingerprintmatcher.domain.MatchResult
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -30,7 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.Serializable
-import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
+import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
 
 @RunWith(AndroidJUnit4::class)
 class MatchingViewModelTest {
