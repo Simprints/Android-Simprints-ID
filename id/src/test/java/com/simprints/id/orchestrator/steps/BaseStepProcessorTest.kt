@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.consent.screens.ConsentWrapperActivity
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
+import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 
 open class BaseStepProcessorTest {
@@ -34,6 +35,13 @@ open class BaseStepProcessorTest {
         CoreRequestCode.FETCH_GUID_CHECK.value,
         "com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity",
         FetchSubjectWrapperActivity.FETCH_SUBJECT_ARGS_EXTRA
+    )
+
+    protected inline fun <reified T : Parcelable> verifyGuidSelectedIntent(step: Step) = verifyStep<T>(
+        step,
+        CoreRequestCode.GUID_SELECTION_CODE.value,
+        "com.simprints.feature.selectsubject.SelectSubjectWrapperActivity",
+        SelectSubjectWrapperActivity.SELECT_SUBJECT_ARGS_EXTRA
     )
 
     protected inline fun <reified T : Parcelable> verifyStep(step: Step, expectedRequestCode: Int, activityName: String, bundleKey: String) {
