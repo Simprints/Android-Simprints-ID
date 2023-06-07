@@ -11,15 +11,15 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.fetchsubject.FetchSubjectResult
+import com.simprints.feature.selectsubject.SelectSubjectContract
+import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.id.data.exitform.ExitFormReason
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
-import com.simprints.id.orchestrator.steps.core.requests.GuidSelectionRequest
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -59,23 +59,10 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
-    fun buildConfirmIdentityStepShouldBuildTheRightStep() {
-        val step = coreStepProcessor.buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1, GUID2)
-        with(step) {
-            assertThat(activityName).isEqualTo(GUID_SELECTION_ACTIVITY_NAME)
-            assertThat(requestCode).isEqualTo(GUID_SELECTION_REQUEST_CODE)
-            assertThat(bundleKey).isEqualTo(CORE_STEP_BUNDLE)
-            assertThat(request).isEqualTo(GuidSelectionRequest(DEFAULT_PROJECT_ID, GUID1, GUID2))
-            assertThat(getStatus()).isEqualTo(Step.Status.NOT_STARTED)
-        }
-    }
+    fun stepProcessor_shouldBuildRightStepForGuidSelect() {
+        val step = CoreStepProcessorImpl().buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1)
 
-    @Test
-    fun stepProcessor_shouldProcessGuidSelectionResponse() {
-        val guidSelectionReturn = Intent().putExtra(CORE_STEP_BUNDLE, GuidSelectionResponse(true))
-        val result = coreStepProcessor.processResult(guidSelectionReturn)
-
-        assertThat(result).isInstanceOf(GuidSelectionResponse::class.java)
+        verifyGuidSelectedIntent<Bundle>(step)
     }
 
     @Test
@@ -89,6 +76,14 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     @Test
     fun stepProcessor_shouldSkipLegacyFetchGuidResult() {
         val consentData = Intent().putExtra(CORE_STEP_BUNDLE, FetchGUIDResponse(false))
+        val result = coreStepProcessor.processResult(consentData)
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun stepProcessor_shouldSkipLegacySelectGuidResult() {
+        val consentData = Intent().putExtra(CORE_STEP_BUNDLE, GuidSelectionResponse(true))
         val result = coreStepProcessor.processResult(consentData)
 
         assertThat(result).isNull()
@@ -132,6 +127,14 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
         val result = coreStepProcessor.processResult(consentData)
 
         assertThat(result).isNull()
+    }
+
+    @Test
+    fun stepProcessor_shouldProcessSelectedGuidResponse() {
+        val consentData = Intent().putExtra(SelectSubjectContract.SELECT_SUBJECT_RESULT, SelectSubjectResult(true))
+        val result = coreStepProcessor.processResult(consentData)
+
+        assertThat(result).isInstanceOf(GuidSelectionResponse::class.java)
     }
 
     @Test
