@@ -5,10 +5,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -27,12 +24,11 @@ import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.hamcrest.core.IsNot
+import org.hamcrest.core.IsNot.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowLooper
 import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
@@ -346,9 +342,7 @@ internal class LogoutSyncFragmentTest {
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
-            matches(
-                IsNot.not(isDisplayed())
-            )
+            matches(not(isDisplayed()))
         )
 
         onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
@@ -422,7 +416,7 @@ internal class LogoutSyncFragmentTest {
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
-            matches(IsNot.not(isDisplayed()))
+            matches(not(isDisplayed()))
         )
 
         onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
@@ -449,6 +443,28 @@ internal class LogoutSyncFragmentTest {
             .isEqualTo(R.id.requestLoginFragment)
     }
 
+    @Test
+    fun `logout button is not visible when records are not synchronized`() {
+        mockSyncToBFSIDAllowed(true)
+        mockSyncCardLiveData(SyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
+
+        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        onView(withId(R.id.logoutButton)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.logout_sync_info)).check(matches(isDisplayed()))
+        onView(withId(R.id.logoutWithoutSyncButton)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun `logout button is visible when records are synchronized`() {
+        mockSyncToBFSIDAllowed(true)
+        mockSyncCardLiveData(SyncCardState.SyncComplete(LAST_SYNC_TIME))
+
+        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        onView(withId(R.id.logoutButton)).check(matches(isDisplayed()))
+        onView(withId(R.id.logout_sync_info)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.logoutWithoutSyncButton)).check(matches(not(isDisplayed())))
+    }
+
     private fun mockSyncCardLiveData(state: SyncCardState) {
         every { syncViewModel.syncCardLiveData } returns mockk {
             every { observe(any(), any()) } answers {
@@ -468,7 +484,7 @@ internal class LogoutSyncFragmentTest {
     private fun checkHiddenViews(views: List<Int>) {
         views.forEach {
             onView(withId(it))
-                .check(matches(IsNot.not(isDisplayed())))
+                .check(matches(not(isDisplayed())))
         }
     }
 
