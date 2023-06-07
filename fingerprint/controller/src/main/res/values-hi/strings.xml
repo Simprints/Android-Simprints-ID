@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="finger_selection_confirm_dialog_no">रद्द करें</string>
+    <string name="preference_view_fingers_title">डिफ़ॉल्ट उंगलियां देखें</string>
+    <string name="finger_selection_fragment_title">उंगलियां देखें</string>
+    <string name="button_submit">सबमिट करें</string>
+    <string name="cancel_button">रद्द करें</string>
+    <string name="close">बंद करें</string>
+    <string name="error_occurred_title">त्रुटि</string>
+    <string name="hint_other_reason">अतिरिक्त जानकारी</string>
+    <string name="pair_scanner_label">सेटिंग</string>
+    <string name="refusal_app_not_working">एप काम नहीं कर रहा</string>
+    <string name="refusal_data_concerns">डाटा नहीं देना चाहते</string>
+    <string name="refusal_does_not_have_permission">अनुमति नहीं है</string>
+    <string name="refusal_other">अन्य</string>
+    <string name="refusal_person_not_present">व्यक्ति उपस्थित नहीं है</string>
+    <string name="refusal_religious_concerns">धार्मिक कारण</string>
+    <string name="refusal_toast_select_option_submit">कृपया किसी एक विकल्प का चयन करें और सबमिट करें</string>
+    <string name="refusal_toast_submit">कृपया फ़ॉर्म सबमिट करें</string>
+    <string name="refusal_too_young">आयु बहुत कम है</string>
+    <string name="settings_label">फोन सेटिंग</string>
+    <string name="try_again_label">पुनः प्रयास करें</string>
+    <string name="unforeseen_error_message">कृपया पुनः प्रयास करें, और यदि सिंप्रिंट्स फिर भी काम न करे तो कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
+    <string name="serial_entry_ok">ठीक</string>
+    <plurals name="returned_result">
+        <item quantity="other">%d परिणाम आए।</item>
+    </plurals>
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">कोई बहुत अच्छा मेल नहीं है</item>
+        <item quantity="one">%d बहुत अच्छा मेल</item>
+        <item quantity="other">%d बहुत अच्छा मेल हैं</item>
+    </plurals>
+    <plurals name="tier3_matches">
+        <item quantity="zero">कोई अच्छा मेल नहीं</item>
+        <item quantity="one">%d अच्छा मेल है</item>
+        <item quantity="other">%d अच्छे मेल हैं</item>
+    </plurals>
+    <plurals name="tier4_matches">
+        <item quantity="zero">कोई मेल नही</item>
+        <item quantity="one">%d मेल</item>
+        <item quantity="other">%d मेल खाते हैं</item>
+    </plurals>
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">%d उम्मीदवार को लोड किया गया।</item>
+        <item quantity="other">%d उम्मीदवारों को लोड किया गया।</item>
+    </plurals>
+</resources>

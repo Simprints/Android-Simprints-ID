@@ -2,7 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_ONE_MATCH
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class OneToOneMatchEvent(
@@ -16,7 +16,7 @@ data class OneToOneMatchEvent(
         createdAt: Long,
         endTime: Long,
         candidateId: String,
-        matcher: Matcher,
+        matcher: String,
         result: MatchEntry?,
         fingerComparisonStrategy: FingerComparisonStrategy?,
         labels: EventLabels = EventLabels()
@@ -32,7 +32,7 @@ data class OneToOneMatchEvent(
         override val eventVersion: Int,
         override var endedAt: Long,
         val candidateId: String,
-        val matcher: Matcher,
+        val matcher: String,
         val result: MatchEntry?,
         val fingerComparisonStrategy: FingerComparisonStrategy?,
         override val type: EventType = ONE_TO_ONE_MATCH

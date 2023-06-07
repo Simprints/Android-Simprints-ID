@@ -5,19 +5,30 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.face.FixtureGenerator
 import com.simprints.face.FixtureGenerator.generateSequenceN
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
-import com.simprints.face.controllers.core.events.model.*
-import com.simprints.face.controllers.core.events.model.Matcher
+import com.simprints.face.controllers.core.events.model.Event
+import com.simprints.face.controllers.core.events.model.MatchEntry
+import com.simprints.face.controllers.core.events.model.OneToManyMatchEvent
+import com.simprints.face.controllers.core.events.model.OneToOneMatchEvent
 import com.simprints.face.controllers.core.flow.Action
 import com.simprints.face.controllers.core.flow.MasterFlowManager
 import com.simprints.face.controllers.core.repository.FaceDbManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
-import com.simprints.face.data.db.person.FaceSample
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
+import com.simprints.infra.facebiosdk.matching.FaceMatcher
+import com.simprints.infra.facebiosdk.matching.FaceSample
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
-import io.mockk.*
+import io.mockk.CapturingSlot
+import io.mockk.Runs
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -25,6 +36,9 @@ import org.junit.Test
 import java.io.Serializable
 
 class FaceMatchViewModelTest {
+    companion object{
+        const val MATCHER_NAME = "any matcher"
+    }
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -39,7 +53,9 @@ class FaceMatchViewModelTest {
 
     private val masterFlowManager: MasterFlowManager = mockk()
     private val faceDbManager: FaceDbManager = mockk()
-    private val faceMatcher: FaceMatcher = spyk()
+    private val faceMatcher: FaceMatcher = spyk{
+        every { matcherName } returns MATCHER_NAME
+    }
     private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxUnitFun = true)
     private val faceTimeHelper: FaceTimeHelper = mockk {
         every { now() } returns 0
@@ -98,7 +114,7 @@ class FaceMatchViewModelTest {
             assertThat(startTime).isEqualTo(0)
             assertThat(endTime).isEqualTo(1)
             assertThat(count).isEqualTo(5)
-            assertThat(matcher).isEqualTo(Matcher.UNKNOWN)
+            assertThat(matcher).isEqualTo(MATCHER_NAME)
             assertThat(query).isEqualTo(mockQuery)
             assertThat(result).isEqualTo(eventEntries)
         }
@@ -157,7 +173,7 @@ class FaceMatchViewModelTest {
             assertThat(startTime).isEqualTo(0)
             assertThat(endTime).isEqualTo(1)
             assertThat(count).isEqualTo(5)
-            assertThat(matcher).isEqualTo(Matcher.UNKNOWN)
+            assertThat(matcher).isEqualTo(MATCHER_NAME)
             assertThat(query).isEqualTo(mockQuery)
             assertThat(result).isEqualTo(eventEntries)
         }
@@ -198,7 +214,7 @@ class FaceMatchViewModelTest {
         with(eventCapture.captured as OneToOneMatchEvent) {
             assertThat(startTime).isEqualTo(0)
             assertThat(endTime).isEqualTo(1)
-            assertThat(matcher).isEqualTo(Matcher.UNKNOWN)
+            assertThat(matcher).isEqualTo(MATCHER_NAME)
             assertThat(query).isEqualTo(mockQuery)
             assertThat(result).isEqualTo(eventEntry)
         }

@@ -6,7 +6,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.feature.dashboard.settings.about.SignerManager
+import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LogoutSyncViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val signerManager: SignerManager,
+    private val authManager: AuthManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -28,6 +28,6 @@ class LogoutSyncViewModel @Inject constructor(
 
 
     fun logout() {
-        externalScope.launch { signerManager.signOut() }
+        externalScope.launch { authManager.signOut() }
     }
 }

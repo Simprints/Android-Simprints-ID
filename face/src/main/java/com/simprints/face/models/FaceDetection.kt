@@ -5,9 +5,7 @@ import com.simprints.face.controllers.core.events.model.FaceCaptureBiometricsEve
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
-import com.simprints.face.detection.Face
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
-import com.simprints.moduleapi.face.responses.entities.IFaceTemplateFormat
+import com.simprints.infra.facebiosdk.detection.Face
 import java.util.UUID
 
 data class FaceDetection(
@@ -30,29 +28,12 @@ data class FaceDetection(
         TOOFAR
     }
 
-    enum class TemplateFormat {
-        RANK_ONE_1_23,
-        MOCK;
-
-        fun fromDomainToCore(): FaceTemplateFormat =
-            when (this) {
-                RANK_ONE_1_23 -> FaceTemplateFormat.RANK_ONE_1_23
-                MOCK -> FaceTemplateFormat.MOCK
-            }
-
-        fun fromDomainToModuleApi(): IFaceTemplateFormat =
-            when (this) {
-                RANK_ONE_1_23 -> IFaceTemplateFormat.RANK_ONE_1_23
-                MOCK -> IFaceTemplateFormat.MOCK
-            }
-    }
-
     fun toFaceSample(): FaceSample =
         FaceSample(
             id,
             face?.template ?: ByteArray(0),
             securedImageRef,
-            face?.format?.fromDomainToModuleApi() ?: IFaceTemplateFormat.RANK_ONE_1_23
+            face?.format ?: ""
         )
 
     fun toFaceCaptureEvent(attemptNumber: Int, qualityThreshold: Float): FaceCaptureEvent =

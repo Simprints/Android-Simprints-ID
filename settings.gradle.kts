@@ -36,7 +36,8 @@ dependencyResolutionManagement {
             name = "SimMatcherGitHubPackages"
             url = uri("https://maven.pkg.github.com/simprints/lib-android-simmatcher")
             credentials {
-                username = properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                username =
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
                 password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
             }
         }
@@ -49,12 +50,16 @@ rootProject.name = "android-simprints-id"
 // Main application module
 include(":id")
 
+//Fingerprint modality modules
+include(
+    ":fingerprint:controller",
+    ":fingerprint:scanner",
+    ":fingerprint:scannermock",
+    ":fingerprint:infra:matcher",
+)
+
 // Modules to be refactored
 include(
-    ":fingerprint",
-    ":fingerprintmatcher",
-    ":fingerprintscanner",
-    ":fingerprintscannermock",
     ":face",
     ":clientapi",
     ":moduleapi",
@@ -62,6 +67,7 @@ include(
 
 // Feature modules
 include(
+    ":feature:login",
     ":featuredashboard",
     ":featurealert",
     ":featureexitform",
@@ -77,13 +83,16 @@ include(
     ":infraimages",
     ":infralicense",
     ":infralogging",
-    ":infralogin",
+    ":infra:auth-store",
+    ":infra:auth-logic",
     ":infranetwork",
     ":infrarealm",
     ":infrarecentuseractivity",
     ":infraresources",
     ":infrasecurity",
     ":infrauibase",
+    ":infrafacebiosdk",
+    ":infrarocwrapper",
 )
 
 // Tooling modules

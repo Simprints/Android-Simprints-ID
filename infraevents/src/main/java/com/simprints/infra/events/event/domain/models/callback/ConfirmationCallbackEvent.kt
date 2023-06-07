@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_CONFIRMATION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class ConfirmationCallbackEvent(
@@ -26,6 +26,7 @@ data class ConfirmationCallbackEvent(
         ConfirmationCallbackPayload(createdAt, EVENT_VERSION, identificationOutcome),
         CALLBACK_CONFIRMATION)
 
+    @Keep
     data class ConfirmationCallbackPayload(
         override val createdAt: Long,
         override val eventVersion: Int,

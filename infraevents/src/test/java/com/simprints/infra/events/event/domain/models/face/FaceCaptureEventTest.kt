@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test
 
@@ -12,7 +13,7 @@ class FaceCaptureEventTest {
     @Test
     fun create_FaceCaptureEvent() {
         val labels = EventLabels(sessionId = SampleDefaults.GUID1)
-        val faceArg = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FaceTemplateFormat.RANK_ONE_1_23)
+        val faceArg = FaceCaptureEvent.FaceCapturePayload.Face(0F, 1F, 2F, FACE_TEMPLATE_FORMAT)
         val event = FaceCaptureEvent(
             SampleDefaults.CREATED_AT,
             SampleDefaults.ENDED_AT, 0, 1F,

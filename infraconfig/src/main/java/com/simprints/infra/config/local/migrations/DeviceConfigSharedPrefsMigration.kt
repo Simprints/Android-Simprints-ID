@@ -6,7 +6,7 @@ import androidx.datastore.core.DataMigration
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ import javax.inject.Inject
  */
 internal class DeviceConfigSharedPrefsMigration @Inject constructor(
     @ApplicationContext private val ctx: Context,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
 ) : DataMigration<ProtoDeviceConfiguration> {
 
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
@@ -58,7 +58,7 @@ internal class DeviceConfigSharedPrefsMigration @Inject constructor(
     }
 
     override suspend fun shouldMigrate(currentData: ProtoDeviceConfiguration): Boolean =
-        loginManager.signedInProjectId.isNotEmpty() && prefs.getString(LANGUAGE_KEY, "") != ""
+        authStore.signedInProjectId.isNotEmpty() && prefs.getString(LANGUAGE_KEY, "") != ""
 
     companion object {
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"

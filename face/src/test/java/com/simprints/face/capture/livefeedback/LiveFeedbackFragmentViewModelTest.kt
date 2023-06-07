@@ -15,11 +15,10 @@ import com.simprints.face.controllers.core.events.model.FaceCaptureBiometricsEve
 import com.simprints.face.controllers.core.events.model.FaceCaptureEvent
 import com.simprints.face.controllers.core.events.model.FaceFallbackCaptureEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
-import com.simprints.face.detection.Face
-import com.simprints.face.detection.FaceDetector
 import com.simprints.face.models.FaceDetection
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
+import com.simprints.infra.facebiosdk.detection.Face
+import com.simprints.infra.facebiosdk.detection.FaceDetector
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.*
@@ -240,7 +239,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(startTime).isEqualTo(2)
                         assertThat(endTime).isEqualTo(0)
                         assertThat(eventFace).isNotNull()
-                        assertThat(eventFace.format).isEqualTo(FaceTemplateFormat.MOCK)
+                        assertThat(eventFace.format).isEqualTo(validFace.format)
                     }
                 }
                 true
@@ -273,7 +272,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(endTime).isEqualTo(0)
                         assertThat(eventFace).isNotNull()
                         eventFace.let {
-                            assertThat(it.format).isEqualTo(FaceTemplateFormat.MOCK)
+                            assertThat(it.format).isEqualTo(validFace.format)
                         }
                     }
                 }
@@ -306,7 +305,7 @@ class LiveFeedbackFragmentViewModelTest {
                         assertThat(startTime).isEqualTo(0)
                         assertThat(endTime).isEqualTo(0)
                         assertThat(eventFace).isNotNull()
-                        assertThat(eventFace.format).isEqualTo(FaceTemplateFormat.MOCK)
+                        assertThat(eventFace.format).isEqualTo(validFace.format)
 
                     }
                 }

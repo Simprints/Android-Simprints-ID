@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class AuthenticationEvent(
@@ -41,6 +41,7 @@ data class AuthenticationEvent(
         @Keep
         data class UserInfo(val projectId: String, val userId: String)
 
+        @Keep
         enum class Result {
             AUTHENTICATED,
             BAD_CREDENTIALS,

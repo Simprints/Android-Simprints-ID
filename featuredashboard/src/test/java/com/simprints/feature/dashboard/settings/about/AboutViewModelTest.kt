@@ -2,6 +2,8 @@ package com.simprints.feature.dashboard.settings.about
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
@@ -10,7 +12,6 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.login.LoginManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -51,14 +52,14 @@ class AboutViewModelTest {
     )
     private val eventSyncManager = mockk<EventSyncManager>()
 
-    private val loginManager = mockk<LoginManager> {
+    private val authStore = mockk<AuthStore> {
         every { signedInProjectId } returns PROJECT_ID
     }
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns buildProjectConfigurationMock()
     }
 
-    private val signerManager = mockk<SignerManager>(relaxed = true)
+    private val authManager = mockk<AuthManager>(relaxed = true)
     private val recentUserActivityManager = mockk<RecentUserActivityManager> {
         coEvery { getRecentUserActivity() } returns recentUserActivity
     }
@@ -67,18 +68,16 @@ class AboutViewModelTest {
     fun `should initialize the live data correctly`() {
         val viewModel = AboutViewModel(
             configManager = configManager,
-            loginManager = loginManager,
+            authStore = authStore,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
-            signerManager = signerManager,
+            authManager = authManager,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
 
         assertThat(viewModel.modalities.value).isEqualTo(MODALITIES)
         assertThat(viewModel.syncAndSearchConfig.value).isEqualTo(
-            SyncAndSearchConfig(
-                PARTITION_TYPE.name, POOL_TYPE.name
-            )
+            SyncAndSearchConfig(PARTITION_TYPE.name, POOL_TYPE.name)
         )
         assertThat(viewModel.recentUserActivity.value).isEqualTo(recentUserActivity)
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Locked("1234"))
@@ -90,7 +89,7 @@ class AboutViewModelTest {
             buildLogoutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
         runTest {
             viewModel.processLogoutRequest()
-            coVerify(exactly = 1) { signerManager.signOut() }
+            coVerify(exactly = 1) { authManager.signOut() }
         }
     }
 
@@ -100,7 +99,7 @@ class AboutViewModelTest {
             buildLogoutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
         runTest {
             viewModel.processLogoutRequest()
-            coVerify(exactly = 1) { signerManager.signOut() }
+            coVerify(exactly = 1) { authManager.signOut() }
         }
     }
 
@@ -110,7 +109,7 @@ class AboutViewModelTest {
             buildLogoutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
         runTest {
             viewModel.processLogoutRequest()
-            coVerify(exactly = 0) { signerManager.signOut() }
+            coVerify(exactly = 0) { authManager.signOut() }
         }
     }
 
@@ -190,12 +189,11 @@ class AboutViewModelTest {
         )
         return AboutViewModel(
             configManager = configManager,
-            loginManager = loginManager,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
-            signerManager = signerManager,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+            authManager = authManager,
+            authStore = authStore
         )
-
     }
 }

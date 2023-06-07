@@ -12,7 +12,7 @@ import com.simprints.feature.dashboard.tools.di.FakeCoreModule
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.moveToState
 import com.simprints.testtools.hilt.testNavController
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import dagger.hilt.android.testing.*
 import io.mockk.every
 import org.hamcrest.core.StringContains.containsString
@@ -32,7 +32,7 @@ class RequestLoginFragmentTest {
     var hiltRule = HiltAndroidRule(this)
 
     @Inject
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     @Before
     fun setup() {
@@ -56,7 +56,7 @@ class RequestLoginFragmentTest {
 
     @Test
     fun `should not redirect to the main fragment if the user is not logged in when resuming the fragment`() {
-        every { loginManager.signedInProjectId } returns ""
+        every { authStore.signedInProjectId } returns ""
 
         val navController =
             testNavController(R.navigation.graph_dashboard, R.id.requestLoginFragment)
@@ -72,8 +72,8 @@ class RequestLoginFragmentTest {
 
     @Test
     fun `should redirect to the main fragment if the user is logged in when resuming the fragment`() {
-        every { loginManager.signedInProjectId } returns "project"
-        every { loginManager.signedInUserId } returns "user"
+        every { authStore.signedInProjectId } returns "project"
+        every { authStore.signedInUserId } returns "user"
 
         val navController =
             testNavController(R.navigation.graph_dashboard, R.id.requestLoginFragment)

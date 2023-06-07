@@ -27,7 +27,7 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +43,7 @@ internal class SyncViewModel @Inject constructor(
     private val connectivityTracker: ConnectivityTracker,
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
 ) : ViewModel() {
 
     companion object {
@@ -132,7 +132,7 @@ internal class SyncViewModel @Inject constructor(
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
             eventSyncManager
-                .countEventsToUpload(loginManager.getSignedInProjectIdOrEmpty(), EventType.ENROLMENT_V2)
+                .countEventsToUpload(authStore.signedInProjectId, EventType.ENROLMENT_V2)
                 .collect { upSyncCountLiveData.postValue(it) }
         }
 
