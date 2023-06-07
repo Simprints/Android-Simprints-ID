@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -49,8 +50,11 @@ class LogoutSyncFragment : Fragment(R.layout.fragment_logout_sync) {
 
     private fun observeLiveData() = with(binding) {
         syncViewModel.syncCardLiveData.observe(viewLifecycleOwner) { state ->
+            val isLogoutButtonVisible = isLogoutButtonVisible(state)
             logoutSyncCard.render(state)
-            logoutButton.isVisible = isLogoutButtonVisible(state)
+            logoutButton.isVisible = isLogoutButtonVisible
+            logoutWithoutSyncButton.isVisible = isLogoutButtonVisible.not()
+            logoutSyncInfo.isInvisible = isLogoutButtonVisible
         }
     }
 
