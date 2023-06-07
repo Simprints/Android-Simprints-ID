@@ -48,15 +48,17 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
             T::class.java.name
         )
         fragment.arguments = fragmentArgs
+        fragment.viewLifecycleOwnerLiveData.observeForever { owner ->
+            if (owner != null && navController != null) {
+                Navigation.setViewNavController(fragment.requireView(), navController)
+            }
+        }
+
         activity.supportFragmentManager
             .beginTransaction()
             .add(android.R.id.content, fragment, FRAGMENT_TAG)
             .setMaxLifecycle(fragment, initialState)
             .commitNow()
-
-        navController?.also {
-            Navigation.setViewNavController(fragment.requireView(), it)
-        }
 
         fragment.action()
     }

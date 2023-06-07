@@ -12,7 +12,9 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusa
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
 import com.simprints.id.domain.moduleapi.fingerprint.responses.toAppErrorReason
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.core.response.*
+import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
+import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 
 abstract class BaseAppResponseBuilder : AppResponseBuilder {
 

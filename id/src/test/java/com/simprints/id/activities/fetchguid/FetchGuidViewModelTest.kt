@@ -27,8 +27,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
