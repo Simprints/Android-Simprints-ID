@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.simprints.feature.dashboard.R
+import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
 import dagger.hilt.android.testing.BindValue
@@ -49,7 +50,7 @@ class SyncFragmentTest {
 
         launchFragmentInHiltContainer<SyncFragment>()
 
-        onView(withId(R.id.dashboard_sync_card)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.dashboardSyncCard)).check(matches(not(isDisplayed())))
     }
 
     @Test
@@ -58,31 +59,31 @@ class SyncFragmentTest {
 
         launchFragmentInHiltContainer<SyncFragment>()
 
-        onView(withId(R.id.dashboard_sync_card)).check(matches(isDisplayed()))
+        onView(withId(R.id.dashboardSyncCard)).check(matches(isDisplayed()))
     }
 
     @Test
     fun `should display the correct sync card view for the SyncDefault state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncDefault(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncDefault(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_failed_message,
-                R.id.dashboard_sync_card_select_no_modules,
-                R.id.dashboard_sync_card_offline,
-                R.id.dashboard_sync_card_progress,
-                R.id.dashboard_sync_card_try_again,
+                R.id.sync_card_failed_message,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
+                R.id.sync_card_try_again,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_default_items_to_upload)).check(matches(withText(
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_default_items_to_upload)).check(matches(withText(
             context.getString(IDR.string.dashboard_sync_card_records_uploaded)
         )))
-        onView(withId(R.id.dashboard_sync_card_default_state_sync_button))
+        onView(withId(R.id.sync_card_default_state_sync_button))
             .check(matches(isDisplayed()))
             .perform(click())
         verify(exactly = 1) { viewModel.sync() }
@@ -91,25 +92,25 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncPendingUpload state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncPendingUpload(LAST_SYNC_TIME, 2))
+        mockSyncCardLiveData(SyncCardState.SyncPendingUpload(LAST_SYNC_TIME, 2))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_failed_message,
-                R.id.dashboard_sync_card_select_no_modules,
-                R.id.dashboard_sync_card_offline,
-                R.id.dashboard_sync_card_progress,
-                R.id.dashboard_sync_card_try_again,
+                R.id.sync_card_failed_message,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
+                R.id.sync_card_try_again,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_default_items_to_upload)).check(matches(withText(
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_default_items_to_upload)).check(matches(withText(
             context.resources.getQuantityString(IDR.plurals.dashboard_sync_card_records_to_upload, 2, 2)
         )))
-        onView(withId(R.id.dashboard_sync_card_default_state_sync_button))
+        onView(withId(R.id.sync_card_default_state_sync_button))
             .check(matches(isDisplayed()))
             .perform(click())
         verify(exactly = 1) { viewModel.sync() }
@@ -119,51 +120,51 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncFailed state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncFailed(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncFailed(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_select_no_modules,
-                R.id.dashboard_sync_card_offline,
-                R.id.dashboard_sync_card_progress,
-                R.id.dashboard_sync_card_try_again,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
+                R.id.sync_card_try_again,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_failed_message)))
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_failed_message)))
     }
 
     @Test
     fun `should display the correct sync card view for the SyncFailedBackendMaintenance state without estimated outage`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncFailedBackendMaintenance(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncFailedBackendMaintenance(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_select_no_modules,
-                R.id.dashboard_sync_card_offline,
-                R.id.dashboard_sync_card_progress,
-                R.id.dashboard_sync_card_try_again,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
+                R.id.sync_card_try_again,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_failed_message)).check(matches(withText(IDR.string.error_backend_maintenance_message)))
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.error_backend_maintenance_message)))
     }
 
     @Test
     fun `should display the correct sync card view for the SyncFailedBackendMaintenance state with estimated outage`() {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(
-            DashboardSyncCardState.SyncFailedBackendMaintenance(
+            SyncCardState.SyncFailedBackendMaintenance(
                 LAST_SYNC_TIME,
                 10L
             )
@@ -173,63 +174,63 @@ class SyncFragmentTest {
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_select_no_modules,
-                R.id.dashboard_sync_card_offline,
-                R.id.dashboard_sync_card_progress,
-                R.id.dashboard_sync_card_try_again,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
+                R.id.sync_card_try_again,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         val text =
             context.getString(IDR.string.error_backend_maintenance_with_time_message, "10 seconds")
-        onView(withId(R.id.dashboard_sync_card_failed_message)).check(matches(withText(text)))
+        onView(withId(R.id.sync_card_failed_message)).check(matches(withText(text)))
     }
 
     @Test
     fun `should display the correct sync card view for the SyncTooManyRequests state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncTooManyRequests(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncTooManyRequests(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_select_no_modules,
-                R.id.dashboard_sync_card_offline,
-                R.id.dashboard_sync_card_progress,
-                R.id.dashboard_sync_card_try_again,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
+                R.id.sync_card_try_again,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_too_many_modules_message)))
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_too_many_modules_message)))
     }
 
     @Test
     fun `should display the correct sync card view for the SyncTryAgain state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncTryAgain(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncTryAgain(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_failed_message,
-                R.id.dashboard_sync_card_select_no_modules,
-                R.id.dashboard_sync_card_offline,
-                R.id.dashboard_sync_card_progress,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_failed_message,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_try_again_sync_button))
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_try_again_sync_button))
             .check(matches(isDisplayed()))
             .perform(click())
         verify(exactly = 1) { viewModel.sync() }
@@ -238,7 +239,7 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncHasNoModules state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncHasNoModules(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncHasNoModules(LAST_SYNC_TIME))
 
         val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
@@ -246,17 +247,17 @@ class SyncFragmentTest {
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_failed_message,
-                R.id.dashboard_sync_card_try_again,
-                R.id.dashboard_sync_card_offline,
-                R.id.dashboard_sync_card_progress,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_failed_message,
+                R.id.sync_card_try_again,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_select_no_modules_button))
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_select_no_modules_button))
             .check(matches(isDisplayed()))
             .perform(click())
         Truth.assertThat(navController.currentDestination?.id)
@@ -266,23 +267,23 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncOffline state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncOffline(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncOffline(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_failed_message,
-                R.id.dashboard_sync_card_try_again,
-                R.id.dashboard_sync_card_select_no_modules_button,
-                R.id.dashboard_sync_card_progress,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_failed_message,
+                R.id.sync_card_try_again,
+                R.id.sync_card_select_no_modules_button,
+                R.id.sync_card_progress,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_offline_button))
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_offline_button))
             .check(matches(isDisplayed()))
             .perform(click())
     }
@@ -290,96 +291,96 @@ class SyncFragmentTest {
     @Test
     fun `should display the correct sync card view for the SyncProgress state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
+        mockSyncCardLiveData(SyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_failed_message,
-                R.id.dashboard_sync_card_try_again,
-                R.id.dashboard_sync_card_select_no_modules_button,
-                R.id.dashboard_sync_card_offline,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_failed_message,
+                R.id.sync_card_try_again,
+                R.id.sync_card_select_no_modules_button,
+                R.id.sync_card_offline,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)).check(
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
             matches(
                 not(isDisplayed())
             )
         )
 
-        onView(withId(R.id.dashboard_sync_card_progress_sync_progress_bar)).check(
+        onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
             matches(
                 isDisplayed()
             )
         )
 
         val text = context.getString(IDR.string.dashboard_sync_card_progress, "50%")
-        onView(withId(R.id.dashboard_sync_card_progress_message)).check(matches(withText(text)))
+        onView(withId(R.id.sync_card_progress_message)).check(matches(withText(text)))
     }
 
     @Test
     fun `should display the correct sync card view for the SyncConnecting state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncConnecting(LAST_SYNC_TIME, 20, 40))
+        mockSyncCardLiveData(SyncCardState.SyncConnecting(LAST_SYNC_TIME, 20, 40))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_failed_message,
-                R.id.dashboard_sync_card_try_again,
-                R.id.dashboard_sync_card_select_no_modules_button,
-                R.id.dashboard_sync_card_offline,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_failed_message,
+                R.id.sync_card_try_again,
+                R.id.sync_card_select_no_modules_button,
+                R.id.sync_card_offline,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)).check(
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
             matches(isDisplayed())
         )
 
-        onView(withId(R.id.dashboard_sync_card_progress_sync_progress_bar)).check(
+        onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
             matches(isDisplayed())
         )
 
-        onView(withId(R.id.dashboard_sync_card_progress_message)).check(matches(withText(IDR.string.dashboard_sync_card_connecting)))
+        onView(withId(R.id.sync_card_progress_message)).check(matches(withText(IDR.string.dashboard_sync_card_connecting)))
     }
 
     @Test
     fun `should display the correct sync card view for the SyncComplete state`() {
         mockSyncToBFSIDAllowed(true)
-        mockSyncCardLiveData(DashboardSyncCardState.SyncComplete(LAST_SYNC_TIME))
+        mockSyncCardLiveData(SyncCardState.SyncComplete(LAST_SYNC_TIME))
 
         launchFragmentInHiltContainer<SyncFragment>()
 
         checkHiddenViews(
             listOf(
-                R.id.dashboard_sync_card_default_state_sync_button,
-                R.id.dashboard_sync_card_failed_message,
-                R.id.dashboard_sync_card_try_again,
-                R.id.dashboard_sync_card_select_no_modules_button,
-                R.id.dashboard_sync_card_offline,
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_failed_message,
+                R.id.sync_card_try_again,
+                R.id.sync_card_select_no_modules_button,
+                R.id.sync_card_offline,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
-        onView(withId(R.id.dashboard_sync_card_last_sync)).check(matches(withText(lastSyncText)))
-        onView(withId(R.id.dashboard_sync_card_progress_indeterminate_progress_bar)).check(
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
             matches(not(isDisplayed()))
         )
 
-        onView(withId(R.id.dashboard_sync_card_progress_sync_progress_bar)).check(
+        onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
             matches(isDisplayed())
         )
 
-        onView(withId(R.id.dashboard_sync_card_progress_message)).check(matches(withText(IDR.string.dashboard_sync_card_complete)))
+        onView(withId(R.id.sync_card_progress_message)).check(matches(withText(IDR.string.dashboard_sync_card_complete)))
     }
 
     private fun mockSyncToBFSIDAllowed(allowed: Boolean) {
@@ -390,10 +391,10 @@ class SyncFragmentTest {
         }
     }
 
-    private fun mockSyncCardLiveData(state: DashboardSyncCardState) {
+    private fun mockSyncCardLiveData(state: SyncCardState) {
         every { viewModel.syncCardLiveData } returns mockk {
             every { observe(any(), any()) } answers {
-                secondArg<Observer<DashboardSyncCardState>>().onChanged(state)
+                secondArg<Observer<SyncCardState>>().onChanged(state)
             }
         }
     }

@@ -7,8 +7,10 @@ import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CONFIGURATION
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.face.requests.IFaceRequest
