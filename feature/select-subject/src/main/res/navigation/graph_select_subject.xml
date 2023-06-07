@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_fetch_guid"
+    app:startDestination="@id/selectSubjectFragment">
+
+    <fragment
+        android:id="@+id/selectSubjectFragment"
+        android:name="com.simprints.feature.selectsubject.screen.SelectSubjectFragment"
+        android:label="SelectSubjectFragment"
+        tools:layout="@layout/fragment_select_subject">
+
+        <argument
+            android:name="projectId"
+            app:argType="string" />
+
+        <argument
+            android:name="subjectId"
+            app:argType="string" />
+    </fragment>
+
+</navigation>
