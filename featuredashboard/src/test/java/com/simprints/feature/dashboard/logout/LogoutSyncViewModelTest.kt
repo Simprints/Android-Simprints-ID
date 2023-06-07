@@ -2,7 +2,8 @@ package com.simprints.feature.dashboard.logout
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.dashboard.settings.about.SignerManager
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -22,7 +23,7 @@ import org.junit.Test
 internal class LogoutSyncViewModelTest {
 
     @MockK
-    lateinit var signerManager: SignerManager
+    lateinit var authManager: AuthManager
 
     @MockK
     lateinit var configManager: ConfigManager
@@ -41,14 +42,14 @@ internal class LogoutSyncViewModelTest {
     @Test
     fun `should logout correctly`() {
         val viewModel = LogoutSyncViewModel(
-            signerManager = signerManager,
-            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
-            configManager = configManager
+            configManager = configManager,
+            authManager = authManager,
+            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
 
         viewModel.logout()
 
-        coVerify(exactly = 1) { signerManager.signOut() }
+        coVerify(exactly = 1) { authManager.signOut() }
     }
 
     @Test
@@ -60,9 +61,9 @@ internal class LogoutSyncViewModelTest {
             }
         }
         val viewModel = LogoutSyncViewModel(
-            signerManager = signerManager,
+            configManager = configManager,
+            authManager = authManager,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
-            configManager = configManager
         )
         val resultConfig = viewModel.settingsLocked.getOrAwaitValue()
         assertThat(resultConfig.peekContent()).isEqualTo(config)

@@ -7,12 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.login.LoginManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,10 +25,10 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configManager: ConfigManager,
-    private val loginManager: LoginManager,
+    private val authManager: AuthManager,
+    private val authStore: AuthStore,
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
-    private val signerManager: SignerManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -58,7 +59,7 @@ internal class AboutViewModel @Inject constructor(
 
     fun processLogoutRequest() {
         viewModelScope.launch {
-            val projectId = loginManager.signedInProjectId
+            val projectId = authStore.signedInProjectId
             val logoutDestination =
                 when (canSyncDataToSimprints() && hasEventsToUpload(projectId)) {
                     true -> LogoutDestination.LogoutDataSyncScreen
@@ -78,7 +79,7 @@ internal class AboutViewModel @Inject constructor(
         configManager.getProjectConfiguration().canSyncDataToSimprints()
 
     private fun logout() {
-        externalScope.launch { signerManager.signOut() }
+        externalScope.launch { authManager.signOut() }
     }
 
     private fun load() = viewModelScope.launch {

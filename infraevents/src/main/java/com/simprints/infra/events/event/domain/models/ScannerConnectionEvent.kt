@@ -2,7 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class ScannerConnectionEvent(
@@ -37,6 +37,7 @@ data class ScannerConnectionEvent(
                                val generation: ScannerGeneration,
                                var hardwareVersion: String?)
 
+        @Keep
         enum class ScannerGeneration {
             VERO_1,
             VERO_2

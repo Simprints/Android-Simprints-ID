@@ -3,7 +3,6 @@ package com.simprints.infra.events.event.domain.models.subject
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FACE_REFERENCE_KEY
 import com.simprints.infra.events.event.domain.models.subject.BiometricReferenceType.Companion.FINGERPRINT_REFERENCE_KEY
@@ -19,7 +18,7 @@ sealed class BiometricReference(open val id: String,
 
 data class FaceReference(override val id: String,
                          val templates: List<FaceTemplate>,
-                         val format: FaceTemplateFormat = FaceTemplateFormat.RANK_ONE_1_23,
+                         val format: String,
                          val metadata: HashMap<String, String>? = null) : BiometricReference(id, BiometricReferenceType.FACE_REFERENCE)
 
 data class FingerprintReference(override val id: String,

@@ -9,8 +9,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.face.FaceTemplateFormat
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
+import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
 import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
@@ -50,7 +50,7 @@ class PersonCreationEventHelperImplTest {
         "face_id",
         EncodingUtilsImplForTests.base64ToBytes("template"),
         null,
-        FaceTemplateFormat.RANK_ONE_1_23
+        FACE_TEMPLATE_FORMAT
     )
 
     private val fingerprintCaptureResponse = FingerprintCaptureResponse(

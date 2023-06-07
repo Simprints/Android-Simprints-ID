@@ -11,7 +11,7 @@ import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigra
 import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
 import com.simprints.infra.config.local.models.*
 import com.simprints.infra.config.testtools.protoProjectConfiguration
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
@@ -27,13 +27,13 @@ class ProjectConfigSharedPrefsMigrationTest {
     private val preferences = mockk<SharedPreferences>(relaxed = true) {
         every { edit() } returns editor
     }
-    private val loginManager = mockk<LoginManager>()
+    private val authStore = mockk<com.simprints.infra.authstore.AuthStore>()
     private lateinit var projectConfigSharedPrefsMigration: ProjectConfigSharedPrefsMigration
 
     @Before
     fun setup() {
         every { ctx.getSharedPreferences(any(), any()) } returns preferences
-        projectConfigSharedPrefsMigration = ProjectConfigSharedPrefsMigration(ctx, loginManager)
+        projectConfigSharedPrefsMigration = ProjectConfigSharedPrefsMigration(ctx, authStore)
     }
 
     @Test
@@ -83,7 +83,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_SYNCHRONIZATION_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -107,7 +107,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_FACE_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -132,7 +132,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_FACE_CONFIGURATION_WITHOUT_FIELDS
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -157,7 +157,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_FINGERPRINT_CONFIGURATION_WITHOUT_FIELDS
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -183,7 +183,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_FINGERPRINT_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -209,7 +209,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_VERO_2_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -240,7 +240,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_VERO_2_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -272,7 +272,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_VERO_2_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -304,7 +304,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_VERO_2_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -336,7 +336,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_VERO_2_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -368,7 +368,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             JSON_VERO_2_CONFIGURATION
         )
         every { preferences.getString(any(), any()) } returns json
-        every { loginManager.signedInProjectId } returns PROJECT_ID
+        every { authStore.signedInProjectId } returns PROJECT_ID
 
         val expectedProto = ProtoProjectConfiguration.newBuilder()
             .setProjectId(PROJECT_ID)
@@ -392,7 +392,7 @@ class ProjectConfigSharedPrefsMigrationTest {
     fun `migrate should return the default project configuration if the existing config is invalid`() =
         runTest {
             every { preferences.getString(any(), any()) } returns "{invalidJson}"
-            every { loginManager.signedInProjectId } returns PROJECT_ID
+            every { authStore.signedInProjectId } returns PROJECT_ID
 
             val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
             assertThat(proto).isEqualTo(ProtoProjectConfiguration.getDefaultInstance())
@@ -409,7 +409,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                 JSON_FINGERPRINT_CONFIGURATION
             )
             every { preferences.getString(any(), any()) } returns json
-            every { loginManager.signedInProjectId } returns PROJECT_ID
+            every { authStore.signedInProjectId } returns PROJECT_ID
 
             // Force an exception
             val exception = Exception("")

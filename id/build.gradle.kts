@@ -16,18 +16,12 @@ android {
     buildTypes {
         getByName("release") {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "60L")
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "30L")
         }
         getByName("staging") {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
         getByName("debug") {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("long", "SYNC_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
-            buildConfigField("long", "SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES", "15L")
         }
     }
 }
@@ -42,14 +36,16 @@ dependencies {
 
     implementation(project(":infraevents"))
     implementation(project(":infraeventsync"))
-    implementation(project(":infralogin"))
+    implementation(project(":infra:auth-logic"))
+    implementation(project(":infra:auth-store"))
     implementation(project(":clientapi"))
     implementation(project(":face"))
+    implementation(project(":feature:login"))
     implementation(project(":featuredashboard"))
     implementation(project(":featurealert"))
     implementation(project(":featureexitform"))
     implementation(project(":featureconsent"))
-    implementation(project(":fingerprint"))
+    implementation(project(":fingerprint:controller"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infrarecentuseractivity"))
@@ -70,42 +66,26 @@ dependencies {
     implementation(libs.androidX.lifecycle.scope)
     implementation(libs.androidX.lifecycle.livedata.ktx)
 
-    implementation(libs.androidX.cameraX.core)
-    runtimeOnly(libs.androidX.cameraX.camera2)
-    implementation(libs.androidX.cameraX.lifecycle)
-    implementation(libs.androidX.cameraX.view)
-
     implementation(libs.workManager.work)
     implementation(libs.playServices.location)
 
     implementation(libs.rxJava2.core)
-    implementation(libs.jackson.core)
-
-    // Firebase
-    implementation(libs.firebase.storage)
-    implementation(libs.firebase.barcode)
-
-    implementation(libs.retrofit.core)
-    implementation(libs.jackson.core)
 
     // ######################################################
     //                      Unit test
     // ######################################################
 
     testImplementation(project(":testtools"))
-    testImplementation(project(":fingerprintscannermock"))
     testImplementation(project(":infraevents"))
     testImplementation(project(":infraeventsync"))
     testImplementation(project(":infralogging"))
-
-    testImplementation(libs.playServices.integrity)
 
     // ######################################################
     //                      Android test
     // ######################################################
 
     androidTestImplementation(project(":testtools"))
-    androidTestImplementation(project(":fingerprintscannermock")) {
+    androidTestImplementation(project(":fingerprint:scannermock")) {
         exclude("org.robolectric")
     }
     androidTestUtil(libs.testing.androidX.orchestrator)

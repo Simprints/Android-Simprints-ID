@@ -17,6 +17,7 @@
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="31" />
 
+    <!-- usesCleartextTraffic ensures that it is also disabled on version that do not support security config -->
     <application
         android:name=".Application"
         android:allowBackup="false"
@@ -24,6 +25,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="false"
+        android:networkSecurityConfig="@xml/network_config"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
@@ -67,15 +70,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.fetchguid.FetchGuidActivity" />
-        <activity
-            android:name=".activities.login.LoginActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".activities.qrcapture.QrCaptureActivity"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.guidselection.GuidSelectionActivity"
             android:exported="true"

@@ -20,7 +20,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Co
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import javax.inject.Inject
 
 class ModalityFlowVerify @Inject constructor(
@@ -28,7 +28,7 @@ class ModalityFlowVerify @Inject constructor(
     private val faceStepProcessor: FaceStepProcessor,
     private val coreStepProcessor: CoreStepProcessor,
     configManager: ConfigManager,
-    loginManager: LoginManager,
+    authStore: AuthStore,
     @DeviceID deviceId: String
 ) :
     ModalityFlowBaseImpl(
@@ -36,7 +36,7 @@ class ModalityFlowVerify @Inject constructor(
         fingerprintStepProcessor,
         faceStepProcessor,
         configManager,
-        loginManager,
+        authStore,
         deviceId
     ) {
 

@@ -19,7 +19,7 @@ import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -33,7 +33,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     @DeviceID private val deviceId: String,
     @PackageVersionName private val appVersionName: String,
     @LibSimprintsVersionName override val libSimprintsVersionName: String,
-    private val loginManager: LoginManager,
+    private val authStore: AuthStore,
     private val eventLocalDataSource: EventLocalDataSource,
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
@@ -48,7 +48,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val validators = validatorsFactory.build()
 
     private val currentProject: String
-        get() = loginManager.getSignedInProjectIdOrEmpty().ifEmpty {
+        get() = authStore.signedInProjectId.ifEmpty {
             PROJECT_ID_FOR_NOT_SIGNED_IN
         }
 

@@ -21,7 +21,7 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.*
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.down.local.DbEventsDownSyncOperationState
-import com.simprints.infra.login.LoginManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
@@ -45,7 +45,7 @@ internal class EventDownSyncScopeRepositoryTest {
     }
 
     @MockK
-    lateinit var loginManager: LoginManager
+    lateinit var authStore: AuthStore
 
     @MockK
     lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
@@ -60,12 +60,12 @@ internal class EventDownSyncScopeRepositoryTest {
         MockKAnnotations.init(this, relaxed = true)
         eventDownSyncScopeRepository =
             EventDownSyncScopeRepository(
-                loginManager,
+                authStore,
                 downSyncOperationOperationDao,
             )
 
-        every { loginManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
-        every { loginManager.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
+        every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
+        every { authStore.signedInUserId } returns DEFAULT_USER_ID
         coEvery { downSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
 
@@ -112,7 +112,7 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun throwWhenProjectIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
-            every { loginManager.getSignedInProjectIdOrEmpty() } returns ""
+            every { authStore.signedInProjectId } returns ""
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
                 eventDownSyncScopeRepository.getDownSyncScope(
@@ -127,7 +127,7 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun throwWhenUserIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
-            every { loginManager.getSignedInUserIdOrEmpty() } returns ""
+            every { authStore.signedInUserId } returns ""
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
                 eventDownSyncScopeRepository.getDownSyncScope(

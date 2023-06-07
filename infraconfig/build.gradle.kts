@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":infralogin"))
+    implementation(project(":infra:auth-store"))
     implementation(project(":infrarealm"))
 
     implementation(libs.workManager.work)
