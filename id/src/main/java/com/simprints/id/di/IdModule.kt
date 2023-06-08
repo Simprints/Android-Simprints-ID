@@ -7,8 +7,6 @@ import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentContract
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenter
-import com.simprints.id.activities.fetchguid.FetchGuidHelper
-import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -157,9 +155,6 @@ abstract class IdOrchestratorModule {
 
     @Binds
     abstract fun provideOrchestratorEventsHelper(impl: OrchestratorEventsHelperImpl): OrchestratorEventsHelper
-
-    @Binds
-    abstract fun provideFetchGuidHelper(impl: FetchGuidHelperImpl): FetchGuidHelper
 
     @ModalityFlowEnrolment
     @Binds

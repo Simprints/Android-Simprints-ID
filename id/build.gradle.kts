@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":clientapi"))
     implementation(project(":face"))
     implementation(project(":feature:login"))
+    implementation(project(":feature:fetch-subject"))
     implementation(project(":featuredashboard"))
     implementation(project(":featurealert"))
     implementation(project(":featureexitform"))

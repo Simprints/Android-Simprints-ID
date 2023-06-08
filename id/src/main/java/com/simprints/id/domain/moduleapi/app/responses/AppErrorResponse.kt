@@ -37,9 +37,6 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
                     AlertType.INTEGRITY_SERVICE_ERROR,
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                    AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
-                    AlertType.GUID_NOT_FOUND_OFFLINE ->
-                        throw Throwable("No ErrorType associated. GUID_NOT_FOUND_OFFLINE should return a ExitForm, not a Error Response.")
                     AlertType.ENROLMENT_LAST_BIOMETRICS_FAILED -> ENROLMENT_LAST_BIOMETRICS_FAILED
                 }
         }
