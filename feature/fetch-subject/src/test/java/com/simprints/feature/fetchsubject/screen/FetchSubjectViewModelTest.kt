@@ -1,0 +1,96 @@
+package com.simprints.feature.fetchsubject.screen
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.common.truth.Truth.assertThat
+import com.jraska.livedata.test
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.fetchsubject.screen.usecase.FetchSubjectUseCase
+import com.simprints.feature.fetchsubject.screen.usecase.SaveSubjectFetchEventUseCase
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+
+internal class FetchSubjectViewModelTest {
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+    @MockK
+    lateinit var fetchSubjectUseCase: FetchSubjectUseCase
+
+    @MockK
+    lateinit var saveSubjectFetchEventUseCase: SaveSubjectFetchEventUseCase
+
+    @MockK
+    lateinit var configManager: ConfigManager
+
+    private lateinit var viewModel: FetchSubjectViewModel
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { timeHelper.now() } returns TIMESTAMP
+
+        viewModel = FetchSubjectViewModel(
+            timeHelper,
+            fetchSubjectUseCase,
+            saveSubjectFetchEventUseCase,
+            configManager,
+        )
+    }
+
+    @Test
+    fun `tries fetching subject`() = runTest {
+        coEvery { fetchSubjectUseCase.invoke(any(), any()) } returns FetchSubjectState.NotFound
+
+        viewModel.fetchSubject(PROJECT_ID, SUBJECT_ID)
+        val result = viewModel.subjectState.test()
+
+        assertThat(result.value().getContentIfNotHandled()).isNotNull()
+        coVerify { fetchSubjectUseCase.invoke(any(), any()) }
+    }
+
+    @Test
+    fun `saves event after fetching subject`() = runTest {
+        coEvery { fetchSubjectUseCase.invoke(any(), any()) } returns FetchSubjectState.NotFound
+
+        viewModel.fetchSubject(PROJECT_ID, SUBJECT_ID)
+
+        coVerify { saveSubjectFetchEventUseCase.invoke(any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `startExitForm returns list of modalities`() {
+        coEvery { configManager.getProjectConfiguration().general.modalities } returns listOf(
+            GeneralConfiguration.Modality.FACE
+        )
+
+        viewModel.startExitForm()
+        val result = viewModel.subjectState.test().value().getContentIfNotHandled()
+
+        assertThat(result).isInstanceOf(FetchSubjectState.ShowExitForm::class.java)
+        assertThat((result as FetchSubjectState.ShowExitForm).modalities.size).isEqualTo(1)
+    }
+
+    companion object {
+        private const val TIMESTAMP = 1L
+        private const val PROJECT_ID = "projectId"
+        private const val SUBJECT_ID = "subjectId"
+    }
+}

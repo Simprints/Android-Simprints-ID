@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_fetch_guid"
+    app:startDestination="@id/fetchSubjectFragment">
+
+    <fragment
+        android:id="@+id/fetchSubjectFragment"
+        android:name="com.simprints.feature.fetchsubject.screen.FetchSubjectFragment"
+        android:label="FetchSubjectFragment"
+        tools:layout="@layout/fragment_subject_fetch">
+
+        <argument
+            android:name="projectId"
+            app:argType="string" />
+
+        <argument
+            android:name="subjectId"
+            app:argType="string" />
+    </fragment>
+
+    <include app:graph="@navigation/graph_alert" />
+
+    <include app:graph="@navigation/graph_exit_form" />
+
+    <action
+        android:id="@+id/action_fetchSubjectFragment_to_errorFragment"
+        app:destination="@id/graph_alert"
+        app:popUpTo="@id/fetchSubjectFragment" />
+
+    <action
+        android:id="@+id/action_fetchSubjectFragment_to_exitFormFragment"
+        app:destination="@id/graph_exit_form"
+        app:popUpTo="@id/fetchSubjectFragment" />
+</navigation>
