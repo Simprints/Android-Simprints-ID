@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_fetch_guid"
+    app:startDestination="@id/enrolLastBiometricFragment">
+
+    <include app:graph="@navigation/graph_alert" />
+
+    <fragment
+        android:id="@+id/enrolLastBiometricFragment"
+        android:name="com.simprints.feature.enrollast.screen.EnrolLastBiometricFragment"
+        android:label="FetchSubjectFragment"
+        tools:layout="@layout/fragment_enrol_last">
+
+        <argument
+            android:name="params"
+            app:argType="com.simprints.feature.enrollast.EnrolLastBiometricParams" />
+
+        <action
+            android:id="@+id/action_enrolLastBiometricFragment_to_errorFragment"
+            app:destination="@id/graph_alert"
+            app:popUpTo="@id/enrolLastBiometricFragment" />
+    </fragment>
+
+</navigation>
