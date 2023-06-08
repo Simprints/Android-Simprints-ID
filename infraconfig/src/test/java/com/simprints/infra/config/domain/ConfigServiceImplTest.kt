@@ -8,6 +8,7 @@ import com.simprints.infra.config.domain.models.PrivacyNoticeResult.FailedBecaus
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult.InProgress
 import com.simprints.infra.config.domain.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.testtools.deviceConfiguration
@@ -20,7 +21,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -88,7 +89,7 @@ class ConfigServiceImplTest {
     }
 
     @Test
-    fun `refresh project should get the project remotely and save it and update the api base url if not empty`() =
+    fun `refreshProject() should get the project remotely and save it and update the api base url if not empty`() =
         runTest {
             coEvery { localDataSource.saveProject(project) } returns Unit
             coEvery { remoteDataSource.getProject(PROJECT_ID) } returns project
@@ -100,7 +101,7 @@ class ConfigServiceImplTest {
         }
 
     @Test
-    fun `refresh project should get the project remotely and save it and not update the api base url if empty`() =
+    fun `refreshProject() should get the project remotely and save it and not update the api base url if empty`() =
         runTest {
             val project = Project("id", "name", "description", "creator", "url", "")
             coEvery { localDataSource.saveProject(project) } returns Unit
@@ -113,7 +114,7 @@ class ConfigServiceImplTest {
         }
 
     @Test
-    fun `should get the project configuration locally`() = runTest {
+    fun `getConfiguration() should get the project configuration locally`() = runTest {
         coEvery { localDataSource.getProjectConfiguration() } returns projectConfiguration
 
         val receivedProject = configServiceImpl.getConfiguration()
@@ -123,7 +124,7 @@ class ConfigServiceImplTest {
     }
 
     @Test
-    fun `refresh project configuration should get the project configuration remotely and save it`() =
+    fun `refreshConfiguration() should get the project configuration remotely and save it`() =
         runTest {
             coEvery { localDataSource.saveProjectConfiguration(projectConfiguration) } returns Unit
             coEvery { remoteDataSource.getConfiguration(PROJECT_ID) } returns projectConfiguration
@@ -132,6 +133,33 @@ class ConfigServiceImplTest {
             coVerify(exactly = 1) { localDataSource.saveProjectConfiguration(projectConfiguration) }
             coVerify(exactly = 1) { remoteDataSource.getConfiguration(PROJECT_ID) }
         }
+
+    @Test
+    fun `getConfiguration() should get the project configuration remotely if local one is empty`() = runTest {
+        coEvery { localDataSource.getProjectConfiguration() } returns mockk(relaxed = true)
+        coEvery { localDataSource.getProject().id } returns PROJECT_ID
+        coEvery { remoteDataSource.getConfiguration(PROJECT_ID) } returns projectConfiguration
+
+        val receivedProject = configServiceImpl.getConfiguration()
+
+        assertThat(receivedProject).isEqualTo(projectConfiguration)
+        coVerify(exactly = 1) { localDataSource.getProjectConfiguration() }
+        coVerify(exactly = 1) { remoteDataSource.getConfiguration(PROJECT_ID) }
+    }
+
+    @Test
+    fun `getConfiguration() should still return empty config if getting it remotely fails`() = runTest {
+        val localConfig = mockk<ProjectConfiguration>(relaxed = true)
+        coEvery { localDataSource.getProjectConfiguration() } returns localConfig
+        coEvery { localDataSource.getProject().id } returns PROJECT_ID
+        coEvery { remoteDataSource.getConfiguration(PROJECT_ID) } throws Exception()
+
+        val receivedProject = configServiceImpl.getConfiguration()
+
+        assertThat(receivedProject).isEqualTo(localConfig)
+        coVerify(exactly = 1) { localDataSource.getProjectConfiguration() }
+        coVerify(exactly = 1) { remoteDataSource.getConfiguration(PROJECT_ID) }
+    }
 
     @Test
     fun `getDeviceConfiguration should call the correct method`() = runTest {
