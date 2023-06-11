@@ -1,7 +1,7 @@
 # Scanner Package
 
 This package provides a layer with which to interface with the
-[`fingerprintscanner`](../../../../../../../../fingerprintscanner)
+[`fingerprintscanner`](../../../../../../../../fingerprint/infra/scanner)
 library.
 
 ### Scanner Wrapper
@@ -80,7 +80,7 @@ are some helper classes and tools:
 ### Versioning System
 
 Vero 2 comes with 3 chips (see the documentation for
-[Scanner V2](../../../../../../../../fingerprintscanner/src/main/java/com/simprints/fingerprintscanner/v2/README.md)
+[Scanner V2](../../../../../../../../fingerprint/infra/scanner/src/main/java/com/simprints/fingerprintscanner/v2/README.md)
 for details), each with its own app and API versions.
 
 - The app version is of type `[Major].[Minor]` and refers to the version

@@ -1,6 +1,12 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20AppVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmFirmwareVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirmwareVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.UnifiedVersionInformation
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
@@ -9,12 +15,6 @@ import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.tools.BatteryLevelChecker
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20AppVersion
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.root.models.CypressFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
-import com.simprints.fingerprintscanner.v2.domain.root.models.UnifiedVersionInformation
-import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.testtools.common.syntax.assertThrows

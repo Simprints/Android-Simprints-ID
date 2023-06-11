@@ -1,22 +1,26 @@
 package com.simprints.fingerprint.scanner.factory
 
 import com.simprints.core.DispatcherIO
-import com.simprints.fingerprint.scanner.controllers.v2.*
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprint.infra.scanner.v2.scanner.create
+import com.simprints.fingerprint.scanner.controllers.v2.ConnectionHelper
+import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.ScannerInitialSetupHelper
+import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
+import com.simprints.fingerprint.scanner.controllers.v2.Un20OtaHelper
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV2
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprintscanner.v2.scanner.create
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
-import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
-import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
+import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerFactoryImpl @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
