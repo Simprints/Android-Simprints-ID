@@ -9,6 +9,8 @@ import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.config.ExitFormOption
+import com.simprints.feature.fetchsubject.FetchSubjectContract
+import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.id.data.exitform.ExitFormReason
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
@@ -43,19 +45,17 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessor_shouldProcessFetchGUIDResponse() {
-        val fetchActivityReturn: Intent =
-            Intent().putExtra(CORE_STEP_BUNDLE, FetchGUIDResponse(false))
-        val result = coreStepProcessor.processResult(fetchActivityReturn)
-
-        assertThat(result).isInstanceOf(FetchGUIDResponse::class.java)
-    }
-
-    @Test
     fun stepProcessor_shouldBuildRightStepForVerify() {
         val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.VERIFY)
 
         verifyConsentIntent<Bundle>(step, CoreRequestCode.CONSENT.value)
+    }
+
+    @Test
+    fun stepProcessor_shouldBuildRightStepForGuidFetch() {
+        val step = CoreStepProcessorImpl().buildFetchGuidStep(DEFAULT_PROJECT_ID, GUID1)
+
+        verifyFetchGuidIntent<Bundle>(step)
     }
 
     @Test
@@ -87,6 +87,14 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
+    fun stepProcessor_shouldSkipLegacyFetchGuidResult() {
+        val consentData = Intent().putExtra(CORE_STEP_BUNDLE, FetchGUIDResponse(false))
+        val result = coreStepProcessor.processResult(consentData)
+
+        assertThat(result).isNull()
+    }
+
+    @Test
     fun stepProcessor_shouldReturnConsentResultWhenAccepted() {
         val consentData = Intent().putExtra(ConsentContract.CONSENT_RESULT, ConsentResult(true))
         val result = coreStepProcessor.processResult(consentData)
@@ -100,6 +108,22 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
         val result = coreStepProcessor.processResult(consentData)
 
         assertThat(result).isInstanceOf(ExitFormResponse::class.java)
+    }
+
+    @Test
+    fun stepProcessor_shouldProcessFetchGUIDResponseWhenReturnedToExitForm() {
+        val fetchActivityReturn: Intent = Intent().putExtra(FetchSubjectContract.FETCH_SUBJECT_RESULT, ExitFormResult(true, ExitFormOption.Other))
+        val result = coreStepProcessor.processResult(fetchActivityReturn)
+
+        assertThat(result).isInstanceOf(ExitFormResponse::class.java)
+    }
+
+    @Test
+    fun stepProcessor_shouldProcessFetchGUIDResponseWhenTried() {
+        val fetchActivityReturn: Intent = Intent().putExtra(FetchSubjectContract.FETCH_SUBJECT_RESULT, FetchSubjectResult(false))
+        val result = coreStepProcessor.processResult(fetchActivityReturn)
+
+        assertThat(result).isInstanceOf(FetchGUIDResponse::class.java)
     }
 
     @Test
