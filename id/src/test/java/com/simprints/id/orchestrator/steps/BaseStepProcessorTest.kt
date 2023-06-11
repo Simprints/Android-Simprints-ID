@@ -3,6 +3,8 @@ package com.simprints.id.orchestrator.steps
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.consent.screens.ConsentWrapperActivity
+import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
+import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 
 open class BaseStepProcessorTest {
 
@@ -25,6 +27,13 @@ open class BaseStepProcessorTest {
         expectedRequestCode,
         "com.simprints.feature.consent.screens.ConsentWrapperActivity",
         ConsentWrapperActivity.CONSENT_ARGS_EXTRA,
+    )
+
+    protected inline fun <reified T : Parcelable> verifyFetchGuidIntent(step: Step) = verifyStep<T>(
+        step,
+        CoreRequestCode.FETCH_GUID_CHECK.value,
+        "com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity",
+        FetchSubjectWrapperActivity.FETCH_SUBJECT_ARGS_EXTRA
     )
 
     protected inline fun <reified T : Parcelable> verifyStep(step: Step, expectedRequestCode: Int, activityName: String, bundleKey: String) {
