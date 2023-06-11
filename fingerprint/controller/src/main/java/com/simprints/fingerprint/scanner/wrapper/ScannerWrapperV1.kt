@@ -2,20 +2,42 @@ package com.simprints.fingerprint.scanner.wrapper
 
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
-import com.simprints.fingerprint.scanner.domain.*
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BLUETOOTH_DISABLED
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BLUETOOTH_NOT_SUPPORTED
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BUSY
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.INTERRUPTED
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.INVALID_STATE
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.IO_ERROR
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.OUTDATED_SCANNER_INFO
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.SCANNER_UNBONDED
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.SCANNER_UNREACHABLE
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.TIMEOUT
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_INVALID_STATE
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_LOW_VOLTAGE
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_SDK_ERROR
+import com.simprints.fingerprint.infra.scanner.v1.ScannerCallback
+import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
+import com.simprints.fingerprint.scanner.domain.BatteryInfo
+import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
-import com.simprints.fingerprint.scanner.exceptions.safe.*
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2Feature
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2FeatureException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
-import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
-import com.simprints.fingerprintscanner.v1.SCANNER_ERROR.*
-import com.simprints.fingerprintscanner.v1.ScannerCallback
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -24,8 +46,8 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import com.simprints.fingerprintscanner.v1.ButtonListener as ScannerTriggerListenerV1
-import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
+import com.simprints.fingerprint.infra.scanner.v1.ButtonListener as ScannerTriggerListenerV1
+import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
 
 
 /**

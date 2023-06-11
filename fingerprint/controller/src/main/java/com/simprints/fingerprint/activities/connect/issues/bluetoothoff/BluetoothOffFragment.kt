@@ -23,8 +23,8 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentBluetoothOffBinding
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprint.tools.extensions.showToast
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as CR

@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.scanner.adapters.v2.toExtendedVersionInformation
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
@@ -7,8 +9,6 @@ import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.tools.extensions.delayForOneSecond
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
-import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import io.reactivex.Completable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector

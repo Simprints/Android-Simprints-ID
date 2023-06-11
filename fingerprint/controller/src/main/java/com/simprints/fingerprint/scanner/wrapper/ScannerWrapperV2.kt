@@ -3,6 +3,11 @@ package com.simprints.fingerprint.scanner.wrapper
 import android.annotation.SuppressLint
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageFormatData
+import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.*
 import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
@@ -18,11 +23,6 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2F
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Dpi
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageFormatData
-import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
-import com.simprints.fingerprintscanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.infra.logging.Simber
 import io.reactivex.Completable
 import io.reactivex.Observer
@@ -36,8 +36,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import java.io.IOException
-import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
-import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
+import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerWrapperV2(
     private val scannerV2: ScannerV2,

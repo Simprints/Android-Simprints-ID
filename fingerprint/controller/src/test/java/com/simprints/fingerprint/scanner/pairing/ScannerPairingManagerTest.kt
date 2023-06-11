@@ -3,13 +3,12 @@ package com.simprints.fingerprint.scanner.pairing
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
-import com.simprints.fingerprintscannermock.dummy.DummyBluetoothDevice
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -96,7 +95,11 @@ class ScannerPairingManagerTest {
 
     @Test
     fun getPairedScannerAddressToUse_oneValidPairedDevice_returnsCorrectly() = runTest {
-        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(DummyBluetoothDevice(address = correctAddress))
+        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
+            com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(
+                address = correctAddress
+            )
+        )
         every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(correctGeneration)
 
         assertThat(scannerPairingManager.getPairedScannerAddressToUse()).isEqualTo(correctAddress)
@@ -104,7 +107,11 @@ class ScannerPairingManagerTest {
 
     @Test
     fun getPairedScannerAddressToUse_oneInvalidPairedDevice_throws() = runTest {
-        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(DummyBluetoothDevice(address = incorrectAddress))
+        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
+            com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(
+                address = incorrectAddress
+            )
+        )
         every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(correctGeneration)
 
         assertThrows<ScannerNotPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
@@ -112,7 +119,11 @@ class ScannerPairingManagerTest {
 
     @Test
     fun getPairedScannerAddressToUse_noScannersPaired_throws() = runTest {
-        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(DummyBluetoothDevice(address = notScannerAddress))
+        every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
+            com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(
+                address = notScannerAddress
+            )
+        )
 
         assertThrows<ScannerNotPairedException> { scannerPairingManager.getPairedScannerAddressToUse() }
     }
@@ -128,9 +139,9 @@ class ScannerPairingManagerTest {
     fun getPairedScannerAddressToUse_multipleDevicesWithOneValidScanner_returnsCorrectly() =
         runTest {
             every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
-                DummyBluetoothDevice(address = correctAddress),
-                DummyBluetoothDevice(address = incorrectAddress),
-                DummyBluetoothDevice(address = notScannerAddress)
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = correctAddress),
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = incorrectAddress),
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = notScannerAddress)
             )
             every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
                 correctGeneration
@@ -145,9 +156,9 @@ class ScannerPairingManagerTest {
     fun getPairedScannerAddressToUse_multipleValidDevices_lastScannerUsedExistsAndIsPaired() =
         runTest {
             every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
-                DummyBluetoothDevice(address = correctAddress),
-                DummyBluetoothDevice(address = incorrectAddress),
-                DummyBluetoothDevice(address = notScannerAddress)
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = correctAddress),
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = incorrectAddress),
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = notScannerAddress)
             )
             every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
                 correctGeneration,
@@ -163,9 +174,9 @@ class ScannerPairingManagerTest {
     @Test
     fun getPairedScannerAddressToUse_multipleValidDevices_noLastScannerUsed_throws() = runTest {
         every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
-            DummyBluetoothDevice(address = correctAddress),
-            DummyBluetoothDevice(address = incorrectAddress),
-            DummyBluetoothDevice(address = notScannerAddress)
+            com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = correctAddress),
+            com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = incorrectAddress),
+            com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = notScannerAddress)
         )
         every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
             correctGeneration,
@@ -180,9 +191,9 @@ class ScannerPairingManagerTest {
     fun getPairedScannerAddressToUse_multipleValidDevices_lastScannerUsedNotPaired_throws() =
         runTest {
             every { bluetoothAdapterMock.getBondedDevices() } returns setOf(
-                DummyBluetoothDevice(address = correctAddress),
-                DummyBluetoothDevice(address = incorrectAddress),
-                DummyBluetoothDevice(address = notScannerAddress)
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = correctAddress),
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = incorrectAddress),
+                com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(address = notScannerAddress)
             )
             every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
                 correctGeneration,

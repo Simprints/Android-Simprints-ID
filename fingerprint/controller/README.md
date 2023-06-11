@@ -14,7 +14,7 @@ The main domain sub-packages are:
 - [Orchestrator](./src/main/java/com/simprints/fingerprint/orchestrator/README.md)
   \- which handles requests to the module and calling out to other
   activities within the module.
-- [Scanner](./src/main/java/com/simprints/fingerprint/scanner/README.md)
+- [Scanner](./src/main/java/com/simprints/fingerprint/infra/scanner/README.md)
   \- which handles high-level interfacing with the `fingerprintscanner`
   module for using a Vero fingerprint scanner.
 
@@ -32,10 +32,10 @@ The main activities are:
 The satellite libraries of the fingerprint modality that are used in
 this module are:
 
-- [`fingerprintscanner`](../fingerprintscanner/README.md) - which
+- [`fingerprintscanner`](../infra/scanner/README.md) - which
   handles low-level communication with the fingerprint scanner and tucks
   it behind a `Scanner` class abstraction.
-- [`fingerprintscannermock`](../fingerprintscannermock/README.md) -
+- [`fingerprintscannermock`](../infra/scannermock/README.md) -
   which is a utility package providing mocking and simulation options
   for the fingerprint scanner for testing and debugging.
 - [`fingerprintmatcher`](../infra/matcher/README.md) - which houses
