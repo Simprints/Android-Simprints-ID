@@ -309,7 +309,7 @@ definitions:
         ######################################################################
         -   step: &promote-alpha-to-production-25
                 name: "Promote Alpha Track to Production Track 25% rollout"
-                deployment: Prod-25-Percent-Rollout
+                deployment: "Prod-25-Percent-Rollout"
                 max-time: 30
                 size: 2x
                 trigger: manual
@@ -327,7 +327,7 @@ definitions:
         ######################################################################
         -   step: &update-production-rollout-to-50
                 name: "Update Production rollout percentage to 50%"
-                deployment: Prod-50-Percent-Rollout
+                deployment: "Prod-50-Percent-Rollout"
                 max-time: 30
                 size: 2x
                 trigger: manual
@@ -345,7 +345,7 @@ definitions:
         ######################################################################
         -   step: &full-production-rollout
                 name: "100% Production rollout"
-                deployment: Prod-100-Percent-Rollout
+                deployment: "Prod-100-Percent-Rollout"
                 max-time: 30
                 size: 2x
                 trigger: manual
