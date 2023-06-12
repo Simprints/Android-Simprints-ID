@@ -4,6 +4,13 @@ package com.simprints.fingerprint.scanner.wrapper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageData
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.TemplateData
+import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
+import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
+import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
@@ -16,13 +23,6 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2F
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.ImageData
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.TemplateData
-import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException
-import com.simprints.fingerprintscanner.v2.exceptions.state.NotConnectedException
-import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import com.simprints.fingerprintscanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK

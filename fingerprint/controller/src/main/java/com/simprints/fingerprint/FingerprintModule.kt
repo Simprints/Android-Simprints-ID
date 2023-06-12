@@ -17,14 +17,14 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
 import com.simprints.fingerprint.infra.matcher.FingerprintMatcherModule
 import com.simprints.fingerprint.infra.matcher.JNILibAfisModule
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
