@@ -69,16 +69,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activities.guidselection.GuidSelectionActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.enrollast.EnrolLastBiometricsActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
 
         <service
             android:name=".services.sync.events.down.EventDownSyncResetService"
