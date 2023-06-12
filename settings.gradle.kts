@@ -69,6 +69,7 @@ include(
 include(
     ":feature:login",
     ":feature:fetch-subject",
+    ":feature:select-subject",
     ":featuredashboard",
     ":featurealert",
     ":featureexitform",

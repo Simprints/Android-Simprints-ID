@@ -34,8 +34,6 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.services.guidselection.GuidSelectionManager
-import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
@@ -90,9 +88,6 @@ abstract class IdAppModule {
             view: CheckLoginFromIntentContract.View,
         ): CheckLoginFromIntentPresenter
     }
-
-    @Binds
-    abstract fun provideGuidSelectionManager(impl: GuidSelectionManagerImpl): GuidSelectionManager
 
     @Binds
     abstract fun provideModuleRepository(impl: ModuleRepositoryImpl): ModuleRepository
