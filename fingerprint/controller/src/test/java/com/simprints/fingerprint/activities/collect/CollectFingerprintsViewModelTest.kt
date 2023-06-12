@@ -103,7 +103,7 @@ class CollectFingerprintsViewModelTest {
     fun viewModel_start_beginsWithCorrectState() {
         vm.start(TWO_FINGERS_IDS)
 
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
@@ -144,7 +144,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Scanning())
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.Scanning())
     }
 
     @Test
@@ -174,7 +174,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
                 ScanResult(
                     GOOD_QUALITY,
@@ -196,7 +196,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     GOOD_QUALITY,
@@ -209,7 +209,7 @@ class CollectFingerprintsViewModelTest {
         vm.vibrate.assertEventReceived()
 
         mockTimer.executeNextTask()
-        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+        assertThat(vm.state.currentFingerIndex).isEqualTo(1)
 
         coVerify { sessionEventsManager.addEvent(any()) }
     }
@@ -225,7 +225,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     GOOD_QUALITY,
@@ -239,7 +239,7 @@ class CollectFingerprintsViewModelTest {
         coVerify { sessionEventsManager.addEvent(any()) }
 
         mockTimer.executeNextTask()
-        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+        assertThat(vm.state.currentFingerIndex).isEqualTo(1)
     }
 
     @Test
@@ -252,7 +252,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     BAD_QUALITY,
@@ -276,7 +276,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     BAD_QUALITY,
@@ -300,7 +300,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotDetected())
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotDetected())
         vm.vibrate.assertEventReceived()
         coVerify { sessionEventsManager.addEvent(any()) }
     }
@@ -320,7 +320,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
         vm.launchReconnect.assertEventReceived()
     }
 
@@ -335,7 +335,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
         vm.launchReconnect.assertEventReceived()
     }
 
@@ -349,7 +349,7 @@ class CollectFingerprintsViewModelTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     BAD_QUALITY,
@@ -360,7 +360,7 @@ class CollectFingerprintsViewModelTest {
             )
         )
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     BAD_QUALITY,
@@ -371,7 +371,7 @@ class CollectFingerprintsViewModelTest {
             )
         )
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     BAD_QUALITY,
@@ -382,12 +382,12 @@ class CollectFingerprintsViewModelTest {
             )
         )
 
-        assertThat(vm.state().isShowingSplashScreen).isTrue()
+        assertThat(vm.state.isShowingSplashScreen).isTrue()
         mockTimer.executeNextTask()
-        assertThat(vm.state().fingerStates.size).isEqualTo(3)
+        assertThat(vm.state.fingerStates.size).isEqualTo(3)
         mockTimer.executeNextTask()
-        assertThat(vm.state().isShowingSplashScreen).isFalse()
-        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+        assertThat(vm.state.isShowingSplashScreen).isFalse()
+        assertThat(vm.state.currentFingerIndex).isEqualTo(1)
 
         coVerify(exactly = 1) { scanner.acquireImage(any()) }
         coVerify(exactly = 4) { sessionEventsManager.addEvent(any()) }
@@ -407,7 +407,7 @@ class CollectFingerprintsViewModelTest {
             mockTimer.executeAllTasks()
         }
 
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = FOUR_FINGERS_IDS.map {
                     FingerState(
@@ -457,7 +457,7 @@ class CollectFingerprintsViewModelTest {
             mockTimer.executeAllTasks()
         }
 
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
@@ -510,7 +510,7 @@ class CollectFingerprintsViewModelTest {
             mockTimer.executeAllTasks()
         }
 
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
@@ -551,17 +551,17 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         mockTimer.executeNextTask()
-        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+        assertThat(vm.state.currentFingerIndex).isEqualTo(1)
 
         vm.updateSelectedFinger(0)
-        assertThat(vm.state().currentFingerIndex).isEqualTo(0)
+        assertThat(vm.state.currentFingerIndex).isEqualTo(0)
 
         vm.handleScanButtonPressed()
-        assertThat(vm.state().isAskingRescan).isTrue()
+        assertThat(vm.state.isAskingRescan).isTrue()
 
         vm.handleScanButtonPressed()
-        assertThat(vm.state().isAskingRescan).isFalse()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.isAskingRescan).isFalse()
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     DIFFERENT_GOOD_QUALITY,
@@ -581,13 +581,13 @@ class CollectFingerprintsViewModelTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleMissingFingerButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Skipped)
-        assertThat(vm.state().isShowingSplashScreen).isTrue()
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.Skipped)
+        assertThat(vm.state.isShowingSplashScreen).isTrue()
         mockTimer.executeNextTask()
-        assertThat(vm.state().fingerStates.size).isEqualTo(3)
+        assertThat(vm.state.fingerStates.size).isEqualTo(3)
         mockTimer.executeNextTask()
-        assertThat(vm.state().isShowingSplashScreen).isFalse()
-        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+        assertThat(vm.state.isShowingSplashScreen).isFalse()
+        assertThat(vm.state.currentFingerIndex).isEqualTo(1)
 
         coVerify { sessionEventsManager.addEvent(any()) }
     }
@@ -602,7 +602,7 @@ class CollectFingerprintsViewModelTest {
             mockTimer.executeAllTasks()
         }
 
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = FOUR_FINGERS_IDS.map {
                     FingerState(
@@ -621,7 +621,7 @@ class CollectFingerprintsViewModelTest {
         vm.handleConfirmFingerprintsAndContinue()
 
         vm.noFingersScannedToast.assertEventReceived()
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
@@ -677,7 +677,7 @@ class CollectFingerprintsViewModelTest {
         vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = listOf(
                     FingerState(
@@ -774,7 +774,7 @@ class CollectFingerprintsViewModelTest {
         vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = listOf(
                     FingerState(
@@ -842,9 +842,9 @@ class CollectFingerprintsViewModelTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Scanning())
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.Scanning())
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
     }
 
     @Test
@@ -857,7 +857,7 @@ class CollectFingerprintsViewModelTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
                 ScanResult(
                     GOOD_QUALITY,
@@ -868,7 +868,7 @@ class CollectFingerprintsViewModelTest {
             )
         )
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
                 ScanResult(
                     GOOD_QUALITY,
@@ -896,11 +896,11 @@ class CollectFingerprintsViewModelTest {
         vm.handleScanButtonPressed()
         mockTimer.executeAllTasks()
 
-        assertThat(vm.state().isShowingConfirmDialog).isTrue()
+        assertThat(vm.state.isShowingConfirmDialog).isTrue()
 
         vm.handleRestart()
 
-        assertThat(vm.state()).isEqualTo(
+        assertThat(vm.state).isEqualTo(
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
@@ -925,9 +925,9 @@ class CollectFingerprintsViewModelTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.Scanning())
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.Scanning())
         vm.handleOnBackPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
     }
 
     @Test
@@ -936,7 +936,7 @@ class CollectFingerprintsViewModelTest {
 
         vm.start(TWO_FINGERS_IDS)
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
         vm.launchReconnect.assertEventReceived()
     }
 
@@ -951,7 +951,7 @@ class CollectFingerprintsViewModelTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
                 ScanResult(
                     GOOD_QUALITY,
@@ -962,7 +962,7 @@ class CollectFingerprintsViewModelTest {
             )
         )
         vm.handleOnBackPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
     }
 
     @Test
@@ -975,7 +975,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         vm.handleOnBackPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
                     GOOD_QUALITY,
@@ -996,7 +996,7 @@ class CollectFingerprintsViewModelTest {
 
         vm.start(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
 
         vm.launchAlert.assertEventReceivedWithContent(AlertError.UNEXPECTED_ERROR)
     }
@@ -1159,7 +1159,7 @@ class CollectFingerprintsViewModelTest {
         vm.start(TWO_FINGERS_IDS)
         vm.updateSelectedFinger(1)
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(CaptureState.NotCollected)
+        assertThat(vm.state.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
         vm.launchReconnect.assertEventReceived()
     }
 
