@@ -20,12 +20,12 @@ class DummyBluetoothDevice(
 
     companion object {
 
-        fun random(isBonded: Boolean = true): com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice {
+        fun random(isBonded: Boolean = true): DummyBluetoothDevice {
             val number = Random.nextInt(1000000)
             val address = "F0:AC:D7:C" + StringBuilder(number.toString(16).padStart(5, '0'))
                 .insert(1, ":").insert(4, ":").toString()
             val name = "SP" + number.toString().padStart(6, '0')
-            return com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice(
+            return DummyBluetoothDevice(
                 name = name,
                 address = address,
                 isBonded = isBonded
