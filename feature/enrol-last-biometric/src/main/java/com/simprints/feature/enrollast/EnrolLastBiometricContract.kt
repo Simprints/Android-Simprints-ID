@@ -8,11 +8,13 @@ object EnrolLastBiometricContract {
 
     fun getArgs(
         projectId: String,
-        moduleId: String,
         userId: String,
+        moduleId: String,
+        steps: List<EnrolLastBiometricStepResult>,
     ) = EnrolLastBiometricFragmentArgs(EnrolLastBiometricParams(
         projectId = projectId,
         userId = userId,
         moduleId = moduleId,
+        steps = steps,
     )).toBundle()
 }

@@ -13,5 +13,6 @@ dependencies {
 
     implementation(project(":infraconfig"))
     implementation(project(":infraevents"))
+    implementation(project(":infraenrolmentrecords"))
 
 }

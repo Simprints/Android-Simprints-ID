@@ -7,5 +7,5 @@ import kotlinx.parcelize.Parcelize
 @Keep
 @Parcelize
 data class EnrolLastBiometricResult(
-    private val guid: String?
+    val newSubjectId: String?
 ) : Parcelable

@@ -44,6 +44,7 @@ object LoggingConstants {
         REALM_DB,
         ROOM_DB,
         DB_CORRUPTION,
+        ENROLMENT,
     }
 
 }
