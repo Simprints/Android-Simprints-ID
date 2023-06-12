@@ -44,7 +44,7 @@ class ModalityFlowConfirmIdentityTest {
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain())
 
         assertThat(modalityFlowConfirmIdentity.steps).hasSize(1)
-        verify { coreProcessorMock.buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1, GUID2) }
+        verify { coreProcessorMock.buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID2) }
     }
 
     @Test
@@ -57,7 +57,7 @@ class ModalityFlowConfirmIdentityTest {
         )
         val step = mockk<Step>()
         every { step.getStatus() } returns Step.Status.NOT_STARTED
-        every { coreProcessorMock.buildConfirmIdentityStep(any(), any(), any()) } returns step
+        every { coreProcessorMock.buildConfirmIdentityStep(any(), any()) } returns step
 
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain())
 

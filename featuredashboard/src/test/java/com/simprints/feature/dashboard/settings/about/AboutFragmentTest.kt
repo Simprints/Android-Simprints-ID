@@ -1,5 +1,7 @@
 package com.simprints.feature.dashboard.settings.about
 
+import android.content.Context
+import androidx.annotation.IdRes
 import androidx.lifecycle.Observer
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -13,6 +15,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.R
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
@@ -121,11 +124,10 @@ class AboutFragmentTest {
     }
 
     @Test
-    fun `should logout and redirect correctly when no password and clicking on logout`() {
+    fun `should process logout when no password and clicking on logout`() {
         mockSettingsPassword(SettingsPasswordConfig.NotSet)
         mockModalities(listOf(GeneralConfiguration.Modality.FACE))
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
-
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
         onView(withText(IDR.string.preference_logout_title)).perform(click())
@@ -134,8 +136,33 @@ class AboutFragmentTest {
             .check(matches(isDisplayed()))
             .perform(click())
 
-        Truth.assertThat(navController.currentDestination?.id).isEqualTo(R.id.requestLoginFragment)
-        verify(exactly = 1) { viewModel.logout() }
+        verify(exactly = 1) { viewModel.processLogoutRequest() }
+    }
+
+    @Test
+    fun `should navigate to logout sync screen when LogoutDestination_LogoutDataSyncScreen is received`() {
+        runNavigationTest(
+            destination = LogoutDestination.LogoutDataSyncScreen,
+            targetDestinationId = R.id.logOutSyncFragment
+        )
+    }
+
+    @Test
+    fun `should navigate to request login screen when LogoutDestination_LoginScreen is received`() {
+        runNavigationTest(
+            destination = LogoutDestination.LoginScreen,
+            targetDestinationId = R.id.requestLoginFragment
+        )
+    }
+
+    private fun runNavigationTest(destination: LogoutDestination, @IdRes targetDestinationId: Int) {
+        mockSettingsPassword(SettingsPasswordConfig.NotSet)
+        mockModalities(listOf(GeneralConfiguration.Modality.FACE))
+        mockLogoutDestination(destination)
+        val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
+
+        launchFragmentInHiltContainer<AboutFragment>(navController = navController)
+        Truth.assertThat(navController.currentDestination?.id).isEqualTo(targetDestinationId)
     }
 
     @Test
@@ -153,7 +180,7 @@ class AboutFragmentTest {
             .perform(click())
 
         Truth.assertThat(navController.currentDestination?.id).isEqualTo(R.id.aboutFragment)
-        verify(exactly = 0) { viewModel.logout() }
+        verify(exactly = 0) { viewModel.processLogoutRequest() }
     }
 
     @Test
@@ -170,8 +197,7 @@ class AboutFragmentTest {
             .check(matches(isDisplayed()))
             .perform(replaceText("1234"))
 
-        Truth.assertThat(navController.currentDestination?.id).isEqualTo(R.id.requestLoginFragment)
-        verify(exactly = 1) { viewModel.logout() }
+        verify(exactly = 1) { viewModel.processLogoutRequest() }
     }
 
 
@@ -190,7 +216,7 @@ class AboutFragmentTest {
             .perform(replaceText("1111"))
 
         Truth.assertThat(navController.currentDestination?.id).isEqualTo(R.id.aboutFragment)
-        verify(exactly = 0) { viewModel.logout() }
+        verify(exactly = 0) { viewModel.processLogoutRequest() }
     }
 
     private fun mockModalities(modalities: List<GeneralConfiguration.Modality>) {
@@ -204,6 +230,16 @@ class AboutFragmentTest {
     private fun mockSettingsPassword(lock: SettingsPasswordConfig) {
         every { viewModel.settingsLocked } returns mockk {
             every { value } returns lock
+        }
+    }
+
+    private fun mockLogoutDestination(destination: LogoutDestination) {
+        every { viewModel.logoutDestinationEvent } returns mockk {
+            every { observe(any(), any()) } answers {
+                secondArg<Observer<LiveDataEventWithContent<LogoutDestination>>>().onChanged(
+                    LiveDataEventWithContent(destination)
+                )
+            }
         }
     }
 }

@@ -6,17 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -39,7 +44,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(IDR.string.confirmation_logout_title))
             .setMessage(getString(IDR.string.confirmation_logout_message))
-            .setPositiveButton(getString(IDR.string.logout)) { _, _ -> logOut() }
+            .setPositiveButton(getString(IDR.string.logout)) { _, _ -> viewModel.processLogoutRequest() }
             .setNegativeButton(
                 getString(IDR.string.confirmation_logout_cancel), null
             ).create()
@@ -77,6 +82,15 @@ internal class AboutFragment : PreferenceFragmentCompat() {
         viewModel.recentUserActivity.observe(viewLifecycleOwner) {
             getScannerVersionPreference()?.summary = it.lastScannerVersion
         }
+        viewModel.logoutDestinationEvent.observe(
+            viewLifecycleOwner,
+            LiveDataEventWithContentObserver {
+                val destination = when (it) {
+                    LogoutDestination.LogoutDataSyncScreen -> R.id.action_aboutFragment_to_logout_navigation
+                    LogoutDestination.LoginScreen -> R.id.action_aboutFragment_to_requestLoginFragment
+                }
+                findNavController().navigate(destination)
+            })
     }
 
     private fun initLayout() {
@@ -89,7 +103,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                     SettingsPasswordDialogFragment(
                         title = IDR.string.password_lock_title_logout,
                         passwordToMatch = password,
-                        onSuccess = { logOut() }
+                        onSuccess = { viewModel.processLogoutRequest() }
                     ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)
                 } else {
                     confirmationDialogForLogout.show()
@@ -97,11 +111,6 @@ internal class AboutFragment : PreferenceFragmentCompat() {
             }
             true
         }
-    }
-
-    private fun logOut() {
-        viewModel.logout()
-        findNavController().navigate(R.id.action_aboutFragment_to_requestLoginFragment)
     }
 
     private fun getAppVersionPreference(): Preference? =

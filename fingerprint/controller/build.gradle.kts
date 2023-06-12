@@ -32,8 +32,8 @@ dependencies {
     // Simprints
     implementation(project(":infraevents"))
     implementation(project(":infraenrolmentrecords"))
-    implementation(project(":fingerprint:matcher"))
-    implementation(project(":fingerprint:scanner"))
+    implementation(project(":fingerprint:infra:matcher"))
+    implementation(project(":fingerprint:infra:scanner"))
     implementation(project(":infraconfig"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infraimages"))
@@ -42,8 +42,8 @@ dependencies {
     implementation(project(":featureexitform"))
 
     // If mock/dummy BT adapter is required test implementation can be switched to regular one
-    testImplementation(project(":fingerprint:scannermock"))
-    //implementation(project(":fingerprintscannermock"))
+    testImplementation(project(":fingerprint:infra:scannermock"))
+    //implementation(project(":fingerprint:infra:scannermock"))
 
     implementation(libs.retrofit.core)
     runtimeOnly(libs.jackson.core)

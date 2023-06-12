@@ -14,8 +14,6 @@ import com.simprints.feature.dashboard.main.projectdetails.ProjectDetailsViewMod
 import com.simprints.feature.dashboard.main.sync.SyncViewModel
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
-import com.simprints.infra.resources.R as IDR
-import com.simprints.feature.consent.R as PrivacyR
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -26,6 +24,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import com.simprints.feature.consent.R as PrivacyR
+import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest

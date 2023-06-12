@@ -112,12 +112,16 @@ definitions:
                     - ./gradlew featureexitform:jacocoTestReport
                     - ./gradlew featureconsent:jacocoTestReport
                     - ./gradlew feature:login:jacocoTestReport
+                    - ./gradlew feature:fetch-subject:jacocoTestReport
+                    - ./gradlew feature:select-subject:jacocoTestReport
                 artifacts:
                     - featuredashboard/build/reports/**
                     - featurealert/build/reports/**
                     - featureexitform/build/reports/**
                     - featureconsent/build/reports/**
                     - feature/login/build/reports/**
+                    - feature/fetch-subject/build/reports/**
+                    - feature/select-subject/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
@@ -149,14 +153,14 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew fingerprint:controller:jacocoTestReport
-                    - ./gradlew fingerprint:matcher:jacocoTestReport
-                    - ./gradlew fingerprint:scanner:jacocoTestReport
+                    - ./gradlew fingerprint:infra:matcher:jacocoTestReport
+                    - ./gradlew fingerprint:infra:scanner:jacocoTestReport
 
 
                 artifacts:
                     - fingerprint/controller/build/reports/**
-                    - fingerprint/matcher/build/reports/**
-                    - fingerprint/scanner/build/reports/**
+                    - fingerprint/infra/matcher/build/reports/**
+                    - fingerprint/infra/scanner/build/reports/**
 
 
         ######################################################################

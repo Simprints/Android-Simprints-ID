@@ -4,14 +4,12 @@ import android.content.Intent
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.nhaarman.mockitokotlin2.any
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.exitform.screen.ExitFormWrapperActivity
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.*
 import org.junit.Before
-
 import org.junit.Test
 import org.junit.runner.RunWith
 

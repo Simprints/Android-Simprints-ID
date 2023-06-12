@@ -9,8 +9,10 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CAPTURE
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CONFIGURATION
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
