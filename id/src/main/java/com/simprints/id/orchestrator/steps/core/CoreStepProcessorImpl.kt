@@ -8,6 +8,9 @@ import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.consent.screens.ConsentWrapperActivity
+import com.simprints.feature.enrollast.EnrolLastBiometricContract
+import com.simprints.feature.enrollast.EnrolLastBiometricResult
+import com.simprints.feature.enrollast.EnrolLastBiometricWrapperActivity
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.fetchsubject.FetchSubjectResult
@@ -17,12 +20,12 @@ import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.setup.SetupWrapperActivity
 import com.simprints.id.data.exitform.ExitFormReason.Companion.fromExitFormOption
+import com.simprints.id.orchestrator.steps.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.FETCH_GUID_CHECK
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.GUID_SELECTION_CODE
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.LAST_BIOMETRICS_CORE
-import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.AskConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.ConsentResponse
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
@@ -35,7 +38,9 @@ import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import javax.inject.Inject
 
-class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
+class CoreStepProcessorImpl @Inject constructor(
+    private val mapStepsForLastBiometricEnrol: MapStepsForLastBiometricEnrolUseCase
+) : CoreStepProcessor {
 
     companion object {
         const val SETUP_ACTIVITY_NAME = "com.simprints.feature.setup.SetupWrapperActivity"
@@ -45,7 +50,7 @@ class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
         const val GUID_SELECTION_ACTIVITY_NAME =
             "com.simprints.feature.selectsubject.SelectSubjectWrapperActivity"
         const val LAST_BIOMETRICS_CORE_ACTIVITY_NAME =
-            "com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity"
+            "com.simprints.feature.enrollast.EnrolLastBiometricWrapperActivity"
     }
 
     override fun buildStepSetup(): Step = Step(
@@ -92,18 +97,17 @@ class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
     ) = Step(
         requestCode = LAST_BIOMETRICS_CORE.value,
         activityName = LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
-        bundleKey = CORE_STEP_BUNDLE,
-        request = EnrolLastBiometricsRequest(projectId, userId, moduleId, previousSteps, sessionId),
+        bundleKey = EnrolLastBiometricWrapperActivity.ENROL_LAST_ARGS_EXTRA,
+        request = EnrolLastBiometricContract.getArgs(projectId, userId, moduleId, mapStepsForLastBiometricEnrol(previousSteps)),
         status = Step.Status.NOT_STARTED
     )
 
     override fun processResult(data: Intent?): Step.Result? {
-        val coreResponse = data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)
+        val legacyCoreResponse = data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)
 
-        return if (coreResponse != null) {
-            when (coreResponse.type) {
+        return if (legacyCoreResponse != null) {
+            when (legacyCoreResponse.type) {
                 CoreResponseType.EXIT_FORM -> data.getParcelableExtra<ExitFormResponse>(CORE_STEP_BUNDLE)
-                CoreResponseType.ENROL_LAST_BIOMETRICS -> data.getParcelableExtra<EnrolLastBiometricsResponse>(CORE_STEP_BUNDLE)
                 else -> null // No-op, data will not have response with key CORE_STEP_BUNDLE
             }
         } else {
@@ -124,6 +128,13 @@ class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
             when (val result = data.getParcelable<Parcelable>(FetchSubjectContract.FETCH_SUBJECT_RESULT)) {
                 is ExitFormResult -> mapExitFormResponse(result)
                 is FetchSubjectResult -> FetchGUIDResponse(result.found)
+                else -> null
+            }
+        }
+
+        data.containsKey(EnrolLastBiometricContract.ENROL_LAST_RESULT) -> {
+            when (val result = data.getParcelable<Parcelable>(EnrolLastBiometricContract.ENROL_LAST_RESULT)) {
+                is EnrolLastBiometricResult -> EnrolLastBiometricsResponse(result.newSubjectId)
                 else -> null
             }
         }
