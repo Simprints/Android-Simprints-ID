@@ -1177,19 +1177,19 @@ class CollectFingerprintsViewModelTest {
         vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().isShowingSplashScreen).isTrue()
+        assertThat(vm.state.isShowingSplashScreen).isTrue()
         mockTimer.executeNextTask()
-        assertThat(vm.state().fingerStates.size).isEqualTo(3)
+        assertThat(vm.state.fingerStates.size).isEqualTo(3)
         mockTimer.executeNextTask()
-        assertThat(vm.state().isShowingSplashScreen).isFalse()
-        assertThat(vm.state().currentFingerIndex).isEqualTo(1)
+        assertThat(vm.state.isShowingSplashScreen).isFalse()
+        assertThat(vm.state.currentFingerIndex).isEqualTo(1)
 
         vm.updateSelectedFinger(0)
-        assertThat(vm.state().currentFingerIndex).isEqualTo(0)
+        assertThat(vm.state.currentFingerIndex).isEqualTo(0)
 
         vm.handleScanButtonPressed()
 
-        assertThat(vm.state().currentCaptureState()).isEqualTo(
+        assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.NotDetected(3)
         )
 
