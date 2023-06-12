@@ -22,7 +22,6 @@ class ModalityFlowConfirmIdentity @Inject constructor(private val coreStepProces
         listOf(
             coreStepProcessor.buildConfirmIdentityStep(
                 appRequest.projectId,
-                appRequest.sessionId,
                 appRequest.selectedGuid
             )
         )
