@@ -1,9 +1,9 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.domain.alert.AlertType.DIFFERENT_PROJECT_ID
-import com.simprints.id.domain.alert.AlertType.DIFFERENT_USER_ID
-import com.simprints.id.domain.alert.AlertType.UNEXPECTED_ERROR
+import com.simprints.id.alert.AlertType.DIFFERENT_PROJECT_ID
+import com.simprints.id.alert.AlertType.DIFFERENT_USER_ID
+import com.simprints.id.alert.AlertType.UNEXPECTED_ERROR
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException

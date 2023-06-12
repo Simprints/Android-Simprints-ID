@@ -1,4 +1,4 @@
-package com.simprints.id.domain.alert
+package com.simprints.id.alert
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
