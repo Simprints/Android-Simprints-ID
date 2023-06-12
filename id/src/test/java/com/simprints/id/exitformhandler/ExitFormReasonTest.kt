@@ -1,16 +1,16 @@
-package com.simprints.id.data.exitform
+package com.simprints.id.exitformhandler
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.exitform.config.ExitFormOption
-import com.simprints.id.data.exitform.ExitFormReason.APP_NOT_WORKING
-import com.simprints.id.data.exitform.ExitFormReason.Companion.fromExitFormOption
-import com.simprints.id.data.exitform.ExitFormReason.OTHER
-import com.simprints.id.data.exitform.ExitFormReason.REFUSED_DATA_CONCERNS
-import com.simprints.id.data.exitform.ExitFormReason.REFUSED_NOT_PRESENT
-import com.simprints.id.data.exitform.ExitFormReason.REFUSED_PERMISSION
-import com.simprints.id.data.exitform.ExitFormReason.REFUSED_RELIGION
-import com.simprints.id.data.exitform.ExitFormReason.REFUSED_YOUNG
-import com.simprints.id.data.exitform.ExitFormReason.SCANNER_NOT_WORKING
+import com.simprints.id.exitformhandler.ExitFormReason.APP_NOT_WORKING
+import com.simprints.id.exitformhandler.ExitFormReason.Companion.fromExitFormOption
+import com.simprints.id.exitformhandler.ExitFormReason.OTHER
+import com.simprints.id.exitformhandler.ExitFormReason.REFUSED_DATA_CONCERNS
+import com.simprints.id.exitformhandler.ExitFormReason.REFUSED_NOT_PRESENT
+import com.simprints.id.exitformhandler.ExitFormReason.REFUSED_PERMISSION
+import com.simprints.id.exitformhandler.ExitFormReason.REFUSED_RELIGION
+import com.simprints.id.exitformhandler.ExitFormReason.REFUSED_YOUNG
+import com.simprints.id.exitformhandler.ExitFormReason.SCANNER_NOT_WORKING
 import org.junit.Test
 
 class ExitFormReasonTest {

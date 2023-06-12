@@ -1,12 +1,12 @@
-package com.simprints.id.domain.alert
+package com.simprints.id.alert
 
 
 import android.os.Bundle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.alert.AlertResult
-import com.simprints.id.domain.alert.AlertType.*
-import com.simprints.id.domain.alert.AlertType.Companion.fromAlertToAlertTypeEvent
+import com.simprints.id.alert.AlertType.*
+import com.simprints.id.alert.AlertType.Companion.fromAlertToAlertTypeEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import org.junit.Test
 import org.junit.runner.RunWith

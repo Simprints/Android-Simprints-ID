@@ -1,4 +1,4 @@
-package com.simprints.id.data.exitform
+package com.simprints.id.exitformhandler
 
 import com.simprints.feature.exitform.config.ExitFormOption
 

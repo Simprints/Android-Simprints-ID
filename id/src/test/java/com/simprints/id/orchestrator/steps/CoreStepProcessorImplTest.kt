@@ -17,7 +17,7 @@ import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.setup.SetupResult
-import com.simprints.id.data.exitform.ExitFormReason
+import com.simprints.id.exitformhandler.ExitFormReason
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.testtools.TestApplication
