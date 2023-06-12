@@ -152,13 +152,13 @@ definitions:
                     - source ci/pipeline/setup
                     - ./gradlew fingerprint:controller:jacocoTestReport
                     - ./gradlew fingerprint:infra:matcher:jacocoTestReport
-                    - ./gradlew fingerprint:scanner:jacocoTestReport
+                    - ./gradlew fingerprint:infra:scanner:jacocoTestReport
 
 
                 artifacts:
                     - fingerprint/controller/build/reports/**
                     - fingerprint/infra/matcher/build/reports/**
-                    - fingerprint/scanner/build/reports/**
+                    - fingerprint/infra/scanner/build/reports/**
 
 
         ######################################################################
