@@ -107,10 +107,10 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
             setFocusOnExitReasonAndDisableSubmit()
         }
         viewModel.requestSelectOptionEvent.observe(viewLifecycleOwner) {
-            requireContext().showToast(getString(IDR.string.refusal_toast_select_option_submit))
+            requireContext().showToast(IDR.string.refusal_toast_select_option_submit)
         }
         viewModel.requestFormSubmitEvent.observe(viewLifecycleOwner) {
-            requireContext().showToast(getString(IDR.string.refusal_toast_submit))
+            requireContext().showToast(IDR.string.refusal_toast_submit)
         }
         viewModel.submitEnabled.observe(viewLifecycleOwner) {
             binding.exitFormSubmit.isEnabled = true == it
