@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.scanner.exceptions.unexpected
 
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
+import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR
 
 
 class UnexpectedScannerException : FingerprintUnexpectedException {

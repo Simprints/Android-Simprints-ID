@@ -87,7 +87,7 @@ dependencies {
     // ######################################################
 
     androidTestImplementation(project(":testtools"))
-    androidTestImplementation(project(":fingerprint:scannermock")) {
+    androidTestImplementation(project(":fingerprint:infra:scannermock")) {
         exclude("org.robolectric")
     }
     androidTestUtil(libs.testing.androidX.orchestrator)

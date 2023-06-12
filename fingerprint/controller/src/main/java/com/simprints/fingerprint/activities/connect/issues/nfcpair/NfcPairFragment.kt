@@ -24,12 +24,12 @@ import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEve
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.databinding.FragmentNfcPairBinding
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprint.tools.nfc.ComponentNfcTag
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers

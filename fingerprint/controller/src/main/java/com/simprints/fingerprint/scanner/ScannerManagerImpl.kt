@@ -1,12 +1,12 @@
 package com.simprints.fingerprint.scanner
 
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.NullScannerException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
 import javax.inject.Inject
 import javax.inject.Singleton
 

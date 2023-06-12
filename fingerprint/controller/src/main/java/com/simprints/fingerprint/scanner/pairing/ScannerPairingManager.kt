@@ -3,12 +3,12 @@ package com.simprints.fingerprint.scanner.pairing
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import javax.inject.Inject
