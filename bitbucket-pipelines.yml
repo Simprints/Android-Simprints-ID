@@ -343,8 +343,8 @@ definitions:
         ######################################################################
         # Full production rollout
         ######################################################################
-        -   step: &full-production-rollout
-                name: "100% Production rollout"
+        -   step: &update-production-rollout-to-100
+                name: "Update Production rollout percentage to 100%"
                 deployment: "Prod-100-Percent-Rollout"
                 max-time: 30
                 size: 2x
@@ -397,7 +397,7 @@ flows:
             -   step: *promote-internal-to-alpha
             -   step: *promote-alpha-to-production-25
             -   step: *update-production-rollout-to-50
-            -   step: *full-production-rollout
+            -   step: *update-production-rollout-to-100
     -   flow: &ci-test # For CI testing purposes only
             -   step: *build-and-sign-universal-apk
             -   step: *run-all-android-tests
