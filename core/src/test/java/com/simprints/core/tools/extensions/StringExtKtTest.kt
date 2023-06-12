@@ -1,10 +1,10 @@
-package com.simprints.id.tools.extensions
+package com.simprints.core.tools.extensions
 
 import com.simprints.core.tools.extentions.fromLowerCamelToLowerUnderscore
 import org.junit.Assert
 import org.junit.Test
 
-class String_extKtTest {
+class StringExtKtTest {
 
     @Test
     fun fromLowerCamelToLowerUnderscore() {
