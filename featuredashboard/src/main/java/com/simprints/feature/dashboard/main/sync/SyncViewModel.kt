@@ -1,8 +1,23 @@
 package com.simprints.feature.dashboard.main.sync
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.feature.dashboard.main.sync.DashboardSyncCardState.*
+import com.simprints.feature.dashboard.views.SyncCardState
+import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
+import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
+import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailed
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedBackendMaintenance
+import com.simprints.feature.dashboard.views.SyncCardState.SyncHasNoModules
+import com.simprints.feature.dashboard.views.SyncCardState.SyncOffline
+import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
+import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
+import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
+import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
@@ -19,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,9 +55,9 @@ internal class SyncViewModel @Inject constructor(
         get() = _syncToBFSIDAllowed
     private val _syncToBFSIDAllowed = MutableLiveData<Boolean>()
 
-    val syncCardLiveData: LiveData<DashboardSyncCardState>
+    val syncCardLiveData: LiveData<SyncCardState>
         get() = _syncCardLiveData
-    private val _syncCardLiveData = MediatorLiveData<DashboardSyncCardState>()
+    private val _syncCardLiveData = MediatorLiveData<SyncCardState>()
 
     private val upSyncCountLiveData = MutableLiveData(0)
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
@@ -147,7 +162,7 @@ internal class SyncViewModel @Inject constructor(
         }
     }
 
-    private suspend fun processRecentSyncState(syncState: EventSyncState, itemsToUpSync: Int): DashboardSyncCardState {
+    private suspend fun processRecentSyncState(syncState: EventSyncState, itemsToUpSync: Int): SyncCardState {
 
         val downSyncStates = syncState.downSyncWorkersInfo
         val upSyncStates = syncState.upSyncWorkersInfo

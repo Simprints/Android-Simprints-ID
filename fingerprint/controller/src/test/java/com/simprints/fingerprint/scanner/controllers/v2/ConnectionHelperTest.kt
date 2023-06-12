@@ -1,15 +1,19 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothSocket
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothDevice
-import com.simprints.fingerprintscanner.component.bluetooth.ComponentBluetoothSocket
-import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.*
+import io.mockk.Ordering
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import io.reactivex.Completable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking

@@ -41,6 +41,8 @@ dependencies {
     implementation(project(":clientapi"))
     implementation(project(":face"))
     implementation(project(":feature:login"))
+    implementation(project(":feature:fetch-subject"))
+    implementation(project(":feature:select-subject"))
     implementation(project(":featuredashboard"))
     implementation(project(":featurealert"))
     implementation(project(":featureexitform"))
@@ -85,7 +87,7 @@ dependencies {
     // ######################################################
 
     androidTestImplementation(project(":testtools"))
-    androidTestImplementation(project(":fingerprint:scannermock")) {
+    androidTestImplementation(project(":fingerprint:infra:scannermock")) {
         exclude("org.robolectric")
     }
     androidTestUtil(libs.testing.androidX.orchestrator)

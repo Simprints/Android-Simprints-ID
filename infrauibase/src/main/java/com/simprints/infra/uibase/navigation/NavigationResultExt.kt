@@ -60,16 +60,18 @@ fun <T : Parcelable> NavController.handleResult(
     handler: (T) -> Unit
 ) {
     // `getCurrentBackStackEntry` doesn't work in case of recovery from the process death when dialog is opened.
+    findDestination(currentDestinationId) ?: return // Do not handle anything if current destination is not available in the stack
     val currentEntry = getBackStackEntry(currentDestinationId)
+
     val observer = LifecycleEventObserver { _, event ->
         if (event == Lifecycle.Event.ON_RESUME) {
             handleResultFromChild(targetDestinationId, currentEntry, handler)
         }
     }
-    currentEntry.getLifecycle().addObserver(observer)
+    currentEntry.lifecycle.addObserver(observer)
     lifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
         if (event == Lifecycle.Event.ON_DESTROY) {
-            currentEntry.getLifecycle().removeObserver(observer)
+            currentEntry.lifecycle.removeObserver(observer)
         }
     })
 }

@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerVersion
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
@@ -9,7 +10,6 @@ import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.tools.BatteryLevelChecker
-import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import kotlinx.coroutines.delay

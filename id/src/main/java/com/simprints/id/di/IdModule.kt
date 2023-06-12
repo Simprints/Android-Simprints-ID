@@ -7,8 +7,6 @@ import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentContract
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenter
-import com.simprints.id.activities.fetchguid.FetchGuidHelper
-import com.simprints.id.activities.fetchguid.FetchGuidHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -36,8 +34,6 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.services.guidselection.GuidSelectionManager
-import com.simprints.id.services.guidselection.GuidSelectionManagerImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
 import com.simprints.id.tools.LocationManager
@@ -92,9 +88,6 @@ abstract class IdAppModule {
             view: CheckLoginFromIntentContract.View,
         ): CheckLoginFromIntentPresenter
     }
-
-    @Binds
-    abstract fun provideGuidSelectionManager(impl: GuidSelectionManagerImpl): GuidSelectionManager
 
     @Binds
     abstract fun provideModuleRepository(impl: ModuleRepositoryImpl): ModuleRepository
@@ -157,9 +150,6 @@ abstract class IdOrchestratorModule {
 
     @Binds
     abstract fun provideOrchestratorEventsHelper(impl: OrchestratorEventsHelperImpl): OrchestratorEventsHelper
-
-    @Binds
-    abstract fun provideFetchGuidHelper(impl: FetchGuidHelperImpl): FetchGuidHelper
 
     @ModalityFlowEnrolment
     @Binds

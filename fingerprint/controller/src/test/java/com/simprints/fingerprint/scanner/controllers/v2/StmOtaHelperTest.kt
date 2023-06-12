@@ -1,17 +1,21 @@
 package com.simprints.fingerprint.scanner.controllers.v2
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressExtendedFirmwareVersion
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ExtendedVersionInformation
+import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
+import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.scanner.adapters.v2.toScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.data.local.FirmwareLocalDataSource
 import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaFailedException
-import com.simprints.fingerprintscanner.v2.domain.main.message.un20.models.Un20ExtendedAppVersion
-import com.simprints.fingerprintscanner.v2.domain.main.message.vero.models.StmExtendedFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.root.models.CypressExtendedFirmwareVersion
-import com.simprints.fingerprintscanner.v2.domain.root.models.ExtendedVersionInformation
-import com.simprints.fingerprintscanner.v2.domain.root.models.ScannerInformation
-import com.simprints.fingerprintscanner.v2.scanner.Scanner
-import io.mockk.*
+import io.mockk.CapturingSlot
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -22,7 +26,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
-import com.simprints.fingerprintscanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
+import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException as ScannerV2OtaFailedException
 
 class StmOtaHelperTest {
 

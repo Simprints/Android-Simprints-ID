@@ -165,7 +165,7 @@ class ProjectAuthenticatorTest {
             authenticationRemoteDataSource.requestAuthToken(PROJECT_ID, USER_ID, any())
         } returns Token("", "", "", "")
 
-        coEvery { configManager.refreshProjectConfiguration(PROJECT_ID) } returns ProjectConfiguration(
+        coEvery { configManager.getProjectConfiguration() } returns ProjectConfiguration(
             PROJECT_ID,
             general = GeneralConfiguration(
                 modalities = mockk(),

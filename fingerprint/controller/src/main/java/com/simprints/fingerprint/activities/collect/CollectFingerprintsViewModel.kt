@@ -390,8 +390,9 @@ class CollectFingerprintsViewModel(
                 payloadId = payloadId
             )
             val fingerprintCaptureBiometricsEvent =
-                if (captureEvent.result == FingerprintCaptureEvent.Result.GOOD_SCAN ||
-                    tooManyBadScans(currentCapture(), plusBadScan = false)
+                if (currentCapture() is CaptureState.Collected &&
+                    (captureEvent.result == FingerprintCaptureEvent.Result.GOOD_SCAN ||
+                    tooManyBadScans(currentCapture(), plusBadScan = false))
                 )
                     FingerprintCaptureBiometricsEvent(
                         createdAt = lastCaptureStartedAt,
@@ -403,7 +404,8 @@ class CollectFingerprintsViewModel(
                             )
                         },
                         payloadId = payloadId
-                    ) else null
+                    )
+                else null
 
             captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
 

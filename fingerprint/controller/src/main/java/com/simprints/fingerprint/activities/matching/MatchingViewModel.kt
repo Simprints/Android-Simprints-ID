@@ -16,10 +16,10 @@ import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.matching.MatchResult
+import com.simprints.fingerprint.infra.matcher.FingerprintMatcher
+import com.simprints.fingerprint.infra.matcher.domain.MatchingAlgorithm
+import com.simprints.fingerprint.infra.matcher.domain.TemplateFormat
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprintmatcher.FingerprintMatcher
-import com.simprints.fingerprintmatcher.domain.MatchingAlgorithm
-import com.simprints.fingerprintmatcher.domain.TemplateFormat
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
@@ -29,10 +29,10 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
-import com.simprints.fingerprintmatcher.domain.FingerIdentifier as MatcherFingerIdentifier
-import com.simprints.fingerprintmatcher.domain.Fingerprint as MatcherFingerprint
-import com.simprints.fingerprintmatcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
-import com.simprints.fingerprintmatcher.domain.MatchResult as MatcherMatchResult
+import com.simprints.fingerprint.infra.matcher.domain.FingerIdentifier as MatcherFingerIdentifier
+import com.simprints.fingerprint.infra.matcher.domain.Fingerprint as MatcherFingerprint
+import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
+import com.simprints.fingerprint.infra.matcher.domain.MatchResult as MatcherMatchResult
 
 @HiltViewModel
 class MatchingViewModel @Inject constructor(
