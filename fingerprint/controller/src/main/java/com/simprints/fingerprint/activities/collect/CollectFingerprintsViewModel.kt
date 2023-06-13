@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.randomUUID
@@ -681,14 +682,6 @@ class CollectFingerprintsViewModel(
         if (scannerManager.isScannerAvailable) scannerManager.scanner.block()
         else launchReconnect.postEvent()
     }
-
-    private fun <T> List<T>.updateOnIndex(index: Int, newItem: (T) -> T): List<T> =
-        mapIndexed { i, item ->
-            when (i) {
-                index -> newItem(item)
-                else -> item
-            }
-        }
 
     companion object {
         const val targetNumberOfGoodScans = 2
