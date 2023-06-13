@@ -15,6 +15,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":infrauibase"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infraeventsync"))

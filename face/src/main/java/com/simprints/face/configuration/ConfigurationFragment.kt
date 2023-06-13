@@ -8,7 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.core.tools.utils.TimeUtils
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.databinding.FragmentConfigurationBinding
 import com.simprints.face.orchestrator.FaceOrchestratorViewModel

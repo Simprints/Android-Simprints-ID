@@ -1,11 +1,10 @@
-package com.simprints.core.tools.extensions
+package com.simprints.infra.uibase.view
 
 import android.content.Context
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.extentions.setTextWithFallbacks
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

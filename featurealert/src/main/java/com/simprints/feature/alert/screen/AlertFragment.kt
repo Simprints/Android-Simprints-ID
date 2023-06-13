@@ -10,8 +10,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.core.tools.extentions.setTextWithFallbacks
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.view.setTextWithFallbacks
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.R

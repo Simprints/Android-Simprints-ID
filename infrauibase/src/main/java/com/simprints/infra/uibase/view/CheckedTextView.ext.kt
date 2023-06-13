@@ -1,4 +1,4 @@
-package com.simprints.core.tools.extentions
+package com.simprints.infra.uibase.view
 
 import android.graphics.drawable.Drawable
 import android.widget.CheckedTextView
