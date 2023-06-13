@@ -303,13 +303,13 @@ definitions:
                     - ./gradlew promoteArtifact --from-track internal --promote-track alpha
 
         ######################################################################
-        # Promote the Alpha track build to the Production Track
+        # Promote the Alpha track build to the Production Track with rollout 25%
         #
         # Signing vars are only available on a deployment step.
         ######################################################################
-        -   step: &promote-alpha-to-production
-                name: "Promote Alpha Track to Production Track"
-                deployment: Production
+        -   step: &promote-alpha-to-production-25
+                name: "Promote Alpha Track to Production Track 25% rollout"
+                deployment: "Prod-25-Percent-Rollout"
                 max-time: 30
                 size: 2x
                 trigger: manual
@@ -320,8 +320,43 @@ definitions:
                     - source ci/pipeline/setup
                     - bash ./ci/deployment/build_properties_setup
                     - bash ./ci/deployment/signing_properties_setup
-                    - ./gradlew promoteArtifact --from-track alpha --promote-track production
+                    - ./gradlew promoteArtifact --from-track alpha --promote-track production --release-status inProgress --user-fraction .25
 
+        ######################################################################
+        # Update production rollout percentage to 50%
+        ######################################################################
+        -   step: &update-production-rollout-to-50
+                name: "Update Production rollout percentage to 50%"
+                deployment: "Prod-50-Percent-Rollout"
+                max-time: 30
+                size: 2x
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - source ci/pipeline/setup
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
+                    - ./gradlew promoteArtifact --update production --user-fraction .5
+
+        ######################################################################
+        # Full production rollout
+        ######################################################################
+        -   step: &update-production-rollout-to-100
+                name: "Update Production rollout percentage to 100%"
+                deployment: "Prod-100-Percent-Rollout"
+                max-time: 30
+                size: 2x
+                trigger: manual
+                caches:
+                    - gradle
+                    - gradlewrapper
+                script:
+                    - source ci/pipeline/setup
+                    - bash ./ci/deployment/build_properties_setup
+                    - bash ./ci/deployment/signing_properties_setup
+                    - ./gradlew promoteArtifact --update production --release-status completed
 
         ######################################################################
         # Run renovate automated dependency update tool
@@ -360,7 +395,9 @@ flows:
             -   step: *sign-and-deploy-to-staging
             -   step: *sign-and-deploy-to-internal
             -   step: *promote-internal-to-alpha
-            -   step: *promote-alpha-to-production
+            -   step: *promote-alpha-to-production-25
+            -   step: *update-production-rollout-to-50
+            -   step: *update-production-rollout-to-100
     -   flow: &ci-test # For CI testing purposes only
             -   step: *build-and-sign-universal-apk
             -   step: *run-all-android-tests
