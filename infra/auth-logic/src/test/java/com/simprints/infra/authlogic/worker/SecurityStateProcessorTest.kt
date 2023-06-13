@@ -1,14 +1,11 @@
-package com.simprints.infra.authlogic.securitystate.worker
+package com.simprints.infra.authlogic.worker
 
 import com.simprints.infra.authlogic.authenticator.SignerManager
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
-import com.simprints.infra.authlogic.securitystate.models.SecurityState.Status.COMPROMISED
-import com.simprints.infra.authlogic.securitystate.models.SecurityState.Status.PROJECT_ENDED
-import com.simprints.infra.authlogic.securitystate.models.SecurityState.Status.RUNNING
-import com.simprints.infra.authlogic.securitystate.models.UpSyncEnrolmentRecords
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.models.UpSyncEnrolmentRecords
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
@@ -45,18 +42,23 @@ internal class SecurityStateProcessorTest {
     }
 
     @Test
-    fun `when there is an instruction it should schedule a work to upload the enrolment records`() = runTest {
-        val securityState =
-            SecurityState(DEVICE_ID, RUNNING, UpSyncEnrolmentRecords("id", listOf("subject1")))
+    fun `when there is an instruction it should schedule a work to upload the enrolment records`() =
+        runTest {
+            val securityState =
+                SecurityState(
+                    DEVICE_ID,
+                    SecurityState.Status.RUNNING,
+                    UpSyncEnrolmentRecords("id", listOf("subject1"))
+                )
 
-        securityStateProcessor.processSecurityState(securityState)
+            securityStateProcessor.processSecurityState(securityState)
 
-        coVerify(exactly = 1) { enrolmentRecordManager.upload("id", listOf("subject1")) }
-    }
+            coVerify(exactly = 1) { enrolmentRecordManager.upload("id", listOf("subject1")) }
+        }
 
     @Test
     fun withRunningSecurityState_shouldDoNothing() = runTest {
-        val status = RUNNING
+        val status = SecurityState.Status.RUNNING
         val securityState = SecurityState(DEVICE_ID, status)
 
         securityStateProcessor.processSecurityState(securityState)
@@ -69,7 +71,7 @@ internal class SecurityStateProcessorTest {
 
     @Test
     fun withCompromisedSecurityState_shouldDeleteLocalDataAndSignOut() = runTest {
-        val status = COMPROMISED
+        val status = SecurityState.Status.COMPROMISED
         val securityState = SecurityState(DEVICE_ID, status)
 
         securityStateProcessor.processSecurityState(securityState)
@@ -82,7 +84,7 @@ internal class SecurityStateProcessorTest {
 
     @Test
     fun withProjectEndedSecurityState_shouldDeleteLocalDataAndSignOut() = runTest {
-        val status = PROJECT_ENDED
+        val status = SecurityState.Status.PROJECT_ENDED
         val securityState = SecurityState(DEVICE_ID, status)
 
         securityStateProcessor.processSecurityState(securityState)

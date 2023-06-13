@@ -1,9 +1,9 @@
-package com.simprints.infra.authlogic.securitystate.repo.local
+package com.simprints.infra.projectsecurity.securitystate.repo.local
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
