@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.extentions.hasPermission
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.FragmentQrScannerBinding
 import com.simprints.feature.login.tools.camera.CameraHelper

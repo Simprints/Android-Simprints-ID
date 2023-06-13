@@ -1,4 +1,4 @@
-package com.simprints.core.tools.viewbinding
+package com.simprints.infra.uibase.viewbinding
 
 import android.view.View
 import androidx.fragment.app.Fragment

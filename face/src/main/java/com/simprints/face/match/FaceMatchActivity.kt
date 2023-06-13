@@ -12,7 +12,7 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest

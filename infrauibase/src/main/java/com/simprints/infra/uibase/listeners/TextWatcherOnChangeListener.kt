@@ -1,9 +1,11 @@
-package com.simprints.core.tools.extentions
+package com.simprints.infra.uibase.listeners
 
 import android.text.Editable
 import android.text.TextWatcher
 
-fun textWatcherOnChange(function: (charSequence: String) -> Unit) = object : TextWatcher {
+class TextWatcherOnChangeListener(
+    private val function: (charSequence: String) -> Unit
+) : TextWatcher {
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
         // We do not need to listen to changes to the edit text field before the text is changed.
