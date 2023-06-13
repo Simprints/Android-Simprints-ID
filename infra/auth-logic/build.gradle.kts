@@ -24,6 +24,7 @@ android {
 dependencies {
 
     implementation(project(":infra:auth-store"))
+    implementation(project(":infra:project-security"))
     implementation(project(":infraconfig"))
     implementation(project(":infraevents"))
 

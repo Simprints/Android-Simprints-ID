@@ -1,7 +1,7 @@
-package com.simprints.infra.authlogic.securitystate.repo.remote
+package com.simprints.infra.projectsecurity.securitystate.repo.remote
 
 import com.simprints.core.DeviceID
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.network.SimNetwork

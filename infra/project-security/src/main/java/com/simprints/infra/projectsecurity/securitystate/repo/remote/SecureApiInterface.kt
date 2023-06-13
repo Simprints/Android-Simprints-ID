@@ -1,4 +1,4 @@
-package com.simprints.infra.authlogic.securitystate.repo.remote
+package com.simprints.infra.projectsecurity.securitystate.repo.remote
 
 import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.GET

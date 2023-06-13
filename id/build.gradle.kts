@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":infraeventsync"))
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:auth-store"))
+    implementation(project(":infra:project-security"))
     implementation(project(":clientapi"))
     implementation(project(":face"))
     implementation(project(":feature:login"))

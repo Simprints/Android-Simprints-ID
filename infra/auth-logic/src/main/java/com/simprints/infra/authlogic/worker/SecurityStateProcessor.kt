@@ -1,11 +1,11 @@
-package com.simprints.infra.authlogic.securitystate.worker
+package com.simprints.infra.authlogic.worker
 
 import com.simprints.infra.authlogic.authenticator.SignerManager
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
 import javax.inject.Inject
 
 internal class SecurityStateProcessor @Inject constructor(
@@ -21,11 +21,11 @@ internal class SecurityStateProcessor @Inject constructor(
             signOut()
         }
 
-        if (securityState.mustUpSyncEnrolmentRecords != null) {
-            Simber.i("subject ids ${securityState.mustUpSyncEnrolmentRecords.subjectIds.size}")
+        securityState.mustUpSyncEnrolmentRecords?.let { upSyncEnrolmentRecords ->
+            Simber.i("subject ids ${upSyncEnrolmentRecords.subjectIds.size}")
             enrolmentRecordManager.upload(
-                securityState.mustUpSyncEnrolmentRecords.id,
-                securityState.mustUpSyncEnrolmentRecords.subjectIds
+                upSyncEnrolmentRecords.id,
+                upSyncEnrolmentRecords.subjectIds
             )
         }
     }

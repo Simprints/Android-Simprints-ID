@@ -1,4 +1,4 @@
-package com.simprints.infra.authlogic.securitystate.models
+package com.simprints.infra.projectsecurity.securitystate.models
 
 import androidx.annotation.Keep
 

@@ -2,9 +2,8 @@ package com.simprints.infra.authlogic
 
 import com.simprints.infra.authlogic.authenticator.Authenticator
 import com.simprints.infra.authlogic.authenticator.SignerManager
-import com.simprints.infra.authlogic.securitystate.SecurityStateScheduler
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
-import com.simprints.infra.authlogic.securitystate.repo.SecurityStateRepository
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.repo.SecurityStateRepository
 import javax.inject.Inject
 
 internal class AuthManagerImpl @Inject constructor(
