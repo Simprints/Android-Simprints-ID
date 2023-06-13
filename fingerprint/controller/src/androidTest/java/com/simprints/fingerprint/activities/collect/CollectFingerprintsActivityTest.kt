@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
@@ -407,12 +408,4 @@ class CollectFingerprintsActivityTest {
             it.putExtra(CollectFingerprintsTaskRequest.BUNDLE_KEY, this)
         }
     }
-
-    private fun <T> List<T>.updateOnIndex(index: Int, newItem: (T) -> T): List<T> =
-        mapIndexed { i, item ->
-            when (i) {
-                index -> newItem(item)
-                else -> item
-            }
-        }
 }
