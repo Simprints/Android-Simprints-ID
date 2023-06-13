@@ -1,5 +1,6 @@
 package com.simprints.feature.login
 
+import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.core.DispatcherBG
 import com.simprints.feature.login.tools.camera.QrCodeAnalyzer
 import com.simprints.feature.login.tools.camera.QrCodeDetector
@@ -20,4 +21,6 @@ object LoginModule {
         @DispatcherBG coroutineDispatcher: CoroutineDispatcher,
     ) = QrCodeAnalyzer(qrCodeDetector, coroutineDispatcher)
 
+    @Provides
+    fun provideGoogleApiAvailability() = GoogleApiAvailability.getInstance()
 }
