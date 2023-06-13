@@ -1,10 +1,10 @@
-package com.simprints.infra.authlogic.securitystate.repo
+package com.simprints.infra.projectsecurity.securitystate.repo
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
-import com.simprints.infra.authlogic.securitystate.repo.local.SecurityStateLocalDataSource
-import com.simprints.infra.authlogic.securitystate.repo.remote.SecurityStateRemoteDataSource
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.repo.local.SecurityStateLocalDataSource
+import com.simprints.infra.projectsecurity.securitystate.repo.remote.SecurityStateRemoteDataSource
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -41,7 +41,7 @@ internal class SecurityStateRepositoryTest {
         MockKAnnotations.init(this, relaxed = true)
         Dispatchers.setMain(Dispatchers.Unconfined)
 
-        repository = SecurityStateRepository(mockRemoteDataSource, mockLocalDataSource)
+        repository = SecurityStateRepositoryImpl(mockRemoteDataSource, mockLocalDataSource)
     }
 
     @Test

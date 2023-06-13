@@ -1,9 +1,9 @@
-package com.simprints.infra.authlogic.securitystate.worker
+package com.simprints.infra.authlogic.worker
 
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
-import com.simprints.infra.authlogic.securitystate.repo.SecurityStateRepository
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.repo.SecurityStateRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify

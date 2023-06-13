@@ -1,6 +1,5 @@
 plugins {
     id("simprints.infra")
-    id("simprints.library.room")
     id("simprints.config.cloud")
 }
 

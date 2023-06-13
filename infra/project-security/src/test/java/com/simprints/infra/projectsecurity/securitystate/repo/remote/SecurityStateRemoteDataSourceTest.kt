@@ -1,14 +1,14 @@
-package com.simprints.infra.authlogic.securitystate.repo.remote
+package com.simprints.infra.projectsecurity.securitystate.repo.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
-import com.simprints.infra.authlogic.securitystate.models.UpSyncEnrolmentRecords
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.models.UpSyncEnrolmentRecords
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery

@@ -1,7 +1,7 @@
-package com.simprints.infra.authlogic.securitystate.repo.remote
+package com.simprints.infra.projectsecurity.securitystate.repo.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
 import org.junit.Test
 
 class ApiSecurityStateTest {
