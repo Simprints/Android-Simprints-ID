@@ -42,6 +42,10 @@ abstract class ModalityFlowBaseImpl(
         steps.addAll(stepsToRestore)
     }
 
+    protected fun addSetupStep() {
+        steps.add(coreStepProcessor.buildStepSetup())
+    }
+
     protected suspend fun addModalityConfigurationSteps() {
         val projectConfiguration = configManager.getProjectConfiguration()
         steps.addAll(buildModalityConfigurationSteps(projectConfiguration.general.modalities))
