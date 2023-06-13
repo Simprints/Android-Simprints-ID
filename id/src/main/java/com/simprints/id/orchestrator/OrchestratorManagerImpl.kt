@@ -1,14 +1,17 @@
 package com.simprints.id.orchestrator
 
-import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
-import androidx.work.WorkManager
 import com.simprints.core.domain.common.FlowProvider
-import com.simprints.core.domain.common.FlowProvider.FlowType.*
+import com.simprints.core.domain.common.FlowProvider.FlowType.ENROL
+import com.simprints.core.domain.common.FlowProvider.FlowType.IDENTIFY
+import com.simprints.core.domain.common.FlowProvider.FlowType.VERIFY
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.setup.LocationStore
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
@@ -22,20 +25,18 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
-import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class OrchestratorManagerImpl @Inject constructor(
-    @ApplicationContext private val appContext: Context,
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
     private val hotCache: HotCache,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val timeHelper: TimeHelper,
-    private val personCreationEventHelper: PersonCreationEventHelper
+    private val personCreationEventHelper: PersonCreationEventHelper,
+    private val locationStore: LocationStore
 ) : OrchestratorManager, FlowProvider {
 
     override val ongoingStep = MutableLiveData<Step?>()
@@ -115,10 +116,9 @@ class OrchestratorManagerImpl @Inject constructor(
                     startStep(potentialNextStep)
                 } else {
                     buildAppResponseAndUpdateDailyActivity()
-                    // Acquiring location info could take long time. so we should cancel StoreUserLocationIntoCurrentSessionWorker
+                    // Acquiring location info could take long time, so we should stop location tracker
                     // before returning to the caller app to avoid creating empty sessions.
-                    WorkManager.getInstance(appContext)
-                        .cancelAllWorkByTag(STORE_USER_LOCATION_WORKER_TAG)
+                    locationStore.cancelLocationCollection()
                 }
             }
         }
@@ -151,18 +151,21 @@ class OrchestratorManagerImpl @Inject constructor(
                     it.lastActivityTime = timeHelper.now()
                 }
             }
+
             AppResponseType.IDENTIFY -> recentUserActivityManager.updateRecentUserActivity {
                 it.apply {
                     it.identificationsToday++
                     it.lastActivityTime = timeHelper.now()
                 }
             }
+
             AppResponseType.VERIFY -> recentUserActivityManager.updateRecentUserActivity {
                 it.apply {
                     it.verificationsToday++
                     it.lastActivityTime = timeHelper.now()
                 }
             }
+
             AppResponseType.REFUSAL,
             AppResponseType.CONFIRMATION,
             AppResponseType.ERROR -> {

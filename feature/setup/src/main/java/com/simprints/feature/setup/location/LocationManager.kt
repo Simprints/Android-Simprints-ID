@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.feature.setup.location
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -13,27 +13,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import javax.inject.Inject
 
-class LocationManagerImpl @Inject constructor(@ApplicationContext val ctx: Context) : LocationManager {
+internal class LocationManager @Inject constructor(
+    @ApplicationContext val ctx: Context,
+) {
 
     private val locationClient = LocationServices.getFusedLocationProviderClient(ctx)
 
     @SuppressLint("MissingPermission")
-    override fun requestLocation(request: LocationRequest): Flow<Location?> = channelFlow {
+    fun requestLocation(request: LocationRequest): Flow<Location?> = channelFlow {
         val cancellationTokenSource = CancellationTokenSource()
-        val currentLocationTask: Task<Location> =
-            locationClient.getCurrentLocation(request.priority, cancellationTokenSource.token)
-        currentLocationTask.addOnCompleteListener {
-            val result: Location? = if (it.isSuccessful) {
-                it.result
-            } else {
-                null
-            }
-            trySend(result)
+        val currentLocationTask: Task<Location> = locationClient.getCurrentLocation(request.priority, cancellationTokenSource.token)
+
+        currentLocationTask.addOnCompleteListener { task ->
+            trySend(task.takeIf { it.isSuccessful }?.result)
         }
 
         awaitClose {
             cancellationTokenSource.cancel()
         }
     }
-
 }
