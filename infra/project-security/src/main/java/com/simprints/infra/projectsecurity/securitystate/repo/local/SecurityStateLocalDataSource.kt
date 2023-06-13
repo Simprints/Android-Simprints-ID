@@ -1,7 +1,7 @@
-package com.simprints.infra.authlogic.securitystate.repo.local
+package com.simprints.infra.projectsecurity.securitystate.repo.local
 
 import android.content.Context
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
+import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

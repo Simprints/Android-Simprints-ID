@@ -1,10 +1,8 @@
-package com.simprints.infra.authlogic.securitystate
+package com.simprints.infra.authlogic
 
 import android.content.Context
 import androidx.work.*
 import androidx.work.WorkRequest.Companion.MIN_BACKOFF_MILLIS
-import com.simprints.infra.authlogic.BuildConfig
-import com.simprints.infra.authlogic.securitystate.worker.SecurityStateWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -19,7 +17,7 @@ internal class SecurityStateScheduler @Inject constructor(
         workManager.enqueueUniqueWork(
             WORK_NAME_ONE_TIME,
             ExistingWorkPolicy.KEEP,
-            OneTimeWorkRequestBuilder<SecurityStateWorker>()
+            OneTimeWorkRequestBuilder<com.simprints.infra.authlogic.worker.SecurityStateWorker>()
                 .setConstraints(workerConstraints())
                 .build()
         )
@@ -39,7 +37,8 @@ internal class SecurityStateScheduler @Inject constructor(
 
     private fun buildWork(): PeriodicWorkRequest {
 
-        return PeriodicWorkRequestBuilder<SecurityStateWorker>(REPEAT_INTERVAL, TimeUnit.MINUTES)
+        return PeriodicWorkRequestBuilder<com.simprints.infra.authlogic.worker.SecurityStateWorker>(
+            REPEAT_INTERVAL, TimeUnit.MINUTES)
             .setConstraints(workerConstraints())
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
