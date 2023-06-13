@@ -74,6 +74,7 @@ include(
     ":featurealert",
     ":featureexitform",
     ":featureconsent",
+    ":feature:setup",
 )
 
 // Infra modules
