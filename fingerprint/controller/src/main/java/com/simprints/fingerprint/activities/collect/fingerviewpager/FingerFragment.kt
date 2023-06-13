@@ -48,7 +48,7 @@ class FingerFragment : FingerprintFragment() {
 
         initTimeoutBars()
 
-        vm.state.fragmentObserveWith {
+        vm.stateLiveData.fragmentObserveWith {
             updateOrHideFingerImageAccordingToSettings()
             updateFingerNameText()
             it.updateFingerCaptureNumberText()
@@ -59,7 +59,7 @@ class FingerFragment : FingerprintFragment() {
     }
 
     private fun initTimeoutBars() {
-        vm.state().fingerStates.find { it.id == fingerId }?.run {
+        vm.state.fingerStates.find { it.id == fingerId }?.run {
             timeoutBars = List(captures.size) {
                 ProgressBar(
                     requireContext(),

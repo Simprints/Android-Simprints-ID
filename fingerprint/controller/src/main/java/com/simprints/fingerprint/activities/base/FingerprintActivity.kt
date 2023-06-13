@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.activities.base
 
 import android.os.Bundle
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventObserver
@@ -28,15 +28,15 @@ abstract class FingerprintActivity : BaseSplitActivity() {
         logActivityDestroyed()
     }
 
-    private fun <T, O : Observer<T>> MutableLiveData<T>.activityObserve(observer: O) =
+    private fun <T, O : Observer<T>> LiveData<T>.activityObserve(observer: O) =
         observe(this@FingerprintActivity, observer)
 
-    fun <T : Any?> MutableLiveData<T>.activityObserveWith(observer: (T) -> Unit) =
+    fun <T : Any?> LiveData<T>.activityObserveWith(observer: (T) -> Unit) =
         activityObserve(Observer(observer))
 
-    fun MutableLiveData<LiveDataEvent>.activityObserveEventWith(observer: () -> Unit) =
+    fun LiveData<LiveDataEvent>.activityObserveEventWith(observer: () -> Unit) =
         activityObserve(LiveDataEventObserver(observer))
 
-    fun <T> MutableLiveData<LiveDataEventWithContent<T>>.activityObserveEventWith(observer: (T) -> Unit) =
+    fun <T> LiveData<LiveDataEventWithContent<T>>.activityObserveEventWith(observer: (T) -> Unit) =
         activityObserve(LiveDataEventWithContentObserver(observer))
 }
