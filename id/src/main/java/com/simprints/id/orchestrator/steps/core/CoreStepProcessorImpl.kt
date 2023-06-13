@@ -3,6 +3,7 @@ package com.simprints.id.orchestrator.steps.core
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.bundleOf
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
@@ -13,6 +14,8 @@ import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
+import com.simprints.feature.setup.SetupContract
+import com.simprints.feature.setup.SetupWrapperActivity
 import com.simprints.id.data.exitform.ExitFormReason.Companion.fromExitFormOption
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT
@@ -35,6 +38,7 @@ import javax.inject.Inject
 class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
 
     companion object {
+        const val SETUP_ACTIVITY_NAME = "com.simprints.feature.setup.SetupWrapperActivity"
         const val CONSENT_ACTIVITY_NAME = "com.simprints.feature.consent.screens.ConsentWrapperActivity"
         const val FETCH_GUID_ACTIVITY_NAME =
             "com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity"
@@ -44,10 +48,15 @@ class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
             "com.simprints.id.activities.enrollast.EnrolLastBiometricsActivity"
     }
 
-    override fun buildStepConsent(consentType: ConsentType) =
-        buildConsentStep(consentType)
+    override fun buildStepSetup(): Step = Step(
+        requestCode = CoreRequestCode.SETUP.value,
+        activityName = SETUP_ACTIVITY_NAME,
+        bundleKey = SetupWrapperActivity.SETUP_ARGS_EXTRA,
+        request = bundleOf(),
+        status = Step.Status.NOT_STARTED,
+    )
 
-    private fun buildConsentStep(consentType: ConsentType) = Step(
+    override fun buildStepConsent(consentType: ConsentType) = Step(
         requestCode = CONSENT.value,
         activityName = CONSENT_ACTIVITY_NAME,
         bundleKey = ConsentWrapperActivity.CONSENT_ARGS_EXTRA,
@@ -93,12 +102,9 @@ class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
 
         return if (coreResponse != null) {
             when (coreResponse.type) {
-                CoreResponseType.CONSENT -> null // Handled by else branch
-                CoreResponseType.FETCH_GUID -> null // Handled by else branch
-                CoreResponseType.GUID_SELECTION -> null // Handled by else branch
                 CoreResponseType.EXIT_FORM -> data.getParcelableExtra<ExitFormResponse>(CORE_STEP_BUNDLE)
-                CoreResponseType.SETUP -> data.getParcelableExtra<SetupResponse>(CORE_STEP_BUNDLE)
                 CoreResponseType.ENROL_LAST_BIOMETRICS -> data.getParcelableExtra<EnrolLastBiometricsResponse>(CORE_STEP_BUNDLE)
+                else -> null // No-op, data will not have response with key CORE_STEP_BUNDLE
             }
         } else {
             data?.extras?.let { handleFeatureModuleResponses(it) }
@@ -124,6 +130,9 @@ class CoreStepProcessorImpl @Inject constructor() : CoreStepProcessor {
 
         // We always return identification successful
         data.containsKey(SelectSubjectContract.SELECT_SUBJECT_RESULT) -> GuidSelectionResponse(identificationOutcome = true)
+
+        // We always return setup successful
+        data.containsKey(SetupContract.SETUP_RESULT) -> SetupResponse(isSetupComplete = true)
 
         else -> null
     }
