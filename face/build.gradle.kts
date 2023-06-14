@@ -17,7 +17,7 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation(project(":infraconfig"))
+    implementation(project(":infra:config"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infraevents"))
     implementation(project(":infralicense"))

@@ -82,7 +82,7 @@ include(
 include(
     ":infraevents",
     ":infraeventsync",
-    ":infraconfig",
+    ":infra:config",
     ":infraenrolmentrecords",
     ":infraimages",
     ":infralicense",

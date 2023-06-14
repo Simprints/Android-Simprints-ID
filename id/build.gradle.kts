@@ -52,7 +52,7 @@ dependencies {
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:consent"))
     implementation(project(":fingerprint:controller"))
-    implementation(project(":infraconfig"))
+    implementation(project(":infra:config"))
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infrarecentuseractivity"))
     implementation(project(":infraimages"))

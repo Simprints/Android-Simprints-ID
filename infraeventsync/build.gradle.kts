@@ -35,7 +35,7 @@ android {
 
 dependencies {
     implementation(project(":infraevents"))
-    implementation(project(":infraconfig"))
+    implementation(project(":infra:config"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infraenrolmentrecords"))
 
