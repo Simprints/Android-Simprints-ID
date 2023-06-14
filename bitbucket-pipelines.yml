@@ -111,7 +111,7 @@ definitions:
                     - source ci/pipeline/setup
                     - ./gradlew featuredashboard:jacocoTestReport
                     - ./gradlew feature:alert:jacocoTestReport
-                    - ./gradlew featureexitform:jacocoTestReport
+                    - ./gradlew feature:exit-form:jacocoTestReport
                     - ./gradlew feature:consent:jacocoTestReport
                     - ./gradlew feature:login:jacocoTestReport
                     - ./gradlew feature:fetch-subject:jacocoTestReport
@@ -121,7 +121,7 @@ definitions:
                 artifacts:
                     - featuredashboard/build/reports/**
                     - feature/alert/build/reports/**
-                    - featureexitform/build/reports/**
+                    - feature/exit-form/build/reports/**
                     - feature/consent/build/reports/**
                     - feature/login/build/reports/**
                     - feature/fetch-subject/build/reports/**

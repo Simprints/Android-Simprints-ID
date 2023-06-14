@@ -73,7 +73,7 @@ include(
     ":feature:enrol-last-biometric",
     ":featuredashboard",
     ":feature:alert",
-    ":featureexitform",
+    ":feature:exit-form",
     ":feature:consent",
     ":feature:setup",
 )
