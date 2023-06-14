@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":infraconfig"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infra:project-security-store"))
 
     implementation(libs.workManager.work)
 
