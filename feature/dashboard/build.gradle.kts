@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":infraevents"))
+    implementation(project(":infra:events"))
     implementation(project(":infraeventsync"))
     implementation(project(":infra:config"))
     implementation(project(":infra:enrolment-records"))

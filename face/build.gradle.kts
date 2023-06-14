@@ -19,7 +19,7 @@ dependencies {
 
     implementation(project(":infra:config"))
     implementation(project(":infra:enrolment-records"))
-    implementation(project(":infraevents"))
+    implementation(project(":infra:events"))
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))
     implementation(project(":feature:alert"))
