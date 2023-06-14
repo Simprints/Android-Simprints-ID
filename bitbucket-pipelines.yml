@@ -59,7 +59,7 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew core:jacocoTestReport
-                    - ./gradlew infraevents:jacocoTestReport
+                    - ./gradlew infra:events:jacocoTestReport
                     - ./gradlew infraeventsync:jacocoTestReport
                     - ./gradlew infra:config:jacocoTestReport
                     - ./gradlew infra:enrolment-records:jacocoTestReport
@@ -78,7 +78,7 @@ definitions:
                     - ./gradlew infrarocwrapper:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
-                    - infraevents/build/reports/**
+                    - infra/events/build/reports/**
                     - infraeventsync/build/reports/**
                     - infra/config/build/reports/**
                     - infra/enrolment-records/build/reports/**

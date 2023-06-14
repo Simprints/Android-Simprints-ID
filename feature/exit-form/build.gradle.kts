@@ -8,5 +8,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":infraevents"))
+    implementation(project(":infra:events"))
 }

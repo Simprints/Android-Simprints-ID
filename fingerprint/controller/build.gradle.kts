@@ -30,7 +30,7 @@ android {
 dependencies {
 
     // Simprints
-    implementation(project(":infraevents"))
+    implementation(project(":infra:events"))
     implementation(project(":infra:enrolment-records"))
     implementation(project(":fingerprint:infra:matcher"))
     implementation(project(":fingerprint:infra:scanner"))
