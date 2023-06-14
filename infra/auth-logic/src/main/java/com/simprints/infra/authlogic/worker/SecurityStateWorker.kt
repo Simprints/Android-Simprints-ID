@@ -5,7 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
-import com.simprints.infra.projectsecurity.securitystate.repo.SecurityStateRepository
+import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher

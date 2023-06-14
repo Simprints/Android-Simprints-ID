@@ -4,8 +4,8 @@ import com.simprints.infra.authlogic.authenticator.SignerManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
-import com.simprints.infra.projectsecurity.securitystate.models.UpSyncEnrolmentRecords
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
+import com.simprints.infra.projectsecuritystore.securitystate.models.UpSyncEnrolmentRecords
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
