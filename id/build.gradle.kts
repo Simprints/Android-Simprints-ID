@@ -53,7 +53,7 @@ dependencies {
     implementation(project(":feature:consent"))
     implementation(project(":fingerprint:controller"))
     implementation(project(":infra:config"))
-    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infra:enrolment-records"))
     implementation(project(":infrarecentuseractivity"))
     implementation(project(":infraimages"))
 

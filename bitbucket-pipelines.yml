@@ -62,7 +62,7 @@ definitions:
                     - ./gradlew infraevents:jacocoTestReport
                     - ./gradlew infraeventsync:jacocoTestReport
                     - ./gradlew infra:config:jacocoTestReport
-                    - ./gradlew infraenrolmentrecords:jacocoTestReport
+                    - ./gradlew infra:enrolment-records:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
                     - ./gradlew infra:auth-store:jacocoTestReport
                     - ./gradlew infra:auth-logic:jacocoTestReport
@@ -81,7 +81,7 @@ definitions:
                     - infraevents/build/reports/**
                     - infraeventsync/build/reports/**
                     - infra/config/build/reports/**
-                    - infraenrolmentrecords/build/reports/**
+                    - infra/enrolment-records/build/reports/**
                     - infralogging/build/reports/**
                     - infra/auth-store/build/reports/**
                     - infra/auth-logic/build/reports/**

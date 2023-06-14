@@ -83,7 +83,7 @@ include(
     ":infraevents",
     ":infraeventsync",
     ":infra:config",
-    ":infraenrolmentrecords",
+    ":infra:enrolment-records",
     ":infraimages",
     ":infralicense",
     ":infralogging",

@@ -28,7 +28,7 @@ dependencies {
     implementation(project(":infraevents"))
 
     implementation(project(":infraeventsync"))
-    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infra:enrolment-records"))
     implementation(project(":infraimages"))
     implementation(project(":infrarecentuseractivity"))
 
