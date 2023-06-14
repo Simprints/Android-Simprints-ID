@@ -22,7 +22,7 @@ dependencies {
     implementation(project(":infraevents"))
     implementation(project(":infralicense"))
     implementation(project(":infraimages"))
-    implementation(project(":featurealert"))
+    implementation(project(":feature:alert"))
     implementation(project(":featureexitform"))
 
     //BIO SDK

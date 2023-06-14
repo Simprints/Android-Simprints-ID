@@ -72,7 +72,7 @@ include(
     ":feature:select-subject",
     ":feature:enrol-last-biometric",
     ":featuredashboard",
-    ":featurealert",
+    ":feature:alert",
     ":featureexitform",
     ":featureconsent",
     ":feature:setup",
