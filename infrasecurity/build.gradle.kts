@@ -9,7 +9,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":infralogging"))
+    implementation(project(":infra:logging"))
     implementation(libs.androidX.security)
 
     // RootBeer (root detection)
