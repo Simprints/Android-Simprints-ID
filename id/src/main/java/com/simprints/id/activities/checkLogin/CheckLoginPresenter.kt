@@ -36,9 +36,6 @@ abstract class CheckLoginPresenter(
     lateinit var syncManager: SyncManager
 
     @Inject
-    lateinit var authManager: AuthManager
-
-    @Inject
     lateinit var securityStateRepository: SecurityStateRepository
 
     protected suspend fun checkSignedInStateAndMoveOn() {
