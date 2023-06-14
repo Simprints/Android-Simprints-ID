@@ -5,7 +5,7 @@ import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import javax.inject.Inject
 
 internal class SecurityStateProcessor @Inject constructor(

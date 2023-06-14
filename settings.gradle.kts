@@ -87,7 +87,7 @@ include(
     ":infralogging",
     ":infra:auth-store",
     ":infra:auth-logic",
-    ":infra:project-security",
+    ":infra:project-security-store",
     ":infranetwork",
     ":infrarealm",
     ":infrarecentuseractivity",
@@ -103,4 +103,3 @@ include(
     ":core",
     ":testtools",
 )
-include(":infra:project-security")

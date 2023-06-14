@@ -1,7 +1,6 @@
 package com.simprints.infra.authlogic
 
 import com.simprints.infra.authlogic.model.AuthenticateDataResult
-import com.simprints.infra.projectsecurity.securitystate.models.SecurityState
 
 // TODO This module is just a collection of all the public auth/login related
 //      business logic pulled together as-is without proper review and refactoring.
@@ -15,8 +14,6 @@ interface AuthManager {
         projectSecret: String,
         deviceId: String
     ): AuthenticateDataResult
-
-    fun getSecurityStatusFromLocal(): SecurityState.Status
 
     fun startSecurityStateCheck()
 

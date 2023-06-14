@@ -1,7 +1,7 @@
 package com.simprints.infra.authlogic.authenticator
 
 import com.simprints.core.DispatcherIO
-import com.simprints.infra.authlogic.SecurityStateScheduler
+import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.ConfigManager
