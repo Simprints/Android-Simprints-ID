@@ -37,7 +37,7 @@ dependencies {
     implementation(project(":infra:config"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:images"))
-    implementation(project(":infrarecentuseractivity"))
+    implementation(project(":infra:recent-user-activity"))
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
 
