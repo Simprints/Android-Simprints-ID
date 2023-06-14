@@ -12,6 +12,7 @@ import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.security.SecurityManager
 import javax.inject.Inject
 
@@ -35,7 +36,7 @@ abstract class CheckLoginPresenter(
     lateinit var syncManager: SyncManager
 
     @Inject
-    lateinit var authManager: AuthManager
+    lateinit var securityStateRepository: SecurityStateRepository
 
     protected suspend fun checkSignedInStateAndMoveOn() {
         try {
@@ -61,7 +62,7 @@ abstract class CheckLoginPresenter(
     }
 
     private fun checkStatusForDeviceAndProject() {
-        val status = authManager.getSecurityStatusFromLocal()
+        val status = securityStateRepository.getSecurityStatusFromLocal()
         if (status.isCompromisedOrProjectEnded())
             handleNotSignedInUser()
     }

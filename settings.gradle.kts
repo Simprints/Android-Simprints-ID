@@ -88,6 +88,7 @@ include(
     ":infralogging",
     ":infra:auth-store",
     ":infra:auth-logic",
+    ":infra:project-security-store",
     ":infranetwork",
     ":infrarealm",
     ":infrarecentuseractivity",
