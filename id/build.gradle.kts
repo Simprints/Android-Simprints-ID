@@ -47,7 +47,7 @@ dependencies {
     implementation(project(":feature:select-subject"))
     implementation(project(":feature:enrol-last-biometric"))
     implementation(project(":feature:setup"))
-    implementation(project(":featuredashboard"))
+    implementation(project(":feature:dashboard"))
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:consent"))
