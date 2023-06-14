@@ -10,7 +10,7 @@ android {
 dependencies {
     implementation(project(":infra:config"))
     implementation(project(":infra:auth-store"))
-    implementation(project(":infrarealm"))
+    implementation(project(":infra:realm"))
 
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
