@@ -17,7 +17,7 @@ android {
 dependencies {
     api(project(":moduleapi"))
     api(project(":infra:logging"))
-    api(project(":infranetwork"))
+    api(project(":infra:network"))
     api(project(":infraresources"))
     api(project(":infrasecurity"))
 

@@ -67,7 +67,7 @@ definitions:
                     - ./gradlew infra:auth-store:jacocoTestReport
                     - ./gradlew infra:auth-logic:jacocoTestReport
                     - ./gradlew infra:project-security-store:jacocoTestReport
-                    - ./gradlew infranetwork:jacocoTestReport
+                    - ./gradlew infra:network:jacocoTestReport
                     - ./gradlew infrarealm:jacocoTestReport
                     - ./gradlew infrarecentuseractivity:jacocoTestReport
                     - ./gradlew infrasecurity:jacocoTestReport
@@ -86,7 +86,7 @@ definitions:
                     - infra/auth-store/build/reports/**
                     - infra/auth-logic/build/reports/**
                     - infra/project-security-store/build/reports/**
-                    - infranetwork/build/reports/**
+                    - infra/network/build/reports/**
                     - infrarealm/build/reports/**
                     - infrarecentuseractivity/build/reports/**
                     - infrasecurity/build/reports/**
