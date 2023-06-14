@@ -95,7 +95,7 @@ include(
     ":infra:recent-user-activity",
     ":infra:resources",
     ":infra:security",
-    ":infrauibase",
+    ":infra:ui-base",
     ":infrafacebiosdk",
     ":infrarocwrapper",
 )
