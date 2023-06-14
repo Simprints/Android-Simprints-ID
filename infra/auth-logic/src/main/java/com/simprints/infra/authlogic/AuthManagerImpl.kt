@@ -2,22 +2,17 @@ package com.simprints.infra.authlogic
 
 import com.simprints.infra.authlogic.authenticator.Authenticator
 import com.simprints.infra.authlogic.authenticator.SignerManager
-import com.simprints.infra.authlogic.securitystate.SecurityStateScheduler
-import com.simprints.infra.authlogic.securitystate.models.SecurityState
-import com.simprints.infra.authlogic.securitystate.repo.SecurityStateRepository
+import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import javax.inject.Inject
 
 internal class AuthManagerImpl @Inject constructor(
     private val authenticator: Authenticator,
     private val securityStateScheduler: SecurityStateScheduler,
-    private val securityStateRepository: SecurityStateRepository,
     private val signerManager: SignerManager,
 ) : AuthManager {
 
     override suspend fun authenticateSafely(userId: String, projectId: String, projectSecret: String, deviceId: String) =
         authenticator.authenticate(userId, projectId, projectSecret, deviceId)
-
-    override fun getSecurityStatusFromLocal(): SecurityState.Status = securityStateRepository.getSecurityStatusFromLocal()
 
     override fun startSecurityStateCheck() = securityStateScheduler.startSecurityStateCheck()
 

@@ -1,6 +1,5 @@
 plugins {
     id("simprints.infra")
-    id("simprints.library.room")
     id("simprints.config.cloud")
 }
 
@@ -24,6 +23,7 @@ android {
 dependencies {
 
     implementation(project(":infra:auth-store"))
+    implementation(project(":infra:project-security-store"))
     implementation(project(":infraconfig"))
     implementation(project(":infraevents"))
 
