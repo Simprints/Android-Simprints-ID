@@ -49,7 +49,7 @@ dependencies {
     implementation(project(":feature:setup"))
     implementation(project(":featuredashboard"))
     implementation(project(":feature:alert"))
-    implementation(project(":featureexitform"))
+    implementation(project(":feature:exit-form"))
     implementation(project(":feature:consent"))
     implementation(project(":fingerprint:controller"))
     implementation(project(":infraconfig"))

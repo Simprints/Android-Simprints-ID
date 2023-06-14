@@ -10,7 +10,7 @@ android {
 dependencies {
 
     implementation(project(":feature:alert"))
-    implementation(project(":featureexitform"))
+    implementation(project(":feature:exit-form"))
 
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infraeventsync"))
