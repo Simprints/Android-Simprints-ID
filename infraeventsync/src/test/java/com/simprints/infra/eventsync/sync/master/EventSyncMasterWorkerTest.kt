@@ -12,12 +12,15 @@ import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.S
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.infra.eventsync.TestTimeHelperImpl
+import com.simprints.infra.eventsync.runPrivateSuspendFunction
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
+import com.simprints.infra.projectsecuritystore.SecurityStateRepository
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -80,6 +83,9 @@ internal class EventSyncMasterWorkerTest {
     @MockK
     lateinit var configManager: ConfigManager
 
+    @MockK
+    lateinit var securityStateRepository: SecurityStateRepository
+
 
     private lateinit var masterWorker: EventSyncMasterWorker
 
@@ -94,7 +100,9 @@ internal class EventSyncMasterWorkerTest {
         every { workManager.beginWith(any<OneTimeWorkRequest>()) } returns workContinuation
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns listOf(downSyncWorker)
+        coEvery { downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns listOf(
+            downSyncWorker
+        )
         coEvery { upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns listOf(upSyncWorker)
         every { eventSyncSubMasterWorkersBuilder.buildStartSyncReporterWorker(any()) } returns startSyncReporterWorker
         every { eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns endSyncReporterWorker
@@ -104,17 +112,18 @@ internal class EventSyncMasterWorkerTest {
         coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
 
         masterWorker = EventSyncMasterWorker(
-            ctx,
-            mockk(relaxed = true) {
+            appContext = ctx,
+            params = mockk(relaxed = true) {
                 every { tags } returns setOf(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
             },
-            downSyncWorkerBuilder,
-            upSyncWorkerBuilder,
-            configManager,
-            eventSyncCache,
-            eventSyncSubMasterWorkersBuilder,
-            TestTimeHelperImpl(),
-            testCoroutineRule.testCoroutineDispatcher
+            downSyncWorkerBuilder = downSyncWorkerBuilder,
+            upSyncWorkerBuilder = upSyncWorkerBuilder,
+            configManager = configManager,
+            eventSyncCache = eventSyncCache,
+            securityStateRepository = securityStateRepository,
+            eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
+            timeHelper = TestTimeHelperImpl(),
+            dispatcher = testCoroutineRule.testCoroutineDispatcher
         )
     }
 
@@ -231,6 +240,39 @@ internal class EventSyncMasterWorkerTest {
         val result = masterWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+    }
+
+    @Test
+    fun `isEventDownSyncAllowed should return false when project state is paused`() = runTest {
+        val securityStatus = SecurityState.Status.PAUSED
+        val isEventDownSyncAllowed = getIsEventDownSyncAllowed(
+            securityStatus = securityStatus,
+            syncConfig = SynchronizationConfiguration.Frequency.PERIODICALLY
+        )
+        assertThat(isEventDownSyncAllowed).isFalse()
+    }
+
+    @Test
+    fun `isEventDownSyncAllowed should return false when sync config is ONLY_PERIODICALLY_UP_SYNC`() = runTest {
+        val securityStatus = SecurityState.Status.RUNNING
+        val isEventDownSyncAllowed = getIsEventDownSyncAllowed(
+            securityStatus = securityStatus,
+            syncConfig = SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+        )
+        assertThat(isEventDownSyncAllowed).isFalse()
+    }
+
+    private suspend fun getIsEventDownSyncAllowed(
+        securityStatus: SecurityState.Status,
+        syncConfig: SynchronizationConfiguration.Frequency
+    ): Boolean {
+        coEvery { securityStateRepository.getSecurityStatusFromLocal() } returns securityStatus
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
+            every { synchronization } returns mockk {
+                every { frequency } returns syncConfig
+            }
+        }
+        return masterWorker.runPrivateSuspendFunction("isEventDownSyncAllowed") as Boolean
     }
 
     private fun shouldSyncRun(should: Boolean) {
