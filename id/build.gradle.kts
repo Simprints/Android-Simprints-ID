@@ -36,7 +36,7 @@ dependencies {
 
     implementation(project(":infrauibase"))
     implementation(project(":infra:events"))
-    implementation(project(":infraeventsync"))
+    implementation(project(":infra:event-sync"))
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:project-security-store"))
@@ -82,7 +82,7 @@ dependencies {
 
     testImplementation(project(":testtools"))
     testImplementation(project(":infra:events"))
-    testImplementation(project(":infraeventsync"))
+    testImplementation(project(":infra:event-sync"))
     testImplementation(project(":infralogging"))
 
     // ######################################################

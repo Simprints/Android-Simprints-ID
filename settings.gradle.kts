@@ -81,7 +81,7 @@ include(
 // Infra modules
 include(
     ":infra:events",
-    ":infraeventsync",
+    ":infra:event-sync",
     ":infra:config",
     ":infra:enrolment-records",
     ":infraimages",

@@ -13,7 +13,7 @@ dependencies {
     implementation(project(":feature:exit-form"))
 
     implementation(project(":infra:enrolment-records"))
-    implementation(project(":infraeventsync"))
+    implementation(project(":infra:event-sync"))
     implementation(project(":infra:events"))
     implementation(project(":infra:config"))
 
