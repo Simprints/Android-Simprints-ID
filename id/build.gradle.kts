@@ -34,7 +34,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
 
-    implementation(project(":infrauibase"))
+    implementation(project(":infra:ui-base"))
     implementation(project(":infra:events"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:auth-logic"))
