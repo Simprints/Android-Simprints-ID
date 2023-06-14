@@ -94,7 +94,7 @@ include(
     ":infra:realm",
     ":infrarecentuseractivity",
     ":infraresources",
-    ":infrasecurity",
+    ":infra:security",
     ":infrauibase",
     ":infrafacebiosdk",
     ":infrarocwrapper",
