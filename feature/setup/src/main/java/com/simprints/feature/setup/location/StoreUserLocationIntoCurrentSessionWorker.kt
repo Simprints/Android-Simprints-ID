@@ -47,9 +47,7 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
     }
 
     private fun createLocationFlow(): Flow<android.location.Location?> {
-        val locationRequest = LocationRequest.create().apply {
-            priority = Priority.PRIORITY_HIGH_ACCURACY
-        }
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, DEFAULT_INTERVAL).build()
         return locationManager.requestLocation(locationRequest).take(1)
     }
 
@@ -61,5 +59,10 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
             eventRepository.addOrUpdateEvent(currentSession)
             Simber.d("Saving user's location into the current session")
         }
+    }
+
+    companion object {
+        // Based on the default value of minUpdateIntervalMillis in LocationRequest
+        private const val DEFAULT_INTERVAL = 10 * 60 * 1000L
     }
 }
