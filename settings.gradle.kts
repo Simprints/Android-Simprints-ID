@@ -91,7 +91,7 @@ include(
     ":infra:auth-logic",
     ":infra:project-security-store",
     ":infra:network",
-    ":infrarealm",
+    ":infra:realm",
     ":infrarecentuseractivity",
     ":infraresources",
     ":infrasecurity",
