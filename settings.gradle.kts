@@ -93,7 +93,7 @@ include(
     ":infra:network",
     ":infra:realm",
     ":infrarecentuseractivity",
-    ":infraresources",
+    ":infra:resources",
     ":infra:security",
     ":infrauibase",
     ":infrafacebiosdk",

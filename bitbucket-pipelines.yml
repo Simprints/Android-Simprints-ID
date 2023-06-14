@@ -73,7 +73,6 @@ definitions:
                     - ./gradlew infra:security:jacocoTestReport
                     - ./gradlew infra:license:jacocoTestReport
                     - ./gradlew infra:images:jacocoTestReport
-                    - ./gradlew infraresources:jacocoTestReport
                     - ./gradlew infrafacebiosdk:jacocoTestReport
                     - ./gradlew infrarocwrapper:jacocoTestReport
                 artifacts:
@@ -92,7 +91,6 @@ definitions:
                     - infra/security/build/reports/**
                     - infra/license/build/reports/**
                     - infra/images/build/reports/**
-                    - infraresources/build/reports/**
                     - infrafacebiosdk/build/reports/**
                     - infrarocwrapper/build/reports/**
 

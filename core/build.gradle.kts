@@ -18,7 +18,7 @@ dependencies {
     api(project(":moduleapi"))
     api(project(":infra:logging"))
     api(project(":infra:network"))
-    api(project(":infraresources"))
+    api(project(":infra:resources"))
     api(project(":infra:security"))
 
     api(libs.androidX.appcompat)
