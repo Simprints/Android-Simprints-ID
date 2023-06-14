@@ -13,8 +13,9 @@ import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.selectsubject.SelectSubjectResult
+import com.simprints.feature.setup.SetupContract
+import com.simprints.feature.setup.SetupResult
 import com.simprints.id.data.exitform.ExitFormReason
-import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.testtools.TestApplication
@@ -31,24 +32,32 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     private val coreStepProcessor = CoreStepProcessorImpl()
 
     @Test
+    fun stepProcessor_shouldBuildRightStepForSetup() {
+        val step = CoreStepProcessorImpl().buildStepSetup()
+
+        verifySetupIntent<Bundle>(step)
+    }
+
+
+    @Test
     fun stepProcessor_shouldBuildRightStepForEnrol() {
         val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.ENROL)
 
-        verifyConsentIntent<Bundle>(step, CoreRequestCode.CONSENT.value)
+        verifyConsentIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessor_shouldBuildRightStepForIdentify() {
         val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.IDENTIFY)
 
-        verifyConsentIntent<Bundle>(step, CoreRequestCode.CONSENT.value)
+        verifyConsentIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessor_shouldBuildRightStepForVerify() {
         val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.VERIFY)
 
-        verifyConsentIntent<Bundle>(step, CoreRequestCode.CONSENT.value)
+        verifyConsentIntent<Bundle>(step)
     }
 
     @Test
@@ -84,6 +93,14 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     @Test
     fun stepProcessor_shouldSkipLegacySelectGuidResult() {
         val consentData = Intent().putExtra(CORE_STEP_BUNDLE, GuidSelectionResponse(true))
+        val result = coreStepProcessor.processResult(consentData)
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun stepProcessor_shouldSkipLegacySetupResult() {
+        val consentData = Intent().putExtra(CORE_STEP_BUNDLE, SetupResponse(true))
         val result = coreStepProcessor.processResult(consentData)
 
         assertThat(result).isNull()
@@ -150,7 +167,7 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessor_shouldProcessResultFromSetup() {
-        val setupData = Intent().putExtra(CORE_STEP_BUNDLE, SetupResponse(true))
+        val setupData = Intent().putExtra(SetupContract.SETUP_RESULT, SetupResult(true))
         val result = coreStepProcessor.processResult(setupData)
 
         assertThat(result).isInstanceOf(SetupResponse::class.java)

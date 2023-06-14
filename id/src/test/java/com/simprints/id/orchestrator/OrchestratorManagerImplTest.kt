@@ -8,8 +8,8 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.WorkManager
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.setup.LocationStore
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -24,7 +24,6 @@ import com.simprints.id.orchestrator.steps.Step.Status.*
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.services.location.STORE_USER_LOCATION_WORKER_TAG
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.moduleapi.face.requests.IFaceRequest
@@ -67,7 +66,7 @@ class OrchestratorManagerImplTest {
     private lateinit var personCreationEventHelper: PersonCreationEventHelper
 
     @MockK
-    private lateinit var workManagerMock: WorkManager
+    private lateinit var locationStore: LocationStore
 
     private lateinit var modalityFlowFactoryMock: ModalityFlowFactory
     private lateinit var orchestrator: OrchestratorManager
@@ -84,9 +83,6 @@ class OrchestratorManagerImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        mockkStatic(WorkManager::class)
-
-        every { WorkManager.getInstance(any()) } returns workManagerMock
 
         Intents.init()
 
@@ -327,7 +323,7 @@ class OrchestratorManagerImplTest {
         }
 
     private fun verifyOrchestratorTriedToCancelAllLocationWorkers() =
-        verify(exactly = 1) { workManagerMock.cancelAllWorkByTag(STORE_USER_LOCATION_WORKER_TAG) }
+        verify(exactly = 1) { locationStore.cancelLocationCollection() }
 
     private fun prepareModalFlowForFaceEnrol() {
         every { modalityFlowMock.getNextStepToLaunch() } answers {
@@ -361,13 +357,13 @@ class OrchestratorManagerImplTest {
             )
         } returns mockk()
         return OrchestratorManagerImpl(
-            mockk(),
             modalityFlowFactoryMock,
             appResponseFactoryMock,
             hotCache,
             recentUserActivityManager,
             timeHelper,
-            personCreationEventHelper
+            personCreationEventHelper,
+            locationStore,
         )
     }
 

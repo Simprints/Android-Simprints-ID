@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":feature:login"))
     implementation(project(":feature:fetch-subject"))
     implementation(project(":feature:select-subject"))
+    implementation(project(":feature:setup"))
     implementation(project(":featuredashboard"))
     implementation(project(":featurealert"))
     implementation(project(":featureexitform"))
@@ -69,7 +70,6 @@ dependencies {
     implementation(libs.androidX.lifecycle.livedata.ktx)
 
     implementation(libs.workManager.work)
-    implementation(libs.playServices.location)
 
     implementation(libs.rxJava2.core)
 
