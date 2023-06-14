@@ -30,7 +30,7 @@ dependencies {
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:enrolment-records"))
     implementation(project(":infra:images"))
-    implementation(project(":infrarecentuseractivity"))
+    implementation(project(":infra:recent-user-activity"))
 
     implementation(libs.retrofit.core)
     implementation(libs.playServices.integrity)

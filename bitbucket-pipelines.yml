@@ -69,7 +69,7 @@ definitions:
                     - ./gradlew infra:project-security-store:jacocoTestReport
                     - ./gradlew infra:network:jacocoTestReport
                     - ./gradlew infra:realm:jacocoTestReport
-                    - ./gradlew infrarecentuseractivity:jacocoTestReport
+                    - ./gradlew infra:recent-user-activity:jacocoTestReport
                     - ./gradlew infra:security:jacocoTestReport
                     - ./gradlew infra:license:jacocoTestReport
                     - ./gradlew infra:images:jacocoTestReport
@@ -87,7 +87,7 @@ definitions:
                     - infra/project-security-store/build/reports/**
                     - infra/network/build/reports/**
                     - infra/realm/build/reports/**
-                    - infrarecentuseractivity/build/reports/**
+                    - infra/recent-user-activity/build/reports/**
                     - infra/security/build/reports/**
                     - infra/license/build/reports/**
                     - infra/images/build/reports/**

@@ -92,7 +92,7 @@ include(
     ":infra:project-security-store",
     ":infra:network",
     ":infra:realm",
-    ":infrarecentuseractivity",
+    ":infra:recent-user-activity",
     ":infra:resources",
     ":infra:security",
     ":infrauibase",
