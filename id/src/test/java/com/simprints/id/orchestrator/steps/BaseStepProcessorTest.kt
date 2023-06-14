@@ -3,6 +3,7 @@ package com.simprints.id.orchestrator.steps
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.consent.screens.ConsentWrapperActivity
+import com.simprints.feature.enrollast.EnrolLastBiometricWrapperActivity
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
 import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
 import com.simprints.feature.setup.SetupWrapperActivity
@@ -50,6 +51,13 @@ open class BaseStepProcessorTest {
         CoreRequestCode.GUID_SELECTION_CODE.value,
         "com.simprints.feature.selectsubject.SelectSubjectWrapperActivity",
         SelectSubjectWrapperActivity.SELECT_SUBJECT_ARGS_EXTRA
+    )
+
+    protected inline fun <reified T : Parcelable> verifyLastBiometricIntent(step: Step) = verifyStep<T>(
+        step,
+        CoreRequestCode.LAST_BIOMETRICS_CORE.value,
+        "com.simprints.feature.enrollast.EnrolLastBiometricWrapperActivity",
+        EnrolLastBiometricWrapperActivity.ENROL_LAST_ARGS_EXTRA
     )
 
     protected inline fun <reified T : Parcelable> verifyStep(step: Step, expectedRequestCode: Int, activityName: String, bundleKey: String) {

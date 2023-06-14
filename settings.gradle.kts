@@ -70,6 +70,7 @@ include(
     ":feature:login",
     ":feature:fetch-subject",
     ":feature:select-subject",
+    ":feature:enrol-last-biometric",
     ":featuredashboard",
     ":featurealert",
     ":featureexitform",
