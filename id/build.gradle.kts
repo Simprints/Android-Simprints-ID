@@ -44,6 +44,7 @@ dependencies {
     implementation(project(":feature:login"))
     implementation(project(":feature:fetch-subject"))
     implementation(project(":feature:select-subject"))
+    implementation(project(":feature:enrol-last-biometric"))
     implementation(project(":feature:setup"))
     implementation(project(":featuredashboard"))
     implementation(project(":featurealert"))

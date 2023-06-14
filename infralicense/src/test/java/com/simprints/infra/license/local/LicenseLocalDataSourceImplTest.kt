@@ -13,7 +13,7 @@ import java.io.File
 class LicenseLocalDataSourceImplTest {
 
     @Test
-    fun `check file directory is created`() = runTest {
+    fun `check file directory is created`() = runTest(UnconfinedTestDispatcher()) {
 
         val path = "testpath"
         val file = File(path)
@@ -26,7 +26,7 @@ class LicenseLocalDataSourceImplTest {
     }
 
     @Test
-    fun `check saving the file opens a file output`() = runTest {
+    fun `check saving the file opens a file output`() = runTest(UnconfinedTestDispatcher()) {
 
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
@@ -47,7 +47,7 @@ class LicenseLocalDataSourceImplTest {
     }
 
     @Test
-    fun `check getting the file requests the created file`() = runTest {
+    fun `check getting the file requests the created file`() = runTest(UnconfinedTestDispatcher()) {
 
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
@@ -67,7 +67,7 @@ class LicenseLocalDataSourceImplTest {
     }
 
     @Test
-    fun `check file delete deletes the dir`() = runTest {
+    fun `check file delete deletes the dir`() = runTest(UnconfinedTestDispatcher()) {
 
         val path = "testpath"
         val file = File(path)

@@ -50,12 +50,6 @@ enum class AlertType(
         backgroundColor = AlertColor.Red,
     ),
 
-    ENROLMENT_LAST_BIOMETRICS_FAILED(
-        title = IDR.string.enrol_last_biometrics_alert_title,
-        message = IDR.string.enrol_last_biometrics_alert_message,
-        backgroundColor = AlertColor.Gray,
-    ),
-
     GOOGLE_PLAY_SERVICES_OUTDATED(
         title = IDR.string.outdated_google_play_services_alert_title,
         message = IDR.string.outdated_google_play_services_alert_message,
@@ -93,7 +87,6 @@ enum class AlertType(
             DIFFERENT_USER_ID -> AlertScreenEventType.DIFFERENT_USER_ID
             INTEGRITY_SERVICE_ERROR -> AlertScreenEventType.INTEGRITY_SERVICE_ERROR
             UNEXPECTED_ERROR -> AlertScreenEventType.UNEXPECTED_ERROR
-            ENROLMENT_LAST_BIOMETRICS_FAILED -> AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
             GOOGLE_PLAY_SERVICES_OUTDATED -> AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED
             MISSING_GOOGLE_PLAY_SERVICES -> AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES
             MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
