@@ -112,7 +112,7 @@ definitions:
                     - ./gradlew featuredashboard:jacocoTestReport
                     - ./gradlew feature:alert:jacocoTestReport
                     - ./gradlew featureexitform:jacocoTestReport
-                    - ./gradlew featureconsent:jacocoTestReport
+                    - ./gradlew feature:consent:jacocoTestReport
                     - ./gradlew feature:login:jacocoTestReport
                     - ./gradlew feature:fetch-subject:jacocoTestReport
                     - ./gradlew feature:select-subject:jacocoTestReport
@@ -122,7 +122,7 @@ definitions:
                     - featuredashboard/build/reports/**
                     - feature/alert/build/reports/**
                     - featureexitform/build/reports/**
-                    - featureconsent/build/reports/**
+                    - feature/consent/build/reports/**
                     - feature/login/build/reports/**
                     - feature/fetch-subject/build/reports/**
                     - feature/select-subject/build/reports/**

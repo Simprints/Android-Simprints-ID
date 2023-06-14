@@ -74,7 +74,7 @@ include(
     ":featuredashboard",
     ":feature:alert",
     ":featureexitform",
-    ":featureconsent",
+    ":feature:consent",
     ":feature:setup",
 )
 

@@ -50,7 +50,7 @@ dependencies {
     implementation(project(":featuredashboard"))
     implementation(project(":feature:alert"))
     implementation(project(":featureexitform"))
-    implementation(project(":featureconsent"))
+    implementation(project(":feature:consent"))
     implementation(project(":fingerprint:controller"))
     implementation(project(":infraconfig"))
     implementation(project(":infraenrolmentrecords"))
