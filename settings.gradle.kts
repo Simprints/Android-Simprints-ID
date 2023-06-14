@@ -84,7 +84,7 @@ include(
     ":infra:event-sync",
     ":infra:config",
     ":infra:enrolment-records",
-    ":infraimages",
+    ":infra:images",
     ":infralicense",
     ":infralogging",
     ":infra:auth-store",

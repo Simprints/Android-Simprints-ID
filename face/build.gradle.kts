@@ -21,7 +21,7 @@ dependencies {
     implementation(project(":infra:enrolment-records"))
     implementation(project(":infra:events"))
     implementation(project(":infralicense"))
-    implementation(project(":infraimages"))
+    implementation(project(":infra:images"))
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
 

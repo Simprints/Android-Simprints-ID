@@ -29,7 +29,7 @@ dependencies {
 
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:enrolment-records"))
-    implementation(project(":infraimages"))
+    implementation(project(":infra:images"))
     implementation(project(":infrarecentuseractivity"))
 
     implementation(libs.retrofit.core)
