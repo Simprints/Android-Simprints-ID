@@ -55,7 +55,7 @@ dependencies {
     implementation(project(":infra:config"))
     implementation(project(":infra:enrolment-records"))
     implementation(project(":infrarecentuseractivity"))
-    implementation(project(":infraimages"))
+    implementation(project(":infra:images"))
 
     implementation(libs.kotlin.reflect)
     runtimeOnly(libs.kotlin.coroutinesAndroid)

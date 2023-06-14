@@ -72,7 +72,7 @@ definitions:
                     - ./gradlew infrarecentuseractivity:jacocoTestReport
                     - ./gradlew infrasecurity:jacocoTestReport
                     - ./gradlew infralicense:jacocoTestReport
-                    - ./gradlew infraimages:jacocoTestReport
+                    - ./gradlew infra:images:jacocoTestReport
                     - ./gradlew infraresources:jacocoTestReport
                     - ./gradlew infrafacebiosdk:jacocoTestReport
                     - ./gradlew infrarocwrapper:jacocoTestReport
@@ -91,7 +91,7 @@ definitions:
                     - infrarecentuseractivity/build/reports/**
                     - infrasecurity/build/reports/**
                     - infralicense/build/reports/**
-                    - infraimages/build/reports/**
+                    - infra/images/build/reports/**
                     - infraresources/build/reports/**
                     - infrafacebiosdk/build/reports/**
                     - infrarocwrapper/build/reports/**
