@@ -60,7 +60,7 @@ definitions:
                     - source ci/pipeline/setup
                     - ./gradlew core:jacocoTestReport
                     - ./gradlew infra:events:jacocoTestReport
-                    - ./gradlew infraeventsync:jacocoTestReport
+                    - ./gradlew infra:event-sync:jacocoTestReport
                     - ./gradlew infra:config:jacocoTestReport
                     - ./gradlew infra:enrolment-records:jacocoTestReport
                     - ./gradlew infralogging:jacocoTestReport
@@ -79,7 +79,7 @@ definitions:
                 artifacts:
                     - core/build/reports/**
                     - infra/events/build/reports/**
-                    - infraeventsync/build/reports/**
+                    - infra/event-sync/build/reports/**
                     - infra/config/build/reports/**
                     - infra/enrolment-records/build/reports/**
                     - infralogging/build/reports/**

@@ -9,7 +9,7 @@ android {
 
 dependencies {
     implementation(project(":infra:events"))
-    implementation(project(":infraeventsync"))
+    implementation(project(":infra:event-sync"))
     implementation(project(":infra:config"))
     implementation(project(":infra:enrolment-records"))
     implementation(project(":infraimages"))
