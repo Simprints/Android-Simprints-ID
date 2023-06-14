@@ -83,7 +83,7 @@ dependencies {
     testImplementation(project(":testtools"))
     testImplementation(project(":infra:events"))
     testImplementation(project(":infra:event-sync"))
-    testImplementation(project(":infralogging"))
+    testImplementation(project(":infra:logging"))
 
     // ######################################################
     //                      Android test

@@ -86,7 +86,7 @@ include(
     ":infra:enrolment-records",
     ":infra:images",
     ":infra:license",
-    ":infralogging",
+    ":infra:logging",
     ":infra:auth-store",
     ":infra:auth-logic",
     ":infra:project-security-store",

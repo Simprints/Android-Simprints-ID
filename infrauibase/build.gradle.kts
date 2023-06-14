@@ -16,7 +16,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":infralogging"))
+    implementation(project(":infra:logging"))
 
     api(libs.androidX.core)
     api(libs.androidX.appcompat)
