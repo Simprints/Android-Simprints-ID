@@ -9,7 +9,7 @@ android {
 
 dependencies {
     implementation(project(":infra:auth-store"))
-    implementation(project(":infraconfig"))
+    implementation(project(":infra:config"))
 
     implementation(libs.retrofit.core)
     implementation(libs.workManager.work)

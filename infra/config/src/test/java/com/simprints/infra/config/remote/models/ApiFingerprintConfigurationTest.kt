@@ -3,12 +3,10 @@ package com.simprints.infra.config.remote.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
-import com.simprints.infra.config.testtools.*
 import com.simprints.infra.config.testtools.apiDecisionPolicy
 import com.simprints.infra.config.testtools.apiFingerprintConfiguration
 import com.simprints.infra.config.testtools.decisionPolicy
 import com.simprints.infra.config.testtools.fingerprintConfiguration
-import com.simprints.infra.config.testtools.vero2Configuration
 import org.junit.Test
 
 class ApiFingerprintConfigurationTest {

@@ -11,10 +11,10 @@ import java.io.File
 import javax.inject.Inject
 
 internal class ConfigLocalDataSourceImpl @Inject constructor(
-    @AbsolutePath private val absolutePath: String,
-    private val projectDataStore: DataStore<ProtoProject>,
-    private val configDataStore: DataStore<ProtoProjectConfiguration>,
-    private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>,
+        @AbsolutePath private val absolutePath: String,
+        private val projectDataStore: DataStore<ProtoProject>,
+        private val configDataStore: DataStore<ProtoProjectConfiguration>,
+        private val deviceConfigDataStore: DataStore<ProtoDeviceConfiguration>,
 ) : ConfigLocalDataSource {
 
     override suspend fun saveProject(project: Project) {

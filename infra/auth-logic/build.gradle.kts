@@ -24,7 +24,7 @@ dependencies {
 
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:project-security-store"))
-    implementation(project(":infraconfig"))
+    implementation(project(":infra:config"))
     implementation(project(":infraevents"))
 
     implementation(project(":infraeventsync"))

@@ -3,7 +3,6 @@ package com.simprints.infra.config.local.migrations
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.local.models.ProtoProject
 import com.simprints.infra.config.testtools.protoProject
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbProject
 import io.mockk.CapturingSlot

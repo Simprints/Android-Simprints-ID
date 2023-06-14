@@ -11,7 +11,6 @@ import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigra
 import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
 import com.simprints.infra.config.local.models.*
 import com.simprints.infra.config.testtools.protoProjectConfiguration
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
