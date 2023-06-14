@@ -2,7 +2,6 @@ package com.simprints.id.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentContract
@@ -36,8 +35,6 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
-import com.simprints.id.tools.LocationManager
-import com.simprints.id.tools.LocationManagerImpl
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Binds
@@ -112,9 +109,6 @@ abstract class IdAppModule {
 
     @Binds
     abstract fun provideEnrolResponseAdjudicationHelper(impl: EnrolResponseAdjudicationHelperImpl): EnrolResponseAdjudicationHelper
-
-    @Binds
-    abstract fun provideLocationManager(impl: LocationManagerImpl): LocationManager
 }
 
 @Module
@@ -203,6 +197,4 @@ object IdDependenciesModule {
     fun provideDomainToModuleApiAppResponse(): DomainToModuleApiAppResponse =
         DomainToModuleApiAppResponse
 
-    @Provides
-    fun provideGoogleApiAvailability() = GoogleApiAvailability.getInstance()
 }

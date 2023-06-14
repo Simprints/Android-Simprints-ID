@@ -114,6 +114,7 @@ definitions:
                     - ./gradlew feature:login:jacocoTestReport
                     - ./gradlew feature:fetch-subject:jacocoTestReport
                     - ./gradlew feature:select-subject:jacocoTestReport
+                    - ./gradlew feature:setup:jacocoTestReport
                 artifacts:
                     - featuredashboard/build/reports/**
                     - featurealert/build/reports/**
@@ -122,6 +123,7 @@ definitions:
                     - feature/login/build/reports/**
                     - feature/fetch-subject/build/reports/**
                     - feature/select-subject/build/reports/**
+                    - feature/setup/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.
