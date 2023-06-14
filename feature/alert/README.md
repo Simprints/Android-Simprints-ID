@@ -26,7 +26,7 @@ Alert screen does not handle any pre-defined action besides closing itself.
 ```kotlin
 // In module/build.gradle.kts
 
-implementation(project(":featurealert"))
+implementation(project(":feature:alert"))
 ```
 
 2. Include alert sub-graph and define actions to navigate to the alert screen

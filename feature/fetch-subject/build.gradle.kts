@@ -9,7 +9,7 @@ android {
 
 dependencies {
 
-    implementation(project(":featurealert"))
+    implementation(project(":feature:alert"))
     implementation(project(":featureexitform"))
 
     implementation(project(":infraenrolmentrecords"))

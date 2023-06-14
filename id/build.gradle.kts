@@ -48,7 +48,7 @@ dependencies {
     implementation(project(":feature:enrol-last-biometric"))
     implementation(project(":feature:setup"))
     implementation(project(":featuredashboard"))
-    implementation(project(":featurealert"))
+    implementation(project(":feature:alert"))
     implementation(project(":featureexitform"))
     implementation(project(":featureconsent"))
     implementation(project(":fingerprint:controller"))

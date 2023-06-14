@@ -38,7 +38,7 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infraimages"))
     implementation(project(":infrarecentuseractivity"))
-    implementation(project(":featurealert"))
+    implementation(project(":feature:alert"))
     implementation(project(":featureexitform"))
 
     // If mock/dummy BT adapter is required test implementation can be switched to regular one

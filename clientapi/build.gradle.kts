@@ -20,7 +20,7 @@ dependencies {
     implementation(project(":infraenrolmentrecords"))
     implementation(project(":infraeventsync"))
     implementation(project(":infraevents"))
-    implementation(project(":featurealert"))
+    implementation(project(":feature:alert"))
 
     implementation(libs.libsimprints)
 }

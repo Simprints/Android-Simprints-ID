@@ -110,7 +110,7 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew featuredashboard:jacocoTestReport
-                    - ./gradlew featurealert:jacocoTestReport
+                    - ./gradlew feature:alert:jacocoTestReport
                     - ./gradlew featureexitform:jacocoTestReport
                     - ./gradlew featureconsent:jacocoTestReport
                     - ./gradlew feature:login:jacocoTestReport
@@ -120,7 +120,7 @@ definitions:
                     - ./gradlew feature:enrol-last-biometric:jacocoTestReport
                 artifacts:
                     - featuredashboard/build/reports/**
-                    - featurealert/build/reports/**
+                    - feature/alert/build/reports/**
                     - featureexitform/build/reports/**
                     - featureconsent/build/reports/**
                     - feature/login/build/reports/**
