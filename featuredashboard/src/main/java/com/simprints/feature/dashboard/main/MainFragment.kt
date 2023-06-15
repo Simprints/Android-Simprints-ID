@@ -6,7 +6,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.BuildConfig
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentMainBinding

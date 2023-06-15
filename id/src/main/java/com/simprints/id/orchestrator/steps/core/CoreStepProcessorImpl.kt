@@ -17,9 +17,9 @@ import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
+import com.simprints.id.exitformhandler.ExitFormReason.Companion.fromExitFormOption
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.setup.SetupWrapperActivity
-import com.simprints.id.data.exitform.ExitFormReason.Companion.fromExitFormOption
 import com.simprints.id.orchestrator.steps.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT

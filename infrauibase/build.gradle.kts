@@ -11,6 +11,8 @@ android {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
     }
+
+    viewBinding.enable = true
 }
 
 dependencies {
@@ -30,4 +32,6 @@ dependencies {
     api(libs.androidX.ui.cardview)
 
     api(libs.androidX.navigation.fragment)
+
+    testImplementation(project(":testtools"))
 }

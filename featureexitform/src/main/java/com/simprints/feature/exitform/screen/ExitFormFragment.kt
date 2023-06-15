@@ -10,10 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.core.tools.extentions.setTextWithFallbacks
+import com.simprints.infra.uibase.view.setTextWithFallbacks
 import com.simprints.core.tools.extentions.showToast
-import com.simprints.core.tools.extentions.textWatcherOnChange
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.listeners.TextWatcherOnChangeListener
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.R
 import com.simprints.feature.exitform.config.ExitFormOption
@@ -29,7 +29,7 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
     private val viewModel by viewModels<ExitFormViewModel>()
     private val binding by viewBinding(FragmentExitFormBinding::bind)
 
-    private val textWatcher = textWatcherOnChange {
+    private val textWatcher = TextWatcherOnChangeListener {
         viewModel.reasonTextChanged(it)
     }
 
@@ -107,10 +107,10 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
             setFocusOnExitReasonAndDisableSubmit()
         }
         viewModel.requestSelectOptionEvent.observe(viewLifecycleOwner) {
-            requireContext().showToast(getString(IDR.string.refusal_toast_select_option_submit))
+            requireContext().showToast(IDR.string.refusal_toast_select_option_submit)
         }
         viewModel.requestFormSubmitEvent.observe(viewLifecycleOwner) {
-            requireContext().showToast(getString(IDR.string.refusal_toast_submit))
+            requireContext().showToast(IDR.string.refusal_toast_submit)
         }
         viewModel.submitEnabled.observe(viewLifecycleOwner) {
             binding.exitFormSubmit.isEnabled = true == it

@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.exitform.screen.ExitFormFragmentArgs
-import com.simprints.id.data.exitform.ExitFormReason
 import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.resources.R

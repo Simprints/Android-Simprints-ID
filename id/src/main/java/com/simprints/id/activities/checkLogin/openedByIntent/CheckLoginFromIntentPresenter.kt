@@ -7,7 +7,7 @@ import com.simprints.core.ExternalScope
 import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow
