@@ -66,6 +66,12 @@ enum class AlertType(
         title = IDR.string.missing_google_play_services_alert_title,
         message = IDR.string.missing_google_play_services_alert_message,
         backgroundColor = AlertColor.Red,
+    ),
+
+    PROJECT_PAUSED(
+        title = IDR.string.project_paused_title,
+        message = IDR.string.project_paused_body,
+        backgroundColor = AlertColor.Red,
     );
 
     fun toAlertConfig(customMessage: String? = null) = alertConfiguration {
@@ -97,6 +103,7 @@ enum class AlertType(
             GOOGLE_PLAY_SERVICES_OUTDATED -> AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED
             MISSING_GOOGLE_PLAY_SERVICES -> AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES
             MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
+            PROJECT_PAUSED -> AlertScreenEventType.PROJECT_PAUSED
         }
 
         internal const val PAYLOAD_KEY = "alert_payload"
