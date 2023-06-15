@@ -38,8 +38,8 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infraimages"))
     implementation(project(":infrarecentuseractivity"))
-    implementation(project(":featurealert"))
-    implementation(project(":featureexitform"))
+    implementation(project(":feature:alert"))
+    implementation(project(":feature:exit-form"))
 
     // If mock/dummy BT adapter is required test implementation can be switched to regular one
     testImplementation(project(":fingerprint:infra:scannermock"))

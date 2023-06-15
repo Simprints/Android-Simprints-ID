@@ -71,10 +71,10 @@ include(
     ":feature:fetch-subject",
     ":feature:select-subject",
     ":feature:enrol-last-biometric",
-    ":featuredashboard",
-    ":featurealert",
-    ":featureexitform",
-    ":featureconsent",
+    ":feature:dashboard",
+    ":feature:alert",
+    ":feature:exit-form",
+    ":feature:consent",
     ":feature:setup",
 )
 

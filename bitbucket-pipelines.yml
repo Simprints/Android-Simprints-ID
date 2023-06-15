@@ -109,20 +109,20 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew featuredashboard:jacocoTestReport
-                    - ./gradlew featurealert:jacocoTestReport
-                    - ./gradlew featureexitform:jacocoTestReport
-                    - ./gradlew featureconsent:jacocoTestReport
+                    - ./gradlew feature:dashboard:jacocoTestReport
+                    - ./gradlew feature:alert:jacocoTestReport
+                    - ./gradlew feature:exit-form:jacocoTestReport
+                    - ./gradlew feature:consent:jacocoTestReport
                     - ./gradlew feature:login:jacocoTestReport
                     - ./gradlew feature:fetch-subject:jacocoTestReport
                     - ./gradlew feature:select-subject:jacocoTestReport
                     - ./gradlew feature:setup:jacocoTestReport
                     - ./gradlew feature:enrol-last-biometric:jacocoTestReport
                 artifacts:
-                    - featuredashboard/build/reports/**
-                    - featurealert/build/reports/**
-                    - featureexitform/build/reports/**
-                    - featureconsent/build/reports/**
+                    - feature/dashboard/build/reports/**
+                    - feature/alert/build/reports/**
+                    - feature/exit-form/build/reports/**
+                    - feature/consent/build/reports/**
                     - feature/login/build/reports/**
                     - feature/fetch-subject/build/reports/**
                     - feature/select-subject/build/reports/**
