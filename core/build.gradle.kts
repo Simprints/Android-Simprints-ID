@@ -6,12 +6,6 @@ plugins {
 
 android {
     namespace = "com.simprints.core"
-
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    testOptions.unitTests.isReturnDefaultValues = true
 }
 
 dependencies {
