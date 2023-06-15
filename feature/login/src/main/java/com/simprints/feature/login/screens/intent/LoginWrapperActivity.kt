@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.ActivityLoginWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult

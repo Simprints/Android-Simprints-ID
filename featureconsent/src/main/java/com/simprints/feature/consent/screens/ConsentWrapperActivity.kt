@@ -6,7 +6,7 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.R
 import com.simprints.feature.consent.databinding.ActivityConsentWrapperBinding

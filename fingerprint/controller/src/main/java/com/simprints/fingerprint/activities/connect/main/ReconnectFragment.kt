@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.activities.connect.main
 
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.databinding.FragmentReconnectBinding
 import dagger.hilt.android.AndroidEntryPoint

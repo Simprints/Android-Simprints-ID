@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ShowExitFormWrapper

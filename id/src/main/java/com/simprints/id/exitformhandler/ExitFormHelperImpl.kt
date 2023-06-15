@@ -5,7 +5,7 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
-import com.simprints.id.data.exitform.ExitFormReason.Companion.fromExitFormOption
+import com.simprints.id.exitformhandler.ExitFormReason.Companion.fromExitFormOption
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.infra.config.domain.models.GeneralConfiguration
