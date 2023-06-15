@@ -34,9 +34,9 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
 
-    implementation(project(":infrauibase"))
-    implementation(project(":infraevents"))
-    implementation(project(":infraeventsync"))
+    implementation(project(":infra:ui-base"))
+    implementation(project(":infra:events"))
+    implementation(project(":infra:event-sync"))
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:project-security-store"))
@@ -52,10 +52,10 @@ dependencies {
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:consent"))
     implementation(project(":fingerprint:controller"))
-    implementation(project(":infraconfig"))
-    implementation(project(":infraenrolmentrecords"))
-    implementation(project(":infrarecentuseractivity"))
-    implementation(project(":infraimages"))
+    implementation(project(":infra:config"))
+    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:recent-user-activity"))
+    implementation(project(":infra:images"))
 
     implementation(libs.kotlin.reflect)
     runtimeOnly(libs.kotlin.coroutinesAndroid)
@@ -81,9 +81,9 @@ dependencies {
     // ######################################################
 
     testImplementation(project(":testtools"))
-    testImplementation(project(":infraevents"))
-    testImplementation(project(":infraeventsync"))
-    testImplementation(project(":infralogging"))
+    testImplementation(project(":infra:events"))
+    testImplementation(project(":infra:event-sync"))
+    testImplementation(project(":infra:logging"))
 
     // ######################################################
     //                      Android test

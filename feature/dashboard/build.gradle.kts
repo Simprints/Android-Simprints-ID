@@ -8,14 +8,14 @@ android {
 }
 
 dependencies {
-    implementation(project(":infraevents"))
-    implementation(project(":infraeventsync"))
-    implementation(project(":infraconfig"))
-    implementation(project(":infraenrolmentrecords"))
-    implementation(project(":infraimages"))
+    implementation(project(":infra:events"))
+    implementation(project(":infra:event-sync"))
+    implementation(project(":infra:config"))
+    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:images"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:auth-logic"))
-    implementation(project(":infrarecentuseractivity"))
+    implementation(project(":infra:recent-user-activity"))
     implementation(project(":feature:consent"))
 
     implementation(libs.fuzzywuzzy.core)

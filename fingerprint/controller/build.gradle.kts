@@ -30,14 +30,14 @@ android {
 dependencies {
 
     // Simprints
-    implementation(project(":infraevents"))
-    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infra:events"))
+    implementation(project(":infra:enrolment-records"))
     implementation(project(":fingerprint:infra:matcher"))
     implementation(project(":fingerprint:infra:scanner"))
-    implementation(project(":infraconfig"))
+    implementation(project(":infra:config"))
     implementation(project(":infra:auth-store"))
-    implementation(project(":infraimages"))
-    implementation(project(":infrarecentuseractivity"))
+    implementation(project(":infra:images"))
+    implementation(project(":infra:recent-user-activity"))
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
 
