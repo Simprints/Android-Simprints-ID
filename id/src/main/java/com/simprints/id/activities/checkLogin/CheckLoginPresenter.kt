@@ -7,12 +7,13 @@ import com.simprints.id.domain.alert.AlertType.UNEXPECTED_ERROR
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.exceptions.safe.secure.ProjectPausedException
 import com.simprints.id.services.sync.SyncManager
-import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.infra.security.SecurityManager
 import javax.inject.Inject
 
@@ -44,11 +45,22 @@ abstract class CheckLoginPresenter(
             handleSignedInUser()
         } catch (t: Throwable) {
             when (t) {
-                is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID)
-                is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID)
+                is DifferentProjectIdSignedInException -> {
+                    view.openAlertActivityForError(DIFFERENT_PROJECT_ID)
+                }
+
+                is DifferentUserIdSignedInException -> {
+                    view.openAlertActivityForError(DIFFERENT_USER_ID)
+                }
+
                 is NotSignedInException -> handleNotSignedInUser().also {
                     syncManager.cancelBackgroundSyncs()
                 }
+
+                is ProjectPausedException -> handlePausedProject().also {
+                    syncManager.cancelBackgroundSyncs()
+                }
+
                 else -> {
                     Simber.e(t)
                     view.openAlertActivityForError(UNEXPECTED_ERROR)
@@ -63,10 +75,13 @@ abstract class CheckLoginPresenter(
 
     private fun checkStatusForDeviceAndProject() {
         val status = securityStateRepository.getSecurityStatusFromLocal()
-        if (status.isCompromisedOrProjectEnded())
-            handleNotSignedInUser()
+        when {
+            status == SecurityState.Status.PAUSED -> throw ProjectPausedException()
+            status.isCompromisedOrProjectEnded() -> handleNotSignedInUser()
+        }
     }
 
+    abstract fun handlePausedProject()
     abstract fun handleNotSignedInUser()
 
     /**

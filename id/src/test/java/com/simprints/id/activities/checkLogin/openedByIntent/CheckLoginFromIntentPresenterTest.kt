@@ -2,6 +2,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.infra.config.ConfigManager
@@ -123,6 +124,17 @@ class CheckLoginFromIntentPresenterTest {
             val updatedActivity =
                 updateConfigFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
             assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID)
+        }
+    }
+
+    @Test
+    fun presenter_handlePausedProject_shouldOpenAlertActivityForError() {
+        runTest(UnconfinedTestDispatcher()) {
+
+            presenter.onViewCreated(true)
+            presenter.handlePausedProject()
+
+            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.PROJECT_PAUSED) }
         }
     }
 //
