@@ -27,7 +27,7 @@ class ModuleFeatureConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                add("implementation", project(":infrauibase"))
+                add("implementation", project(":infra:ui-base"))
                 add("implementation", project(":core"))
 
                 add("testImplementation", project(":testtools"))

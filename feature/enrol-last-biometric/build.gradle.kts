@@ -11,8 +11,8 @@ dependencies {
 
     implementation(project(":feature:alert"))
 
-    implementation(project(":infraconfig"))
-    implementation(project(":infraevents"))
-    implementation(project(":infraenrolmentrecords"))
+    implementation(project(":infra:config"))
+    implementation(project(":infra:events"))
+    implementation(project(":infra:enrolment-records"))
 
 }

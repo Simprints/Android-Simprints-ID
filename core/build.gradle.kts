@@ -10,10 +10,10 @@ android {
 
 dependencies {
     api(project(":moduleapi"))
-    api(project(":infralogging"))
-    api(project(":infranetwork"))
-    api(project(":infraresources"))
-    api(project(":infrasecurity"))
+    api(project(":infra:logging"))
+    api(project(":infra:network"))
+    api(project(":infra:resources"))
+    api(project(":infra:security"))
 
     api(libs.androidX.appcompat)
     api(libs.androidX.multidex)

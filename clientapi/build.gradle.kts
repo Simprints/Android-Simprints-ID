@@ -15,11 +15,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":infrauibase"))
-    implementation(project(":infraconfig"))
-    implementation(project(":infraenrolmentrecords"))
-    implementation(project(":infraeventsync"))
-    implementation(project(":infraevents"))
+    implementation(project(":infra:ui-base"))
+    implementation(project(":infra:config"))
+    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:event-sync"))
+    implementation(project(":infra:events"))
     implementation(project(":feature:alert"))
 
     implementation(libs.libsimprints)

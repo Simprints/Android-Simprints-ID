@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":infraevents"))
+    implementation(project(":infra:events"))
 
     implementation(libs.playServices.location)
     implementation(libs.workManager.work)
