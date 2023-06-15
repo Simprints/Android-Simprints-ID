@@ -11,5 +11,5 @@ dependencies {
     implementation(project(":infraconfig"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infraevents"))
-    implementation(project(":featureexitform"))
+    implementation(project(":feature:exit-form"))
 }

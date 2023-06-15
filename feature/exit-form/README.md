@@ -21,7 +21,7 @@ so that caller could resume execution flow as usual.
 ```kotlin
 // In module/build.gradle.kts
 
-implementation(project(":featurexitform"))
+implementation(project(":feature:exit-form"))
 ```
 
 2. Include exit form sub-graph and define actions to navigate to the exit form screen
