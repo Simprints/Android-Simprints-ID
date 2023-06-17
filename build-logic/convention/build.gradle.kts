@@ -14,7 +14,7 @@ configurations.all {
             // dependencies and it is not possible to use newest features of both FragmentActivity
             // and AppCompatActivity (we use both for screen results API).
             // https://issuetracker.google.com/u/0/issues/178403178#comment17
-            substitute(module("androidx.fragment:fragment:1.0.0"))
+            substitute(module("androidx.fragment:fragment:1.6.0"))
                 .using(module("androidx.fragment:fragment:${libs.versions.androidx.fragment.version.get()}"))
         }
     }
