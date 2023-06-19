@@ -65,7 +65,7 @@ enum class AlertType(
     PROJECT_PAUSED(
         title = IDR.string.project_paused_title,
         message = IDR.string.project_paused_body,
-        backgroundColor = AlertColor.Red,
+        backgroundColor = AlertColor.Yellow,
     );
 
     fun toAlertConfig(customMessage: String? = null) = alertConfiguration {
