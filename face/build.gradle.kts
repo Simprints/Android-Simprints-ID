@@ -17,13 +17,13 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
-    implementation(project(":infraconfig"))
-    implementation(project(":infraenrolmentrecords"))
-    implementation(project(":infraevents"))
-    implementation(project(":infralicense"))
-    implementation(project(":infraimages"))
-    implementation(project(":featurealert"))
-    implementation(project(":featureexitform"))
+    implementation(project(":infra:config"))
+    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:events"))
+    implementation(project(":infra:license"))
+    implementation(project(":infra:images"))
+    implementation(project(":feature:alert"))
+    implementation(project(":feature:exit-form"))
 
     //BIO SDK
     implementation(project(":infrafacebiosdk"))

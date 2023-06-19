@@ -11,7 +11,6 @@ import com.simprints.id.orchestrator.cache.HotCacheImpl.AppRequestWrapper.Compan
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.ParcelableConverter.marshall
 import com.simprints.id.tools.ParcelableConverter.unmarshall
-import com.simprints.id.tools.extensions.save
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
@@ -54,7 +53,7 @@ class HotCacheImpl @Inject constructor(
 
     private fun saveInSharedPrefs(transaction: (SharedPreferences.Editor) -> Unit) {
         with(sharedPrefs) {
-            save(transaction)
+            edit().also { transaction(it) }.commit()
         }
     }
 

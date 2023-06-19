@@ -24,13 +24,13 @@ dependencies {
 
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:project-security-store"))
-    implementation(project(":infraconfig"))
-    implementation(project(":infraevents"))
+    implementation(project(":infra:config"))
+    implementation(project(":infra:events"))
 
-    implementation(project(":infraeventsync"))
-    implementation(project(":infraenrolmentrecords"))
-    implementation(project(":infraimages"))
-    implementation(project(":infrarecentuseractivity"))
+    implementation(project(":infra:event-sync"))
+    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:images"))
+    implementation(project(":infra:recent-user-activity"))
 
     implementation(libs.retrofit.core)
     implementation(libs.playServices.integrity)

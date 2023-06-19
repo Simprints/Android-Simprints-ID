@@ -1,8 +1,6 @@
 package com.simprints.id.di
 
-import android.content.Context
 import android.content.SharedPreferences
-import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentContract
@@ -16,8 +14,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
-import com.simprints.id.moduleselection.ModuleRepository
-import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
@@ -36,8 +32,6 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.id.services.sync.SyncSchedulerImpl
-import com.simprints.id.tools.LocationManager
-import com.simprints.id.tools.LocationManagerImpl
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.SecurityManager.Companion.GLOBAL_SHARED_PREFS_FILENAME
 import dagger.Binds
@@ -45,7 +39,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.assisted.AssistedFactory
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -74,10 +67,6 @@ annotation class ModalityFlowVerification
 @Retention(AnnotationRetention.BINARY)
 annotation class EncryptedSharedPreferences
 
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class AbsolutePath
-
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class IdAppModule {
@@ -88,9 +77,6 @@ abstract class IdAppModule {
             view: CheckLoginFromIntentContract.View,
         ): CheckLoginFromIntentPresenter
     }
-
-    @Binds
-    abstract fun provideModuleRepository(impl: ModuleRepositoryImpl): ModuleRepository
 
     @Binds
     abstract fun providePersonCreationEventHelper(impl: PersonCreationEventHelperImpl): PersonCreationEventHelper
@@ -112,9 +98,6 @@ abstract class IdAppModule {
 
     @Binds
     abstract fun provideEnrolResponseAdjudicationHelper(impl: EnrolResponseAdjudicationHelperImpl): EnrolResponseAdjudicationHelper
-
-    @Binds
-    abstract fun provideLocationManager(impl: LocationManagerImpl): LocationManager
 }
 
 @Module
@@ -186,12 +169,6 @@ abstract class IdSyncModule {
 @InstallIn(SingletonComponent::class)
 object IdDependenciesModule {
 
-    @AbsolutePath
-    @Provides
-    @Singleton
-    fun provideAbsolutePath(@ApplicationContext context: Context): String =
-        context.filesDir.absolutePath
-
     @EncryptedSharedPreferences
     @Provides
     @Singleton
@@ -200,9 +177,6 @@ object IdDependenciesModule {
 
     @Provides
     @Singleton
-    fun provideDomainToModuleApiAppResponse(): DomainToModuleApiAppResponse =
-        DomainToModuleApiAppResponse
+    fun provideDomainToModuleApiAppResponse(): DomainToModuleApiAppResponse = DomainToModuleApiAppResponse
 
-    @Provides
-    fun provideGoogleApiAvailability() = GoogleApiAvailability.getInstance()
 }

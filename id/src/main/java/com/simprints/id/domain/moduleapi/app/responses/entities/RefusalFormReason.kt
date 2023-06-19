@@ -1,6 +1,6 @@
 package com.simprints.id.domain.moduleapi.app.responses.entities
 
-import com.simprints.id.data.exitform.ExitFormReason
+import com.simprints.id.exitformhandler.ExitFormReason
 
 enum class RefusalFormReason {
     REFUSED_RELIGION,

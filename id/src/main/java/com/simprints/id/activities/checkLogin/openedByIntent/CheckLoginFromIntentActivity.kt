@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.simprints.core.tools.activity.BaseSplitActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.login.LoginContract
@@ -19,11 +19,13 @@ import com.simprints.feature.login.ShowLoginWrapper
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
 import com.simprints.id.di.IdAppModule
-import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
+import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
-import com.simprints.id.tools.extensions.parseAppRequest
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
 import dagger.hilt.android.AndroidEntryPoint
@@ -90,8 +92,10 @@ open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromInt
         finish()
     }
 
-    override fun parseRequest() =
-        intent.parseAppRequest()
+    override fun parseRequest() = intent.extras
+        ?.getParcelable<IAppRequest>(IAppRequest.BUNDLE_KEY)
+        ?.fromModuleApiToDomain()
+        ?: throw InvalidAppRequest()
 
     override fun getCheckCallingApp() = getCallingPackageName()
 

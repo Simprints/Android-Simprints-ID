@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.simprints.core.CoreApplication
+import com.simprints.core.tools.extentions.deviceId
 import com.simprints.core.tools.utils.LanguageHelper
-import com.simprints.id.tools.extensions.deviceId
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.logging.SimberBuilder
