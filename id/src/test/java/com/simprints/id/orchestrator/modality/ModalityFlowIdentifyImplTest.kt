@@ -2,17 +2,13 @@ package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.orchestrator.identifyAppRequest
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_AND_FINGER
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_WITHOUT_CONSENT
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FINGER
-import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FINGER_WITHOUT_CONSENT
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.SETUP_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
@@ -20,7 +16,6 @@ import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FACE
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
-import com.simprints.infra.authstore.AuthStore
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
@@ -46,6 +41,9 @@ class ModalityFlowIdentifyImplTest {
     lateinit var coreStepProcessor: CoreStepProcessor
 
     @MockK
+    lateinit var setupStepMock: Step
+
+    @MockK
     lateinit var fingerprintStepMock: Step
 
     @MockK
@@ -54,25 +52,32 @@ class ModalityFlowIdentifyImplTest {
     @MockK
     lateinit var consentStepMock: Step
 
-    private val generalConfiguration = mockk<GeneralConfiguration>()
-    private val consentConfiguration = mockk<ConsentConfiguration>()
-    private val configManager = mockk<ConfigManager> {
-        coEvery { getProjectConfiguration() } returns mockk {
+    @MockK
+    lateinit var configManager: ConfigManager
+
+    @MockK
+    lateinit var generalConfiguration: GeneralConfiguration
+
+    @MockK
+    lateinit var consentConfiguration: ConsentConfiguration
+
+    @MockK
+    lateinit var authStore: AuthStore
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
             every { consent } returns consentConfiguration
             every { identification } returns mockk {
                 every { poolType } returns IdentificationConfiguration.PoolType.PROJECT
             }
         }
-    }
-    private val authStore = mockk<com.simprints.infra.authstore.AuthStore> {
-        every { signedInProjectId } returns ModalityFlowEnrolImplTest.PROJECT_ID
-    }
+        every { authStore.signedInProjectId } returns ModalityFlowEnrolImplTest.PROJECT_ID
 
-    @Before
-    fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
-
+        every { setupStepMock.activityName } returns SETUP_ACTIVITY_NAME
         every { fingerprintStepMock.activityName } returns FINGERPRINT_ACTIVITY_NAME
         every { faceStepMock.activityName } returns FACE_ACTIVITY_NAME
         every { consentStepMock.activityName } returns CONSENT_ACTIVITY_NAME
@@ -81,6 +86,7 @@ class ModalityFlowIdentifyImplTest {
         coEvery { faceStepProcessor.buildCaptureStep() } returns faceStepMock
         every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
         every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
+        every { coreStepProcessor.buildStepSetup() } returns setupStepMock
         every { coreStepProcessor.buildStepConsent(any()) } returns consentStepMock
     }
 
@@ -89,11 +95,12 @@ class ModalityFlowIdentifyImplTest {
         buildModalityFlowIdentify(true, listOf(FACE))
         modalityFlowIdentify.startFlow(identifyAppRequest)
 
-        with(modalityFlowIdentify.steps) {
-            assertThat(this).hasSize(NUMBER_STEPS_FACE)
-            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
-        }
+        assertThat(modalityFlowIdentify.steps.map { it.activityName }).isEqualTo(listOf(
+            SETUP_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+            CONSENT_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+        ))
     }
 
     @Test
@@ -101,13 +108,12 @@ class ModalityFlowIdentifyImplTest {
         buildModalityFlowIdentify(true, listOf(FINGERPRINT))
         modalityFlowIdentify.startFlow(identifyAppRequest)
 
-        with(modalityFlowIdentify.steps) {
-            println(this)
-
-            assertThat(this).hasSize(NUMBER_STEPS_FINGER)
-            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
-        }
+        assertThat(modalityFlowIdentify.steps.map { it.activityName }).isEqualTo(listOf(
+            SETUP_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+            CONSENT_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+        ))
     }
 
     @Test
@@ -115,13 +121,14 @@ class ModalityFlowIdentifyImplTest {
         buildModalityFlowIdentify(true, listOf(FACE, FINGERPRINT))
         modalityFlowIdentify.startFlow(identifyAppRequest)
 
-        with(modalityFlowIdentify.steps) {
-            println(this)
-            assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(4), FINGERPRINT_ACTIVITY_NAME)
-        }
+        assertThat(modalityFlowIdentify.steps.map { it.activityName }).isEqualTo(listOf(
+            SETUP_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+            CONSENT_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+        ))
     }
 
     @Test
@@ -129,14 +136,14 @@ class ModalityFlowIdentifyImplTest {
         buildModalityFlowIdentify(true, listOf(FINGERPRINT, FACE))
         modalityFlowIdentify.startFlow(identifyAppRequest)
 
-        with(modalityFlowIdentify.steps) {
-            println(this)
-
-            assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-            verifyStepWasAdded(get(2), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(4), FACE_ACTIVITY_NAME)
-        }
+        assertThat(modalityFlowIdentify.steps.map { it.activityName }).isEqualTo(listOf(
+            SETUP_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+            CONSENT_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+        ))
     }
 
     @Test
@@ -144,10 +151,11 @@ class ModalityFlowIdentifyImplTest {
         buildModalityFlowIdentify(false, listOf(FACE))
         modalityFlowIdentify.startFlow(identifyAppRequest)
 
-        with(modalityFlowIdentify.steps) {
-            assertThat(this).hasSize(NUMBER_STEPS_FACE_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
-        }
+        assertThat(modalityFlowIdentify.steps.map { it.activityName }).isEqualTo(listOf(
+            SETUP_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+        ))
     }
 
     @Test
@@ -155,12 +163,11 @@ class ModalityFlowIdentifyImplTest {
         buildModalityFlowIdentify(false, listOf(FINGERPRINT))
         modalityFlowIdentify.startFlow(identifyAppRequest)
 
-        with(modalityFlowIdentify.steps) {
-            println(this)
-
-            assertThat(this).hasSize(NUMBER_STEPS_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
-        }
+        assertThat(modalityFlowIdentify.steps.map { it.activityName }).isEqualTo(listOf(
+            SETUP_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+        ))
     }
 
     @Test
@@ -168,12 +175,13 @@ class ModalityFlowIdentifyImplTest {
         buildModalityFlowIdentify(false, listOf(FACE, FINGERPRINT))
         modalityFlowIdentify.startFlow(identifyAppRequest)
 
-        with(modalityFlowIdentify.steps) {
-            println(this)
-            assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
-        }
+        assertThat(modalityFlowIdentify.steps.map { it.activityName }).isEqualTo(listOf(
+            SETUP_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+        ))
     }
 
     @Test
@@ -181,16 +189,14 @@ class ModalityFlowIdentifyImplTest {
         buildModalityFlowIdentify(false, listOf(FINGERPRINT, FACE))
         modalityFlowIdentify.startFlow(identifyAppRequest)
 
-        with(modalityFlowIdentify.steps) {
-            println(this)
-            assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
-        }
+        assertThat(modalityFlowIdentify.steps.map { it.activityName }).isEqualTo(listOf(
+            SETUP_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+            FINGERPRINT_ACTIVITY_NAME,
+            FACE_ACTIVITY_NAME,
+        ))
     }
-
-    private fun verifyStepWasAdded(step: Step, activityName: String) =
-        assertThat(step.activityName).isEqualTo(activityName)
 
     private fun buildModalityFlowIdentify(collectConsent: Boolean, modalities: List<Modality>) {
         every { generalConfiguration.collectLocation } returns true

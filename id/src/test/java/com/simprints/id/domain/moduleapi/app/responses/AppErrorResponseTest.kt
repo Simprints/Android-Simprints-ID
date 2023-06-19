@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.app.responses
 
 import com.google.common.truth.Truth
-import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.Companion.fromDomainAlertTypeToAppErrorType
 import org.junit.Test
 

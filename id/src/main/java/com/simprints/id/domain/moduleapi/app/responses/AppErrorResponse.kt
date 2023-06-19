@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.app.responses
 
 import androidx.annotation.Keep
-import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.alert.AlertType
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 

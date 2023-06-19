@@ -59,40 +59,40 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew core:jacocoTestReport
-                    - ./gradlew infraevents:jacocoTestReport
-                    - ./gradlew infraeventsync:jacocoTestReport
-                    - ./gradlew infraconfig:jacocoTestReport
-                    - ./gradlew infraenrolmentrecords:jacocoTestReport
-                    - ./gradlew infralogging:jacocoTestReport
+                    - ./gradlew infra:events:jacocoTestReport
+                    - ./gradlew infra:event-sync:jacocoTestReport
+                    - ./gradlew infra:config:jacocoTestReport
+                    - ./gradlew infra:enrolment-records:jacocoTestReport
+                    - ./gradlew infra:logging:jacocoTestReport
                     - ./gradlew infra:auth-store:jacocoTestReport
                     - ./gradlew infra:auth-logic:jacocoTestReport
                     - ./gradlew infra:project-security-store:jacocoTestReport
-                    - ./gradlew infranetwork:jacocoTestReport
-                    - ./gradlew infrarealm:jacocoTestReport
-                    - ./gradlew infrarecentuseractivity:jacocoTestReport
-                    - ./gradlew infrasecurity:jacocoTestReport
-                    - ./gradlew infralicense:jacocoTestReport
-                    - ./gradlew infraimages:jacocoTestReport
-                    - ./gradlew infraresources:jacocoTestReport
+                    - ./gradlew infra:network:jacocoTestReport
+                    - ./gradlew infra:realm:jacocoTestReport
+                    - ./gradlew infra:recent-user-activity:jacocoTestReport
+                    - ./gradlew infra:security:jacocoTestReport
+                    - ./gradlew infra:license:jacocoTestReport
+                    - ./gradlew infra:images:jacocoTestReport
+                    - ./gradlew infra:ui-base:jacocoTestReport
                     - ./gradlew infrafacebiosdk:jacocoTestReport
                     - ./gradlew infrarocwrapper:jacocoTestReport
                 artifacts:
                     - core/build/reports/**
-                    - infraevents/build/reports/**
-                    - infraeventsync/build/reports/**
-                    - infraconfig/build/reports/**
-                    - infraenrolmentrecords/build/reports/**
-                    - infralogging/build/reports/**
+                    - infra/events/build/reports/**
+                    - infra/event-sync/build/reports/**
+                    - infra/config/build/reports/**
+                    - infra/enrolment-records/build/reports/**
+                    - infra/logging/build/reports/**
                     - infra/auth-store/build/reports/**
                     - infra/auth-logic/build/reports/**
                     - infra/project-security-store/build/reports/**
-                    - infranetwork/build/reports/**
-                    - infrarealm/build/reports/**
-                    - infrarecentuseractivity/build/reports/**
-                    - infrasecurity/build/reports/**
-                    - infralicense/build/reports/**
-                    - infraimages/build/reports/**
-                    - infraresources/build/reports/**
+                    - infra/network/build/reports/**
+                    - infra/realm/build/reports/**
+                    - infra/recent-user-activity/build/reports/**
+                    - infra/security/build/reports/**
+                    - infra/license/build/reports/**
+                    - infra/images/build/reports/**
+                    - infra/ui-base/build/reports/**
                     - infrafacebiosdk/build/reports/**
                     - infrarocwrapper/build/reports/**
 
@@ -109,21 +109,25 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew featuredashboard:jacocoTestReport
-                    - ./gradlew featurealert:jacocoTestReport
-                    - ./gradlew featureexitform:jacocoTestReport
-                    - ./gradlew featureconsent:jacocoTestReport
+                    - ./gradlew feature:dashboard:jacocoTestReport
+                    - ./gradlew feature:alert:jacocoTestReport
+                    - ./gradlew feature:exit-form:jacocoTestReport
+                    - ./gradlew feature:consent:jacocoTestReport
                     - ./gradlew feature:login:jacocoTestReport
                     - ./gradlew feature:fetch-subject:jacocoTestReport
                     - ./gradlew feature:select-subject:jacocoTestReport
+                    - ./gradlew feature:setup:jacocoTestReport
+                    - ./gradlew feature:enrol-last-biometric:jacocoTestReport
                 artifacts:
-                    - featuredashboard/build/reports/**
-                    - featurealert/build/reports/**
-                    - featureexitform/build/reports/**
-                    - featureconsent/build/reports/**
+                    - feature/dashboard/build/reports/**
+                    - feature/alert/build/reports/**
+                    - feature/exit-form/build/reports/**
+                    - feature/consent/build/reports/**
                     - feature/login/build/reports/**
                     - feature/fetch-subject/build/reports/**
                     - feature/select-subject/build/reports/**
+                    - feature/setup/build/reports/**
+                    - feature/enrol-last-biometric/build/reports/**
 
         ######################################################################
         # Run the Face unit tests with coverage and upload report to artifacts.

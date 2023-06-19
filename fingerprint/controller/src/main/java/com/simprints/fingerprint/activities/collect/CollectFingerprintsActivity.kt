@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
-import com.simprints.core.tools.viewbinding.viewBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ShowExitFormWrapper
@@ -107,12 +107,12 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     private fun initViewPagerManager() {
         fingerViewPagerManager = FingerViewPagerManager(
-            vm.state().fingerStates.map { it.id }.toMutableList(),
+            vm.state.fingerStates.map { it.id }.toMutableList(),
             this,
             mainContentBinding.viewPager,
             mainContentBinding.indicatorLayout,
             onFingerSelected = { position -> vm.updateSelectedFinger(position) },
-            isAbleToSelectNewFinger = { !vm.state().currentCaptureState().isCommunicating() }
+            isAbleToSelectNewFinger = { !vm.state.currentCaptureState().isCommunicating() }
         )
     }
 
@@ -134,7 +134,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun observeStateChanges() {
-        vm.state.activityObserveWith {
+        vm.stateLiveData.activityObserveWith {
             it.updateViewPagerManager()
             it.updateScanButton()
             it.listenForConfirmDialog()
@@ -240,7 +240,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
 
     override fun onBackPressed() {
         vm.handleOnBackPressed()
-        if (!vm.state().currentCaptureState().isCommunicating()) {
+        if (!vm.state.currentCaptureState().isCommunicating()) {
             showRefusal.launch(RefusalAlertHelper.refusalArgs())
         }
     }

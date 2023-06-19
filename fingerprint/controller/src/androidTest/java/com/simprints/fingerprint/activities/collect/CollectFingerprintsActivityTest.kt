@@ -15,6 +15,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
@@ -104,7 +105,7 @@ class CollectFingerprintsActivityTest {
             mockCoroutineScope,
         )
     ) {
-        every { state } returns this@CollectFingerprintsActivityTest.state
+        every { stateLiveData } returns this@CollectFingerprintsActivityTest.state
         every { vibrate } returns this@CollectFingerprintsActivityTest.vibrate
         every { noFingersScannedToast } returns this@CollectFingerprintsActivityTest.noFingersScannedToast
         every { launchAlert } returns this@CollectFingerprintsActivityTest.launchAlert
@@ -117,7 +118,7 @@ class CollectFingerprintsActivityTest {
             this@CollectFingerprintsActivityTest.state.value = startingState(fingers)
         }
 
-        every { state() } answers { this@CollectFingerprintsActivityTest.state.value!! }
+        every { state } answers { this@CollectFingerprintsActivityTest.state.value!! }
         every { isImageTransferRequired() } returns true
     }
 
@@ -231,8 +232,7 @@ class CollectFingerprintsActivityTest {
                         60
                     )
                 )
-            }
-                .apply { isAskingRescan = true }
+            }.copy(isAskingRescan = true)
             it.assertViewPager(count = 2, currentIndex = 0)
             it.assertScanButtonText(R.string.rescan_label_question)
         }
@@ -242,18 +242,19 @@ class CollectFingerprintsActivityTest {
     fun currentFingerIndexUpdates_scrollsProperly() {
         scenario = ActivityScenario.launch(collectTaskRequest(FOUR_FINGERS_IDS).toIntent())
 
-        val initialState = startingState(FOUR_FINGERS_IDS).apply {
-            fingerStates = fingerStates.toMutableList().also {
-                it[0] = FingerState(
+        val startingState = startingState(FOUR_FINGERS_IDS)
+        val initialState = startingState.copy(
+            fingerStates = listOf(
+                FingerState(
                     FOUR_FINGERS_IDS[0],
                     listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
-                )
-                it[1] = FingerState(
+                ),
+                FingerState(
                     FOUR_FINGERS_IDS[1],
                     listOf(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null, 60)))
                 )
-            }
-        }
+            )
+        )
 
         scenario.onActivity {
             state.value = initialState
@@ -300,7 +301,7 @@ class CollectFingerprintsActivityTest {
         Intents.intending(hasComponent(SplashScreenActivity::class.java.name))
             .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
 
-        state.postValue(startingState(TWO_FINGERS_IDS).apply { isShowingSplashScreen = true })
+        state.postValue(startingState(TWO_FINGERS_IDS).copy(isShowingSplashScreen = true))
 
         Intents.intended(hasComponent(SplashScreenActivity::class.java.name))
 
@@ -359,16 +360,16 @@ class CollectFingerprintsActivityTest {
     }
 
     private fun CollectFingerprintsState.updateCurrentFingerState(block: CaptureState.() -> CaptureState) =
-        apply {
-            fingerStates = fingerStates.toMutableList().also { fingerStates ->
-                fingerStates[currentFingerIndex] = fingerStates[currentFingerIndex]
-                    .copy(captures = fingerStates[currentFingerIndex].captures.toMutableList()
-                        .apply {
-                            this[fingerStates[currentFingerIndex].currentCaptureIndex] =
-                                fingerStates[currentFingerIndex].currentCapture().block()
-                        })
+        this.copy(
+            fingerStates = fingerStates.updateOnIndex(currentFingerIndex) { fingerState ->
+                fingerState.copy(
+                    captures = fingerState.captures.updateOnIndex(
+                        index = fingerState.currentCaptureIndex,
+                        newItem = block
+                    )
+                )
             }
-        }
+        )
 
     private fun CollectFingerprintsActivity.assertViewPager(count: Int, currentIndex: Int) {
         val viewPager = findViewById<ViewPager2>(R.id.view_pager)

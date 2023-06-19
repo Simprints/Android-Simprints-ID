@@ -7,19 +7,28 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
+import com.simprints.feature.enrollast.EnrolLastBiometricContract
+import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.selectsubject.SelectSubjectResult
-import com.simprints.id.data.exitform.ExitFormReason
-import com.simprints.id.orchestrator.steps.core.CoreRequestCode
+import com.simprints.feature.setup.SetupContract
+import com.simprints.feature.setup.SetupResult
+import com.simprints.id.exitformhandler.ExitFormReason
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.core.response.*
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -28,41 +37,69 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class)
 class CoreStepProcessorImplTest : BaseStepProcessorTest() {
 
-    private val coreStepProcessor = CoreStepProcessorImpl()
+    @MockK
+    private lateinit var mapStepsForLastBiometricEnrol: MapStepsForLastBiometricEnrolUseCase
+
+    private lateinit var coreStepProcessor: CoreStepProcessorImpl
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        coreStepProcessor = CoreStepProcessorImpl(mapStepsForLastBiometricEnrol)
+    }
+
+    @Test
+    fun stepProcessor_shouldBuildRightStepForSetup() {
+        val step = coreStepProcessor.buildStepSetup()
+
+        verifySetupIntent<Bundle>(step)
+    }
 
     @Test
     fun stepProcessor_shouldBuildRightStepForEnrol() {
-        val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.ENROL)
+        val step = coreStepProcessor.buildStepConsent(ConsentType.ENROL)
 
-        verifyConsentIntent<Bundle>(step, CoreRequestCode.CONSENT.value)
+        verifyConsentIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessor_shouldBuildRightStepForIdentify() {
-        val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.IDENTIFY)
+        val step = coreStepProcessor.buildStepConsent(ConsentType.IDENTIFY)
 
-        verifyConsentIntent<Bundle>(step, CoreRequestCode.CONSENT.value)
+        verifyConsentIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessor_shouldBuildRightStepForVerify() {
-        val step = CoreStepProcessorImpl().buildStepConsent(ConsentType.VERIFY)
+        val step = coreStepProcessor.buildStepConsent(ConsentType.VERIFY)
 
-        verifyConsentIntent<Bundle>(step, CoreRequestCode.CONSENT.value)
+        verifyConsentIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessor_shouldBuildRightStepForGuidFetch() {
-        val step = CoreStepProcessorImpl().buildFetchGuidStep(DEFAULT_PROJECT_ID, GUID1)
+        val step = coreStepProcessor.buildFetchGuidStep(DEFAULT_PROJECT_ID, GUID1)
 
         verifyFetchGuidIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessor_shouldBuildRightStepForGuidSelect() {
-        val step = CoreStepProcessorImpl().buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1)
+        val step = coreStepProcessor.buildConfirmIdentityStep(DEFAULT_PROJECT_ID, GUID1)
 
         verifyGuidSelectedIntent<Bundle>(step)
+    }
+
+    @Test
+    fun stepProcessor_shouldBuildRightStepForEnrolLastBiometric() {
+        every { mapStepsForLastBiometricEnrol.invoke(any()) } returns emptyList()
+
+        val step = coreStepProcessor.buildAppEnrolLastBiometricsStep(
+            DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, emptyList(), GUID1
+        )
+
+        verifyLastBiometricIntent<Bundle>(step)
     }
 
     @Test
@@ -84,6 +121,22 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     @Test
     fun stepProcessor_shouldSkipLegacySelectGuidResult() {
         val consentData = Intent().putExtra(CORE_STEP_BUNDLE, GuidSelectionResponse(true))
+        val result = coreStepProcessor.processResult(consentData)
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun stepProcessor_shouldSkipLegacyEnrolLastBiometricResult() {
+        val consentData = Intent().putExtra(CORE_STEP_BUNDLE, EnrolLastBiometricsResponse(null))
+        val result = coreStepProcessor.processResult(consentData)
+
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun stepProcessor_shouldSkipLegacySetupResult() {
+        val consentData = Intent().putExtra(CORE_STEP_BUNDLE, SetupResponse(true))
         val result = coreStepProcessor.processResult(consentData)
 
         assertThat(result).isNull()
@@ -138,6 +191,14 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
+    fun stepProcessor_shouldProcessEnrolLastBiometricResponse() {
+        val consentData = Intent().putExtra(EnrolLastBiometricContract.ENROL_LAST_RESULT, EnrolLastBiometricResult(null))
+        val result = coreStepProcessor.processResult(consentData)
+
+        assertThat(result).isInstanceOf(EnrolLastBiometricsResponse::class.java)
+    }
+
+    @Test
     fun stepProcessor_shouldProcessCoreExitFormResult() {
         val exitFormData = Intent().putExtra(
             CORE_STEP_BUNDLE,
@@ -150,7 +211,7 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessor_shouldProcessResultFromSetup() {
-        val setupData = Intent().putExtra(CORE_STEP_BUNDLE, SetupResponse(true))
+        val setupData = Intent().putExtra(SetupContract.SETUP_RESULT, SetupResult(true))
         val result = coreStepProcessor.processResult(setupData)
 
         assertThat(result).isInstanceOf(SetupResponse::class.java)
@@ -173,9 +234,6 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     companion object {
-        const val GUID_SELECTION_ACTIVITY_NAME =
-            "com.simprints.id.activities.guidselection.GuidSelectionActivity"
-        const val GUID_SELECTION_REQUEST_CODE = 304
         const val CORE_STEP_BUNDLE = "core_step_bundle"
     }
 }

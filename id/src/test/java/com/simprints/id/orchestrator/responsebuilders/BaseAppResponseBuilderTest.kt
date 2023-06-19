@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.responsebuilders
 
 import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.data.exitform.ExitFormReason
+import com.simprints.id.exitformhandler.ExitFormReason
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse

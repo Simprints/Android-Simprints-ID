@@ -42,6 +42,7 @@ class ModalityFlowVerify @Inject constructor(
 
     override suspend fun startFlow(appRequest: AppRequest) {
         require(appRequest is AppVerifyRequest)
+        addSetupStep()
         addModalityConfigurationSteps()
         addCoreFetchGuidStep(appRequest.projectId, appRequest.verifyGuid)
         addCoreConsentStepIfRequired(ConsentType.VERIFY)
