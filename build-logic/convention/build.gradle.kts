@@ -7,19 +7,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-configurations.all {
-    resolutionStrategy {
-        dependencySubstitution {
-            // Due to bug either in AS or explicit fragment dependency does not override transitive
-            // dependencies and it is not possible to use newest features of both FragmentActivity
-            // and AppCompatActivity (we use both for screen results API).
-            // https://issuetracker.google.com/u/0/issues/178403178#comment17
-            substitute(module("androidx.fragment:fragment:1.0.0"))
-                .using(module("androidx.fragment:fragment:${libs.versions.androidx.fragment.version.get()}"))
-        }
-    }
-}
-
 dependencies {
     // Gradle & Kotlin
     compileOnly(libs.plugin.gradle.android)
