@@ -383,6 +383,7 @@ class ConnectScannerViewModelTest {
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
         viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+        viewModel.start()
         viewModel.handleScannerDisconnectedNoClick()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcPair)
@@ -396,6 +397,7 @@ class ConnectScannerViewModelTest {
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
         viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
+        viewModel.start()
         viewModel.handleIncorrectScanner()
 
         connectScannerIssueObserver.assertEventReceivedWithContent(ConnectScannerIssue.NfcPair)
