@@ -68,11 +68,6 @@ class ConnectScannerViewModel @Inject constructor(
 
     fun init(connectMode: ConnectScannerTaskRequest.ConnectMode) {
         this.connectMode = connectMode
-
-        viewModelScope.launch {
-            allowedGenerations = configManager.getProjectConfiguration().fingerprint
-                ?.allowedVeroGenerations.orEmpty()
-        }
     }
 
     fun start() {
@@ -90,6 +85,8 @@ class ConnectScannerViewModel @Inject constructor(
 
     @SuppressLint("CheckResult")
     private suspend fun startSetup() {
+        allowedGenerations = configManager.getProjectConfiguration().fingerprint
+            ?.allowedVeroGenerations.orEmpty()
         _isConnecting.postValue(true)
         stopConnectingAndResetState()
 
