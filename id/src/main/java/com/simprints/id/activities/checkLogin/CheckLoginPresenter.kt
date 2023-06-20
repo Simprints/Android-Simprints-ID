@@ -58,7 +58,7 @@ abstract class CheckLoginPresenter(
                 }
 
                 is ProjectPausedException -> handlePausedProject().also {
-                    syncManager.cancelBackgroundSyncs()
+                    syncManager.scheduleBackgroundSyncs()
                 }
 
                 else -> {

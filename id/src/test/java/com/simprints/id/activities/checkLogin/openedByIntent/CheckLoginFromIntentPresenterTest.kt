@@ -3,8 +3,13 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.alert.AlertType
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
+import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
+import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
+import com.simprints.id.exceptions.safe.secure.ProjectPausedException
+import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -17,11 +22,14 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.events.sampledata.SampleDefaults.STATIC_GUID
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.failTest
 import com.simprints.testtools.reflection.runPrivateParentSuspendFunction
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -65,6 +73,9 @@ class CheckLoginFromIntentPresenterTest {
 
     @MockK
     lateinit var securityStateRepositoryMock: SecurityStateRepository
+
+    @MockK
+    lateinit var syncManager: SyncManager
 
     private val generalConfiguration = mockk<GeneralConfiguration>()
 
@@ -166,6 +177,84 @@ class CheckLoginFromIntentPresenterTest {
 
             coVerify(exactly = 1) { securityStateRepositoryMock.getSecurityStatusFromRemote() }
             coVerify(exactly = 1) { securityStateRepositoryMock.getSecurityStatusFromLocal() }
+        }
+    }
+
+
+    @Test
+    fun presenter_opens_alert_activity_on_DifferentProjectIdSignedInException() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { authStoreMock.signedInProjectId } throws DifferentProjectIdSignedInException()
+
+            presenter.authStore = authStoreMock
+            presenter.runPrivateParentSuspendFunction("checkSignedInStateAndMoveOn")
+
+            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.DIFFERENT_PROJECT_ID) }
+        }
+    }
+
+    @Test
+    fun presenter_opens_alert_activity_on_DifferentUserIdSignedInException() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { authStoreMock.signedInProjectId } throws DifferentUserIdSignedInException()
+
+            presenter.authStore = authStoreMock
+            presenter.runPrivateParentSuspendFunction("checkSignedInStateAndMoveOn")
+
+            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.DIFFERENT_USER_ID) }
+        }
+    }
+
+    @Test
+    fun presenter_handles_not_signed_user_on_ProjectPausedException() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { authStoreMock.signedInProjectId } throws ProjectPausedException()
+
+            presenter.authStore = authStoreMock
+            presenter.syncManager = syncManager
+            presenter.runPrivateParentSuspendFunction("checkSignedInStateAndMoveOn")
+
+            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.PROJECT_PAUSED) }
+            coVerify(exactly = 1) { syncManager.scheduleBackgroundSyncs() }
+        }
+    }
+
+    @Test
+    fun presenter_handles_not_signed_in_user_when_project_compromised_or_ended() {
+        runTest(UnconfinedTestDispatcher()) {
+            val appRequest = AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest(
+                DEFAULT_PROJECT_ID,
+                DEFAULT_USER_ID,
+                "session",
+                STATIC_GUID
+            )
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromRemote() } returns mockk {
+                every { status } returns SecurityState.Status.COMPROMISED
+            }
+
+            presenter.appRequest = appRequest
+            presenter.syncManager = syncManager
+            presenter.runPrivateParentSuspendFunction("checkStatusForDeviceAndProject")
+
+            coVerify(exactly = 1) { view.finishCheckLoginFromIntentActivity() }
+        }
+    }
+
+    @Test
+    fun presenter_throws_ProjectPausedException_when_security_status_is_paused() {
+        runTest(UnconfinedTestDispatcher()) {
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromRemote() } returns mockk {
+                every { status } returns SecurityState.Status.PROJECT_PAUSED
+            }
+
+            presenter.syncManager = syncManager
+            try {
+                presenter.runPrivateParentSuspendFunction("checkStatusForDeviceAndProject")
+                failTest("ProjectPausedException is not thrown")
+            } catch (e: Exception) {
+                assertThat(e is ProjectPausedException)
+            }
+
         }
     }
 //
