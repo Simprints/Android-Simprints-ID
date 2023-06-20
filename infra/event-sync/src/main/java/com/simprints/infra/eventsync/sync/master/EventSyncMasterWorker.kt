@@ -112,7 +112,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
 
     private suspend fun isEventDownSyncAllowed(): Boolean {
         val isProjectPaused =
-            securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PAUSED
+            securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PROJECT_PAUSED
         val isDownSyncConfigEnabled =
             with(configManager.getProjectConfiguration().synchronization) {
                 frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC

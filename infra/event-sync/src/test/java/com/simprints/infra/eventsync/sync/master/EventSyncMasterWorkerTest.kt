@@ -12,7 +12,6 @@ import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.S
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.infra.eventsync.TestTimeHelperImpl
-import com.simprints.infra.eventsync.runPrivateSuspendFunction
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
@@ -22,6 +21,7 @@ import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.reflection.runPrivateSuspendFunction
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
@@ -244,10 +244,10 @@ internal class EventSyncMasterWorkerTest {
 
     @Test
     fun `isEventDownSyncAllowed should return false when project state is paused`() = runTest {
-        val securityStatus = SecurityState.Status.PAUSED
+        val securityStatus = SecurityState.Status.PROJECT_PAUSED
         val isEventDownSyncAllowed = getIsEventDownSyncAllowed(
             securityStatus = securityStatus,
-            syncConfig = SynchronizationConfiguration.Frequency.PERIODICALLY
+            syncConfig = PERIODICALLY
         )
         assertThat(isEventDownSyncAllowed).isFalse()
     }
@@ -257,7 +257,7 @@ internal class EventSyncMasterWorkerTest {
         val securityStatus = SecurityState.Status.RUNNING
         val isEventDownSyncAllowed = getIsEventDownSyncAllowed(
             securityStatus = securityStatus,
-            syncConfig = SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+            syncConfig = ONLY_PERIODICALLY_UP_SYNC
         )
         assertThat(isEventDownSyncAllowed).isFalse()
     }
