@@ -3,10 +3,18 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
+/*
+Workaround to set jvmToolchain = 11 because R8 doesn't yet support java 17
+Should be removed before migrating to jdk 17
+https://issuetracker.google.com/issues/212279104
+ */
+kotlin {
+    jvmToolchain(11)
+}
 dependencies {
     // Gradle & Kotlin
     compileOnly(libs.plugin.gradle.android)
