@@ -2,7 +2,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.infra.config.ConfigManager
@@ -17,9 +17,12 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.projectsecuritystore.SecurityStateRepository
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.reflection.runPrivateParentSuspendFunction
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
@@ -60,6 +63,9 @@ class CheckLoginFromIntentPresenterTest {
     @MockK
     lateinit var recentUserActivityManager: RecentUserActivityManager
 
+    @MockK
+    lateinit var securityStateRepositoryMock: SecurityStateRepository
+
     private val generalConfiguration = mockk<GeneralConfiguration>()
 
     @Before
@@ -93,6 +99,7 @@ class CheckLoginFromIntentPresenterTest {
                 DEFAULT_METADATA,
                 GUID1
             )
+            securityStateRepository = securityStateRepositoryMock
         }
     }
 
@@ -135,6 +142,30 @@ class CheckLoginFromIntentPresenterTest {
             presenter.handlePausedProject()
 
             coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.PROJECT_PAUSED) }
+        }
+    }
+
+    @Test
+    fun presenter_gets_security_status_from_remote() {
+        runTest(UnconfinedTestDispatcher()) {
+
+            presenter.onViewCreated(true)
+            presenter.runPrivateParentSuspendFunction("getSecurityStatus") as SecurityState.Status
+
+            coVerify(exactly = 1) { securityStateRepositoryMock.getSecurityStatusFromRemote() }
+        }
+    }
+
+    @Test
+    fun presenter_gets_security_status_from_local_when_remote_throws_exception() {
+        runTest(UnconfinedTestDispatcher()) {
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromRemote() } throws Exception()
+
+            presenter.onViewCreated(true)
+            presenter.runPrivateParentSuspendFunction("getSecurityStatus") as SecurityState.Status
+
+            coVerify(exactly = 1) { securityStateRepositoryMock.getSecurityStatusFromRemote() }
+            coVerify(exactly = 1) { securityStateRepositoryMock.getSecurityStatusFromLocal() }
         }
     }
 //

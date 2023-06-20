@@ -73,12 +73,18 @@ abstract class CheckLoginPresenter(
         checkStatusForDeviceAndProject()
     }
 
-    private fun checkStatusForDeviceAndProject() {
-        val status = securityStateRepository.getSecurityStatusFromLocal()
+    private suspend fun checkStatusForDeviceAndProject() {
+        val status = getSecurityStatus()
         when {
-            status == SecurityState.Status.PAUSED -> throw ProjectPausedException()
+            status == SecurityState.Status.PROJECT_PAUSED -> throw ProjectPausedException()
             status.isCompromisedOrProjectEnded() -> handleNotSignedInUser()
         }
+    }
+
+    private suspend fun getSecurityStatus() = try {
+        securityStateRepository.getSecurityStatusFromRemote().status
+    } catch (e: Exception) {
+        securityStateRepository.getSecurityStatusFromLocal()
     }
 
     abstract fun handlePausedProject()
@@ -92,9 +98,9 @@ abstract class CheckLoginPresenter(
     private fun checkSignedInOrThrow() {
         val isUserSignedIn =
             isProjectIdStoredAndMatches() &&
-                isLocalKeyValid(authStore.signedInProjectId) &&
-                isUserIdStoredAndMatches() &&
-                isFirebaseTokenValid()
+                    isLocalKeyValid(authStore.signedInProjectId) &&
+                    isUserIdStoredAndMatches() &&
+                    isFirebaseTokenValid()
 
         if (!isUserSignedIn) {
             throw NotSignedInException()

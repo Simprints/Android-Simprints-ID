@@ -46,4 +46,6 @@ dependencies {
     api(libs.rxJava2.android)
     api(libs.rxJava2.core)
     api(libs.rxJava2.kotlin)
+
+    api(libs.kotlin.reflect)
 }
