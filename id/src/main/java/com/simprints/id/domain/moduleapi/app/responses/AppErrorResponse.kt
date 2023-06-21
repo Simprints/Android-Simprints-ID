@@ -25,6 +25,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         FACE_LICENSE_INVALID,
         FINGERPRINT_CONFIGURATION_ERROR,
         BACKEND_MAINTENANCE_ERROR,
+        PROJECT_ENDING,
         FACE_CONFIGURATION_ERROR;
 
         companion object {
@@ -37,6 +38,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
                     AlertType.INTEGRITY_SERVICE_ERROR,
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+                    AlertType.PROJECT_ENDING -> PROJECT_ENDING
                 }
         }
     }

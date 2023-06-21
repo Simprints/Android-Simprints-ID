@@ -26,7 +26,8 @@ internal data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCal
         LOGIN_NOT_COMPLETE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         FACE_LICENSE_MISSING,
-        FACE_LICENSE_INVALID
+        FACE_LICENSE_INVALID,
+        PROJECT_ENDING
     }
 }
 
@@ -44,6 +45,7 @@ internal fun Reason.fromDomainToApi() =
         FINGERPRINT_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         FACE_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         BACKEND_MAINTENANCE_ERROR -> ApiReason.BACKEND_MAINTENANCE_ERROR
+        PROJECT_ENDING -> ApiReason.PROJECT_ENDING
     }
 
 
@@ -61,4 +63,5 @@ internal fun ApiReason.fromApiToDomain(): Reason =
         ApiReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
         ApiReason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
         ApiReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
+        ApiReason.PROJECT_ENDING -> PROJECT_ENDING
     }

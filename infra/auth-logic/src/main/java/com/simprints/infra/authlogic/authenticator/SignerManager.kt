@@ -27,6 +27,9 @@ internal class SignerManager @Inject constructor(
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
 
+    val signedInProjectId: String
+        get() = authStore.signedInProjectId
+
     suspend fun signIn(projectId: String, userId: String, token: Token) = withContext(dispatcher) {
         try {
             // Store Firebase token so it can be used by ConfigManager

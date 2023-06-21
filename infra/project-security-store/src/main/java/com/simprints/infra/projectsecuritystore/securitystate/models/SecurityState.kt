@@ -13,6 +13,7 @@ data class SecurityState(
     enum class Status {
         RUNNING,
         COMPROMISED,
+        PROJECT_ENDING,
         PROJECT_ENDED;
 
         fun isCompromisedOrProjectEnded(): Boolean = this == COMPROMISED || this == PROJECT_ENDED
