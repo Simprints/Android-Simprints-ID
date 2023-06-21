@@ -9,6 +9,10 @@ plugins {
 android {
     namespace = "com.simprints.id"
 
+    lint {
+        //suppress false positives lint rules
+        disable += setOf("BadConfigurationProvider", "Instantiatable")
+    }
     defaultConfig {
         ndk.abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
     }
