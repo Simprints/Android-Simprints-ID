@@ -40,12 +40,12 @@ internal class SecurityStateProcessor @Inject constructor(
     private suspend fun shouldSignOut(securityState: SecurityState): Boolean {
         val isProjectEnded = securityState.status.isCompromisedOrProjectEnded()
         val isProjectEnding = securityState.status == SecurityState.Status.PROJECT_ENDING
-        val hasEventsToUpload = eventSyncManager.countEventsToUpload(
+        val hasNoEventsToUpload = eventSyncManager.countEventsToUpload(
             projectId = signerManager.signedInProjectId,
             type = null
         ).first() == 0
 
-        return isProjectEnded || (isProjectEnding && hasEventsToUpload.not())
+        return isProjectEnded || (isProjectEnding && hasNoEventsToUpload)
     }
 
     private suspend fun deleteLocalData() {
