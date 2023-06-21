@@ -200,6 +200,10 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             }
         }
 
+    override fun handleProjectEnding() {
+        view.openAlertActivityForError(AlertType.DIFFERENT_PROJECT_ID)
+    }
+
     override fun handleNotSignedInUser() {
         // The ConfirmIdentity should not be used to trigger the login, since if user is not signed in
         // there is not session open. (ClientApi doesn't create it for ConfirmIdentity)
