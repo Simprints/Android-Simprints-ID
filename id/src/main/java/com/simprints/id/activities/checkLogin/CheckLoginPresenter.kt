@@ -57,10 +57,7 @@ abstract class CheckLoginPresenter(
                     syncManager.cancelBackgroundSyncs()
                 }
 
-                is ProjectPausedException -> handlePausedProject().also {
-                    syncManager.scheduleBackgroundSyncs()
-                }
-
+                is ProjectPausedException -> handlePausedProject()
                 else -> {
                     Simber.e(t)
                     view.openAlertActivityForError(UNEXPECTED_ERROR)
@@ -73,18 +70,12 @@ abstract class CheckLoginPresenter(
         checkStatusForDeviceAndProject()
     }
 
-    private suspend fun checkStatusForDeviceAndProject() {
-        val status = getSecurityStatus()
+    private fun checkStatusForDeviceAndProject() {
+        val status = securityStateRepository.getSecurityStatusFromLocal()
         when {
             status == SecurityState.Status.PROJECT_PAUSED -> throw ProjectPausedException()
             status.isCompromisedOrProjectEnded() -> handleNotSignedInUser()
         }
-    }
-
-    private suspend fun getSecurityStatus() = try {
-        securityStateRepository.getSecurityStatusFromRemote().status
-    } catch (e: Exception) {
-        securityStateRepository.getSecurityStatusFromLocal()
     }
 
     abstract fun handlePausedProject()

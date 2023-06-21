@@ -206,20 +206,6 @@ class CheckLoginFromIntentPresenterTest {
     }
 
     @Test
-    fun presenter_handles_not_signed_user_on_ProjectPausedException() {
-        runTest(UnconfinedTestDispatcher()) {
-            every { authStoreMock.signedInProjectId } throws ProjectPausedException()
-
-            presenter.authStore = authStoreMock
-            presenter.syncManager = syncManager
-            presenter.runPrivateParentSuspendFunction("checkSignedInStateAndMoveOn")
-
-            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.PROJECT_PAUSED) }
-            coVerify(exactly = 1) { syncManager.scheduleBackgroundSyncs() }
-        }
-    }
-
-    @Test
     fun presenter_handles_not_signed_in_user_when_project_compromised_or_ended() {
         runTest(UnconfinedTestDispatcher()) {
             val appRequest = AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest(
@@ -228,9 +214,7 @@ class CheckLoginFromIntentPresenterTest {
                 "session",
                 STATIC_GUID
             )
-            coEvery { securityStateRepositoryMock.getSecurityStatusFromRemote() } returns mockk {
-                every { status } returns SecurityState.Status.COMPROMISED
-            }
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns SecurityState.Status.COMPROMISED
 
             presenter.appRequest = appRequest
             presenter.syncManager = syncManager
