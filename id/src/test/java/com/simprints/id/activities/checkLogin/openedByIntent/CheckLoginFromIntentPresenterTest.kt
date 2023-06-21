@@ -1,6 +1,7 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -28,9 +29,7 @@ import com.simprints.infra.projectsecuritystore.securitystate.models.SecuritySta
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.failTest
-import com.simprints.testtools.reflection.runPrivateParentSuspendFunction
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
@@ -75,7 +74,13 @@ class CheckLoginFromIntentPresenterTest {
     lateinit var securityStateRepositoryMock: SecurityStateRepository
 
     @MockK
-    lateinit var syncManager: SyncManager
+    lateinit var syncManagerMock: SyncManager
+
+    @MockK
+    lateinit var configManagerMock: ConfigManager
+
+    @MockK
+    lateinit var timeHelperMock: TimeHelper
 
     private val generalConfiguration = mockk<GeneralConfiguration>()
 
@@ -94,14 +99,14 @@ class CheckLoginFromIntentPresenterTest {
         coEvery { eventRepositoryMock.getEventsFromSession(any()) } returns emptyList()
 
         presenter = CheckLoginFromIntentPresenter(
-            view,
-            DEFAULT_DEVICE_ID,
-            recentUserActivityManager,
-            eventRepositoryMock,
-            enrolmentRecordManager,
-            simNetworkUtilsMock,
-            CoroutineScope(dispatcher),
-            dispatcher,
+            view = view,
+            deviceId = DEFAULT_DEVICE_ID,
+            recentUserActivityManager = recentUserActivityManager,
+            eventRepository = eventRepositoryMock,
+            enrolmentRecordManager = enrolmentRecordManager,
+            simNetworkUtils = simNetworkUtilsMock,
+            externalScope = CoroutineScope(dispatcher),
+            dispatcher = dispatcher,
         ).apply {
             appRequest = AppVerifyRequest(
                 DEFAULT_PROJECT_ID,
@@ -111,6 +116,10 @@ class CheckLoginFromIntentPresenterTest {
                 GUID1
             )
             securityStateRepository = securityStateRepositoryMock
+            timeHelper = timeHelperMock
+            configManager = configManagerMock
+            authStore = authStoreMock
+            syncManager = syncManagerMock
         }
     }
 
@@ -162,7 +171,7 @@ class CheckLoginFromIntentPresenterTest {
             every { authStoreMock.signedInProjectId } throws DifferentProjectIdSignedInException()
 
             presenter.authStore = authStoreMock
-            presenter.runPrivateParentSuspendFunction("checkSignedInStateAndMoveOn")
+            presenter.checkSignedInStateIfPossible()
 
             coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.DIFFERENT_PROJECT_ID) }
         }
@@ -174,7 +183,7 @@ class CheckLoginFromIntentPresenterTest {
             every { authStoreMock.signedInProjectId } throws DifferentUserIdSignedInException()
 
             presenter.authStore = authStoreMock
-            presenter.runPrivateParentSuspendFunction("checkSignedInStateAndMoveOn")
+            presenter.checkSignedInStateIfPossible()
 
             coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.DIFFERENT_USER_ID) }
         }
@@ -192,8 +201,7 @@ class CheckLoginFromIntentPresenterTest {
             coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns SecurityState.Status.COMPROMISED
 
             presenter.appRequest = appRequest
-            presenter.syncManager = syncManager
-            presenter.runPrivateParentSuspendFunction("checkStatusForDeviceAndProject")
+            presenter.handleSignedInUser()
 
             coVerify(exactly = 1) { view.finishCheckLoginFromIntentActivity() }
         }
@@ -204,12 +212,11 @@ class CheckLoginFromIntentPresenterTest {
         runTest(UnconfinedTestDispatcher()) {
             coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns SecurityState.Status.PROJECT_PAUSED
 
-            presenter.syncManager = syncManager
             try {
-                presenter.runPrivateParentSuspendFunction("checkStatusForDeviceAndProject")
+                presenter.handleSignedInUser()
                 failTest("ProjectPausedException is not thrown")
             } catch (e: Exception) {
-                assertThat(e is ProjectPausedException)
+                assertThat(e).isInstanceOf(ProjectPausedException::class.java)
             }
 
         }
