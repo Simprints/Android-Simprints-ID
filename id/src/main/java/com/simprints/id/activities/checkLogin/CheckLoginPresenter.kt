@@ -45,18 +45,11 @@ abstract class CheckLoginPresenter(
             handleSignedInUser()
         } catch (t: Throwable) {
             when (t) {
-                is DifferentProjectIdSignedInException -> {
-                    view.openAlertActivityForError(DIFFERENT_PROJECT_ID)
-                }
-
-                is DifferentUserIdSignedInException -> {
-                    view.openAlertActivityForError(DIFFERENT_USER_ID)
-                }
-
+                is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID)
+                is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID)
                 is NotSignedInException -> handleNotSignedInUser().also {
                     syncManager.cancelBackgroundSyncs()
                 }
-
                 is ProjectEndingException -> handleProjectEnding()
                 else -> {
                     Simber.e(t)
