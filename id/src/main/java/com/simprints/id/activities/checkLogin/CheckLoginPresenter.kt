@@ -57,7 +57,7 @@ abstract class CheckLoginPresenter(
                     syncManager.cancelBackgroundSyncs()
                 }
 
-                is ProjectEndingException -> handleNotSignedInUser()
+                is ProjectEndingException -> handleProjectEnding()
                 else -> {
                     Simber.e(t)
                     view.openAlertActivityForError(UNEXPECTED_ERROR)

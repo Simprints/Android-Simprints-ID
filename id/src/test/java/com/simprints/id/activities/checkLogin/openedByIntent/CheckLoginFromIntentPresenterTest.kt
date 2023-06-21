@@ -2,8 +2,10 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.id.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
+import com.simprints.id.exceptions.safe.secure.ProjectEndingException
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -16,9 +18,12 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.projectsecuritystore.SecurityStateRepository
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.syntax.failTest
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
@@ -59,6 +64,9 @@ class CheckLoginFromIntentPresenterTest {
     @MockK
     lateinit var recentUserActivityManager: RecentUserActivityManager
 
+    @MockK
+    lateinit var securityStateRepositoryMock: SecurityStateRepository
+
     private val generalConfiguration = mockk<GeneralConfiguration>()
 
     @Before
@@ -92,6 +100,7 @@ class CheckLoginFromIntentPresenterTest {
                 DEFAULT_METADATA,
                 GUID1
             )
+            securityStateRepository = securityStateRepositoryMock
         }
     }
 
@@ -123,6 +132,28 @@ class CheckLoginFromIntentPresenterTest {
             val updatedActivity =
                 updateConfigFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
             assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID)
+        }
+    }
+
+    @Test
+    fun presenter_handleEndingProject_shouldOpenAlertActivityForError() {
+        runTest(UnconfinedTestDispatcher()) {
+            presenter.onViewCreated(true)
+            presenter.handleProjectEnding()
+            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.PROJECT_ENDING) }
+        }
+    }
+
+    @Test
+    fun presenter_throws_ProjectEndingException_when_security_status_is_ending() {
+        runTest(UnconfinedTestDispatcher()) {
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns SecurityState.Status.PROJECT_ENDING
+            try {
+                presenter.handleSignedInUser()
+                failTest("ProjectEndingException is not thrown")
+            } catch (e: Exception) {
+                assertThat(e).isInstanceOf(ProjectEndingException::class.java)
+            }
         }
     }
 //

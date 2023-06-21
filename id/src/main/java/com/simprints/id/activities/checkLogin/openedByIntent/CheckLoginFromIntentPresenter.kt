@@ -201,7 +201,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         }
 
     override fun handleProjectEnding() {
-        view.openAlertActivityForError(AlertType.DIFFERENT_PROJECT_ID)
+        view.openAlertActivityForError(AlertType.PROJECT_ENDING)
     }
 
     override fun handleNotSignedInUser() {
