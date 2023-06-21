@@ -1,11 +1,15 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.alert.AlertType
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
+import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.ProjectEndingException
+import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -18,6 +22,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.events.sampledata.SampleDefaults.STATIC_GUID
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -67,6 +72,15 @@ class CheckLoginFromIntentPresenterTest {
     @MockK
     lateinit var securityStateRepositoryMock: SecurityStateRepository
 
+    @MockK
+    lateinit var syncManagerMock: SyncManager
+
+    @MockK
+    lateinit var configManagerMock: ConfigManager
+
+    @MockK
+    lateinit var timeHelperMock: TimeHelper
+
     private val generalConfiguration = mockk<GeneralConfiguration>()
 
     @Before
@@ -101,6 +115,10 @@ class CheckLoginFromIntentPresenterTest {
                 GUID1
             )
             securityStateRepository = securityStateRepositoryMock
+            timeHelper = timeHelperMock
+            configManager = configManagerMock
+            authStore = authStoreMock
+            syncManager = syncManagerMock
         }
     }
 
@@ -154,6 +172,32 @@ class CheckLoginFromIntentPresenterTest {
             } catch (e: Exception) {
                 assertThat(e).isInstanceOf(ProjectEndingException::class.java)
             }
+        }
+    }
+
+    @Test
+    fun presenter_opens_alert_activity_on_DifferentUserIdSignedInException() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { authStoreMock.signedInProjectId } throws DifferentUserIdSignedInException()
+            presenter.authStore = authStoreMock
+            presenter.checkSignedInStateIfPossible()
+            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.DIFFERENT_USER_ID) }
+        }
+    }
+
+    @Test
+    fun presenter_handles_not_signed_in_user_when_project_compromised_or_ended() {
+        runTest(UnconfinedTestDispatcher()) {
+            val appRequest = AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest(
+                DEFAULT_PROJECT_ID,
+                DEFAULT_USER_ID,
+                "session",
+                STATIC_GUID
+            )
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns SecurityState.Status.COMPROMISED
+            presenter.appRequest = appRequest
+            presenter.handleSignedInUser()
+            coVerify(exactly = 1) { view.finishCheckLoginFromIntentActivity() }
         }
     }
 //
