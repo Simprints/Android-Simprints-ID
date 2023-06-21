@@ -157,31 +157,6 @@ class CheckLoginFromIntentPresenterTest {
     }
 
     @Test
-    fun presenter_gets_security_status_from_remote() {
-        runTest(UnconfinedTestDispatcher()) {
-
-            presenter.onViewCreated(true)
-            presenter.runPrivateParentSuspendFunction("getSecurityStatus") as SecurityState.Status
-
-            coVerify(exactly = 1) { securityStateRepositoryMock.getSecurityStatusFromRemote() }
-        }
-    }
-
-    @Test
-    fun presenter_gets_security_status_from_local_when_remote_throws_exception() {
-        runTest(UnconfinedTestDispatcher()) {
-            coEvery { securityStateRepositoryMock.getSecurityStatusFromRemote() } throws Exception()
-
-            presenter.onViewCreated(true)
-            presenter.runPrivateParentSuspendFunction("getSecurityStatus") as SecurityState.Status
-
-            coVerify(exactly = 1) { securityStateRepositoryMock.getSecurityStatusFromRemote() }
-            coVerify(exactly = 1) { securityStateRepositoryMock.getSecurityStatusFromLocal() }
-        }
-    }
-
-
-    @Test
     fun presenter_opens_alert_activity_on_DifferentProjectIdSignedInException() {
         runTest(UnconfinedTestDispatcher()) {
             every { authStoreMock.signedInProjectId } throws DifferentProjectIdSignedInException()
@@ -227,9 +202,7 @@ class CheckLoginFromIntentPresenterTest {
     @Test
     fun presenter_throws_ProjectPausedException_when_security_status_is_paused() {
         runTest(UnconfinedTestDispatcher()) {
-            coEvery { securityStateRepositoryMock.getSecurityStatusFromRemote() } returns mockk {
-                every { status } returns SecurityState.Status.PROJECT_PAUSED
-            }
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns SecurityState.Status.PROJECT_PAUSED
 
             presenter.syncManager = syncManager
             try {
