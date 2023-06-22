@@ -117,7 +117,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
             with(configManager.getProjectConfiguration().synchronization) {
                 frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
             }
-        return isProjectPaused.not() && isDownSyncConfigEnabled
+        return !isProjectPaused && isDownSyncConfigEnabled
     }
 
     private fun getLastSyncId(): String? {
