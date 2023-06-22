@@ -5,6 +5,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.ExternalScope
+import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
@@ -18,6 +20,8 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
 import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
@@ -27,8 +31,9 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.projectsecuritystore.SecurityStateRepository
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -44,6 +49,9 @@ internal class SyncViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
+    private val securityStateRepository: SecurityStateRepository,
+    private val authManager: AuthManager,
+    @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     companion object {
@@ -58,6 +66,9 @@ internal class SyncViewModel @Inject constructor(
     val syncCardLiveData: LiveData<SyncCardState>
         get() = _syncCardLiveData
     private val _syncCardLiveData = MediatorLiveData<SyncCardState>()
+    val signOutEventLiveData: LiveData<LiveDataEvent>
+        get() = _signOutEventLiveData
+    private val _signOutEventLiveData = MediatorLiveData<LiveDataEvent>()
 
     private val upSyncCountLiveData = MutableLiveData(0)
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
@@ -73,6 +84,20 @@ internal class SyncViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _syncCardLiveData.postValue(SyncConnecting(lastTimeSyncSucceed(), 0, null))
+        }
+
+        // CORE-2638
+        // When project is in ENDING state and all data is synchronized, the user must be logged out
+        _signOutEventLiveData.addSource(_syncCardLiveData) { cardState ->
+            val isSyncComplete = cardState is SyncComplete
+            val isProjectEnding =
+                securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PROJECT_ENDING
+            if (isSyncComplete && isProjectEnding) {
+                externalScope.launch {
+                    authManager.signOut()
+                    _signOutEventLiveData.postValue(LiveDataEvent())
+                }
+            }
         }
 
         startInitialSyncIfRequired()
