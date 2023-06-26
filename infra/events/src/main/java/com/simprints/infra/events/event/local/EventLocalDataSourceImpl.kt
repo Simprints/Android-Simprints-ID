@@ -1,5 +1,6 @@
 package com.simprints.infra.events.event.local
 
+import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.database.sqlite.SQLiteException
 import com.simprints.core.DispatcherIO
 import com.simprints.core.NonCancellableIO
@@ -27,34 +28,50 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
     private var eventDao: EventRoomDao = eventDatabaseFactory.build().eventDao
     private val mutex = Mutex()
 
-    private suspend fun <R> useRoom(context: CoroutineContext, block: suspend () -> R): R {
-        return withContext(context) {
+    private suspend fun <R> useRoom(context: CoroutineContext, block: suspend () -> R): R =
+        withContext(context) {
             try {
                 block()
             } catch (ex: SQLiteException) {
-                if (ex.message?.contains("file is not a database") == true) {
-                    handleDatabaseEncryptionCorruption(ex, block)
+                if (isFileCorruption(ex)) {
+                    rebuildDatabase(ex)
+                    // Retry operation with new file and key
+                    block()
                 } else {
                     throw ex
                 }
             }
         }
-    }
 
-    private suspend fun <R> handleDatabaseEncryptionCorruption(ex: Exception, block: suspend () -> R): R {
-        mutex.withLock {
-            //DB corruption detected; either DB file or key is corrupt
-            //1. Delete DB file in order to create a new one at next init
-            eventDatabaseFactory.deleteDatabase()
-            //2. Recreate the DB key
-            eventDatabaseFactory.recreateDatabaseKey()
-            //3. Log exception after recreating the key so we get extra info
-            Simber.tag(DB_CORRUPTION.name).e(ex)
-            //4. Rebuild database
-            eventDao = eventDatabaseFactory.build().eventDao
-            //5. Retry operation with new file and key
-            return block()
+    private suspend fun <R> useRoomFlow(context: CoroutineContext, block: () -> Flow<R>): Flow<R> =
+        withContext(context) {
+            try {
+                block()
+            } catch (ex: SQLiteException) {
+                if (isFileCorruption(ex)) {
+                    rebuildDatabase(ex)
+                    // Retry operation with new file and key
+                    block()
+                } else {
+                    throw ex
+                }
+            }
         }
+
+    private fun isFileCorruption(ex: Throwable) =
+        ex is SQLiteDatabaseCorruptException ||
+            ex.let { it as? SQLiteException }?.message?.contains("file is not a database") == true
+
+    private suspend fun rebuildDatabase(ex: Throwable) = mutex.withLock {
+        //DB corruption detected; either DB file or key is corrupt
+        //1. Delete DB file in order to create a new one at next init
+        eventDatabaseFactory.deleteDatabase()
+        //2. Recreate the DB key
+        eventDatabaseFactory.recreateDatabaseKey()
+        //3. Log exception after recreating the key so we get extra info
+        Simber.tag(DB_CORRUPTION.name).e(ex)
+        //4. Rebuild database
+        eventDao = eventDatabaseFactory.build().eventDao
     }
 
     override suspend fun loadAll(): Flow<Event> =
@@ -93,12 +110,12 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         }
 
     override suspend fun observeCount(projectId: String): Flow<Int> =
-        useRoom(readingDispatcher) {
+        useRoomFlow(readingDispatcher) {
             eventDao.observeCount(projectId = projectId)
         }
 
     override suspend fun observeCount(projectId: String, type: EventType): Flow<Int> =
-        useRoom(readingDispatcher) {
+        useRoomFlow(readingDispatcher) {
             eventDao.observeCountFromType(projectId = projectId, type = type)
         }
 
