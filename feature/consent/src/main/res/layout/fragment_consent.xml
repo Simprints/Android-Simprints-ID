@@ -22,7 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="600dp"
-        app:srcCompat="@drawable/ic_simprints_logo_white_vertical" />
+        app:srcCompat="@drawable/simprints_logo_with_text" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/consentTabHost"

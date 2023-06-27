@@ -20,6 +20,7 @@ import androidx.work.await
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.R
+import com.simprints.infra.resources.R as IDR
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.models.FaceDetection
@@ -142,10 +143,10 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
             captureOverlay.drawWhiteTarget()
 
             captureTitle.setTextColor(
-                ContextCompat.getColor(requireContext(), R.color.capture_grey_blue)
+                ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey)
             )
             captureFeedbackTxtExplanation.setTextColor(
-                ContextCompat.getColor(requireContext(), R.color.capture_grey_blue)
+                ContextCompat.getColor(requireContext(), IDR.color.simprints_blue_grey)
             )
         }
     }
@@ -244,8 +245,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
 
     private fun renderProgressBar(valid: Boolean) {
         binding.apply {
-            val progressColor = if (valid) R.color.capture_green
-            else R.color.capture_grey
+            val progressColor = if (valid) IDR.color.simprints_light_green
+            else IDR.color.simprints_light_blue_grey
 
             captureProgress.progressColor = ContextCompat.getColor(
                 requireContext(), progressColor
