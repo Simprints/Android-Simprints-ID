@@ -25,11 +25,6 @@ fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
         }
     }
 
-@Suppress("unused")
-@ColorRes
-fun CaptureState.buttonTextColour(): Int =
-    android.R.color.white
-
 @ColorRes
 fun CaptureState.buttonBackgroundColour(): Int =
     when (this) {
