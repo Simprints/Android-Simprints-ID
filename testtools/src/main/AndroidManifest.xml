@@ -5,6 +5,6 @@
         <activity
             android:name=".hilt.HiltTestActivity"
             android:exported="false"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/Theme.Simprints" />
     </application>
 </manifest>

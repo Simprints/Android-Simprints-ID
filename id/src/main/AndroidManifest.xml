@@ -4,8 +4,8 @@
     <!-- Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -23,10 +23,10 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="false"
         android:networkSecurityConfig="@xml/network_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Simprints"
+        android:usesCleartextTraffic="false"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
@@ -43,7 +43,7 @@
         <activity
             android:name=".activities.orchestrator.OrchestratorActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Launcher" />
+            android:theme="@style/Theme.Simprints.Launcher" />
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
             android:exported="true"
@@ -72,7 +72,7 @@
 
         <service
             android:name=".services.sync.events.down.EventDownSyncResetService"
-            android:exported="false"/>
+            android:exported="false" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
