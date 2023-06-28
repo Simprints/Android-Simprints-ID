@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Simprints" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Color palette -->
+        <!-- https://m2.material.io/develop/android/theming/color -->
+
+        <item name="colorPrimary">@color/simprints_blue</item>
+        <item name="colorPrimaryVariant">@color/simprints_blue_dark</item>
+        <item name="colorOnPrimary">@color/simprints_text_white</item>
+        <item name="colorSecondary">@color/simprints_orange</item>
+        <item name="colorSecondaryVariant">@color/simprints_orange_dark</item>
+        <item name="colorOnSecondary">@color/simprints_text_white</item>
+        <item name="android:colorBackground">@color/simprints_white</item>
+        <item name="colorOnBackground">@color/simprints_text_black</item>
+        <item name="colorError">@color/simprints_red_dark</item>
+        <item name="colorOnError">@color/simprints_text_white</item>
+        <item name="colorSurface">@color/simprints_white</item>
+        <item name="colorOnSurface">@color/simprints_text_black</item>
+
+        <!-- Default typography -->
+        <!-- https://m2.material.io/develop/android/theming/typography -->
+        <item name="textAppearanceHeadline1">@style/TextAppearance.Simprints.Headline1</item>
+        <item name="textAppearanceHeadline2">@style/TextAppearance.Simprints.Headline2</item>
+        <item name="textAppearanceHeadline3">@style/TextAppearance.Simprints.Headline3</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.Simprints.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Simprints.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Simprints.Headline6</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.Simprints.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.Simprints.Subtitle2</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.Simprints.Body1</item>
+        <item name="textAppearanceBody2">@style/TextAppearance.Simprints.Body2</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.Simprints.Caption</item>
+        <item name="textAppearanceButton">@style/TextAppearance.Simprints.Button</item>
+        <item name="textAppearanceOverline">@style/TextAppearance.Simprints.Overline</item>
+
+        <!-- Default shapes -->
+        <!-- https://m2.material.io/develop/android/theming/shape -->
+        <item name="shapeAppearanceSmallComponent">@style/Shape.Simprints.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/Shape.Simprints.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/Shape.Simprints.LargeComponent</item>
+
+        <!-- Default widget styles -->
+        <item name="android:textViewStyle">@style/Widget.Simprints.TextView</item>
+        <item name="appBarLayoutStyle">@style/Widget.Simprints.AppBarLayout</item>
+        <item name="toolbarStyle">@style/Widget.Simprints.Toolbar</item>
+        <item name="borderlessButtonStyle">@style/Widget.Simprints.Button.TextButton</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Simprints.Button.OutlinedButton</item>
+        <item name="materialButtonStyle">@style/Widget.Simprints.Button</item>
+        <item name="radioButtonStyle">@style/Widget.Simprints.RadioButton</item>
+        <item name="tabStyle">@style/Widget.Simprints.TabLayout</item>
+        <item name="textInputStyle">@style/Widget.Simprints.FilledTextInputLayout</item>
+        <item name="chipStyle">@style/Widget.Simprints.Chip</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Simprints.AlertDialog</item>
+        <item name="preferenceTheme">@style/ThemeOverlay.Simprints.Preferences</item>
+        <item name="circularProgressIndicatorStyle">@style/Widget.Simprints.CircularProgressIndicator</item>
+        <item name="linearProgressIndicatorStyle">@style/Widget.Simprints.LinearProgressIndicator</item>
+
+        <!-- Misc configuration -->
+        <item name="android:statusBarColor">?colorPrimaryVariant</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Theme variant with logo on a blue background, can be used for splash screen activities -->
+    <style name="Theme.Simprints.Launcher">
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
+    <style name="Theme.Simprints.Transparent">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:background">#00000000</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+
+</resources>
