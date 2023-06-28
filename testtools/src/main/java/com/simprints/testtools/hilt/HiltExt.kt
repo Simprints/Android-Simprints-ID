@@ -13,6 +13,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.material.R as MR
 
 const val FRAGMENT_TAG = "FRAGMENT_TAG"
 
@@ -28,7 +29,7 @@ const val FRAGMENT_TAG = "FRAGMENT_TAG"
 inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     fragmentArgs: Bundle? = null,
     initialState: Lifecycle.State = Lifecycle.State.RESUMED,
-    @StyleRes themeResId: Int = androidx.appcompat.R.style.Theme_AppCompat,
+    @StyleRes themeResId: Int = MR.style.Theme_MaterialComponents,
     navController: NavController? = null,
     crossinline action: Fragment.() -> Unit = {}
 ) {

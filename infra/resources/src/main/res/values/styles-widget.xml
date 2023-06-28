@@ -108,6 +108,7 @@
         <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TextInputLayout</item>
         <item name="shapeAppearance">@style/Shape.Simprints.MediumComponent</item>
         <item name="android:textColorHint">@color/simprints_text_grey_light</item>
+        <item name="endIconTint">@color/simprints_text_grey_light</item>
         <item name="android:textColor">@color/simprints_text_black</item>
     </style>
 
