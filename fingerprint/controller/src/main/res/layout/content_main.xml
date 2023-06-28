@@ -1,77 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/simprints_off_white"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
+    tools:showIn="@layout/activity_collect_fingerprints">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/simprints_off_white"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        tools:context="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
-        tools:showIn="@layout/activity_collect_fingerprints">
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_weight="5" />
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/view_pager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:layout_weight="5" />
+    <TextView
+        android:id="@+id/missingFingerText"
+        style="@style/Text.Body2.Accented"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="start"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="6dp"
+        android:text="@string/missing_finger" />
 
-        <TextView
-            android:id="@+id/missingFingerText"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_weight=".5"
-            android:layout_marginTop="6dp"
-            android:layout_marginStart="40dp"
-            android:layout_gravity="start"
-            android:textSize="15sp"
-            android:textColor="@color/colorAccent"/>
+    <LinearLayout
+        android:id="@+id/indicator_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_weight=".5"
+        android:orientation="horizontal" />
 
-        <LinearLayout
-            android:id="@+id/indicator_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:layout_weight=".5"
-            android:orientation="horizontal" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".5" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight=".5" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/scan_button"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:longClickable="true"
+        tools:text="@string/scan_label" />
 
-        <Button
-            android:id="@+id/scan_button"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/muli"
-            android:longClickable="true"
-            android:textColor="#7F000000"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>
