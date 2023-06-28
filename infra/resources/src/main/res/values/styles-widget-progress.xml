@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Progress indicators definitions are in a separate file since there is large number of variations.
+        Styles follow same rules and conventions as described in styles-widget.xml.
+
+        https://m2.material.io/components/progress-indicators/android#theming
+    -->
+
+    <style name="Widget.Simprints.CircularProgressIndicator" parent="Widget.MaterialComponents.CircularProgressIndicator">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.CircularProgressIndicator</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.CircularProgressIndicator" parent="">
+        <item name="colorPrimary">@color/simprints_orange</item>
+    </style>
+
+    <style name="Widget.Simprints.LinearProgressIndicator" parent="Widget.MaterialComponents.LinearProgressIndicator">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.LinearProgressIndicator</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.LinearProgressIndicator" parent="">
+        <item name="colorPrimary">@color/simprints_orange</item>
+    </style>
+
+    <style name="Widget.Simprints.LinearProgressIndicator.Blue" parent="Widget.MaterialComponents.LinearProgressIndicator">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.LinearProgressIndicator.Blue</item>
+    </style>
+
+    <style name="Widget.Simprints.LinearProgressIndicator.Blue.Large" >
+        <item name="trackThickness">16dp</item>
+        <item name="trackCornerRadius">8dp</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.LinearProgressIndicator.Blue" parent="">
+        <item name="colorPrimary">@color/simprints_blue</item>
+    </style>
+
+    <style name="Widget.Simprints.LinearProgressIndicator.White" parent="Widget.MaterialComponents.LinearProgressIndicator">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.LinearProgressIndicator.White</item>
+    </style>
+
+    <style name="Widget.Simprints.LinearProgressIndicator.White.Large" >
+        <item name="trackThickness">16dp</item>
+        <item name="trackCornerRadius">8dp</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.LinearProgressIndicator.White" parent="">
+        <item name="colorPrimary">@color/simprints_white</item>
+    </style>
+
+</resources>
