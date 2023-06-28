@@ -1,22 +1,26 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection
 
-import androidx.appcompat.widget.SearchView
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.lifecycle.MutableLiveData
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools.ModuleQueryFilter
 
 internal class ModuleSelectionQueryListener(private val modules: List<Module>) :
-    SearchView.OnQueryTextListener {
+    TextWatcher {
 
     val searchResults = MutableLiveData<List<Module>>()
 
     private val queryFilter = ModuleQueryFilter()
 
-    override fun onQueryTextSubmit(query: String?) = false
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        searchResults.value = queryFilter.getFilteredList(modules, newText)
-        return false
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
     }
 
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+    }
+
+    override fun afterTextChanged(s: Editable?) {
+        val newText = s?.toString().orEmpty()
+        searchResults.value = queryFilter.getFilteredList(modules, newText)
+    }
 }

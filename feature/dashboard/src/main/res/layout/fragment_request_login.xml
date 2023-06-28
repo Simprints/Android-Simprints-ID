@@ -23,49 +23,46 @@
 
         <ImageView
             android:id="@+id/loginImageViewLogo"
-            android:layout_width="55dp"
-            android:layout_height="75dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:src="@drawable/simprints_logo" />
 
 
         <TextView
             android:id="@+id/libSimprintsVersionTextView"
+            style="@style/Text.Body1.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="43dp"
             android:text="@string/libsimprints_label"
-            android:textColor="@color/simprints_white"
-            android:textSize="15sp" />
-
+            android:textColor="@color/simprints_white" />
 
         <TextView
             android:id="@+id/simprintsIdVersionTextView"
+            style="@style/Text.Body1.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:textColor="@color/simprints_white"
-            android:textSize="15sp"
             tools:text="Simprints ID: 0.0.0-dev+1" />
 
         <TextView
             android:id="@+id/requestLogin"
+            style="@style/Text.Headline5.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:gravity="center"
             android:text="@string/requestLogin_message"
-            android:textColor="@color/simprints_white"
-            android:textSize="20sp" />
+            android:textColor="@color/simprints_white" />
 
         <TextView
             android:id="@+id/tv_device_id"
+            style="@style/Text.Headline6.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:gravity="center"
-            android:textColor="@color/simprints_white"
             android:textIsSelectable="true"
-            android:textSize="20sp"
             tools:text="DeviceID: some device id" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

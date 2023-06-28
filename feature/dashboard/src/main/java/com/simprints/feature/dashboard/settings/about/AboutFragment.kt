@@ -6,23 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Locale
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -41,13 +38,12 @@ internal class AboutFragment : PreferenceFragmentCompat() {
     private val binding by viewBinding(FragmentSettingsAboutBinding::bind)
 
     private val confirmationDialogForLogout: AlertDialog by lazy {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(IDR.string.confirmation_logout_title))
             .setMessage(getString(IDR.string.confirmation_logout_message))
             .setPositiveButton(getString(IDR.string.logout)) { _, _ -> viewModel.processLogoutRequest() }
-            .setNegativeButton(
-                getString(IDR.string.confirmation_logout_cancel), null
-            ).create()
+            .setNegativeButton(getString(IDR.string.confirmation_logout_cancel), null)
+            .create()
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
