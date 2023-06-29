@@ -10,6 +10,8 @@ import androidx.navigation.fragment.findNavController
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDashboardCardSyncBinding
+import com.simprints.feature.dashboard.requestlogin.LogoutReason
+import com.simprints.feature.dashboard.requestlogin.RequestLoginFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,6 +43,16 @@ internal class SyncFragment : Fragment(R.layout.fragment_dashboard_card_sync) {
         }
         viewModel.syncCardLiveData.observe(viewLifecycleOwner) {
             binding.dashboardSyncCard.render(state = it)
+        }
+        viewModel.signOutEventLiveData.observe(viewLifecycleOwner) {
+            val logoutReason = LogoutReason(
+                title = getString(com.simprints.infra.resources.R.string.project_ending_title),
+                body = getString(com.simprints.infra.resources.R.string.project_ending_body)
+            )
+            findNavController().navigate(
+                R.id.action_mainFragment_to_requestLoginFragment,
+                RequestLoginFragmentArgs(logoutReason = logoutReason).toBundle()
+            )
         }
     }
 }

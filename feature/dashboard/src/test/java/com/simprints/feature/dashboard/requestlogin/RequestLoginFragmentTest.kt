@@ -1,5 +1,6 @@
 package com.simprints.feature.dashboard.requestlogin
 
+import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -41,7 +42,10 @@ class RequestLoginFragmentTest {
 
     @Test
     fun `should add the text correctly`() {
-        launchFragmentInHiltContainer<RequestLoginFragment>(initialState = Lifecycle.State.STARTED)
+        launchFragmentInHiltContainer<RequestLoginFragment>(
+            initialState = Lifecycle.State.STARTED,
+            fragmentArgs = Bundle()
+        )
         onView(withId(R.id.tv_device_id)).check(matches(withText(containsString(FakeCoreModule.DEVICE_ID))))
         onView(withId(R.id.simprintsIdVersionTextView)).check(
             matches(
@@ -63,7 +67,8 @@ class RequestLoginFragmentTest {
 
         launchFragmentInHiltContainer<RequestLoginFragment>(
             initialState = Lifecycle.State.STARTED,
-            navController = navController
+            navController = navController,
+            fragmentArgs = Bundle()
         ) {
             activity?.moveToState(Lifecycle.State.RESUMED)
             assertThat(navController.currentDestination?.id).isEqualTo(R.id.requestLoginFragment)
@@ -80,7 +85,8 @@ class RequestLoginFragmentTest {
 
         launchFragmentInHiltContainer<RequestLoginFragment>(
             initialState = Lifecycle.State.STARTED,
-            navController = navController
+            navController = navController,
+            fragmentArgs = Bundle()
         ) {
             activity?.moveToState(Lifecycle.State.RESUMED)
 

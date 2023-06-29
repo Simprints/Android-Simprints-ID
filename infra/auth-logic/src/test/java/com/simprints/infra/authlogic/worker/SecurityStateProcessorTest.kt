@@ -10,9 +10,7 @@ import com.simprints.infra.projectsecuritystore.securitystate.models.UpSyncEnrol
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -37,15 +35,12 @@ internal class SecurityStateProcessorTest {
 
     private lateinit var securityStateProcessor: SecurityStateProcessor
 
-    private val projectId = "projectId"
-    private val subjects = listOf("subject1")
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { mockSignerManager.signedInProjectId } returns projectId
-        coEvery { eventSyncManager.countEventsToUpload(projectId, null) } returns flowOf(0)
+        coEvery { mockSignerManager.signedInProjectId } returns PROJECT_ID
+        coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, null) } returns flowOf(0)
         securityStateProcessor = SecurityStateProcessor(
             imageRepository = mockImageRepository,
             enrolmentRecordManager = enrolmentRecordManager,
@@ -62,13 +57,13 @@ internal class SecurityStateProcessorTest {
                 SecurityState(
                     DEVICE_ID,
                     SecurityState.Status.RUNNING,
-                    UpSyncEnrolmentRecords(projectId, subjects)
+                    UpSyncEnrolmentRecords(PROJECT_ID, SUBJECTS)
                 )
 
             securityStateProcessor.processSecurityState(securityState)
 
             coVerify(exactly = 1) {
-                enrolmentRecordManager.upload(id = projectId, subjectIds = subjects)
+                enrolmentRecordManager.upload(id = PROJECT_ID, subjectIds = SUBJECTS)
             }
         }
 
@@ -107,7 +102,7 @@ internal class SecurityStateProcessorTest {
             securityStateProcessor.processSecurityState(securityState)
 
             coVerify(exactly = 1) {
-                eventSyncManager.countEventsToUpload(projectId = projectId, type = null)
+                eventSyncManager.countEventsToUpload(projectId = PROJECT_ID, type = null)
             }
             coVerify(exactly = 1) { mockImageRepository.deleteStoredImages() }
             coVerify(exactly = 1) { enrolmentRecordManager.deleteAll() }
@@ -118,25 +113,25 @@ internal class SecurityStateProcessorTest {
     @Test
     fun `when project state is PROJECT_ENDING and there are events to upload should not sign out and not delete local data`() =
         runTest {
-            coEvery { eventSyncManager.countEventsToUpload(projectId, null) } returns flowOf(1)
+            coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, null) } returns flowOf(1)
             val status = SecurityState.Status.PROJECT_ENDING
             val securityState = SecurityState(
                 deviceId = DEVICE_ID,
                 status = status,
-                mustUpSyncEnrolmentRecords = UpSyncEnrolmentRecords(projectId, subjects)
+                mustUpSyncEnrolmentRecords = UpSyncEnrolmentRecords(PROJECT_ID, SUBJECTS)
             )
 
             securityStateProcessor.processSecurityState(securityState)
 
             coVerify(exactly = 1) {
-                eventSyncManager.countEventsToUpload(projectId = projectId, type = null)
+                eventSyncManager.countEventsToUpload(projectId = PROJECT_ID, type = null)
             }
             coVerify(exactly = 0) { mockImageRepository.deleteStoredImages() }
             coVerify(exactly = 0) { enrolmentRecordManager.deleteAll() }
             coVerify(exactly = 0) { eventRepository.deleteAll() }
             coVerify(exactly = 0) { mockSignerManager.signOut() }
             coVerify(exactly = 1) {
-                enrolmentRecordManager.upload(id = projectId, subjectIds = subjects)
+                enrolmentRecordManager.upload(id = PROJECT_ID, subjectIds = SUBJECTS)
             }
         }
 
@@ -155,6 +150,8 @@ internal class SecurityStateProcessorTest {
 
     private companion object {
         const val DEVICE_ID = "device-id"
+        const val PROJECT_ID = "projectId"
+        val SUBJECTS = listOf("subject1")
     }
 
 }
