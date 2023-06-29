@@ -26,8 +26,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         FINGERPRINT_CONFIGURATION_ERROR,
         BACKEND_MAINTENANCE_ERROR,
         PROJECT_ENDING,
-        PROJECT_PAUSED;
-        FACE_CONFIGURATION_ERROR,
+        PROJECT_PAUSED,
+        FACE_CONFIGURATION_ERROR;
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =

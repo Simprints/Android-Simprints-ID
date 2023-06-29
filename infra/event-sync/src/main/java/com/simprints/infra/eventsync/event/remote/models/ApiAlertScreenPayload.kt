@@ -106,4 +106,6 @@ internal fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
         AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED -> GOOGLE_PLAY_SERVICES_OUTDATED
         AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
         AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
+        AlertScreenEventType.PROJECT_PAUSED -> PROJECT_PAUSED
+        AlertScreenEventType.PROJECT_ENDING -> PROJECT_ENDING
     }
