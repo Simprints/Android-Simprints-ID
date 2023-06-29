@@ -3,6 +3,7 @@ package com.simprints.feature.dashboard.main.sync
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
@@ -15,6 +16,7 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
 import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
+import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -27,14 +29,18 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.projectsecuritystore.SecurityStateRepository
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Rule
@@ -69,6 +75,12 @@ class SyncViewModelTest {
 
     @MockK
     lateinit var authStore: AuthStore
+
+    @MockK
+    lateinit var securityStateRepository: SecurityStateRepository
+
+    @MockK
+    lateinit var authManager: AuthManager
 
     @Before
     fun setUp() {
@@ -123,11 +135,11 @@ class SyncViewModelTest {
     fun `should not trigger an initial sync if the sync is running`() {
         syncState.value = EventSyncState(
             "", 0, 0, listOf(
-            EventSyncState.SyncWorkerInfo(
-                EventSyncWorkerType.DOWNLOADER,
-                EventSyncWorkerState.Running
-            )
-        ), listOf()
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Running
+                )
+            ), listOf()
         )
         isConnected.value = true
 
@@ -224,11 +236,11 @@ class SyncViewModelTest {
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 0, 0, listOf(), listOf(
-            EventSyncState.SyncWorkerInfo(
-                EventSyncWorkerType.DOWNLOADER,
-                EventSyncWorkerState.Succeeded
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Succeeded
+                )
             )
-        )
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -289,11 +301,11 @@ class SyncViewModelTest {
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
-            EventSyncState.SyncWorkerInfo(
-                EventSyncWorkerType.DOWNLOADER,
-                EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true)
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseTooManyRequest = true)
+                )
             )
-        )
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -310,11 +322,11 @@ class SyncViewModelTest {
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
-            EventSyncState.SyncWorkerInfo(
-                EventSyncWorkerType.DOWNLOADER,
-                EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true)
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseCloudIntegration = true)
+                )
             )
-        )
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -353,14 +365,14 @@ class SyncViewModelTest {
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
-            EventSyncState.SyncWorkerInfo(
-                EventSyncWorkerType.DOWNLOADER,
-                EventSyncWorkerState.Failed(
-                    failedBecauseBackendMaintenance = true,
-                    estimatedOutage = 30
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(
+                        failedBecauseBackendMaintenance = true,
+                        estimatedOutage = 30
+                    )
                 )
             )
-        )
         )
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -389,11 +401,40 @@ class SyncViewModelTest {
         assertThat(syncCardLiveData).isEqualTo(SyncTryAgain(DATE))
     }
 
+    @Test
+    fun `should logout when project is ending and sync is complete`() {
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf("module 1"),
+            ""
+        )
+        every { securityStateRepository.getSecurityStatusFromLocal() } returns SecurityState.Status.PROJECT_ENDING
+        isConnected.value = true
+        syncState.value = EventSyncState(
+            "", 0, 0, listOf(),
+            listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Succeeded
+                )
+            )
+        )
+        val viewModel = initViewModel()
+        viewModel.syncCardLiveData.getOrAwaitValue()
+        val signOutEvent = viewModel.signOutEventLiveData.getOrAwaitValue()
+
+        assertThat(signOutEvent).isNotNull()
+        coVerify(exactly = 1) { authManager.signOut() }
+    }
+
     private fun initViewModel(): SyncViewModel = SyncViewModel(
-        eventSyncManager,
-        connectivityTracker,
-        configManager,
-        timeHelper,
-        authStore,
+        eventSyncManager = eventSyncManager,
+        connectivityTracker = connectivityTracker,
+        configManager = configManager,
+        timeHelper = timeHelper,
+        authStore = authStore,
+        securityStateRepository = securityStateRepository,
+        authManager = authManager,
+        externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
     )
 }

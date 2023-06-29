@@ -221,6 +221,13 @@ internal class SignerManagerTest {
         coVerify { mockConfigManager.clearData() }
     }
 
+    @Test
+    fun `when signedInProjectId is accessed then authStore is invoked`() {
+        signerManager.signedInProjectId
+
+        verify(exactly = 1) { mockAuthStore.signedInProjectId }
+    }
+
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)
 
     private fun mockStoreCredentialsLocally(error: Boolean = false) =
