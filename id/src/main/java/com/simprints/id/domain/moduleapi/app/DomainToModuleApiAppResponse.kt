@@ -40,6 +40,7 @@ object DomainToModuleApiAppResponse {
             FINGERPRINT_CONFIGURATION_ERROR -> IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR
             FACE_CONFIGURATION_ERROR -> IAppErrorReason.FACE_CONFIGURATION_ERROR
             BACKEND_MAINTENANCE_ERROR -> IAppErrorReason.BACKEND_MAINTENANCE_ERROR
+            PROJECT_PAUSED -> IAppErrorReason.PROJECT_PAUSED
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)

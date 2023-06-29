@@ -50,6 +50,7 @@ data class ErrorCallbackEvent(
             FACE_LICENSE_INVALID,
             FINGERPRINT_CONFIGURATION_ERROR,
             BACKEND_MAINTENANCE_ERROR,
+            PROJECT_PAUSED,
             FACE_CONFIGURATION_ERROR;
 
             companion object {
@@ -67,6 +68,7 @@ data class ErrorCallbackEvent(
                         IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR -> FINGERPRINT_CONFIGURATION_ERROR
                         IAppErrorReason.FACE_CONFIGURATION_ERROR -> FACE_CONFIGURATION_ERROR
                         IAppErrorReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
+                        IAppErrorReason.PROJECT_PAUSED -> PROJECT_PAUSED
                         IAppErrorReason.ROOTED_DEVICE -> throw Throwable("Can't convert from rooted device")
                     }
             }
