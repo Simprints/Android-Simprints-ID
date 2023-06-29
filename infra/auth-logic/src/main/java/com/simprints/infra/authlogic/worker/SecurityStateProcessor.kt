@@ -19,20 +19,16 @@ internal class SecurityStateProcessor @Inject constructor(
 ) {
 
     suspend fun processSecurityState(securityState: SecurityState) {
-        when (shouldSignOut(securityState)) {
-            true -> {
-                deleteLocalData()
-                signOut()
-            }
-
-            false -> {
-                securityState.mustUpSyncEnrolmentRecords?.let { upSyncEnrolmentRecords ->
-                    Simber.i("subject ids ${upSyncEnrolmentRecords.subjectIds.size}")
-                    enrolmentRecordManager.upload(
-                        upSyncEnrolmentRecords.id,
-                        upSyncEnrolmentRecords.subjectIds
-                    )
-                }
+        if (shouldSignOut(securityState)) {
+            deleteLocalData()
+            signOut()
+        } else {
+            securityState.mustUpSyncEnrolmentRecords?.let { upSyncEnrolmentRecords ->
+                Simber.i("subject ids ${upSyncEnrolmentRecords.subjectIds.size}")
+                enrolmentRecordManager.upload(
+                    upSyncEnrolmentRecords.id,
+                    upSyncEnrolmentRecords.subjectIds
+                )
             }
         }
     }
