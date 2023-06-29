@@ -219,6 +219,10 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         }
     }
 
+    override fun handlePausedProject() {
+        view.openAlertActivityForError(AlertType.PROJECT_PAUSED)
+    }
+
     /** @throws DifferentProjectIdSignedInException */
     override fun isProjectIdStoredAndMatches(): Boolean =
         authStore.signedInProjectId.isNotEmpty() &&
