@@ -75,11 +75,8 @@ abstract class CheckLoginPresenter(
     private fun checkStatusForDeviceAndProject() {
         val status = securityStateRepository.getSecurityStatusFromLocal()
         when {
-            status == SecurityState.Status.PROJECT_ENDING -> throw ProjectEndingException()
-            status.isCompromisedOrProjectEnded() -> handleNotSignedInUser()
-        }
-        when {
             status == SecurityState.Status.PROJECT_PAUSED -> throw ProjectPausedException()
+            status == SecurityState.Status.PROJECT_ENDING -> throw ProjectEndingException()
             status.isCompromisedOrProjectEnded() -> handleNotSignedInUser()
         }
     }
