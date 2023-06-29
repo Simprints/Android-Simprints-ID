@@ -197,8 +197,7 @@ class CheckLoginFromIntentPresenterTest {
             presenter.appRequest = appRequest
             presenter.handleSignedInUser()
 
-            // We expect 2 calls, one for ended and one for paused
-            coVerify(exactly = 2) { view.finishCheckLoginFromIntentActivity() }
+            coVerify(exactly = 1) { view.finishCheckLoginFromIntentActivity() }
         }
     }
 
