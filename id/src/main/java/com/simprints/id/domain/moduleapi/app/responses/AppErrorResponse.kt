@@ -26,7 +26,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         FINGERPRINT_CONFIGURATION_ERROR,
         BACKEND_MAINTENANCE_ERROR,
         PROJECT_ENDING,
-        FACE_CONFIGURATION_ERROR;
+        PROJECT_PAUSED;
+        FACE_CONFIGURATION_ERROR,
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
@@ -39,6 +40,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.INTEGRITY_SERVICE_ERROR,
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     AlertType.PROJECT_ENDING -> PROJECT_ENDING
+                    AlertType.PROJECT_PAUSED -> PROJECT_PAUSED
                 }
         }
     }

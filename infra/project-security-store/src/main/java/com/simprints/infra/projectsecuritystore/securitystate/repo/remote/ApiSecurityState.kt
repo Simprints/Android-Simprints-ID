@@ -13,6 +13,7 @@ internal data class ApiSecurityState(
     @Keep
     enum class Status {
         RUNNING,
+        PROJECT_PAUSED,
         COMPROMISED,
         PROJECT_ENDING,
         PROJECT_ENDED,
@@ -23,6 +24,7 @@ internal data class ApiSecurityState(
             COMPROMISED -> SecurityState.Status.COMPROMISED
             PROJECT_ENDED -> SecurityState.Status.PROJECT_ENDED
             PROJECT_ENDING -> SecurityState.Status.PROJECT_ENDING
+            PROJECT_PAUSED -> SecurityState.Status.PROJECT_PAUSED
         }
     }
 

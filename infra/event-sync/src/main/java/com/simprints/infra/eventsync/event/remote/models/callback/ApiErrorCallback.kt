@@ -15,11 +15,13 @@ internal data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCal
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
         GUID_NOT_FOUND_ONLINE,
+
         @Deprecated("User can't leave the app anymore in case of GUID_NOT_FOUND_OFFLINE. He exits through the ExitForm.")
         GUID_NOT_FOUND_OFFLINE,
         UNEXPECTED_ERROR,
         BACKEND_MAINTENANCE_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
+
         @Deprecated("User can't leave the app anymore in case of SCANNER_LOW_BATTERY. He exits through the ExitForm.")
         SCANNER_LOW_BATTERY,
 
@@ -27,7 +29,8 @@ internal data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCal
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         FACE_LICENSE_MISSING,
         FACE_LICENSE_INVALID,
-        PROJECT_ENDING
+        PROJECT_ENDING,
+        PROJECT_PAUSED
     }
 }
 
@@ -45,7 +48,6 @@ internal fun Reason.fromDomainToApi() =
         FINGERPRINT_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         FACE_CONFIGURATION_ERROR -> ApiReason.UNEXPECTED_ERROR
         BACKEND_MAINTENANCE_ERROR -> ApiReason.BACKEND_MAINTENANCE_ERROR
-        PROJECT_ENDING -> ApiReason.PROJECT_ENDING
     }
 
 
@@ -63,5 +65,4 @@ internal fun ApiReason.fromApiToDomain(): Reason =
         ApiReason.FACE_LICENSE_MISSING -> FACE_LICENSE_MISSING
         ApiReason.FACE_LICENSE_INVALID -> FACE_LICENSE_INVALID
         ApiReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
-        ApiReason.PROJECT_ENDING -> PROJECT_ENDING
     }

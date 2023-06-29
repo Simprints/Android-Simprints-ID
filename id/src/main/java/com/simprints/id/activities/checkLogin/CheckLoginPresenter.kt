@@ -8,6 +8,7 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.safe.secure.ProjectEndingException
+import com.simprints.id.exceptions.safe.secure.ProjectPausedException
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
@@ -45,12 +46,20 @@ abstract class CheckLoginPresenter(
             handleSignedInUser()
         } catch (t: Throwable) {
             when (t) {
-                is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID)
-                is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID)
+                is DifferentProjectIdSignedInException -> {
+                    view.openAlertActivityForError(DIFFERENT_PROJECT_ID)
+                }
+
+                is DifferentUserIdSignedInException -> {
+                    view.openAlertActivityForError(DIFFERENT_USER_ID)
+                }
+
                 is NotSignedInException -> handleNotSignedInUser().also {
                     syncManager.cancelBackgroundSyncs()
                 }
                 is ProjectEndingException -> handleProjectEnding()
+
+                is ProjectPausedException -> handlePausedProject()
                 else -> {
                     Simber.e(t)
                     view.openAlertActivityForError(UNEXPECTED_ERROR)
@@ -69,9 +78,14 @@ abstract class CheckLoginPresenter(
             status == SecurityState.Status.PROJECT_ENDING -> throw ProjectEndingException()
             status.isCompromisedOrProjectEnded() -> handleNotSignedInUser()
         }
+        when {
+            status == SecurityState.Status.PROJECT_PAUSED -> throw ProjectPausedException()
+            status.isCompromisedOrProjectEnded() -> handleNotSignedInUser()
+        }
     }
 
     abstract fun handleProjectEnding()
+    abstract fun handlePausedProject()
     abstract fun handleNotSignedInUser()
 
     /**

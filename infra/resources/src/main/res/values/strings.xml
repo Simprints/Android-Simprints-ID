@@ -329,6 +329,8 @@
     <string name="outdated_google_play_services_alert_message">The installed \"Google Play Services\" version on this device is older than the one required by SID</string>
     <string name="missing_google_play_services_alert_title">Missing \"Google Play Services\"</string>
     <string name="missing_google_play_services_alert_message">The \"Google Play Services\" isn\'t installed on this device.</string>
+    <string name="project_paused_title">Project is currently paused</string>
+    <string name="project_paused_body">Unable to launch session because the project is currently paused. Please contact your supervisor for more information</string>
     <string name="project_ending_title">Project is currently ending</string>
     <string name="project_ending_body">Unable to launch session because the project is currently ending. Please contact your supervisor for more information</string>
 

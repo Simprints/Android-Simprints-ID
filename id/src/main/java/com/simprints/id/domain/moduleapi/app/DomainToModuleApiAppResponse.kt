@@ -41,6 +41,7 @@ object DomainToModuleApiAppResponse {
             FACE_CONFIGURATION_ERROR -> IAppErrorReason.FACE_CONFIGURATION_ERROR
             BACKEND_MAINTENANCE_ERROR -> IAppErrorReason.BACKEND_MAINTENANCE_ERROR
             PROJECT_ENDING -> IAppErrorReason.PROJECT_ENDING
+            PROJECT_PAUSED -> IAppErrorReason.PROJECT_PAUSED
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
