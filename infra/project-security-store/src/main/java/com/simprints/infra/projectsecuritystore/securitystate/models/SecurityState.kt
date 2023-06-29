@@ -12,6 +12,7 @@ data class SecurityState(
     @Keep
     enum class Status {
         RUNNING,
+        PROJECT_PAUSED,
         COMPROMISED,
         PROJECT_ENDING,
         PROJECT_ENDED;

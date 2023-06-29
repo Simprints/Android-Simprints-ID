@@ -33,9 +33,17 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 buildTypes {
                     getByName(BuildTypes.release) {
                         isMinifyEnabled = true
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            "$rootDir/build-logic/proguard-rules.pro"
+                        )
                     }
                     create(BuildTypes.staging) {
                         isMinifyEnabled = true
+                        proguardFiles(
+                            getDefaultProguardFile("proguard-android-optimize.txt"),
+                            "$rootDir/build-logic/proguard-rules.pro"
+                        )
                     }
                     getByName(BuildTypes.debug) {
                         isMinifyEnabled = false

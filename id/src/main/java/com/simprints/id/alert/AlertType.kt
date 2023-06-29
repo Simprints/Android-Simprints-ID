@@ -62,6 +62,12 @@ enum class AlertType(
         backgroundColor = AlertColor.Red,
     ),
 
+    PROJECT_PAUSED(
+        title = IDR.string.project_paused_title,
+        message = IDR.string.project_paused_body,
+        backgroundColor = AlertColor.Yellow,
+    ),
+
     PROJECT_ENDING(
         title = IDR.string.project_ending_title,
         message = IDR.string.project_ending_body,
@@ -96,6 +102,7 @@ enum class AlertType(
             GOOGLE_PLAY_SERVICES_OUTDATED -> AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED
             MISSING_GOOGLE_PLAY_SERVICES -> AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES
             MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
+            PROJECT_PAUSED -> AlertScreenEventType.PROJECT_PAUSED
             PROJECT_ENDING -> AlertScreenEventType.PROJECT_ENDING
         }
 

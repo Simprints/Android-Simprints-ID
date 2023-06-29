@@ -14,6 +14,8 @@ import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.projectsecuritystore.SecurityStateRepository
+import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,6 +30,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
     private val configManager: ConfigManager,
     private val eventSyncCache: EventSyncCache,
+    private val securityStateRepository: SecurityStateRepository,
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
     private val timeHelper: TimeHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
@@ -107,10 +110,15 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
             }
         }
 
-    private suspend fun isEventDownSyncAllowed() =
-        with(configManager.getProjectConfiguration().synchronization) {
-            frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
-        }
+    private suspend fun isEventDownSyncAllowed(): Boolean {
+        val isProjectPaused =
+            securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PROJECT_PAUSED
+        val isDownSyncConfigEnabled =
+            with(configManager.getProjectConfiguration().synchronization) {
+                frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+            }
+        return !isProjectPaused && isDownSyncConfigEnabled
+    }
 
     private fun getLastSyncId(): String? {
         return syncWorkers.last()?.getUniqueSyncId()

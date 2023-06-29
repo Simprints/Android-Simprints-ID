@@ -5,7 +5,7 @@ import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
 import com.simprints.libsimprints.Constants.*
 
 internal fun ErrorResponse.Reason.libSimprintsResultCode() =
-    when(this) {
+    when (this) {
         DIFFERENT_PROJECT_ID_SIGNED_IN -> SIMPRINTS_INVALID_PROJECT_ID
         DIFFERENT_USER_ID_SIGNED_IN -> SIMPRINTS_INVALID_USER_ID
         GUID_NOT_FOUND_ONLINE -> SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE
@@ -28,5 +28,6 @@ internal fun ErrorResponse.Reason.libSimprintsResultCode() =
         FINGERPRINT_CONFIGURATION_ERROR -> SIMPRINTS_FINGERPRINT_CONFIGURATION_ERROR
         FACE_CONFIGURATION_ERROR -> SIMPRINTS_FACE_CONFIGURATION_ERROR
         BACKEND_MAINTENANCE_ERROR -> SIMPRINTS_BACKEND_MAINTENANCE_ERROR
+        PROJECT_PAUSED -> SIMPRINTS_PROJECT_PAUSED
         PROJECT_ENDING -> SIMPRINTS_PROJECT_ENDING
     }
