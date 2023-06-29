@@ -57,16 +57,16 @@
     <string name="settings_too_many_modules_toast">የተሳሳተ ምርጫ ፡ካሉት ምዕራፎች ውስጥ ከ %1$d በላይ መምረጥ አይችሉም</string>
     <string name="settings_title">ማስተካከያ</string>
 
-    <string name="consent_enrol">እርስዎን %1$s ላይ በማካተት ለወደፊቱ መለየት ይቻል ዘንድ የጣት አሻራዎትን መጠቀም እፈልጋለሁ.&#160;</string>
-    <string name="consent_parental_enrol">እርስዎን ልጅ %1$s ላይ በማካተት ለወደፊቱ መለየት ይቻል ዘንድ የጣት አሻራውን መጠቀም እፈልጋለሁ.&#160;</string>
-    <string name="consent_parental_id_verify">የእርስዎን ልጅበሚመለከት %1$s ላይ የሰፈሩ መረጃዎችን ማግኘት ይቻል ዘንድ  የጣት አሻራውን  መጠቀም እፈልጋለሁ.&#160;</string>
-    <string name="consent_parental_share_data_yes">%1$s ሲምፕሪንት ከተባለው ድርጅት ጋር የጣት አሻራ መረጃ እና አሁን ስላሉበት አድራሻ መረጃ የማግኘት ፈቃድ አለዎት.&#160;</string>
+    <string name="consent_enrol">ወደፊት የጣት አሻራዎትን እርስዎን መለየት ይቻል ዘንድ እና የጣት አሻራ መረጃዎትን ለመመዝገብ %1$s እና %2$s መጠቀም እፈልጋለሁ</string>
+    <string name="consent_parental_enrol">እርስዎን %2$s ለመመዝገብ አንዲቻል ዉስጥ %1$s እና ወደፊት መለየት አንዲቻል ::</string>
+    <string name="consent_parental_id_verify">እርስዎን %2$s ወደፊት መለየት አንዲቻል %1$s ::</string>
+    <string name="consent_parental_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ ::</string>
     <string name="consent_parental_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና ልጁን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ.&#160;</string>
-    <string name="consent_parental_confirmation">ልጁን የጣት አሻራ መጠቀም እችላለሁ? እባክዎትን እስማማለሁ፣ አልስማማም፣ ጥያቄ አለኝ በማለት ይመልሱ.</string>
-    <string name="consent_id_verify">እርስዎን በሚመለከት %1$s ት ላይ የሰፈሩ መረጃዎችን ማግኘት ይቻል ዘንድ  የጣት አሻራዎትን መጠቀም እፈልጋለሁ.&#160;</string>
-    <string name="consent_share_data_yes">%1$s ሲምፕሪንት የተባለው ድርጅት ስለእርስዎ የጣት አሻራ እና አድራሻዎ መረጃ ይኖኖራቸዋል.&#160;</string>
+    <string name="consent_parental_confirmation">የልጅዎን የጣት አሻራ መጠቀም እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
+    <string name="consent_id_verify">ወደፊት %2$s የእርስዎን መረጃ ለማግኘት የጣት አሻራዎትን መጠቀም እፈልጋለሁ %1$s ::</string>
+    <string name="consent_share_data_yes">አሁን ያለ ተጠቃሚ: %1$s</string>
     <string name="consent_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና እርስዎን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ.&#160;</string>
-    <string name="consent_confirmation">የጣት አሻራዎትን መጠቀም እችላለሁ? እባክዎትን እስማማለሁ ወይም አልስማማም ወይም ጥያቄ አለኝ ይበሉ.</string>
+    <string name="consent_confirmation">እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="launch_consent_decline_button">አለመቀበል</string>
     <string name="launch_consent_accept_button">መቀበል</string>
     <string name="consent_general_title">ፈቃደኝነት</string>
@@ -163,12 +163,12 @@
 
     <string name="biometric_concat_modalities">እና</string>
     <string name="consent_collect_yes">ሲምፕሪንትስ መረጃውን ለጥናት አላማ ሊጠቀምበት ይችላል</string>
-    <string name="consent_share_data_no">ሲምፕሪንትስ፣እንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቋቋመ ድርጅት የእርስዎን እና መገኛ አድራሻዎን መረጃ ያገኛል</string>
+    <string name="consent_share_data_no">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ ::</string>
     <string name="dashboard_card_available_on_phone">ከስልከዎ ላይ ይገኛል</string>
     <string name="dashboard_card_enrol_title">የመጨረሻ ምዝገባ </string>
     <string name="dashboard_card_enrolment_info">የምዝገባ መረጃ</string>
     <string name="dashboard_card_identification_title">የመጨረሻው መለያ</string>
-    <string name="dashboard_card_lastscanner_used">እስካነር ይጠቀሙ</string>
+    <string name="dashboard_card_lastscanner_used">በመጠቀም ላይ ያለው ስካነር %1$s</string>
     <string name="dashboard_card_to_download">ለ ማውረድ</string>
     <string name="dashboard_card_to_upload">ለ መጫን</string>
     <string name="dashboard_card_verification_title">የመጨረሻው ማጣሪያ</string>

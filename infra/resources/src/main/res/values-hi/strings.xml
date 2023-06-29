@@ -157,11 +157,11 @@
     <string name="confirmation_sent">पुष्टिकरण भेजा गया</string>
     <string name="redirecting_you_back">आपको वापस रीडायरेक्ट कर रहा है</string>
     <string name="dashboard_card_available_on_phone">फ़ोन पर उपलब्ध है</string>
-    <string name="dashboard_card_current_user">वर्तमान उपयोगकर्ता</string>
+    <string name="dashboard_card_current_user">वर्तमान उपयोगकर्ता: %1$s</string>
     <string name="dashboard_card_enrol_title">अंतिम बार पंजीकृत</string>
     <string name="dashboard_card_enrolment_info">पंजीकरण की जानकारी</string>
     <string name="dashboard_card_identification_title">अंतिम पहचान</string>
-    <string name="dashboard_card_lastscanner_used">स्कैनर का उपयोग किया गया</string>
+    <string name="dashboard_card_lastscanner_used">उपयोग किया गया स्कैनर %1$s</string>
     <string name="dashboard_card_to_download">डाउनलोड करने हेतु</string>
     <string name="dashboard_card_to_upload">अपलोड करने हेतु</string>
     <string name="dashboard_card_verification_title">अंतिम बार सत्यापन</string>
