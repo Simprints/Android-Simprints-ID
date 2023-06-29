@@ -69,7 +69,7 @@
     <string name="confirmation_logout_title">লগআউট করুন</string>
     <string name="consent_confirmation">আমি কি %1$s\? অনুগ্রহ করে বলুন- \"আমি অনুমতি দিচ্ছি \", \" আমি প্রত্যাখ্যান করছি\" অথবা \"আমার প্রশ্ন আছে।\"</string>
     <string name="consent_enrol">আমি আপনাার %2$s আপনাকে %1$s এ নিবন্ধন করতে চাই এবং ভবিষ্যতে তা দিয়ে আপনাকে সনাক্ত করতে চাই। </string>
-    <string name="consent_id_verify">আমি আপনার আঙ্গু্লের ছাপ ব্যবহার করে এসেনশিয়াল হেল্‌থ কেয়ার প্রোগ্রাম- এর জন্য আপনার তথ্যাদি খুঁজে বের করতে চাই।</string>
+    <string name="consent_id_verify">আমি আপনার %2$s ব্যবহার করে %1$s - এর জন্য আপনার তথ্যাদি খুঁজে বের করতে চাই।</string>
     <string name="consent_parental_share_data_yes">%1$s এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে। </string>
     <string name="consent_privacy_rights">সম্মতি দেবার পরেও যেকোনো সময় আপনি অনুমতি ফিরিয়ে নিতে এবং আপনার তথ্যাদি মুছে ফেলতে বলতে পারেন।</string>
     <string name="consent_share_data_yes">%1$s এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে। </string>
@@ -190,7 +190,7 @@
     <string name="modality_download_taking_longer">ডাউলোড</string>
     <string name="fingerprint_feature_alert">আঙ্গুলের ছাপ এর বৈশিষ্ট্য</string>
     <string name="modality_starting_download">ডাউনলোড শুরু করুন</string>
-    <string name="modality_downloading">"ডাউনলোড হচ্ছে "</string>
+    <string name="modality_downloading">%1$s ডাউনলোড হচ্ছে</string>
     <string name="modality_installing">ইন্সটল হচ্ছে</string>
     <string name="biometrics_access_fingerprint_face">আঙ্গুলের ছাপের তথ্য, ছবি</string>
     <string name="consent_enrol_only">আমি আপনাকে %2$s এ নিবন্ধন করতে চাই %1$s </string>
@@ -220,7 +220,7 @@
     <string name="dashboard_card_enrol_title">সর্বশেষ নিবন্ধন</string>
     <string name="dashboard_card_enrolment_info">নিবন্ধন তথ্য</string>
     <string name="dashboard_card_identification_title">সর্বশেষ সনাক্তকরন</string>
-    <string name="dashboard_card_lastscanner_used">স্ক্যানার ব্যবহার করা হয়েছে</string>
+    <string name="dashboard_card_lastscanner_used">ব্যবহারকৃত স্ক্যানার %1$s</string>
     <string name="dashboard_card_to_download">ডাউনলোড করতে</string>
     <string name="dashboard_card_to_upload">আপলোড করতে</string>
     <string name="dashboard_card_verification_title">সর্বশেষ যাচাই </string>
