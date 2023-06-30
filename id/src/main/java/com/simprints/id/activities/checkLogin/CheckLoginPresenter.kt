@@ -7,6 +7,7 @@ import com.simprints.id.alert.AlertType.UNEXPECTED_ERROR
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.exceptions.safe.secure.ProjectEndingException
 import com.simprints.id.exceptions.safe.secure.ProjectPausedException
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.authstore.AuthStore
@@ -56,6 +57,7 @@ abstract class CheckLoginPresenter(
                 is NotSignedInException -> handleNotSignedInUser().also {
                     syncManager.cancelBackgroundSyncs()
                 }
+                is ProjectEndingException -> handleProjectEnding()
 
                 is ProjectPausedException -> handlePausedProject()
                 else -> {
@@ -74,10 +76,12 @@ abstract class CheckLoginPresenter(
         val status = securityStateRepository.getSecurityStatusFromLocal()
         when {
             status == SecurityState.Status.PROJECT_PAUSED -> throw ProjectPausedException()
+            status == SecurityState.Status.PROJECT_ENDING -> throw ProjectEndingException()
             status.isCompromisedOrProjectEnded() -> handleNotSignedInUser()
         }
     }
 
+    abstract fun handleProjectEnding()
     abstract fun handlePausedProject()
     abstract fun handleNotSignedInUser()
 

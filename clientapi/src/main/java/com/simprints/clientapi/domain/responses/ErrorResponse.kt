@@ -38,6 +38,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         FINGERPRINT_CONFIGURATION_ERROR,
         BACKEND_MAINTENANCE_ERROR,
         PROJECT_PAUSED,
+        PROJECT_ENDING,
         FACE_CONFIGURATION_ERROR;
 
         companion object {
@@ -58,6 +59,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.FACE_CONFIGURATION_ERROR -> FACE_CONFIGURATION_ERROR
                     IAppErrorReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
                     IAppErrorReason.PROJECT_PAUSED -> PROJECT_PAUSED
+                    IAppErrorReason.PROJECT_ENDING -> PROJECT_ENDING
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =

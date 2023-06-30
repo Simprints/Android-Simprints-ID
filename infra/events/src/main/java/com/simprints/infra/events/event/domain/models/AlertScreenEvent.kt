@@ -67,7 +67,8 @@ data class AlertScreenEvent(
             GOOGLE_PLAY_SERVICES_OUTDATED,
             MISSING_GOOGLE_PLAY_SERVICES,
             MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
-            PROJECT_PAUSED
+            PROJECT_PAUSED,
+            PROJECT_ENDING
         }
     }
 

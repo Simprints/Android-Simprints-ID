@@ -331,6 +331,8 @@
     <string name="missing_google_play_services_alert_message">The \"Google Play Services\" isn\'t installed on this device.</string>
     <string name="project_paused_title">Project is currently paused</string>
     <string name="project_paused_body">Unable to launch session because the project is currently paused. Please contact your supervisor for more information</string>
+    <string name="project_ending_title">Project is currently ending</string>
+    <string name="project_ending_body">Unable to launch session because the project is currently ending. Please contact your supervisor for more information</string>
 
     <string name="missing_or_outdated_google_play_store_app_alert_title">Missing or outdated \"Google Play Store app\"</string>
     <string name="missing_or_outdated_google_play_store_app_alert_message">The \"Google Play Store app\" isn\'t installed or updated.</string>
