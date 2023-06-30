@@ -10,6 +10,11 @@
         android:name="com.simprints.feature.dashboard.requestlogin.RequestLoginFragment"
         android:label="RequestLoginFragment"
         tools:layout="@layout/fragment_request_login">
+        <argument
+            android:name="logoutReason"
+            android:defaultValue="@null"
+            app:argType="com.simprints.feature.dashboard.requestlogin.LogoutReason"
+            app:nullable="true" />
         <action
             android:id="@+id/action_requestLoginFragment_to_mainFragment"
             app:destination="@id/mainFragment"
@@ -46,6 +51,11 @@
         <action
             android:id="@+id/action_mainFragment_to_moduleSelectionFragment"
             app:destination="@id/moduleSelectionFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_requestLoginFragment"
+            app:destination="@id/requestLoginFragment"
+            app:popUpTo="@id/dashboard_navigation"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/debugFragment"
@@ -74,18 +84,18 @@
         tools:layout="@layout/fragment_settings_about">
         <action
             android:id="@+id/action_aboutFragment_to_logout_navigation"
-            app:destination="@id/logout_navigation"/>
+            app:destination="@id/logout_navigation" />
         <action
             android:id="@+id/action_aboutFragment_to_requestLoginFragment"
             app:destination="@id/requestLoginFragment"
             app:popUpTo="@id/dashboard_navigation"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/syncInfoFragment"
         android:name="com.simprints.feature.dashboard.settings.syncinfo.SyncInfoFragment"
         android:label="fragment_sync_info"
-        tools:layout="@layout/fragment_sync_info" >
+        tools:layout="@layout/fragment_sync_info">
         <action
             android:id="@+id/action_syncInfoFragment_to_moduleSelectionFragment"
             app:destination="@id/moduleSelectionFragment" />
@@ -94,12 +104,12 @@
         android:id="@+id/moduleSelectionFragment"
         android:name="com.simprints.feature.dashboard.settings.syncinfo.moduleselection.ModuleSelectionFragment"
         android:label="ModuleSelectionFragment"
-        tools:layout="@layout/fragment_sync_module_selection"/>
+        tools:layout="@layout/fragment_sync_module_selection" />
     <fragment
         android:id="@+id/fingerSelectionFragment"
         android:name="com.simprints.feature.dashboard.settings.fingerselection.FingerSelectionFragment"
         android:label="FingerSelectionFragment"
-        tools:layout="@layout/fragment_finger_selection"/>
+        tools:layout="@layout/fragment_finger_selection" />
 
     <include app:graph="@navigation/graph_privacy" />
     <action

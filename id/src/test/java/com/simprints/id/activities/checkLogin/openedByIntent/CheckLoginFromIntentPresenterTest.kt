@@ -9,8 +9,10 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
+import com.simprints.id.exceptions.safe.secure.ProjectEndingException
 import com.simprints.id.exceptions.safe.secure.ProjectPausedException
 import com.simprints.id.services.sync.SyncManager
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -21,17 +23,21 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.createSessionCaptureEvent
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.sampledata.SampleDefaults.STATIC_GUID
+import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.failTest
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -178,18 +184,6 @@ class CheckLoginFromIntentPresenterTest {
     }
 
     @Test
-    fun presenter_opens_alert_activity_on_DifferentUserIdSignedInException() {
-        runTest(UnconfinedTestDispatcher()) {
-            every { authStoreMock.signedInProjectId } throws DifferentUserIdSignedInException()
-
-            presenter.authStore = authStoreMock
-            presenter.checkSignedInStateIfPossible()
-
-            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.DIFFERENT_USER_ID) }
-        }
-    }
-
-    @Test
     fun presenter_handles_not_signed_in_user_when_project_compromised_or_ended() {
         runTest(UnconfinedTestDispatcher()) {
             val appRequest = AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest(
@@ -221,6 +215,40 @@ class CheckLoginFromIntentPresenterTest {
 
         }
     }
+
+    @Test
+    fun presenter_handleEndingProject_shouldOpenAlertActivityForError() {
+        runTest(UnconfinedTestDispatcher()) {
+            presenter.onViewCreated(true)
+            presenter.handleProjectEnding()
+            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.PROJECT_ENDING) }
+        }
+    }
+
+    @Test
+    fun presenter_throws_ProjectEndingException_when_security_status_is_ending() {
+        runTest(UnconfinedTestDispatcher()) {
+            coEvery { securityStateRepositoryMock.getSecurityStatusFromLocal() } returns SecurityState.Status.PROJECT_ENDING
+            try {
+                presenter.handleSignedInUser()
+                failTest("ProjectEndingException is not thrown")
+            } catch (e: Exception) {
+                assertThat(e).isInstanceOf(ProjectEndingException::class.java)
+            }
+        }
+    }
+
+    @Test
+    fun presenter_opens_alert_activity_on_DifferentUserIdSignedInException() {
+        runTest(UnconfinedTestDispatcher()) {
+            every { authStoreMock.signedInProjectId } throws DifferentUserIdSignedInException()
+            presenter.authStore = authStoreMock
+            presenter.checkSignedInStateIfPossible()
+            coVerify(exactly = 1) { view.openAlertActivityForError(AlertType.DIFFERENT_USER_ID) }
+        }
+    }
+
+
 //
 //    @Test
 //    fun presenter_setup_shouldAddEnrolmentCallout() {

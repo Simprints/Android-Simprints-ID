@@ -63,8 +63,9 @@ internal data class ApiAlertScreenPayload(
         FACE_LICENSE_MISSING,
         GOOGLE_PLAY_SERVICES_OUTDATED,
         MISSING_GOOGLE_PLAY_SERVICES,
-        MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
-        PROJECT_PAUSED
+        PROJECT_PAUSED,
+        PROJECT_ENDING,
+        MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
     }
 }
 
@@ -106,4 +107,5 @@ internal fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
         AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES -> MISSING_GOOGLE_PLAY_SERVICES
         AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
         AlertScreenEventType.PROJECT_PAUSED -> PROJECT_PAUSED
+        AlertScreenEventType.PROJECT_ENDING -> PROJECT_ENDING
     }

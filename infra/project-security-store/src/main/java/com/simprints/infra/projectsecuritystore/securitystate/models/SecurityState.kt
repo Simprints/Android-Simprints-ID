@@ -14,6 +14,7 @@ data class SecurityState(
         RUNNING,
         PROJECT_PAUSED,
         COMPROMISED,
+        PROJECT_ENDING,
         PROJECT_ENDED;
 
         fun isCompromisedOrProjectEnded(): Boolean = this == COMPROMISED || this == PROJECT_ENDED
