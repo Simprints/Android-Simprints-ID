@@ -55,7 +55,7 @@ chuck_version = "3.5.2"
 rx_version = "2.2.21"
 rx_android_version = "2.1.1"
 rx_kotlin_version = "2.4.0"
-rx_adapter_version = "1.7.1"
+rx_adapter_version = "1.7.2"
 
 sqlCipher_version = "4.5.4"
 fuzzywuzzy_version = "1.4.0"
