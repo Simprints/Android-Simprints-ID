@@ -34,9 +34,6 @@ internal class LoginFormViewModel @Inject constructor(
         get() = _signInState
     private val _signInState = MutableLiveData<LiveDataEventWithContent<SignInState>>(null)
 
-    fun init() {
-        simNetwork.resetApiBaseUrl()
-    }
 
     fun signInClicked(
         loginParams: LoginParams,
