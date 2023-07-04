@@ -167,7 +167,7 @@
     <string name="dashboard_card_enrol_title">Última inscrição</string>
     <string name="dashboard_card_enrolment_info">Informações de inscrição</string>
     <string name="dashboard_card_identification_title">Última Identificação</string>
-    <string name="dashboard_card_lastscanner_used">Scanner usado</string>
+    <string name="dashboard_card_lastscanner_used">Scanner used %1$s</string>
     <string name="dashboard_card_to_download">Para baixar</string>
     <string name="dashboard_card_to_upload">Para fazer o upload</string>
     <string name="dashboard_card_verification_title">Última Verificação</string>

@@ -180,7 +180,7 @@
     <string name="dashboard_card_enrol_title">Usajili wa mwisho</string>
     <string name="dashboard_card_enrolment_info">Taarifa za Usajili</string>
     <string name="dashboard_card_identification_title">Utambulisho wa mwisho</string>
-    <string name="dashboard_card_lastscanner_used">Skana iliyotumika</string>
+    <string name="dashboard_card_lastscanner_used">Skana iliyotumika %1$s</string>
     <string name="dashboard_card_to_download">Kupakua</string>
     <string name="dashboard_card_to_upload">Kupakia</string>
     <string name="dashboard_card_verification_title">Uhakiki wa mwisho</string>
