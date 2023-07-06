@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
-import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.R
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -19,7 +19,7 @@ import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 
 @AndroidEntryPoint
-class OrchestratorActivity : BaseSplitActivity() {
+class OrchestratorActivity : BaseActivity() {
 
     @Inject
     lateinit var syncManager: SyncManager

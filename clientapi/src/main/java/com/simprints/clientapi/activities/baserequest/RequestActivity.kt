@@ -23,7 +23,7 @@ import com.simprints.clientapi.errors.ClientApiAlert.Companion.toAlertConfig
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
-import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.alert.withPayload
@@ -38,7 +38,7 @@ import com.simprints.moduleapi.app.responses.IAppResponseType
 import com.simprints.moduleapi.app.responses.IAppVerifyResponse
 import kotlinx.coroutines.launch
 
-abstract class RequestActivity : BaseSplitActivity(), RequestContract.RequestView {
+abstract class RequestActivity : BaseActivity(), RequestContract.RequestView {
 
     private var isActivityRestored = false
     private var requestProcessed = false

@@ -7,7 +7,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 
@@ -16,7 +16,7 @@ import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
  * or shared functionality like loading/releasing koin DI for fingerprint and logging activity
  * creation and destruction.
  */
-abstract class FingerprintActivity : BaseSplitActivity() {
+abstract class FingerprintActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
