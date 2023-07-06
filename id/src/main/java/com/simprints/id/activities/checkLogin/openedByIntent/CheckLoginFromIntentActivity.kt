@@ -7,24 +7,29 @@ import android.view.View.VISIBLE
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginError
-import com.simprints.feature.login.LoginError.*
+import com.simprints.feature.login.LoginError.IntegrityServiceError
+import com.simprints.feature.login.LoginError.LoginNotCompleted
+import com.simprints.feature.login.LoginError.MissingOrOutdatedPlayServices
+import com.simprints.feature.login.LoginError.MissingPlayServices
+import com.simprints.feature.login.LoginError.OutdatedPlayServices
+import com.simprints.feature.login.LoginError.Unknown
 import com.simprints.feature.login.ShowLoginWrapper
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
+import com.simprints.id.alert.AlertType
 import com.simprints.id.databinding.CheckLoginFromIntentScreenBinding
 import com.simprints.id.di.IdAppModule
-import com.simprints.id.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -35,7 +40,7 @@ import com.simprints.infra.resources.R as IDR
 
 // App launched when user open SimprintsID using a client app (by intent)
 @AndroidEntryPoint
-open class CheckLoginFromIntentActivity : BaseSplitActivity(), CheckLoginFromIntentContract.View {
+open class CheckLoginFromIntentActivity : BaseActivity(), CheckLoginFromIntentContract.View {
 
     private val binding by viewBinding(CheckLoginFromIntentScreenBinding::inflate)
 

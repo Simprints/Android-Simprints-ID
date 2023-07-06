@@ -2,17 +2,17 @@ package com.simprints.feature.alert.intent
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.R
 import com.simprints.feature.alert.databinding.ActivityAlertWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-internal class AlertWrapperActivity : AppCompatActivity() {
+internal class AlertWrapperActivity : BaseActivity() {
 
     private val binding by viewBinding(ActivityAlertWrapperBinding::inflate)
 

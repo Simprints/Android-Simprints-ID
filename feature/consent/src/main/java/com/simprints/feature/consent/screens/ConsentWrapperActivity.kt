@@ -4,19 +4,19 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.Keep
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.R
 import com.simprints.feature.consent.databinding.ActivityConsentWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 // Wrapper activity must be public because it is being referenced by the classname from legacy orchestrator.
 @Keep
 @AndroidEntryPoint
-class ConsentWrapperActivity : AppCompatActivity() {
+class ConsentWrapperActivity : BaseActivity() {
 
     private val binding by viewBinding(ActivityConsentWrapperBinding::inflate)
 
