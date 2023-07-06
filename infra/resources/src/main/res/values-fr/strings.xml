@@ -16,7 +16,7 @@
     <string name="confirmation_logout_cancel">Annuler</string>
     <string name="confirmation_logout_message">Voulez-vous vous déconnecter ?</string>
     <string name="confirmation_logout_title">Déconnexion</string>
-    <string name="consent_collect_yes">Simprints utilisera également ces données à des fins de recherche.</string>
+    <string name="consent_collect_yes">Simprints utilisera également ces données à des fins de recherche.&#160;</string>
     <string name="consent_confirmation">Puis-je %1$s ? Veuillez dire \"J\'accepte\", \"Je refuse\", ou \"J\'ai des questions\".</string>
     <string name="consent_enrol">Je voudrais %2$s pour vous inscrire à %1$s et vous identifier à l\'avenir.&#160;</string>
     <string name="consent_enrol_only">Je voudrais %2$s pour vous inscrire à %1$s.&#160;</string>
