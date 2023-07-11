@@ -5,15 +5,15 @@ import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
+import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceConfigurationRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.ConfigManager
-import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
-import com.simprints.moduleapi.face.requests.IFaceConfigurationRequest
-import com.simprints.moduleapi.face.requests.IFaceMatchRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
@@ -64,28 +64,28 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     fun stepProcessorShouldBuildTheRightStepForVerify() {
         val step = faceStepProcess.buildStepMatch(mockk(), mockk())
 
-        verifyFaceIntent<IFaceMatchRequest>(step, MATCH.value)
+        verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)
     }
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForEnrol() = runTest {
         val step = faceStepProcess.buildCaptureStep()
 
-        verifyFaceIntent<IFaceCaptureRequest>(step, CAPTURE.value)
+        verifyFaceIntent<FaceCaptureRequest>(step, CAPTURE.value)
     }
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForIdentify() = runTest {
         val step = faceStepProcess.buildStepMatch(mockk(), mockk())
 
-        verifyFaceIntent<IFaceMatchRequest>(step, MATCH.value)
+        verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)
     }
 
     @Test
     fun stepProcessorShouldBuildRightStepForConfiguration() {
         val step = faceStepProcess.buildConfigurationStep("projectId", "deviceId")
 
-        verifyFaceIntent<IFaceConfigurationRequest>(step, CONFIGURATION.value)
+        verifyFaceIntent<FaceConfigurationRequest>(step, CONFIGURATION.value)
     }
 
     @Test
