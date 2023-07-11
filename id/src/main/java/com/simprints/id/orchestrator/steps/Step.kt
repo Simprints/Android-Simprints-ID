@@ -1,8 +1,14 @@
 package com.simprints.id.orchestrator.steps
 
+import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
+import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
+import com.simprints.id.orchestrator.steps.core.requests.CoreRequest
 import java.util.UUID
 
 data class Step(
@@ -10,7 +16,8 @@ data class Step(
     val requestCode: Int,
     val activityName: String,
     val bundleKey: String,
-    val request: Parcelable,
+    val payloadType: PayloadType,
+    val payload: Parcelable,
     private var result: Result? = null,
     private var status: Status
 ) : Parcelable {
@@ -38,7 +45,8 @@ data class Step(
             writeInt(requestCode)
             writeString(activityName)
             writeString(bundleKey)
-            writeParcelable(request, flags)
+            writeString(payloadType.name)
+            writeParcelable(payload, flags)
             writeString(status.name)
             writeParcelable(result, flags)
         }
@@ -48,7 +56,7 @@ data class Step(
 
     // Useful when debugging
     override fun toString(): String {
-        return "$request: $status"
+        return "$payload: $status"
     }
 
     private fun updateStatusBasedOnResult() {
@@ -62,14 +70,31 @@ data class Step(
             val requestCode = source.readInt()
             val activityName = source.readString()!!
             val bundleKey = source.readString()!!
-            val request = source.readParcelable<Request>(Request::class.java.classLoader)!!
+            val payloadType = PayloadType.valueOf(source.readString()!!)
+            val request = when (payloadType) {
+                PayloadType.BUNDLE -> source.readParcelable<Bundle>(Bundle::class.java.classLoader)!!
+                PayloadType.REQUEST -> source.readParcelable<Request>(Request::class.java.classLoader)!!
+            }
             val status = Status.valueOf(source.readString()!!)
             val result = source.readParcelable<Result>(Result::class.java.classLoader)
 
-            return Step(id, requestCode, activityName, bundleKey, request, result, status)
+            return Step(
+                id,
+                requestCode,
+                activityName,
+                bundleKey,
+                payloadType,
+                request,
+                result,
+                status
+            )
         }
 
         override fun newArray(size: Int): Array<Step?> = arrayOfNulls(size)
+    }
+
+    enum class PayloadType {
+        BUNDLE, REQUEST
     }
 
     enum class Status {
@@ -80,3 +105,12 @@ data class Step(
 
     interface Result : Parcelable
 }
+
+fun Step.Request.fromDomainToModuleApi(): Parcelable =
+    when (this) {
+        is FingerprintRequest -> fromDomainToModuleApi()
+        is FaceRequest -> fromDomainToModuleApi()
+        is CoreRequest -> this
+
+        else -> throw Throwable("Invalid Request $this")
+    }

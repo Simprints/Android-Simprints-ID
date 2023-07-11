@@ -15,7 +15,8 @@ class StepTest {
             requestCode = resultOk,
             activityName = "someActivityClassName",
             bundleKey = "bundle_key",
-            request = mockk(),
+            payloadType = Step.PayloadType.REQUEST,
+            payload = mockk(),
             result = mockk(),
             status = ONGOING
         )

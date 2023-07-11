@@ -65,7 +65,7 @@ class StepEncoderImplTest {
             MatcherAssert.assertThat(requestCode, CoreMatchers.`is`(REQUEST_CODE))
             MatcherAssert.assertThat(activityName, CoreMatchers.`is`(ACTIVITY_NAME))
             MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
-            MatcherAssert.assertThat(request, CoreMatchers.`is`(fingerprintCaptureRequest))
+            MatcherAssert.assertThat(payload, CoreMatchers.`is`(fingerprintCaptureRequest))
             MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
             MatcherAssert.assertThat(
                 getResult(),
@@ -91,7 +91,7 @@ class StepEncoderImplTest {
             MatcherAssert.assertThat(requestCode, CoreMatchers.`is`(REQUEST_CODE))
             MatcherAssert.assertThat(activityName, CoreMatchers.`is`(ACTIVITY_NAME))
             MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
-            MatcherAssert.assertThat(request, CoreMatchers.`is`(faceCaptureRequest))
+            MatcherAssert.assertThat(payload, CoreMatchers.`is`(faceCaptureRequest))
             MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
             MatcherAssert.assertThat(
                 getResult(),
@@ -108,7 +108,8 @@ class StepEncoderImplTest {
         requestCode = REQUEST_CODE,
         activityName = ACTIVITY_NAME,
         bundleKey = BUNDLE_KEY,
-        request = request,
+        payloadType = Step.PayloadType.REQUEST,
+        payload = request,
         result = result,
         status = Step.Status.COMPLETED
     )
