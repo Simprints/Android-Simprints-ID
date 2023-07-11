@@ -17,9 +17,9 @@ import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
-import com.simprints.id.exitformhandler.ExitFormReason.Companion.fromExitFormOption
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.setup.SetupWrapperActivity
+import com.simprints.id.exitformhandler.ExitFormReason.Companion.fromExitFormOption
 import com.simprints.id.orchestrator.steps.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT
@@ -57,7 +57,8 @@ class CoreStepProcessorImpl @Inject constructor(
         requestCode = CoreRequestCode.SETUP.value,
         activityName = SETUP_ACTIVITY_NAME,
         bundleKey = SetupWrapperActivity.SETUP_ARGS_EXTRA,
-        request = bundleOf(),
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = bundleOf(),
         status = Step.Status.NOT_STARTED,
     )
 
@@ -65,7 +66,8 @@ class CoreStepProcessorImpl @Inject constructor(
         requestCode = CONSENT.value,
         activityName = CONSENT_ACTIVITY_NAME,
         bundleKey = ConsentWrapperActivity.CONSENT_ARGS_EXTRA,
-        request = ConsentContract.getArgs(consentType),
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = ConsentContract.getArgs(consentType),
         status = Step.Status.NOT_STARTED
     )
 
@@ -73,7 +75,8 @@ class CoreStepProcessorImpl @Inject constructor(
         requestCode = FETCH_GUID_CHECK.value,
         activityName = FETCH_GUID_ACTIVITY_NAME,
         bundleKey = FetchSubjectWrapperActivity.FETCH_SUBJECT_ARGS_EXTRA,
-        request = FetchSubjectContract.getArgs(projectId, verifyGuid),
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = FetchSubjectContract.getArgs(projectId, verifyGuid),
         status = Step.Status.NOT_STARTED
     )
 
@@ -84,7 +87,8 @@ class CoreStepProcessorImpl @Inject constructor(
         requestCode = GUID_SELECTION_CODE.value,
         activityName = GUID_SELECTION_ACTIVITY_NAME,
         bundleKey = SelectSubjectWrapperActivity.SELECT_SUBJECT_ARGS_EXTRA,
-        request = SelectSubjectContract.getArgs(projectId, selectedGuid),
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = SelectSubjectContract.getArgs(projectId, selectedGuid),
         status = Step.Status.NOT_STARTED
     )
 
@@ -98,7 +102,8 @@ class CoreStepProcessorImpl @Inject constructor(
         requestCode = LAST_BIOMETRICS_CORE.value,
         activityName = LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
         bundleKey = EnrolLastBiometricWrapperActivity.ENROL_LAST_ARGS_EXTRA,
-        request = EnrolLastBiometricContract.getArgs(projectId, userId, moduleId, mapStepsForLastBiometricEnrol(previousSteps)),
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = EnrolLastBiometricContract.getArgs(projectId, userId, moduleId, mapStepsForLastBiometricEnrol(previousSteps)),
         status = Step.Status.NOT_STARTED
     )
 

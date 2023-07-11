@@ -10,6 +10,7 @@ import com.simprints.id.R
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.eventsync.EventSyncManager
@@ -34,7 +35,12 @@ class OrchestratorActivity : BaseActivity() {
     private val observerForNextStep = Observer<Step?> {
         it?.let {
             with(Intent().setClassName(packageName, it.activityName)) {
-                putExtra(it.bundleKey, it.request)
+                val bundle = if (it.payload is Step.Request) {
+                    it.payload.fromDomainToModuleApi()
+                } else {
+                    it.payload
+                }
+                putExtra(it.bundleKey, bundle)
                 startActivityForResult(this, it.requestCode)
                 this@OrchestratorActivity.removeAnimationsToNextActivity()
             }
