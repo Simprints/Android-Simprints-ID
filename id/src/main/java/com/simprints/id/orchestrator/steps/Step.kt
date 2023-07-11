@@ -11,6 +11,19 @@ import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 import com.simprints.id.orchestrator.steps.core.requests.CoreRequest
 import java.util.UUID
 
+/**
+ * Step
+ *
+ * @property id
+ * @property requestCode
+ * @property activityName
+ * @property bundleKey
+ * @property payloadType
+ * @property payload   A Step payload can carry either a bundle of navigation args or a request to be handled
+ * @property result
+ * @property status
+ * @constructor Create empty Step
+ */
 data class Step(
     val id: String = UUID.randomUUID().toString(),
     val requestCode: Int,
