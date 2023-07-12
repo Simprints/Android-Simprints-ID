@@ -27,6 +27,7 @@ enum class RefusalAnswer {
     REFUSED_PERMISSION,
     SCANNER_NOT_WORKING,
     REFUSED_NOT_PRESENT,
+    APP_NOT_WORKING,
     REFUSED_YOUNG,
     OTHER;
 
@@ -40,6 +41,7 @@ enum class RefusalAnswer {
                 RefusalFormReason.REFUSED_NOT_PRESENT -> REFUSED_NOT_PRESENT
                 RefusalFormReason.REFUSED_YOUNG -> REFUSED_YOUNG
                 RefusalFormReason.OTHER -> OTHER
+                RefusalFormReason.APP_NOT_WORKING -> APP_NOT_WORKING
             }
     }
 }
@@ -55,5 +57,6 @@ fun RefusalAnswer.fromDomainToCore(): CoreRefusalAnswer =
         RefusalAnswer.SCANNER_NOT_WORKING -> CoreRefusalAnswer.SCANNER_NOT_WORKING
         RefusalAnswer.REFUSED_NOT_PRESENT -> CoreRefusalAnswer.REFUSED_NOT_PRESENT
         RefusalAnswer.REFUSED_YOUNG -> CoreRefusalAnswer.REFUSED_YOUNG
+        RefusalAnswer.APP_NOT_WORKING -> CoreRefusalAnswer.APP_NOT_WORKING
         RefusalAnswer.OTHER -> CoreRefusalAnswer.OTHER
     }
