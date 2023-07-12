@@ -65,7 +65,7 @@
     <string name="modality_installation_offline">Verifique se o Wi-Fi ou os dados móveis estão activados nas configurações para concluir o download</string>
     <string name="feature_not_downloaded">Para usar Simprints, continue e baixe o %1$s</string>
     <string name="face_feature_alert">característica do rosto</string>
-    <string name="close">FECHAR</string>
+    <string name="close">Fechar</string>
     <string name="settings_label">Configurações do telefone</string>
     <string name="button_submit">Enviar</string>
     <string name="hint_other_reason">Informação Adicional</string>
@@ -88,7 +88,7 @@
     <string name="login_server_error">Ocorreu um problema ao tentar entrar em contacto com o servidor. Por favor, tente novamente mais tarde.</string>
     <string name="dashboard_label">Painel de controle</string>
     <string name="confirmation_logout_title">Sair</string>
-    <string name="confirmation_logout_message">Quer sair\?</string>
+    <string name="confirmation_logout_message">Quer sair?</string>
     <string name="records_up_to_date">Todos os registos são actualizados</string>
     <string name="dashboard_sync_card_complete">Sincronização completa</string>
     <string name="dashboard_sync_card_incomplete">Sincronização incompleta</string>

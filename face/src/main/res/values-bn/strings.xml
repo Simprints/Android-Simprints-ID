@@ -28,8 +28,8 @@
     <string name="capture_title_too_close">বেশি কাছে</string>
     <string name="capture_title_face_too_far">বেশি দূরে</string>
     <string name="matching_x_records">%s রেকর্ড এর সাথে মিলানো হচ্ছে</string>
-    <string name="face_match_please_wait">"আঙ্গুলের ছাপ মিলানো হচ্ছে, অপেক্ষা করুন  "</string>
-    <string name="face_match_loading_candidates">"অংশগ্রহণকারীদের তথ্য লোড হচ্ছে "</string>
+    <string name="face_match_please_wait">আঙ্গুলের ছাপ মিলানো হচ্ছে, অপেক্ষা করুন</string>
+    <string name="face_match_loading_candidates">অংশগ্রহণকারীদের তথ্য লোড হচ্ছে</string>
 
 
 
