@@ -231,4 +231,12 @@
     <string name="password_lock_hint">Mot de passe</string>
     <string name="password_lock_wrong_pin">Mot de passe incorrect</string>
     <string name="password_lock_overlay_title">Appuyez pour déverrouiller</string>
+    <string name="logout_sync_decline_button">Se déconnecter sans synchronisation</string>
+    <string name="logout_sync_info">Il y a des enregistrements sur votre appareil qui doivent être synchronisés avant de vous déconnecter. Veuillez laisser le processus de synchronisation se terminer.\n\nUne fois la synchronisation terminée, vous pourrez vous déconnecter.</string>
+    <string name="logout_sync_decline_warning_title">Avertissement</string>
+    <string name="logout_sync_decline_warning_body">La synchronisation des données est essentielle pour garantir que votre projet dispose d\'enregistrements à jour. Ne pas synchroniser vos données sans raison valable aura un impact sur l\'accès de vos collègues aux enregistrements importants et sur la capacité du projet à générer des rapports précis.\n\nNe pas synchroniser les données sans raison valable peut également constituer une violation du protocole de collecte de données et peut entraîner des conséquences indésirables pour vous et le projet.</string>
+    <string name="project_paused_title">Le projet est actuellement en pause</string>
+    <string name="project_paused_body">Impossible de lancer la session car le projet est actuellement en pause. Veuillez contacter votre superviseur pour plus d\'informations</string>
+    <string name="project_ending_title">Le projet se termine actuellement</string>
+    <string name="project_ending_body">Impossible de lancer la session car le projet se termine actuellement. Veuillez contacter votre superviseur pour plus d\'informations</string>
 </resources>

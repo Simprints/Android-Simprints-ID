@@ -201,4 +201,12 @@
     <string name="password_lock_wrong_pin">Jecha icciitii sirrii hin taane</string>
     <string name="refusal_scanner_not_working">Scanner hin hojjenne</string>
     <string name="password_lock_overlay_title">Qulfii banuuf tuqi</string>
+    <string name="logout_sync_decline_button">Walsimsiisaa malee ba\'aa</string>
+    <string name="logout_sync_info">Meeshaa keessan irratti galmeewwan osoo hin ba\'iin dura walsimsiisuu qaban jiru. Mee adeemsi walsimsiisaa akka xumuramu hayyami.Erga walsimsiisni xumurame bahuu ni dandeessa.</string>
+    <string name="logout_sync_decline_warning_title">Akeekkachiisa</string>
+    <string name="logout_sync_decline_warning_body">Pirojektiin kee galmee yeroo ammaa akka qabu mirkaneessuuf walsimsiisni deetaa barbaachisaa dha. Sababa sirrii malee deetaa kee walsimsiisuu dadhabuun galmeewwan barbaachisoo ta\'uu fi dandeettii pirojektichi sirritti gabaasuu irratti dhiibbaa qaba.\n\nSababni sirrii malee deetaa walsimsiisuu dadhabuunis pirootokoolii walitti qabuu deetaa cabsuu ta'uu danda'a akkasumas bu’aa hin barbaachifne siifi pirojektichaaf fiduu danda’a.</string>
+    <string name="project_paused_title">Pirojektiin yeroo ammaa dhaabbateera</string>
+    <string name="project_paused_body">Pirojektichi yeroo ammaa waan dhaabbateef turtii jalqabuu hin dandeenye. Odeeffannoo dabalataaf supparvaayizara keessan qunnamaa</string>
+    <string name="project_ending_title">Pirojektiin yeroo ammaa xumuramaa jira</string>
+    <string name="project_ending_body">Pirojektichi yeroo ammaa xumuramaa waan jiruuf session jalqabuu hin dandeenye. Odeeffannoo dabalataaf supparvaayizara keessan qunnamaa</string>
 </resources>
