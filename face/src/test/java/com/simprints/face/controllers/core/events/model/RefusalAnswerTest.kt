@@ -14,7 +14,7 @@ class RefusalAnswerTest {
             ExitFormOption.DataConcerns to RefusalAnswer.REFUSED_DATA_CONCERNS,
             ExitFormOption.NoPermission to RefusalAnswer.REFUSED_PERMISSION,
             ExitFormOption.AppNotWorking to RefusalAnswer.APP_NOT_WORKING,
-            ExitFormOption.ScannerNotWorking to RefusalAnswer.APP_NOT_WORKING,
+            ExitFormOption.ScannerNotWorking to RefusalAnswer.SCANNER_NOT_WORKING,
             ExitFormOption.PersonNotPresent to RefusalAnswer.REFUSED_NOT_PRESENT,
             ExitFormOption.TooYoung to RefusalAnswer.REFUSED_YOUNG,
             ExitFormOption.Other to RefusalAnswer.OTHER,
