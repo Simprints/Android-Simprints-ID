@@ -40,8 +40,8 @@ enum class RefusalAnswer {
                 RefusalFormReason.SCANNER_NOT_WORKING -> SCANNER_NOT_WORKING
                 RefusalFormReason.REFUSED_NOT_PRESENT -> REFUSED_NOT_PRESENT
                 RefusalFormReason.REFUSED_YOUNG -> REFUSED_YOUNG
-                RefusalFormReason.OTHER -> OTHER
                 RefusalFormReason.APP_NOT_WORKING -> APP_NOT_WORKING
+                RefusalFormReason.OTHER -> OTHER
             }
     }
 }
