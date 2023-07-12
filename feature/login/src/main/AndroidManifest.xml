@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
-        <activity android:name=".screens.intent.LoginWrapperActivity" />
+        <activity android:name=".screens.intent.LoginWrapperActivity"
+            android:screenOrientation="portrait"/>
     </application>
 </manifest>
