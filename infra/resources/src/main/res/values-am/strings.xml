@@ -213,4 +213,12 @@
     <string name="password_lock_wrong_pin">የተሳሳተ የይለፍ ቃል</string>
     <string name="password_lock_overlay_title">ለመክፈት መታ ያድርጉ</string>
     <string name="refusal_scanner_not_working">ስካነር አይሰራም</string>
+    <string name="logout_sync_decline_button">ሳይመሳሰል ውጣ</string>
+    <string name="logout_sync_info">በመሳሪያዎ ላይ ከመውጣትዎ በፊት መመሳሰል ያለባቸው መዝገቦች አሉ። እባክህ የማመሳሰል ሂደቱ እንዲጠናቀቅ ፍቀድ።\n\nአንዴ ማመሳሰል እንደተጠናቀቀ ዘግተህ መውጣት ትችላለህ።</string>
+    <string name="logout_sync_decline_warning_title">ማስጠንቀቂያ</string>
+    <string name="logout_sync_decline_warning_body">የእርስዎ ፕሮጀክት ወቅታዊ መዛግብት እንዳለው ለማረጋገጥ የውሂብ ማመሳሰል አስፈላጊ ነው። ያለ ትክክለኛ ምክንያት የእርስዎን ውሂብ ማመሳሰል አለመቻል የስራ ባልደረቦችዎ ጠቃሚ መዝገቦችን ማግኘት እና የፕሮጀክቱን ትክክለኛ ሪፖርት የማድረግ ችሎታ ላይ ተጽእኖ ያሳድራል። እና ለእርስዎ እና ለፕሮጀክቱ የማይፈለጉ ውጤቶችን ሊያስከትል ይችላል.</string>
+    <string name="project_paused_title">ፕሮጀክቱ በአሁኑ ጊዜ ባለበት ቆሟል</string>
+    <string name="project_paused_body">ክፍለ-ጊዜን ማስጀመር አልተቻለም ምክንያቱም ፕሮጀክቱ በአሁኑ ጊዜ ባለበት ቆሟል። ለበለጠ መረጃ እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
+    <string name="project_ending_title">ፕሮጀክቱ በአሁኑ ጊዜ እየተጠናቀቀ ነው።</string>
+    <string name="project_ending_body">ፕሮጀክቱ በአሁኑ ጊዜ እያለቀ ስለሆነ ክፍለ-ጊዜን ማስጀመር አልተቻለም። ለበለጠ መረጃ እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
 </resources>
