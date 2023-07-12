@@ -338,7 +338,8 @@ class OrchestratorManagerImplTest {
                 requestCode = CAPTURE.value,
                 activityName = FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
                 bundleKey = IFaceRequest.BUNDLE_KEY,
-                request = request,
+                payloadType = Step.PayloadType.REQUEST,
+                payload = request,
                 status = NOT_STARTED
             )
         )
@@ -399,7 +400,8 @@ class OrchestratorManagerImplTest {
                 requestCode = CAPTURE.value,
                 activityName = FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME,
                 bundleKey = IFingerprintRequest.BUNDLE_KEY,
-                request = FingerprintCaptureRequest(fingerprintsToCapture = emptyList()),
+                payloadType = Step.PayloadType.REQUEST,
+                payload = FingerprintCaptureRequest(fingerprintsToCapture = emptyList()),
                 status = COMPLETED,
                 result = result
             )
@@ -412,7 +414,8 @@ class OrchestratorManagerImplTest {
                 requestCode = CAPTURE.value,
                 activityName = FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
                 bundleKey = IFaceRequest.BUNDLE_KEY,
-                request = FaceCaptureRequest(nFaceSamplesToCapture = 3),
+                payloadType = Step.PayloadType.REQUEST,
+                payload = FaceCaptureRequest(nFaceSamplesToCapture = 3),
                 status = COMPLETED,
                 result = result
             )
