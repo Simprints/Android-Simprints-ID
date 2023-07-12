@@ -2,12 +2,12 @@
 <resources>
     <string name="app_name">Simprints ID</string>
     <string name="alert_title">Yaadachiisa</string>
-    <string name="alert_try_again">Yeroo gabaabaa keessatti irra deebi\'uun yaali</string>
+    <string name="alert_try_again">Irra deebi\'ii yaali</string>
     <string name="confirmation_logout_cancel">Haquu</string>
     <string name="confirmation_logout_message">Keessa bahuu barbaadda?</string>
     <string name="confirmation_logout_title">Keessaa bahi</string>
-    <string name="dashboard_card_calculating">Shalagaa jira…</string>
-    <string name="dashboard_card_current_user">Fayyadamaa Mosaajii: %1$s</string>
+    <string name="dashboard_card_calculating">Shalagaa jira</string>
+    <string name="dashboard_card_current_user">Fayyadamaa Mosaajii</string>
     <string name="dashboard_card_scanner_used">Iskaanarii hojii irra oole: %1$s</string>
     <string name="dashboard_card_sync_last_sync">Yeroo dhumaaf siink kan tahe: %1$s</string>
     <string name="dashboard_label">Daash-boordii</string>
@@ -199,5 +199,6 @@
     <string name="password_lock_title_logout">Ba\'uuf jecha icciitii galchi</string>
     <string name="password_lock_hint">Jecha iccitii</string>
     <string name="password_lock_wrong_pin">Jecha icciitii sirrii hin taane</string>
+    <string name="refusal_scanner_not_working">Scanner hin hojjenne</string>
     <string name="password_lock_overlay_title">Qulfii banuuf tuqi</string>
 </resources>

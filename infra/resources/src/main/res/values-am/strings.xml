@@ -5,7 +5,7 @@
     <string name="error_occurred_title">ስህተት አጋጥሟል</string>
     <string name="different_projectId_message">የተለየ የፕሮጀክት መለያ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="different_userId_message">የተለየ የተጠቃሚ መለያ ቁጥር ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="alert_try_again">ትንሽ ቆይተው ይሞክሩ</string>
+    <string name="alert_try_again">እንደገና ይሞክሩ</string>
     <string name="close">ይዝጉ</string>
     <string name="confirmation_logout_cancel">ሰርዝ</string>
     <string name="confirmation_logout_message">ጨርሰው መውጣት ይፈልጋሉ</string>
@@ -13,7 +13,7 @@
     <string name="dashboard_card_calculating">በማስላት ላይ</string>
     <string name="dashboard_card_current_user">አሁን ያለ ተጠቃሚ: %1$s</string>
     <string name="dashboard_card_scanner_used">እስካነር ይጠቀሙ: %1$s</string>
-    <string name="dashboard_label">"የሁነቶች ማሳያ "</string>
+    <string name="dashboard_label">የሁነቶች ማሳያ </string>
     <string name="login">መግባት</string>
     <string name="login_id_hint">የፕሮጀክት መለያ ቁጥር</string>
     <string name="login_invalid_credentials">ትክክል ያልሆነ ተጠቃሚ ነው ፡ እባክዎ የፕሮጀክት ቁጥር እና ቁልፍ ያረጋግጡ፡፡</string>
@@ -36,9 +36,9 @@
     <string name="preference_device_id_title">የመሳሪያው መለያ</string>
     <string name="preference_logout_title">ይውጡ</string>
     <string name="preference_scanner_version_title">የእስካነር  ስሪት</string>
-    <string name="preference_view_fingers_title">ለአሻራ የሚሆን ቋሚ እጣት ይምረጡ</string>
+    <string name="preference_view_fingers_title">ነባሪ ጣቶችን ይመልከቱ</string>
     <string name="preference_select_language_title">ቋንቋ</string>
-    <string name="preference_select_modules_title">ምዕራፍ/ቀበሊውን ይመረጡ</string>
+    <string name="preference_select_modules_title">ሞጅውሎችን ይምረጡ</string>
     <string name="preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
     <string name="preference_sync_and_search_title">የሲንክ እና የፍለጋ ተግባቦት</string>
     <string name="records_up_to_date">ሁሉም መረጃዎች ወቅታዊ ሆነዋል</string>
@@ -53,19 +53,19 @@
     <string name="title_activity_settings">ማስተካከያ</string>
     <string name="title_activity_settings_about">የበለጠ</string>
     <string name="unforeseen_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
-    <string name="dashboard_card_sync_last_sync">ያለፈው ግንኙነት: %1$s</string>
+    <string name="dashboard_card_sync_last_sync">መጨረሻ ጊዜ ወደ ሰርቨር የተላከው : %1$s</string>
     <string name="settings_too_many_modules_toast">የተሳሳተ ምርጫ ፡ካሉት ምዕራፎች ውስጥ ከ %1$d በላይ መምረጥ አይችሉም</string>
     <string name="settings_title">ማስተካከያ</string>
 
     <string name="consent_enrol">ወደፊት የጣት አሻራዎትን እርስዎን መለየት ይቻል ዘንድ እና የጣት አሻራ መረጃዎትን ለመመዝገብ %1$s እና %2$s መጠቀም እፈልጋለሁ</string>
     <string name="consent_parental_enrol">እርስዎን %2$s ለመመዝገብ አንዲቻል ዉስጥ %1$s እና ወደፊት መለየት አንዲቻል ::</string>
     <string name="consent_parental_id_verify">እርስዎን %2$s ወደፊት መለየት አንዲቻል %1$s ::</string>
-    <string name="consent_parental_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ ::</string>
-    <string name="consent_parental_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና ልጁን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ.&#160;</string>
+    <string name="consent_parental_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
+    <string name="consent_parental_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና ልጁን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ።</string>
     <string name="consent_parental_confirmation">የልጅዎን የጣት አሻራ መጠቀም እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="consent_id_verify">ወደፊት %2$s የእርስዎን መረጃ ለማግኘት የጣት አሻራዎትን መጠቀም እፈልጋለሁ %1$s ::</string>
     <string name="consent_share_data_yes">አሁን ያለ ተጠቃሚ: %1$s</string>
-    <string name="consent_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና እርስዎን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ.&#160;</string>
+    <string name="consent_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና እርስዎን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ።</string>
     <string name="consent_confirmation">እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="launch_consent_decline_button">አለመቀበል</string>
     <string name="launch_consent_accept_button">መቀበል</string>
@@ -99,7 +99,7 @@
         <item quantity="one">ማመሳከር</item>
         <item quantity="other">ማመሳከር</item>
     </plurals>
-    <string name="dashboard_sync_card_try_again_button">ትንሽ ቆይተው ይሞክሩ</string>
+    <string name="dashboard_sync_card_try_again_button">እንደገና ይሞክሩ</string>
     <string name="cancel_button">ሰርዝ</string>
     <string name="confirm_module_selection_cancel">ሰርዝ</string>
     <string name="confirm_module_selection_title">ሞጁል ተመርጧል</string>
@@ -150,20 +150,20 @@
     <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
     <string name="preference_summary_sync_information">ሲንክ ላይ ተጨማሪ ዝርዝር መረጃ</string>
     <string name="preference_sync_information_title">ሲንክ የተደረገ መረጃ</string>
-    <string name="progress_sync_overlay">በግንኙነት ላይ</string>
-    <string name="enrol_last_biometrics_alert_message">1 የማህደሩን %1$s  መመዝገብ አልተሳካም \n 2 መዝጊያውን ይጫኑ</string>
+    <string name="progress_sync_overlay">መረጃውን በመላላክ  ላይ...</string>
+    <string name="enrol_last_biometrics_alert_message">1. %1$s ሪኮርድን ማስቀመጥ አልተሳካም \n 2. ዝጋን መታ ያድርጉ</string>
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
-    <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
-    <string name="enrol_last_biometrics_success">የተግባቦት ስህተት አጋጥሟል(የተሳሳተ ሲምፕሪንስ ኢንተንት) እባክዎ ለሲስተም አድሚኒስትሬተር ያሳውቁ</string>
-    <string name="enrol_last_biometrics_alert_title">সመመዝገብ አልተቻለም</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">የፊት / የጣት አሻራ</string>
+    <string name="enrol_last_biometrics_success">ምዝገባው ተሳክቷል</string>
+    <string name="enrol_last_biometrics_alert_title">የመጨረሻውን ባዮሜትሪክስ  ለመመዝግብ ማንቂያ</string>
     <string name="confirmation_sent">ማረጋገጫ ተልኳል</string>
     <string name="redirecting_you_back">እርስዎን መልሰው በማዛወር ላይ</string>
 
 
     <string name="biometric_concat_modalities">እና</string>
     <string name="consent_collect_yes">ሲምፕሪንትስ መረጃውን ለጥናት አላማ ሊጠቀምበት ይችላል</string>
-    <string name="consent_share_data_no">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ ::</string>
+    <string name="consent_share_data_no">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ  ለትርፍ ያልተቃቑመ ድርጅት,  የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="dashboard_card_available_on_phone">ከስልከዎ ላይ ይገኛል</string>
     <string name="dashboard_card_enrol_title">የመጨረሻ ምዝገባ </string>
     <string name="dashboard_card_enrolment_info">የምዝገባ መረጃ</string>
@@ -194,7 +194,7 @@
     <string name="error_backend_maintenance_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ቆየት ብለው ይሞክሩ.</string>
     <string name="error_backend_maintenance_with_time_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ከ%s በኋላ እንደገና ይሞክሩ</string>
     <string name="dashboard_sync_card_records_to_upload">ለመስቀል %1$d መዝገብ</string>
-    <string name="dashboard_sync_card_records_uploaded">ሁሉም መዝገቦች ተሰቅለዋል።</string>
+    <string name="dashboard_sync_card_records_uploaded">ሁሉም መዝገቦች ተጭነዋል</string>
     <string name="outdated_google_play_services_alert_title">ጊዜው ያለፈበት የጉግል ፕሌይ አገልግሎቶች</string>
     <string name="outdated_google_play_services_alert_message">በዚህ መሳሪያ ላይ የተጫነው የጉግል ፕለይ አገልግሎት ስሪት በSID ከሚያስፈልገው በላይ የቆየ ነው።</string>
     <string name="missing_google_play_services_alert_title">የጎግል ፐሌይ አገልግሎቶች ይጎድላሉ</string>
@@ -212,4 +212,5 @@
     <string name="password_lock_hint">የይለፍ ቃል</string>
     <string name="password_lock_wrong_pin">የተሳሳተ የይለፍ ቃል</string>
     <string name="password_lock_overlay_title">ለመክፈት መታ ያድርጉ</string>
+    <string name="refusal_scanner_not_working">ስካነር አይሰራም</string>
 </resources>

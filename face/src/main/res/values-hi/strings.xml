@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="why_did_you_skip_face_capture">आपने चेहरे की पहचान क्यों नहीं ली\?</string>
+    <string name="why_did_you_skip_face_capture">आपने चेहरे की पहचान क्यों नहीं ली?</string>
     <string name="exit_form_return_to_face_capture">चेहरे की फ़ोटो लें</string>
     <string name="error_licence_invalid_title">लाइसेंस अमान्य है</string>
     <string name="error_licence_invalid_message">बायोमेट्रिक लाइसेंस अमान्य है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
@@ -22,7 +22,7 @@
     <string name="capture_error_look_straight">सुनिश्चित करें कि व्यक्ति सीधे कैमरे में देख रहा है</string>
     <string name="capture_ready">कैप्चर करने के लिए तैयार</string>
     <string name="capture_prep_begin_btn">कैप्चर करने के लिए टैप करें</string>
-    <string name="capture_prep_begin_btn_capturing">कैप्चर हो रहा है....…</string>
+    <string name="capture_prep_begin_btn_capturing">कैप्चर हो रहा है.......</string>
     <string name="capture_title_scan_progress">स्कैन प्रगति पर है</string>
     <string name="capture_hold">अपनी जगह पर रहें</string>
     <string name="captured_successfully">चेहरे को सफलतापूर्वक कैप्चर कर लिया गया है।</string>

@@ -6,14 +6,14 @@
     <string name="error_occurred_title">ስህተት አጋጥሟል</string>
     <string name="different_projectId_message">የተለየ የፕሮጀክት መለያ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="different_userId_message">የተለየ የተጠቃሚ መለያ ቁጥር ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="alert_try_again">ትንሽ ቆይተው ይሞክሩ</string>
+    <string name="alert_try_again">እንደገና ይሞክሩ</string>
     <string name="close">ይዝጉ</string>
     <string name="confirmation_logout_cancel">ሰርዝ</string>
     <string name="confirmation_logout_message">ጨርሰው መውጣት ይፈልጋሉ</string>
     <string name="confirmation_logout_title">መውጣት</string>
     <string name="dashboard_card_calculating">በማስላት ላይ</string>
     <string name="dashboard_card_sync_title">መረጃውን መገናኘት</string>
-    <string name="dashboard_label">"የሁነቶች ማሳያ "</string>
+    <string name="dashboard_label">የሁነቶች ማሳያ</string>
     <string name="login">መግባት</string>
     <string name="login_id_hint">የፕሮጀክት መለያ ቁጥር</string>
     <string name="login_invalid_credentials">ትክክል ያልሆነ ተጠቃሚ ነው ፡ እባክዎ የፕሮጀክት ቁጥር እና ቁልፍ ያረጋግጡ፡፡</string>
@@ -36,9 +36,9 @@
     <string name="preference_device_id_title">የመሳሪያው መለያ</string>
     <string name="preference_logout_title">ይውጡ</string>
     <string name="preference_scanner_version_title">የእስካነር  ስሪት</string>
-    <string name="preference_view_fingers_title">ለአሻራ የሚሆን ቋሚ እጣት ይምረጡ</string>
+    <string name="preference_view_fingers_title">ነባሪ ጣቶችን ይመልከቱ</string>
     <string name="preference_select_language_title">ቋንቋ</string>
-    <string name="preference_select_modules_title">ምዕራፍ ይመረጡ</string>
+    <string name="preference_select_modules_title">ሞጅውሎችን ይምረጡ</string>
     <string name="preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
     <string name="preference_sync_and_search_title">የሲንክ እና የፍለጋ ተግባቦት</string>
     <string name="records_up_to_date">ሁሉም መረጃዎች ወቅታዊ ሆነዋል</string>
@@ -58,9 +58,9 @@
     <string name="settings_title">ማስተካከያ</string>
 
     <string name="consent_parental_id_verify">እርስዎን %2$s ወደፊት መለየት አንዲቻል %1$s ::</string>
-    <string name="consent_parental_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ ::</string>
+    <string name="consent_parental_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="consent_parental_confirmation">የልጅዎን የጣት አሻራ መጠቀም እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
-    <string name="consent_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ ::</string>
+    <string name="consent_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="consent_confirmation">እችላለሁ %1$s?  እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="launch_consent_decline_button">አለመቀበል</string>
     <string name="launch_consent_accept_button">መቀበል</string>
@@ -94,7 +94,7 @@
         <item quantity="one">ማመሳከር</item>
         <item quantity="other">ማመሳከር</item>
     </plurals>
-    <string name="dashboard_sync_card_try_again_button">ትንሽ ቆይተው ይሞክሩ</string>
+    <string name="dashboard_sync_card_try_again_button">እንደገና ይሞክሩ</string>
     <string name="consent_enrol">ወደፊት የጣት አሻራዎትን እርስዎን መለየት ይቻል ዘንድ እና የጣት አሻራ መረጃዎትን ለመመዝገብ %1$s እና %2$s መጠቀም እፈልጋለሁ</string>
     <string name="consent_id_verify">ወደፊት %2$s የእርስዎን መረጃ ለማግኘት የጣት አሻራዎትን መጠቀም እፈልጋለሁ %1$s ::</string>
     <string name="consent_parental_enrol">እርስዎን %2$s ለመመዝገብ አንዲቻል  ዉስጥ %1$s እና ወደፊት መለየት አንዲቻል ::</string>
@@ -149,12 +149,12 @@
     <string name="verify_guid_not_found_online_message">አንዲጠራ የተመረጠው ግለሰብ ዳታቤዙ ውስጥ የለም</string>
     <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
     <string name="fetch_guid_checking_person_in_database">ተገልጋዩ ዳታቤዝ ውስጥ መኖሩን ማረጋገጥ</string>
-    <string name="progress_sync_overlay">በግንኙነት ላይ</string>
-    <string name="enrol_last_biometrics_alert_message">1 የማህደሩን %1$s  መመዝገብ አልተሳካም \n 2 መዝጊያውን ይጫኑ</string>
+    <string name="progress_sync_overlay">መረጃ በመላላክ ላይ... </string>
+    <string name="enrol_last_biometrics_alert_message">1. %1$s ሪኮርድን ማስቀመጥ አልተሳካም \n 2. ዝጋን መታ ያድርጉ</string>
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
-    <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
-    <string name="enrol_last_biometrics_success">የተግባቦት ስህተት አጋጥሟል(የተሳሳተ ሲምፕሪንስ ኢንተንት) እባክዎ ለሲስተም አድሚኒስትሬተር ያሳውቁ</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">ፊት /የጣት አሻራ</string>
+    <string name="enrol_last_biometrics_success">የተሳካ ምዝገባ</string>
     <string name="enrol_last_biometrics_alert_title">መመዝገብ አልተቻለም</string>
     <string name="confirmation_sent">ማረጋገጫ ተልኳል</string>
     <string name="redirecting_you_back">እርስዎን መልሰው በማዛወር ላይ</string>
@@ -184,7 +184,7 @@
     <string name="modality_download_taking_longer">ማዉረዱ ከተጠበቀው በላይ እየወሰደ ነው...</string>
     <string name="calculating_overlay">በማስላት ላይ</string>
     <string name="long_consent_downloading">የግላዊነት ማስታወቂያ በማውረድ ላይ</string>
-    <string name="configuration_error_message">የማዋቀር ስህተት ተፈጥሯል (%1$s)፣ እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
+    <string name="configuration_error_message">ሲስተሙ የተግበቦት (%1$s) ስህተት አጋጥሞታል እባክዎትን የሲስተሙን አስተዳደሪ ያነጋግሩ</string>
     <string name="error_backend_maintenance_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ቆየት ብለው ይሞክሩ.</string>
     <string name="error_backend_maintenance_with_time_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ከ%s በኋላ እንደገና ይሞክሩ</string>
     <string name="dashboard_sync_card_records_to_upload">ለመስቀል %1$d መዝገብ</string>
@@ -198,10 +198,11 @@
     <string name="biometrics_parental_face">የልጅዎትን ፎቶግራፍ ማንሳት</string>
     <string name="face_feature_alert">የፊት ፊችር</string>
     <string name="fingerprint_face_feature_alert">የጣት አሻራና ፊት ፊቸር</string>
-    <string name="sync_info_images_to_upload">የሚጫኑ ምስሎች</string>
+    <string name="sync_info_images_to_upload">የሚጫኑ ምስሎች </string>
     <string name="password_lock_title_default">ለመክፈት የይለፍ ቃል ያስገቡ</string>
     <string name="password_lock_title_logout">ለመውጣት የይለፍ ቃል ያስገቡ</string>
     <string name="password_lock_hint">የይለፍ ቃል</string>
     <string name="password_lock_wrong_pin">የተሳሳተ የይለፍ ቃል</string>
     <string name="password_lock_overlay_title">ለመክፈት መታ ያድርጉ</string>
+    <string name="refusal_scanner_not_working">ስካነር አይሰራም</string>
 </resources>

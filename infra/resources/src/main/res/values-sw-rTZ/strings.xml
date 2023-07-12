@@ -59,7 +59,7 @@
     <string name="login_invalid_qr_code">QR uliyochukua ni batili</string>
     <string name="login_missing_credentials">Namba ya utambulisho unakosekana. Tafadhali angalia namba ya utambulisho wa mtumiaji, namba ya utabulisho wa mradi, na ufunguo, na jaribu tena</string>
     <string name="login_no_network">Kwa sasa hauko kwenye mtandao. Tafadhali angalia kama simu yako imeunganishwa na mtandao </string>
-    <string name="login_project_id_intent_mismatch">Namba ya utambulisho wa mradi tofauti na ile iliyotelewa kwa kusudi. Tafadhali wasiliana na msimamizi wa mfumo huu</string>
+    <string name="login_project_id_intent_mismatch">Namba ya utambulisho wa mradi tofauti na ile iliyotelewa kwa kusudi. Tafadhali wasiliana na msimamizi wa mfumo huu.</string>
     <string name="login_qr_code_scanning_problem">Tatizo limetokea wakati wa kuchukua alama za QR</string>
     <string name="login_secret_hint">Lengo la mradi</string>
     <string name="login_server_error">Tatizo limetokea wakati wa kuwasiliana na mtandao wa kimfumo. Tafadhali jaribu tena baadaye.</string>
@@ -70,7 +70,7 @@
     <string name="long_consent_failed_to_download">Imeshindikana kupakua taarifa zinazohusiana na kutoa idhini</string>
     <string name="matching_fingerprints">Kulinganisha alama za vidole</string>
     <string name="menu_privacy_notice">Taarifa zinazohusiana na kutoa idhin</string>
-    <string name="menu_settings">Mpangilio</string>
+    <string name="menu_settings">Mipangilio</string>
     <string name="no_results">Hakuna matokeo</string>
     <string name="ok">Sawa</string>
     <string name="preference_app_details_title">Kuhusu</string>
@@ -102,8 +102,8 @@
     <string name="refusal_too_young">Mdogo sana</string>
     <string name="requestLogin_message">Unahitaji kuingia. Tafadhali tumia programu yako ya mteja kufungua Kitambulisho cha Simprints na uingie</string>
     <string name="requestLogin_title">Inahitajika kuingia</string>
-    <string name="select_modules_button_title">Chagua vipengele</string>
-    <string name="selected_modules">Vipengele villivyochaguliwa</string>
+    <string name="select_modules_button_title">Chagua moduli</string>
+    <string name="selected_modules">Vipengele vilivyochaguliwa</string>
     <string name="scan_qr">Chukua QR</string>
     <string name="settings_app_details">Taarifa za mfumo</string>
     <string name="settings_general">Kwa ujumla</string>
@@ -122,7 +122,7 @@
     <string name="sync_info_unselected_modules">Vipengele ambavyo havijachaguliwa</string>
     <string name="sync_info_sync_now">Oanisha sasa</string>
     <string name="sync_info_sync_in_progress">Inaoanisha…</string>
-    <string name="title_activity_settings">Mpangilio</string>
+    <string name="title_activity_settings">Mipangilio</string>
     <string name="title_activity_settings_about">Kuhusu</string>
     <string name="title_activity_sync_information">Oanisha taarifa</string>
     <string name="try_again_label">Jaribu tena</string>
