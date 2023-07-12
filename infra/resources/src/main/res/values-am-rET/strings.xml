@@ -204,4 +204,5 @@
     <string name="password_lock_hint">የይለፍ ቃል</string>
     <string name="password_lock_wrong_pin">የተሳሳተ የይለፍ ቃል</string>
     <string name="password_lock_overlay_title">ለመክፈት መታ ያድርጉ</string>
+    <string name="refusal_scanner_not_working">ስካነር አይሰራም</string>
 </resources>

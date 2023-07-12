@@ -59,6 +59,7 @@ object DomainToFingerprintResponse {
             RefusalFormReason.SCANNER_NOT_WORKING -> IFingerprintExitReason.SCANNER_NOT_WORKING
             RefusalFormReason.REFUSED_NOT_PRESENT -> IFingerprintExitReason.REFUSED_NOT_PRESENT
             RefusalFormReason.REFUSED_YOUNG -> IFingerprintExitReason.REFUSED_YOUNG
+            RefusalFormReason.APP_NOT_WORKING -> IFingerprintExitReason.APP_NOT_WORKING
             RefusalFormReason.OTHER -> IFingerprintExitReason.OTHER
         }
 

@@ -13,6 +13,7 @@ enum class RefusalFormReason {
     SCANNER_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
+    APP_NOT_WORKING,
     OTHER;
 
     companion object {
@@ -20,7 +21,7 @@ enum class RefusalFormReason {
             ExitFormOption.ReligiousConcerns -> REFUSED_RELIGION
             ExitFormOption.DataConcerns -> REFUSED_DATA_CONCERNS
             ExitFormOption.NoPermission -> REFUSED_PERMISSION
-            ExitFormOption.AppNotWorking -> SCANNER_NOT_WORKING
+            ExitFormOption.AppNotWorking -> APP_NOT_WORKING
             ExitFormOption.ScannerNotWorking -> SCANNER_NOT_WORKING
             ExitFormOption.PersonNotPresent -> REFUSED_NOT_PRESENT
             ExitFormOption.TooYoung -> REFUSED_YOUNG
