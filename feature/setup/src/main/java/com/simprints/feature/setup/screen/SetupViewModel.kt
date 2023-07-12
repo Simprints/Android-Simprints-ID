@@ -12,16 +12,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SetupViewModel @Inject constructor(
-    private val locationStore: LocationStore, private val configManager: ConfigManager
+    private val locationStore: LocationStore,
+    private val configManager: ConfigManager
 ) : ViewModel() {
 
     val requestLocationPermission: LiveData<Unit>
         get() = _requestLocationPermission
-    private var _requestLocationPermission = MutableLiveData<Unit>()
+    private val _requestLocationPermission = MutableLiveData<Unit>()
 
     val finish: LiveData<Boolean>
         get() = _finish
-    private var _finish = MutableLiveData<Boolean>()
+    private val _finish = MutableLiveData<Boolean>()
 
 
     fun collectLocation() {
