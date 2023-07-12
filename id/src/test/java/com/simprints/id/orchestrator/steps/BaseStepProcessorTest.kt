@@ -64,7 +64,7 @@ open class BaseStepProcessorTest {
         assertThat(step.activityName).isEqualTo(activityName)
         assertThat(step.requestCode).isEqualTo(expectedRequestCode)
         assertThat(step.bundleKey).isEqualTo(bundleKey)
-        assertThat(step.request).isInstanceOf(T::class.java)
+        assertThat(step.payload).isInstanceOf(T::class.java)
         assertThat(step.getResult()).isNull()
         assertThat(step.getStatus()).isEqualTo(Step.Status.NOT_STARTED)
     }

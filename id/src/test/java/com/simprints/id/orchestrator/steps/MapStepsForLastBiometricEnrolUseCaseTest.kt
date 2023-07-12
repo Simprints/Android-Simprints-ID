@@ -142,7 +142,8 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
         activityName = "",
         bundleKey = "",
         status = Step.Status.NOT_STARTED,
-        request = request,
+        payloadType = Step.PayloadType.REQUEST,
+        payload = request,
         result = result,
     )
 }

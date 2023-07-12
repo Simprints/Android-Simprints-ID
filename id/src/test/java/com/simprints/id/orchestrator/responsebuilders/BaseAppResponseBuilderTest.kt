@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator.responsebuilders
 
 import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.exitformhandler.ExitFormReason
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
@@ -15,6 +14,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorR
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
+import com.simprints.id.exitformhandler.ExitFormReason
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
@@ -117,7 +117,8 @@ class BaseAppResponseBuilderTest {
     private fun wrapIntoStepList(result: Step.Result) = listOf(Step(
         requestCode = 0,
         activityName = "",
-        request = Bundle(),
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = Bundle(),
         bundleKey = "",
         status = Step.Status.ONGOING,
         result = result,

@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CAPTURE
@@ -13,8 +15,6 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.ConfigManager
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
 import io.mockk.*
@@ -63,14 +63,14 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     @Test
     fun stepProcessorShouldBuildTheRightStepForMatching() {
         val step = fingerprintStepProcess.buildStepToMatch(mockk(), mockk())
-        verifyFingerprintIntent<IFingerprintMatchRequest>(step, MATCH.value)
+        verifyFingerprintIntent<FingerprintMatchRequest>(step, MATCH.value)
     }
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForCapturing() = runTest {
         with(enrolAppRequest) {
             val step = fingerprintStepProcess.buildStepToCapture()
-            verifyFingerprintIntent<IFingerprintCaptureRequest>(step, CAPTURE.value)
+            verifyFingerprintIntent<FingerprintCaptureRequest>(step, CAPTURE.value)
         }
     }
 
