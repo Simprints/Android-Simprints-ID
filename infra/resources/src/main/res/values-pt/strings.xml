@@ -14,36 +14,36 @@
     <string name="finger_selection_confirm_dialog_no">Cancelar</string>
     <string name="select_modules_button_title">Selecione os módulos</string>
     <string name="sync_info_selected_modules">Módulos selecionados</string>
-    <string name="calculating_overlay">Calculando …</string>
-    <string name="why_did_you_skip_face_capture">Por que pulou a captura de rosto\?</string>
+    <string name="calculating_overlay">Calculando ...</string>
+    <string name="why_did_you_skip_face_capture">Por que pulou a captura de rosto?</string>
     <string name="exit_form_capture_face">Capturar rosto</string>
     <string name="confirm_module_selection_yes">Confirmar</string>
     <string name="modality_downloading">Baixando…%1$s</string>
     <string name="modality_installing">Instalando…</string>
-    <string name="modality_download_taking_longer">Download demorando mais do que o esperado …</string>
+    <string name="modality_download_taking_longer">Download demorando mais do que o esperado ...</string>
     <string name="confirm_module_selection_cancel">Cancelar</string>
     <string name="dashboard_sync_card_try_again_button">Tente novamente</string>
-    <string name="toast_login_failed">Login falhou. Por favor contacte seu supervisor.</string>
-    <string name="modality_starting_download">Iniciando download…</string>
+    <string name="toast_login_failed">Falha na autenticação. Entre em contacto com o seu supervisor.</string>
+    <string name="modality_starting_download">Iniciando download</string>
     <string name="alert_title">Alerta</string>
-    <string name="consent_enrol_only">Gostaria de %2$s para inscrevê-lo em %1$s. </string>
-    <string name="consent_enrol">Gostaria de %2$s para inscrevê-lo em %1$s e identificá-lo no futuro.</string>
-    <string name="consent_id_verify">Gostaria de %2$s para localizar os seus registos em %1$s. </string>
-    <string name="consent_share_data_no">Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terá acesso ao seu %1$s e à localização actual. </string>
-    <string name="consent_share_data_yes">%1$s e a Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terá acesso ao seu %2$s e à localização actual. </string>
-    <string name="consent_collect_yes">Simprints também usará os dados para fins de pesquisa. </string>
-    <string name="consent_privacy_rights">Se aceitar, pode retirar a sua permissão a qualquer momento e solicitar que os seus dados sejam apagados. </string>
-    <string name="consent_confirmation">Posso %1$s\? Diga \"Aceito\", \"Recuso\", ou \"Tenho dúvidas.\"</string>
-    <string name="consent_parental_enrol_only">Gostaria de %2$s para inscrevê-los em %1$s. </string>
-    <string name="consent_parental_enrol">Gostaria de %2$s para inscrevê-los em %1$s e identificá-los no futuro.</string>
-    <string name="consent_parental_id_verify">Gostaria de %2$s para localizar os registos em %1$s. </string>
-    <string name="consent_parental_share_data_no">Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terá acesso ao seu %1$s e à localização actual. </string>
-    <string name="consent_parental_share_data_yes">%1$s e a Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terão acesso a seu %2$s e localização actual. </string>
-    <string name="consent_parental_privacy_rights">Se aceitar, pode retirar a sua permissão a qualquer momento e solicitar que os dados da sua criança sejam apagados. </string>
-    <string name="consent_parental_confirmation">Posso %1$s\? Diga \"Aceito\", \"Recuso\", ou \"Tenho dúvidas.\"</string>
-    <string name="biometric_general_face">tirar fotos do seu rosto</string>
+    <string name="consent_enrol_only">Gostaria de %1$s inscrevê-lo em %2$s.</string>
+    <string name="consent_enrol">Gostaria que %2$s inscrevesse você em %1$s e identificasse você no futuro.</string>
+    <string name="consent_id_verify">Gostaria de %2$s localizar os seus registos de %1$s.</string>
+    <string name="consent_share_data_no">Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terá acesso ao seu %1$s e à localização actual.</string>
+    <string name="consent_share_data_yes">%1$s e a Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terá acesso ao seu %2$s e à localização actual.</string>
+    <string name="consent_collect_yes">Simprints também usará os dados para fins de pesquisa.</string>
+    <string name="consent_privacy_rights">Se aceitar, pode retirar a sua permissão a qualquer momento e solicitar que os seus dados sejam apagados.</string>
+    <string name="consent_confirmation">Posso %1$s? Diga \"Aceito\", \"Recuso\", ou \"Tenho dúvidas.\"</string>
+    <string name="consent_parental_enrol_only">Gostaria de %2$s inscrevê-los em %1$s.</string>
+    <string name="consent_parental_enrol">Gostaria de %2$s inscrevê-los em %1$s e identificá-los no futuro.</string>
+    <string name="consent_parental_id_verify">Gostaria que %2$s encontrasse os registos de %1$s.</string>
+    <string name="consent_parental_share_data_no">Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terá acesso ao seu %1$s e à localização actual.</string>
+    <string name="consent_parental_share_data_yes">%1$s e a Simprints, uma organização sem fins lucrativos com sede no Reino Unido, terão acesso a seu %2$s e localização actual.</string>
+    <string name="consent_parental_privacy_rights">Se aceitar, pode retirar a sua permissão a qualquer momento e solicitar que os dados da sua criança sejam apagados.</string>
+    <string name="consent_parental_confirmation">Posso usar o %1$s do seu filho? Diga \"Aceito\", \"Recuso\", ou \"Tenho dúvidas.\"</string>
+    <string name="biometric_general_face">tire fotos do seu rosto</string>
     <string name="biometrics_access_face">fotografias</string>
-    <string name="biometrics_parental_face">tirar fotos do rosto da sua criança</string>
+    <string name="biometrics_parental_face">tire fotos do rosto da sua criança</string>
     <string name="biometric_concat_modalities">e</string>
     <string name="launch_consent_decline_button">Recusar</string>
     <string name="launch_consent_accept_button">Aceitar</string>
@@ -101,8 +101,8 @@
     <string name="dashboard_sync_card_offline_message">Active a conexão com a Internet nas configurações</string>
     <string name="dashboard_card_sync_title">Status de sincronização</string>
     <string name="dashboard_card_sync_last_sync">Última sincronização: %1$s</string>
-    <string name="dashboard_card_current_user">Usuário atual: %1$s</string>
-    <string name="dashboard_card_calculating">Calculando…</string>
+    <string name="dashboard_card_current_user">Usuário actual: %1$</string>
+    <string name="dashboard_card_calculating">Calculando ...</string>
     <string name="dashboard_card_activity">Atividade: %1$s</string>
     <string name="menu_privacy_notice">Aviso de privacidade</string>
     <string name="menu_settings">Definições</string>
@@ -130,7 +130,7 @@
     <string name="sync_info_images_to_upload">Imagens para fazer upload</string>
     <string name="sync_info_sync_now">Sincronize agora</string>
     <string name="sync_info_sync_in_progress">Sincronizando</string>
-    <string name="progress_sync_overlay">Sincronizando …</string>
+    <string name="progress_sync_overlay">Sincronizando ...</string>
     <string name="refusal_toast_select_option_submit">Selecione uma opção e envie</string>
     <string name="refusal_toast_submit">Por favor, envie o formulário</string>
     <string name="refusal_religious_concerns">Preocupações religiosas</string>
@@ -141,7 +141,7 @@
     <string name="refusal_too_young">Jovem demais</string>
     <string name="refusal_other">Outro</string>
     <string name="exit_form_return_to_simprints">Capturar rosto</string>
-    <string name="why_did_you_skip_biometrics">Por que pulou a biometria\?</string>
+    <string name="why_did_you_skip_biometrics">Por que pulou a biometria?</string>
     <string name="fetch_guid_checking_person_in_database">Verificando pessoa no banco de dados</string>
     <string name="hint_search_modules">Módulos de pesquisa</string>
     <string name="no_modules_selected">Nenhum módulo selecionado</string>
@@ -167,7 +167,7 @@
     <string name="dashboard_card_enrol_title">Última inscrição</string>
     <string name="dashboard_card_enrolment_info">Informações de inscrição</string>
     <string name="dashboard_card_identification_title">Última Identificação</string>
-    <string name="dashboard_card_lastscanner_used">Scanner used %1$s</string>
+    <string name="dashboard_card_lastscanner_used">Scanner usado %1$s</string>
     <string name="dashboard_card_to_download">Para baixar</string>
     <string name="dashboard_card_to_upload">Para fazer o upload</string>
     <string name="dashboard_card_verification_title">Última Verificação</string>
@@ -179,7 +179,7 @@
     <string name="enrol_last_biometrics_alert_message">1. Falha ao salvar o registro %1$s \n 2. Toque em fechar</string>
     <string name="enrol_last_biometrics_alert_title">Incapaz de salvar</string>
     <string name="enrol_last_biometrics_success">Inscrição bem-sucedida</string>
-    <string name="configuration_error_message">Ocorreu um erro de configuração (%1$s), entre em contato com o administrador do sistema</string>
+    <string name="configuration_error_message">Ocorreu um erro de configuração (%1$s), entre em contacto com o administrador do sistema</string>
     <string name="error_backend_maintenance_message">O sistema está atualmente offline para manutenção. Por favor, tente novamente mais tarde.</string>
     <string name="error_backend_maintenance_with_time_message">O sistema está atualmente offline para manutenção. Por favor, tente novamente após %s</string>
     <string name="dashboard_sync_card_records_to_upload">%1$d registro para carregar</string>
@@ -194,4 +194,31 @@
     <string name="password_lock_hint">Senha</string>
     <string name="password_lock_wrong_pin">Senha incorreta</string>
     <string name="password_lock_overlay_title">Toque para desbloquear</string>
+    <string name="preference_view_fingers_title">Ver dedos padrão</string>
+    <string name="finger_selection_fragment_title">Ver Dedos</string>
+    <string name="pair_scanner_label">Definições</string>
+    <string name="serial_entry_ok">OK</string>
+    <plurals name="returned_results">
+        <item quantity="one">Retorno %de resultado.</item>
+        <item quantity="other">Retornou %d resultados.</item>
+    </plurals>
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">Sem combinações muito boas</item>
+        <item quantity="one">%d combinação muito boa</item>
+        <item quantity="other">%d combinações muito boas</item>
+    </plurals>
+    <plurals name="tier3_matches">
+        <item quantity="zero">Sem boas combinações</item>
+        <item quantity="one">%d boa combinação</item>
+        <item quantity="other">%d boas combinações</item>
+    </plurals>
+    <plurals name="tier4_matches">
+        <item quantity="zero">Sem combinações</item>
+        <item quantity="one">%d combinação</item>
+        <item quantity="other">%d combinações</item>
+    </plurals>
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">%d candidato carregado.</item>
+        <item quantity="other">%d candidatos carregados.</item>
+    </plurals>
 </resources>
