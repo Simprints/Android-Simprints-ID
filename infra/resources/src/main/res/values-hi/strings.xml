@@ -196,4 +196,34 @@
     <string name="project_paused_body">सत्र लॉन्च करने में असमर्थ क्योंकि प्रोजेक्ट फिलहाल रुका हुआ है। अधिक जानकारी के लिए कृपया अपने पर्यवेक्षक से संपर्क करें</string>
     <string name="project_ending_title">प्रोजेक्ट फिलहाल ख़त्म हो रहा है</string>
     <string name="project_ending_body">सत्र लॉन्च करने में असमर्थ क्योंकि परियोजना वर्तमान में समाप्त हो रही है। अधिक जानकारी के लिए कृपया अपने पर्यवेक्षक से संपर्क करें</string>
+    <string name="enrol_last_biometrics_success">पुष्टिकरण भेजा गया</string>
+    <string name="configuration_error_message">आपको वापस रीडायरेक्ट कर रहा है</string>
+    <string name="finger_selection_invalid">अमान्य चयन - एक उंगलियाँ 5 से अधिक हैं</string>
+    <string name="preference_view_fingers_title">डिफ़ॉल्ट उंगलियां देखें</string>
+    <string name="finger_selection_fragment_title">उंगलियां देखें</string>
+    <string name="pair_scanner_label">सेटिंग</string>
+    <string name="serial_entry_ok">ठीक</string>
+    <plurals name="returned_results">
+        <item quantity="one">%d परिणाम आए।</item>
+        <item quantity="other">%d परिणाम लौटाया गया.</item>
+    </plurals>
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">कोई बहुत अच्छा मेल नहीं है</item>
+        <item quantity="one">%d बहुत अच्छा मेल</item>
+        <item quantity="other">%d बहुत अच्छा मेल हैं</item>
+    </plurals>
+    <plurals name="tier3_matches">
+        <item quantity="zero">कोई अच्छा मेल नहीं</item>
+        <item quantity="one">%d अच्छा मेल है</item>
+        <item quantity="other">%d अच्छे मेल हैं</item>
+    </plurals>
+    <plurals name="tier4_matches">
+        <item quantity="zero">कोई मेल नही</item>
+        <item quantity="one">%d मेल</item>
+        <item quantity="other">%d मेल खाते हैं</item>
+    </plurals>
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">%d उम्मीदवार को लोड किया गया।</item>
+        <item quantity="other">%d उम्मीदवारों को लोड किया गया।</item>
+    </plurals>
 </resources>
