@@ -213,7 +213,6 @@
     <string name="project_paused_body">ክፍለ-ጊዜን ማስጀመር አልተቻለም ምክንያቱም ፕሮጀክቱ በአሁኑ ጊዜ ባለበት ቆሟል። ለበለጠ መረጃ እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
     <string name="project_ending_title">ፕሮጀክቱ በአሁኑ ጊዜ እየተጠናቀቀ ነው።</string>
     <string name="project_ending_body">ፕሮጀክቱ በአሁኑ ጊዜ እያለቀ ስለሆነ ክፍለ-ጊዜን ማስጀመር አልተቻለም። ለበለጠ መረጃ እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
-    <string name="privacy_notice_text">የደህንነት ማሳታወቂያ</string>
     <string name="biometrics_access_fingerprint">የጣት አሻራ መረጃ</string>
     <string name="biometrics_access_fingerprint_face">የጣት አሻራ መረጃ፣ፎቶግራፍ</string>
     <string name="biometrics_general_fingerprint">የጣት አሻራን ተጠቀም</string>
