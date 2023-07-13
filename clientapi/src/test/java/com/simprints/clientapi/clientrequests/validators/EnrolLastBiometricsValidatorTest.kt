@@ -2,6 +2,7 @@ package com.simprints.clientapi.clientrequests.validators
 
 import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
 import com.simprints.clientapi.exceptions.InvalidSessionIdException
+import com.simprints.clientapi.exceptions.InvalidUserIdException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -37,6 +38,14 @@ class EnrolLastBiometricsValidatorTest {
     fun aRequestWithoutSessionIdReceived_shouldThrowAnException() {
         val enrolLastBiometricsValidator = EnrolLastBiometricsValidator(enrolLastBiometricsExtractor, sessionID, true)
         assertThrows<InvalidSessionIdException> {
+            enrolLastBiometricsValidator.validateClientRequest()
+        }
+    }
+    @Test
+    fun aRequestWithoutUserIdReceived_shouldThrowAnException() {
+        every { enrolLastBiometricsExtractor.getUserId() } returns ""
+        val enrolLastBiometricsValidator = EnrolLastBiometricsValidator(enrolLastBiometricsExtractor, sessionID, true)
+        assertThrows<InvalidUserIdException> {
             enrolLastBiometricsValidator.validateClientRequest()
         }
     }
