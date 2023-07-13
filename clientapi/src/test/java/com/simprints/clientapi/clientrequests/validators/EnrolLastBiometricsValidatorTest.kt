@@ -8,7 +8,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class EnrolLastBiometricsValidatorTest {
 
@@ -21,11 +21,13 @@ class EnrolLastBiometricsValidatorTest {
         MockKAnnotations.init(this)
         every { enrolLastBiometricsExtractor.getProjectId() } returns "xppPLwmR2eUmyN6LS3SN"
         every { enrolLastBiometricsExtractor.getUserId() } returns "user_id"
+        every { enrolLastBiometricsExtractor.getModuleId() } returns "module_id"
     }
 
     @Test
     fun givenNotIdentificationAsLastFlow_enrolLastBiometricsReceived_shouldThrowAnException() {
         val enrolLastBiometricsValidator = EnrolLastBiometricsValidator(enrolLastBiometricsExtractor, sessionID, false)
+
         assertThrows<InvalidSessionIdException> {
             enrolLastBiometricsValidator.validateClientRequest()
         }
