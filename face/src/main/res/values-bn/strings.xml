@@ -40,7 +40,7 @@
     </plurals>
 
     <plurals name="face_match_returned_results">
-        <item quantity="one">%d রেজাল্ট ফেরত</item>
+        <item quantity="one">%d ফলাফল ফিরে এসেছে</item>
         <item quantity="other">%d রেজাল্ট ফেরত</item>
     </plurals>
 
