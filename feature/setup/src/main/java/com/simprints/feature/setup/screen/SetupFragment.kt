@@ -24,7 +24,8 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         if (granted) {
             viewModel.collectLocation()
         }
-        finishWithResult(granted)
+        // Always finish with true result, even if permission is not granted
+        finishWithResult(true)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
