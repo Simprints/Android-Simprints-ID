@@ -20,6 +20,7 @@ fun IFingerprintExitFormResponse.fromModuleApiToDomain(): FingerprintRefusalForm
         IFingerprintExitReason.SCANNER_NOT_WORKING -> FingerprintRefusalFormReason.SCANNER_NOT_WORKING
         IFingerprintExitReason.REFUSED_NOT_PRESENT -> FingerprintRefusalFormReason.REFUSED_NOT_PRESENT
         IFingerprintExitReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
+        IFingerprintExitReason.APP_NOT_WORKING -> FingerprintRefusalFormReason.APP_NOT_WORKING
         IFingerprintExitReason.OTHER -> FingerprintRefusalFormReason.OTHER
     }
 
