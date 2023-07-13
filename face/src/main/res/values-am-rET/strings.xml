@@ -54,7 +54,7 @@
         <item quantity="other">%d ዉጤቶችን ይዟል</item>
     </plurals>
     <plurals name="face_match_tier1or2_matches">
-        <item quantity="zero">%d ዉጤቶችን ይዟል</item>
+        <item quantity="zero">በጣም ጥሩ ግጥሚያዎች የሉም</item>
         <item quantity="one">%d በጣም ጥሩ ተመራጭ</item>
         <item quantity="other">%d በጣም ጥሩ ተመራጮች</item>
     </plurals>
