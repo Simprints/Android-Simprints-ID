@@ -50,12 +50,12 @@
 
     <string name="face_match_matching_candidates">उम्मीदवार में से मिलान हो रहा हैं</string>
     <plurals name="face_match_matched_candidates">
-        <item quantity="one">"%d  उम्मीदवार से तुलना की गई"</item>
-        <item quantity="other">"%d  उम्मीदवारों से तुलना की गई"</item>
+        <item quantity="one">%d  उम्मीदवार से तुलना की गई</item>
+        <item quantity="other">%d  उम्मीदवारों से तुलना की गई</item>
     </plurals>
 
     <plurals name="face_match_returned_results">
-        <item quantity="one">%d परिणाम आए।</item>
+        <item quantity="one">%d परिणाम लौटाया गया</item>
         <item quantity="other">%d परिणाम आए।</item>
     </plurals>
 
