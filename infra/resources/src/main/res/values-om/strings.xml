@@ -200,4 +200,5 @@
     <string name="password_lock_hint">Jecha iccitii</string>
     <string name="password_lock_wrong_pin">Jecha icciitii sirrii hin taane</string>
     <string name="password_lock_overlay_title">Qulfii banuuf tuqi</string>
+    <string name="refusal_scanner_not_working">Scanner hin hojjenne</string>
 </resources>
