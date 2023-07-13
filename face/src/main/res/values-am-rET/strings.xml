@@ -30,7 +30,7 @@
     <string name="capture_title_too_close">ፊቱ በጣም ቀርቧል</string>
     <string name="capture_title_face_too_far">ፊቱ በጣም ርቋል</string>
     <string name="matching_x_records">ካሉት %s ማህደር ዉስጥ እየለየ</string>
-    <string name="face_match_please_wait">የመለየት ሰራውን እስኪጠናቀቅ እባክዎት ትንሽ ይጠብቁ </string>
+    <string name="face_match_please_wait">የመለየት ሰራውን እስኪጠናቀቅ እባክዎት ትንሽ ይጠብቁ</string>
     <string name="face_match_loading_candidates">ዕጩዎችን በመጫን ላይ ነው</string>
     <string name="face_match_matching_candidates">ካሉት %s ማህደር ዉስጥ እየለየ</string>
     <string name="error_licence_invalid_title">ፍቃድ አይሰራም/ትክክል አይደለም</string>
@@ -38,7 +38,7 @@
     <string name="error_close_button">ይዝጉ</string>
     <string name="error_licence_missing_title">ላይሰንሱ/ ፍቃድ ጠፍቷል</string>
     <string name="error_licence_missing_message">የፊት ላይሰንሱ/ ፍቃድ ጠፍቷል፤እባክዎ የሲስተም አስተዳዳሪውን ያሳውቁ</string>
-    <string name="face_configuration_started">የፊት ሞዳሊቲ እየተሰራ</string>
+    <string name="face_configuration_started">የፊት ሞዳሊቲ አልተገኘም</string>
     <string name="face_configuration_downloading">አስፈላጊ ፋይሎችን በማውረድ ላይ</string>
     <string name="error_configuration_error_title">የማዋቀር ስህተት</string>
     <string name="error_configuration_error_message">የፊት ሁነታን በማዋቀር ላይ ስህተት ነበር፣እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
@@ -46,7 +46,7 @@
     <string name="error_unexpected_error_title">ስህተት አጋጥሟል</string>
     <string name="error_unexpected_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
     <plurals name="face_match_matched_candidates">
-        <item quantity="one"> እያወዳደረ %d ተመራጭ</item>
+        <item quantity="one">እያወዳደረ %d ተመራጭ</item>
         <item quantity="other">እያወዳደረ %d ተመራጮችን</item>
     </plurals>
     <plurals name="face_match_returned_results">
@@ -65,7 +65,7 @@
     </plurals>
     <plurals name="face_match_tier4_matches">
         <item quantity="zero">ተመራጮች የሉም</item>
-        <item quantity="one">%d  ተመራጭ </item>
+        <item quantity="one">%d  ተመራጭ</item>
         <item quantity="other">%d  ተመራጮች</item>
     </plurals>
 </resources>
