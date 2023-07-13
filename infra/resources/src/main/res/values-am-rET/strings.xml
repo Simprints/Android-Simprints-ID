@@ -137,7 +137,7 @@
     <string name="sync_info_records_to_delete">የተመዘገበውን ለመሰረዝ</string>
     <string name="sync_info_records_to_download">የተመዘገበውን ለመማውረድ</string>
     <string name="sync_info_records_to_upload">የተመዘገበውን ለመጫን</string>
-    <string name="sync_info_selected_modules">የተመረጡ ሞዱሎች  ሲንክ መረጃ</string>
+    <string name="sync_info_selected_modules">የተመረጠ ሞጁል</string>
     <string name="sync_info_total_records">አጠቃላይ የተመዘገበ</string>
     <string name="sync_info_total_records_on_device">በስልኩ አጠቃላይ የተመዘገበ</string>
     <string name="sync_info_unselected_modules">ያልተመረጡ ሞጁሎች</string>
@@ -325,7 +325,7 @@
     </plurals>
     <plurals name="tier1or2_matches">
         <item quantity="zero">በጣም ጥሩ ግጥሚያዎች የሉም</item>
-        <item quantity="one">%d በጣም ጥሩ ግጥሚያ</item>
+        <item quantity="one">%d በጣም ጥሩ ተመራጭ</item>
         <item quantity="other">%d በጣም ጥሩ ተመራጮች</item>
     </plurals>
     <plurals name="tier3_matches">

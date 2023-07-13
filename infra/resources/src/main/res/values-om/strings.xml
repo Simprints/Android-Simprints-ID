@@ -60,21 +60,20 @@
     <string name="close">Cufi</string>
 
     <string name="launch_consent_accept_button">Haa ta\’uu</string>
-    <string name="launch_consent_decline_button">Hin ta\'u</string>
-    <string name="consent_enrol">Gara fulduraa haala salphaan adda si baasuuf ashuuraa quba kee fayyadamna fi galmee kee argachuuf.&#160;</string>
-    <string name="consent_parental_enrol">Gara fulduraa haala salphaan da\’ima kee adda baasuuf ashuuraa quba da\’ima keen fayyadama fi galmee da\’ima kee argachuuf.&#160;</string>
-    <string name="consent_id_verify">Gara fulduraa haala salphaan adda si baasuuf ashuuraa quba kee fayyadamna fi galmee kee argachuuf.&#160;</string>
-    <string name="consent_parental_id_verify">Gara fulduraa haala salphaan da\’ima kee adda baasuuf ashuuraa quba da\’ima keen fayyadama fi galmee da\’ima kee argachuuf.&#160;</string>
-    <string name="consent_share_data_yes">Ministeerri fayyaa Itiyoophiyaa ashuuraa quba kee hojii \‘eCHIS\’tiif qofa fayyadama.&#160;</string>
-    <string name="consent_parental_share_data_yes">Ministeerri fayyaa Itiyoophiyaa ashuuraa quba da\’ima kee hojii \‘eCHIS\’tiif qofa fayyadama.&#160;</string>
-    <string name="consent_confirmation">Ashuuraa quba kee fayyadamuu danda\’aa?</string>
+    <string name="launch_consent_decline_button">Hin ta’u</string>
+    <string name="consent_enrol">%2$s %1$s keessatti akka si galmeessee gara fuulduraatti adda si baasuu barbaada.</string>
+    <string name="consent_parental_enrol">%1$s keessatti galmeessee gara fuulduraatti adda baasuuf %2$s gochuun barbaada.</string>
+    <string name="consent_id_verify">%1$s keessatti si galmeessee gara fuulduraatti adda si baasuuf %2$s barbaada.</string>
+    <string name="consent_parental_id_verify">Galmee isaanii %1$s argachuuf %2$s gochuun barbaada.</string>
+    <string name="consent_share_data_yes">$1%s fi Simprints, dhaabbata bu’aa hin arganne UK keessatti argamu, $2%s fi bakka amma jirtu argachuu ni danda’a.</string>
+    <string name="consent_parental_share_data_yes">Dhaabbanni bu’aa hin arganne UK keessatti argamu %1$s fi Simprints %2$s isaanii fi bakka amma jiran ni argatu.</string>
+    <string name="consent_confirmation">%1$s gochuu nan danda\'aa? Mee \"Ani fudhadha\", \"ani dide\", ykn \"Gaaffii qaba.\" jedhi.</string>
     <string name="consent_general_title">Hayyama</string>
     <string name="consent_parental_title">Hayyaama maatii</string>
-    <string name="consent_parental_confirmation">Ashuuraa quba da\’ima kee fayyadamuu danda\’aa?</string>
-    <string name="privacy_notice_text"><u>Yaadachiisa iccitiin eegamu</u></string>
+    <string name="consent_parental_confirmation">%1$s mucaa keessanii fayyadamuu nan danda\'aa? Mee \"Ani fudhadha\", \"ani dide\", ykn \"Gaaffii qaba.\" jedhi.</string>
     <string name="privacy_notice_title">Yaadachiisa iccitiin eegamu</string>
 
-    <string name="refusal_toast_select_option_submit">Maaloo tokko filachuun ol ergi</string>
+    <string name="refusal_toast_select_option_submit">\"Maaloo tokko filachuun ol ergi \"</string>
     <string name="refusal_toast_submit">Maaloo unkicha ol ergi</string>
     <string name="refusal_app_not_working">Mosaajichi hin hojjeetu</string>
     <string name="refusal_data_concerns">Ragaa kennuu hin barbaanne</string>
@@ -100,9 +99,9 @@
         <item quantity="one">Mirkaneeffannaa</item>
         <item quantity="other">Mirkaneeffannaa</item>
     </plurals>
-    <string name="dashboard_sync_card_try_again_button">Yeroo gabaabaa keessatti irra deebi\'uun yaali</string>
-    <string name="cancel_button">Addaan kuti</string>
-    <string name="confirm_module_selection_cancel">Addaan kuti</string>
+    <string name="dashboard_sync_card_try_again_button">Irra deebi\'ii yaali</string>
+    <string name="cancel_button">Haquu</string>
+    <string name="confirm_module_selection_cancel">Haquu</string>
     <string name="confirm_module_selection_title">Mojuulaa filatamee</string>
     <string name="confirm_module_selection_yes">Mirkaneessi</string>
     <string name="dashboard_card_activity">Hojii guyyaa guyyaa:%1$s</string>
@@ -138,7 +137,7 @@
     <string name="sync_info_records_to_delete">Barreeffama haquuf</string>
     <string name="sync_info_records_to_download">Barreeffama gad-buussuf</string>
     <string name="sync_info_records_to_upload">Barreeffama olfe\'aa</string>
-    <string name="sync_info_selected_modules">Mojuulaa filadhuu</string>
+    <string name="sync_info_selected_modules">Moojuula filatamee</string>
     <string name="sync_info_total_records">Barreeffama waliigalaa</string>
     <string name="sync_info_total_records_on_device">Barreeffama waliigalaa meeshaarra</string>
     <string name="sync_info_unselected_modules">Moojuulaa hin filatamne</string>
@@ -158,7 +157,7 @@
     <string name="dashboard_card_to_upload">Ol erguuf</string>
     <string name="dashboard_card_verification_title">Mirkaneeffannaa xumuraa</string>
     <string name="fetch_guid_checking_person_in_database">Namni daataa beezii fayyadamaa jiraachuu mirkaneeffachaa jira.</string>
-    <string name="preference_summary_sync_information">bal\'inaan siinkirrattii</string>
+    <string name="preference_summary_sync_information">Bal\'inaan siinkirrattii</string>
     <string name="safetynet_down_alert_message">Daqiiqaa 5-10 booda irra deebi\'uun yaali</string>
     <string name="scan_qr">Scan QR</string>
     <string name="id_error_save">Olkaa\'uu hin dandeenyee</string>
@@ -191,8 +190,8 @@
     <string name="outdated_google_play_services_alert_message">Meeshaa kana irratti google play services version install ta\'e kan SID barbaadu caalaa dulloomaadha</string>
     <string name="missing_google_play_services_alert_title">Tajaajila tapha Google dhabame</string>
     <string name="missing_google_play_services_alert_message">Tajaajilli google play meeshaa kana irratti hin fe\'amne.</string>
-    <string name="face_feature_alert">fuula fuula</string>
-    <string name="fingerprint_face_feature_alert">ashaaraa qubaa fi amala fuula</string>
+    <string name="face_feature_alert">Fuula fuula</string>
+    <string name="fingerprint_face_feature_alert">Ashaaraa qubaa fi amala fuula</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Fuula/Ashaaraa Qubaa</string>
     <string name="sync_info_images_to_upload">Suuraalee olkaa\'uuf</string>
     <string name="password_lock_title_default">Unlock gochuuf jecha icciitii galchi</string>
@@ -204,14 +203,14 @@
     <string name="logout_sync_decline_button">Walsimsiisaa malee ba\'aa</string>
     <string name="logout_sync_info">Meeshaa keessan irratti galmeewwan osoo hin ba\'iin dura walsimsiisuu qaban jiru. Mee adeemsi walsimsiisaa akka xumuramu hayyami.Erga walsimsiisni xumurame bahuu ni dandeessa.</string>
     <string name="logout_sync_decline_warning_title">Akeekkachiisa</string>
-    <string name="logout_sync_decline_warning_body">Pirojektiin kee galmee yeroo ammaa akka qabu mirkaneessuuf walsimsiisni deetaa barbaachisaa dha. Sababa sirrii malee deetaa kee walsimsiisuu dadhabuun galmeewwan barbaachisoo ta\'uu fi dandeettii pirojektichi sirritti gabaasuu irratti dhiibbaa qaba.\n\nSababni sirrii malee deetaa walsimsiisuu dadhabuunis pirootokoolii walitti qabuu deetaa cabsuu ta\'uu danda\'a akkasumas bu\’aa hin barbaachifne siifi pirojektichaaf fiduu danda\’a.</string>
+    <string name="logout_sync_decline_warning_body">Pirojektiin kee galmee yeroo ammaa akka qabu mirkaneessuuf walsimsiisni deetaa barbaachisaa dha. Sababa sirrii malee deetaa kee walsimsiisuu dadhabuun galmeewwan barbaachisoo ta\'uu fi dandeettii pirojektichi sirritti gabaasuu irratti dhiibbaa qaba.\n\nSababni sirrii malee deetaa walsimsiisuu dadhabuunis pirootokoolii walitti qabuu deetaa cabsuu ta\'uu danda\'a akkasumas bu’aa hin barbaachifne siifi pirojektichaaf fiduu danda’a.</string>
     <string name="project_paused_title">Pirojektiin yeroo ammaa dhaabbateera</string>
     <string name="project_paused_body">Pirojektichi yeroo ammaa waan dhaabbateef turtii jalqabuu hin dandeenye. Odeeffannoo dabalataaf supparvaayizara keessan qunnamaa</string>
     <string name="project_ending_title">Pirojektiin yeroo ammaa xumuramaa jira</string>
     <string name="project_ending_body">Pirojektichi yeroo ammaa xumuramaa waan jiruuf session jalqabuu hin dandeenye. Odeeffannoo dabalataaf supparvaayizara keessan qunnamaa</string>
-    <string name="biometric_concat_modalities">fi</string>
+    <string name="biometric_concat_modalities">Fi</string>
     <string name="privacy_notice_text">Yaadachiisa iccitiin eegamu</string>
-    <string name="biometric_general_face">suuraa fuula keessanii kaasuun</string>
+    <string name="biometric_general_face">Suuraa fuula keessanii kaasuun</string>
     <string name="preference_select_fingers_title">Ashaaraa qubaa beekamaa filadhu</string>
     <string name="finger_selection_confirm_dialog_text">Sajoo qusachuu?</string>
     <string name="finger_selection_confirm_dialog_yes">Qusachuu</string>
@@ -312,14 +311,14 @@
     <string name="capture_number_text">%1$s %2$s sakatta\'i</string>
     <string name="please_scan_again">Mee ammas scan godhaa</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Ashaaraa Qubaa</string>
-    <string name="fingerprint_feature_alert">amala ashaaraa qubaa</string>
+    <string name="fingerprint_feature_alert">Amala ashaaraa qubaa</string>
     <string name="finger_selection_activity_title">Quba filadhu</string>
     <plurals name="returned_results">
-        <item quantity="one">Bu'aa %d deebi'e.</item>
+        <item quantity="one">Bu\'aa %d deebi\'e.</item>
         <item quantity="other">Bu\'aa %d deebi\'e.</item>
     </plurals>
     <plurals name="tier1or2_matches">
-        <item quantity="zero">%d walsimsiisaa baay\'ee gaarii</item>
+        <item quantity="zero">Taphoota baayyee gaarii ta\'an hin jiran</item>
         <item quantity="one">%d walsimsiisaa baay\'ee gaarii dha</item>
         <item quantity="other">%d walsimsiisaa baayyee gaarii dha</item>
     </plurals>
