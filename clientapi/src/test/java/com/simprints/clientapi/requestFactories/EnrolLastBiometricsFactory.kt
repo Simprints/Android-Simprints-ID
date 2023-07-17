@@ -9,7 +9,6 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
 import io.mockk.every
 import io.mockk.mockk
-import java.util.*
 
 object EnrolLastBiometricsFactory : RequestFactory() {
 
@@ -24,7 +23,7 @@ object EnrolLastBiometricsFactory : RequestFactory() {
         )
 
     override fun getValidator(extractor: ClientRequestExtractor): EnrolLastBiometricsValidator =
-        EnrolLastBiometricsValidator(extractor as EnrolLastBiometricsExtractor, UUID.randomUUID().toString(), true)
+        EnrolLastBiometricsValidator(extractor as EnrolLastBiometricsExtractor, MOCK_SESSION_ID, true)
 
     override fun getBuilder(extractor: ClientRequestExtractor): EnrolLastBiometricsBuilder =
         EnrolLastBiometricsBuilder(extractor as EnrolLastBiometricsExtractor, getValidator(extractor))

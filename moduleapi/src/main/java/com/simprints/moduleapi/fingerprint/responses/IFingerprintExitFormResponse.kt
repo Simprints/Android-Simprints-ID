@@ -13,5 +13,6 @@ enum class IFingerprintExitReason {
     SCANNER_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
+    APP_NOT_WORKING,
     OTHER
 }
