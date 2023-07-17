@@ -300,7 +300,6 @@
     <string name="refusal_person_not_present">Person not present</string>
     <string name="refusal_too_young">Too young</string>
     <string name="refusal_other">Other</string>
-    <string name="refusal_scanner_not_working">Scanner not working</string>
     <string name="exit_form_return_to_simprints">Capture face</string>
     <string name="exit_form_capture_face">Capture face</string>
     <string name="why_did_you_skip_biometrics">Why did you skip Biometrics?</string>
