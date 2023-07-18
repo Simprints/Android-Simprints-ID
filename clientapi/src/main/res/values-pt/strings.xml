@@ -14,8 +14,7 @@
     <string name="rooted_device_title">Dispositivo enraizado detectado</string>
     <string name="guid_selection_data_sent">Dados enviados</string>
     <string name="configuration_error_message">Ocorreu um erro de configuração (%1$s), entre em contacto com o administrador do sistema</string>
-    <string name="rooted_device_message">1. Contacte o seu supervisor - dispositivo enraizado detectado
-\n2. Toque em Fechar</string>
+    <string name="rooted_device_message">1. Contacte o seu supervisor - dispositivo enraizado detectado\n2. Toque em Fechar</string>
     <string name="guid_selection_result_sent">Resultado enviado</string>
-    <string name="close">FECHAR</string>
+    <string name="close">Fechar</string>
 </resources>

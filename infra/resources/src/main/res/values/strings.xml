@@ -30,22 +30,22 @@
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- First argument in consent text should always be program name, second is modality specific access/use case text -->
-    <string name="consent_enrol_only">I\'d like to %2$s to enrol you in %1$s.&#160;</string>
-    <string name="consent_enrol">I\'d like to %2$s to enrol you in %1$s and identify you in the future.&#160;</string>
-    <string name="consent_id_verify">I\'d like to %2$s to find your records for %1$s.&#160;</string>
-    <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your %1$s and current location.&#160;</string>
-    <string name="consent_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to your %2$s and current location.&#160;</string>
-    <string name="consent_collect_yes">Simprints will also use the data for research purposes.&#160;</string>
-    <string name="consent_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your data to be erased.&#160;</string>
-    <string name="consent_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
+    <string name="consent_enrol_only">I\'d like to %2$s to enrol you in %1$s.</string>
+    <string name="consent_enrol">I\'d like to %2$s to enrol you in %1$s and identify you in the future.</string>
+    <string name="consent_id_verify">I\'d like to %2$s to find your records for %1$s.</string>
+    <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your %1$s and current location.</string>
+    <string name="consent_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to your %2$s and current location.</string>
+    <string name="consent_collect_yes">Simprints will also use the data for research purposes.</string>
+    <string name="consent_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your data to be erased.</string>
+    <string name="consent_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\"</string>
 
-    <string name="consent_parental_enrol_only">I\'d like to %2$s to enrol them in %1$s.&#160;</string>
-    <string name="consent_parental_enrol">I\'d like to %2$s to enrol them in %1$s and identify them in the future.&#160;</string>
-    <string name="consent_parental_id_verify">I\'d like to %2$s to find their records for %1$s.&#160;</string>
-    <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their %1$s and current location.&#160;</string>
-    <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their %2$s and current location.&#160;</string>
-    <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
-    <string name="consent_parental_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
+    <string name="consent_parental_enrol_only">I\'d like to %2$s to enrol them in %1$s.</string>
+    <string name="consent_parental_enrol">I\'d like to %2$s to enrol them in %1$s and identify them in the future.</string>
+    <string name="consent_parental_id_verify">I\'d like to %2$s to find their records for %1$s.</string>
+    <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their %1$s and current location.</string>
+    <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their %2$s and current location.</string>
+    <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.</string>
+    <string name="consent_parental_confirmation">May I use your child\'s %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\"</string>
 
     <string name="biometrics_general_fingerprint">use your fingerprints</string>
     <string name="biometric_general_face">take photographs of your face</string>
@@ -300,7 +300,6 @@
     <string name="refusal_person_not_present">Person not present</string>
     <string name="refusal_too_young">Too young</string>
     <string name="refusal_other">Other</string>
-    <string name="refusal_scanner_not_working">Scanner not working</string>
     <string name="exit_form_return_to_simprints">Capture face</string>
     <string name="exit_form_capture_face">Capture face</string>
     <string name="why_did_you_skip_biometrics">Why did you skip Biometrics?</string>
@@ -361,4 +360,5 @@
     <string name="id_enrolment_successful">Enrolment successful</string>
     <string name="id_config_error_enrol_last_biometrics">A configuration error has occurred (invalid Simprints intent), please contact your system administrator.</string>
     <string name="configuration_error_message">A configuration error has occurred (%1$s), please contact your system administrator</string>
+    <string name="refusal_scanner_not_working">Scanner not working</string>
 </resources>
