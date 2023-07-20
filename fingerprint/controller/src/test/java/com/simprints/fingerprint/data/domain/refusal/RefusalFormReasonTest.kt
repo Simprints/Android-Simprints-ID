@@ -15,7 +15,7 @@ class RefusalFormReasonTest {
             ExitFormOption.ReligiousConcerns to REFUSED_RELIGION,
             ExitFormOption.DataConcerns to REFUSED_DATA_CONCERNS,
             ExitFormOption.NoPermission to REFUSED_PERMISSION,
-            ExitFormOption.AppNotWorking to SCANNER_NOT_WORKING,
+            ExitFormOption.AppNotWorking to APP_NOT_WORKING,
             ExitFormOption.ScannerNotWorking to SCANNER_NOT_WORKING,
             ExitFormOption.PersonNotPresent to REFUSED_NOT_PRESENT,
             ExitFormOption.TooYoung to REFUSED_YOUNG,

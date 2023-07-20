@@ -3,16 +3,16 @@ package com.simprints.feature.login.screens.intent
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.ActivityLoginWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-internal class LoginWrapperActivity : AppCompatActivity() {
+internal class LoginWrapperActivity : BaseActivity() {
 
     private val binding by viewBinding(ActivityLoginWrapperBinding::inflate)
 

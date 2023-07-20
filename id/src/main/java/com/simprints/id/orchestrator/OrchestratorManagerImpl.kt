@@ -73,11 +73,11 @@ class OrchestratorManagerImpl @Inject constructor(
 
         if (appRequest !is AppRequest.AppRequestFollowUp) {
             val fingerprintCaptureCompleted =
-                !modalities.contains(GeneralConfiguration.Modality.FINGERPRINT) || modalitiesFlow.steps.filter { it.request is FingerprintCaptureRequest }
+                !modalities.contains(GeneralConfiguration.Modality.FINGERPRINT) || modalitiesFlow.steps.filter { it.payload is FingerprintCaptureRequest }
                     .all { it.getResult() is FingerprintCaptureResponse }
 
             val faceCaptureCompleted =
-                !modalities.contains(GeneralConfiguration.Modality.FACE) || modalitiesFlow.steps.filter { it.request is FaceCaptureRequest }
+                !modalities.contains(GeneralConfiguration.Modality.FACE) || modalitiesFlow.steps.filter { it.payload is FaceCaptureRequest }
                     .all { it.getResult() is FaceCaptureResponse }
 
 
