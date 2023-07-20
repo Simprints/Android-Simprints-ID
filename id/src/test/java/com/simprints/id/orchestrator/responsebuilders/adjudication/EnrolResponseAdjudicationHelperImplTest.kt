@@ -168,7 +168,8 @@ class EnrolResponseAdjudicationHelperImplTest {
             requestCode = 234,
             activityName = "com.simprints.id.MyFingerprintActivity",
             bundleKey = "BUNDLE_KEY",
-            request = mockk(),
+            payloadType = Step.PayloadType.REQUEST,
+            payload = mockk(),
             result = FingerprintMatchResponse(
                 listOf(
                     FingerprintMatchResult("person_id", confidenceScore)
@@ -183,7 +184,8 @@ class EnrolResponseAdjudicationHelperImplTest {
             requestCode = 322,
             activityName = "com.simprints.id.MyFaceActivity",
             bundleKey = "BUNDLE_KEY",
-            request = mockk(),
+            payloadType = Step.PayloadType.REQUEST,
+            payload = mockk(),
             result = FaceMatchResponse(
                 listOf(
                     FaceMatchResult(guidFound = "person_id", confidence = confidenceScore)

@@ -4,12 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
-import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.core.tools.extentions.removeAnimationsToNextActivity
 import com.simprints.id.R
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.eventsync.EventSyncManager
@@ -19,7 +20,7 @@ import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 
 @AndroidEntryPoint
-class OrchestratorActivity : BaseSplitActivity() {
+class OrchestratorActivity : BaseActivity() {
 
     @Inject
     lateinit var syncManager: SyncManager
@@ -34,7 +35,12 @@ class OrchestratorActivity : BaseSplitActivity() {
     private val observerForNextStep = Observer<Step?> {
         it?.let {
             with(Intent().setClassName(packageName, it.activityName)) {
-                putExtra(it.bundleKey, it.request)
+                val bundle = if (it.payload is Step.Request) {
+                    it.payload.fromDomainToModuleApi()
+                } else {
+                    it.payload
+                }
+                putExtra(it.bundleKey, bundle)
                 startActivityForResult(this, it.requestCode)
                 this@OrchestratorActivity.removeAnimationsToNextActivity()
             }

@@ -55,7 +55,7 @@
     </plurals>
     <plurals name="face_match_tier1or2_matches">
         <item quantity="zero">Taphoota baayyee gaarii ta\'an hin jiran</item>
-        <item quantity="one">%d walsimsiisaa baay\'ee gaarii</item>
+        <item quantity="one">%d walsimsiisaa baay\'ee gaarii dha</item>
         <item quantity="other">%d walsimsiisaa baayyee gaarii dha</item>
     </plurals>
     <plurals name="face_match_tier3_matches">

@@ -1,5 +1,7 @@
 package com.simprints.id.orchestrator.cache
 
+import android.os.Bundle
+import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
@@ -11,6 +13,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
@@ -65,7 +68,7 @@ class StepEncoderImplTest {
             MatcherAssert.assertThat(requestCode, CoreMatchers.`is`(REQUEST_CODE))
             MatcherAssert.assertThat(activityName, CoreMatchers.`is`(ACTIVITY_NAME))
             MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
-            MatcherAssert.assertThat(request, CoreMatchers.`is`(fingerprintCaptureRequest))
+            MatcherAssert.assertThat(payload, CoreMatchers.`is`(fingerprintCaptureRequest))
             MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
             MatcherAssert.assertThat(
                 getResult(),
@@ -91,7 +94,7 @@ class StepEncoderImplTest {
             MatcherAssert.assertThat(requestCode, CoreMatchers.`is`(REQUEST_CODE))
             MatcherAssert.assertThat(activityName, CoreMatchers.`is`(ACTIVITY_NAME))
             MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
-            MatcherAssert.assertThat(request, CoreMatchers.`is`(faceCaptureRequest))
+            MatcherAssert.assertThat(payload, CoreMatchers.`is`(faceCaptureRequest))
             MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
             MatcherAssert.assertThat(
                 getResult(),
@@ -104,11 +107,45 @@ class StepEncoderImplTest {
         }
     }
 
+    @Test
+    fun shouldDecodeStringToSetupStep() {
+        val setupBundle: Bundle = bundleOf()
+        val setupResponse = SetupResponse(isSetupComplete = true)
+        val step = Step(
+            requestCode = REQUEST_CODE,
+            activityName = ACTIVITY_NAME,
+            bundleKey = BUNDLE_KEY,
+            payloadType = Step.PayloadType.BUNDLE,
+            payload = setupBundle,
+            status = Step.Status.COMPLETED,
+            result = setupResponse
+        )
+        val encodedString = stepEncoder.encode(step)
+        val decodedStep = stepEncoder.decode(encodedString)
+
+        with(decodedStep) {
+            MatcherAssert.assertThat(requestCode, CoreMatchers.`is`(REQUEST_CODE))
+            MatcherAssert.assertThat(activityName, CoreMatchers.`is`(ACTIVITY_NAME))
+            MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
+            MatcherAssert.assertThat(payloadType, CoreMatchers.`is`(Step.PayloadType.BUNDLE))
+            MatcherAssert.assertThat((payload as Bundle).size(), CoreMatchers.`is`(0))
+            MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
+            MatcherAssert.assertThat(
+                getResult(),
+                CoreMatchers.instanceOf(SetupResponse::class.java)
+            )
+            MatcherAssert.assertThat(
+                (getResult() as SetupResponse).isSetupComplete,
+                CoreMatchers.`is`(setupResponse.isSetupComplete))
+        }
+    }
+
     private fun buildStep(request: Step.Request, result: Step.Result): Step = Step(
         requestCode = REQUEST_CODE,
         activityName = ACTIVITY_NAME,
         bundleKey = BUNDLE_KEY,
-        request = request,
+        payloadType = Step.PayloadType.REQUEST,
+        payload = request,
         result = result,
         status = Step.Status.COMPLETED
     )
