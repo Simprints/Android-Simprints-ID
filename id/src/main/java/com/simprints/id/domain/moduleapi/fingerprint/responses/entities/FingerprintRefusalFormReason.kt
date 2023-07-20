@@ -9,6 +9,7 @@ enum class FingerprintRefusalFormReason {
     REFUSED_PERMISSION,
     SCANNER_NOT_WORKING,
     REFUSED_NOT_PRESENT,
+    APP_NOT_WORKING,
     REFUSED_YOUNG,
     OTHER
 }
@@ -21,6 +22,7 @@ fun FingerprintRefusalFormReason.toAppRefusalFormReason() =
         FingerprintRefusalFormReason.REFUSED_YOUNG -> RefusalFormReason.REFUSED_YOUNG
         FingerprintRefusalFormReason.REFUSED_NOT_PRESENT -> RefusalFormReason.REFUSED_NOT_PRESENT
         FingerprintRefusalFormReason.SCANNER_NOT_WORKING -> RefusalFormReason.SCANNER_NOT_WORKING
+        FingerprintRefusalFormReason.APP_NOT_WORKING -> RefusalFormReason.APP_NOT_WORKING
         FingerprintRefusalFormReason.OTHER -> RefusalFormReason.OTHER
     }
 
@@ -32,5 +34,6 @@ fun IFingerprintExitReason.fromModuleApiToDomain() =
         IFingerprintExitReason.SCANNER_NOT_WORKING -> FingerprintRefusalFormReason.SCANNER_NOT_WORKING
         IFingerprintExitReason.REFUSED_NOT_PRESENT -> FingerprintRefusalFormReason.REFUSED_NOT_PRESENT
         IFingerprintExitReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
+        IFingerprintExitReason.APP_NOT_WORKING -> FingerprintRefusalFormReason.APP_NOT_WORKING
         IFingerprintExitReason.OTHER -> FingerprintRefusalFormReason.OTHER
     }

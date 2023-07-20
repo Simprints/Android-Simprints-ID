@@ -3,7 +3,6 @@ package com.simprints.id.orchestrator.steps.fingerprint
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
@@ -49,7 +48,8 @@ class FingerprintStepProcessorImpl @Inject constructor(
             requestCode = requestCode.value,
             activityName = ACTIVITY_CLASS_NAME,
             bundleKey = IFingerprintRequest.BUNDLE_KEY,
-            request = request.fromDomainToModuleApi(),
+            payloadType = Step.PayloadType.REQUEST,
+            payload = request,
             status = NOT_STARTED
         )
     }

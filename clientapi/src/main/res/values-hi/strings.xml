@@ -16,4 +16,5 @@
     <string name="rooted_device_message">1. अपने सुपरवाइज़र से सम्पर्क करें - रूटेड डिवाइस मिली है 2. बंद करें पर क्लिक करें</string>
     <string name="guid_selection_data_sent">डाटा भेजना सफल रहा</string>
     <string name="guid_selection_result_sent">परिणाम भेजना सफल रहा</string>
+    <string name="configuration_error_message">आपको वापस रीडायरेक्ट कर रहा है</string>
 </resources>

@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.login.R
@@ -39,6 +38,7 @@ import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -68,7 +68,6 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
         initUi()
         observeUiState()
-        viewModel.init()
         playServicesChecker.check(requireActivity()) { finishWithError(it) }
     }
 

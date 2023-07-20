@@ -55,12 +55,6 @@ internal class LoginFormViewModelTest {
         )
     }
 
-    @Test
-    fun `resets api base url on initialisation`() {
-        viewModel.init()
-
-        verify { simNetwork.resetApiBaseUrl() }
-    }
 
     @Test
     fun `returns MissingCredentials when empty user id`() {

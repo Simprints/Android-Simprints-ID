@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
-        <activity android:name=".screens.ConsentWrapperActivity" />
+        <activity
+            android:name=".screens.ConsentWrapperActivity"
+            android:screenOrientation="portrait" />
 
     </application>
 </manifest>

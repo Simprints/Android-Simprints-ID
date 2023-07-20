@@ -73,7 +73,7 @@
                 android:id="@+id/exitFormRadioScannerNotWorking"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_app_not_working"
+                android:text="@string/refusal_scanner_not_working"
                 android:visibility="gone"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />

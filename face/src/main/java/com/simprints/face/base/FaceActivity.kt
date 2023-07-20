@@ -1,5 +1,5 @@
 package com.simprints.face.base
 
-import com.simprints.core.tools.activity.BaseSplitActivity
+import com.simprints.core.tools.activity.BaseActivity
 
-open class FaceActivity : BaseSplitActivity()
+open class FaceActivity : BaseActivity()

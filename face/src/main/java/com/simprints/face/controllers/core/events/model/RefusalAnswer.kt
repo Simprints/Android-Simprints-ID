@@ -10,6 +10,7 @@ enum class RefusalAnswer {
     REFUSED_DATA_CONCERNS,
     REFUSED_PERMISSION,
     APP_NOT_WORKING,
+    SCANNER_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
     OTHER;
@@ -23,6 +24,7 @@ enum class RefusalAnswer {
             APP_NOT_WORKING -> IFaceExitReason.APP_NOT_WORKING
             REFUSED_NOT_PRESENT -> IFaceExitReason.REFUSED_NOT_PRESENT
             REFUSED_YOUNG -> IFaceExitReason.REFUSED_YOUNG
+            SCANNER_NOT_WORKING -> IFaceExitReason.SCANNER_NOT_WORKING
             OTHER -> IFaceExitReason.OTHER
         }
 
@@ -32,7 +34,7 @@ enum class RefusalAnswer {
             ExitFormOption.DataConcerns -> REFUSED_DATA_CONCERNS
             ExitFormOption.NoPermission -> REFUSED_PERMISSION
             ExitFormOption.AppNotWorking -> APP_NOT_WORKING
-            ExitFormOption.ScannerNotWorking -> APP_NOT_WORKING
+            ExitFormOption.ScannerNotWorking -> SCANNER_NOT_WORKING
             ExitFormOption.PersonNotPresent -> REFUSED_NOT_PRESENT
             ExitFormOption.TooYoung -> REFUSED_YOUNG
             ExitFormOption.Other -> OTHER

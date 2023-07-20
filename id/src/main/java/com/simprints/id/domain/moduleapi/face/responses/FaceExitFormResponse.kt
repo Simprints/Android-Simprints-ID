@@ -19,6 +19,7 @@ enum class FaceExitReason {
     APP_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
+    SCANNER_NOT_WORKING,
     OTHER;
 
     fun toAppRefusalFormReason() =
@@ -29,6 +30,7 @@ enum class FaceExitReason {
             REFUSED_YOUNG -> RefusalFormReason.REFUSED_YOUNG
             REFUSED_NOT_PRESENT -> RefusalFormReason.REFUSED_NOT_PRESENT
             APP_NOT_WORKING -> RefusalFormReason.APP_NOT_WORKING
+            SCANNER_NOT_WORKING -> RefusalFormReason.SCANNER_NOT_WORKING
             OTHER -> RefusalFormReason.OTHER
         }
 
@@ -42,6 +44,7 @@ fun IFaceExitFormResponse.fromModuleApiToDomain(): FaceExitFormResponse {
         IFaceExitReason.APP_NOT_WORKING -> FaceExitReason.APP_NOT_WORKING
         IFaceExitReason.REFUSED_NOT_PRESENT -> FaceExitReason.REFUSED_NOT_PRESENT
         IFaceExitReason.REFUSED_YOUNG -> FaceExitReason.REFUSED_YOUNG
+        IFaceExitReason.SCANNER_NOT_WORKING -> FaceExitReason.SCANNER_NOT_WORKING
         IFaceExitReason.OTHER -> FaceExitReason.OTHER
     }
 
