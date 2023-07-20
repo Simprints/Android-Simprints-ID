@@ -12,13 +12,13 @@
     <string name="capture_prep_begin_btn" translatable="false">Bonyeza ili kupiga picha</string>
     <string name="capture_prep_begin_btn_capturing">Inapiga picha</string>
     <string name="capture_title_scan_progress">Skani inaendelea</string>
-    <string name="capture_hold">kaa hivohivo</string>
+    <string name="capture_hold">Kaa hivohivo</string>
     <string name="captured_successfully">Picha ya sura imefanikiwa kuchukuliwa</string>
     <string name="title_preparation">Maandalizi</string>
     <string name="btn_finish">Bonyeza ili kuendelea</string>
     <string name="btn_capture_again">Piga tena</string>
     <string name="captured_unsuccessful">Imeshindwa kuchukukua picha ya sura kwa sababu ya tatizo la kiufundi</string>
-    <string name="retry_tips">Hivi ndivyo unaweza kutatua tatizo\n\n1.Hakikisha uko kwenye mwanga.\n2.Hakikisha anayepigwa picha ameangalia kwa kunyooka.\n3. endelea kubaki na  kukaa hivyohivyo</string>
+    <string name="retry_tips">Hivi ndivyo unaweza kutatua tatizo\n\n1.Hakikisha uko kwenye mwanga.\n2.Hakikisha anayepigwa picha ameangalia kwa kunyooka.\n3. endelea kubaki na kukaa hivyohivyo</string>
     <string name="onboarding_light">Tafuta mahali penye mwanga mzuri</string>
     <string name="onboarding_fill">Jaza uso kwenye mduara wa fremu</string>
     <string name="onboarding_straight">Hakikisha mtu anayepigwa picha anaangalia kwa kunyooka</string>
@@ -40,7 +40,7 @@
     </plurals>
 
     <plurals name="face_match_returned_results">
-        <item quantity="one">Matokeo yamerudi %d</item>
+        <item quantity="one">Imerejesha matokeo %d</item>
         <item quantity="other">Matokeo yamerudi %d</item>
     </plurals>
 
@@ -58,8 +58,8 @@
 
     <plurals name="face_match_tier4_matches">
         <item quantity="zero">Hakuna zinazofanana nayo</item>
-        <item quantity="one">"%d inayofanana "</item>
-        <item quantity="other">"%d inayofanana "</item>
+        <item quantity="one">%d inayofanana</item>
+        <item quantity="other">%d inayofanana</item>
     </plurals>
 
 
@@ -69,7 +69,7 @@
     <string name="error_licence_missing_title">Leseni haipo</string>
     <string name="error_licence_missing_button">Funga</string>
     <string name="why_did_you_skip_face_capture">Kwanini umeruka kupiga picha ya uso?</string>
-    <string name="exit_form_return_to_face_capture">Rudi kwenye Simprint</string>
+    <string name="exit_form_return_to_face_capture">Rudi kwenye Simprints</string>
     <string name="error_close_button">Funga</string>
     <string name="error_licence_missing_message">Leseni ya uso haipo, tafadhali wasiliana na msimamizi wa mfumo huu</string>
     <string name="face_configuration_started">Inasanidi muundo wa uso</string>
@@ -77,7 +77,7 @@
     <string name="error_configuration_error_title">Hitilafu ya usanidi</string>
     <string name="error_configuration_error_message">Kulikuwa na hitilafu wakati wa kusanidi muundo wa uso, tafadhali wasiliana na msimamizi wa mfumo wako</string>
     <string name="enrol_last_biometrics_alert_message_face_param">Uso</string>
-    <string name="exit_form_capture_face">Rudi kwenye Simprint</string>
+    <string name="exit_form_capture_face">Rudi kwenye Simprints</string>
     <string name="error_unexpected_error_title">Kosa limetokea</string>
     <string name="error_unexpected_error_message">Tafadhali jaribu tena na iwapo progrmu ya Simprints haitafanya kazi wasiliana na msimamizi wako wa huu mfumo</string>
 </resources>

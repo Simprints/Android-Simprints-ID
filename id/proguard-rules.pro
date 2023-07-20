@@ -61,6 +61,12 @@
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
 
+# Keep firebase classes. more details at https://github.com/firebase/firebase-android-sdk/issues/2124#issuecomment-1091962221
+-keep public class com.google.firebase.** {*;}
+-keep class com.google.android.gms.internal.** {*;}
+-keepclasseswithmembers class com.google.firebase.FirebaseException
+
+
 # Dagger
 -dontwarn com.google.errorprone.annotations.**
 
