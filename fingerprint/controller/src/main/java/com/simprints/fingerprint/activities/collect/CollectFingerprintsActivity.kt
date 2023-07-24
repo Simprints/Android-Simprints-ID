@@ -96,9 +96,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun initToolbar() {
-        setActionBar(binding.toolbar)
-        actionBar?.show()
-        actionBar?.title = when (masterFlowManager.getCurrentAction()) {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.show()
+        supportActionBar?.title = when (masterFlowManager.getCurrentAction()) {
             Action.ENROL -> getString(R.string.register_title)
             Action.IDENTIFY -> getString(R.string.identify_title)
             Action.VERIFY -> getString(R.string.verify_title)
