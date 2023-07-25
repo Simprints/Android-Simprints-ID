@@ -2,9 +2,7 @@ package com.simprints.infra.config.local.migrations.models
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.domain.models.*
 import org.json.JSONObject
 
@@ -49,6 +47,8 @@ internal data class OldProjectConfig(
     @JsonProperty("Modality") private val modality: String,
     @JsonProperty("Custom") private val custom: Any?
 ) {
+    private val jsonHelper= JsonHelper
+
     fun toDomain(projectId: String): ProjectConfiguration =
         ProjectConfiguration(
             projectId = projectId,
@@ -125,8 +125,7 @@ internal data class OldProjectConfig(
                 firmwareVersions = if (vero2FirmwareVersions.isNullOrEmpty()) {
                     emptyMap()
                 } else {
-                    val type = object : TypeReference<Map<String, Vero2Configuration.Vero2FirmwareVersions>>() {}
-                    ObjectMapper().readValue(vero2FirmwareVersions,type)
+                    JsonHelper.fromJson(vero2FirmwareVersions)
                 },
             )
 
@@ -137,8 +136,8 @@ internal data class OldProjectConfig(
             collectConsent = consentRequired.toBoolean(),
             displaySimprintsLogo = logoExists.toBoolean(),
             allowParentalConsent = consentParentalExists.toBoolean(),
-            generalPrompt = fromJson<GeneralConsentOptions>(consentGeneralOptions).toDomain(),
-            parentalPrompt = fromJson<ParentalConsentOptions>(consentParentalOptions).toDomain(),
+            generalPrompt = jsonHelper.fromJson<GeneralConsentOptions>(consentGeneralOptions).toDomain(),
+            parentalPrompt = jsonHelper.fromJson<ParentalConsentOptions>(consentParentalOptions).toDomain(),
         )
 
     private fun identificationConfiguration(): IdentificationConfiguration =
@@ -199,13 +198,8 @@ internal data class OldProjectConfig(
             )
         }
 
-    private inline fun <reified T> fromJson(json: String): T {
-        return jacksonObjectMapper().readValue(json, T::class.java)
-    }
-
     companion object {
         private const val DEFAULT_FACE_FRAMES_TO_CAPTURE = 2
     }
-
 }
 
