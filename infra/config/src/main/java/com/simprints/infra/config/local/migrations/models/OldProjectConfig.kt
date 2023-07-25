@@ -2,9 +2,9 @@ package com.simprints.infra.config.local.migrations.models
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.simprints.infra.config.domain.models.*
 import org.json.JSONObject
 
@@ -125,7 +125,8 @@ internal data class OldProjectConfig(
                 firmwareVersions = if (vero2FirmwareVersions.isNullOrEmpty()) {
                     emptyMap()
                 } else {
-                    ObjectMapper().readValue(vero2FirmwareVersions)
+                    val type = object : TypeReference<Map<String, Vero2Configuration.Vero2FirmwareVersions>>() {}
+                    ObjectMapper().readValue(vero2FirmwareVersions,type)
                 },
             )
 
