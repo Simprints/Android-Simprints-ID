@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/capture_blue"
+    android:background="@color/simprints_blue"
     tools:context=".capture.FaceCaptureActivity">
 
     <TextView
@@ -33,7 +33,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="16dp"
-        android:src="@drawable/ic_checked_green_32dp"
+        android:src="@drawable/ic_checked_green_large"
         app:layout_constraintBottom_toBottomOf="@id/confirmation_txt"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/confirmation_txt" />
@@ -62,7 +62,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/confirmation_btn_bg"
         android:text="@string/btn_recapture"
-        android:textColor="@color/capture_blue"
+        android:textColor="@color/simprints_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/confirmation_btn"
         app:layout_constraintStart_toStartOf="parent" />
@@ -75,7 +75,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/confirmation_btn_bg"
         android:text="@string/btn_finish"
-        android:textColor="@color/capture_blue"
+        android:textColor="@color/simprints_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/recapture_btn" />

@@ -45,7 +45,7 @@
         android:layout_height="242dp"
         android:indeterminate="false"
         android:visibility="gone"
-        app:dcp_color="@color/capture_green"
+        app:dcp_color="@color/simprints_light_green"
         app:dcp_max="10"
         app:layout_constraintBottom_toBottomOf="@id/capture_guide_frame"
         app:layout_constraintEnd_toEndOf="parent"

@@ -60,13 +60,12 @@
             style="@style/SimprintsStyle.TextView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
-            android:drawablePadding="5dp"
+            android:drawablePadding="8dp"
             android:text="Placeholder"
             android:textColor="@color/simprints_red_dark"
             android:textSize="16sp"
             android:visibility="gone"
-            app:drawableStartCompat="@drawable/sync_failed_icon"
+            app:drawableStartCompat="@drawable/ic_sync_failed"
             tools:ignore="HardcodedText"
             tools:visibility="visible" />
 
@@ -116,28 +115,19 @@
             android:visibility="gone"
             tools:visibility="visible">
 
-            <ImageView
-                android:id="@+id/sync_card_offline_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:contentDescription="@string/dashboard_sync_card_offline_message"
-                android:src="@drawable/sync_no_connection"
-                app:layout_constraintBottom_toBottomOf="@+id/sync_card_offline_message"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/sync_card_offline_message" />
-
             <TextView
                 android:id="@+id/sync_card_offline_message"
                 style="@style/SimprintsStyle.TextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                android:drawablePadding="8dp"
                 android:text="@string/dashboard_sync_card_offline_message"
                 android:textSize="16sp"
+                app:drawableStartCompat="@drawable/ic_sync_no_connection"
                 app:layout_constraintBottom_toBottomOf="@+id/sync_card_offline_button"
                 app:layout_constraintEnd_toStartOf="@+id/sync_card_offline_button"
-                app:layout_constraintStart_toEndOf="@+id/sync_card_offline_icon"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/sync_card_offline_button" />
 
             <androidx.appcompat.widget.AppCompatButton
