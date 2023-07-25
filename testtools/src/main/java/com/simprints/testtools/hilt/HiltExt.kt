@@ -13,6 +13,7 @@ import androidx.navigation.Navigation
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import org.robolectric.res.android.Registries
 import com.google.android.material.R as MR
 
 const val FRAGMENT_TAG = "FRAGMENT_TAG"
@@ -77,4 +78,18 @@ fun testNavController(graph: Int, startDestination: Int? = null): TestNavHostCon
     navController.setGraph(graph)
     startDestination?.also { navController.setCurrentDestination(it) }
     return navController
+}
+
+/**
+ * Prevents OOM in roboelectric tests, should be called in `@After` method of the test case.
+ *
+ * There is a long history of OOM issues in roboelectric theme management.
+ * One of the workaround is to forcefully reset theme registry after each test.
+ *      https://github.com/robolectric/robolectric/issues/2068
+ *      https://github.com/robolectric/robolectric/issues/5530
+ *      https://github.com/robolectric/robolectric/issues/6872
+ *      https://github.com/robolectric/robolectric/issues/7702
+ */
+fun resetThemeResources() {
+    Registries.NATIVE_THEME9_REGISTRY.clear()
 }
