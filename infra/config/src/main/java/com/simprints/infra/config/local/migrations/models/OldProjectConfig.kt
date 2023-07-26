@@ -6,6 +6,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.domain.models.*
 import org.json.JSONObject
 
+
 @Keep
 internal data class OldProjectConfig(
     @JsonProperty("CaptureFingerprintStrategy") private val captureFingerprintStrategy: String?,
@@ -47,8 +48,6 @@ internal data class OldProjectConfig(
     @JsonProperty("Modality") private val modality: String,
     @JsonProperty("Custom") private val custom: Any?
 ) {
-    private val jsonHelper= JsonHelper
-
     fun toDomain(projectId: String): ProjectConfiguration =
         ProjectConfiguration(
             projectId = projectId,
@@ -125,7 +124,13 @@ internal data class OldProjectConfig(
                 firmwareVersions = if (vero2FirmwareVersions.isNullOrEmpty()) {
                     emptyMap()
                 } else {
-                    JsonHelper.fromJson(vero2FirmwareVersions)
+                    // Construct a JavaType instance for Map<String, Vero2FirmwareVersions>
+                    val type = JsonHelper.jackson.typeFactory.constructMapType(
+                        Map::class.java,
+                        String::class.java,
+                        Vero2Configuration.Vero2FirmwareVersions::class.java
+                    )
+                    JsonHelper.fromJson(vero2FirmwareVersions, type)
                 },
             )
 
@@ -136,8 +141,10 @@ internal data class OldProjectConfig(
             collectConsent = consentRequired.toBoolean(),
             displaySimprintsLogo = logoExists.toBoolean(),
             allowParentalConsent = consentParentalExists.toBoolean(),
-            generalPrompt = jsonHelper.fromJson<GeneralConsentOptions>(consentGeneralOptions).toDomain(),
-            parentalPrompt = jsonHelper.fromJson<ParentalConsentOptions>(consentParentalOptions).toDomain(),
+            generalPrompt = JsonHelper.fromJson<GeneralConsentOptions>(consentGeneralOptions)
+                .toDomain(),
+            parentalPrompt = JsonHelper.fromJson<ParentalConsentOptions>(consentParentalOptions)
+                .toDomain(),
         )
 
     private fun identificationConfiguration(): IdentificationConfiguration =

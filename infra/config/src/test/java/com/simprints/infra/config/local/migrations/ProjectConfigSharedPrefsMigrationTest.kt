@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigration.Companion.ALL_KEYS
 import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigration.Companion.PROJECT_SETTINGS_JSON_STRING_KEY
 import com.simprints.infra.config.local.migrations.models.OldProjectConfig
@@ -21,18 +22,17 @@ import org.junit.runner.RunWith
 class ProjectConfigSharedPrefsMigrationTest {
 
     private val ctx = mockk<Context>()
-    private val jsonHeler = spyk<JsonHelper>()
     private val editor = mockk<SharedPreferences.Editor>(relaxed = true)
     private val preferences = mockk<SharedPreferences>(relaxed = true) {
         every { edit() } returns editor
     }
-    private val authStore = mockk<com.simprints.infra.authstore.AuthStore>()
+    private val authStore = mockk<AuthStore>()
     private lateinit var projectConfigSharedPrefsMigration: ProjectConfigSharedPrefsMigration
 
     @Before
     fun setup() {
         every { ctx.getSharedPreferences(any(), any()) } returns preferences
-        projectConfigSharedPrefsMigration = ProjectConfigSharedPrefsMigration(ctx,authStore, jsonHeler)
+        projectConfigSharedPrefsMigration = ProjectConfigSharedPrefsMigration(ctx,authStore)
     }
 
     @Test
@@ -412,7 +412,8 @@ class ProjectConfigSharedPrefsMigrationTest {
 
             // Force an exception
             val exception = Exception("")
-            every { jsonHeler.fromJson<OldProjectConfig>(any()) } throws exception
+            mockkObject(JsonHelper)
+            every { JsonHelper.fromJson<OldProjectConfig>(any()) } throws exception
             val receivedException = assertThrows<Exception> {
                 projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
             }

@@ -19,7 +19,6 @@ import javax.inject.Inject
 internal class ProjectConfigSharedPrefsMigration @Inject constructor(
     @ApplicationContext ctx: Context,
     private val authStore: AuthStore,
-    private val jsonHelper: JsonHelper=JsonHelper
 ) : DataMigration<ProtoProjectConfiguration> {
 
     private val prefs = ctx.getSharedPreferences(PREF_FILE_NAME, PREF_MODE)
@@ -38,7 +37,7 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 
         return try {
-            jsonHelper.fromJson<OldProjectConfig>(projectSettingsJson)
+            JsonHelper.fromJson<OldProjectConfig>(projectSettingsJson)
                 .toDomain(authStore.signedInProjectId)
                 .toProto()
         } catch (e: Exception) {
