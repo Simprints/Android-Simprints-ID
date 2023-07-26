@@ -11,12 +11,10 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            apply(from = "${rootDir}/build-logic/signing_properties.gradle")
+            apply(from = "${rootDir}/build-logic/signing_properties.gradle.kts")
             val props = extra.properties
 
             with(pluginManager) {
-                apply("simprints.android.application")
-
                 apply("com.github.triplet.play")
                 apply("com.google.firebase.appdistribution")
             }

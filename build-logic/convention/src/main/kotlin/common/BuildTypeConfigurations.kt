@@ -22,7 +22,7 @@ fun NamedDomainObjectContainer<LibraryBuildType>.configureDebugModeBuildTypes() 
 }
 
 fun Project.configureDbEncryptionBuild() {
-    apply(from = "${rootDir}${File.separator}build-logic${File.separator}build_properties.gradle")
+    apply(from = "${rootDir}${File.separator}build-logic${File.separator}build_properties.gradle.kts")
     val props = extra.properties
     val propDbEncrypted = props["DB_ENCRYPTION"] as Boolean
 
