@@ -4,14 +4,12 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.datastore.core.DataMigration
 import com.fasterxml.jackson.core.JacksonException
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.local.migrations.models.OldProjectConfig
 import com.simprints.infra.config.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.local.models.toProto
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -39,9 +37,7 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         if (projectSettingsJson.isNullOrEmpty()) return currentData
 
         return try {
-            jacksonObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .readValue<OldProjectConfig>(projectSettingsJson)
+            JsonHelper.fromJson<OldProjectConfig>(projectSettingsJson)
                 .toDomain(authStore.signedInProjectId)
                 .toProto()
         } catch (e: Exception) {
