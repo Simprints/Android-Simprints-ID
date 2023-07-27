@@ -65,7 +65,8 @@ internal data class ApiAlertScreenPayload(
         MISSING_GOOGLE_PLAY_SERVICES,
         PROJECT_PAUSED,
         PROJECT_ENDING,
-        MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
+        MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
+        BLUETOOTH_NO_PERMISSION
     }
 }
 
@@ -108,4 +109,5 @@ internal fun AlertScreenEventType.fromDomainToApi(): ApiAlertScreenEventType =
         AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
         AlertScreenEventType.PROJECT_PAUSED -> PROJECT_PAUSED
         AlertScreenEventType.PROJECT_ENDING -> PROJECT_ENDING
+        AlertScreenEventType.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
     }

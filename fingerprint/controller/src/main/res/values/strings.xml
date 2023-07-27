@@ -169,6 +169,8 @@
     <string name="bluetooth_error_pair_scanner_and_device_title">Pair scanner and device</string>
     <string name="scanner_error_turn_scanner_on_title">Turn scanner on</string>
     <!-- Error Message Text -->
+    <string name="no_permission_title">No permission</string>
+    <string name="bluetooth_no_permission_message">Please enable the Bluetooth permission in the phone settings</string>
     <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
     <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
     <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
