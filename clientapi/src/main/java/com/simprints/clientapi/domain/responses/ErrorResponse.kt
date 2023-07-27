@@ -39,6 +39,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         BACKEND_MAINTENANCE_ERROR,
         PROJECT_PAUSED,
         PROJECT_ENDING,
+        BLUETOOTH_NO_PERMISSION,
         FACE_CONFIGURATION_ERROR;
 
         companion object {
@@ -60,6 +61,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
                     IAppErrorReason.PROJECT_PAUSED -> PROJECT_PAUSED
                     IAppErrorReason.PROJECT_ENDING -> PROJECT_ENDING
+                    IAppErrorReason.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =

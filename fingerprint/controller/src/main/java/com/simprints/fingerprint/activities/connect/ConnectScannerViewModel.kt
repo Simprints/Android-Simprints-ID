@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.permission.Permission
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.R
@@ -61,6 +62,8 @@ class ConnectScannerViewModel @Inject constructor(
     val scannerConnected = MutableLiveData<LiveDataEventWithContent<Boolean>>()
     val finish = MutableLiveData<LiveDataEvent>()
     val finishAfterError = MutableLiveData<LiveDataEvent>()
+    private val _bluetoothPermission = MutableLiveData<LiveDataEventWithContent<Permission>>()
+    val bluetoothPermission: LiveData<LiveDataEventWithContent<Permission>> = _bluetoothPermission
 
     val showScannerErrorDialogWithScannerId = MutableLiveData<LiveDataEventWithContent<String>>()
 
@@ -184,20 +187,26 @@ class ConnectScannerViewModel @Inject constructor(
         when (e) {
             is BluetoothNotEnabledException ->
                 connectScannerIssue.postEvent(ConnectScannerIssue.BluetoothOff)
+
             is ScannerNotPairedException, is MultiplePossibleScannersPairedException ->
                 connectScannerIssue.postEvent(determineAppropriateScannerIssueForPairing())
+
             is ScannerDisconnectedException, is UnknownScannerIssueException ->
                 scannerManager.currentScannerId?.let {
                     showScannerErrorDialogWithScannerId.postEvent(it)
                 }
+
             is OtaAvailableException -> {
                 setLastConnectedScannerInfo()
                 connectScannerIssue.postEvent(ConnectScannerIssue.Ota(OtaFragmentRequest(e.availableOtas)))
             }
+
             is BluetoothNotSupportedException ->
                 launchAlert.postEvent(AlertError.BLUETOOTH_NOT_SUPPORTED)
+
             is ScannerLowBatteryException ->
                 launchAlert.postEvent(AlertError.LOW_BATTERY)
+
             else -> launchAlert.postEvent(AlertError.UNEXPECTED_ERROR)
         }
     }
@@ -312,6 +321,14 @@ class ConnectScannerViewModel @Inject constructor(
 
     fun logScannerErrorDialogShownToCrashReport() {
         Simber.tag(CrashReportTag.ALERT.name).i("Scanner error confirm dialog shown")
+    }
+
+    fun handleNoBluetoothPermission() {
+        launchAlert.postEvent(AlertError.BLUETOOTH_NO_PERMISSION)
+    }
+
+    fun setBluetoothPermission(permission: Permission) {
+        _bluetoothPermission.postEvent(permission)
     }
 
 
