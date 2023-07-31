@@ -19,6 +19,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
@@ -49,8 +50,8 @@ class ConnectScannerActivityAndroidTest {
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns mockk {
-                every { qualityThreshold } returns 60
                 every { vero2 } returns mockk {
+                    every { qualityThreshold } returns 60
                     every { displayLiveFeedback } returns false
                     every { imageSavingStrategy } returns Vero2Configuration.ImageSavingStrategy.EAGER
                 }
@@ -59,6 +60,9 @@ class ConnectScannerActivityAndroidTest {
     }
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>().apply {
         every { isLiveFeedbackAvailable() } returns false
+        every { versionInformation() } returns mockk {
+            every { generation } returns ScannerGeneration.VERO_2
+        }
     }
     private val scannerManager: ScannerManager =
         spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {

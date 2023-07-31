@@ -5,6 +5,7 @@ import com.simprints.infra.config.domain.models.Vero2Configuration
 
 @Keep
 internal data class ApiVero2Configuration(
+    val qualityThreshold: Int,
     val imageSavingStrategy: ImageSavingStrategy,
     val captureStrategy: CaptureStrategy,
     val displayLiveFeedback: Boolean,
@@ -13,6 +14,7 @@ internal data class ApiVero2Configuration(
 
     fun toDomain(): Vero2Configuration =
         Vero2Configuration(
+            qualityThreshold,
             imageSavingStrategy.toDomain(),
             captureStrategy.toDomain(),
             displayLiveFeedback,
