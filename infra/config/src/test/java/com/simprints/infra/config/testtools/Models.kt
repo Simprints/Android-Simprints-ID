@@ -145,6 +145,7 @@ internal val vero2Configuration = Vero2Configuration(
 )
 
 internal val protoVero2Configuration = ProtoVero2Configuration.newBuilder()
+    .setQualityThreshold(30)
     .setCaptureStrategy(ProtoVero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI)
     .setImageSavingStrategy(ProtoVero2Configuration.ImageSavingStrategy.EAGER)
     .setDisplayLiveFeedback(false)
@@ -178,12 +179,11 @@ internal val fingerprintConfiguration = FingerprintConfiguration(
 
 internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration.newBuilder()
     .addFingersToCapture(ProtoFinger.LEFT_3RD_FINGER)
-    .setQualityThreshold(10)
     .setDecisionPolicy(protoDecisionPolicy)
     .addAllowedVeroGenerations(ProtoFingerprintConfiguration.VeroGeneration.VERO_2)
     .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
     .setDisplayHandIcons(true)
-.setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(10).build())
+    .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(10).build())
     .setVero2(protoVero2Configuration)
     .build()
 
