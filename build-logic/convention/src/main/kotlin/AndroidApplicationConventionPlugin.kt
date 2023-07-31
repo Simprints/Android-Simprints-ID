@@ -14,7 +14,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            apply(from = "${rootDir}${File.separator}build-logic${File.separator}build_properties.gradle")
+            apply(from = "${rootDir}${File.separator}build-logic${File.separator}build_properties.gradle.kts")
             val props = extra.properties
             val propVersionCode = props["VERSION_CODE"] as Int
             val propVersionName = props["VERSION_NAME"] as String
