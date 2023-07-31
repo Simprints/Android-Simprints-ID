@@ -14,21 +14,21 @@ class ApiErrorCallbackTest {
     @Test
     fun `ApiReason correctly mapped to domain`() {
         mapOf(
-            ApiErrorCallback.ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN to DIFFERENT_PROJECT_ID_SIGNED_IN,
-            ApiErrorCallback.ApiReason.DIFFERENT_USER_ID_SIGNED_IN to DIFFERENT_USER_ID_SIGNED_IN,
-            ApiErrorCallback.ApiReason.GUID_NOT_FOUND_ONLINE to GUID_NOT_FOUND_ONLINE,
-            GUID_NOT_FOUND_OFFLINE to UNEXPECTED_ERROR,
-            ApiErrorCallback.ApiReason.UNEXPECTED_ERROR to UNEXPECTED_ERROR,
-            ApiErrorCallback.ApiReason.BLUETOOTH_NOT_SUPPORTED to BLUETOOTH_NOT_SUPPORTED,
-            SCANNER_LOW_BATTERY to UNEXPECTED_ERROR,
-            ApiErrorCallback.ApiReason.LOGIN_NOT_COMPLETE to LOGIN_NOT_COMPLETE,
-            ApiErrorCallback.ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED to ENROLMENT_LAST_BIOMETRICS_FAILED,
-            ApiErrorCallback.ApiReason.FACE_LICENSE_MISSING to FACE_LICENSE_MISSING,
-            ApiErrorCallback.ApiReason.FACE_LICENSE_INVALID to FACE_LICENSE_INVALID,
-            ApiErrorCallback.ApiReason.BACKEND_MAINTENANCE_ERROR to BACKEND_MAINTENANCE_ERROR,
-            ApiErrorCallback.ApiReason.PROJECT_ENDING to PROJECT_ENDING,
-            ApiErrorCallback.ApiReason.PROJECT_PAUSED to PROJECT_PAUSED,
-            ApiErrorCallback.ApiReason.BLUETOOTH_NO_PERMISSION to BLUETOOTH_NO_PERMISSION
+            ApiErrorCallback.ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN to ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN,
+            ApiErrorCallback.ApiReason.DIFFERENT_USER_ID_SIGNED_IN to ErrorReason.DIFFERENT_USER_ID_SIGNED_IN,
+            ApiErrorCallback.ApiReason.GUID_NOT_FOUND_ONLINE to ErrorReason.GUID_NOT_FOUND_ONLINE,
+            GUID_NOT_FOUND_OFFLINE to ErrorReason.UNEXPECTED_ERROR,
+            ApiErrorCallback.ApiReason.UNEXPECTED_ERROR to ErrorReason.UNEXPECTED_ERROR,
+            ApiErrorCallback.ApiReason.BLUETOOTH_NOT_SUPPORTED to ErrorReason.BLUETOOTH_NOT_SUPPORTED,
+            SCANNER_LOW_BATTERY to ErrorReason.UNEXPECTED_ERROR,
+            ApiErrorCallback.ApiReason.LOGIN_NOT_COMPLETE to ErrorReason.LOGIN_NOT_COMPLETE,
+            ApiErrorCallback.ApiReason.ENROLMENT_LAST_BIOMETRICS_FAILED to ErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED,
+            ApiErrorCallback.ApiReason.FACE_LICENSE_MISSING to ErrorReason.FACE_LICENSE_MISSING,
+            ApiErrorCallback.ApiReason.FACE_LICENSE_INVALID to ErrorReason.FACE_LICENSE_INVALID,
+            ApiErrorCallback.ApiReason.BACKEND_MAINTENANCE_ERROR to ErrorReason.BACKEND_MAINTENANCE_ERROR,
+            ApiErrorCallback.ApiReason.PROJECT_ENDING to ErrorReason.PROJECT_ENDING,
+            ApiErrorCallback.ApiReason.PROJECT_PAUSED to ErrorReason.PROJECT_PAUSED,
+            ApiErrorCallback.ApiReason.BLUETOOTH_NO_PERMISSION to ErrorReason.BLUETOOTH_NO_PERMISSION
         ).forEach {
             assertThat(it.key.fromApiToDomain()).isEqualTo(it.value)
         }
