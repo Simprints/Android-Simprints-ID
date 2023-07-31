@@ -1,6 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintErrorReason
 import org.junit.Test
 
@@ -22,10 +23,10 @@ class FingerprintErrorResponseKtTest {
     @Test
     fun `FingerprintErrorReason maps correctly to app error reason`() {
         mapOf(
-            FingerprintErrorReason.UNEXPECTED_ERROR to IFingerprintErrorReason.UNEXPECTED_ERROR,
-            FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED to IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED,
-            FingerprintErrorReason.FINGERPRINT_CONFIGURATION_ERROR to IFingerprintErrorReason.FINGERPRINT_CONFIGURATION_ERROR,
-            FingerprintErrorReason.BLUETOOTH_NO_PERMISSION to IFingerprintErrorReason.BLUETOOTH_NO_PERMISSION
+            FingerprintErrorReason.UNEXPECTED_ERROR to AppErrorResponse.Reason.UNEXPECTED_ERROR,
+            FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED to AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED,
+            FingerprintErrorReason.FINGERPRINT_CONFIGURATION_ERROR to AppErrorResponse.Reason.FINGERPRINT_CONFIGURATION_ERROR,
+            FingerprintErrorReason.BLUETOOTH_NO_PERMISSION to AppErrorResponse.Reason.BLUETOOTH_NO_PERMISSION
         ).forEach {
             assertThat(it.key.toAppErrorReason()).isEqualTo(it.value)
         }
