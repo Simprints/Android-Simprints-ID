@@ -652,6 +652,7 @@ class ProjectConfigSharedPrefsMigrationTest {
                 "{\"CaptureFingerprintStrategy\":\"SECUGEN_ISO_500_DPI\",\"FingerComparisonStrategyForVerification\":\"SAME_FINGER\",\"FingerprintLiveFeedbackOn\":\"true\",\"SaveFingerprintImagesStrategy\":\"WSQ_15_EAGER\",\"Vero2FirmwareVersions\":\"{\\\"E-1\\\":{\\\"cypress\\\":\\\"1.1\\\",\\\"stm\\\":\\\"1.0\\\",\\\"un20\\\":\\\"1.3\\\"}}\"}"
             )
         private val PROTO_VERO_2_CONFIGURATION = ProtoVero2Configuration.newBuilder()
+            .setQualityThreshold(60)
             .setCaptureStrategy(ProtoVero2Configuration.CaptureStrategy.SECUGEN_ISO_500_DPI)
             .setImageSavingStrategy(ProtoVero2Configuration.ImageSavingStrategy.EAGER)
             .setDisplayLiveFeedback(true)
@@ -680,7 +681,6 @@ class ProjectConfigSharedPrefsMigrationTest {
                     ProtoFinger.LEFT_THUMB
                 )
             )
-            .setQualityThreshold(60)
             .setDecisionPolicy(
                 ProtoDecisionPolicy.newBuilder().setLow(10).setMedium(40).setHigh(200).build()
             )
@@ -691,16 +691,17 @@ class ProjectConfigSharedPrefsMigrationTest {
                 )
             )
             .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
+            .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build())
             .setDisplayHandIcons(true)
             .build()
 
         private val PROTO_FINGERPRINT_DEFAULT_CONFIGURATION = ProtoFingerprintConfiguration.newBuilder()
             .addAllFingersToCapture(listOf(ProtoFinger.LEFT_THUMB, ProtoFinger.LEFT_INDEX_FINGER))
-            .setQualityThreshold(60)
             .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(700).build())
             .addAllAllowedVeroGenerations(listOf(ProtoFingerprintConfiguration.VeroGeneration.VERO_1))
             .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
             .setDisplayHandIcons(false)
+            .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build())
             .build()
     }
 }
