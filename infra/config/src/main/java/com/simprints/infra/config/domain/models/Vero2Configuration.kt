@@ -3,6 +3,7 @@ package com.simprints.infra.config.domain.models
 import androidx.annotation.Keep
 
 data class Vero2Configuration(
+    val qualityThreshold: Int,
     val imageSavingStrategy: ImageSavingStrategy,
     val captureStrategy: CaptureStrategy,
     val displayLiveFeedback: Boolean,

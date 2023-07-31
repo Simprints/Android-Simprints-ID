@@ -33,6 +33,7 @@ import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.tools.livedata.postEvent
@@ -72,9 +73,9 @@ class CollectFingerprintsActivityTest {
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns mockk {
-                every { qualityThreshold } returns 60
                 every { displayHandIcons } returns true
                 every { vero2 } returns mockk {
+                    every { qualityThreshold } returns 60
                     every { displayLiveFeedback } returns false
                     every { captureStrategy } returns Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI
                     every { imageSavingStrategy } returns Vero2Configuration.ImageSavingStrategy.NEVER
@@ -85,6 +86,9 @@ class CollectFingerprintsActivityTest {
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>(relaxUnitFun = true).apply {
         every { isLiveFeedbackAvailable() } returns false
         coEvery { disconnect() } just Runs
+        every { versionInformation() } returns mockk {
+            every { generation } returns ScannerGeneration.VERO_2
+        }
     }
     private val scannerManager: ScannerManager =
         spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
