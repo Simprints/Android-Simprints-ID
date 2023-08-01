@@ -8,10 +8,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentRequestLoginBinding
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -51,7 +51,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
 
     override fun onResume() {
         super.onResume()
-        if (authStore.signedInProjectId.isNotEmpty() && authStore.signedInUserId.isNotEmpty())
+        if (authStore.signedInProjectId.isNotEmpty())
             findNavController().navigate(R.id.action_requestLoginFragment_to_mainFragment)
     }
 

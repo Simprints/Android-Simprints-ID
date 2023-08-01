@@ -2,17 +2,21 @@ package com.simprints.infra.eventsync.status.down
 
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.eventsync.exceptions.MissingArgumentForDownSyncScopeException
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
-import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.*
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.SubjectModuleScope
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.SubjectProjectScope
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.SubjectUserScope
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.down.local.DbEventsDownSyncOperationState.Companion.buildFromEventsDownSyncOperationState
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import javax.inject.Inject
 
 internal class EventDownSyncScopeRepository @Inject constructor(
     private val authStore: AuthStore,
+    private val recentUserActivityManager: RecentUserActivityManager,
     private val downSyncOperationOperationDao: DbEventDownSyncOperationStateDao,
 ) {
 
@@ -42,8 +46,8 @@ internal class EventDownSyncScopeRepository @Inject constructor(
         return projectId
     }
 
-    private fun getUserId(): String {
-        val possibleUserId: String = authStore.signedInUserId
+    private suspend fun getUserId(): String {
+        val possibleUserId: String = recentUserActivityManager.getRecentUserActivity().lastUserUsed
         if (possibleUserId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }

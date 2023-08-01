@@ -66,7 +66,7 @@ class ProjectAuthenticatorTest {
     @Test
     fun successfulResponse_userShouldSignIn() = runTest {
 
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+        authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
     }
 
     @Test
@@ -74,13 +74,13 @@ class ProjectAuthenticatorTest {
         coEvery {
             authenticationRemoteDataSource.requestAuthToken(
                 PROJECT_ID,
-                USER_ID,
+                DEVICE_ID,
                 any()
             )
         } throws IOException()
 
         assertThrows<IOException> {
-            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+            authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
         }
     }
 
@@ -89,7 +89,7 @@ class ProjectAuthenticatorTest {
         coEvery {
             authenticationRemoteDataSource.requestAuthToken(
                 PROJECT_ID,
-                USER_ID,
+                DEVICE_ID,
                 any()
             )
         } throws BackendMaintenanceException(
@@ -98,9 +98,8 @@ class ProjectAuthenticatorTest {
 
         assertThrows<BackendMaintenanceException> {
             authenticator.authenticate(
-                NonceScope(PROJECT_ID, USER_ID),
+                NonceScope(PROJECT_ID, DEVICE_ID),
                 PROJECT_SECRET,
-                DEVICE_ID
             )
         }
     }
@@ -108,12 +107,11 @@ class ProjectAuthenticatorTest {
     @Test
     fun authenticate_invokeAuthenticationDataManagerCorrectly() = runTest {
 
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+        authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
 
         coVerify(exactly = 1) {
             authenticationRemoteDataSource.requestAuthenticationData(
                 PROJECT_ID,
-                USER_ID,
                 DEVICE_ID,
             )
         }
@@ -122,22 +120,22 @@ class ProjectAuthenticatorTest {
     @Test
     fun authenticate_invokeSignerManagerCorrectly() = runTest(StandardTestDispatcher()) {
 
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+        authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
 
-        coVerify(exactly = 1) { signerManager.signIn(PROJECT_ID, USER_ID, any()) }
+        coVerify(exactly = 1) { signerManager.signIn(PROJECT_ID, any()) }
     }
 
     @Test
     fun authenticate_invokeSecureDataManagerCorrectly() = runTest(StandardTestDispatcher()) {
 
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+        authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
 
         coVerify(exactly = 1) { secureDataManager.createLocalDatabaseKeyIfMissing(PROJECT_ID) }
     }
 
     @Test
     fun `authenticate should fetch the correct long consents`() = runTest(StandardTestDispatcher()) {
-        authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+        authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
 
         coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
         coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
@@ -150,7 +148,7 @@ class ProjectAuthenticatorTest {
         )
 
         assertThrows<RequestingIntegrityTokenException> {
-            authenticator.authenticate(NonceScope(PROJECT_ID, USER_ID), PROJECT_SECRET, DEVICE_ID)
+            authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
         }
     }
 
@@ -158,11 +156,11 @@ class ProjectAuthenticatorTest {
         every { projectSecretManager.encryptProjectSecret(any(), any()) } returns PROJECT_SECRET
 
         coEvery {
-            authenticationRemoteDataSource.requestAuthenticationData(any(), any(), any())
+            authenticationRemoteDataSource.requestAuthenticationData(any(), any())
         } returns AuthenticationData(PUBLIC_KEY, "")
 
         coEvery {
-            authenticationRemoteDataSource.requestAuthToken(PROJECT_ID, USER_ID, any())
+            authenticationRemoteDataSource.requestAuthToken(PROJECT_ID, DEVICE_ID, any())
         } returns Token("", "", "", "")
 
         coEvery { configManager.getProjectConfiguration() } returns ProjectConfiguration(
@@ -190,7 +188,6 @@ class ProjectAuthenticatorTest {
         private const val PUBLIC_KEY =
             "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB"
         private const val PROJECT_ID = "project_id"
-        private const val USER_ID = "user_id"
         private const val PROJECT_SECRET = "encrypted_project_secret"
         private const val DEVICE_ID = "device_id"
         private const val LANGUAGE_1 = "en"

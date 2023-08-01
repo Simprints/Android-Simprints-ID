@@ -22,11 +22,6 @@ internal class AuthStoreImpl @Inject constructor(
         set(value) {
             loginInfoStore.signedInProjectId = value
         }
-    override var signedInUserId: String
-        get() = loginInfoStore.signedInUserId
-        set(value) {
-            loginInfoStore.signedInUserId = value
-        }
 
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
         loginInfoStore.isProjectIdSignedIn(possibleProjectId)
@@ -35,8 +30,8 @@ internal class AuthStoreImpl @Inject constructor(
         loginInfoStore.cleanCredentials()
     }
 
-    override fun storeCredentials(projectId: String, userId: String) {
-        loginInfoStore.storeCredentials(projectId, userId)
+    override fun storeCredentials(projectId: String) {
+        loginInfoStore.storeCredentials(projectId)
     }
 
     override suspend fun storeFirebaseToken(token: Token) {
@@ -47,8 +42,8 @@ internal class AuthStoreImpl @Inject constructor(
         firebaseAuthManager.signOut()
     }
 
-    override fun isSignedIn(projectId: String, userId: String): Boolean =
-        firebaseAuthManager.isSignedIn(projectId, userId)
+    override fun isSignedIn(projectId: String): Boolean =
+        firebaseAuthManager.isSignedIn(projectId)
 
     override fun getCoreApp(): FirebaseApp =
         firebaseAuthManager.getCoreApp()
