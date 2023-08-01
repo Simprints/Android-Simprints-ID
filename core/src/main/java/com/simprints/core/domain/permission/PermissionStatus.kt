@@ -1,5 +1,5 @@
 package com.simprints.core.domain.permission
 
-enum class Permission {
+enum class PermissionStatus {
     Granted, Denied, DeniedNeverAskAgain
 }

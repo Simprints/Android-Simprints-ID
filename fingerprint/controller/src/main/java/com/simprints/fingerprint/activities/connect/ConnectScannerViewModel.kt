@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.domain.permission.Permission
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.fingerprint.R
@@ -62,8 +62,8 @@ class ConnectScannerViewModel @Inject constructor(
     val scannerConnected = MutableLiveData<LiveDataEventWithContent<Boolean>>()
     val finish = MutableLiveData<LiveDataEvent>()
     val finishAfterError = MutableLiveData<LiveDataEvent>()
-    private val _bluetoothPermission = MutableLiveData<LiveDataEventWithContent<Permission>>()
-    val bluetoothPermission: LiveData<LiveDataEventWithContent<Permission>> = _bluetoothPermission
+    private val _bluetoothPermission = MutableLiveData<LiveDataEventWithContent<PermissionStatus>>()
+    val bluetoothPermission: LiveData<LiveDataEventWithContent<PermissionStatus>> = _bluetoothPermission
 
     val showScannerErrorDialogWithScannerId = MutableLiveData<LiveDataEventWithContent<String>>()
 
@@ -327,7 +327,7 @@ class ConnectScannerViewModel @Inject constructor(
         launchAlert.postEvent(AlertError.BLUETOOTH_NO_PERMISSION)
     }
 
-    fun setBluetoothPermission(permission: Permission) {
+    fun setBluetoothPermission(permission: PermissionStatus) {
         _bluetoothPermission.postEvent(permission)
     }
 

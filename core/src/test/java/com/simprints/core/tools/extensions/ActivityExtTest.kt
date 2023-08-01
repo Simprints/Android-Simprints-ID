@@ -4,7 +4,7 @@ import android.app.Activity
 import androidx.core.app.ActivityCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.core.domain.permission.Permission
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extentions.permissionFromResult
 import io.mockk.every
 import io.mockk.mockk
@@ -21,7 +21,7 @@ class ActivityExtTest {
             grantResult = true,
             shouldShowRationale = true
         )
-        Truth.assertThat(permission).isEqualTo(Permission.Granted)
+        Truth.assertThat(permission).isEqualTo(PermissionStatus.Granted)
     }
 
     @Test
@@ -30,7 +30,7 @@ class ActivityExtTest {
             grantResult = false,
             shouldShowRationale = true
         )
-        Truth.assertThat(permission).isEqualTo(Permission.Denied)
+        Truth.assertThat(permission).isEqualTo(PermissionStatus.Denied)
     }
 
     @Test
@@ -39,13 +39,13 @@ class ActivityExtTest {
             grantResult = false,
             shouldShowRationale = false
         )
-        Truth.assertThat(permission).isEqualTo(Permission.DeniedNeverAskAgain)
+        Truth.assertThat(permission).isEqualTo(PermissionStatus.DeniedNeverAskAgain)
     }
 
     private fun runPermissionMappingTest(
         grantResult: Boolean,
         shouldShowRationale: Boolean
-    ): Permission {
+    ): PermissionStatus {
         val activity = mockk<Activity>()
         val permission = "permission"
         mockkStatic(ActivityCompat::class)
