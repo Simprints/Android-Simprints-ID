@@ -70,8 +70,8 @@ class ConnectScannerActivity : FingerprintActivity() {
                 permissionFromResult(permission = entry.key, grantResult = entry.value)
             }
         val permission = when {
-            mappedPermissions.any { it == Permission.DeniedNeverAskAgain } -> Permission.DeniedNeverAskAgain
-            mappedPermissions.any { it == Permission.Denied } -> Permission.Denied
+            mappedPermissions.contains(Permission.DeniedNeverAskAgain) -> Permission.DeniedNeverAskAgain
+            mappedPermissions.contains(Permission.Denied) -> Permission.Denied
             else -> Permission.Granted
         }
         Simber.i("Bluetooth permission: $permission")
