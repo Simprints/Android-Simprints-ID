@@ -2,7 +2,7 @@ package com.simprints.fingerprint.activities.connect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.permission.Permission
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Companion.MAX_RETRY_COUNT
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
@@ -455,7 +455,7 @@ class ConnectScannerViewModelTest {
 
     @Test
     fun setBluetoothPermission_sendsBluetoothPermissionEvent() {
-        Permission.values().forEach { permission ->
+        PermissionStatus.values().forEach { permission ->
             val observer = viewModel.bluetoothPermission.testObserver()
             viewModel.setBluetoothPermission(permission)
             observer.assertEventReceivedWithContent(permission)

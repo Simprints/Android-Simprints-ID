@@ -8,7 +8,7 @@ import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import com.simprints.core.domain.permission.Permission
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.tools.extentions.hasPermissions
 import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.alert.ShowAlertWrapper
@@ -70,9 +70,9 @@ class ConnectScannerActivity : FingerprintActivity() {
                 permissionFromResult(permission = entry.key, grantResult = entry.value)
             }
         val permission = when {
-            mappedPermissions.contains(Permission.DeniedNeverAskAgain) -> Permission.DeniedNeverAskAgain
-            mappedPermissions.contains(Permission.Denied) -> Permission.Denied
-            else -> Permission.Granted
+            mappedPermissions.contains(PermissionStatus.DeniedNeverAskAgain) -> PermissionStatus.DeniedNeverAskAgain
+            mappedPermissions.contains(PermissionStatus.Denied) -> PermissionStatus.Denied
+            else -> PermissionStatus.Granted
         }
         Simber.i("Bluetooth permission: $permission")
         viewModel.setBluetoothPermission(permission)
@@ -96,9 +96,9 @@ class ConnectScannerActivity : FingerprintActivity() {
         viewModel.finishAfterError.activityObserveEventWith { finishWithError() }
         viewModel.bluetoothPermission.activityObserveEventWith { permission ->
             when (permission) {
-                Permission.Granted -> viewModel.start()
-                Permission.Denied -> requestBluetoothPermissions()
-                Permission.DeniedNeverAskAgain -> viewModel.handleNoBluetoothPermission()
+                PermissionStatus.Granted -> viewModel.start()
+                PermissionStatus.Denied -> requestBluetoothPermissions()
+                PermissionStatus.DeniedNeverAskAgain -> viewModel.handleNoBluetoothPermission()
             }
         }
         viewModel.init(connectScannerRequest.connectMode)
@@ -116,7 +116,7 @@ class ConnectScannerActivity : FingerprintActivity() {
 
     private fun checkBluetoothPermissions() {
         if (hasBluetoothPermissions()) {
-            viewModel.setBluetoothPermission(Permission.Granted)
+            viewModel.setBluetoothPermission(PermissionStatus.Granted)
         } else {
             requestBluetoothPermissions()
         }

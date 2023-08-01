@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.ActivityCompat
-import com.simprints.core.domain.permission.Permission
+import com.simprints.core.domain.permission.PermissionStatus
 
 fun Activity.hideKeyboard() {
     val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -28,15 +28,15 @@ fun Activity.hasPermissions(permissions: List<String>): Boolean {
     return permissions.all(::hasPermission)
 }
 
-fun Activity.permissionFromResult(permission: String, grantResult: Boolean): Permission =
+fun Activity.permissionFromResult(permission: String, grantResult: Boolean): PermissionStatus =
     when (grantResult) {
-        true -> Permission.Granted
+        true -> PermissionStatus.Granted
         else -> {
             val shouldShowRationale =
                 ActivityCompat.shouldShowRequestPermissionRationale(this, permission)
             when (shouldShowRationale) {
-                true -> Permission.Denied
-                false -> Permission.DeniedNeverAskAgain
+                true -> PermissionStatus.Denied
+                false -> PermissionStatus.DeniedNeverAskAgain
             }
         }
     }
