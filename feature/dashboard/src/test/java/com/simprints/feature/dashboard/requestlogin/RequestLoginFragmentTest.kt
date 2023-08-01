@@ -10,10 +10,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.tools.di.FakeCoreModule
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.moveToState
 import com.simprints.testtools.hilt.testNavController
-import com.simprints.infra.authstore.AuthStore
 import dagger.hilt.android.testing.*
 import io.mockk.every
 import org.hamcrest.core.StringContains.containsString
@@ -78,7 +78,6 @@ class RequestLoginFragmentTest {
     @Test
     fun `should redirect to the main fragment if the user is logged in when resuming the fragment`() {
         every { authStore.signedInProjectId } returns "project"
-        every { authStore.signedInUserId } returns "user"
 
         val navController =
             testNavController(R.navigation.graph_dashboard, R.id.requestLoginFragment)

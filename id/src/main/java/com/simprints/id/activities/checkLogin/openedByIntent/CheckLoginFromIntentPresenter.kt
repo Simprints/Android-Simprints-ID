@@ -16,7 +16,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollo
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
-import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
@@ -241,29 +240,10 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         else
             throw DifferentProjectIdSignedInException()
 
-    /** @throws DifferentUserIdSignedInException */
-    override fun isUserIdStoredAndMatches() =
-    //if (dataManager.userId != dataManager.getSignedInUserIdOrEmpty())
-    //    throw DifferentUserIdSignedInException()
-    //else
-        /** Hack to support multiple users: we do not check if the signed UserId
-        matches the userId from the Intent */
-        authStore.signedInUserId.isNotEmpty()
-
     @SuppressLint("CheckResult")
     override suspend fun handleSignedInUser() {
         super.handleSignedInUser()
         Simber.d("[CHECK_LOGIN] User is signed in")
-
-        /** Hack to support multiple users: If all login checks success, then we consider
-         *  the userId in the Intent as new signed User
-         *  Because we move ConfirmIdentity behind the login check, some integration
-         *  doesn't have the userId in the intent. We don't want to switch the
-         *  user otherwise will be set to "" and the following requests would fail.
-         *  */
-        if (appRequest.userId.isNotEmpty()) {
-            authStore.signedInUserId = appRequest.userId
-        }
 
         updateProjectInCurrentSession()
 
@@ -319,7 +299,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         val projectConfiguration = configManager.getProjectConfiguration()
         val deviceConfiguration = configManager.getDeviceConfiguration()
         Simber.tag(PROJECT_ID, true).i(authStore.signedInProjectId)
-        Simber.tag(USER_ID, true).i(authStore.signedInUserId)
+        Simber.tag(USER_ID, true).i(appRequest.userId)
         Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(projectConfiguration.synchronization.frequency.toString())
@@ -331,7 +311,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             timeHelper.now(),
             result,
             if (result == AuthorizationResult.AUTHORIZED) {
-                UserInfo(authStore.signedInProjectId, authStore.signedInUserId)
+                UserInfo(authStore.signedInProjectId, appRequest.userId)
             } else {
                 null
             }
