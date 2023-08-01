@@ -47,6 +47,7 @@ message ProtoFingerprintConfiguration {
     FingerComparisonStrategy comparison_strategy_for_verification = 5;
     bool display_hand_icons = 6;
     optional ProtoVero2Configuration vero_2 = 7;
+    optional ProtoVero1Configuration vero_1 = 8;
 
     enum VeroGeneration {
         VERO_1 = 0;
@@ -59,11 +60,16 @@ message ProtoFingerprintConfiguration {
     }
 }
 
+message ProtoVero1Configuration {
+    int32 quality_threshold = 1;
+}
+
 message ProtoVero2Configuration {
     ImageSavingStrategy image_saving_strategy = 1;
     CaptureStrategy capture_strategy = 2;
     bool display_live_feedback = 3;
     map<string, Vero2FirmwareVersions> firmware_versions = 4;
+    int32 quality_threshold = 5;
 
     enum ImageSavingStrategy {
         NEVER = 0;

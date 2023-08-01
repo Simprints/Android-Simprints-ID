@@ -37,6 +37,7 @@ import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedExce
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
@@ -179,6 +180,7 @@ class CollectFingerprintsViewModel(
                     else
                         startLiveFeedback(scannerManager.scanner)
                 }
+
                 is CaptureState.Scanning,
                 is CaptureState.TransferringImage -> pauseLiveFeedback()
             }
@@ -229,7 +231,7 @@ class CollectFingerprintsViewModel(
 
     fun isImageTransferRequired(): Boolean =
         configuration.vero2?.imageSavingStrategy?.toDomain()?.isImageTransferRequired() ?: false &&
-                scannerManager.scanner.isImageTransferSupported()
+            scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
         viewModelScope.launch {
@@ -280,6 +282,7 @@ class CollectFingerprintsViewModel(
             is CaptureState.Scanning -> cancelScanning()
             is CaptureState.TransferringImage -> { /* do nothing */
             }
+
             is CaptureState.NotCollected, is CaptureState.Skipped, is CaptureState.NotDetected, is CaptureState.Collected -> startScanning()
         }
     }
@@ -301,7 +304,7 @@ class CollectFingerprintsViewModel(
                 val capturedFingerprint = scannerManager.scanner.captureFingerprint(
                     configuration.vero2?.captureStrategy?.toDomain(),
                     scanningTimeoutMs.toInt(),
-                    configuration.qualityThreshold
+                    qualityThreshold()
                 )
 
                 handleCaptureSuccess(capturedFingerprint)
@@ -319,7 +322,7 @@ class CollectFingerprintsViewModel(
             captureFingerprintResponse.imageQualityScore,
             captureFingerprintResponse.template,
             null,
-            configuration.qualityThreshold
+            qualityThreshold()
         )
         vibrate.postEvent()
         if (shouldProceedToImageTransfer(scanResult.qualityScore)) {
@@ -332,7 +335,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun shouldProceedToImageTransfer(quality: Int) =
-        isImageTransferRequired() && (quality >= configuration.qualityThreshold || tooManyBadScans(
+        isImageTransferRequired() && (quality >= qualityThreshold() || tooManyBadScans(
             state.currentCaptureState(),
             plusBadScan = true
         ) || configuration.vero2?.imageSavingStrategy?.toDomain()?.isEager() ?: false)
@@ -381,7 +384,7 @@ class CollectFingerprintsViewModel(
                 lastCaptureStartedAt,
                 timeHelper.now(),
                 id,
-                configuration.qualityThreshold,
+                qualityThreshold(),
                 FingerprintCaptureEvent.buildResult(currentCapture()),
                 (currentCapture() as? CaptureState.Collected)?.scanResult?.let {
                     FingerprintCaptureEvent.Fingerprint(
@@ -393,7 +396,7 @@ class CollectFingerprintsViewModel(
             val fingerprintCaptureBiometricsEvent =
                 if (currentCapture() is CaptureState.Collected &&
                     (captureEvent.result == FingerprintCaptureEvent.Result.GOOD_SCAN ||
-                    tooManyBadScans(currentCapture(), plusBadScan = false))
+                        tooManyBadScans(currentCapture(), plusBadScan = false))
                 )
                     FingerprintCaptureBiometricsEvent(
                         createdAt = lastCaptureStartedAt,
@@ -501,10 +504,12 @@ class CollectFingerprintsViewModel(
             is ScannerOperationInterruptedException -> {
                 updateCaptureState { toNotCollected() }
             }
+
             is ScannerDisconnectedException -> {
                 updateCaptureState { toNotCollected() }
                 launchReconnect.postEvent()
             }
+
             is NoFingerDetectedException -> handleNoFingerDetected()
             else -> {
                 updateCaptureState { toNotCollected() }
@@ -682,6 +687,12 @@ class CollectFingerprintsViewModel(
         if (scannerManager.isScannerAvailable) scannerManager.scanner.block()
         else launchReconnect.postEvent()
     }
+
+    private fun qualityThreshold(): Int =
+        if (scannerManager.scanner.versionInformation().generation == ScannerGeneration.VERO_1)
+            configuration.vero1!!.qualityThreshold
+        else
+            configuration.vero2!!.qualityThreshold
 
     companion object {
         const val targetNumberOfGoodScans = 2
