@@ -9,11 +9,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.initialize
 import com.simprints.core.DispatcherIO
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.domain.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.infra.authstore.domain.LoginInfoStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -50,7 +50,7 @@ internal class FirebaseAuthManager @Inject constructor(
         tryToDeleteCoreApp()
     }
 
-    fun isSignedIn(projectId: String, userId: String): Boolean {
+    fun isSignedIn(projectId: String): Boolean {
         val lastProjectIdClaim = loginInfoStore.projectIdTokenClaim
         return if (!lastProjectIdClaim.isNullOrEmpty()) {
             lastProjectIdClaim == projectId
@@ -86,10 +86,6 @@ internal class FirebaseAuthManager @Inject constructor(
         extractTokenPayloadAsJson(claim)?.let {
             if (it.has(TOKEN_PROJECT_ID_CLAIM)) {
                 loginInfoStore.projectIdTokenClaim = it.getString(TOKEN_PROJECT_ID_CLAIM)
-            }
-
-            if (it.has(TOKEN_USER_ID_CLAIM)) {
-                loginInfoStore.userIdTokenClaim = it.getString(TOKEN_USER_ID_CLAIM)
             }
         }
     }
@@ -193,8 +189,6 @@ internal class FirebaseAuthManager @Inject constructor(
 
     companion object {
         private const val TOKEN_PROJECT_ID_CLAIM = "projectId"
-        private const val TOKEN_USER_ID_CLAIM = "userId"
-
         private const val CORE_BACKEND_PROJECT = "coreBackendFirebaseProject"
     }
 }

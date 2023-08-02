@@ -8,17 +8,16 @@ import retrofit2.http.*
 
 internal interface AuthenticationRemoteInterface : SimRemoteInterface {
 
-    @GET("projects/{projectId}/users/{userId}/authentication-data")
+    @GET("projects/{projectId}/devices/{deviceId}/authentication-data")
     suspend fun requestAuthenticationData(
         @Path("projectId") projectId: String,
-        @Path("userId") userId: String,
-        @Query("deviceId") deviceId: String
+        @Path("deviceId") deviceId: String
     ): ApiAuthenticationData
 
-    @POST("projects/{projectId}/users/{userId}/authenticate")
+    @POST("projects/{projectId}/devices/{deviceId}/authenticate")
     suspend fun requestCustomTokens(
         @Path("projectId") projectId: String,
-        @Path("userId") userId: String,
+        @Path("deviceId") deviceId: String,
         @Body credentials: ApiAuthRequestBody
     ): ApiToken
 

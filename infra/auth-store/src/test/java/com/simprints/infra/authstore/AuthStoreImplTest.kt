@@ -5,8 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
 import com.simprints.infra.authstore.db.FirebaseAuthManager
 import com.simprints.infra.authstore.domain.LoginInfoStore
-import com.simprints.infra.authstore.domain.models.AuthRequest
-import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.network.SimApiClientFactory
 import com.simprints.infra.network.SimNetwork
@@ -47,35 +45,11 @@ class AuthStoreImplTest {
     }
 
     @Test
-    fun `get signedInUserId should call the correct method`() {
-        every { loginInfoStore.signedInUserId } returns USER_ID
-        val receivedProjectId = loginManagerManagerImpl.signedInUserId
-
-        assertThat(receivedProjectId).isEqualTo(USER_ID)
-    }
-
-    @Test
-    fun `set signedInUserId should call the correct method`() {
-        every { loginInfoStore.signedInUserId } returns USER_ID
-        loginManagerManagerImpl.signedInUserId = USER_ID
-
-        verify { loginInfoStore.setProperty("signedInUserId").value(USER_ID) }
-    }
-
-    @Test
     fun `getSignedInProjectIdOrEmpty should call the correct method`() {
         every { loginInfoStore.signedInProjectId } returns PROJECT_ID
         val receivedProjectId = loginManagerManagerImpl.signedInProjectId
 
         assertThat(receivedProjectId).isEqualTo(PROJECT_ID)
-    }
-
-    @Test
-    fun `getSignedInUserIdOrEmpty should call the correct method`() {
-        every { loginInfoStore.signedInUserId } returns USER_ID
-        val receivedUserId = loginManagerManagerImpl.signedInUserId
-
-        assertThat(receivedUserId).isEqualTo(USER_ID)
     }
 
     @Test
@@ -95,9 +69,9 @@ class AuthStoreImplTest {
 
     @Test
     fun `storeCredentials should call the correct method`() {
-        loginManagerManagerImpl.storeCredentials(PROJECT_ID, USER_ID)
+        loginManagerManagerImpl.storeCredentials(PROJECT_ID)
 
-        verify(exactly = 1) { loginInfoStore.storeCredentials(PROJECT_ID, USER_ID) }
+        verify(exactly = 1) { loginInfoStore.storeCredentials(PROJECT_ID) }
     }
 
     @Test
@@ -116,8 +90,8 @@ class AuthStoreImplTest {
 
     @Test
     fun `isSignedIn should call the correct method`() {
-        every { firebaseAuthManager.isSignedIn(PROJECT_ID, USER_ID) } returns true
-        val receivedIsSignedIn = loginManagerManagerImpl.isSignedIn(PROJECT_ID, USER_ID)
+        every { firebaseAuthManager.isSignedIn(PROJECT_ID) } returns true
+        val receivedIsSignedIn = loginManagerManagerImpl.isSignedIn(PROJECT_ID)
 
         assertThat(receivedIsSignedIn).isTrue()
     }
@@ -147,14 +121,7 @@ class AuthStoreImplTest {
     }
 
     companion object {
-        private const val INTEGRITY_TOKEN = "token"
-        private const val NONCE = "nonce"
         private const val PROJECT_ID = "projectId"
-        private const val DEVICE_ID = "deviceId"
-        private const val USER_ID = "userId"
-        private const val FIREBASE_PROJECT_ID = "project"
-        private val AUTHENTICATION_DATA = AuthenticationData("public_key", "nonce")
-        private val AUTH_REQUEST = AuthRequest("secret", "token", "deviceId")
         private val TOKEN = Token("token", "projectId", "apiKey", "application")
         private val FIREBASE_APP = mockk<FirebaseApp>()
         private val SIM_API_CLIENT = mockk<SimNetwork.SimApiClient<SimRemoteInterface>>()
