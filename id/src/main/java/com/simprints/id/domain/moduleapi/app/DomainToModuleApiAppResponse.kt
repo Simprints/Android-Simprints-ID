@@ -42,6 +42,7 @@ object DomainToModuleApiAppResponse {
             BACKEND_MAINTENANCE_ERROR -> IAppErrorReason.BACKEND_MAINTENANCE_ERROR
             PROJECT_ENDING -> IAppErrorReason.PROJECT_ENDING
             PROJECT_PAUSED -> IAppErrorReason.PROJECT_PAUSED
+            BLUETOOTH_NO_PERMISSION -> IAppErrorReason.BLUETOOTH_NO_PERMISSION
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
