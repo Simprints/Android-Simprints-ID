@@ -26,24 +26,25 @@ class ActivityExtTest {
         // Given
         every { Looper.myLooper() } returns Looper.getMainLooper()
         // When
-        var x =1
+        var x = 1
         val context = spyk<Context>()
-        context.runOnUiThread{
-            x =2
+        context.runOnUiThread {
+            x = 2
         }
         // Then
         assertThat(x).isEqualTo(2)
     }
+
     @Test
     fun `test runOnUiThread from another thread`() {
         // Given
         every { Looper.myLooper() } returns mockk(relaxed = true)
 
         // When
-        var x =1
+        var x = 1
         val context = spyk<Context>()
-        context.runOnUiThread{
-            x =2
+        context.runOnUiThread {
+            x = 2
         }
         ShadowLooper.idleMainLooper()
         // Then

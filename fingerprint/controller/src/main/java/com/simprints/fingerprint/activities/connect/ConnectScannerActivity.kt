@@ -2,12 +2,15 @@ package com.simprints.fingerprint.activities.connect
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.simprints.core.tools.extentions.requestPermissionsIfRequired
+import androidx.annotation.RequiresApi
+import com.simprints.core.domain.permission.PermissionStatus
+import com.simprints.core.tools.extentions.hasPermissions
+import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ShowExitFormWrapper
@@ -31,14 +34,19 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ConnectScannerActivity : FingerprintActivity() {
 
-    private val permissionCode = 0
-    private val viewModel: ConnectScannerViewModel by viewModels()
+    private var shouldRequestPermissions = true
 
+    @RequiresApi(Build.VERSION_CODES.S)
+    private val bluetoothPermissions = arrayOf(
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_CONNECT
+    )
+    private val viewModel: ConnectScannerViewModel by viewModels()
     private val showRefusal = registerForActivityResult(ShowExitFormWrapper()) { result ->
         RefusalAlertHelper.handleRefusal(
             result = result,
-            onBack = { viewModel.retryConnect() },
-            onSubmit = { setResultAndFinish(ResultCode.REFUSED, it) },
+            onBack = { shouldRequestPermissions = true },
+            onSubmit = { setResultAndFinish(ResultCode.REFUSED, it) }
         )
     }
 
@@ -48,8 +56,26 @@ class ConnectScannerActivity : FingerprintActivity() {
             this,
             result,
             showRefusal = { showRefusal.launch(RefusalAlertHelper.refusalArgs()) },
-            retry = { viewModel.retryConnect() },
+            retry = {}
         )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private val bluetoothPermissionsCall = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions: Map<String, Boolean> ->
+        val mappedPermissions = permissions
+            .filterKeys(bluetoothPermissions::contains)
+            .map { entry ->
+                permissionFromResult(permission = entry.key, grantResult = entry.value)
+            }
+        val permission = when {
+            mappedPermissions.contains(PermissionStatus.DeniedNeverAskAgain) -> PermissionStatus.DeniedNeverAskAgain
+            mappedPermissions.contains(PermissionStatus.Denied) -> PermissionStatus.Denied
+            else -> PermissionStatus.Granted
+        }
+        Simber.i("Bluetooth permission: $permission")
+        viewModel.setBluetoothPermission(permission)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,41 +88,49 @@ class ConnectScannerActivity : FingerprintActivity() {
             this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
                 ?: throw InvalidRequestForConnectScannerActivityException()
 
-        viewModel.launchAlert.activityObserveEventWith { showAlert.launch(it.toAlertConfig().toArgs()) }
+
+        viewModel.launchAlert.activityObserveEventWith {
+            showAlert.launch(it.toAlertConfig().toArgs())
+        }
         viewModel.finish.activityObserveEventWith { vibrateAndContinueToNextActivity() }
         viewModel.finishAfterError.activityObserveEventWith { finishWithError() }
+        viewModel.bluetoothPermission.activityObserveEventWith { permission ->
+            when (permission) {
+                PermissionStatus.Granted -> viewModel.start()
+                PermissionStatus.Denied -> requestBluetoothPermissions()
+                PermissionStatus.DeniedNeverAskAgain -> viewModel.handleNoBluetoothPermission()
+            }
+        }
         viewModel.init(connectScannerRequest.connectMode)
-
-        if (Build.VERSION.SDK_INT < 31)
-            viewModel.start()
-        else if (!requestPermissionsIfRequired(
-                listOf(
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ), permissionCode
-            )
-        )
-            viewModel.start()
     }
 
     override fun onResume() {
         super.onResume()
-        alertHelper.handleResume { viewModel.retryConnect() }
+        if (shouldRequestPermissions) {
+            shouldRequestPermissions = false
+            checkBluetoothPermissions()
+        } else {
+            alertHelper.handleResume { shouldRequestPermissions = true }
+        }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == permissionCode && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-            Simber.i("Bluetooth permission was accepted")
-            viewModel.start()
+    private fun checkBluetoothPermissions() {
+        if (hasBluetoothPermissions()) {
+            viewModel.setBluetoothPermission(PermissionStatus.Granted)
         } else {
-            Simber.w("Bluetooth permission was denied")
-            finishWithError()
+            requestBluetoothPermissions()
         }
+    }
+
+    private fun requestBluetoothPermissions() {
+        if (Build.VERSION.SDK_INT >= 31) {
+            bluetoothPermissionsCall.launch(bluetoothPermissions)
+        }
+    }
+
+    private fun hasBluetoothPermissions(): Boolean {
+        return if (Build.VERSION.SDK_INT < 31) true
+        else hasPermissions(bluetoothPermissions.toList())
     }
 
     private fun vibrateAndContinueToNextActivity() {
