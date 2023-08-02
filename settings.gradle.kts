@@ -55,6 +55,7 @@ include(
     ":fingerprint:controller",
     ":fingerprint:infra:scanner",
     ":fingerprint:infra:scannermock",
+    ":fingerprint:infra:basebiosdk",
     ":fingerprint:infra:matcher",
 )
 
