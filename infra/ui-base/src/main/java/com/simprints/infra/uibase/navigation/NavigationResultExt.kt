@@ -60,7 +60,8 @@ fun <T : Parcelable> NavController.handleResult(
     handler: (T) -> Unit
 ) {
     // `getCurrentBackStackEntry` doesn't work in case of recovery from the process death when dialog is opened.
-    findDestination(currentDestinationId) ?: return // Do not handle anything if current destination is not available in the stack
+    findDestination(currentDestinationId)
+        ?: return // Do not handle anything if current destination is not available in the stack
     val currentEntry = getBackStackEntry(currentDestinationId)
 
     val observer = LifecycleEventObserver { _, event ->
@@ -113,8 +114,22 @@ fun <T : Parcelable> NavController.setResult(fragment: Fragment, result: T) {
  * @return true if the stack was popped at least once
  */
 fun <T : Parcelable> NavController.finishWithResult(fragment: Fragment, result: T): Boolean {
-    setResult(fragment, result)
-    return popBackStack()
+    val currentDestinationId = currentDestination?.id
+    val saveHandle = previousBackStackEntry?.savedStateHandle
+
+    // Result listener is set via FragmentContainerView it will be executed as soon as setFragmentResult is called.
+    // Therefore popping the stack first to make sure that navigation always happens before the result callback.
+    val popped = popBackStack()
+
+    if (currentDestinationId != null) {
+        val resultName = resultName(currentDestinationId)
+
+        // Set results into correct navigation stack entry
+        saveHandle?.set(resultName, result)
+        // Send result to fragment result listeners
+        fragment.setFragmentResult(resultName, bundleOf(resultName to result))
+    }
+    return popped
 }
 
 private fun resultName(resultSourceId: Int) = "result-$resultSourceId"
