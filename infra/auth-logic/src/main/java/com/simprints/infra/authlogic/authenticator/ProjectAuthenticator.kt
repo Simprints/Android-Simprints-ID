@@ -1,13 +1,13 @@
 package com.simprints.infra.authlogic.authenticator
 
-import com.simprints.infra.authlogic.integrity.IntegrityTokenRequester
 import com.simprints.infra.authlogic.authenticator.remote.AuthenticationRemoteDataSource
+import com.simprints.infra.authlogic.integrity.IntegrityTokenRequester
+import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authstore.domain.models.AuthRequest
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -35,12 +35,11 @@ internal class ProjectAuthenticator @Inject constructor(
     suspend fun authenticate(
         nonceScope: NonceScope,
         projectSecret: String,
-        deviceId: String
     ) {
         createLocalDbKeyForProject(nonceScope.projectId)
 
-        makeAuthRequest(prepareAuthRequestParameters(nonceScope, projectSecret, deviceId), nonceScope)
-            .signIn(nonceScope.projectId, nonceScope.userId)
+        makeAuthRequest(prepareAuthRequestParameters(nonceScope, projectSecret), nonceScope)
+            .signIn(nonceScope.projectId)
 
         val config = configManager.getProjectConfiguration()
         fetchProjectLongConsentTexts(config.general.languageOptions, config.projectId)
@@ -49,23 +48,19 @@ internal class ProjectAuthenticator @Inject constructor(
     private suspend fun prepareAuthRequestParameters(
         nonceScope: NonceScope,
         projectSecret: String,
-        deviceId: String
-    ): AuthRequest = buildAuthRequestParameters(nonceScope, projectSecret, deviceId)
+    ): AuthRequest = buildAuthRequestParameters(nonceScope, projectSecret)
 
     private suspend fun buildAuthRequestParameters(
         nonceScope: NonceScope,
         projectSecret: String,
-        deviceId: String
     ): AuthRequest {
         val authenticationData = authenticationRemoteDataSource.requestAuthenticationData(
             nonceScope.projectId,
-            nonceScope.userId,
-            deviceId
+            nonceScope.deviceId,
         )
         return buildAuthRequest(
             getEncryptedProjectSecret(projectSecret, authenticationData),
             integrityTokenRequester.getToken(authenticationData.nonce),
-            deviceId
         )
     }
 
@@ -80,19 +75,18 @@ internal class ProjectAuthenticator @Inject constructor(
     private fun buildAuthRequest(
         encryptedProjectSecret: String,
         integrityToken: String,
-        deviceId: String
-    ): AuthRequest = AuthRequest(encryptedProjectSecret, integrityToken, deviceId)
+    ): AuthRequest = AuthRequest(encryptedProjectSecret, integrityToken)
 
 
     private suspend fun makeAuthRequest(authRequest: AuthRequest, nonceScope: NonceScope): Token =
         authenticationRemoteDataSource.requestAuthToken(
             nonceScope.projectId,
-            nonceScope.userId,
+            nonceScope.deviceId,
             authRequest
         )
 
-    private suspend fun Token.signIn(projectId: String, userId: String) {
-        signerManager.signIn(projectId, userId, this)
+    private suspend fun Token.signIn(projectId: String) {
+        signerManager.signIn(projectId, this)
     }
 
     private fun createLocalDbKeyForProject(projectId: String) {

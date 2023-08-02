@@ -53,7 +53,6 @@ class FirebaseAuthManagerIntegrationTest {
 
         verify(exactly = 1) { firebaseAuth.signInWithCustomToken(TOKEN_VALUE) }
         verify(exactly = 1) { loginInfoStore.projectIdTokenClaim = "project" }
-        verify(exactly = 1) { loginInfoStore.userIdTokenClaim = "user" }
         verify(exactly = 1) { loginInfoStore.coreFirebaseProjectId = GCP_PROJECT_ID }
         verify(exactly = 1) { loginInfoStore.coreFirebaseApplicationId = APPLICATION_ID }
         verify(exactly = 1) { loginInfoStore.coreFirebaseApiKey = API_KEY }

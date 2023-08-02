@@ -41,21 +41,6 @@ class LoginInfoStoreTest {
     }
 
     @Test
-    fun `getting the signed in user id should returns it`() {
-        every { sharedPreferences.getString(any(), any()) } returns "userId"
-
-        assertThat(loginInfoStoreImpl.signedInUserId).isEqualTo("userId")
-    }
-
-    @Test
-    fun `setting the signed in user id should set in the shared preferences`() {
-        loginInfoStoreImpl.signedInUserId = "userId"
-
-        verify(exactly = 1) { editor.putString("USER_ID", "userId") }
-        verify(exactly = 1) { editor.apply() }
-    }
-
-    @Test
     fun `getting the core firebase project id should returns it`() {
         every { sharedPreferences.getString(any(), any()) } returns "firebase"
 
@@ -153,21 +138,6 @@ class LoginInfoStoreTest {
     }
 
     @Test
-    fun `getting the user id claim should returns the string`() {
-        every { sharedPreferences.getString(any(), any()) } returns "user"
-
-        assertThat(loginInfoStoreImpl.userIdTokenClaim).isEqualTo("user")
-    }
-
-    @Test
-    fun `setting the user id claim should set in the shared preferences`() {
-        loginInfoStoreImpl.userIdTokenClaim = "user"
-
-        verify(exactly = 1) { editor.putString("USER_ID_CLAIM", "user") }
-        verify(exactly = 1) { editor.apply() }
-    }
-
-    @Test
     fun `isProjectIdSignedIn should return false if the signed in project id is empty`() {
         every { sharedPreferences.getString(any(), any()) } returns ""
 
@@ -193,22 +163,19 @@ class LoginInfoStoreTest {
         loginInfoStoreImpl.cleanCredentials()
 
         verify(exactly = 1) { editor.putString("PROJECT_ID", "") }
-        verify(exactly = 1) { editor.putString("USER_ID", "") }
         verify(exactly = 1) { editor.putString("ENCRYPTED_PROJECT_SECRET", "") }
         verify(exactly = 1) { editor.putString("PROJECT_ID_CLAIM", "") }
-        verify(exactly = 1) { editor.putString("USER_ID_CLAIM", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_PROJECT_ID", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_APPLICATION_ID", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_API_KEY", "") }
-        verify(exactly = 8) { editor.apply() }
+        verify(exactly = 6) { editor.apply() }
     }
 
     @Test
     fun `storeCredentials should set the credentials`() {
-        loginInfoStoreImpl.storeCredentials("project", "user")
+        loginInfoStoreImpl.storeCredentials("project")
 
         verify(exactly = 1) { editor.putString("PROJECT_ID", "project") }
-        verify(exactly = 1) { editor.putString("USER_ID", "user") }
-        verify(exactly = 2) { editor.apply() }
+        verify(exactly = 1) { editor.apply() }
     }
 }
