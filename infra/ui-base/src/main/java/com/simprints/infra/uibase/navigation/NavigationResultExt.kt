@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
 /**
  * Add lifecycle aware fragment result listener for a provided destination ID for the navigation host controller.
@@ -21,6 +22,7 @@ import androidx.navigation.NavController
  *
  * Handler will be invoked when the result is set in the calling fragment.
  */
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 fun <T : Parcelable> FragmentContainerView.handleResult(
     lifecycleOwner: LifecycleOwner,
     @IdRes targetDestinationId: Int,
@@ -37,6 +39,7 @@ fun <T : Parcelable> FragmentContainerView.handleResult(
  * Add fragment result listener directly to the calling fragment.
  * This function should be used only in fragment tests to verify correct results are being returned.
  */
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 fun <T : Parcelable> Fragment.handleResultDirectly(@IdRes targetDestinationId: Int, handler: (T) -> Unit) {
     val expectedResultKey = resultName(targetDestinationId)
     setFragmentResultListener(expectedResultKey) { key, resultBundle ->
@@ -53,6 +56,7 @@ fun <T : Parcelable> Fragment.handleResultDirectly(@IdRes targetDestinationId: I
  * Handler will be invoked when parent fragment is restored.
  */
 @Suppress("UsePropertyAccessSyntax") // compiler is confused by `lifecycle` getter
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 fun <T : Parcelable> NavController.handleResult(
     lifecycleOwner: LifecycleOwner,
     @IdRes currentDestinationId: Int,
@@ -96,6 +100,7 @@ private fun <T : Parcelable> handleResultFromChild(
  * Sets the provided parcelable as a fragment result to be used both
  * within and outside of the navigation graph.
  */
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 fun <T : Parcelable> NavController.setResult(fragment: Fragment, result: T) {
     val currentDestinationId = currentDestination?.id
     if (currentDestinationId != null) {
@@ -113,6 +118,7 @@ fun <T : Parcelable> NavController.setResult(fragment: Fragment, result: T) {
  *
  * @return true if the stack was popped at least once
  */
+@ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
 fun <T : Parcelable> NavController.finishWithResult(fragment: Fragment, result: T): Boolean {
     val currentDestinationId = currentDestination?.id
     val saveHandle = previousBackStackEntry?.savedStateHandle
