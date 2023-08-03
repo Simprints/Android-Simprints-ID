@@ -1,13 +1,12 @@
 package com.simprints.fingerprint.activities.collect
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ShowExitFormWrapper
@@ -18,7 +17,6 @@ import com.simprints.fingerprint.activities.collect.confirmfingerprints.ConfirmF
 import com.simprints.fingerprint.activities.collect.fingerviewpager.FingerViewPagerManager
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.resources.buttonBackgroundColour
-import com.simprints.fingerprint.activities.collect.resources.buttonTextColour
 import com.simprints.fingerprint.activities.collect.resources.buttonTextId
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.state.CaptureState.Collected
@@ -38,6 +36,7 @@ import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.fingerprint.tools.extensions.showToast
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -96,9 +95,8 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun initToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.show()
-        supportActionBar?.title = when (masterFlowManager.getCurrentAction()) {
+        // TODO setSupportActionBar(binding.toolbar)
+        binding.toolbar.title = when (masterFlowManager.getCurrentAction()) {
             Action.ENROL -> getString(R.string.register_title)
             Action.IDENTIFY -> getString(R.string.identify_title)
             Action.VERIFY -> getString(R.string.verify_title)
@@ -155,7 +153,6 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun CollectFingerprintsState.updateScanButton() {
         with(currentCaptureState()) {
             mainContentBinding.scanButton.text = getString(buttonTextId(isAskingRescan))
-            mainContentBinding.scanButton.setTextColor(resources.getColor(buttonTextColour(), null))
             mainContentBinding.scanButton.setBackgroundColor(
                 resources.getColor(
                     buttonBackgroundColour(),

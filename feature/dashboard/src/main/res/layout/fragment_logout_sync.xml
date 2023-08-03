@@ -10,19 +10,16 @@
         android:id="@+id/logoutSyncAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/logoutSyncToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             android:minHeight="?android:attr/actionBarSize"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="@string/logout" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -42,20 +39,18 @@
 
             <TextView
                 android:id="@+id/logout_sync_info"
-                style="@style/SimprintsStyle.TextView"
+                style="@style/Text.Body2.White"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="@dimen/margin_large"
                 android:paddingVertical="@dimen/margin_default"
                 android:text="@string/logout_sync_info"
-                android:textColor="@color/simprints_white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.simprints.feature.dashboard.views.SyncCardView
                 android:id="@+id/logoutSyncCard"
-                style="@style/DashboardCardStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
@@ -64,9 +59,8 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/logout_sync_info" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/logoutButton"
-                style="@style/SimprintsOrangeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
@@ -80,16 +74,14 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/logoutWithoutSyncButton"
-        style="@style/DialogButtonStyle"
+        style="@style/Widget.Simprints.Button.TextButton.Grey"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:textColor="@color/simprints_grey"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginVertical="@dimen/margin_large"
         android:text="@string/logout_sync_decline_button"
-        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

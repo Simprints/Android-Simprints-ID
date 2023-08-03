@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Strictly defined type scale and specific text styles.
+
+        Naming convention:
+            * For textAppearance styles "TextAppearance.Simprints.<scale>"
+            * For text styles "Text.<scale>.<variant>"
+
+        Use "TextAppearance.*" styles strictly for the "android:textAppearance" property if required.
+            * To avoid confusion do not create style variants that change text size, it should be
+              defined exclusively via textAppearance and be consistent throughout the application.
+
+        For TextView's always set appropriate "Text.*" style variant.
+          * To add new text style variant just create a new descendant of the base style and change
+            the appropriate parameters (e.g. textColor, textStyle).
+
+        Relevant documentation:
+            https://m2.material.io/design/typography/the-type-system.html#type-scale
+            https://m2.material.io/develop/android/theming/typography
+    -->
+
+    <!-- Text appearance defines properties of the typeface - e.g. font, textSize, letterSpacing -->
+
+    <style name="TextAppearance.Simprints.Headline1" parent="TextAppearance.MaterialComponents.Headline1">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">96sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">60sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Headline3" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">48sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">34sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Body2" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Simprints.Overline" parent="TextAppearance.MaterialComponents.Overline">
+        <item name="fontFamily">@font/muli</item>
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!-- Text style defines properties of the text container - e.g. color -->
+
+    <!-- H1 variants -->
+
+    <style name="Text.Headline1" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline1</item>
+    </style>
+
+    <!-- H2 variants -->
+
+    <style name="Text.Headline2" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline2</item>
+    </style>
+
+    <!-- H3 variants -->
+
+    <style name="Text.Headline3" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline3</item>
+    </style>
+
+    <!-- H4 variants -->
+
+    <style name="Text.Headline4" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline4</item>
+    </style>
+
+    <!-- H5 variants -->
+
+    <style name="Text.Headline5" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline5</item>
+    </style>
+
+    <style name="Text.Headline5.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.Headline5.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Text.Headline5.White.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- H6 variants -->
+
+    <style name="Text.Headline6" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Headline6</item>
+    </style>
+
+    <style name="Text.Headline6.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.Headline6.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Text.Headline6.Secondary">
+        <item name="android:textColor">@color/simprints_text_grey</item>
+    </style>
+
+    <!-- Subtitle1 variants -->
+
+    <style name="Text.Subtitle1" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Subtitle1</item>
+    </style>
+
+    <style name="Text.Subtitle1.Bold">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text.Subtitle1.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Text.Subtitle1.Secondary">
+        <item name="android:textColor">@color/simprints_text_grey</item>
+    </style>
+
+    <style name="Text.Subtitle1.Accented">
+        <item name="android:textColor">@color/simprints_text_orange</item>
+    </style>
+    <!-- Subtitle2 variants -->
+
+    <style name="Text.Subtitle2" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Subtitle2</item>
+    </style>
+
+    <style name="Text.Subtitle2.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Text.Subtitle2.Secondary">
+        <item name="android:textColor">@color/simprints_text_grey</item>
+    </style>
+
+    <!-- Body1 variants -->
+
+    <style name="Text.Body1" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Body1</item>
+    </style>
+
+    <style name="Text.Body1.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Text.Body1.Secondary">
+        <item name="android:textColor">@color/simprints_text_grey</item>
+    </style>
+
+    <style name="Text.Body1.Error">
+        <item name="android:textColor">@color/simprints_red_dark</item>
+    </style>
+
+    <!-- Body2 variants -->
+
+    <style name="Text.Body2" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Body2</item>
+    </style>
+
+    <style name="Text.Body2.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Text.Body2.Secondary">
+        <item name="android:textColor">@color/simprints_text_grey</item>
+    </style>
+
+    <style name="Text.Body2.Accented">
+        <item name="android:textColor">@color/simprints_text_orange</item>
+    </style>
+
+    <!-- Caption variants -->
+
+    <style name="Text.Caption" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Caption</item>
+    </style>
+
+    <style name="Text.Caption.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Text.Caption.Secondary">
+        <item name="android:textColor">@color/simprints_text_grey</item>
+    </style>
+
+    <!-- Button variants -->
+
+    <style name="Text.Button" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Button</item>
+    </style>
+
+    <!-- Overline variants -->
+
+    <style name="Text.Overline" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Overline</item>
+    </style>
+
+
+</resources>

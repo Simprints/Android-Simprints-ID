@@ -7,28 +7,28 @@
 
     <TextView
         android:id="@+id/fingerNameTextView"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="@dimen/finger_selection_item_padding"
-        android:fontFamily="@font/muli"
-        app:layout_constraintWidth_percent="@dimen/finger_selection_finger_name_width_proportion"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/fingerQuantityTextView"
-        tools:text="Left Thumb"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="@dimen/finger_selection_finger_name_width_proportion"
+        tools:text="Left Thumb" />
 
     <TextView
         android:id="@+id/fingerQuantityTextView"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="@dimen/finger_selection_item_padding"
-        android:fontFamily="@font/muli"
         android:gravity="center"
-        app:layout_constraintWidth_percent="@dimen/finger_selection_finger_quantity_width_proportion"
-        app:layout_constraintTop_toTopOf="parent"
+        android:padding="@dimen/finger_selection_item_padding"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/fingerNameTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="1"/>
+        app:layout_constraintStart_toEndOf="@id/fingerNameTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="@dimen/finger_selection_finger_quantity_width_proportion"
+        tools:text="1" />
 </androidx.constraintlayout.widget.ConstraintLayout>

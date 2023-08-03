@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dashboard_daily_activity_card"
-    style="@style/DashboardCardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:visibility="gone"
@@ -11,26 +10,26 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dashboard_daily_activity_card_root"
-        style="@style/DashboardCardStyleRoot"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="14dp">
 
         <TextView
             android:id="@+id/dashboard_daily_activity_card_title"
-            style="@style/DashboardCardStyleTitle"
+            style="@style/Text.Subtitle1.Bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_dashboard_card_space_below_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Activity: 31/01/2020" />
 
         <TextView
             android:id="@+id/dashboard_daily_activity_card_enrolments_count"
-            style="@style/SimprintsStyle.TextView"
+            style="@style/Text.Subtitle1.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_large"
-            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="@+id/enrolments_label"
             app:layout_constraintStart_toStartOf="@+id/enrolments_label"
             app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
@@ -38,11 +37,10 @@
 
         <TextView
             android:id="@+id/dashboard_daily_activity_card_identifications_count"
-            style="@style/SimprintsStyle.TextView"
+            style="@style/Text.Subtitle1.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_large"
-            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="@id/identifications_label"
             app:layout_constraintStart_toStartOf="@id/identifications_label"
             app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
@@ -50,11 +48,10 @@
 
         <TextView
             android:id="@+id/dashboard_daily_activity_card_verifications_count"
-            style="@style/SimprintsStyle.TextView"
+            style="@style/Text.Subtitle1.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_large"
-            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="@+id/verifications_label"
             app:layout_constraintStart_toStartOf="@+id/verifications_label"
             app:layout_constraintTop_toBottomOf="@id/dashboard_daily_activity_card_title"
@@ -62,7 +59,7 @@
 
         <TextView
             android:id="@+id/enrolments_label"
-            style="@style/SimprintsStyle.TextView"
+            style="@style/Text.Body2.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -74,7 +71,7 @@
 
         <View
             android:id="@+id/divider_enrolments"
-            android:layout_width="3dp"
+            android:layout_width="1dp"
             android:layout_height="0dp"
             android:background="@drawable/divider_dashboard_daily_activity"
             android:visibility="gone"
@@ -86,7 +83,7 @@
 
         <TextView
             android:id="@+id/identifications_label"
-            style="@style/SimprintsStyle.TextView"
+            style="@style/Text.Body2.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -97,7 +94,7 @@
 
         <View
             android:id="@+id/divider_identifications"
-            android:layout_width="3dp"
+            android:layout_width="1dp"
             android:layout_height="0dp"
             android:background="@drawable/divider_dashboard_daily_activity"
             android:visibility="gone"
@@ -109,7 +106,7 @@
 
         <TextView
             android:id="@+id/verifications_label"
-            style="@style/SimprintsStyle.TextView"
+            style="@style/Text.Body2.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -144,4 +141,4 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

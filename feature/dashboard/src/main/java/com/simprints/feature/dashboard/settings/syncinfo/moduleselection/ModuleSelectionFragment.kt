@@ -1,6 +1,5 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection
 
-import android.app.AlertDialog
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -18,8 +17,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.tools.extentions.hideKeyboard
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncModuleSelectionBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
@@ -30,6 +29,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools.ChipClickListener
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools.ModuleChipHelper
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -40,14 +40,9 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private val adapter by lazy { ModuleAdapter(listener = this) }
     private val chipHelper by lazy {
         // We need to have material theme for the chip
-        ModuleChipHelper(
-            ContextThemeWrapper(
-                requireContext(),
-                IDR.style.AppTheme_NoActionBar_MaterialComponents
-            ), this
-        )
-
+        ModuleChipHelper(ContextThemeWrapper(requireContext(), null), this)
     }
+
     private val viewModel by viewModels<ModuleSelectionViewModel>()
     private val binding by viewBinding(FragmentSyncModuleSelectionBinding::bind)
 
@@ -55,14 +50,12 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private var rvModules: RecyclerView? = null
 
     private val confirmModuleSelectionDialog by lazy {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(IDR.string.confirm_module_selection_title))
             .setMessage(getModulesSelectedTextForDialog())
             .setCancelable(false)
-            .setPositiveButton(getString(IDR.string.confirm_module_selection_yes))
-            { _, _ -> handleModulesConfirmClick() }
-            .setNegativeButton(getString(IDR.string.confirm_module_selection_cancel))
-            { _, _ -> findNavController().popBackStack() }
+            .setPositiveButton(getString(IDR.string.confirm_module_selection_yes)) { _, _ -> handleModulesConfirmClick() }
+            .setNegativeButton(getString(IDR.string.confirm_module_selection_cancel)) { _, _ -> findNavController().popBackStack() }
             .create()
     }
 
@@ -102,7 +95,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     }
 
     override fun onModuleSelected(module: Module) {
-        binding.searchView.setQuery("", false)
+        binding.searchViewInput.setText("")
         hideKeyboard()
         updateSelectionIfPossible(module)
         binding.scrollView.post {
@@ -122,7 +115,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
         val context = requireContext()
         val dividerItemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
             .apply {
-                val colour = ContextCompat.getColor(context, IDR.color.simprints_light_grey)
+                val colour = ContextCompat.getColor(context, IDR.color.simprints_grey_light)
                 setDrawable(ColorDrawable(colour))
             }
         rvModules?.addItemDecoration(dividerItemDecoration)
@@ -203,9 +196,9 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
 
     private fun configureSearchView() {
         configureSearchViewEditText()
-        binding.searchView.queryHint = getString(IDR.string.hint_search_modules)
+
         val queryListener = ModuleSelectionQueryListener(modulesToSelect.getUnselected())
-        binding.searchView.setOnQueryTextListener(queryListener)
+        binding.searchViewInput.addTextChangedListener(queryListener)
         observeSearchResults(queryListener)
     }
 

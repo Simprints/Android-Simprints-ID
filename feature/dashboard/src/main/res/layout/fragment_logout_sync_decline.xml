@@ -9,19 +9,16 @@
         android:id="@+id/logoutSyncDeclineAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/logoutSyncDeclineToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             android:minHeight="?android:attr/actionBarSize"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="@string/logout" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -45,53 +42,35 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.5" />
 
-            <LinearLayout
+            <TextView
                 android:id="@+id/title_container"
+                style="@style/Text.Headline5.White.Bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:drawablePadding="16dp"
+                android:paddingHorizontal="@dimen/margin_large"
+                android:paddingVertical="@dimen/margin_default"
                 android:paddingTop="@dimen/margin_default"
+                android:text="@string/logout_sync_decline_warning_title"
+                app:drawableStartCompat="@drawable/ic_warning"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:layout_width="@dimen/icon_title"
-                    android:layout_height="@dimen/icon_title"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_warning" />
-
-                <TextView
-                    style="@style/SimprintsStyle.TextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="@dimen/margin_large"
-                    android:paddingVertical="@dimen/margin_default"
-                    android:text="@string/logout_sync_decline_warning_title"
-                    android:textAllCaps="true"
-                    android:textColor="@color/simprints_white"
-                    android:textSize="@dimen/text_size_title"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/sync_decline_warning_body"
-                style="@style/SimprintsStyle.TextView"
+                style="@style/Text.Body1.White"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="@dimen/margin_large"
                 android:paddingVertical="@dimen/margin_default"
                 android:text="@string/logout_sync_decline_warning_body"
-                android:textColor="@color/simprints_white"
-                android:textSize="@dimen/text_size_large"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/title_container" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/logoutWithoutSyncCancelButton"
-                style="@style/SimprintsOrangeButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
@@ -102,14 +81,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sync_decline_warning_body" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/logoutWithoutSyncConfirmButton"
-                style="@style/SimprintsOrangeButton"
+                style="@style/Widget.Simprints.Button.Red"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
                 android:layout_marginVertical="@dimen/margin_large"
-                android:background="@drawable/button_rounded_corners_red"
                 android:text="@string/logout"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

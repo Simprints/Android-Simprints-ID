@@ -1,11 +1,11 @@
 package com.simprints.fingerprint.activities.connect.main
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.fingerprint.activities.base.FingerprintFragment

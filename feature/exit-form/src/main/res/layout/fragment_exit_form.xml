@@ -18,12 +18,11 @@
 
         <TextView
             android:id="@+id/exitFormTitle"
+            style="@style/Text.Headline5.White.Bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/why_did_you_skip_biometrics"
             android:textAlignment="center"
-            android:textColor="@color/simprints_white"
-            android:textSize="25sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -37,78 +36,71 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/exitFormTitle">
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioReligiousConcerns"
+                style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_religious_concerns"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
+                android:text="@string/refusal_religious_concerns" />
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioDataConcerns"
+                style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_data_concerns"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
+                android:text="@string/refusal_data_concerns" />
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioNoPermission"
+                style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_does_not_have_permission"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
+                android:text="@string/refusal_does_not_have_permission" />
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioAppNotWorking"
+                style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_app_not_working"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
+                android:text="@string/refusal_app_not_working" />
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioScannerNotWorking"
+                style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/refusal_scanner_not_working"
-                android:visibility="gone"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
+                android:visibility="gone" />
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFromRadioPersonNotPresent"
+                style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_person_not_present"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
+                android:text="@string/refusal_person_not_present" />
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioTooYoung"
+                style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_too_young"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
+                android:text="@string/refusal_too_young" />
 
-            <RadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioOther"
+                style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_other"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
+                android:text="@string/refusal_other" />
         </RadioGroup>
 
-        <EditText
+        <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/exitFormInputField"
+            app:shapeAppearance="@style/Shape.Simprints.MediumComponent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/simprints_white"
+            android:background="@drawable/text_box_background"
             android:enabled="false"
             android:gravity="top|start"
             android:hint="@string/hint_other_reason"
@@ -117,7 +109,8 @@
             android:maxLength="100"
             android:maxLines="4"
             android:minHeight="100dp"
-            android:padding="4dp"
+            android:padding="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/exitFormRadioGroup" />
@@ -135,24 +128,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/exitFormInputField">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/exitFormGoBack"
+                style="@style/Widget.Simprints.Button.White"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:minHeight="70dp"
-                android:text="@string/exit_form_return_to_simprints"
-                tools:ignore="ButtonStyle" />
+                android:text="@string/exit_form_return_to_simprints" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/exitFormSubmit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:enabled="false"
-                android:minHeight="70dp"
                 android:text="@string/button_submit"
-                tools:ignore="ButtonStyle" />
+                tools:enabled="true" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
