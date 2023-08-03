@@ -4,34 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/simprints_white"
-    android:theme="@style/AppTheme">
+    android:background="@color/simprints_white">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/privacyAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/privacyToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
             android:minHeight="?android:attr/actionBarSize"
             app:navigationContentDescription="back"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="@string/privacy_notice_title" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
         android:id="@+id/privacyText"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="8dp"
-        android:background="@color/simprints_white"
         android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
         android:scrollbars="vertical"
@@ -44,19 +40,12 @@
         tools:text="@tools:sample/lorem/random"
         tools:visibility="visible" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/privacyDownloadButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
-        android:background="@drawable/button_rounded_corners_orange"
-        android:fontFamily="@font/muli"
-        android:paddingHorizontal="16sp"
-        android:paddingVertical="8sp"
         android:text="@string/long_consent_download_button_text"
-        android:textColor="@color/simprints_white"
-        android:textStyle="bold"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/privacyProgress"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,14 +53,13 @@
         app:layout_constraintTop_toBottomOf="@+id/privacyHeader"
         tools:visibility="visible" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/privacyErrorCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="12dp"
         android:layout_marginVertical="8dp"
         android:visibility="gone"
-        app:cardCornerRadius="12dp"
         app:layout_constraintBottom_toTopOf="@+id/privacyDownloadButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -81,18 +69,17 @@
 
         <TextView
             android:id="@+id/privacyErrorText"
-            style="@style/SimprintsStyle.TextView"
+            style="@style/Text.Body1.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/simprints_blue"
-            android:padding="8dp"
-            android:textColor="@color/simprints_white"
-            android:textSize="16sp"
+            android:padding="16dp"
             tools:text="@tools:sample/lorem" />
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/privacyHeader"
+        style="@style/Text.Body1.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -106,14 +93,12 @@
         app:layout_constraintVertical_chainStyle="spread"
         tools:visibility="visible" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/privacyProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:max="100"
-        android:minWidth="200dp"
-        android:minHeight="24dp"
+        android:indeterminate="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/privacyMidLine"
         app:layout_constraintEnd_toEndOf="parent"

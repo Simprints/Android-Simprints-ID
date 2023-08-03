@@ -7,17 +7,11 @@
     android:background="@color/simprints_blue"
     tools:context=".activities.connect.issues.otarecovery.OtaRecoveryFragment">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/tryAgainButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="0dp"
-        android:layout_height="54dp"
-        android:background="@drawable/button_rounded_corners_orange"
-        android:fontFamily="@font/muli"
-        android:padding="8sp"
+        android:layout_height="wrap_content"
         android:text="@string/try_again_label"
-        android:textColor="@color/simprints_white"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/otaRecoveryEndGuideline"
         app:layout_constraintStart_toStartOf="@+id/otaRecoveryStartGuideline"
@@ -26,17 +20,18 @@
 
     <TextView
         android:id="@+id/otaRecoveryInstructionsTextView"
+        style="@style/Text.Headline6.White"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:textColor="@color/simprints_white"
-        android:textSize="22sp"
+        android:paddingHorizontal="24dp"
         app:layout_constraintBottom_toTopOf="@id/tryAgainButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/otaRecoveryImageGuideline"
-        app:layout_constraintVertical_weight="0.25" />
+        app:layout_constraintVertical_weight="0.25"
+        tools:text="@string/ota_recovery_hard_reset" />
 
     <ImageView
         android:id="@+id/otaRecoveryImageView"
@@ -52,12 +47,11 @@
         app:layout_constraintVertical_weight="0.65"
         tools:ignore="ContentDescription" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/otaRecoveryProgressBar"
-        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:progressTint="@color/simprints_white"
+        android:indeterminate="true"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/tryAgainButton"
         app:layout_constraintEnd_toEndOf="@id/tryAgainButton"
@@ -66,14 +60,12 @@
 
     <TextView
         android:id="@+id/otaRecoveryTitleTextView"
+        style="@style/Text.Headline5.White.Bold"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:text="@string/ota_recovery_title"
-        android:textColor="@color/simprints_white"
-        android:textSize="26sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/otaRecoveryImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -4,32 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/AppTheme"
     tools:context=".settings.syncinfo.SyncInfoFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/syncInfoToolbar"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
-            android:background="@color/colorPrimary"
             app:menu="@menu/sync_info_menu"
             app:navigationContentDescription="back"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="@string/title_activity_sync_information" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordsToDownloadCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -49,17 +45,17 @@
 
             <TextView
                 android:id="@+id/recordsToDownloadText"
+                style="@style/Text.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:padding="5dp"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:text="@string/sync_info_records_to_download"/>
+                android:text="@string/sync_info_records_to_download" />
 
             <TextView
                 android:id="@+id/recordsToDownloadCount"
+                style="@style/Text.Body1.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -76,14 +72,13 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/colorPrimary"
                 android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordsToDeleteCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -102,17 +97,17 @@
 
             <TextView
                 android:id="@+id/recordsToDeleteText"
+                style="@style/Text.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:padding="5dp"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:text="@string/sync_info_records_to_delete"/>
+                android:text="@string/sync_info_records_to_delete" />
 
             <TextView
                 android:id="@+id/recordsToDeleteCount"
+                style="@style/Text.Body1.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -129,34 +124,27 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/colorPrimary"
                 android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/syncButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/button_rounded_corners"
-        android:fontFamily="@font/muli"
-        android:textColor="@color/simprints_white"
-        android:textSize="16sp"
-        android:text="Sync now"
+        android:text="@string/sync_info_sync_now"
         app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
         app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
         app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView"
-        tools:ignore="SpeakableTextPresentCheck" />
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDeleteCardView" />
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordsInLocalCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -175,23 +163,22 @@
 
             <TextView
                 android:id="@+id/totalRecordsOnDeviceText"
+                style="@style/Text.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:padding="5dp"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
                 android:text="@string/sync_info_total_records_on_device" />
 
             <TextView
                 android:id="@+id/totalRecordsCount"
+                style="@style/Text.Body1.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="0.2"
                 android:gravity="center"
-                android:textSize="16sp"
                 tools:text="137" />
 
             <ProgressBar
@@ -202,14 +189,13 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/colorPrimary"
                 android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/recordsToUploadCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -230,22 +216,21 @@
 
             <TextView
                 android:id="@+id/recordsToUploadText"
+                style="@style/Text.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:gravity="center"
                 android:padding="5dp"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
                 android:text="@string/sync_info_records_to_upload" />
 
             <TextView
                 android:id="@+id/recordsToUploadCount"
+                style="@style/Text.Body1.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="16sp"
                 tools:text="0" />
 
             <ProgressBar
@@ -256,19 +241,18 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/colorPrimary"
                 android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/imagesToUploadCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toTopOf="@+id/recordsToDownloadCardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -283,22 +267,21 @@
 
             <TextView
                 android:id="@+id/imagesToUploadText"
+                style="@style/Text.Body1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="@string/sync_info_images_to_upload"
-                android:textColor="@android:color/black"
-                android:textSize="16sp" />
+                android:text="@string/sync_info_images_to_upload" />
 
             <TextView
                 android:id="@+id/imagesToUploadCount"
+                style="@style/Text.Body1.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="16sp"
                 tools:text="0" />
 
             <ProgressBar
@@ -309,73 +292,66 @@
                 android:layout_weight="0.2"
                 android:gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/colorPrimary"
                 android:indeterminateTintMode="src_atop" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
         android:id="@+id/modulesTabHost"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="15dp"
+        android:background="@color/cardview_light_background"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/moduleSelectionButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/syncButton"
-        android:background="@color/cardview_light_background"
         tools:ignore="SpeakableTextPresentCheck">
 
         <TextView
+            style="@style/Text.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/sync_info_selected_modules"
-            android:textAlignment="center"
             android:padding="5dp"
-            android:textSize="16sp"/>
+            android:text="@string/sync_info_selected_modules"
+            android:textAlignment="center" />
 
         <View
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/colorAccent" />
+            android:background="@color/simprints_orange" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/selectedModulesView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fadeScrollbars="false"
+            android:orientation="vertical"
             android:padding="10dp"
             android:scrollbars="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:orientation="vertical"
             tools:itemCount="100"
             tools:listitem="@layout/item_module_count" />
 
     </LinearLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/moduleSelectionButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
-        android:background="@drawable/button_rounded_corners_orange"
-        android:fontFamily="@font/muli"
-        android:textColor="@color/simprints_white"
-        android:textSize="16sp"
         android:text="@string/select_modules_button_title"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
         app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
-        app:layout_constraintTop_toBottomOf="@+id/modulesTabHost"
-        tools:ignore="SpeakableTextPresentCheck" />
+        app:layout_constraintTop_toBottomOf="@+id/modulesTabHost"/>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/recordsCardsBarrier"

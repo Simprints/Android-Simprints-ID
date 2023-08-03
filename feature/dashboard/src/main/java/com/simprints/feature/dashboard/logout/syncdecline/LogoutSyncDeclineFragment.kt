@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
@@ -25,7 +26,7 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
     }
 
     private val confirmationDialogForLogout: AlertDialog by lazy {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(com.simprints.infra.resources.R.string.confirmation_logout_title))
             .setMessage(getString(com.simprints.infra.resources.R.string.confirmation_logout_message))
             .setPositiveButton(getString(com.simprints.infra.resources.R.string.logout)) { _, _ -> processLogoutConfirmation() }

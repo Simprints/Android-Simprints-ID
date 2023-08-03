@@ -9,6 +9,7 @@
 
     <TextView
         android:id="@+id/face_match_please_wait"
+        style="@style/Text.Subtitle2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -19,16 +20,15 @@
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Loading candidates…" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/face_match_progress"
-        style="@android:style/Widget.ProgressBar.Horizontal"
+        style="@style/Widget.Simprints.LinearProgressIndicator.Blue.Large"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:indeterminate="false"
         android:max="100"
         android:progress="0"
-        android:progressDrawable="@drawable/face_matching_progress_bar"
         app:layout_constraintBottom_toTopOf="@+id/face_match_tv_matchingProgressStatus1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +37,7 @@
 
     <TextView
         android:id="@+id/face_match_tv_matchingProgressStatus1"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -48,6 +49,7 @@
 
     <TextView
         android:id="@+id/face_match_tv_matchingProgressStatus2"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -59,6 +61,7 @@
 
     <TextView
         android:id="@+id/face_match_tv_matchingResultStatus1"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -71,6 +74,7 @@
 
     <TextView
         android:id="@+id/face_match_tv_matchingResultStatus2"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -83,6 +87,7 @@
 
     <TextView
         android:id="@+id/face_match_tv_matchingResultStatus3"
+        style="@style/Text.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
