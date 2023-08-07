@@ -35,7 +35,7 @@ play_location_services_version = "21.0.1"
 play_integrity_version = "1.1.0"
 gsm_plugin_version = "4.3.15"
 play_publisher_version = "3.8.4"
-play_barcode_version = "18.2.0"
+play_barcode_version = "18.3.0"
 
 firebase_auth_version = "22.1.1"
 firebase_storage_version = "20.2.1"
