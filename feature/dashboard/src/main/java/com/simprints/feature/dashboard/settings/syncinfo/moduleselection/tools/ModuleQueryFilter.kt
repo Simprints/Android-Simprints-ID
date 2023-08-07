@@ -12,8 +12,6 @@ internal class ModuleQueryFilter {
             items
     }
 
-    private fun isRelevantQuery(query: String?): Boolean {
-        return query != null && query.isNotEmpty() && query.isNotBlank()
-    }
+    private fun isRelevantQuery(query: String?): Boolean = !query.isNullOrBlank()
 
 }

@@ -3,38 +3,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:theme="@style/AppTheme">
+    android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/dashboardToolbar"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
-            android:background="@color/colorPrimary"
             app:navigationContentDescription="back"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="@string/preference_select_modules_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
         android:id="@+id/txtSelectedModules"
-        style="@style/SimprintsStyle.TextView.Orange"
+        style="@style/Text.Subtitle1.Accented"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_large"
         android:text="@string/selected_modules"
-        android:textAllCaps="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -60,7 +56,7 @@
 
     <TextView
         android:id="@+id/txtNoModulesSelected"
-        style="@style/SimprintsStyle.TextView"
+        style="@style/Text.Body1.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/no_modules_selected"
@@ -81,32 +77,40 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="@dimen/margin_default"
-        android:background="@color/simprints_light_grey"
+        android:background="@color/simprints_grey_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline" />
 
-    <androidx.appcompat.widget.SearchView
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_large"
         android:layout_marginEnd="@dimen/margin_large"
-        android:background="@drawable/shape_search_view_outline"
-        app:closeIcon="@drawable/ic_cancel_search_bar"
-        app:iconifiedByDefault="false"
+        app:endIconMode="clear_text"
         app:layout_constraintBottom_toTopOf="@+id/bottomDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topDivider" />
+        app:layout_constraintTop_toBottomOf="@id/topDivider"
+        app:startIconDrawable="@drawable/ic_search"
+        app:startIconTint="@color/simprints_text_grey_light">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchViewInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_search_modules"
+            tools:text="Module A" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <View
         android:id="@+id/bottomDivider"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginTop="@dimen/margin_large"
-        android:background="@color/simprints_light_grey"
+        android:background="@color/simprints_grey_light"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchView" />
@@ -127,38 +131,38 @@
 
     <TextView
         android:id="@+id/txtNoResults"
-        style="@style/SimprintsStyle.TextView"
+        style="@style/Text.Body1.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_huge"
         android:text="@string/no_results"
-        android:textSize="@dimen/text_size_large"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/searchView" />
+        app:layout_constraintTop_toBottomOf="@id/searchView"
+        tools:visibility="visible" />
 
     <FrameLayout
         android:id="@+id/modulesLockOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="true"
-        android:focusable="false"
         android:alpha="0.7"
         android:background="@color/simprints_grey"
+        android:clickable="true"
+        android:focusable="false"
         android:visibility="gone"
-        tools:visibility="visible"
-        tools:ignore="KeyboardInaccessibleWidget">
+        tools:ignore="KeyboardInaccessibleWidget"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/modulesLockOverlayClickableArea"
+            style="@style/Text.Headline5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:drawablePadding="16dp"
             android:padding="24dp"
             android:text="@string/password_lock_overlay_title"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             app:drawableTopCompat="@drawable/ic_overlay_lock" />
     </FrameLayout>
 

@@ -224,8 +224,7 @@ class ModuleSelectionFragmentTest {
     fun `should filter the modules according to the search`() {
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
-
-        onView(withId(R.id.searchView)).perform(typeSearchViewText("2"))
+        onView(withId(R.id.searchViewInput)).perform(typeSearchViewText("2"))
         onView(withId(R.id.rvModules))
             .check(matches(not(hasDescendant(withText("module12")))))
             .check(matches(hasDescendant(withText("module2"))))
@@ -238,7 +237,7 @@ class ModuleSelectionFragmentTest {
     fun `should display the no result test when the search doesn't have results`() {
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
-        onView(withId(R.id.searchView)).perform(typeSearchViewText("no-results"))
+        onView(withId(R.id.searchViewInput)).perform(typeSearchViewText("no-results"))
         onView(withId(R.id.rvModules))
             .check(matches(not(hasDescendant(withText("module12")))))
             .check(matches(not(hasDescendant(withText("module2")))))
