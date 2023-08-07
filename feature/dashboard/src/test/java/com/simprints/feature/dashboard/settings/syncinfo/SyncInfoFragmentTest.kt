@@ -9,13 +9,14 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.feature.dashboard.R
-import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
 import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.resetThemeResources
 import com.simprints.testtools.hilt.testNavController
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -25,6 +26,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.hamcrest.core.IsNot.not
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,6 +43,11 @@ class SyncInfoFragmentTest {
     @BindValue
     @JvmField
     internal val viewModel = mockk<SyncInfoViewModel>(relaxed = true)
+
+    @After
+    fun tearDown() {
+        resetThemeResources()
+    }
 
     @Test
     fun `should display the number of total record count if records in local is not null`() {

@@ -8,15 +8,13 @@
 
     <TextView
         android:id="@+id/alertTitle"
+        style="@style/Text.Headline5.White.Bold"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="24dp"
         android:gravity="center"
         android:maxLines="2"
-        android:textColor="@color/simprints_white"
-        android:textSize="24sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/alertImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,14 +40,13 @@
 
     <TextView
         android:id="@+id/alertMessage"
+        style="@style/Text.Subtitle1.White"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:drawablePadding="16dp"
         android:gravity="center"
         android:maxLines="5"
-        android:textColor="@color/simprints_white"
-        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/alertImage"
@@ -60,21 +57,15 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="@color/simprints_light_grey"
+        android:background="@color/simprints_grey_light"
         app:layout_constraintBottom_toTopOf="@id/alertLeftButton" />
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/alertLeftButton"
+        style="@style/Widget.Simprints.Button.TextButton.White"
         android:layout_width="0dp"
         android:layout_height="96dp"
         android:layout_marginTop="2dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?selectableItemBackground"
-        android:gravity="center"
-        android:maxLines="1"
-        android:textColor="@color/simprints_white"
-        android:textSize="24sp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/alertRightButton"
@@ -82,18 +73,12 @@
         tools:text="Close"
         tools:visibility="visible" />
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/alertRightButton"
+        style="@style/Widget.Simprints.Button.TextButton.White"
         android:layout_width="0dp"
         android:layout_height="96dp"
         android:layout_marginTop="2dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?selectableItemBackground"
-        android:gravity="center"
-        android:maxLines="1"
-        android:textColor="@color/simprints_white"
-        android:textSize="24sp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

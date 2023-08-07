@@ -1,14 +1,13 @@
 package com.simprints.feature.dashboard.settings.password
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import androidx.annotation.StringRes
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.feature.dashboard.databinding.FragmentSettingsPasswordInputBinding
-import com.google.android.material.R as MR
 import com.simprints.infra.resources.R as IDR
 
 class SettingsPasswordDialogFragment(
@@ -17,8 +16,7 @@ class SettingsPasswordDialogFragment(
     val onSuccess: () -> Unit,
 ) : DialogFragment() {
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = AlertDialog
-        .Builder(requireContext(), MR.style.ThemeOverlay_AppCompat_Dialog)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = MaterialAlertDialogBuilder(requireContext())
         .setTitle(title)
         .setView(inflateInputView())
         .setNegativeButton(IDR.string.password_lock_cancel) { _, _ -> dismiss() }
