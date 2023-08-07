@@ -4,19 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/simprints_blue"
-    android:padding="16dp">
+    android:background="@color/simprints_blue">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
+        android:padding="@dimen/padding_default"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="360dp"
+        app:layout_constraintWidth_max="392dp"
         app:layout_constraintWidth_percent="0.95">
 
         <ImageView
@@ -41,7 +41,8 @@
                 android:inputType="text"
                 android:minWidth="150dp"
                 tools:text="UserName" />
-            <requestFocus/>
+
+            <requestFocus />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -108,16 +109,35 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/loginProgress"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:background="@drawable/progress_dialog_bg"
-        android:indeterminate="true"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+        tools:visibility="visible">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.2"
+            android:background="@color/simprints_blue"
+            android:clickable="true"
+            android:focusable="true"
+            tools:visibility="gone" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/progress_dialog_bg"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
