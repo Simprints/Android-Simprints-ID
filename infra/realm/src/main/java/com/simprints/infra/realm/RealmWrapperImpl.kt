@@ -4,68 +4,90 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.simprints.infra.logging.LoggingConstants.CrashReportTag.*
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.REALM_DB
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.config.RealmConfig
 import com.simprints.infra.realm.exceptions.RealmUninitialisedException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.exceptions.RealmFileException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import io.realm.kotlin.exceptions.RealmException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class RealmWrapperImpl @Inject constructor(
     @ApplicationContext private val appContext: Context,
+    private val configFactory: RealmConfig,
     private val securityManager: SecurityManager,
-    private val authStore: AuthStore
+    private val authStore: AuthStore,
 ) : RealmWrapper {
 
     private lateinit var config: RealmConfiguration
 
     private fun initRealm() {
         if (!this::config.isInitialized) {
-            Realm.init(appContext)
             config = createAndSaveRealmConfig()
         }
     }
 
-    /**
-     * Use realm instance in from IO threads
-     * throws RealmUninitialisedException
-     */
-    override suspend fun <R> useRealmInstance(block: (Realm) -> R): R =
-        withContext(Dispatchers.IO) {
-            initRealm()
-            Simber.tag(REALM_DB.name).d("[RealmWrapperImpl] getting new realm instance")
+    private fun getRealm(): Realm {
+        initRealm()
+        Simber.tag(REALM_DB.name).d("[RealmWrapperImpl] getting new realm instance")
+        return try {
             try {
-                Realm.getInstance(config).use(block)
-            } catch (ex: RealmFileException) {
-                //DB corruption detected; either DB file or key is corrupt
-                //1. Delete DB file in order to create a new one at next init
-                Realm.deleteRealm(config)
-                //2. Recreate the DB key
-                recreateLocalDbKey()
-                //3. Log exception after recreating the key so we get extra info
-                Simber.tag(DB_CORRUPTION.name).e(ex)
-                //4. Update Realm config with the new key
-                config = createAndSaveRealmConfig()
-                //5. Delete "last sync" info and start new sync
-                resetDownSyncState()
-                //6. Retry operation with new file and key
-                Realm.getInstance(config).use(block)
+                Realm.open(config)
+            } catch (ex: IllegalStateException) {
+                // On the schema update realm it is not being closed correctly and there
+                // is no legitimate way to forcefully restart the realm instance,
+                // so we need to catch this exception and try opening realm again.
+                // If the exception repeats, it should be propagated up the call stack.
+                Realm.open(config)
             }
+        } catch (ex: RealmException) {
+            //DB corruption detected; either DB file or key is corrupt
+            //1. Delete DB file in order to create a new one at next init
+            Realm.deleteRealm(config)
+            //2. Recreate the DB key
+            recreateLocalDbKey()
+            //3. Log exception after recreating the key so we get extra info
+            Simber.tag(DB_CORRUPTION.name).e(ex)
+            //4. Update Realm config with the new key
+            config = createAndSaveRealmConfig()
+            //5. Delete "last sync" info and start new sync
+            resetDownSyncState()
+            //6. Retry operation with new file and key
+            Realm.open(config)
         }
+    }
+
+    /**
+     * Executes provided block ensuring a valid Realm instance is used and closed.
+     */
+    override suspend fun <R> readRealm(block: (Realm) -> R): R {
+        val realm = getRealm()
+        val result = block(realm)
+        realm.close()
+        return result
+    }
+
+    /**
+     * Executes provided block in a transaction ensuring a valid Realm instance is used and closed.
+     */
+    override suspend fun <R> writeRealm(block: (MutableRealm) -> R) {
+        val realm = getRealm()
+        realm.write(block)
+        realm.close()
+    }
 
     private fun createAndSaveRealmConfig(): RealmConfiguration {
         val localDbKey = getLocalDbKey()
-        return RealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
+        return configFactory.get(localDbKey.projectId, localDbKey.value)
     }
 
     private fun getLocalDbKey(): LocalDbKey =
