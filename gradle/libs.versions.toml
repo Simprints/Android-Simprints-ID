@@ -82,7 +82,7 @@ jacoco_version = "0.8.11"
 sonar_plugin_version = "4.2.1.3168"
 deps_analysis_version = "1.20.0"
 retry_version = "1.5.6"
-realm_version = "10.17.0"
+realm_version = "1.12.0"
 protobuf_plugin_version = "0.9.4"
 deps_graph_version = "0.8.0"
 tink_version = "1.11.0"
@@ -152,6 +152,9 @@ firebase-perf = { module = "com.google.firebase:firebase-perf", version.ref = "f
 
 #SqlCipher
 sqlCipher-core = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlCipher_version" }
+
+#Realm
+realm_base = { module = "io.realm.kotlin:library-base", version.ref = "realm_version" }
 
 #Retrofit
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
@@ -249,7 +252,6 @@ plugin-gradle-kotlin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-p
 plugin-gms = { group = "com.google.gms", name = "google-services", version.ref = "gsm_plugin_version" }
 plugin-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-gradle", version.ref = "firebase_crashlyticsPlugin_version" }
 plugin-firebase-perf = { group = "com.google.firebase", name = "perf-plugin", version.ref = "firebase_perfPlugin_version" }
-plugin-realm = { group = "io.realm", name = "realm-gradle-plugin", version.ref = "realm_version" }
 plugin-hilt = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt_version" }
 plugin-protobuf = { group = "com.google.protobuf", name = "protobuf-gradle-plugin", version.ref = "protobuf_plugin_version" }
 plugin-navigation = { group = "androidx.navigation", name = "navigation-safe-args-gradle-plugin", version.ref = "androidx_navigation_version" }
@@ -268,7 +270,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin_ve
 gms = { id = "com.google.gms.google-services", version.ref = "gsm_plugin_version" }
 firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebase_perfPlugin_version" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase_crashlyticsPlugin_version" }
-realm = { id = "realm-android", version.ref = "realm_version" }
+realm = { id = "io.realm.kotlin", version.ref = "realm_version" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf_plugin_version" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt_version" }
 navigation-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx_navigation_version" }
