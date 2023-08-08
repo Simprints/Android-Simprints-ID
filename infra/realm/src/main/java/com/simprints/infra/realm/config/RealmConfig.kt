@@ -1,42 +1,42 @@
 package com.simprints.infra.realm.config
 
 import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.realm.BuildConfig
 import com.simprints.infra.realm.migration.RealmMigrations
 import com.simprints.infra.realm.models.DbFaceSample
 import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.DbProject
 import com.simprints.infra.realm.models.DbSubject
-import io.realm.RealmConfiguration
-import io.realm.annotations.RealmModule
+import io.realm.kotlin.RealmConfiguration
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Keep
-object RealmConfig {
+@Singleton
+@ExcludedFromGeneratedTestCoverageReports("Realm SDK configuration doesn't need to be covered")
+class RealmConfig @Inject constructor() {
 
-    @Keep
-    @RealmModule(
-        classes = [
-            DbFingerprintSample::class,
-            DbFaceSample::class,
-            DbSubject::class,
-            DbProject::class
-        ]
-    )
-    class Module
+    fun get(
+        databaseName: String,
+        key: ByteArray,
+    ) = RealmConfiguration
+        .Builder(
+            setOf(
+                DbFingerprintSample::class,
+                DbFaceSample::class,
+                DbSubject::class,
+                DbProject::class,
+            )
+        )
+        .name("$databaseName.realm")
+        .schemaVersion(REALM_SCHEMA_VERSION)
+        .migration(RealmMigrations())
+        .let { if (BuildConfig.DB_ENCRYPTION) it.encryptionKey(key) else it }
+        .build()
 
-    private const val REALM_SCHEMA_VERSION: Long = 14
+    companion object {
 
-    fun get(databaseName: String, key: ByteArray, projectId: String): RealmConfiguration {
-        val builder = RealmConfiguration
-            .Builder()
-            .name("$databaseName.realm")
-            .schemaVersion(REALM_SCHEMA_VERSION)
-            .migration(RealmMigrations(projectId))
-            .modules(Module())
-
-        if (BuildConfig.DB_ENCRYPTION)
-            builder.encryptionKey(key)
-
-        return builder.build()
+        private const val REALM_SCHEMA_VERSION: Long = 15
     }
 }

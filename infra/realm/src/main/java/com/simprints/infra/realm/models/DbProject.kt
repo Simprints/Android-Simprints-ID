@@ -1,26 +1,19 @@
 package com.simprints.infra.realm.models
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.Required
+import androidx.annotation.Keep
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 
-open class DbProject : RealmObject() {
+@Keep
+@ExcludedFromGeneratedTestCoverageReports("Data model definition for Realm table")
+class DbProject : RealmObject {
+
     @PrimaryKey
-    @Required
     var id: String = ""
-
-    @Required
     var name: String = ""
-
-    @Required
     var description: String = ""
-
-    @Required
     var creator: String = ""
-
-    @Required
     var imageBucket: String = ""
-
-    @Required
     var updatedAt: String = ""
 }
