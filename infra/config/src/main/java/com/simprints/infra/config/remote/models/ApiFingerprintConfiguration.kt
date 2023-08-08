@@ -7,22 +7,22 @@ import com.simprints.infra.config.domain.models.Finger as DomainFingerprint
 @Keep
 internal data class ApiFingerprintConfiguration(
     val fingersToCapture: List<Finger>,
-    val qualityThreshold: Int,
     val decisionPolicy: ApiDecisionPolicy,
     val allowedVeroGenerations: List<VeroGeneration>,
     val comparisonStrategyForVerification: FingerComparisonStrategy,
     val displayHandIcons: Boolean,
+    val vero1: ApiVero1Configuration?,
     val vero2: ApiVero2Configuration?
 ) {
 
     fun toDomain(): FingerprintConfiguration =
         FingerprintConfiguration(
             fingersToCapture.map { it.toDomain() },
-            qualityThreshold,
             decisionPolicy.toDomain(),
             allowedVeroGenerations.map { it.toDomain() },
             comparisonStrategyForVerification.toDomain(),
             displayHandIcons,
+            vero1?.toDomain(),
             vero2?.toDomain()
         )
 

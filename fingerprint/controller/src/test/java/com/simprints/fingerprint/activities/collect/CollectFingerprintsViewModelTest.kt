@@ -2,31 +2,52 @@ package com.simprints.fingerprint.activities.collect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
-import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.*
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.DIFFERENT_GOOD_SCAN
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.GOOD_SCAN
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.NEVER_RETURNS
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.NO_FINGER_DETECTED
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.UNKNOWN_ERROR
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
-import com.simprints.fingerprint.activities.collect.state.*
+import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
+import com.simprints.fingerprint.activities.collect.state.FingerState
+import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
+import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprint.testtools.*
+import com.simprints.fingerprint.testtools.FingerprintGenerator
+import com.simprints.fingerprint.testtools.assertEventReceived
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
+import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
+import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Vero1Configuration
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -52,6 +73,7 @@ class CollectFingerprintsViewModelTest {
     }
     private val sessionEventsManager: FingerprintSessionEventsManager = mockk(relaxed = true)
     private val vero2Configuration = mockk<Vero2Configuration> {
+        every { qualityThreshold } returns 60
         every { displayLiveFeedback } returns false
         every { captureStrategy } returns Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI
         every { imageSavingStrategy } returns Vero2Configuration.ImageSavingStrategy.NEVER
@@ -59,7 +81,7 @@ class CollectFingerprintsViewModelTest {
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns mockk {
-                every { qualityThreshold } returns 60
+                every { vero1 } returns Vero1Configuration(60)
                 every { vero2 } returns vero2Configuration
             }
         }
@@ -67,6 +89,9 @@ class CollectFingerprintsViewModelTest {
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>(relaxUnitFun = true).apply {
         every { isLiveFeedbackAvailable() } returns false
         every { isImageTransferSupported() } returns true
+        every { versionInformation() } returns mockk {
+            every { generation } returns ScannerGeneration.VERO_1
+        }
     }
     private lateinit var scannerManager: ScannerManager
 

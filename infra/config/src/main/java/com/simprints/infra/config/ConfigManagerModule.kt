@@ -9,6 +9,7 @@ import com.simprints.infra.config.domain.ConfigServiceImpl
 import com.simprints.infra.config.local.ConfigLocalDataSource
 import com.simprints.infra.config.local.ConfigLocalDataSourceImpl
 import com.simprints.infra.config.local.migrations.DeviceConfigSharedPrefsMigration
+import com.simprints.infra.config.local.migrations.ProjectConfigQualityThresholdMigration
 import com.simprints.infra.config.local.migrations.ProjectConfigSharedPrefsMigration
 import com.simprints.infra.config.local.migrations.ProjectRealmMigration
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
@@ -75,12 +76,16 @@ object DataStoreModule {
     @Provides
     internal fun provideProjectConfigurationProtoDataStore(
         @ApplicationContext appContext: Context,
-        projectConfigSharedPrefsMigration: ProjectConfigSharedPrefsMigration
+        projectConfigSharedPrefsMigration: ProjectConfigSharedPrefsMigration,
+        projectConfigQualityThresholdMigration: ProjectConfigQualityThresholdMigration
     ): DataStore<ProtoProjectConfiguration> {
         return DataStoreFactory.create(
             serializer = ProjectConfigurationSerializer,
             produceFile = { appContext.dataStoreFile(PROJECT_CONFIG_DATA_STORE_FILE_NAME) },
-            migrations = listOf(projectConfigSharedPrefsMigration)
+            migrations = listOf(
+                projectConfigSharedPrefsMigration,
+                projectConfigQualityThresholdMigration
+            )
         )
     }
 

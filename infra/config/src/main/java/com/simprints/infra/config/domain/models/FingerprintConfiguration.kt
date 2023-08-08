@@ -2,11 +2,11 @@ package com.simprints.infra.config.domain.models
 
 data class FingerprintConfiguration(
     val fingersToCapture: List<Finger>,
-    val qualityThreshold: Int,
     val decisionPolicy: DecisionPolicy,
     val allowedVeroGenerations: List<VeroGeneration>,
     val comparisonStrategyForVerification: FingerComparisonStrategy,
     val displayHandIcons: Boolean,
+    val vero1: Vero1Configuration?,
     val vero2: Vero2Configuration?
 ) {
 

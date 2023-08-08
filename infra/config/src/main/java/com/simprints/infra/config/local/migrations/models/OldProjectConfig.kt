@@ -94,7 +94,6 @@ internal data class OldProjectConfig(
                 fingersToCapture = fingerprintsToCollect?.split(",")
                     ?.map { Finger.valueOf(it) }
                     ?: listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER),
-                qualityThreshold = fingerprintQualityThreshold.toInt(),
                 decisionPolicy = fingerprintConfidenceThresholds?.let { parseDecisionPolicy(it) }
                     ?: DecisionPolicy(0, 0, 700),
                 allowedVeroGenerations = scannerGenerations?.split(",")
@@ -104,6 +103,7 @@ internal data class OldProjectConfig(
                     ?.let { FingerprintConfiguration.FingerComparisonStrategy.valueOf(it) }
                     ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 displayHandIcons = fingerImagesExist.toBoolean(),
+                vero1 = Vero1Configuration(fingerprintQualityThreshold.toInt()),
                 vero2 = vero2Configuration(),
             )
 
@@ -111,6 +111,7 @@ internal data class OldProjectConfig(
         if (captureFingerprintStrategy == null) null
         else
             Vero2Configuration(
+                fingerprintQualityThreshold!!.toInt(),
                 captureStrategy = Vero2Configuration.CaptureStrategy.valueOf(
                     captureFingerprintStrategy
                 ),

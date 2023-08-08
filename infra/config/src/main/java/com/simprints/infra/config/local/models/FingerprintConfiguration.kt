@@ -6,12 +6,14 @@ import com.simprints.infra.config.exceptions.InvalidProtobufEnumException
 internal fun FingerprintConfiguration.toProto(): ProtoFingerprintConfiguration =
     ProtoFingerprintConfiguration.newBuilder()
         .addAllFingersToCapture(fingersToCapture.map { it.toProto() })
-        .setQualityThreshold(qualityThreshold)
         .setDecisionPolicy(decisionPolicy.toProto())
         .addAllAllowedVeroGenerations(allowedVeroGenerations.map { it.toProto() })
         .setComparisonStrategyForVerification(comparisonStrategyForVerification.toProto())
         .setDisplayHandIcons(displayHandIcons)
-        .also { if (vero2 != null) it.vero2 = vero2.toProto() }
+        .also {
+            if (vero1 != null) it.vero1 = vero1.toProto()
+            if (vero2 != null) it.vero2 = vero2.toProto()
+        }
         .build()
 
 internal fun FingerprintConfiguration.VeroGeneration.toProto(): ProtoFingerprintConfiguration.VeroGeneration =
@@ -29,11 +31,11 @@ internal fun FingerprintConfiguration.FingerComparisonStrategy.toProto(): ProtoF
 internal fun ProtoFingerprintConfiguration.toDomain(): FingerprintConfiguration =
     FingerprintConfiguration(
         fingersToCaptureList.map { it.toDomain() },
-        qualityThreshold,
         decisionPolicy.toDomain(),
         allowedVeroGenerationsList.map { it.toDomain() },
         comparisonStrategyForVerification.toDomain(),
         displayHandIcons,
+        if (hasVero1()) vero1.toDomain() else null,
         if (hasVero2()) vero2.toDomain() else null,
     )
 

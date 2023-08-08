@@ -3,6 +3,7 @@ package com.simprints.infra.config.remote.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.domain.models.Vero1Configuration
 import com.simprints.infra.config.testtools.apiDecisionPolicy
 import com.simprints.infra.config.testtools.apiFingerprintConfiguration
 import com.simprints.infra.config.testtools.decisionPolicy
@@ -17,23 +18,47 @@ class ApiFingerprintConfigurationTest {
     }
 
     @Test
-    fun `should map correctly the model when the vero2 is missing`() {
+    fun `should map correctly the model when the vero1 is missing`() {
         val apiFingerprintConfiguration = ApiFingerprintConfiguration(
             listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
-            10,
             apiDecisionPolicy,
             listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
             ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
             true,
             null,
+            apiFingerprintConfiguration.vero2,
         )
         val fingerprintConfiguration = FingerprintConfiguration(
             listOf(Finger.LEFT_3RD_FINGER),
-            10,
             decisionPolicy,
             listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
             FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
             true,
+            null,
+            fingerprintConfiguration.vero2,
+        )
+
+        assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
+    }
+
+    @Test
+    fun `should map correctly the model when the vero2 is missing`() {
+        val apiFingerprintConfiguration = ApiFingerprintConfiguration(
+            listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+            apiDecisionPolicy,
+            listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
+            ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            true,
+            ApiVero1Configuration(10),
+            null,
+        )
+        val fingerprintConfiguration = FingerprintConfiguration(
+            listOf(Finger.LEFT_3RD_FINGER),
+            decisionPolicy,
+            listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
+            FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            true,
+            Vero1Configuration(10),
             null,
         )
 
