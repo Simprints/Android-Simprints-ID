@@ -3,17 +3,23 @@ package com.simprints.infra.enrolment.records.store.local.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.infra.realm.models.DbFaceSample
+import com.simprints.infra.realm.models.DbFingerprintSample
+import com.simprints.infra.realm.models.DbSubject
+import io.realm.kotlin.ext.realmListOf
+import io.realm.kotlin.types.RealmInstant
+import io.realm.kotlin.types.RealmUUID
 import org.junit.Test
 import java.util.Date
-import java.util.UUID
 import kotlin.random.Random
 
 class DbSubjectTest {
 
     companion object {
+
         private const val GUID = "3f0f8e9a-0a0c-456c-846e-577b1440b6fb"
         private const val PROJECT_ID = "projectId"
         private val ATTENDANT_ID = "user1".asTokenizableEncrypted()
@@ -36,22 +42,62 @@ class DbSubjectTest {
             attendantId = ATTENDANT_ID,
             moduleId = MODULE_ID,
             createdAt = Date(0),
-            updatedAt = Date(1),
+            updatedAt = Date(1500),
             fingerprintSamples = listOf(fingerprintSample),
-            faceSamples = listOf(faceSample)
+            faceSamples = listOf(faceSample),
         )
 
         val dbSubject = domainSubject.fromDomainToDb()
 
         with(dbSubject) {
-            assertThat(subjectId).isEqualTo(UUID.fromString(GUID))
-            assertThat(attendantId).isEqualTo(ATTENDANT_ID.value)
-            assertThat(createdAt).isEqualTo(Date(0))
-            assertThat(updatedAt).isEqualTo(Date(1))
-            assertThat(moduleId).isEqualTo(MODULE_ID.value)
+            assertThat(subjectId).isEqualTo(RealmUUID.from(GUID))
             assertThat(projectId).isEqualTo(PROJECT_ID)
-            assertThat(fingerprintSamples.first()?.id).isEqualTo(fingerprintSample.id)
-            assertThat(faceSamples.first()?.id).isEqualTo(faceSample.id)
+            assertThat(attendantId).isEqualTo(ATTENDANT_ID.value)
+            assertThat(moduleId).isEqualTo(MODULE_ID.value)
+            assertThat(createdAt).isEqualTo(RealmInstant.from(0, 0))
+            assertThat(updatedAt).isEqualTo(RealmInstant.from(1, 500_000_000))
+            assertThat(fingerprintSamples.first().id).isEqualTo(fingerprintSample.id)
+            assertThat(faceSamples.first().id).isEqualTo(faceSample.id)
+        }
+    }
+
+    @Test
+    fun fromDbModelToDomain() {
+        val fingerprintSample = DbFingerprintSample().apply {
+            fingerIdentifier = IFingerIdentifier.RIGHT_3RD_FINGER.ordinal
+            template = Random.nextBytes(64)
+            templateQualityScore = 30
+            format = "NEC_1"
+        }
+        val faceSample = DbFaceSample().apply {
+            template = Random.nextBytes(64)
+            format = "RANK_ONE_1_23"
+        }
+
+        val dbSubject = DbSubject().apply {
+            subjectId = RealmUUID.Companion.from(GUID)
+            attendantId = ATTENDANT_ID.value
+            moduleId = MODULE_ID.value
+            projectId = PROJECT_ID
+            createdAt = RealmInstant.from(0, 0)
+            updatedAt = RealmInstant.from(1, 500_000_000)
+            faceSamples = realmListOf(faceSample)
+            fingerprintSamples = realmListOf(fingerprintSample)
+            isModuleIdTokenized = true
+            isAttendantIdTokenized = true
+        }
+
+        val domainSubject = dbSubject.fromDbToDomain()
+
+        with(domainSubject) {
+            assertThat(subjectId).isEqualTo(GUID)
+            assertThat(attendantId).isEqualTo(ATTENDANT_ID)
+            assertThat(createdAt).isEqualTo(Date(0))
+            assertThat(updatedAt).isEqualTo(Date(1500))
+            assertThat(moduleId).isEqualTo(MODULE_ID)
+            assertThat(projectId).isEqualTo(PROJECT_ID)
+            assertThat(fingerprintSamples.first().id).isEqualTo(fingerprintSample.id)
+            assertThat(faceSamples.first().id).isEqualTo(faceSample.id)
         }
     }
 }

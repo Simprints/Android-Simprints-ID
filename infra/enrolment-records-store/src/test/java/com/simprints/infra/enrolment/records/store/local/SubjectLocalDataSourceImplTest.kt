@@ -13,13 +13,15 @@ import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbSubject
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.CapturingSlot
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.slot
-import io.realm.Realm
-import io.realm.RealmQuery
-import io.realm.RealmResults
+import io.realm.kotlin.MutableRealm
+import io.realm.kotlin.Realm
+import io.realm.kotlin.query.RealmQuery
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -28,63 +30,55 @@ import java.util.UUID
 import kotlin.random.Random
 
 class SubjectLocalDataSourceImplTest {
-    private lateinit var subjectLocalDataSource: SubjectLocalDataSource
+
+    @MockK
     private lateinit var realm: Realm
+
+    @MockK
+    private lateinit var mutableRealm: MutableRealm
+
+    @MockK
     private lateinit var realmWrapperMock: RealmWrapper
+
+    @MockK
+    private lateinit var realmQuery: RealmQuery<DbSubject>
+
     private lateinit var blockCapture: CapturingSlot<(Realm) -> Any>
+    private lateinit var mutableBlockCapture: CapturingSlot<(MutableRealm) -> Any>
+
     private var localSubjects: MutableList<Subject> = mutableListOf()
+
+    private lateinit var subjectLocalDataSource: SubjectLocalDataSource
 
     @Before
     fun setup() {
+        MockKAnnotations.init(this, relaxed = true)
         localSubjects = mutableListOf()
-        realm = mockk {
-            val transaction = slot<Realm.Transaction>()
-            every { executeTransaction(capture(transaction)) } answers {
-                transaction.captured.execute(realm)
-            }
-            val insertedSubject = slot<DbSubject>()
-            every { insertOrUpdate(capture(insertedSubject)) } answers {
-                localSubjects.add(insertedSubject.captured.fromDbToDomain())
-            }
+
+        val insertedSubject = slot<DbSubject>()
+        every { mutableRealm.delete(any()) } answers { localSubjects.clear() }
+        every { mutableRealm.copyToRealm(capture(insertedSubject), any()) } answers {
+            localSubjects.add(insertedSubject.captured.fromDbToDomain())
+            insertedSubject.captured
         }
 
-        realmWrapperMock = mockk()
-        subjectLocalDataSource = SubjectLocalDataSourceImpl(realmWrapperMock)
         blockCapture = slot()
-        coEvery {
-            realmWrapperMock.useRealmInstance(capture(blockCapture))
-        } answers { blockCapture.captured.invoke(realm) }
-
-
-        val realmResults: RealmResults<DbSubject> = mockk(relaxed = true) {
-            every { iterator() } answers {
-                localSubjects.map { it.fromDomainToDb() }.iterator() as MutableIterator<DbSubject>
-            }
-            every { deleteAllFromRealm() } answers {
-                localSubjects.clear()
-                true
-            }
+        coEvery { realmWrapperMock.readRealm(capture(blockCapture)) } answers {
+            blockCapture.captured.invoke(realm)
         }
-        val captureUserId = slot<String>()
-        val query: RealmQuery<DbSubject> = mockk(relaxed = true) {
-            every {
-                equalTo(eq(SubjectLocalDataSourceImpl.USER_ID_FIELD), capture(captureUserId))
-            } answers {
-                if (localSubjects.none { it.attendantId.value == captureUserId.captured }) {
-                    null
-                } else this@mockk
-            }
-            every { count() } answers {
-                localSubjects.size.toLong()
-            }
-            every { findAll() } answers {
-
-                realmResults
-            }
+        mutableBlockCapture = slot()
+        coEvery { realmWrapperMock.writeRealm(capture(mutableBlockCapture)) } answers {
+            mutableBlockCapture.captured.invoke(mutableRealm)
         }
-        every { realm.where(DbSubject::class.java) } returns query
+        every { realmQuery.count() } answers {
+            mockk { every { find() } returns localSubjects.size.toLong() }
+        }
+
+        every { realm.query(DbSubject::class) } returns realmQuery
+        every { mutableRealm.query(DbSubject::class) } returns realmQuery
+
+        subjectLocalDataSource = SubjectLocalDataSourceImpl(realmWrapperMock)
     }
-
 
     @Test
     fun givenOneRecordSaved_countShouldReturnOne() = runTest {
@@ -110,18 +104,49 @@ class SubjectLocalDataSourceImplTest {
         assertThat(count).isEqualTo(20)
     }
 
-
     @Test
-    fun givenInvalidSerializableQuery_aThrowableIsThrown() {
-        runTest {
-            assertThrows<InvalidQueryToLoadRecordsException> {
-                (subjectLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(
-                    mockk()
-                )
-            }
+    fun givenInvalidSerializableQueryForFingerprints_aThrowableIsThrown() = runTest {
+        assertThrows<InvalidQueryToLoadRecordsException> {
+            (subjectLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(
+                mockk()
+            )
         }
     }
 
+    @Test
+    fun givenValidSerializableQueryForFingerprints_loadIsCalled() = runTest {
+        val savedPersons = saveFakePeople(getRandomPeople(20))
+        val fakePerson = savedPersons[0].fromDomainToDb()
+
+        val people = (subjectLocalDataSource as FingerprintIdentityLocalDataSource)
+            .loadFingerprintIdentities(SubjectQuery())
+            .toList()
+
+        listOf(fakePerson).zip(people).forEach { (subject, identity) ->
+            assertThat(subject.subjectId).isEqualTo(identity.patientId)
+        }
+    }
+
+    @Test
+    fun givenInvalidSerializableQueryForFace_aThrowableIsThrown() = runTest {
+        assertThrows<InvalidQueryToLoadRecordsException> {
+            (subjectLocalDataSource as FaceIdentityLocalDataSource).loadFaceIdentities(mockk())
+        }
+    }
+
+    @Test
+    fun givenValidSerializableQueryForFace_loadIsCalled() = runTest {
+        val savedPersons = saveFakePeople(getRandomPeople(20))
+        val fakePerson = savedPersons[0].fromDomainToDb()
+
+        val people = (subjectLocalDataSource as FaceIdentityLocalDataSource)
+            .loadFaceIdentities(SubjectQuery())
+            .toList()
+
+        listOf(fakePerson).zip(people).forEach { (subject, identity) ->
+            assertThat(subject.subjectId).isEqualTo(identity.personId)
+        }
+    }
 
     @Test
     fun givenManyPeopleSaved_loadShouldReturnThem() = runTest {
@@ -130,8 +155,9 @@ class SubjectLocalDataSourceImplTest {
 
         val people = subjectLocalDataSource.load(SubjectQuery()).toList()
 
-        listOf(fakePerson).zip(people)
-            .forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
+        listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
+            assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
+        }
     }
 
     @Test
@@ -142,8 +168,9 @@ class SubjectLocalDataSourceImplTest {
         val people =
             subjectLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId.value))
                 .toList()
-        listOf(fakePerson).zip(people)
-            .forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
+        listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
+            assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
+        }
     }
 
     @Test
@@ -153,8 +180,9 @@ class SubjectLocalDataSourceImplTest {
 
         val people =
             subjectLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId)).toList()
-        listOf(fakePerson).zip(people)
-            .forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
+        listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
+            assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
+        }
     }
 
     @Test
@@ -233,13 +261,12 @@ class SubjectLocalDataSourceImplTest {
         faceSamples: Array<FaceSample> = arrayOf(
             FaceSample(Random.nextBytes(64), "faceTemplateFormat"),
             FaceSample(Random.nextBytes(64), "faceTemplateFormat")
-        )
-    ): Subject =
-        Subject(
-            subjectId = patientId,
-            projectId = projectId,
-            attendantId = userId.asTokenizableRaw(),
-            moduleId = moduleId.asTokenizableRaw(),
-            faceSamples = faceSamples.toList()
-        )
+        ),
+    ): Subject = Subject(
+        subjectId = patientId,
+        projectId = projectId,
+        attendantId = userId.asTokenizableRaw(),
+        moduleId = moduleId.asTokenizableRaw(),
+        faceSamples = faceSamples.toList()
+    )
 }
