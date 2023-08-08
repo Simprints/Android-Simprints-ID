@@ -5,6 +5,7 @@ import com.simprints.infra.config.exceptions.InvalidProtobufEnumException
 
 internal fun Vero2Configuration.toProto(): ProtoVero2Configuration =
     ProtoVero2Configuration.newBuilder()
+        .setQualityThreshold(qualityThreshold)
         .setImageSavingStrategy(imageSavingStrategy.toProto())
         .setCaptureStrategy(captureStrategy.toProto())
         .setDisplayLiveFeedback(displayLiveFeedback)
@@ -35,6 +36,7 @@ internal fun Vero2Configuration.Vero2FirmwareVersions.toProto(): ProtoVero2Confi
 
 internal fun ProtoVero2Configuration.toDomain(): Vero2Configuration =
     Vero2Configuration(
+        qualityThreshold,
         imageSavingStrategy.toDomain(),
         captureStrategy.toDomain(),
         displayLiveFeedback,

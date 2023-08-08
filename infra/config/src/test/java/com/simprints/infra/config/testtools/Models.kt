@@ -14,6 +14,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.Vero1Configuration
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import com.simprints.infra.config.local.models.ProtoConsentConfiguration
 import com.simprints.infra.config.local.models.ProtoDecisionPolicy
@@ -28,6 +29,7 @@ import com.simprints.infra.config.local.models.ProtoProject
 import com.simprints.infra.config.local.models.ProtoProjectConfiguration
 import com.simprints.infra.config.local.models.ProtoSynchronizationConfiguration
 import com.simprints.infra.config.local.models.ProtoUpSynchronizationConfiguration
+import com.simprints.infra.config.local.models.ProtoVero1Configuration
 import com.simprints.infra.config.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.remote.models.ApiDecisionPolicy
@@ -38,6 +40,7 @@ import com.simprints.infra.config.remote.models.ApiIdentificationConfiguration
 import com.simprints.infra.config.remote.models.ApiProject
 import com.simprints.infra.config.remote.models.ApiProjectConfiguration
 import com.simprints.infra.config.remote.models.ApiSynchronizationConfiguration
+import com.simprints.infra.config.remote.models.ApiVero1Configuration
 import com.simprints.infra.config.remote.models.ApiVero2Configuration
 
 internal val apiConsentConfiguration = ApiConsentConfiguration(
@@ -126,6 +129,7 @@ internal val protoFaceConfiguration = ProtoFaceConfiguration.newBuilder()
     .build()
 
 internal val apiVero2Configuration = ApiVero2Configuration(
+    30,
     ApiVero2Configuration.ImageSavingStrategy.EAGER,
     ApiVero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI,
     false,
@@ -133,6 +137,7 @@ internal val apiVero2Configuration = ApiVero2Configuration(
 )
 
 internal val vero2Configuration = Vero2Configuration(
+    30,
     Vero2Configuration.ImageSavingStrategy.EAGER,
     Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI,
     false,
@@ -140,6 +145,7 @@ internal val vero2Configuration = Vero2Configuration(
 )
 
 internal val protoVero2Configuration = ProtoVero2Configuration.newBuilder()
+    .setQualityThreshold(30)
     .setCaptureStrategy(ProtoVero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI)
     .setImageSavingStrategy(ProtoVero2Configuration.ImageSavingStrategy.EAGER)
     .setDisplayLiveFeedback(false)
@@ -153,31 +159,31 @@ internal val protoVero2Configuration = ProtoVero2Configuration.newBuilder()
 
 internal val apiFingerprintConfiguration = ApiFingerprintConfiguration(
     listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
-    10,
     apiDecisionPolicy,
     listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
     ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
     true,
+    ApiVero1Configuration(10),
     apiVero2Configuration,
 )
 
 internal val fingerprintConfiguration = FingerprintConfiguration(
     listOf(Finger.LEFT_3RD_FINGER),
-    10,
     decisionPolicy,
     listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
     FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
     true,
+    Vero1Configuration(10),
     vero2Configuration,
 )
 
 internal val protoFingerprintConfiguration = ProtoFingerprintConfiguration.newBuilder()
     .addFingersToCapture(ProtoFinger.LEFT_3RD_FINGER)
-    .setQualityThreshold(10)
     .setDecisionPolicy(protoDecisionPolicy)
     .addAllowedVeroGenerations(ProtoFingerprintConfiguration.VeroGeneration.VERO_2)
     .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
     .setDisplayHandIcons(true)
+    .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(10).build())
     .setVero2(protoVero2Configuration)
     .build()
 
