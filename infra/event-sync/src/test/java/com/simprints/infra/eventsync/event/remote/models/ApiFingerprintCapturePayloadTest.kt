@@ -3,7 +3,6 @@ package com.simprints.infra.eventsync.event.remote.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Test
 
@@ -15,7 +14,7 @@ class ApiFingerprintCapturePayloadTest {
             FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
                 finger = IFingerIdentifier.LEFT_3RD_FINGER,
                 quality = 23,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = "ISO_19794_2"
             )
         )
         val payload = ApiFingerprintCapturePayload(

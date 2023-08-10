@@ -18,9 +18,6 @@ open class DbFingerprintSample(
 
     var templateQualityScore: Int = -1,
 
-    /**
-     * Realm doesn't accept enums, we need to save the formats as Strings. This is a [FingerprintTemplateFormat].
-     */
     @Required
     var format: String = ""
 

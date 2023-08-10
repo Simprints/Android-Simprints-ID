@@ -58,4 +58,7 @@ interface ScannerWrapper {
     fun performStmOta(firmwareVersion: String): Flow<StmOtaStep>
     /** @throws UnavailableVero2FeatureException - if using Vero 1 */
     fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep>
+
+    val templateFormat: String
+        get() = "ISO_19794_2_2011" // This is the default format for Simprint Veros
 }

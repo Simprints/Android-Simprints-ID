@@ -3,7 +3,6 @@ package com.simprints.feature.enrollast
 import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import kotlinx.parcelize.Parcelize
 
 @Keep
@@ -51,7 +50,7 @@ data class FingerTemplateCaptureResult(
     val finger: Finger,
     val template: ByteArray,
     val templateQualityScore: Int,
-    val format: FingerprintTemplateFormat,
+    val format: String,
 ) : Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

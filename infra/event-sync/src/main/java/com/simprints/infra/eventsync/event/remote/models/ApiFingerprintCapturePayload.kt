@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result.*
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.eventsync.event.remote.models.ApiFingerprintCapturePayload.ApiResult
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
@@ -26,7 +25,7 @@ internal data class ApiFingerprintCapturePayload(
     data class ApiFingerprint(
         val finger: IFingerIdentifier,
         val quality: Int,
-        val format: FingerprintTemplateFormat
+        val format: String
     ) {
 
         constructor(finger: FingerprintCapturePayload.Fingerprint) : this(

@@ -2,7 +2,6 @@ package com.simprints.core.biometrics
 
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -101,7 +100,7 @@ object FingerprintGeneratorUtils {
         val templateBytes = ByteArray(bb.remaining())
         bb.get(templateBytes)
         return FingerprintSample(fingerId, templateBytes, qualityScore,
-            IFingerprintTemplateFormat.ISO_19794_2
+            "ISO_19794_2"
         )
     }
 }

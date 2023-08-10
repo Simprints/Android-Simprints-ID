@@ -17,7 +17,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import io.mockk.mockk
 
@@ -41,7 +40,7 @@ fun mockFingerprintCaptureStep(): Step {
                         Finger.LEFT_THUMB,
                         templateQualityScore = 10,
                         template = "template".toByteArray(),
-                        format = FingerprintTemplateFormat.ISO_19794_2
+                        format = "ISO_19794_2"
                     )
                 )
             )

@@ -16,7 +16,7 @@ class FingerprintCaptureEventTest {
         val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
             IFingerIdentifier.LEFT_THUMB,
             8,
-            FingerprintTemplateFormat.ISO_19794_2
+            "ISO_19794_2"
         )
         val event = FingerprintCaptureEventSample.getEvent(labels)
 
