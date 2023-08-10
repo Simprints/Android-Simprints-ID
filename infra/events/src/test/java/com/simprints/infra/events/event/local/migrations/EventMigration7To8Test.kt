@@ -66,7 +66,8 @@ class EventMigration7To8Test {
                 FINGER,
                 QUALITY_THRESHOLD,
                 FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(FINGER, QUALITY),
+                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(FINGER, QUALITY,
+                    FORMAT),
                 eventId
             ),
             type = EventType.FINGERPRINT_CAPTURE,
@@ -96,7 +97,7 @@ class EventMigration7To8Test {
                 FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
                     FINGER,
                     TEMPLATE,
-                    QUALITY,
+                    QUALITY, FORMAT
                 ),
                 eventId
             ),
@@ -150,7 +151,8 @@ class EventMigration7To8Test {
                 FINGER,
                 QUALITY_THRESHOLD,
                 FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(FINGER, QUALITY),
+                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(FINGER, QUALITY,
+                    FORMAT),
                 eventId
             ),
             type = EventType.FINGERPRINT_CAPTURE,
@@ -181,6 +183,7 @@ class EventMigration7To8Test {
                     FINGER,
                     TEMPLATE,
                     QUALITY,
+                    FORMAT,
                 ),
                 eventId
             ),
@@ -234,7 +237,8 @@ class EventMigration7To8Test {
                 FINGER,
                 QUALITY_THRESHOLD,
                 FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(FINGER, QUALITY),
+                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(FINGER, QUALITY,
+                    FORMAT),
                 eventId
             ),
             type = EventType.FINGERPRINT_CAPTURE,
