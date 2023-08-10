@@ -18,7 +18,8 @@
     "fingerprint": {
       "finger": "LEFT_THUMB",
       "quality": 42,
-      "template": "template"
+      "template": "template",
+      "format": "ISO_19794_2"
     }
   }
 }
