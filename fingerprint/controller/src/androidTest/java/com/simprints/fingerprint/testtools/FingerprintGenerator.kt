@@ -5,7 +5,8 @@ import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.*
+import java.util.Random
+import java.util.UUID
 
 object FingerprintGenerator {
 
@@ -92,7 +93,7 @@ object FingerprintGenerator {
         bb.position(0)
         val templateBytes = ByteArray(bb.remaining())
         bb.get(templateBytes)
-        return Fingerprint(fingerId, templateBytes)
+        return Fingerprint(fingerId, templateBytes,"ISO_19794_2")
     }
 
     private fun generateRandomFingerprints(fingerIds: List<FingerIdentifier>) =
