@@ -612,7 +612,11 @@ class CollectFingerprintsViewModel(
 
     private fun proceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
         val domainFingerprints = collectedFingers.map { (id, collectedFinger) ->
-            Fingerprint(id.finger, collectedFinger.scanResult.template,collectedFinger.scanResult.templateFormat).also {
+            Fingerprint(
+                id.finger,
+                collectedFinger.scanResult.template,
+                collectedFinger.scanResult.templateFormat
+            ).also {
                 it.imageRef = imageRefs[id]
             }
         }

@@ -202,7 +202,7 @@ class ClientApiEventRepositoryImplTest {
                     finger = IFingerIdentifier.LEFT_3RD_FINGER,
                     template = "",
                     quality = 0,
-                    format ="",
+                    format = "",
                 ),
                 id = "",
                 endedAt = 0
