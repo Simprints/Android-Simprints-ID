@@ -48,14 +48,15 @@ class Fingerprint(
      *
      * @param fingerId         Finger identifier of the fingerprint
      * @param isoTemplateBytes Byte array containing an ISO 2005 fingerprint template
+     * @param format           The format of the template
      * @throws IllegalArgumentException If the bytes array specified is not a valid ISO 2005
      * (2011 not supported yet) template containing only 1 fingerprint.
      */
     @Throws(IllegalArgumentException::class)
-    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray) : this(
+    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray,format:String) : this(
         fingerId,
         ByteBuffer.allocateDirect(isoTemplateBytes.size),
-        format = "ISO_19794_2"
+        format = format
     ) {
 
         template.put(isoTemplateBytes)

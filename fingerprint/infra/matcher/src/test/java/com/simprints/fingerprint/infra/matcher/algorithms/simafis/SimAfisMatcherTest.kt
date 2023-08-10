@@ -42,7 +42,7 @@ class SimAfisMatcherTest {
                 Fingerprint(
                     FingerIdentifier.RIGHT_THUMB,
                     mockTemplate(),
-                    "ISO_19794_2_2011"
+                    "ISO_19794_2"
                 )
             )
         )
@@ -101,10 +101,10 @@ class SimAfisMatcherTest {
             "candidate",
             listOf(
                 Fingerprint(
-                    FingerIdentifier.LEFT_THUMB, byteArrayOf(), "ISO_19794_2_2011"
+                    FingerIdentifier.LEFT_THUMB, byteArrayOf(), "ISO_19794_2"
                 ),
                 Fingerprint(
-                    FingerIdentifier.RIGHT_THUMB, byteArrayOf(), "ISO_19794_2_2011"
+                    FingerIdentifier.RIGHT_THUMB, byteArrayOf(), "ISO_19794_2"
                 )
             )
         )

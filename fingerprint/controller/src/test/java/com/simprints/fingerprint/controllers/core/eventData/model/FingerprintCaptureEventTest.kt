@@ -11,7 +11,7 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 
 class FingerprintCaptureEventTest {
    companion object{
-       const val TEMPLATE_FORMAT = "ISO_19794_2_2011"
+       const val TEMPLATE_FORMAT = "ISO_19794_2"
    }
 
     @Test

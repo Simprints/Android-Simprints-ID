@@ -388,7 +388,7 @@ class CollectFingerprintsViewModel(
                 FingerprintCaptureEvent.buildResult(currentCapture()),
                 (currentCapture() as? CaptureState.Collected)?.scanResult?.let {
                     FingerprintCaptureEvent.Fingerprint(
-                        id, it.qualityScore, "ISO_19794_2"
+                        id, it.qualityScore, it.templateFormat
                     )
                 },
                 payloadId = payloadId
@@ -404,7 +404,8 @@ class CollectFingerprintsViewModel(
                             FingerprintCaptureBiometricsEvent.Fingerprint(
                                 finger = id,
                                 quality = it.qualityScore,
-                                template = encoder.byteArrayToBase64(it.template)
+                                template = encoder.byteArrayToBase64(it.template),
+                                format = it.templateFormat
                             )
                         },
                         payloadId = payloadId
@@ -611,7 +612,7 @@ class CollectFingerprintsViewModel(
 
     private fun proceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
         val domainFingerprints = collectedFingers.map { (id, collectedFinger) ->
-            Fingerprint(id.finger, collectedFinger.scanResult.template).also {
+            Fingerprint(id.finger, collectedFinger.scanResult.template,collectedFinger.scanResult.templateFormat).also {
                 it.imageRef = imageRefs[id]
             }
         }

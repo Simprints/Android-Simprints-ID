@@ -16,7 +16,7 @@ class FingerprintCaptureBiometricsEventTest {
             FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
                 IFingerIdentifier.LEFT_3RD_FINGER,
                 "template",
-                1,"ISO_19794_2_2011",
+                1,"ISO_19794_2",
             )
         val event = FingerprintCaptureBiometricsEvent(
             createdAt = SampleDefaults.CREATED_AT,
