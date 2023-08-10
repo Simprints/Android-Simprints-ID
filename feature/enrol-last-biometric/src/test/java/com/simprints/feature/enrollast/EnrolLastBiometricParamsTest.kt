@@ -7,13 +7,14 @@ import org.junit.Test
 
 class EnrolLastBiometricParamsTest {
 
+    private val templateFormat = "ISO_19794_2"
     @Test
     fun testFingerTemplateCaptureResultEquals() {
         val result = FingerTemplateCaptureResult(
             finger = Finger.LEFT_THUMB,
             template = byteArrayOf(3, 4),
             templateQualityScore = 42,
-            format = ""ISO_19794_2""
+            format = templateFormat
         )
 
         assertThat(result).isEqualTo(
@@ -21,7 +22,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = "ISO_19794_2"
+                format = templateFormat
             )
         )
         assertThat(result).isNotEqualTo(
@@ -29,7 +30,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = "ISO_19794_2"
+                format = templateFormat
             )
         )
         assertThat(result).isNotEqualTo(
@@ -37,7 +38,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4, 5),
                 templateQualityScore = 42,
-                format = "ISO_19794_2"
+                format = templateFormat
             )
         )
         assertThat(result).isNotEqualTo(
@@ -45,7 +46,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 41,
-                format = "ISO_19794_2"
+                format = templateFormat
             )
         )
         assertThat(result).isNotEqualTo(
@@ -66,14 +67,14 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = "ISO_19794_2"
+                format = templateFormat
             ).hashCode()
         ).isEqualTo(
             FingerTemplateCaptureResult(
                 finger = Finger.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = "ISO_19794_2"
+                format = templateFormat
             ).hashCode()
         )
         assertThat(
@@ -81,14 +82,14 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = "ISO_19794_2"
+                format = templateFormat
             ).hashCode()
         ).isNotEqualTo(
             FingerTemplateCaptureResult(
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4, 5, 6),
                 templateQualityScore = 42,
-                format = "ISO_19794_2"
+                format = templateFormat
             ).hashCode()
         )
     }
