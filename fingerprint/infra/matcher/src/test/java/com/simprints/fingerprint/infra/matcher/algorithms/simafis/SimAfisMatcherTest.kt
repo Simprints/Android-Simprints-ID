@@ -6,7 +6,6 @@ import com.simprints.fingerprint.infra.matcher.algorithms.simafis.models.SimAfis
 import com.simprints.fingerprint.infra.matcher.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.matcher.domain.Fingerprint
 import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity
-import com.simprints.fingerprint.infra.matcher.domain.TemplateFormat
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -43,7 +42,7 @@ class SimAfisMatcherTest {
                 Fingerprint(
                     FingerIdentifier.RIGHT_THUMB,
                     mockTemplate(),
-                    TemplateFormat.ISO_19794_2_2011
+                    "ISO_19794_2_2011"
                 )
             )
         )
@@ -102,10 +101,10 @@ class SimAfisMatcherTest {
             "candidate",
             listOf(
                 Fingerprint(
-                    FingerIdentifier.LEFT_THUMB, byteArrayOf(), TemplateFormat.ISO_19794_2_2011
+                    FingerIdentifier.LEFT_THUMB, byteArrayOf(), "ISO_19794_2_2011"
                 ),
                 Fingerprint(
-                    FingerIdentifier.RIGHT_THUMB, byteArrayOf(), TemplateFormat.ISO_19794_2_2011
+                    FingerIdentifier.RIGHT_THUMB, byteArrayOf(), "ISO_19794_2_2011"
                 )
             )
         )

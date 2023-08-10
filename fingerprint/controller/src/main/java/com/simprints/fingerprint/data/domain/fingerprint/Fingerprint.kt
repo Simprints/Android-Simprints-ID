@@ -3,7 +3,6 @@ package com.simprints.fingerprint.data.domain.fingerprint
 import android.os.Parcel
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import kotlinx.parcelize.Parceler
 import kotlinx.parcelize.Parcelize
 import java.nio.ByteBuffer
@@ -23,7 +22,7 @@ class Fingerprint(
     val fingerId: FingerIdentifier,
     val template: ByteBuffer,
     var imageRef: FingerprintImageRef? = null,
-    val format: FingerprintTemplateFormat
+    val format: String
 ) : Parcelable {
 
     /**
@@ -56,7 +55,7 @@ class Fingerprint(
     constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray) : this(
         fingerId,
         ByteBuffer.allocateDirect(isoTemplateBytes.size),
-        format = FingerprintTemplateFormat.ISO_19794_2
+        format = "ISO_19794_2"
     ) {
 
         template.put(isoTemplateBytes)
@@ -91,7 +90,7 @@ class Fingerprint(
             parcel.readByteArray(temp)
             val template = ByteBuffer.allocateDirect(temp.size)
             template.put(temp)
-            return Fingerprint(fingerId, template, format = FingerprintTemplateFormat.ISO_19794_2)
+            return Fingerprint(fingerId, template, format = "ISO_19794_2")
         }
     }
 }

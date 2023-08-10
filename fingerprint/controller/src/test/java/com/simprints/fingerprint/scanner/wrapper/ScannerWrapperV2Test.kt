@@ -228,6 +228,7 @@ class ScannerWrapperV2Test {
             val qualityThreshold = 50
             val expectedCaptureResponse = CaptureFingerprintResponse(
                 template = byteArrayOf(),
+                "ISO_19794_2_2005",
                 imageQualityScore = qualityThreshold
             )
             every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold)

@@ -17,7 +17,6 @@ import com.simprints.fingerprint.infra.matcher.domain.FingerIdentifier.RIGHT_THU
 import com.simprints.fingerprint.infra.matcher.domain.Fingerprint
 import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.matcher.domain.MatchResult
-import com.simprints.fingerprint.infra.matcher.domain.TemplateFormat
 import javax.inject.Inject
 
 /**
@@ -69,8 +68,8 @@ internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         SimAfisPerson(id, fingerprints.map { it.toSimAfisFingerprint() })
 
     private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint {
-        if (format != TemplateFormat.ISO_19794_2_2011)
-            throw IllegalArgumentException("Attempting to use $format template format for SimAfisMatcher which only accepts ${TemplateFormat.ISO_19794_2_2011}")
+        if (format != SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT)
+            throw IllegalArgumentException("Attempting to use $format template format for SimAfisMatcher which only accepts $SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT")
         return SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
     }
 
@@ -93,4 +92,7 @@ internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         candidates: List<FingerprintIdentity>
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
+    companion object{
+        const val SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT = "ISO_19794_2_2011"
+    }
 }
