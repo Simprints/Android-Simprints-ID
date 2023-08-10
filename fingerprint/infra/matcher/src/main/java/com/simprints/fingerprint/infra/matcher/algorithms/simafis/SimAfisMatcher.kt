@@ -93,6 +93,6 @@ internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
     companion object{
-        const val SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT = "ISO_19794_2_2011"
+        const val SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT = "ISO_19794_2"
     }
 }

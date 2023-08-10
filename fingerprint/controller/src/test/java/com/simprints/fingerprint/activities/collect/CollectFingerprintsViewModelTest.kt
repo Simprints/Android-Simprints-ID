@@ -1330,7 +1330,7 @@ class CollectFingerprintsViewModelTest {
         )
 
         const val GOOD_QUALITY = 80
-        const val TEMPLATE_FORMAT = "ISO_19794_2_2011"
+        const val TEMPLATE_FORMAT = "ISO_19794_2"
         const val DIFFERENT_GOOD_QUALITY = 80
         const val BAD_QUALITY = 20
 

@@ -60,5 +60,5 @@ interface ScannerWrapper {
     fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep>
 
     val templateFormat: String
-        get() = "ISO_19794_2_2011" // This is the default format for Simprint Veros
+        get() = "ISO_19794_2" // This is the default format for Simprint Veros
 }

@@ -22,7 +22,7 @@ class FingerprintCaptureBiometricsEvent(
         val finger: FingerIdentifier,
         val quality: Int,
         val template: String,
-        val format: String = "ISO_19794_2"
+        val format: String
     )
 }
 
