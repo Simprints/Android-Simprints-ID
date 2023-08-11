@@ -53,7 +53,7 @@ class Fingerprint(
      * (2011 not supported yet) template containing only 1 fingerprint.
      */
     @Throws(IllegalArgumentException::class)
-    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray,format:String) : this(
+    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray, format: String) : this(
         fingerId,
         ByteBuffer.allocateDirect(isoTemplateBytes.size),
         format = format
@@ -83,6 +83,7 @@ class Fingerprint(
             val bytes = this.templateBytes
             parcel.writeInt(bytes.size)
             parcel.writeByteArray(bytes)
+            parcel.writeString(format)
         }
 
         override fun create(parcel: Parcel): Fingerprint {
@@ -91,7 +92,8 @@ class Fingerprint(
             parcel.readByteArray(temp)
             val template = ByteBuffer.allocateDirect(temp.size)
             template.put(temp)
-            return Fingerprint(fingerId, template, format = "ISO_19794_2")
+            val format = parcel.readString()!!
+            return Fingerprint(fingerId, template, format = format)
         }
     }
 }
