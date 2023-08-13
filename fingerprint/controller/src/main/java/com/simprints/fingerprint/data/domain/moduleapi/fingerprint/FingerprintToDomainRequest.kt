@@ -20,28 +20,28 @@ object FingerprintToDomainRequest {
 
     fun fromFingerprintToDomainRequest(iFingerprintRequest: IFingerprintRequest): FingerprintRequest =
         when (iFingerprintRequest) {
-            is IFingerprintCaptureRequest -> fromFingerprintToDomainCaptureRequest(
-                iFingerprintRequest
-            )
-
-            is IFingerprintMatchRequest -> fromFingerprintToDomainMatchRequest(iFingerprintRequest)
-
-            is IFingerprintConfigurationRequest -> fromFingerprintToDomainConfigurationRequest(
-                iFingerprintRequest
-            )
-
+            is IFingerprintCaptureRequest ->
+                fromFingerprintToDomainCaptureRequest(iFingerprintRequest)
+            is IFingerprintMatchRequest ->
+                fromFingerprintToDomainMatchRequest(iFingerprintRequest)
+            is IFingerprintConfigurationRequest ->
+                fromFingerprintToDomainConfigurationRequest(iFingerprintRequest)
             else -> throw InvalidRequestForFingerprintException("Could not convert to domain request")
         }
 
     private fun fromFingerprintToDomainCaptureRequest(iFingerprintRequest: IFingerprintCaptureRequest): FingerprintCaptureRequest =
         with(iFingerprintRequest) {
-            FingerprintCaptureRequest(fingerprintsToCapture.map { it.fromModuleApiToDomain() })
+            FingerprintCaptureRequest(
+                fingerprintsToCapture.map { it.fromModuleApiToDomain() }
+            )
         }
 
     private fun fromFingerprintToDomainMatchRequest(iFingerprintRequest: IFingerprintMatchRequest): FingerprintMatchRequest =
         with(iFingerprintRequest) {
             FingerprintMatchRequest(probeFingerprintSamples.map {
-                Fingerprint(it.fingerIdentifier.fromModuleApiToDomain(), it.template, it.format)
+                Fingerprint(
+                    it.fingerIdentifier.fromModuleApiToDomain(), it.template, it.format
+                )
             }, queryForCandidates)
         }
 
