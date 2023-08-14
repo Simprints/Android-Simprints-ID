@@ -16,7 +16,6 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.testtools.common.mock.mockTemplate
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -166,7 +165,7 @@ class StepEncoderImplTest {
                     Finger.RIGHT_THUMB,
                     fakeSample.template,
                     fakeSample.templateQualityScore,
-                    FingerprintTemplateFormat.ISO_19794_2,
+                    "ISO_19794_2",
                     null
                 )
             )
@@ -226,7 +225,7 @@ class StepEncoderImplTest {
                         )
                         MatcherAssert.assertThat(
                             actualSample.format,
-                            CoreMatchers.`is`(FingerprintTemplateFormat.ISO_19794_2)
+                            CoreMatchers.`is`("ISO_19794_2")
                         )
                     }
                 }

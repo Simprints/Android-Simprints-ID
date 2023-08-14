@@ -241,8 +241,7 @@ class ScannerWrapperV2(
             scannerV2.acquireTemplate()
                 .map { templateData ->
                     CaptureFingerprintResponse(
-                        templateData.template,
-                        imageQuality
+                        templateData.template, templateFormat, imageQuality
                     )
                 }
         }

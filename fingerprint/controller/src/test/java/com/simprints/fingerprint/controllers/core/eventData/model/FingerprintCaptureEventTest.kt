@@ -10,6 +10,9 @@ import org.junit.Test
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
 
 class FingerprintCaptureEventTest {
+   companion object{
+       const val TEMPLATE_FORMAT = "ISO_19794_2"
+   }
 
     @Test
     fun `mapping capture state to result works as expected`() {
@@ -18,6 +21,7 @@ class FingerprintCaptureEventTest {
                 ScanResult(
                     qualityScore = 1,
                     template = byteArrayOf(),
+                    TEMPLATE_FORMAT,
                     image = null,
                     qualityThreshold = 0
                 )
@@ -25,6 +29,7 @@ class FingerprintCaptureEventTest {
                 ScanResult(
                     qualityScore = 0,
                     template = byteArrayOf(),
+                    TEMPLATE_FORMAT,
                     image = null,
                     qualityThreshold = 2
                 )

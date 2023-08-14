@@ -46,7 +46,6 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -321,6 +320,7 @@ class CollectFingerprintsViewModel(
         val scanResult = ScanResult(
             captureFingerprintResponse.imageQualityScore,
             captureFingerprintResponse.template,
+            captureFingerprintResponse.templateFormat,
             null,
             qualityThreshold()
         )
@@ -388,7 +388,7 @@ class CollectFingerprintsViewModel(
                 FingerprintCaptureEvent.buildResult(currentCapture()),
                 (currentCapture() as? CaptureState.Collected)?.scanResult?.let {
                     FingerprintCaptureEvent.Fingerprint(
-                        id, it.qualityScore, FingerprintTemplateFormat.ISO_19794_2
+                        id, it.qualityScore, it.templateFormat
                     )
                 },
                 payloadId = payloadId
@@ -404,7 +404,8 @@ class CollectFingerprintsViewModel(
                             FingerprintCaptureBiometricsEvent.Fingerprint(
                                 finger = id,
                                 quality = it.qualityScore,
-                                template = encoder.byteArrayToBase64(it.template)
+                                template = encoder.byteArrayToBase64(it.template),
+                                format = it.templateFormat
                             )
                         },
                         payloadId = payloadId
@@ -611,7 +612,11 @@ class CollectFingerprintsViewModel(
 
     private fun proceedToFinish(collectedFingers: List<Pair<CaptureId, CaptureState.Collected>>) {
         val domainFingerprints = collectedFingers.map { (id, collectedFinger) ->
-            Fingerprint(id.finger, collectedFinger.scanResult.template).also {
+            Fingerprint(
+                id.finger,
+                collectedFinger.scanResult.template,
+                collectedFinger.scanResult.templateFormat
+            ).also {
                 it.imageRef = imageRefs[id]
             }
         }

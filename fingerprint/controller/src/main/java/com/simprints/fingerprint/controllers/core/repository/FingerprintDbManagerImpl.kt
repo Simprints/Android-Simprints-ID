@@ -38,4 +38,4 @@ class FingerprintDbManagerImpl @Inject constructor(
 }
 
 fun FingerprintSample.fromCoreToDomain() =
-    Fingerprint(fingerIdentifier.fromModuleApiToDomain(), template)
+    Fingerprint(fingerIdentifier.fromModuleApiToDomain(), template, format)

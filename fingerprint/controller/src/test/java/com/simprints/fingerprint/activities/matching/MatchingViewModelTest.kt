@@ -53,7 +53,7 @@ class MatchingViewModelTest {
         mockk(relaxed = true)
 
     private fun mockSuccessfulMatcher() {
-        every { mockMatcher.match(any(), any(), any(), any()) } coAnswers {
+        every { mockMatcher.match(any(), any(), any()) } answers  {
             val probe = this.firstArg<MatcherFingerprintIdentity>()
             this.secondArg<List<MatcherFingerprintIdentity>>()
                 .map {
@@ -75,7 +75,6 @@ class MatchingViewModelTest {
                 any(),
                 any(),
                 any(),
-                any()
             )
         } throws Exception("Oops! Match failed")
     }

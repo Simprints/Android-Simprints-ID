@@ -161,7 +161,7 @@ class EnrolmentHelperImpl @Inject constructor(
                     fingerId.fromDomainToModuleApi(),
                     sample.template,
                     sample.templateQualityScore,
-                    sample.format.fromDomainToModuleApi()
+                    sample.format
                 )
             }
         }
