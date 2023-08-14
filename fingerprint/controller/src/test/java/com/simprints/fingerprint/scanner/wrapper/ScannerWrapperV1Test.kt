@@ -26,6 +26,7 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.slot
+import io.mockk.verify
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -58,6 +59,19 @@ class ScannerWrapperV1Test {
         startCapturing()
     }
 
+    @Test(expected = Test.None::class)
+    fun `test captureFingerprint should complete successfully after a TIMEOUT`() = runTest {
+        // Given
+        mockScannerError(SCANNER_ERROR.TIMEOUT)
+        every { scanner.forceCapture(any(), any()) } answers {
+            val scannerCallback = args[1] as ScannerCallback
+            scannerCallback.onSuccess()
+        }
+        // When
+        startCapturing()
+        // Then
+        verify { scanner.forceCapture(any(), any()) }
+    }
     @Test(expected =ScannerDisconnectedException::class)
     fun `test captureFingerprint ScannerDisconnectedException`()= runTest{
         mockScannerError(SCANNER_ERROR.INVALID_STATE)

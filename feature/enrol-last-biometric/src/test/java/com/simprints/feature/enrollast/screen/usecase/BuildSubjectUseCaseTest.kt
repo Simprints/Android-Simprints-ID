@@ -7,7 +7,6 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -101,7 +100,7 @@ class BuildSubjectUseCaseTest {
     )
 
     private fun mockFingerprintResults(finger: Finger) =
-        FingerTemplateCaptureResult(finger, byteArrayOf(), 1, FingerprintTemplateFormat.ISO_19794_2)
+        FingerTemplateCaptureResult(finger, byteArrayOf(), 1, "ISO_19794_2")
 
     private fun mockFaceResultsList(format: String) =
         listOf(FaceTemplateCaptureResult(byteArrayOf(), format))

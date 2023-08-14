@@ -24,7 +24,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
@@ -68,7 +67,7 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
                     fingerIdentifier = Finger.RIGHT_THUMB,
                     template = byteArrayOf(),
                     templateQualityScore = 42,
-                    format = FingerprintTemplateFormat.NEC_1,
+                    format = "NEC_1",
                     imageRef = null
                 )),
             ))
@@ -79,7 +78,7 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
                 finger = Finger.RIGHT_THUMB,
                 template = byteArrayOf(),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.NEC_1,
+                format = "NEC_1",
             )
         )))
     }

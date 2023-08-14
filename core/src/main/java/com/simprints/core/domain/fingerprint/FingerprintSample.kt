@@ -2,16 +2,15 @@ package com.simprints.core.domain.fingerprint
 
 import android.os.Parcelable
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import kotlinx.parcelize.Parcelize
-import java.util.*
+import java.util.UUID
 
 @Parcelize
 data class FingerprintSample(
     val fingerIdentifier: IFingerIdentifier,
     val template: ByteArray,
     val templateQualityScore: Int,
-    val format: IFingerprintTemplateFormat,
+    val format: String,
     val id: String = UUID.randomUUID().toString(),
 ) : Parcelable {
 

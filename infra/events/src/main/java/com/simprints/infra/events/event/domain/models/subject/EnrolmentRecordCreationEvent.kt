@@ -6,7 +6,6 @@ import com.simprints.core.domain.face.uniqueId
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.events.event.domain.models.fingerprint.fromModuleApiToDomain
 import java.util.UUID
 
 @Keep
@@ -75,7 +74,7 @@ data class EnrolmentRecordCreationEvent(
                             it.fingerIdentifier
                         )
                     },
-                    fingerprintSamples.first().format.fromModuleApiToDomain()
+                    fingerprintSamples.first().format
                 )
             } else {
                 null
