@@ -134,8 +134,7 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
-                        it,
-                        listOf(CaptureState.NotCollected)
+                        it, listOf(CaptureState.NotCollected)
                     )
                 },
                 currentFingerIndex = 0,
@@ -204,10 +203,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
                 ScanResult(
-                    GOOD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 )
             )
         )
@@ -226,10 +222,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    GOOD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 )
             )
         )
@@ -255,10 +248,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    GOOD_QUALITY,
-                    TEMPLATE,
-                    IMAGE,
-                    60
+                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60
                 )
             )
         )
@@ -282,10 +272,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    BAD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 ), 1
             )
         )
@@ -306,10 +293,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    BAD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 ), 1
             )
         )
@@ -337,9 +321,7 @@ class CollectFingerprintsViewModelTest {
         mockScannerSetUiIdle()
         coEvery {
             scanner.captureFingerprint(
-                any(),
-                any(),
-                any()
+                any(), any(), any()
             )
         } throws ScannerDisconnectedException()
         withImageTransfer()
@@ -379,10 +361,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    BAD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 ), 1
             )
         )
@@ -390,10 +369,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    BAD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 ), 2
             )
         )
@@ -401,10 +377,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    BAD_QUALITY,
-                    TEMPLATE,
-                    IMAGE,
-                    60
+                    BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60
                 ), 3
             )
         )
@@ -438,10 +411,9 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = FOUR_FINGERS_IDS.map {
                     FingerState(
-                        it,
-                        listOf(
+                        it, listOf(
                             CaptureState.Collected(
-                                ScanResult(BAD_QUALITY, TEMPLATE, IMAGE, 60),
+                                ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
                                 numberOfBadScans = 3
                             )
                         )
@@ -488,14 +460,10 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
-                        it,
-                        listOf(
+                        it, listOf(
                             CaptureState.Collected(
                                 ScanResult(
-                                    GOOD_QUALITY,
-                                    TEMPLATE,
-                                    IMAGE,
-                                    60
+                                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60
                                 )
                             )
                         )
@@ -541,8 +509,13 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
-                        it,
-                        listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
+                        it, listOf(
+                            CaptureState.Collected(
+                                ScanResult(
+                                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
+                                )
+                            )
+                        )
                     )
                 },
                 currentFingerIndex = 1,
@@ -591,10 +564,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    DIFFERENT_GOOD_QUALITY,
-                    DIFFERENT_TEMPLATE,
-                    null,
-                    60
+                    DIFFERENT_GOOD_QUALITY, DIFFERENT_TEMPLATE, TEMPLATE_FORMAT, null, 60
                 )
             )
         )
@@ -633,8 +603,7 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = FOUR_FINGERS_IDS.map {
                     FingerState(
-                        it,
-                        listOf(CaptureState.Skipped)
+                        it, listOf(CaptureState.Skipped)
                     )
                 },
                 currentFingerIndex = 3,
@@ -652,8 +621,7 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
-                        it,
-                        listOf(CaptureState.NotCollected)
+                        it, listOf(CaptureState.NotCollected)
                     )
                 },
                 currentFingerIndex = 0,
@@ -669,10 +637,19 @@ class CollectFingerprintsViewModelTest {
     fun receivesMixOfScanResults_withImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() {
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(
-            BAD_SCAN, NO_FINGER_DETECTED, BAD_SCAN, GOOD_SCAN,
-            BAD_SCAN, NO_FINGER_DETECTED, NO_FINGER_DETECTED, // skipped
-            NO_FINGER_DETECTED, BAD_SCAN, BAD_SCAN, BAD_SCAN,
-            NO_FINGER_DETECTED, GOOD_SCAN
+            BAD_SCAN,
+            NO_FINGER_DETECTED,
+            BAD_SCAN,
+            GOOD_SCAN,
+            BAD_SCAN,
+            NO_FINGER_DETECTED,
+            NO_FINGER_DETECTED, // skipped
+            NO_FINGER_DETECTED,
+            BAD_SCAN,
+            BAD_SCAN,
+            BAD_SCAN,
+            NO_FINGER_DETECTED,
+            GOOD_SCAN
         )
         acquireImageResponses(OK)
         withImageTransfer()
@@ -708,29 +685,23 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = listOf(
                     FingerState(
-                        FOUR_FINGERS_IDS[0],
-                        listOf(
+                        FOUR_FINGERS_IDS[0], listOf(
                             CaptureState.Collected(
-                                ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60),
+                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
                                 numberOfBadScans = 2
                             )
                         )
-                    ),
-                    FingerState(FOUR_FINGERS_IDS[1], listOf(CaptureState.Skipped)),
-                    FingerState(
-                        FOUR_FINGERS_IDS[2],
-                        listOf(
+                    ), FingerState(FOUR_FINGERS_IDS[1], listOf(CaptureState.Skipped)), FingerState(
+                        FOUR_FINGERS_IDS[2], listOf(
                             CaptureState.Collected(
-                                ScanResult(BAD_QUALITY, TEMPLATE, IMAGE, 60),
+                                ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
                                 numberOfBadScans = 3
                             )
                         )
-                    ),
-                    FingerState(
-                        FOUR_FINGERS_IDS[3],
-                        listOf(
+                    ), FingerState(
+                        FOUR_FINGERS_IDS[3], listOf(
                             CaptureState.Collected(
-                                ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60),
+                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
                                 numberOfBadScans = 0
                             )
                         )
@@ -766,10 +737,19 @@ class CollectFingerprintsViewModelTest {
     fun receivesMixOfScanResults_withEagerImageTransfer_updatesStateCorrectlyAndReturnsFingersCorrectly() {
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(
-            BAD_SCAN, NO_FINGER_DETECTED, BAD_SCAN, GOOD_SCAN,
-            BAD_SCAN, NO_FINGER_DETECTED, NO_FINGER_DETECTED, // skipped
-            NO_FINGER_DETECTED, BAD_SCAN, BAD_SCAN, BAD_SCAN,
-            NO_FINGER_DETECTED, GOOD_SCAN
+            BAD_SCAN,
+            NO_FINGER_DETECTED,
+            BAD_SCAN,
+            GOOD_SCAN,
+            BAD_SCAN,
+            NO_FINGER_DETECTED,
+            NO_FINGER_DETECTED, // skipped
+            NO_FINGER_DETECTED,
+            BAD_SCAN,
+            BAD_SCAN,
+            BAD_SCAN,
+            NO_FINGER_DETECTED,
+            GOOD_SCAN
         )
         acquireImageResponses(OK)
         withImageTransfer(isEager = true)
@@ -805,29 +785,23 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = listOf(
                     FingerState(
-                        FOUR_FINGERS_IDS[0],
-                        listOf(
+                        FOUR_FINGERS_IDS[0], listOf(
                             CaptureState.Collected(
-                                ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60),
+                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
                                 numberOfBadScans = 2
                             )
                         )
-                    ),
-                    FingerState(FOUR_FINGERS_IDS[1], listOf(CaptureState.Skipped)),
-                    FingerState(
-                        FOUR_FINGERS_IDS[2],
-                        listOf(
+                    ), FingerState(FOUR_FINGERS_IDS[1], listOf(CaptureState.Skipped)), FingerState(
+                        FOUR_FINGERS_IDS[2], listOf(
                             CaptureState.Collected(
-                                ScanResult(BAD_QUALITY, TEMPLATE, IMAGE, 60),
+                                ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
                                 numberOfBadScans = 3
                             )
                         )
-                    ),
-                    FingerState(
-                        FOUR_FINGERS_IDS[3],
-                        listOf(
+                    ), FingerState(
+                        FOUR_FINGERS_IDS[3], listOf(
                             CaptureState.Collected(
-                                ScanResult(GOOD_QUALITY, TEMPLATE, IMAGE, 60),
+                                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60),
                                 numberOfBadScans = 0
                             )
                         )
@@ -887,10 +861,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
                 ScanResult(
-                    GOOD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 )
             )
         )
@@ -898,10 +869,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
                 ScanResult(
-                    GOOD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 )
             )
         )
@@ -931,8 +899,7 @@ class CollectFingerprintsViewModelTest {
             CollectFingerprintsState(
                 fingerStates = TWO_FINGERS_IDS.map {
                     FingerState(
-                        it,
-                        listOf(CaptureState.NotCollected)
+                        it, listOf(CaptureState.NotCollected)
                     )
                 },
                 currentFingerIndex = 0,
@@ -981,10 +948,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
                 ScanResult(
-                    GOOD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 )
             )
         )
@@ -1005,10 +969,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
                 ScanResult(
-                    GOOD_QUALITY,
-                    TEMPLATE,
-                    null,
-                    60
+                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60
                 )
             )
         )
@@ -1237,8 +1198,7 @@ class CollectFingerprintsViewModelTest {
     }
 
     private fun withImageTransfer(isEager: Boolean = false) {
-        every { vero2Configuration.imageSavingStrategy } returns
-            if (isEager) Vero2Configuration.ImageSavingStrategy.EAGER else Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
+        every { vero2Configuration.imageSavingStrategy } returns if (isEager) Vero2Configuration.ImageSavingStrategy.EAGER else Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
         coEvery { imageManager.save(any(), any(), any()) } returns mockk()
     }
 
@@ -1300,12 +1260,12 @@ class CollectFingerprintsViewModelTest {
 
 
         fun toCaptureFingerprintResponse(): Any = when (this) {
-            GOOD_SCAN -> CaptureFingerprintResponse(TEMPLATE, GOOD_QUALITY)
+            GOOD_SCAN -> CaptureFingerprintResponse(TEMPLATE, TEMPLATE_FORMAT, GOOD_QUALITY)
             DIFFERENT_GOOD_SCAN -> CaptureFingerprintResponse(
-                DIFFERENT_TEMPLATE,
-                DIFFERENT_GOOD_QUALITY
+                DIFFERENT_TEMPLATE, TEMPLATE_FORMAT, DIFFERENT_GOOD_QUALITY
             )
-            BAD_SCAN -> CaptureFingerprintResponse(TEMPLATE, BAD_QUALITY)
+
+            BAD_SCAN -> CaptureFingerprintResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
             NO_FINGER_DETECTED -> NoFingerDetectedException()
             DISCONNECTED -> ScannerDisconnectedException()
             UNKNOWN_ERROR -> Error("Oops!")
@@ -1331,6 +1291,7 @@ class CollectFingerprintsViewModelTest {
         )
 
         const val GOOD_QUALITY = 80
+        const val TEMPLATE_FORMAT = "ISO_19794_2"
         const val DIFFERENT_GOOD_QUALITY = 80
         const val BAD_QUALITY = 20
 

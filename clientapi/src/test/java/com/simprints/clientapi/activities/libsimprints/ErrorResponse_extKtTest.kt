@@ -182,4 +182,11 @@ class ErrorResponseExtKtTest {
 
         assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
     }
+    @Test
+    fun libSimprintsResultCode_BLUETOOTH_NO_PERMISSION_mapCorrectly() {
+        val errorResponseReason = ErrorResponse.Reason.BLUETOOTH_NO_PERMISSION
+        val libSimprintsreason = Constants.SIMPRINTS_BLUETOOTH_NO_PERMISSION
+
+        assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
+    }
 }

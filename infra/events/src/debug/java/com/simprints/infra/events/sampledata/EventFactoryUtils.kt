@@ -67,7 +67,6 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.Location
@@ -279,7 +278,7 @@ fun createFingerprintCaptureEvent(): FingerprintCaptureEvent {
     val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
         LEFT_THUMB,
         8,
-        FingerprintTemplateFormat.ISO_19794_2
+        "ISO_19794_2"
     )
 
     return FingerprintCaptureEvent(
@@ -300,7 +299,7 @@ fun createFingerprintCaptureBiometricsEvent(): FingerprintCaptureBiometricsEvent
             LEFT_THUMB,
             "sometemplate",
             10,
-            FingerprintTemplateFormat.ISO_19794_2
+            "ISO_19794_2"
         )
 
     return FingerprintCaptureBiometricsEvent(

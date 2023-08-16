@@ -14,6 +14,7 @@ fun AlertError.fromFingerprintAlertToAlertTypeEvent(): CoreAlertScreenEventType 
     AlertError.DISCONNECTED -> CoreAlertScreenEventType.DISCONNECTED
     AlertError.LOW_BATTERY -> CoreAlertScreenEventType.LOW_BATTERY
     AlertError.UNEXPECTED_ERROR -> CoreAlertScreenEventType.UNEXPECTED_ERROR
+    AlertError.BLUETOOTH_NO_PERMISSION -> CoreAlertScreenEventType.BLUETOOTH_NO_PERMISSION
 }
 
 /**

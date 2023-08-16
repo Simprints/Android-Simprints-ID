@@ -4,13 +4,13 @@ import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.BLUETOOTH_NO_PERMISSION
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.UNEXPECTED_ERROR
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.moduleapi.common.IPath
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
-import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintMatchResult
@@ -37,7 +37,7 @@ object DomainToFingerprintResponse {
                     fingerprint.imageRef?.path?.let {
                         ISecuredImageRefImpl(IPathImpl(it.parts))
                     },
-                    fingerprint.format.fromDomainToModuleApi()
+                    fingerprint.format
                 )
             )
         })
@@ -70,6 +70,7 @@ object DomainToFingerprintResponse {
         when (reason) {
             UNEXPECTED_ERROR -> IFingerprintErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
+            BLUETOOTH_NO_PERMISSION -> IFingerprintErrorReason.BLUETOOTH_NO_PERMISSION
         }
 
     fun fromDomainToFingerprintConfigurationResponse(@Suppress("UNUSED_PARAMETER") configurationResponse: FingerprintConfigurationResponse): IFingerprintConfigurationResponse =
@@ -127,7 +128,7 @@ private class IFingerprintSampleImpl(
     override val template: ByteArray,
     override val templateQualityScore: Int,
     override val imageRef: ISecuredImageRef?,
-    override val format: IFingerprintTemplateFormat
+    override val format: String
 ) : IFingerprintSample
 
 @Parcelize

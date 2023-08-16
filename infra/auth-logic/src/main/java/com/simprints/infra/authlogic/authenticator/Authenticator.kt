@@ -1,14 +1,14 @@
 package com.simprints.infra.authlogic.authenticator
 
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
+import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
+import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.authlogic.model.AuthenticateDataResult
 import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authlogic.model.toDomainResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
-import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
-import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
@@ -40,8 +40,8 @@ internal class Authenticator @Inject constructor(
             authStore.cleanCredentials()
 
             loginStartTime = timeHelper.now()
-            val nonceScope = NonceScope(projectId, userId)
-            projectAuthenticator.authenticate(nonceScope, projectSecret, deviceId)
+            val nonceScope = NonceScope(projectId, deviceId)
+            projectAuthenticator.authenticate(nonceScope, projectSecret)
 
             logMessageForCrashReportWithNetworkTrigger("Sign in success")
             AuthenticateDataResult.Authenticated

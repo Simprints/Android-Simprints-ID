@@ -30,7 +30,8 @@ internal data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCal
         FACE_LICENSE_MISSING,
         FACE_LICENSE_INVALID,
         PROJECT_ENDING,
-        PROJECT_PAUSED
+        PROJECT_PAUSED,
+        BLUETOOTH_NO_PERMISSION
     }
 }
 
@@ -50,6 +51,7 @@ internal fun Reason.fromDomainToApi() =
         BACKEND_MAINTENANCE_ERROR -> ApiReason.BACKEND_MAINTENANCE_ERROR
         PROJECT_ENDING -> ApiReason.PROJECT_ENDING
         PROJECT_PAUSED -> ApiReason.PROJECT_PAUSED
+        BLUETOOTH_NO_PERMISSION -> ApiReason.BLUETOOTH_NO_PERMISSION
     }
 
 
@@ -69,4 +71,5 @@ internal fun ApiReason.fromApiToDomain(): Reason =
         ApiReason.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
         ApiReason.PROJECT_ENDING -> PROJECT_ENDING
         ApiReason.PROJECT_PAUSED -> PROJECT_PAUSED
+        ApiReason.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
     }

@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.event.remote.models.subject
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
@@ -25,7 +24,7 @@ class ApiEnrolmentRecordCreationEventTest {
                     listOf(
                         ApiFingerprintTemplate(10, "template", IFingerIdentifier.LEFT_THUMB)
                     ),
-                    FingerprintTemplateFormat.NEC_1,
+                    "NEC_1",
                 )
             )
         )
@@ -40,7 +39,7 @@ class ApiEnrolmentRecordCreationEventTest {
                     listOf(
                         FingerprintTemplate(10, "template", IFingerIdentifier.LEFT_THUMB)
                     ),
-                    FingerprintTemplateFormat.NEC_1,
+                    "NEC_1",
                 )
             )
         )

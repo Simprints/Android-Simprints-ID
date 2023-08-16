@@ -38,7 +38,7 @@ class BuildSubjectUseCase @Inject constructor(
         fromDomainToModuleApi(it.finger),
         it.template,
         it.templateQualityScore,
-        it.format.fromDomainToModuleApi()
+        it.format
     )
 
     private fun fromDomainToModuleApi(finger: Finger) = when (finger) {

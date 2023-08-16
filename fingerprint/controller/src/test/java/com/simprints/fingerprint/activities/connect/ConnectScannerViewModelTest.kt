@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Companion.MAX_RETRY_COUNT
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
@@ -33,6 +34,8 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.config.domain.models.FingerprintConfiguration.VeroGeneration.VERO_1
 import com.simprints.infra.config.domain.models.FingerprintConfiguration.VeroGeneration.VERO_2
+import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -43,6 +46,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
@@ -93,7 +97,12 @@ class ConnectScannerViewModelTest {
         every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(VERO_1, VERO_2)
         coEvery { configManager.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
 
-        scannerManager = ScannerManagerImpl(bluetoothAdapter, scannerFactory, pairingManager, SerialNumberConverter())
+        scannerManager = ScannerManagerImpl(
+            bluetoothAdapter,
+            scannerFactory,
+            pairingManager,
+            SerialNumberConverter()
+        )
         viewModel = ConnectScannerViewModel(
             scannerManager,
             mockk(relaxed = true),
@@ -102,6 +111,7 @@ class ConnectScannerViewModelTest {
             configManager,
             nfcManager,
         )
+        mockkObject(Simber)
     }
 
 
@@ -210,7 +220,9 @@ class ConnectScannerViewModelTest {
                 ConnectScannerViewModel.NUMBER_OF_STEPS + 1
             ) // 1 at the start
             verify(exactly = 2) { sessionEventsManager.addEventInBackground(any()) }    // The ScannerConnectionEvent + Vero2InfoSnapshotEvent
-            assertThat(scannerConnectionEvent?.scannerInfo?.hardwareVersion).isEqualTo(VERO_2_VERSION.hardwareVersion)
+            assertThat(scannerConnectionEvent?.scannerInfo?.hardwareVersion).isEqualTo(
+                VERO_2_VERSION.hardwareVersion
+            )
             val updatedActivity =
                 updateActivityFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
             assertThat(updatedActivity.lastScannerUsed).isNotEmpty()
@@ -422,6 +434,32 @@ class ConnectScannerViewModelTest {
         viewModel.startRetryingToConnect()
 
         coVerify(exactly = MAX_RETRY_COUNT) { scannerWrapper.connect() }
+    }
+
+    @Test
+    fun when_logScannerErrorDialogShownToCrashReport_called_then_Simber_logs_the_message() {
+        viewModel.logScannerErrorDialogShownToCrashReport()
+        verify {
+            Simber.tag(LoggingConstants.CrashReportTag.ALERT.name)
+            Simber.i("Scanner error confirm dialog shown")
+        }
+    }
+
+    @Test
+    fun handleNoBluetoothPermission_sendsAlertErrorEvent() {
+        val observer = viewModel.launchAlert.testObserver()
+
+        viewModel.handleNoBluetoothPermission()
+        observer.assertEventReceivedWithContent(AlertError.BLUETOOTH_NO_PERMISSION)
+    }
+
+    @Test
+    fun setBluetoothPermission_sendsBluetoothPermissionEvent() {
+        PermissionStatus.values().forEach { permission ->
+            val observer = viewModel.bluetoothPermission.testObserver()
+            viewModel.setBluetoothPermission(permission)
+            observer.assertEventReceivedWithContent(permission)
+        }
     }
 
     private fun setupBluetooth(isEnabled: Boolean = true, numberOfPairedScanners: Int = 1) {

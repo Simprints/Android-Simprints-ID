@@ -56,7 +56,7 @@ class PersonCreationEventHelperImpl(
                         fingerId.fromDomainToModuleApi(),
                         sample.template,
                         sample.templateQualityScore,
-                        sample.format.fromDomainToModuleApi()
+                        sample.format
                     )
                 }
             }

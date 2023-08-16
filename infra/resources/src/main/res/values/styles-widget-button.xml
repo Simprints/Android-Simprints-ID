@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Buttons definitions are in a separate file since there is large number of variations.
+        Styles follow same rules and conventions as described in styles-widget.xml.
+
+        https://m2.material.io/components/buttons/android#theming-buttons
+     -->
+
+    <!-- Default colors -->
+    <style name="Widget.Simprints.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:minHeight">56dp</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button.TextButton</item>
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Button</item>
+        <item name="shapeAppearance">@style/Shape.Simprints.SmallComponent</item>
+    </style>
+
+    <style name="Widget.Simprints.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:minHeight">56dp</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button.TextButton</item>
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Button</item>
+        <item name="shapeAppearance">@style/Shape.Simprints.SmallComponent</item>
+    </style>
+
+    <style name="Widget.Simprints.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:minHeight">56dp</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button</item>
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Button</item>
+        <item name="shapeAppearance">@style/Shape.Simprints.SmallComponent</item>
+    </style>
+
+    <!-- Primary we use secondary color as main one for clickable elements-->
+    <style name="ThemeOverlay.Simprints.Button.TextButton" parent="">
+        <item name="colorPrimary">@color/simprints_orange</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.Button" parent="">
+        <item name="colorPrimary">@color/simprints_orange</item>
+        <item name="colorOnPrimary">@color/simprints_text_white</item>
+    </style>
+
+    <!-- Custom colors of regular button -->
+    <style name="Widget.Simprints.Button.White">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button.White</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.Button.White" parent="">
+        <item name="colorPrimary">@color/simprints_off_white</item>
+        <item name="colorOnPrimary">@color/simprints_text_black</item>
+    </style>
+
+    <style name="Widget.Simprints.Button.Blue">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button.Blue</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.Button.Blue" parent="">
+        <item name="colorPrimary">@color/simprints_blue</item>
+        <item name="colorOnPrimary">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Widget.Simprints.Button.Red">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button.Red</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.Button.Red" parent="">
+        <item name="colorPrimary">@color/simprints_red_dark</item>
+        <item name="colorOnPrimary">@color/simprints_text_white</item>
+    </style>
+
+    <style name="Widget.Simprints.Button.Green">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Button.Green</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.Button.Green" parent="">
+        <item name="colorPrimary">@color/simprints_green_dark</item>
+        <item name="colorOnPrimary">@color/simprints_text_white</item>
+    </style>
+
+    <!-- Custom colors of text button -->
+    <style name="Widget.Simprints.Button.TextButton.Grey">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TextButton.Grey</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.TextButton.Grey" parent="">
+        <item name="colorPrimary">@color/simprints_text_grey</item>
+    </style>
+
+    <style name="Widget.Simprints.Button.TextButton.Blue">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TextButton.Blue</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.TextButton.Blue" parent="">
+        <item name="colorPrimary">@color/simprints_text_blue</item>
+    </style>
+
+    <style name="Widget.Simprints.Button.TextButton.White">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TextButton.White</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.TextButton.White" parent="">
+        <item name="colorPrimary">@color/simprints_text_white</item>
+    </style>
+
+</resources>

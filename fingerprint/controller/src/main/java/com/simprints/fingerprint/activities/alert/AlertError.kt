@@ -60,6 +60,14 @@ enum class AlertError(
         rightButton = Buttons.bluetoothSettingsButton()
     ),
 
+    BLUETOOTH_NO_PERMISSION(
+        title = R.string.no_permission_title,
+        message = R.string.bluetooth_no_permission_message,
+        mainDrawable = IDR.drawable.ic_alert_bt,
+        hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
+        leftButton = Buttons.appSettingsButton()
+    ),
+
     NOT_PAIRED(
         title = R.string.bluetooth_error_pair_scanner_and_device_title,
         message = R.string.bluetooth_error_pair_scanner_and_device_message,
@@ -124,6 +132,12 @@ enum class AlertError(
             resultKey = ACTION_BT_SETTINGS
         }
 
+        fun appSettingsButton() = alertButton {
+            textRes = R.string.settings_label
+            closeOnClick = true
+            resultKey = ACTION_APP_SETTINGS
+        }
+
         fun tryAgainButton() = alertButton {
             textRes = R.string.try_again_label
             closeOnClick = true
@@ -159,6 +173,7 @@ enum class AlertError(
         internal const val ACTION_RETRY = "action_retry"
         internal const val ACTION_REFUSAL = "action_refusal"
         internal const val ACTION_BT_SETTINGS = "action_bt_settings"
+        internal const val ACTION_APP_SETTINGS = "action_app_settings"
         internal const val ACTION_PAIR = "action_pair"
     }
 
