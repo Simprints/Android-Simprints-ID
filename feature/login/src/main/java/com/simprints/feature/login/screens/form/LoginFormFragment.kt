@@ -88,6 +88,9 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Login button clicked")
 
             binding.loginProgress.isVisible = true
+            binding.loginButtonScanQr.isEnabled = false
+            binding.loginButtonSignIn.isEnabled = false
+
             viewModel.signInClicked(
                 args.loginParams,
                 binding.loginProjectId.text.toString(),
@@ -105,6 +108,9 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     private fun handleSignInResult(result: SignInState) {
         binding.loginProgress.isVisible = false
         binding.loginErrorCard.isVisible = false
+        binding.loginButtonScanQr.isEnabled = true
+        binding.loginButtonSignIn.isEnabled = true
+
 
         when (result) {
             // Showing toast

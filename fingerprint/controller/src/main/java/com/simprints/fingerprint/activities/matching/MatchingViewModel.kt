@@ -17,8 +17,6 @@ import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.infra.matcher.FingerprintMatcher
-import com.simprints.fingerprint.infra.matcher.domain.MatchingAlgorithm
-import com.simprints.fingerprint.infra.matcher.domain.TemplateFormat
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
@@ -116,7 +114,7 @@ class MatchingViewModel @Inject constructor(
         fingerprintMatcher.match(
             probeFingerprints.toFingerprintIdentity().fromDomainToMatcher(),
             candidates.map { it.fromDomainToMatcher() },
-            DEFAULT_MATCHING_ALGORITHM, isCrossFingerMatchingEnabled,
+            isCrossFingerMatchingEnabled,
         ).map { it.fromMatcherToDomain() }
 
     private fun handleMatchFailed(e: Throwable) {
@@ -133,7 +131,7 @@ class MatchingViewModel @Inject constructor(
         MatcherFingerprintIdentity(subjectId, fingerprints.map { it.fromDomainToMatcher() })
 
     private fun Fingerprint.fromDomainToMatcher(): MatcherFingerprint =
-        MatcherFingerprint(fingerId.fromDomainToMatcher(), templateBytes, SAVED_TEMPLATE_FORMAT)
+        MatcherFingerprint(fingerId.fromDomainToMatcher(), templateBytes, format)
 
     private fun FingerIdentifier.fromDomainToMatcher(): MatcherFingerIdentifier =
         when (this) {
@@ -167,8 +165,4 @@ class MatchingViewModel @Inject constructor(
         val finishDelayMillis: Int
     )
 
-    companion object {
-        val SAVED_TEMPLATE_FORMAT = TemplateFormat.ISO_19794_2_2011
-        val DEFAULT_MATCHING_ALGORITHM = MatchingAlgorithm.SIM_AFIS
-    }
 }

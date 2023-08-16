@@ -4,7 +4,7 @@
     tools:ignore="LockedOrientationActivity">
 
     <application
-        android:theme="@style/AppTheme"
+        android:theme="@style/Theme.Simprints"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity

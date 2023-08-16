@@ -245,8 +245,8 @@ class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) {
 
     private fun renderProgressBar(valid: Boolean) {
         binding.apply {
-            val progressColor = if (valid) IDR.color.simprints_light_green
-            else IDR.color.simprints_light_blue_grey
+            val progressColor = if (valid) IDR.color.simprints_green_light
+            else IDR.color.simprints_blue_grey_light
 
             captureProgress.progressColor = ContextCompat.getColor(
                 requireContext(), progressColor

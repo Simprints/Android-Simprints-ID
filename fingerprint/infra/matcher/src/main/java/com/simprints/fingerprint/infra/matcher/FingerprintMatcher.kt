@@ -3,7 +3,6 @@ package com.simprints.fingerprint.infra.matcher
 import com.simprints.fingerprint.infra.matcher.algorithms.simafis.SimAfisMatcher
 import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.matcher.domain.MatchResult
-import com.simprints.fingerprint.infra.matcher.domain.MatchingAlgorithm
 
 interface FingerprintMatcher {
 
@@ -18,7 +17,6 @@ interface FingerprintMatcher {
     fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
-        matchingAlgorithm: MatchingAlgorithm,
         crossFingerComparison: Boolean
     ) : List<MatchResult>
 

@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.status.down
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -18,10 +19,12 @@ import com.simprints.infra.eventsync.exceptions.MissingArgumentForDownSyncScopeE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
-import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.*
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.SubjectModuleScope
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.SubjectProjectScope
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope.SubjectUserScope
 import com.simprints.infra.eventsync.status.down.local.DbEventDownSyncOperationStateDao
 import com.simprints.infra.eventsync.status.down.local.DbEventsDownSyncOperationState
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
@@ -29,6 +32,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -48,6 +52,9 @@ internal class EventDownSyncScopeRepositoryTest {
     lateinit var authStore: AuthStore
 
     @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @MockK
     lateinit var downSyncOperationOperationDao: DbEventDownSyncOperationStateDao
 
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -61,11 +68,14 @@ internal class EventDownSyncScopeRepositoryTest {
         eventDownSyncScopeRepository =
             EventDownSyncScopeRepository(
                 authStore,
+                recentUserActivityManager,
                 downSyncOperationOperationDao,
             )
 
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
-        every { authStore.signedInUserId } returns DEFAULT_USER_ID
+        coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
+            every { lastUserUsed } returns DEFAULT_USER_ID
+        }
         coEvery { downSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
 
@@ -127,7 +137,9 @@ internal class EventDownSyncScopeRepositoryTest {
     @Test
     fun throwWhenUserIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
-            every { authStore.signedInUserId } returns ""
+            coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
+                every { lastUserUsed } returns ""
+            }
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
                 eventDownSyncScopeRepository.getDownSyncScope(

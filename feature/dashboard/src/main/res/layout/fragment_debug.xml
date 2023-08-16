@@ -31,38 +31,43 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/syncStart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:text="Sync Events"
                 tools:ignore="HardcodedText" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/syncConfig"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:text="Sync Config"
                 tools:ignore="HardcodedText" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/syncDevice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:text="Sync Device"
                 tools:ignore="HardcodedText" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/syncStop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:text="Stop Event Sync"
                 tools:ignore="HardcodedText" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/syncSchedule"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
                 android:text="Schedule Event Sync"
                 tools:ignore="HardcodedText" />
 
@@ -78,18 +83,20 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/printRoomDb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
             android:layout_weight="1"
             android:text="Print subjects + events"
             tools:ignore="HardcodedText" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/cleanAll"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="4dp"
             android:layout_weight="1"
             android:text="Delete subjects + events"
             tools:ignore="HardcodedText" />

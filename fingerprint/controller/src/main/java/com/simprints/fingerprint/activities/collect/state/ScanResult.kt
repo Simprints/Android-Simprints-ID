@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect.state
 data class ScanResult(
     val qualityScore: Int,
     val template: ByteArray,
+    val templateFormat: String,
     val image: ByteArray?,
     private val qualityThreshold: Int
 ) {

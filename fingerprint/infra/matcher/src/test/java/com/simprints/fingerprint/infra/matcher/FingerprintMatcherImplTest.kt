@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import com.simprints.fingerprint.infra.matcher.algorithms.simafis.SimAfisMatcher
 import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.matcher.domain.MatchResult
-import com.simprints.fingerprint.infra.matcher.domain.MatchingAlgorithm
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -20,7 +19,6 @@ class FingerprintMatcherImplTest {
         val matcher = FingerprintMatcherImpl(simAfisMatcher)
         val probe: FingerprintIdentity = mockk()
         val candidates: List<FingerprintIdentity> = mockk()
-        val matchingAlgorithm = MatchingAlgorithm.SIM_AFIS
         val crossFingerComparison = false
         val matchResult: List<MatchResult> = mockk()
         every {
@@ -28,7 +26,7 @@ class FingerprintMatcherImplTest {
         } returns matchResult
 
         // When
-        val result = matcher.match(probe, candidates, matchingAlgorithm, crossFingerComparison)
+        val result = matcher.match(probe, candidates, crossFingerComparison)
 
         // Then
         Truth.assertThat(result).isEqualTo(matchResult)

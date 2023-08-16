@@ -2,11 +2,12 @@ package com.simprints.feature.enrollast
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 
 import org.junit.Test
 
 class EnrolLastBiometricParamsTest {
+
+    private val isoTemplateFormat = "ISO_19794_2"
 
     @Test
     fun testFingerTemplateCaptureResultEquals() {
@@ -14,7 +15,7 @@ class EnrolLastBiometricParamsTest {
             finger = Finger.LEFT_THUMB,
             template = byteArrayOf(3, 4),
             templateQualityScore = 42,
-            format = FingerprintTemplateFormat.ISO_19794_2
+            format = isoTemplateFormat
         )
 
         assertThat(result).isEqualTo(
@@ -22,7 +23,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = isoTemplateFormat
             )
         )
         assertThat(result).isNotEqualTo(
@@ -30,7 +31,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = isoTemplateFormat
             )
         )
         assertThat(result).isNotEqualTo(
@@ -38,7 +39,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4, 5),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = isoTemplateFormat
             )
         )
         assertThat(result).isNotEqualTo(
@@ -46,7 +47,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 41,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = isoTemplateFormat
             )
         )
         assertThat(result).isNotEqualTo(
@@ -54,7 +55,7 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4, 5, 6),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.NEC_1
+                format = "NEC_1"
             )
         )
 
@@ -67,14 +68,14 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = isoTemplateFormat
             ).hashCode()
         ).isEqualTo(
             FingerTemplateCaptureResult(
                 finger = Finger.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = isoTemplateFormat
             ).hashCode()
         )
         assertThat(
@@ -82,14 +83,14 @@ class EnrolLastBiometricParamsTest {
                 finger = Finger.LEFT_THUMB,
                 template = byteArrayOf(3, 4),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = isoTemplateFormat
             ).hashCode()
         ).isNotEqualTo(
             FingerTemplateCaptureResult(
                 finger = Finger.RIGHT_3RD_FINGER,
                 template = byteArrayOf(3, 4, 5, 6),
                 templateQualityScore = 42,
-                format = FingerprintTemplateFormat.ISO_19794_2
+                format = isoTemplateFormat
             ).hashCode()
         )
     }

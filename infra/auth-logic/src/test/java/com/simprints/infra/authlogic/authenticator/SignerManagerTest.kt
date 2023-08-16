@@ -6,7 +6,6 @@ import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.network.SimNetwork
@@ -99,7 +98,7 @@ internal class SignerManagerTest {
 
         signIn()
 
-        verify { mockAuthStore.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }
+        verify { mockAuthStore.storeCredentials(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -228,10 +227,10 @@ internal class SignerManagerTest {
         verify(exactly = 1) { mockAuthStore.signedInProjectId }
     }
 
-    private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token)
+    private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, token)
 
     private fun mockStoreCredentialsLocally(error: Boolean = false) =
-        every { mockAuthStore.storeCredentials(DEFAULT_PROJECT_ID, DEFAULT_USER_ID) }.apply {
+        every { mockAuthStore.storeCredentials(DEFAULT_PROJECT_ID) }.apply {
             if (!error) {
                 this.returns(Unit)
             } else {

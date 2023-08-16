@@ -9,10 +9,10 @@
 
     <TextView
         android:id="@+id/splashGetReady"
+        style="@style/Text.Headline6.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textColor="@color/simprints_white"
+        android:text="@string/get_ready"
         app:layout_constraintBottom_toTopOf="@+id/splashTryAnotherFinger"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -22,12 +22,11 @@
 
     <TextView
         android:id="@+id/splashTryAnotherFinger"
+        style="@style/Text.Headline5.White.Bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="26sp"
         android:gravity="center"
-        android:textColor="@color/simprints_white"
-        android:textStyle="bold"
+        android:text="@string/try_another_finger"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

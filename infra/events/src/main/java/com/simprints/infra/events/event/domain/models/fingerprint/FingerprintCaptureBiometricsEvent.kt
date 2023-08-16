@@ -49,7 +49,7 @@ data class FingerprintCaptureBiometricsEvent(
             val finger: IFingerIdentifier,
             val template: String,
             val quality: Int,
-            val format: FingerprintTemplateFormat = FingerprintTemplateFormat.ISO_19794_2
+            val format: String
         )
     }
 
