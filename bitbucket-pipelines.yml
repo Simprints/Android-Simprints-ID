@@ -185,7 +185,7 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew fingerprint:controller:jacocoTestReport
-                    - ./gradlew fingerprint:infra:matcher:jacocoTestReport
+                    - ./gradlew fingerprint:infra:bio-sdk-impl:jacocoTestReport
                     - ./gradlew fingerprint:infra:scanner:jacocoTestReport
 
 

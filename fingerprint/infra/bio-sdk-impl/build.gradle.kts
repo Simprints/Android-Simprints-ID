@@ -4,8 +4,6 @@ plugins {
 
 android {
     namespace = "com.simprints.fingerprint.infra.biosdkimpl"
-
-
 }
 
 dependencies {

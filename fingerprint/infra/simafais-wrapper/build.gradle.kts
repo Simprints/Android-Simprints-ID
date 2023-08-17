@@ -11,5 +11,5 @@ android {
 }
 
 dependencies {
-    api(libs.simmatcher)
+    runtimeOnly(libs.simmatcher)
 }

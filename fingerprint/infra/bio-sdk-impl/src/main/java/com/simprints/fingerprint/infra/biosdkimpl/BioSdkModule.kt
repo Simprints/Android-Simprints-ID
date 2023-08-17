@@ -11,13 +11,9 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class BioSdkModule {
-
-
     //Todo:  the module will provide initializer and detector for fingerprint
     @Binds
     abstract fun provideFingerprintMatcher(impl: FingerprintMatcherImpl): FingerprintMatcher
-
-
 }
 
 
