@@ -55,8 +55,9 @@ include(
     ":fingerprint:controller",
     ":fingerprint:infra:scanner",
     ":fingerprint:infra:scannermock",
-    ":fingerprint:infra:basebiosdk",
-    ":fingerprint:infra:matcher",
+    ":fingerprint:infra:base-bio-sdk",
+    ":fingerprint:infra:bio-sdk-impl",
+    ":fingerprint:infra:simafais-wrapper",
 )
 
 // Modules to be refactored

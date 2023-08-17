@@ -67,7 +67,7 @@ circleImageView_version = "3.1.0"
 timber_version = "5.0.1"
 
 libsimprints_version = "2023.2.2"
-simmatcher_version = "1.1.0"
+simmatcher_version = "1.2.0"
 
 junit_version = "4.13.2"
 junit_ext_version = "1.1.5"
