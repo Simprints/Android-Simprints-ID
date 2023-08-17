@@ -13,8 +13,8 @@ import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
-import com.simprints.fingerprint.infra.matcher.FingerprintMatcher
-import com.simprints.fingerprint.infra.matcher.domain.MatchResult
+import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.infra.config.ConfigManager
@@ -29,7 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.Serializable
-import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity as MatcherFingerprintIdentity
 
 @RunWith(AndroidJUnit4::class)
 class MatchingViewModelTest {
