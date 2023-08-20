@@ -6,8 +6,6 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifi
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
-import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
-import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -43,7 +41,7 @@ class SimAfisMatcherTest {
 
                 Fingerprint(
                     FingerIdentifier.RIGHT_THUMB,
-                    mockTemplate(),
+                    IsoFingerprintTemplateGenerator.generate(1),
                     "ISO_19794_2"
                 )
             )
@@ -116,9 +114,6 @@ class SimAfisMatcherTest {
         verify(exactly = 0) { jniLibAfis.verify(any(), any()) }
         Truth.assertThat(result).isEqualTo(0)
     }
-
-    private fun mockTemplate(): ByteArray =
-        SimAfisFingerprint.generateRandomFingerprint(SimAfisFingerIdentifier.LEFT_THUMB).templateBytes
 
 
 }

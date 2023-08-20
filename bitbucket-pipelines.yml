@@ -191,7 +191,7 @@ definitions:
 
                 artifacts:
                     - fingerprint/controller/build/reports/**
-                    - fingerprint/infra/matcher/build/reports/**
+                    - fingerprint/infra/bio-sdk-impl/build/reports/**
                     - fingerprint/infra/scanner/build/reports/**
 
 

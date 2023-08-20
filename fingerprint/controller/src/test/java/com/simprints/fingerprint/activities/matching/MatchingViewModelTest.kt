@@ -13,7 +13,7 @@ import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
-import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
+import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.FingerprintGenerator
@@ -42,7 +42,7 @@ class MatchingViewModelTest {
 
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
-    private val mockMatcher: FingerprintMatcher = mockk()
+    private val mockFingerprintBioSdk: FingerprintBioSdk = mockk()
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>(relaxed = true)
     private val mockConfigManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
@@ -53,7 +53,7 @@ class MatchingViewModelTest {
         mockk(relaxed = true)
 
     private fun mockSuccessfulMatcher() {
-        every { mockMatcher.match(any(), any(), any()) } answers  {
+        every { mockFingerprintBioSdk.match(any(), any(), any()) } answers  {
             val probe = this.firstArg<MatcherFingerprintIdentity>()
             this.secondArg<List<MatcherFingerprintIdentity>>()
                 .map {
@@ -71,7 +71,7 @@ class MatchingViewModelTest {
 
     private fun mockMatcherError() {
         coEvery {
-            mockMatcher.match(
+            mockFingerprintBioSdk.match(
                 any(),
                 any(),
                 any(),
@@ -84,7 +84,7 @@ class MatchingViewModelTest {
     @Before
     fun setUp() {
         viewModel = MatchingViewModel(
-            mockMatcher,
+            mockFingerprintBioSdk,
             dbManagerMock,
             mockFingerprintSessionEventsManager,
             mockk(relaxed = true),
