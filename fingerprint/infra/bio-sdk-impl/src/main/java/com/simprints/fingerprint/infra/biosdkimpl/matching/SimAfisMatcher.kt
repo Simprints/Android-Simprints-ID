@@ -71,7 +71,7 @@ class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         SimAfisPerson(id, fingerprints.map { it.toSimAfisFingerprint() })
 
     private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint {
-        require(format != SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT) {
+        require(format == SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT) {
             "Attempting to use $format template format for SimAfisMatcher which only accepts $SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT"
         }
         return SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)

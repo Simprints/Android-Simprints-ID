@@ -15,9 +15,8 @@ class FingerprintBioSdk(
     /**
      * Initialize the SDK with the given parameters
      *
-     * @param params
      */
-    fun initialize(params: Map<String, Any>) = sdkInitializer.initialize(params)
+    fun initialize(initializationParams: Map<String, Any>) = sdkInitializer.initialize(initializationParams)
     fun acquireFingerprintImage() = fingerprintImageProvider.acquireFingerprintImage()
     fun acquireFingerprintTemplate() = fingerprintTemplateProvider.acquireFingerprintTemplate()
 

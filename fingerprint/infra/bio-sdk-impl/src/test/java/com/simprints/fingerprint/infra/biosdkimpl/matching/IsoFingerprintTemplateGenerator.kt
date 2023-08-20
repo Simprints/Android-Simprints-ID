@@ -107,7 +107,6 @@ object IsoFingerprintTemplateGenerator {
         val templateBytes = ByteArray(bb.remaining())
         bb[templateBytes]
         return templateBytes
-
     }
 
 }
