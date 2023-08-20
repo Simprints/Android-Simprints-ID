@@ -101,10 +101,10 @@ class SimAfisMatcherTest {
             "candidate",
             listOf(
                 Fingerprint(
-                    FingerIdentifier.LEFT_THUMB, byteArrayOf(), "ISO_19794_2"
+                    FingerIdentifier.LEFT_THUMB, IsoFingerprintTemplateGenerator.generate(1), "ISO_19794_2"
                 ),
                 Fingerprint(
-                    FingerIdentifier.RIGHT_THUMB, byteArrayOf(), "ISO_19794_2"
+                    FingerIdentifier.RIGHT_THUMB, IsoFingerprintTemplateGenerator.generate(1), "ISO_19794_2"
                 )
             )
         )
