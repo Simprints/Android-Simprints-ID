@@ -7,9 +7,8 @@ internal class FingerPrintTemplateProviderImpl: FingerprintTemplateProvider {
     override fun acquireFingerprintTemplate(): AcquireFingerprintTemplateResponse {
         //Todo Will add proper implementation later
         return AcquireFingerprintTemplateResponse(
-            template = ByteArray(0),
-            format = "",
-            imageQualityScore = 0
+            template = byteArrayOf(),
+            templateMetadata = mapOf()
         )
     }
 }

@@ -6,6 +6,6 @@ import com.simprints.fingerprint.infra.basebiosdk.acquization.domain.AcquireFing
 internal class FingerprintImageProviderImpl : FingerprintImageProvider {
     override fun acquireFingerprintImage(): AcquireFingerprintImageResponse {
         //Todo Will add proper implementation later
-        return AcquireFingerprintImageResponse(byteArrayOf())
+        return AcquireFingerprintImageResponse(byteArrayOf(), mapOf())
     }
 }
