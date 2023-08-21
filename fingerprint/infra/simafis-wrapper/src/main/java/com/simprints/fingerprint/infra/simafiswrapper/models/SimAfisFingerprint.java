@@ -5,10 +5,17 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+/**
+ * Represents a fingerprint in the Simprints Afis system.
+ * A fingerprint is identified by a finger identifier and has a quality score.
+ */
+@ExcludedFromGeneratedTestCoverageReports(reason ="POJO")
 public class SimAfisFingerprint implements Parcelable {
 
     private static final int ISO_FORMAT_ID = Integer.parseInt("464D5200", 16);     // 'F' 'M' 'R' 00hex

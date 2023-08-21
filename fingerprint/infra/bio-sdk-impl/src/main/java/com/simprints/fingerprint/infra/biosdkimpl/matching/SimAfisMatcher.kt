@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.basebiosdk.matching
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_3RD_FINGER
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier.LEFT_4TH_FINGER
@@ -77,6 +78,7 @@ class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         return SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
     }
 
+    @ExcludedFromGeneratedTestCoverageReports(reason = "This is just a mapping function")
     private fun FingerIdentifier.toSimAfisFingerIdentifier(): SimAfisFingerIdentifier =
         when (this) {
             RIGHT_5TH_FINGER -> SimAfisFingerIdentifier.RIGHT_5TH_FINGER
@@ -96,7 +98,7 @@ class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         candidates: List<FingerprintIdentity>
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
-    companion object{
+    companion object {
         const val SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT = "ISO_19794_2"
     }
 }

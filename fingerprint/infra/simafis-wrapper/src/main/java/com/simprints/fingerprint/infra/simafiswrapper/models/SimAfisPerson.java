@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -12,6 +14,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Represents a person in the Simprints Afis system.
+ * A person is identified by a Global Unique Id (GUID) and has a list of fingerprints.
+ * <p>
+ * Note: if the specified list of fingerprints contains several fingerprints of the same
+ * finger, only the one with the highest score will be kept.
+ */
+@ExcludedFromGeneratedTestCoverageReports(reason ="POJO")
 public class SimAfisPerson implements Parcelable {
 
     private final static SimAfisFingerIdentifier[] FINGER_IDENTIFIERS = SimAfisFingerIdentifier.values();
