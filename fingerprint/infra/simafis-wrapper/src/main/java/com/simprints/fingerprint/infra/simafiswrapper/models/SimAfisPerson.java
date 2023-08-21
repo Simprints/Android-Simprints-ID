@@ -5,8 +5,6 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import com.simprints.core.ExcludedFromGeneratedTestCoverageReports;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -21,13 +19,12 @@ import java.util.Map;
  * Note: if the specified list of fingerprints contains several fingerprints of the same
  * finger, only the one with the highest score will be kept.
  */
-@ExcludedFromGeneratedTestCoverageReports(reason ="POJO")
 public class SimAfisPerson implements Parcelable {
 
     private final static SimAfisFingerIdentifier[] FINGER_IDENTIFIERS = SimAfisFingerIdentifier.values();
 
-    private final String guid;
-    private final Map<SimAfisFingerIdentifier, SimAfisFingerprint> fingerprints;
+     final String guid;
+     final Map<SimAfisFingerIdentifier, SimAfisFingerprint> fingerprints;
 
 
     /**
