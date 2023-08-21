@@ -53,6 +53,24 @@ class SimAfisMatcherTest {
         Truth.assertThat(result.score).isEqualTo(1)
     }
 
+    @Test(expected = IllegalArgumentException::class)
+    fun `test matching other template format fails`() = runBlocking {
+        every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
+        val candidate = FingerprintIdentity(
+            "candidate",
+            listOf(
+
+                Fingerprint(
+                    FingerIdentifier.RIGHT_3RD_FINGER,
+                    IsoFingerprintTemplateGenerator.generate(1),
+                    "NEC_1"
+                )
+            )
+        )
+        //When
+        val result = simAfisMatcher.match(candidate, listOf(candidate), false).last()
+        //Then throws IllegalArgumentException
+    }
     @Test
     fun `test cross finger match`() = runBlocking {
         mockkStatic("com.simprints.fingerprint.infra.biosdkimpl.matching.CrossMatchingKt")
@@ -104,7 +122,7 @@ class SimAfisMatcherTest {
                     FingerIdentifier.LEFT_THUMB, IsoFingerprintTemplateGenerator.generate(1), "ISO_19794_2"
                 ),
                 Fingerprint(
-                    FingerIdentifier.RIGHT_THUMB, IsoFingerprintTemplateGenerator.generate(1), "ISO_19794_2"
+                    FingerIdentifier.LEFT_3RD_FINGER, IsoFingerprintTemplateGenerator.generate(1), "ISO_19794_2"
                 )
             )
         )
@@ -114,6 +132,4 @@ class SimAfisMatcherTest {
         verify(exactly = 0) { jniLibAfis.verify(any(), any()) }
         Truth.assertThat(result).isEqualTo(0)
     }
-
-
 }

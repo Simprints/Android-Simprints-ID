@@ -1,5 +1,8 @@
 package com.simprints.fingerprint.infra.simafiswrapper.models;
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports;
+
+@ExcludedFromGeneratedTestCoverageReports(reason ="POJO")
 public enum SimAfisFingerIdentifier {
     RIGHT_5TH_FINGER,
     RIGHT_4TH_FINGER,

@@ -187,12 +187,14 @@ definitions:
                     - ./gradlew fingerprint:controller:jacocoTestReport
                     - ./gradlew fingerprint:infra:bio-sdk-impl:jacocoTestReport
                     - ./gradlew fingerprint:infra:scanner:jacocoTestReport
+                    - ./gradlew fingerprint:infra:simafis-wrapper:jacocoTestReport
 
 
                 artifacts:
                     - fingerprint/controller/build/reports/**
                     - fingerprint/infra/bio-sdk-impl/build/reports/**
                     - fingerprint/infra/scanner/build/reports/**
+                    - fingerprint/infra/simafis-wrapper/build/reports/**
 
 
         ######################################################################
