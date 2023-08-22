@@ -32,7 +32,6 @@ dependencies {
     // Simprints
     implementation(project(":infra:events"))
     implementation(project(":infra:enrolment-records"))
-    implementation(project(":fingerprint:infra:matcher"))
     implementation(project(":fingerprint:infra:scanner"))
     implementation(project(":infra:config"))
     implementation(project(":infra:auth-store"))
@@ -40,6 +39,7 @@ dependencies {
     implementation(project(":infra:recent-user-activity"))
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
+    implementation(project(":fingerprint:infra:simprints-bio-sdk"))
 
     // If mock/dummy BT adapter is required test implementation can be switched to regular one
     testImplementation(project(":fingerprint:infra:scannermock"))
