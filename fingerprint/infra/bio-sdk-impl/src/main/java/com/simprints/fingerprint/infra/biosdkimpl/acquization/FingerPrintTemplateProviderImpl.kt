@@ -4,8 +4,8 @@ import com.simprints.fingerprint.infra.basebiosdk.acquization.FingerprintTemplat
 import com.simprints.fingerprint.infra.basebiosdk.acquization.domain.AcquireFingerprintTemplateResponse
 
 internal class FingerPrintTemplateProviderImpl :
-    FingerprintTemplateProvider<Nothing,Nothing> {
-    override fun acquireFingerprintTemplate(settings: Nothing?): AcquireFingerprintTemplateResponse<Nothing> {
+    FingerprintTemplateProvider<Unit,Unit> {
+    override fun acquireFingerprintTemplate(settings: Unit?): AcquireFingerprintTemplateResponse<Unit> {
         TODO("Not yet implemented")
     }
 

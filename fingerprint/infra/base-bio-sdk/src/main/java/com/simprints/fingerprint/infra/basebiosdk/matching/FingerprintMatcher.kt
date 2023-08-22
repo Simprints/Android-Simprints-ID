@@ -4,7 +4,7 @@ package com.simprints.fingerprint.infra.basebiosdk.matching
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 
-fun interface FingerprintMatcher {
+fun interface FingerprintMatcher<MatcherSettings> {
 
     /**
      * Matches a [probe] against the given flow of [candidates] using the given [matchingAlgorithm],
@@ -17,7 +17,7 @@ fun interface FingerprintMatcher {
     fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
-        crossFingerComparison: Boolean
+        settings: MatcherSettings?
     ) : List<MatchResult>
 
 }

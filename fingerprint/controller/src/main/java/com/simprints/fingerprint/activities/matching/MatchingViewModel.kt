@@ -17,6 +17,7 @@ import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
+import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
@@ -34,7 +35,7 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult as
 
 @HiltViewModel
 class MatchingViewModel @Inject constructor(
-    private val fingerprintBioSdk: FingerprintBioSdk,
+    private val fingerprintBioSdk: FingerprintBioSdk<Unit,Unit,Unit,Unit,Unit,SimAfisMatcherSettings>,
     private val dbManager: FingerprintDbManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
@@ -114,7 +115,7 @@ class MatchingViewModel @Inject constructor(
         fingerprintBioSdk.match(
             probeFingerprints.toFingerprintIdentity().fromDomainToMatcher(),
             candidates.map { it.fromDomainToMatcher() },
-            isCrossFingerMatchingEnabled,
+            SimAfisMatcherSettings(isCrossFingerMatchingEnabled)
         ).map { it.fromMatcherToDomain() }
 
     private fun handleMatchFailed(e: Throwable) {
