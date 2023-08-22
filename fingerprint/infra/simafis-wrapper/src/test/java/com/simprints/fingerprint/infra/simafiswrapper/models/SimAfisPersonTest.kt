@@ -1,11 +1,15 @@
 package com.simprints.fingerprint.infra.simafiswrapper.models
 
+import android.os.Parcel
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.fingerprint.infra.simafiswrapper.models.TemplateGenerator.validTemplate
 import com.simprints.fingerprint.infra.simafiswrapper.models.TemplateGenerator.validTemplateWithLowQuality
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class SimAfisPersonTest {
 
     @Test
@@ -66,5 +70,33 @@ class SimAfisPersonTest {
                 "${fingerprints[0]}\n" +
                 "${fingerprints[1]}\n\n"
         assertEquals(expectedString, person.toString())
+    }
+    @Test
+    fun testReadAndWriteToParcel() {
+        val guid = "1234567890"
+        val fingerprints = listOf(
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+        )
+        val person = SimAfisPerson(guid, fingerprints)
+
+        val parcel = Parcel.obtain()
+        person.writeToParcel(parcel, 0)
+        parcel.setDataPosition(0)
+        val personFromParcel = SimAfisPerson.CREATOR.createFromParcel(parcel)
+
+        assertEquals(person, personFromParcel)
+    }
+    @Test
+    fun testHashCode() {
+        val guid = "1234567890"
+        val fingerprints = listOf(
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+        )
+        val person = SimAfisPerson(guid, fingerprints)
+        val person2 = SimAfisPerson(guid, fingerprints)
+
+        assertEquals(person.hashCode(), person2.hashCode())
     }
 }
