@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.infra.simafiswrapper.models
 
+import android.os.Parcel
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.fingerprint.infra.simafiswrapper.models.TemplateGenerator.FORMAT_ID
 import com.simprints.fingerprint.infra.simafiswrapper.models.TemplateGenerator.NB_FINGERPRINTS
 import com.simprints.fingerprint.infra.simafiswrapper.models.TemplateGenerator.RECORD_LENGTH
@@ -11,7 +13,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class SimAfisFingerprintTest {
 
     @Test(expected = Test.None::class)
@@ -129,6 +133,19 @@ class SimAfisFingerprintTest {
         val fingerprint2 = SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, template2)
 
         assertFalse(fingerprint1.equals(fingerprint2))
+    }
+
+    @Test
+    fun testReadAndWriteInParcel() {
+        val template = validTemplate
+        val fingerprint = SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, template)
+
+        val parcel = Parcel.obtain()
+        fingerprint.writeToParcel(parcel, 0)
+        parcel.setDataPosition(0)
+        val fingerprintFromParcel = SimAfisFingerprint.CREATOR.createFromParcel(parcel)
+
+        assertEquals(fingerprint, fingerprintFromParcel)
     }
 
 
