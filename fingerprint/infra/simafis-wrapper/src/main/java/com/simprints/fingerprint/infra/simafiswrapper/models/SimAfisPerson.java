@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -23,8 +24,8 @@ public class SimAfisPerson implements Parcelable {
 
     private final static SimAfisFingerIdentifier[] FINGER_IDENTIFIERS = SimAfisFingerIdentifier.values();
 
-     final String guid;
-     final Map<SimAfisFingerIdentifier, SimAfisFingerprint> fingerprints;
+    final String guid;
+    final Map<SimAfisFingerIdentifier, SimAfisFingerprint> fingerprints;
 
 
     /**
@@ -61,6 +62,13 @@ public class SimAfisPerson implements Parcelable {
         return guid;
     }
 
+
+    /**
+     * @return A newly allocated list of the fingerprints of this Person
+     */
+    public List<SimAfisFingerprint> getFingerprints() {
+        return new ArrayList<>(fingerprints.values());
+    }
 
     @Override
     public boolean equals(Object o) {

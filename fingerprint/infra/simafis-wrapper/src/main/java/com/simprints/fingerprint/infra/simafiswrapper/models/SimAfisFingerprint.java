@@ -66,6 +66,14 @@ public class SimAfisFingerprint implements Parcelable {
             throw new IllegalArgumentException("Invalid template: Processing byte[] failed");
         }
     }
+    /**
+     * @return A reference to the direct ByteBuffer containing the ISO 2005 template of
+     * the fingerprint
+     */
+    public ByteBuffer getTemplateDirectBuffer() {
+        template.position(0);
+        return template;
+    }
 
     public SimAfisFingerIdentifier getFingerId() {
         return fingerId;
