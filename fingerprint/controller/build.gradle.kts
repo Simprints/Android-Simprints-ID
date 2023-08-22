@@ -39,7 +39,7 @@ dependencies {
     implementation(project(":infra:recent-user-activity"))
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
-    implementation(project(":fingerprint:infra:bio-sdk-impl"))
+    implementation(project(":fingerprint:infra:simprints-bio-sdk"))
 
     // If mock/dummy BT adapter is required test implementation can be switched to regular one
     testImplementation(project(":fingerprint:infra:scannermock"))

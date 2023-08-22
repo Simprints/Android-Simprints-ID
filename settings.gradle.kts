@@ -56,7 +56,7 @@ include(
     ":fingerprint:infra:scanner",
     ":fingerprint:infra:scannermock",
     ":fingerprint:infra:base-bio-sdk",
-    ":fingerprint:infra:bio-sdk-impl",
+    ":fingerprint:infra:simprints-bio-sdk",
     ":fingerprint:infra:simafis-wrapper",
 )
 
