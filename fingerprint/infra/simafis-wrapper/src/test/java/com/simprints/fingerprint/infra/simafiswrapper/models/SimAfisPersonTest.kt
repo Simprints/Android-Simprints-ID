@@ -30,8 +30,12 @@ class SimAfisPersonTest {
     @Test
     fun testHasBetterOrSameThan() {
         val guid = "1234567890"
-        val sameFingerprint = SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplateWithLowQuality)
-        val betterFingerprint = SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+        val sameFingerprint = SimAfisFingerprint(
+            SimAfisFingerIdentifier.LEFT_INDEX_FINGER,
+            validTemplateWithLowQuality
+        )
+        val betterFingerprint =
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
         val fingerprints = listOf(sameFingerprint, betterFingerprint)
         val person = SimAfisPerson(guid, fingerprints)
         assertTrue(person.fingerprints[SimAfisFingerIdentifier.LEFT_INDEX_FINGER] == betterFingerprint)
@@ -56,7 +60,6 @@ class SimAfisPersonTest {
     }
 
 
-
     @Test
     fun testToString() {
         val guid = "1234567890"
@@ -67,10 +70,11 @@ class SimAfisPersonTest {
         val person = SimAfisPerson(guid, fingerprints)
 
         val expectedString = "Person $guid, Fingerprints:\n" +
-                "${fingerprints[0]}\n" +
-                "${fingerprints[1]}\n\n"
+            "${fingerprints[0]}\n" +
+            "${fingerprints[1]}\n\n"
         assertEquals(expectedString, person.toString())
     }
+
     @Test
     fun testReadAndWriteToParcel() {
         val guid = "1234567890"
@@ -87,6 +91,7 @@ class SimAfisPersonTest {
 
         assertEquals(person, personFromParcel)
     }
+
     @Test
     fun testHashCode() {
         val guid = "1234567890"
@@ -98,5 +103,17 @@ class SimAfisPersonTest {
         val person2 = SimAfisPerson(guid, fingerprints)
 
         assertEquals(person.hashCode(), person2.hashCode())
+    }
+
+    @Test
+    fun testGetFingerprints(){
+        val guid = "1234567890"
+        val fingerprints = listOf(
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_THUMB, validTemplate),
+            SimAfisFingerprint(SimAfisFingerIdentifier.LEFT_INDEX_FINGER, validTemplate)
+        )
+        val person = SimAfisPerson(guid, fingerprints)
+
+        assertEquals(fingerprints.size, person.fingerprints.values.size)
     }
 }
