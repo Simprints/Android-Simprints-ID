@@ -15,6 +15,7 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
+import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.infra.config.ConfigManager
@@ -42,7 +43,7 @@ class MatchingViewModelTest {
 
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
-    private val mockFingerprintBioSdk: FingerprintBioSdk = mockk()
+    private val mockFingerprintBioSdk: FingerprintBioSdk<Unit,Unit,Unit,Unit,Unit, SimAfisMatcherSettings> = mockk()
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>(relaxed = true)
     private val mockConfigManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {

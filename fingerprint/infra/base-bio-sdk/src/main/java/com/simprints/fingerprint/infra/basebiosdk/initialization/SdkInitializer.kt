@@ -1,5 +1,5 @@
 package com.simprints.fingerprint.infra.basebiosdk.initialization
 
-fun interface SdkInitializer {
-    fun initialize(initializationParams: Map<String, Any>)
+fun interface SdkInitializer<SdkConfig> {
+    fun initialize(initializationParams:SdkConfig?)
 }

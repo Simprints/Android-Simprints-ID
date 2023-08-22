@@ -19,14 +19,15 @@ class FingerprintMatcherImplTest {
         val matcher = FingerprintMatcherImpl(simAfisMatcher)
         val probe: FingerprintIdentity = mockk()
         val candidates: List<FingerprintIdentity> = mockk()
-        val crossFingerComparison = false
+        val simAfisMatcherSettings = SimAfisMatcherSettings()
+        simAfisMatcherSettings.crossFingerComparison=false
         val matchResult: List<MatchResult> = mockk()
         every {
-            simAfisMatcher.match(probe, candidates, crossFingerComparison)
+            simAfisMatcher.match(probe, candidates, false)
         } returns matchResult
 
         // When
-        val result = matcher.match(probe, candidates, crossFingerComparison)
+        val result = matcher.match(probe, candidates, simAfisMatcherSettings)
 
         // Then
         Truth.assertThat(result).isEqualTo(matchResult)

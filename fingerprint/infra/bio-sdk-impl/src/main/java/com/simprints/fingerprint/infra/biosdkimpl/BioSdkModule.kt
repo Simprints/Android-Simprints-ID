@@ -9,6 +9,7 @@ import com.simprints.fingerprint.infra.biosdkimpl.acquization.FingerPrintTemplat
 import com.simprints.fingerprint.infra.biosdkimpl.acquization.FingerprintImageProviderImpl
 import com.simprints.fingerprint.infra.biosdkimpl.initialization.SdkInitializerImpl
 import com.simprints.fingerprint.infra.biosdkimpl.matching.FingerprintMatcherImpl
+import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,11 +24,11 @@ object BioSdkModule {
     @Provides
     @Singleton
     fun provideFingerprintBioSdk(
-        sdkInitializer: SdkInitializer,
-        fingerprintImageProvider: FingerprintImageProvider,
-        fingerprintTemplateProvider: FingerprintTemplateProvider,
-        fingerprintMatcher: FingerprintMatcher
-    ): FingerprintBioSdk {
+        sdkInitializer: SdkInitializer<Unit>,
+        fingerprintImageProvider: FingerprintImageProvider<Unit, Unit>,
+        fingerprintTemplateProvider: FingerprintTemplateProvider<Unit, Unit>,
+        fingerprintMatcher: FingerprintMatcher<SimAfisMatcherSettings>
+    ): FingerprintBioSdk<Unit, Unit, Unit, Unit, Unit, SimAfisMatcherSettings> {
         return FingerprintBioSdk(
             sdkInitializer,
             fingerprintImageProvider,
@@ -37,18 +38,18 @@ object BioSdkModule {
     }
 
     @Provides
-    internal fun provideSdkInitializer(): SdkInitializer = SdkInitializerImpl()
+    internal fun provideSdkInitializer(): SdkInitializer<Unit> = SdkInitializerImpl()
 
     @Provides
-    internal fun provideFingerprintImageProvider(): FingerprintImageProvider =
+    internal fun provideFingerprintImageProvider(): FingerprintImageProvider<Unit, Unit> =
         FingerprintImageProviderImpl()
 
     @Provides
-    internal fun provideFingerprintTemplateProvider(): FingerprintTemplateProvider =
+    internal fun provideFingerprintTemplateProvider(): FingerprintTemplateProvider<Unit, Unit> =
         FingerPrintTemplateProviderImpl()
 
     @Provides
-    internal fun provideFingerprintMatcher(simAfisMatcher: SimAfisMatcher): FingerprintMatcher =
+    internal fun provideFingerprintMatcher(simAfisMatcher: SimAfisMatcher): FingerprintMatcher<SimAfisMatcherSettings> =
         FingerprintMatcherImpl(simAfisMatcher)
 
 }

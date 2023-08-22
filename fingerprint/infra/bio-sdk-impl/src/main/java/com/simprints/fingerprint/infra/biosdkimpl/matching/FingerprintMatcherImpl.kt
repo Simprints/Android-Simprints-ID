@@ -8,20 +8,13 @@ import javax.inject.Inject
 
 internal class FingerprintMatcherImpl @Inject constructor(
     private val simAfisMatcher: SimAfisMatcher
-) : FingerprintMatcher {
+) : FingerprintMatcher<SimAfisMatcherSettings> {
 
     override fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
-        crossFingerComparison: Boolean
-    ): List<MatchResult> = simAfisMatch(probe, candidates, crossFingerComparison)
-
-
-    private fun simAfisMatch(
-        probe: FingerprintIdentity,
-        candidates: List<FingerprintIdentity>,
-        crossFingerComparison: Boolean
-    ): List<MatchResult> {
-        return simAfisMatcher.match(probe, candidates, crossFingerComparison)
-    }
+        settings: SimAfisMatcherSettings?
+    ): List<MatchResult> = simAfisMatcher.match(probe, candidates, settings?.crossFingerComparison?:false)
 }
+
+data class SimAfisMatcherSettings(var crossFingerComparison: Boolean = false)
