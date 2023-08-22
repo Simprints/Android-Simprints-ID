@@ -15,8 +15,6 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
-import com.simprints.fingerprint.infra.matcher.FingerprintMatcherModule
-import com.simprints.fingerprint.infra.matcher.JNILibAfisModule
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.fingerprint.scanner.ScannerManager
@@ -36,8 +34,6 @@ import javax.inject.Singleton
 @Module(
     includes = [
         FingerprintDependenciesModule::class,
-        FingerprintMatcherModule::class,
-        JNILibAfisModule::class,
     ]
 )
 @InstallIn(SingletonComponent::class)
