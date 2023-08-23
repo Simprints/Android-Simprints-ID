@@ -69,6 +69,7 @@ include(
 
 // Feature modules
 include(
+    ":feature:client-api",
     ":feature:login",
     ":feature:fetch-subject",
     ":feature:select-subject",
