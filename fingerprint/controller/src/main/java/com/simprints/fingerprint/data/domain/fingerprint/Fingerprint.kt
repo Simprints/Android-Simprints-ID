@@ -3,9 +3,6 @@ package com.simprints.fingerprint.data.domain.fingerprint
 import android.os.Parcel
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
-import kotlinx.parcelize.Parceler
-import kotlinx.parcelize.Parcelize
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -18,12 +15,11 @@ import java.nio.ByteOrder
  * @property imageRef  the fingerprint image that was captured to generate the template
  * @property format  the format for the template (i.e. the format used to generate the template which will determine the format used to match fingerprints)
  */
-@Parcelize
 class Fingerprint(
     val fingerId: FingerIdentifier,
     val template: ByteBuffer,
     var imageRef: FingerprintImageRef? = null,
-    val format: FingerprintTemplateFormat
+    val format: String
 ) : Parcelable {
 
     /**
@@ -49,14 +45,15 @@ class Fingerprint(
      *
      * @param fingerId         Finger identifier of the fingerprint
      * @param isoTemplateBytes Byte array containing an ISO 2005 fingerprint template
+     * @param format           The format of the template
      * @throws IllegalArgumentException If the bytes array specified is not a valid ISO 2005
      * (2011 not supported yet) template containing only 1 fingerprint.
      */
     @Throws(IllegalArgumentException::class)
-    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray) : this(
+    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray, format: String) : this(
         fingerId,
         ByteBuffer.allocateDirect(isoTemplateBytes.size),
-        format = FingerprintTemplateFormat.ISO_19794_2
+        format = format
     ) {
 
         template.put(isoTemplateBytes)
@@ -67,8 +64,19 @@ class Fingerprint(
         require(this.template.getInt(RECORD_LENGTH) == isoTemplateBytes.size) { "Invalid template: invalid length" }
         require(this.template.get(NB_FINGERPRINTS) == 1.toByte()) { "Invalid template: only single fingerprint template ares supported" }
     }
+    override fun describeContents() = 0
 
-    companion object : Parceler<Fingerprint> {
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.run {
+            writeInt(fingerId.ordinal)
+            val bytes = templateBytes
+            writeInt(bytes.size)
+            writeByteArray(bytes)
+            writeString(format)
+        }
+    }
+
+    companion object CREATOR : Parcelable.Creator<Fingerprint> {
 
         private val ISO_FORMAT_ID = Integer.parseInt("464D5200", 16)     // 'F' 'M' 'R' 00hex
         private val ISO_2005_VERSION = Integer.parseInt("20323000", 16)  // ' ' '2' '0' 00hex
@@ -78,20 +86,15 @@ class Fingerprint(
         private const val NB_FINGERPRINTS = 22       // BYTE
         private const val FIRST_QUALITY = 26         // BYTE
 
-        override fun Fingerprint.write(parcel: Parcel, flags: Int) {
-            parcel.writeInt(fingerId.ordinal)
-            val bytes = this.templateBytes
-            parcel.writeInt(bytes.size)
-            parcel.writeByteArray(bytes)
-        }
-
-        override fun create(parcel: Parcel): Fingerprint {
-            val fingerId = FingerIdentifier.values()[parcel.readInt()]
-            val temp = ByteArray(parcel.readInt())
-            parcel.readByteArray(temp)
+        override fun createFromParcel(source: Parcel): Fingerprint {
+            val fingerId = FingerIdentifier.values()[source.readInt()]
+            val temp = ByteArray(source.readInt())
+            source.readByteArray(temp)
             val template = ByteBuffer.allocateDirect(temp.size)
             template.put(temp)
-            return Fingerprint(fingerId, template, format = FingerprintTemplateFormat.ISO_19794_2)
+            val format = source.readString()!!
+            return Fingerprint(fingerId, template, format = format)
         }
+        override fun newArray(size: Int): Array<Fingerprint?> = arrayOfNulls(size)
     }
 }

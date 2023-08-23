@@ -201,7 +201,8 @@ class ClientApiEventRepositoryImplTest {
                 fingerprint = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
                     finger = IFingerIdentifier.LEFT_3RD_FINGER,
                     template = "",
-                    quality = 0
+                    quality = 0,
+                    format = "",
                 ),
                 id = "",
                 endedAt = 0

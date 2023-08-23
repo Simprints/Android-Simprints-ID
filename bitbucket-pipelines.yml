@@ -185,14 +185,16 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew fingerprint:controller:jacocoTestReport
-                    - ./gradlew fingerprint:infra:matcher:jacocoTestReport
+                    - ./gradlew fingerprint:infra:simprints-bio-sdk:jacocoTestReport
                     - ./gradlew fingerprint:infra:scanner:jacocoTestReport
+                    - ./gradlew fingerprint:infra:simafis-wrapper:jacocoTestReport
 
 
                 artifacts:
                     - fingerprint/controller/build/reports/**
-                    - fingerprint/infra/matcher/build/reports/**
+                    - fingerprint/infra/simprints-bio-sdk/build/reports/**
                     - fingerprint/infra/scanner/build/reports/**
+                    - fingerprint/infra/simafis-wrapper/build/reports/**
 
 
         ######################################################################

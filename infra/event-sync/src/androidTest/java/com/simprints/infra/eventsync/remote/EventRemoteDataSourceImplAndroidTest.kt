@@ -218,7 +218,7 @@ package com.simprints.infra.eventsync.remote
 //                val fingerprint = FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
 //                    finger = fingerIdentifier.fromDomainToModuleApi(),
 //                    quality = 0,
-//                    format = FingerprintTemplateFormat.ISO_19794_2
+//                    format = "ISO_19794_2"
 //                )
 //
 //                val event = FingerprintCaptureEvent(
@@ -248,7 +248,7 @@ package com.simprints.infra.eventsync.remote
 //                    finger = fingerIdentifier.fromDomainToModuleApi(),
 //                    template = fakeTemplate,
 //                    quality = 1,
-//                    format = FingerprintTemplateFormat.ISO_19794_2
+//                    format = "ISO_19794_2"
 //                )
 //
 //            val event = FingerprintCaptureBiometricsEvent(

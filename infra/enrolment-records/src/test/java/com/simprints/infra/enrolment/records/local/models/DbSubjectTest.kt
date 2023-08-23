@@ -5,7 +5,6 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import org.junit.Test
 import java.util.Date
 import java.util.UUID
@@ -26,7 +25,7 @@ class DbSubjectTest {
             IFingerIdentifier.RIGHT_3RD_FINGER,
             Random.nextBytes(64),
             30,
-            IFingerprintTemplateFormat.NEC_1,
+            "NEC_1",
         )
         val faceSample = FaceSample(Random.nextBytes(64), "RANK_ONE_1_23")
 
