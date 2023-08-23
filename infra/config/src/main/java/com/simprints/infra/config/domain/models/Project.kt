@@ -7,7 +7,7 @@ data class Project(
     val creator: String,
     val imageBucket: String,
     val baseUrl: String?,
-    val tokenizationKeys: Map<TokenKeyType, TokenizationKeyData>?
+    val tokenizationKeys: Map<TokenKeyType, TokenizationKeyData>
 )
 
 enum class TokenKeyType {

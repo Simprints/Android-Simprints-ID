@@ -20,11 +20,11 @@ internal fun Project.toProto(): ProtoProject =
         .setImageBucket(imageBucket)
         .also {
             if (baseUrl != null) it.baseUrl = baseUrl
-            tokenizationKeys?.mapKeys { entry ->
+            tokenizationKeys.mapKeys { entry ->
                 entry.key.toString()
-            }?.mapValues { entry ->
+            }.mapValues { entry ->
                 JsonHelper.toJson(TokenizationItem.fromTokenizationKeyData(entry.value))
-            }?.let { map ->
+            }.let { map ->
                 it.putAllTokenizationKeys(map)
             }
         }
