@@ -63,7 +63,8 @@ internal fun Map<String, String>?.asTokenizationKeysMap(): Map<TokenKeyType, Tok
 }
 
 /**
- * Data class that contains the following JSON structure which is received from the backend:
+ * Intermediate data class that is used to map JSON string to [TokenizationKeyData] domain model.
+ * Contains the structure of the following JSON from the backend:
  *
  * {
  *   "primaryKeyId": 987654432,
@@ -81,7 +82,7 @@ internal fun Map<String, String>?.asTokenizationKeysMap(): Map<TokenKeyType, Tok
  *   ]
  * }
  */
-private data class TokenizationItem(
+internal data class TokenizationItem(
     val primaryKeyId: Long,
     val key: List<TokenizationKey>,
 ) {
@@ -118,14 +119,14 @@ private data class TokenizationItem(
     }
 }
 
-private data class TokenizationKey(
+internal  data class TokenizationKey(
     val keyData: KeyData,
     val status: String,
     val keyId: Long,
     val outputPrefixType: String,
 )
 
-private data class KeyData(
+internal  data class KeyData(
     val typeUrl: String,
     val value: String,
     val keyMaterialType: String,
