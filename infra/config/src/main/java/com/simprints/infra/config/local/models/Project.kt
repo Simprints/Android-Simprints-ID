@@ -2,6 +2,7 @@ package com.simprints.infra.config.local.models
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.extentions.filterNotNullValues
+import com.simprints.core.tools.extentions.singleItemList
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.domain.models.KeyMaterialType
 import com.simprints.infra.config.domain.models.Project
@@ -9,6 +10,7 @@ import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.domain.models.TokenizationKeyData
 import com.simprints.infra.logging.Simber
 
+private const val KEY_ENABLED = "enabled"
 internal fun Project.toProto(): ProtoProject =
     ProtoProject.newBuilder()
         .setId(id)
@@ -21,7 +23,7 @@ internal fun Project.toProto(): ProtoProject =
             tokenizationKeys?.mapKeys { entry ->
                 entry.key.toString()
             }?.mapValues { entry ->
-                JsonHelper.toJson(entry.value)
+                JsonHelper.toJson(TokenizationItem.fromTokenizationKeyData(entry.value))
             }?.let { map ->
                 it.putAllTokenizationKeys(map)
             }
@@ -83,6 +85,25 @@ private data class TokenizationItem(
     val primaryKeyId: Long,
     val key: List<TokenizationKey>,
 ) {
+    companion object {
+        fun fromTokenizationKeyData(data: TokenizationKeyData): TokenizationItem {
+            val status = if (data.isEnabled) KEY_ENABLED else "disabled"
+            return TokenizationItem(
+                primaryKeyId = data.primaryKeyId,
+                key = TokenizationKey(
+                    keyData = KeyData(
+                        typeUrl = data.typeUrl,
+                        value = data.value,
+                        keyMaterialType = data.keyMaterialType.toString()
+                    ),
+                    status = status,
+                    keyId = data.keyId,
+                    outputPrefixType = data.outputPrefixType
+                ).singleItemList()
+            )
+        }
+    }
+
     fun toTokenizationKeyData(): TokenizationKeyData? {
         val tokenizationKey = key.firstOrNull() ?: return null
         return TokenizationKeyData(
@@ -90,7 +111,7 @@ private data class TokenizationItem(
             typeUrl = tokenizationKey.keyData.typeUrl,
             value = tokenizationKey.keyData.value,
             keyMaterialType = runCatching { KeyMaterialType.valueOf(tokenizationKey.keyData.keyMaterialType) }.getOrElse { KeyMaterialType.Unknown },
-            isEnabled = tokenizationKey.status.equals("enabled", ignoreCase = true),
+            isEnabled = tokenizationKey.status.equals(KEY_ENABLED, ignoreCase = true),
             keyId = tokenizationKey.keyId,
             outputPrefixType = tokenizationKey.outputPrefixType
         )
