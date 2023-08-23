@@ -70,6 +70,7 @@ include(
 // Feature modules
 include(
     ":feature:client-api",
+    ":feature:orchestrator",
     ":feature:login",
     ":feature:fetch-subject",
     ":feature:select-subject",
