@@ -4,7 +4,6 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.domain.models.Subject
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
@@ -55,13 +54,13 @@ internal class SubjectFactory @Inject constructor(private val encodingUtils: Enc
 
     private fun buildFingerprintSample(
         template: FingerprintTemplate,
-        format: FingerprintTemplateFormat
+        format: String
     ): FingerprintSample {
         return FingerprintSample(
             template.finger,
             encodingUtils.base64ToBytes(template.template),
             template.quality,
-            format.fromDomainToModuleApi()
+            format
         )
     }
 

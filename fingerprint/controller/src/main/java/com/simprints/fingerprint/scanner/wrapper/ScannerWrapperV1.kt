@@ -179,7 +179,13 @@ class ScannerWrapperV1(
     private fun continuousCaptureCallback(qualityThreshold: Int, cont: Continuation<CaptureFingerprintResponse>) =
         ScannerCallbackWrapper(
             success = {
-                cont.resume(CaptureFingerprintResponse(scannerV1.template!!, scannerV1.imageQuality))
+                cont.resume(
+                    CaptureFingerprintResponse(
+                        scannerV1.template!!,
+                        templateFormat,
+                        scannerV1.imageQuality
+                    )
+                )
             },
             failure = {
                 if (it == TIMEOUT)
@@ -191,7 +197,13 @@ class ScannerWrapperV1(
     private fun forceCaptureCallback(cont: Continuation<CaptureFingerprintResponse>) =
         ScannerCallbackWrapper(
             success = {
-                cont.resume(CaptureFingerprintResponse(scannerV1.template!!, scannerV1.imageQuality))
+                cont.resume(
+                    CaptureFingerprintResponse(
+                        scannerV1.template!!,
+                        templateFormat,
+                        scannerV1.imageQuality
+                    )
+                )
             },
             failure = {
                 handleFingerprintCaptureError(it, cont)

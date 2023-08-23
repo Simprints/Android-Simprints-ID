@@ -3,7 +3,6 @@ package com.simprints.fingerprint.controllers.core.eventData.model
 import androidx.annotation.Keep
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent as FingerprintCaptureBiometricsEventCore
 
 @Keep
@@ -23,7 +22,7 @@ class FingerprintCaptureBiometricsEvent(
         val finger: FingerIdentifier,
         val quality: Int,
         val template: String,
-        val format: FingerprintTemplateFormat = FingerprintTemplateFormat.ISO_19794_2
+        val format: String
     )
 }
 

@@ -16,9 +16,8 @@ import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.matching.MatchResult
-import com.simprints.fingerprint.infra.matcher.FingerprintMatcher
-import com.simprints.fingerprint.infra.matcher.domain.MatchingAlgorithm
-import com.simprints.fingerprint.infra.matcher.domain.TemplateFormat
+import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
+import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
@@ -29,14 +28,14 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
-import com.simprints.fingerprint.infra.matcher.domain.FingerIdentifier as MatcherFingerIdentifier
-import com.simprints.fingerprint.infra.matcher.domain.Fingerprint as MatcherFingerprint
-import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
-import com.simprints.fingerprint.infra.matcher.domain.MatchResult as MatcherMatchResult
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier as MatcherFingerIdentifier
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint as MatcherFingerprint
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity as MatcherFingerprintIdentity
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult as MatcherMatchResult
 
 @HiltViewModel
 class MatchingViewModel @Inject constructor(
-    private val fingerprintMatcher: FingerprintMatcher,
+    private val fingerprintBioSdk: FingerprintBioSdk<Unit,Unit,Unit,Unit,Unit,SimAfisMatcherSettings>,
     private val dbManager: FingerprintDbManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
@@ -113,10 +112,10 @@ class MatchingViewModel @Inject constructor(
         probeFingerprints: List<Fingerprint>,
         isCrossFingerMatchingEnabled: Boolean
     ): List<MatchResult> =
-        fingerprintMatcher.match(
+        fingerprintBioSdk.match(
             probeFingerprints.toFingerprintIdentity().fromDomainToMatcher(),
             candidates.map { it.fromDomainToMatcher() },
-            DEFAULT_MATCHING_ALGORITHM, isCrossFingerMatchingEnabled,
+            SimAfisMatcherSettings(isCrossFingerMatchingEnabled)
         ).map { it.fromMatcherToDomain() }
 
     private fun handleMatchFailed(e: Throwable) {
@@ -133,7 +132,7 @@ class MatchingViewModel @Inject constructor(
         MatcherFingerprintIdentity(subjectId, fingerprints.map { it.fromDomainToMatcher() })
 
     private fun Fingerprint.fromDomainToMatcher(): MatcherFingerprint =
-        MatcherFingerprint(fingerId.fromDomainToMatcher(), templateBytes, SAVED_TEMPLATE_FORMAT)
+        MatcherFingerprint(fingerId.fromDomainToMatcher(), templateBytes, format)
 
     private fun FingerIdentifier.fromDomainToMatcher(): MatcherFingerIdentifier =
         when (this) {
@@ -167,8 +166,4 @@ class MatchingViewModel @Inject constructor(
         val finishDelayMillis: Int
     )
 
-    companion object {
-        val SAVED_TEMPLATE_FORMAT = TemplateFormat.ISO_19794_2_2011
-        val DEFAULT_MATCHING_ALGORITHM = MatchingAlgorithm.SIM_AFIS
-    }
 }
