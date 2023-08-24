@@ -7,4 +7,9 @@ data class Project(
     val creator: String,
     val imageBucket: String,
     val baseUrl: String?,
+    val tokenizationKeys: Map<TokenKeyType, String> // Value is JSON string for DAEAD keyset in TINK
 )
+
+enum class TokenKeyType {
+    AttendantId, ModuleId, Unknown
+}

@@ -10,4 +10,5 @@ message ProtoProject {
     string creator = 4;
     string imageBucket = 5;
     string base_url = 6;
+    map<string, string> tokenizationKeys = 7;
 }

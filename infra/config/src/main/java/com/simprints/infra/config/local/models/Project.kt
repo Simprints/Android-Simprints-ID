@@ -1,6 +1,7 @@
 package com.simprints.infra.config.local.models
 
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.models.TokenKeyType
 
 internal fun Project.toProto(): ProtoProject =
     ProtoProject.newBuilder()
@@ -11,8 +12,29 @@ internal fun Project.toProto(): ProtoProject =
         .setImageBucket(imageBucket)
         .also {
             if (baseUrl != null) it.baseUrl = baseUrl
+            it.putAllTokenizationKeys(tokenizationKeys.mapTokenizationKeysToLocal())
         }
         .build()
 
-internal fun ProtoProject.toDomain(): Project =
-    Project(id, name, description, creator, imageBucket, baseUrl)
+internal fun ProtoProject.toDomain(): Project {
+    val tokenizationKeys = tokenizationKeysMap.mapTokenizationKeysToDomain()
+    return Project(
+        id = id,
+        name = name,
+        description = description,
+        creator = creator,
+        imageBucket = imageBucket,
+        baseUrl = baseUrl,
+        tokenizationKeys = tokenizationKeys
+    )
+}
+
+internal fun Map<String, String>?.mapTokenizationKeysToDomain(): Map<TokenKeyType, String> =
+    (this ?: emptyMap()).mapKeys { entry ->
+        runCatching { TokenKeyType.valueOf(entry.key) }.getOrElse { TokenKeyType.Unknown }
+    }
+
+internal fun Map<TokenKeyType, String>.mapTokenizationKeysToLocal(): Map<String, String> =
+    mapKeys { entry ->
+        entry.key.toString()
+    }
