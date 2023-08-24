@@ -257,7 +257,8 @@ internal class SignerManagerTest {
                         "",
                         "",
                         "some_bucket_url",
-                        ""
+                        "",
+                        tokenizationKeys = emptyMap()
                     )
                 )
             } else {
