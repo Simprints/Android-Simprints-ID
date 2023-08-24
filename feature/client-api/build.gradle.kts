@@ -7,4 +7,8 @@ android {
 
 dependencies {
     implementation(project(":feature:orchestrator"))
+
+    implementation(project(":infra:events"))
+
+    implementation(libs.libsimprints)
 }
