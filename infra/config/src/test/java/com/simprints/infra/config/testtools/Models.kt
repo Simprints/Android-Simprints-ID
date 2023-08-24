@@ -13,6 +13,7 @@ import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.Vero1Configuration
 import com.simprints.infra.config.domain.models.Vero2Configuration
@@ -311,8 +312,33 @@ internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
     .setSynchronization(protoSynchronizationConfiguration)
     .build()
 
-internal val apiProject = ApiProject("id", "name", "description", "creator", "url", "baseUrl")
-internal val project = Project("id", "name", "description", "creator", "url", "baseUrl")
+
+internal const val tokenizationJson =
+    "{\"primaryKeyId\":12345,\"key\":[{\"keyData\":{\"typeUrl\":\"typeUrl\",\"value\":\"value\",\"keyMaterialType\":\"keyMaterialType\"},\"status\":\"enabled\",\"keyId\":123456789,\"outputPrefixType\":\"outputPrefixType\"}]}"
+
+internal val tokenizationKeysDomain = mapOf(TokenKeyType.AttendantId to tokenizationJson)
+internal val tokenizationKeysLocal = tokenizationKeysDomain.mapKeys {
+    it.key.toString()
+}
+
+internal val apiProject = ApiProject(
+    id = "id",
+    name = "name",
+    description = "description",
+    creator = "creator",
+    imageBucket = "url",
+    baseUrl = "baseUrl",
+    tokenizationKeys = tokenizationKeysLocal
+)
+internal val project = Project(
+    id = "id",
+    name = "name",
+    description = "description",
+    creator = "creator",
+    imageBucket = "url",
+    baseUrl = "baseUrl",
+    tokenizationKeys = tokenizationKeysDomain
+)
 internal val protoProject = ProtoProject.newBuilder()
     .setId("id")
     .setName("name")
@@ -320,6 +346,7 @@ internal val protoProject = ProtoProject.newBuilder()
     .setCreator("creator")
     .setImageBucket("url")
     .setBaseUrl("baseUrl")
+    .putAllTokenizationKeys(tokenizationKeysLocal)
     .build()
 
 internal val deviceConfiguration =
