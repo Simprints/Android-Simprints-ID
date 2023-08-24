@@ -1,15 +1,19 @@
 package com.simprints.feature.clientapi.session
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -24,6 +28,9 @@ class ClientSessionManagerTest {
     @MockK
     private lateinit var coreEventRepository: EventRepository
 
+    @MockK
+    private lateinit var timeHelper: TimeHelper
+
     private lateinit var clientSessionManager: ClientSessionManager
 
     @Before
@@ -36,6 +43,8 @@ class ClientSessionManagerTest {
 
         clientSessionManager = ClientSessionManager(
             coreEventRepository,
+            timeHelper,
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
     }
 
@@ -132,6 +141,34 @@ class ClientSessionManagerTest {
             //Then
             assertThat(result).isFalse()
         }
+
+    @Test
+    fun `reportUnknownExtras adds event if there are unknown extras`() = runTest {
+        // Given
+        val unknownExtras = mapOf("key" to "value")
+        // When
+        clientSessionManager.reportUnknownExtras(unknownExtras)
+        //Then
+        coVerify { coreEventRepository.addOrUpdateEvent(any<SuspiciousIntentEvent>()) }
+    }
+
+    @Test
+    fun `reportUnknownExtras does not add event if no extras`() = runTest {
+        // Given
+        val unknownExtras = emptyMap<String, Any>()
+        // When
+        clientSessionManager.reportUnknownExtras(unknownExtras)
+        //Then
+        coVerify(exactly = 0) { coreEventRepository.addOrUpdateEvent(any()) }
+    }
+
+    @Test
+    fun `addInvalidIntentEvent adds event`() = runTest {
+        // When
+        clientSessionManager.addInvalidIntentEvent("action", emptyMap())
+        //Then
+        coVerify { coreEventRepository.addOrUpdateEvent(any()) }
+    }
 
     companion object {
 
