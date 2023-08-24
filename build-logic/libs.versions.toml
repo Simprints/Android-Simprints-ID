@@ -65,7 +65,6 @@ kronos_version = "0.0.1-alpha11"
 protobuf_version = "3.24.1"
 circleImageView_version = "3.1.0"
 timber_version = "5.0.1"
-tink_version = "1.10.0"
 
 libsimprints_version = "2023.2.2"
 simmatcher_version = "1.2.0"
@@ -193,9 +192,6 @@ commonsIO-commons_io = { module = "commons-io:commons-io", version.ref = "common
 
 #Timber
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber_version" }
-
-#Google TINK cryptography
-tink-core = { module = "com.google.crypto.tink:tink-android", version.ref = "tink_version" }
 
 #Kronos
 kronos-kronos = { module = "com.lyft.kronos:kronos-android", version.ref = "kronos_version" }
