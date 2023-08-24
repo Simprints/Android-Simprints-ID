@@ -1,16 +1,8 @@
 package com.simprints.infra.config.local.models
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.simprints.core.tools.extentions.filterNotNullValues
-import com.simprints.core.tools.extentions.singleItemList
-import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.domain.models.KeyMaterialType
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.TokenKeyType
-import com.simprints.infra.config.domain.models.TokenizationKeyData
-import com.simprints.infra.logging.Simber
 
-private const val KEY_ENABLED = "enabled"
 internal fun Project.toProto(): ProtoProject =
     ProtoProject.newBuilder()
         .setId(id)
@@ -20,18 +12,12 @@ internal fun Project.toProto(): ProtoProject =
         .setImageBucket(imageBucket)
         .also {
             if (baseUrl != null) it.baseUrl = baseUrl
-            tokenizationKeys.mapKeys { entry ->
-                entry.key.toString()
-            }.mapValues { entry ->
-                JsonHelper.toJson(TokenizationItem.fromTokenizationKeyData(entry.value))
-            }.let { map ->
-                it.putAllTokenizationKeys(map)
-            }
+            it.putAllTokenizationKeys(tokenizationKeys.mapTokenizationKeysToLocal())
         }
         .build()
 
 internal fun ProtoProject.toDomain(): Project {
-    val tokenizationKeys = tokenizationKeysMap.asTokenizationKeysMap()
+    val tokenizationKeys = tokenizationKeysMap.mapTokenizationKeysToDomain()
     return Project(
         id = id,
         name = name,
@@ -43,91 +29,12 @@ internal fun ProtoProject.toDomain(): Project {
     )
 }
 
-/**
- * Maps remote response map of type of String <-> JsonString to the map of [TokenKeyType] <-> [TokenizationKeyData]
- */
-internal fun Map<String, String>?.asTokenizationKeysMap(): Map<TokenKeyType, TokenizationKeyData> {
-    return (this ?: emptyMap()).mapKeys { entry ->
+internal fun Map<String, String>?.mapTokenizationKeysToDomain(): Map<TokenKeyType, String> =
+    (this ?: emptyMap()).mapKeys { entry ->
         runCatching { TokenKeyType.valueOf(entry.key) }.getOrElse { TokenKeyType.Unknown }
-    }.mapValues { entry ->
-        try {
-            JsonHelper.fromJson(
-                json = entry.value,
-                type = object : TypeReference<TokenizationItem>() {}
-            ).toTokenizationKeyData()
-        } catch (e: Exception) {
-            Simber.e(e)
-            return@mapValues null
-        }
-    }.filterNotNullValues()
-}
-
-/**
- * Intermediate data class that is used to map JSON string to [TokenizationKeyData] domain model.
- * Contains the structure of the following JSON from the backend:
- *
- * {
- *   "primaryKeyId": 987654432,
- *   "key": [
- *     {
- *       "keyData": {
- *         "typeUrl": "typeUrl",
- *         "value": "AzT...b12C",
- *         "keyMaterialType": "SYMMETRIC"
- *       },
- *       "status": "ENABLED",
- *       "keyId": 945828840,
- *       "outputPrefixType": "TINK"
- *     }
- *   ]
- * }
- */
-internal data class TokenizationItem(
-    val primaryKeyId: Long,
-    val key: List<TokenizationKey>,
-) {
-    companion object {
-        fun fromTokenizationKeyData(data: TokenizationKeyData): TokenizationItem {
-            val status = if (data.isEnabled) KEY_ENABLED else "disabled"
-            return TokenizationItem(
-                primaryKeyId = data.primaryKeyId,
-                key = TokenizationKey(
-                    keyData = KeyData(
-                        typeUrl = data.typeUrl,
-                        value = data.value,
-                        keyMaterialType = data.keyMaterialType.toString()
-                    ),
-                    status = status,
-                    keyId = data.keyId,
-                    outputPrefixType = data.outputPrefixType
-                ).singleItemList()
-            )
-        }
     }
 
-    fun toTokenizationKeyData(): TokenizationKeyData? {
-        val tokenizationKey = key.firstOrNull() ?: return null
-        return TokenizationKeyData(
-            primaryKeyId = primaryKeyId,
-            typeUrl = tokenizationKey.keyData.typeUrl,
-            value = tokenizationKey.keyData.value,
-            keyMaterialType = runCatching { KeyMaterialType.valueOf(tokenizationKey.keyData.keyMaterialType) }.getOrElse { KeyMaterialType.Unknown },
-            isEnabled = tokenizationKey.status.equals(KEY_ENABLED, ignoreCase = true),
-            keyId = tokenizationKey.keyId,
-            outputPrefixType = tokenizationKey.outputPrefixType
-        )
+internal fun Map<TokenKeyType, String>.mapTokenizationKeysToLocal(): Map<String, String> =
+    mapKeys { entry ->
+        entry.key.toString()
     }
-}
-
-internal  data class TokenizationKey(
-    val keyData: KeyData,
-    val status: String,
-    val keyId: Long,
-    val outputPrefixType: String,
-)
-
-internal  data class KeyData(
-    val typeUrl: String,
-    val value: String,
-    val keyMaterialType: String,
-)

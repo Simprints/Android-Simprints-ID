@@ -2,27 +2,19 @@ package com.simprints.infra.config.local.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.testtools.project
-import com.simprints.infra.config.testtools.tokenizationItem
-import com.simprints.infra.config.testtools.tokenizationKeyData
-import com.simprints.infra.config.testtools.tokenizationKeys
+import com.simprints.infra.config.testtools.tokenizationKeysLocal
 import org.junit.Test
 
 class TokenizationTest {
     @Test
-    fun `remote tokenization map should map correctly to domain tokenization map`() {
-        val remoteMap = tokenizationKeys
+    fun `remote tokenization keys should map correctly to domain tokenization keys`() {
+        val remoteMap = tokenizationKeysLocal
         val domainMap = project.tokenizationKeys
-        assertThat(remoteMap.asTokenizationKeysMap()).isEqualTo(domainMap)
+        assertThat(remoteMap.mapTokenizationKeysToDomain()).isEqualTo(domainMap)
     }
 
     @Test
-    fun `tokenization item should map correctly to tokenization data`() {
-        assertThat(tokenizationItem.toTokenizationKeyData()).isEqualTo(tokenizationKeyData)
-    }
-
-    @Test
-    fun `tokenization data should map correctly to tokenization item`() {
-        assertThat(TokenizationItem.fromTokenizationKeyData(tokenizationKeyData))
-            .isEqualTo(tokenizationItem)
+    fun `domain tokenization keys should map correctly to remote tokenization keys`() {
+        assertThat(project.tokenizationKeys.mapTokenizationKeysToLocal()).isEqualTo(tokenizationKeysLocal)
     }
 }
