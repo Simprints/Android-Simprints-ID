@@ -1,6 +1,5 @@
 package com.simprints.infra.config.testtools
 
-import com.simprints.core.tools.extentions.singleItemList
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.DeviceConfiguration
@@ -10,17 +9,14 @@ import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
-import com.simprints.infra.config.domain.models.KeyMaterialType
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.TokenKeyType
-import com.simprints.infra.config.domain.models.TokenizationKeyData
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.Vero1Configuration
 import com.simprints.infra.config.domain.models.Vero2Configuration
-import com.simprints.infra.config.local.models.KeyData
 import com.simprints.infra.config.local.models.ProtoConsentConfiguration
 import com.simprints.infra.config.local.models.ProtoDecisionPolicy
 import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
@@ -36,8 +32,6 @@ import com.simprints.infra.config.local.models.ProtoSynchronizationConfiguration
 import com.simprints.infra.config.local.models.ProtoUpSynchronizationConfiguration
 import com.simprints.infra.config.local.models.ProtoVero1Configuration
 import com.simprints.infra.config.local.models.ProtoVero2Configuration
-import com.simprints.infra.config.local.models.TokenizationItem
-import com.simprints.infra.config.local.models.TokenizationKey
 import com.simprints.infra.config.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.remote.models.ApiFaceConfiguration
@@ -318,38 +312,15 @@ internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
     .setSynchronization(protoSynchronizationConfiguration)
     .build()
 
-internal val tokenizationKeyData = TokenizationKeyData(
-    primaryKeyId = 123456789,
-    typeUrl = "typeUrl",
-    value = "value",
-    keyMaterialType = KeyMaterialType.Symmetric,
-    isEnabled = true,
-    keyId = 12345,
-    outputPrefixType = "outputPrefixType"
-)
 
-internal val tokenizationJson = with(tokenizationKeyData) {
-    "{\"primaryKeyId\":$primaryKeyId,\"key\":[{\"keyData\":{\"typeUrl\":\"$typeUrl\",\"value\":\"$value\",\"keyMaterialType\":\"$keyMaterialType\"},\"status\":\"enabled\",\"keyId\":$keyId,\"outputPrefixType\":\"$outputPrefixType\"}]}"
+internal const val tokenizationJson =
+    "{\"primaryKeyId\":12345,\"key\":[{\"keyData\":{\"typeUrl\":\"typeUrl\",\"value\":\"value\",\"keyMaterialType\":\"keyMaterialType\"},\"status\":\"enabled\",\"keyId\":123456789,\"outputPrefixType\":\"outputPrefixType\"}]}"
+
+internal val tokenizationKeysDomain = mapOf(TokenKeyType.AttendantId to tokenizationJson)
+internal val tokenizationKeysLocal = tokenizationKeysDomain.mapKeys {
+    it.key.toString()
 }
-internal val tokenizationKeys = mapOf(TokenKeyType.AttendantId.toString() to tokenizationJson)
-internal val tokenizationKey = with(tokenizationKeyData) {
-    TokenizationKey(
-        keyData = KeyData(
-            typeUrl = typeUrl,
-            value = value,
-            keyMaterialType = keyMaterialType.toString()
-        ),
-        status = "enabled",
-        keyId = keyId,
-        outputPrefixType = outputPrefixType
-    )
-}
-internal val tokenizationItem = with(tokenizationKeyData) {
-    TokenizationItem(
-        primaryKeyId = primaryKeyId,
-        key = tokenizationKey.singleItemList()
-    )
-}
+
 internal val apiProject = ApiProject(
     id = "id",
     name = "name",
@@ -357,7 +328,7 @@ internal val apiProject = ApiProject(
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
-    tokenizationKeys = tokenizationKeys
+    tokenizationKeys = tokenizationKeysLocal
 )
 internal val project = Project(
     id = "id",
@@ -366,7 +337,7 @@ internal val project = Project(
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
-    tokenizationKeys = mapOf(TokenKeyType.AttendantId to tokenizationKeyData)
+    tokenizationKeys = tokenizationKeysDomain
 )
 internal val protoProject = ProtoProject.newBuilder()
     .setId("id")
@@ -375,7 +346,7 @@ internal val protoProject = ProtoProject.newBuilder()
     .setCreator("creator")
     .setImageBucket("url")
     .setBaseUrl("baseUrl")
-    .putAllTokenizationKeys(tokenizationKeys)
+    .putAllTokenizationKeys(tokenizationKeysLocal)
     .build()
 
 internal val deviceConfiguration =
