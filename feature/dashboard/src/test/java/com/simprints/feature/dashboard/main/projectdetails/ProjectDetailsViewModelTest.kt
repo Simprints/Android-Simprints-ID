@@ -22,7 +22,7 @@ class ProjectDetailsViewModelTest {
         private const val PROJECT_NAME = "name"
         private const val LAST_SCANNER = "scanner"
         private const val LAST_USER = "user"
-        private val project = Project(PROJECT_ID, PROJECT_NAME, "description", "creator", "bucket", "")
+        private val project = Project(PROJECT_ID, PROJECT_NAME, "description", "creator", "bucket", "", tokenizationKeys = emptyMap())
     }
 
     @get:Rule
