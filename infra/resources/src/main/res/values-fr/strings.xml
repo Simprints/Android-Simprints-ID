@@ -239,4 +239,18 @@
     <string name="project_paused_body">Impossible de lancer la session car le projet est actuellement en pause. Veuillez contacter votre superviseur pour plus d\'informations</string>
     <string name="project_ending_title">Le projet se termine actuellement</string>
     <string name="project_ending_body">Impossible de lancer la session car le projet se termine actuellement. Veuillez contacter votre superviseur pour plus d\'informations</string>
+
+    <string name="invalid_projectId_message">Une erreur de configuration s\'est produite (le champ project ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_selectedId_message">Une erreur de configuration s\'est produite (le champ selected Id est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_sessionId_message">Une erreur de configuration s\'est produite (le champ session ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_intentAction_message">Une erreur de configuration s\'est produite (action intentionnelle invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_metadata_message">Une erreur de configuration s\'est produite (le champ metadata est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_moduleId_message">Une erreur de configuration s\'est produite (le champ module ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_userId_message">Une erreur de configuration s\'est produite (le champ user ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_verifyId_message">Une erreur de configuration s\'est produite (le champ verify GUID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="rooted_device_title">Appareil rooter détecté</string>
+    <string name="rooted_device_message">\"1. Contactez votre superviseur - appareil rooté détecté  2. Tapez sur Fermer\"</string>
+    <string name="guid_selection_data_sent">Données envoyées</string>
+    <string name="guid_selection_result_sent">Résultat envoyé</string>
+
 </resources>

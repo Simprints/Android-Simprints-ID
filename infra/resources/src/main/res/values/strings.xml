@@ -121,7 +121,7 @@
     <string name="fingerprint_face_feature_alert">fingerprint and face features</string>
 
     <!-- Button Labels For Error Messages -->
-    <string name="close">CLOSE</string>
+    <string name="close">Close</string>
     <string name="try_again_label">Try Again</string>
     <string name="settings_label">Phone settings</string>
     <!-- Content Descriptions -->
@@ -361,4 +361,27 @@
     <string name="id_config_error_enrol_last_biometrics">A configuration error has occurred (invalid Simprints intent), please contact your system administrator.</string>
     <string name="configuration_error_message">A configuration error has occurred (%1$s), please contact your system administrator</string>
     <string name="refusal_scanner_not_working">Scanner not working</string>
+
+    <!-- region Error Screen Layout -->
+    <string name="main_error_graphic" translatable="false">Main Error Graphic</string>
+    <string name="failed_to_retrieve_message" translatable="false">Failed to retrieve message</string>
+    <!-- endregion -->
+
+    <!-- region Error Screen Text -->
+    <string name="invalid_projectId_message">A configuration error has occurred (invalid Project Id), please contact your system administrator</string>
+    <string name="invalid_selectedId_message">A configuration error has occurred (invalid Selected Id), please contact your system administrator</string>
+    <string name="invalid_sessionId_message">A configuration error has occurred (invalid Session Id), please contact your system administrator</string>
+    <string name="invalid_intentAction_message">A configuration error has occurred (invalid intent action), please contact your system administrator</string>
+    <string name="invalid_metadata_message">A configuration error has occurred (invalid metadata), please contact your system administrator</string>
+    <string name="invalid_userId_message">A configuration error has occurred (invalid user ID), please contact your system administrator</string>
+    <string name="invalid_moduleId_message">A configuration error has occurred (invalid module ID), please contact your system administrator</string>
+    <string name="invalid_verifyId_message">A configuration error has occurred (invalid verify GUID), please contact your system administrator</string>
+    <string name="rooted_device_title">Rooted device detected</string>
+    <string name="rooted_device_message">1. Contact your supervisor - rooted device detected\n2. Tap Close</string>
+    <!-- endregion -->
+
+    <!-- region GUID selection -->
+    <string name="guid_selection_data_sent">Data sent</string>
+    <string name="guid_selection_result_sent">Result sent</string>
+    <!-- endregion -->
 </resources>

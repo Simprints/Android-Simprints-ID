@@ -2,7 +2,7 @@ package com.simprints.clientapi.identity
 
 import android.content.Context
 import android.widget.Toast
-import com.simprints.clientapi.R
+import com.simprints.infra.resources.R
 import javax.inject.Inject
 
 class DefaultGuidSelectionNotifier @Inject constructor(context: Context) :
