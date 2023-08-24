@@ -8,5 +8,3 @@ fun <T> List<T>.updateOnIndex(index: Int, newItem: (T) -> T): List<T> =
             else -> item
         }
     }
-
-fun <T> T.singleItemList(): List<T> = listOf(this)
