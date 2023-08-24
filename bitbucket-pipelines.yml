@@ -118,6 +118,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
+                    - ./gradlew feature:orchestrator:jacocoTestReport
+                    - ./gradlew feature:client-api:jacocoTestReport
                     - ./gradlew feature:alert:jacocoTestReport
                     - ./gradlew feature:exit-form:jacocoTestReport
                     - ./gradlew feature:consent:jacocoTestReport
@@ -127,6 +129,8 @@ definitions:
                     - ./gradlew feature:setup:jacocoTestReport
                     - ./gradlew feature:enrol-last-biometric:jacocoTestReport
                 artifacts:
+                    - feature/orchestrator/build/reports/**
+                    - feature/client-api/build/reports/**
                     - feature/alert/build/reports/**
                     - feature/exit-form/build/reports/**
                     - feature/consent/build/reports/**
