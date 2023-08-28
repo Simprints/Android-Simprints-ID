@@ -3,6 +3,7 @@ package com.simprints.feature.clientapi.session
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
@@ -21,12 +22,9 @@ internal class ClientSessionManager @Inject constructor(
 
     suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentCaptureSessionEvent().id
 
-    suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean {
-        val session = coreEventRepository.getCurrentCaptureSessionEvent()
-        return coreEventRepository.observeEventsFromSession(session.id).toList().any {
-            it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent
-        }
-    }
+    suspend fun isCurrentSessionAnIdentificationOrEnrolment(): Boolean = getCurrentSessionId()
+        .let { coreEventRepository.observeEventsFromSession(it).toList() }
+        .any { it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent }
 
     suspend fun sessionHasIdentificationCallback(sessionId: String): Boolean = coreEventRepository
         .observeEventsFromSession(sessionId)
@@ -44,6 +42,22 @@ internal class ClientSessionManager @Inject constructor(
     fun addInvalidIntentEvent(action: String, extras: Map<String, Any>) {
         externalScope.launch {
             coreEventRepository.addOrUpdateEvent(InvalidIntentEvent(timeHelper.now(), action, extras))
+        }
+    }
+
+    fun addCompletionCheckEvent(flowCompleted: Boolean) {
+        externalScope.launch {
+            coreEventRepository.addOrUpdateEvent(CompletionCheckEvent(timeHelper.now(), flowCompleted))
+        }
+    }
+
+    suspend fun closeCurrentSessionNormally() {
+        coreEventRepository.closeCurrentSession()
+    }
+
+    fun deleteSessionEvents(sessionId: String) {
+        externalScope.launch {
+            coreEventRepository.deleteSessionEvents(sessionId)
         }
     }
 }

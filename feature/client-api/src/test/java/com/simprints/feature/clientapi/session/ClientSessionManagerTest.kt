@@ -170,6 +170,30 @@ class ClientSessionManagerTest {
         coVerify { coreEventRepository.addOrUpdateEvent(any()) }
     }
 
+    @Test
+    fun `addCompletionCheckEvent adds event`() = runTest {
+        // When
+        clientSessionManager.addCompletionCheckEvent(true)
+        //Then
+        coVerify { coreEventRepository.addOrUpdateEvent(any()) }
+    }
+
+    @Test
+    fun `closeCurrentSessionNormally closes current session`() = runTest {
+        // When
+        clientSessionManager.closeCurrentSessionNormally()
+        //Then
+        coVerify { coreEventRepository.closeCurrentSession() }
+    }
+
+    @Test
+    fun `deleteSessionEvents deletes events in session`() = runTest {
+        // When
+        clientSessionManager.deleteSessionEvents(SESSION_ID)
+        //Then
+        coVerify { coreEventRepository.deleteSessionEvents(eq(SESSION_ID)) }
+    }
+
     companion object {
 
         private const val SESSION_ID = "sessionId"
