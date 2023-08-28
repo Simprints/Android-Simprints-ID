@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.mappers
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.alert.AlertConfigurationBuilder
 import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertButtonConfig
@@ -9,6 +10,7 @@ import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 class AlertConfigurationMapper @Inject constructor() {
 
     fun buildAlertConfig(clientApiError: ClientApiError): AlertConfigurationBuilder = alertConfiguration {

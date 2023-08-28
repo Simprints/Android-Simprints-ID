@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -10,6 +11,8 @@ import com.simprints.feature.alert.toArgs
 import com.simprints.feature.clientapi.R
 import com.simprints.feature.clientapi.extensions.toMap
 import com.simprints.feature.clientapi.mappers.AlertConfigurationMapper
+import com.simprints.feature.clientapi.mappers.response.ActionToIntentMapper
+import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +25,10 @@ internal class ClientApiActivity : BaseActivity(R.layout.activity_client_api) {
 
     @Inject
     lateinit var alertConfigurationMapper: AlertConfigurationMapper
+
+    @Inject
+    lateinit var resultMapper: ActionToIntentMapper
+
 
     private val vm by viewModels<ClientApiViewModel>()
 
@@ -48,6 +55,15 @@ internal class ClientApiActivity : BaseActivity(R.layout.activity_client_api) {
                     // .withPayload() // TODO add payload ot differentiate alert screens when returning
                     .toArgs()
             )
+        })
+
+        vm.returnResponse.observe(this, LiveDataEventWithContentObserver { response ->
+            val responseExtras = resultMapper(response)
+            val resultCode = responseExtras.getInt(LibSimprintsConstants.RESULT_CODE_OVERRIDE, RESULT_OK)
+            responseExtras.remove(LibSimprintsConstants.RESULT_CODE_OVERRIDE)
+
+            setResult(resultCode, Intent().putExtras(responseExtras))
+            finish()
         })
     }
 
