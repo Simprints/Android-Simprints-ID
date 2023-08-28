@@ -3,10 +3,10 @@ package com.simprints.fingerprint.scanner.wrapper
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel
-import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR
 import com.simprints.fingerprint.infra.scanner.v1.Scanner
 import com.simprints.fingerprint.infra.scanner.v1.ScannerCallback
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprint.scanner.domain.BatteryInfo.Companion.UNKNOWN
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
@@ -123,7 +123,7 @@ class ScannerWrapperV1Test {
             captureCallback.captured.onSuccess()
         }
         scannerWrapper.captureFingerprint(
-            CaptureFingerprintStrategy.SECUGEN_ISO_1000_DPI,
+            Dpi(1000),
             CollectFingerprintsViewModel.scanningTimeoutMs.toInt(),
             60
         )
@@ -308,7 +308,7 @@ class ScannerWrapperV1Test {
         }
     }
     private suspend fun startCapturing() = scannerWrapper.captureFingerprint(
-        CaptureFingerprintStrategy.SECUGEN_ISO_1000_DPI,
+        Dpi(1000),
         CollectFingerprintsViewModel.scanningTimeoutMs.toInt(),
         60
     )

@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
+import com.simprints.fingerprint.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
@@ -13,9 +14,7 @@ import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
-import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
-import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.infra.config.ConfigManager
@@ -43,7 +42,7 @@ class MatchingViewModelTest {
 
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
-    private val mockFingerprintBioSdk: FingerprintBioSdk<Unit,Unit,Unit,Unit,Unit, SimAfisMatcherSettings> = mockk()
+    private val mockFingerprintBioSdk: BioSdkWrapper = mockk()
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>(relaxed = true)
     private val mockConfigManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
@@ -54,7 +53,7 @@ class MatchingViewModelTest {
         mockk(relaxed = true)
 
     private fun mockSuccessfulMatcher() {
-        every { mockFingerprintBioSdk.match(any(), any(), any()) } answers  {
+        coEvery { mockFingerprintBioSdk.match(any(), any(), any()) } answers  {
             val probe = this.firstArg<MatcherFingerprintIdentity>()
             this.secondArg<List<MatcherFingerprintIdentity>>()
                 .map {

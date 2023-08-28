@@ -1,7 +1,5 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
-import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BLUETOOTH_DISABLED
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BLUETOOTH_NOT_SUPPORTED
@@ -17,6 +15,7 @@ import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_INVALID_STA
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_LOW_VOLTAGE
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_SDK_ERROR
 import com.simprints.fingerprint.infra.scanner.v1.ScannerCallback
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
@@ -163,7 +162,7 @@ class ScannerWrapperV1(
     override fun isLiveFeedbackAvailable(): Boolean = false
 
     override suspend fun captureFingerprint(
-        captureFingerprintStrategy: CaptureFingerprintStrategy?,
+        captureDpi: Dpi?,
         timeOutMs: Int,
         qualityThreshold: Int,
     )  = withContext(ioDispatcher) {
@@ -219,7 +218,7 @@ class ScannerWrapperV1(
         }
     }
 
-    override suspend fun acquireImage(saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy?): AcquireImageResponse =
+    override suspend fun acquireImage(): AcquireImageResponse =
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
 
     override suspend fun setUiIdle()  = withContext(ioDispatcher) {
