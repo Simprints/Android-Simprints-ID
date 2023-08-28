@@ -1,8 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
 import android.annotation.SuppressLint
-import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
-import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageFormatData
@@ -186,12 +184,12 @@ class ScannerWrapperV2(
     }
 
     override suspend fun captureFingerprint(
-        captureFingerprintStrategy: CaptureFingerprintStrategy?,
+        captureDpi: Dpi?,
         timeOutMs: Int,
         qualityThreshold: Int
     ): CaptureFingerprintResponse = withContext(ioDispatcher) {
         scannerV2
-            .captureFingerprint(captureFingerprintStrategy!!.deduceCaptureDpi())
+            .captureFingerprint(captureDpi!!)
             .ensureCaptureResultOkOrError()
             .andThen(scannerV2.getImageQualityScore())
             .switchIfEmpty(Single.error(NoFingerDetectedException()))
@@ -256,19 +254,13 @@ class ScannerWrapperV2(
             }
         }
 
-    override suspend fun acquireImage(
-        saveFingerprintImagesStrategy: SaveFingerprintImagesStrategy?,
-    ): AcquireImageResponse = withContext(ioDispatcher) {
-        (saveFingerprintImagesStrategy!!.deduceImageAcquisitionFormat()?.let {
-            scannerV2.acquireImage(it)
-                .map { imageBytes ->
-                    AcquireImageResponse(imageBytes.image)
-                }
-        }?.switchIfEmpty(Single.error(NoFingerDetectedException()))
-            ?.wrapErrorsFromScanner()
-            ?: Single.error(
-                IllegalArgumentException("Fingerprint strategy $saveFingerprintImagesStrategy should not call acquireImage in ScannerWrapper")
-            )).await()
+    override suspend fun acquireImage(): AcquireImageResponse {
+        return withContext(ioDispatcher) {
+            scannerV2.acquireImage(IMAGE_FORMAT).map { imageBytes ->
+                AcquireImageResponse(imageBytes.image)
+            }.switchIfEmpty(Single.error(NoFingerDetectedException())).wrapErrorsFromScanner()
+                .await()
+        }
     }
 
     override suspend fun setUiIdle() = withContext(ioDispatcher) {
@@ -315,20 +307,6 @@ class ScannerWrapperV2(
             .mapPotentialErrorFromScanner()
             .flowOn(ioDispatcher)
 
-    private fun CaptureFingerprintStrategy.deduceCaptureDpi(): Dpi =
-        when (this) {
-            CaptureFingerprintStrategy.SECUGEN_ISO_500_DPI -> Dpi(500)
-            CaptureFingerprintStrategy.SECUGEN_ISO_1000_DPI -> Dpi(1000)
-            CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI -> Dpi(1300)
-            CaptureFingerprintStrategy.SECUGEN_ISO_1700_DPI -> Dpi(1700)
-        }
-
-    private fun SaveFingerprintImagesStrategy.deduceImageAcquisitionFormat(): ImageFormatData? =
-        when (this) {
-            SaveFingerprintImagesStrategy.NEVER -> null
-            SaveFingerprintImagesStrategy.WSQ_15,
-            SaveFingerprintImagesStrategy.WSQ_15_EAGER -> ImageFormatData.WSQ(15)
-        }
 
     private fun Completable.wrapErrorsFromScanner() =
         onErrorResumeNext { Completable.error(wrapErrorFromScanner(it)) }
@@ -365,5 +343,6 @@ class ScannerWrapperV2(
     companion object {
         private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD =
             10 // The image quality at which we decide a fingerprint wasn't detected
+        private val IMAGE_FORMAT = ImageFormatData.WSQ(15)
     }
 }
