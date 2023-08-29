@@ -64,6 +64,7 @@ fun verifyCallbackIdentificationScoresApiModel(jsonArray: JSONArray) {
     assertThat(score.getString("guid"))
     assertThat(score.getString("tier"))
     assertThat(score.getString("confidence"))
+    assertThat(score.getString("confidenceMatch"))
     assertThat(jsonArray.length()).isEqualTo(1)
 }
 
@@ -72,8 +73,9 @@ fun verifyCallbackVerificationApiModel(json: JSONObject) {
     with(json.getJSONObject("score")) {
         assertThat(getString("guid"))
         assertThat(getString("confidence"))
+        assertThat(getString("confidenceMatch"))
         assertThat(getString("tier"))
-        assertThat(length()).isEqualTo(3)
+        assertThat(length()).isEqualTo(4)
     }
     assertThat(json.length()).isEqualTo(2)
 }

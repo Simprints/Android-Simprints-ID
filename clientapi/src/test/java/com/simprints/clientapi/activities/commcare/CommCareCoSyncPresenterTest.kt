@@ -33,6 +33,8 @@ import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.libsimprints.Constants
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence.MEDIUM
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
@@ -754,7 +756,7 @@ class CommCareCoSyncPresenterTest {
         createdAt = 2,
         sessionId = UUID.randomUUID().toString(),
         scores = listOf(
-            CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1)
+            CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1, MEDIUM)
         )
     )
 
@@ -765,6 +767,6 @@ class CommCareCoSyncPresenterTest {
 
     private val verificationCallbackEvent = VerificationCallbackEvent(
         2,
-        CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1)
+        CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1, MEDIUM)
     )
 }
