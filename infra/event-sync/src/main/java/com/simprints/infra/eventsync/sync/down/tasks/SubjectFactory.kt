@@ -25,9 +25,9 @@ class SubjectFactory @Inject constructor(
     private val configManager: ConfigManager
 ) {
 
-    suspend fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
+    fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
         with(payload) {
-            buildEncryptedSubject(
+            Subject(
                 subjectId = subjectId,
                 projectId = projectId,
                 attendantId = attendantId,
@@ -37,9 +37,9 @@ class SubjectFactory @Inject constructor(
             )
         }
 
-    suspend fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) =
+    fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) =
         with(payload) {
-            buildEncryptedSubject(
+            Subject(
                 subjectId = subjectId,
                 projectId = projectId,
                 attendantId = attendantId,
