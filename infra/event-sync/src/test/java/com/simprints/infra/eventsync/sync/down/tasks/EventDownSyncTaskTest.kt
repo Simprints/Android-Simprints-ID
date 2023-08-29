@@ -2,6 +2,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -49,7 +50,7 @@ class EventDownSyncTaskTest {
             "projectId",
             "moduleId",
             "attendantId",
-            listOf(FaceReference("id", listOf(FaceTemplate("template")),"format")),
+            listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
         )
         val ENROLMENT_RECORD_MOVE = EnrolmentRecordMoveEvent(
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
@@ -57,7 +58,7 @@ class EventDownSyncTaskTest {
                 "projectId",
                 DEFAULT_MODULE_ID_2,
                 "attendantId",
-                listOf(FaceReference("id", listOf(FaceTemplate("template")),"format"))
+                listOf(FaceReference("id", listOf(FaceTemplate("template")), "format"))
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",
@@ -90,7 +91,10 @@ class EventDownSyncTaskTest {
     @MockK
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
 
-    private val subjectFactory = SubjectFactory(EncodingUtilsImplForTests)
+    @MockK
+    private lateinit var tokenization: Tokenization
+
+    private lateinit var subjectFactory: SubjectFactory
 
 
     @get:Rule
@@ -100,6 +104,11 @@ class EventDownSyncTaskTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
+        subjectFactory = SubjectFactory(
+            encodingUtils = EncodingUtilsImplForTests,
+            tokenization = tokenization,
+            configManager = configManager
+        )
         eventDownSyncTask = EventDownSyncTask(
             enrolmentRecordManager,
             eventDownSyncScopeRepository,
@@ -186,30 +195,31 @@ class EventDownSyncTaskTest {
     }
 
     @Test
-    fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() = runTest {
-        val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
-        mockProgressEmission(listOf(eventToMoveToModule2))
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-            ""
-        )
-
-        val syncByModule2 = moduleOp.copy(
-            queryEvent = moduleOp.queryEvent.copy(
-                moduleIds = listOf(DEFAULT_MODULE_ID_2)
+    fun moveSubjectFromModulesUnderSyncing_theDestinationModuleSyncShouldPerformCreation() =
+        runTest {
+            val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
+            mockProgressEmission(listOf(eventToMoveToModule2))
+            coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+                "",
+                listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+                ""
             )
-        )
-        eventDownSyncTask.downSync(this, syncByModule2).toList()
 
-        coVerify {
-            enrolmentRecordManager.performActions(
-                listOf(
-                    Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
+            val syncByModule2 = moduleOp.copy(
+                queryEvent = moduleOp.queryEvent.copy(
+                    moduleIds = listOf(DEFAULT_MODULE_ID_2)
                 )
             )
+            eventDownSyncTask.downSync(this, syncByModule2).toList()
+
+            coVerify {
+                enrolmentRecordManager.performActions(
+                    listOf(
+                        Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
+                    )
+                )
+            }
         }
-    }
 
     @Test
     fun moveSubjectToAModuleNotUnderSyncing_shouldPerformDeletionOnly() = runTest {
