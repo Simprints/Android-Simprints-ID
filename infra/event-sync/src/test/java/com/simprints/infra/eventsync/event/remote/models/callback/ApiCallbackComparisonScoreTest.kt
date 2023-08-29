@@ -11,54 +11,27 @@ import org.junit.Test
 class ApiCallbackComparisonScoreTest {
 
     @Test
-    fun `correctly converts domain to api`() {
+    fun `correctly converts domain to api v1`() {
         val apiModel = CallbackComparisonScore(
             guid = "guid",
             confidence = 1,
             tier = IAppResponseTier.TIER_1,
             confidenceMatch = IAppMatchConfidence.HIGH,
-        ).fromDomainToApi()
+        ).fromDomainToApi(1) as ApiCallbackComparisonScore.ApiCallbackComparisonScoreV1
 
         assertThat(apiModel.tier).isEqualTo(ApiTier.TIER_1)
-        assertThat(apiModel.confidenceMatch).isEqualTo(ApiConfidenceMatch.HIGH)
     }
 
     @Test
-    fun `correctly converts api to domain`() {
-        val domainModel = ApiCallbackComparisonScore(
-            guid = "guid",
-            confidence = 1,
-            tier = ApiTier.TIER_1,
-            confidenceMatch = ApiConfidenceMatch.HIGH,
-        ).fromApiToDomain()
-
-        assertThat(domainModel.tier).isEqualTo(IAppResponseTier.TIER_1)
-        assertThat(domainModel.confidenceMatch).isEqualTo(IAppMatchConfidence.HIGH)
-    }
-
-    @Test
-    fun `correctly converts domain to api with missing confidence match`() {
+    fun `correctly converts domain to api v2`() {
         val apiModel = CallbackComparisonScore(
             guid = "guid",
             confidence = 1,
             tier = IAppResponseTier.TIER_1,
-            confidenceMatch = null,
-        ).fromDomainToApi()
+            confidenceMatch = IAppMatchConfidence.HIGH,
+        ).fromDomainToApi(2) as ApiCallbackComparisonScore.ApiCallbackComparisonScoreV2
 
         assertThat(apiModel.tier).isEqualTo(ApiTier.TIER_1)
-        assertThat(apiModel.confidenceMatch).isEqualTo(ApiConfidenceMatch.NONE)
-    }
-
-    @Test
-    fun `correctly converts api to domain with missing confidence mathc`() {
-        val domainModel = ApiCallbackComparisonScore(
-            guid = "guid",
-            confidence = 1,
-            tier = ApiTier.TIER_1,
-            confidenceMatch = null,
-        ).fromApiToDomain()
-
-        assertThat(domainModel.tier).isEqualTo(IAppResponseTier.TIER_1)
-        assertThat(domainModel.confidenceMatch).isEqualTo(IAppMatchConfidence.NONE)
+        assertThat(apiModel.confidenceMatch).isEqualTo(ApiConfidenceMatch.HIGH)
     }
 }
