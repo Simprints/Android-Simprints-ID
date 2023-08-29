@@ -13,6 +13,7 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
+import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -25,7 +26,8 @@ private const val TAG = "ENROLMENT"
 class EnrolmentHelperImpl @Inject constructor(
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val eventRepository: EventRepository,
-    private val timeHelper: TimeHelper
+    private val timeHelper: TimeHelper,
+    private val subjectFactory: SubjectFactory
 ) : EnrolmentHelper {
 
     override suspend fun enrol(subject: Subject) {
@@ -57,7 +59,7 @@ class EnrolmentHelperImpl @Inject constructor(
         )
     }
 
-    override fun buildSubject(
+    override suspend fun buildSubject(
         projectId: String,
         userId: String,
         moduleId: String,
@@ -95,7 +97,7 @@ class EnrolmentHelperImpl @Inject constructor(
         }
 
 
-    private fun buildSubjectFromFingerprintAndFace(
+    private suspend fun buildSubjectFromFingerprintAndFace(
         projectId: String,
         userId: String,
         moduleId: String,
@@ -104,18 +106,18 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return Subject(
-            patientId,
-            projectId,
-            userId,
-            moduleId,
+        return subjectFactory.buildEncryptedSubject(
+            subjectId = patientId,
+            projectId = projectId,
+            attendantId = userId,
+            moduleId = moduleId,
             createdAt = Date(timeHelper.now()),
             fingerprintSamples = extractFingerprintSamples(fingerprintResponse),
             faceSamples = extractFaceSamples(faceResponse)
         )
     }
 
-    private fun buildSubjectFromFingerprint(
+    private suspend fun buildSubjectFromFingerprint(
         projectId: String,
         userId: String,
         moduleId: String,
@@ -123,17 +125,17 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return Subject(
-            patientId,
-            projectId,
-            userId,
-            moduleId,
+        return subjectFactory.buildEncryptedSubject(
+            subjectId = patientId,
+            projectId = projectId,
+            attendantId = userId,
+            moduleId = moduleId,
             createdAt = Date(timeHelper.now()),
             fingerprintSamples = extractFingerprintSamples(fingerprintResponse)
         )
     }
 
-    private fun buildSubjectFromFace(
+    private suspend fun buildSubjectFromFace(
         projectId: String,
         userId: String,
         moduleId: String,
@@ -141,11 +143,11 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return Subject(
-            patientId,
-            projectId,
-            userId,
-            moduleId,
+        return subjectFactory.buildEncryptedSubject(
+            subjectId = patientId,
+            projectId = projectId,
+            attendantId = userId,
+            moduleId = moduleId,
             createdAt = Date(timeHelper.now()),
             faceSamples = extractFaceSamples(faceResponse)
         )

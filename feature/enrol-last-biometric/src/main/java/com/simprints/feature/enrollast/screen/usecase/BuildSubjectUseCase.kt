@@ -9,6 +9,7 @@ import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import java.util.Date
 import java.util.UUID
@@ -16,23 +17,28 @@ import javax.inject.Inject
 
 class BuildSubjectUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
+    private val subjectFactory: SubjectFactory
 ) {
 
-    operator fun invoke(params: EnrolLastBiometricParams): Subject = Subject(
-        UUID.randomUUID().toString(),
-        params.projectId,
-        params.userId,
-        params.moduleId,
-        createdAt = Date(timeHelper.now()),
-        fingerprintSamples = getFingerprintCaptureResult(params.steps)?.map(::fingerprintSample).orEmpty(),
-        faceSamples = getFaceCaptureResult(params.steps)?.map(::faceSample).orEmpty()
-    )
+    suspend operator fun invoke(params: EnrolLastBiometricParams): Subject =
+        subjectFactory.buildEncryptedSubject(
+            subjectId = UUID.randomUUID().toString(),
+            projectId = params.projectId,
+            attendantId = params.userId,
+            moduleId = params.moduleId,
+            createdAt = Date(timeHelper.now()),
+            fingerprintSamples = getFingerprintCaptureResult(params.steps)?.map(::fingerprintSample)
+                .orEmpty(),
+            faceSamples = getFaceCaptureResult(params.steps)?.map(::faceSample).orEmpty()
+        )
 
     private fun getFingerprintCaptureResult(steps: List<EnrolLastBiometricStepResult>) =
-        steps.filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>().firstOrNull()?.results
+        steps.filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>()
+            .firstOrNull()?.results
 
     private fun getFaceCaptureResult(steps: List<EnrolLastBiometricStepResult>) =
-        steps.filterIsInstance<EnrolLastBiometricStepResult.FaceCaptureResult>().firstOrNull()?.results
+        steps.filterIsInstance<EnrolLastBiometricStepResult.FaceCaptureResult>()
+            .firstOrNull()?.results
 
     private fun fingerprintSample(it: FingerTemplateCaptureResult) = FingerprintSample(
         fromDomainToModuleApi(it.finger),
