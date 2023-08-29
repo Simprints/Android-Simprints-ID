@@ -129,7 +129,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns success when no duplicate enrolments`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery {  buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
 
@@ -140,7 +140,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `saves event and record when no duplicate enrolments`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
 
@@ -151,7 +151,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns failure record saving fails`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any()) } returns subject
         coEvery { enrolmentRecordManager.performActions(any()) } throws Exception()
 
         viewModel.enrolBiometric(createParams(listOf()))
