@@ -114,7 +114,7 @@ internal class EventDownSyncTask @Inject constructor(
     }
 
     @VisibleForTesting
-    suspend fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
+    fun handleSubjectCreationEvent(event: EnrolmentRecordCreationEvent): List<SubjectAction> {
         val subject = subjectFactory.buildSubjectFromCreationPayload(event.payload)
         return if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
             listOf(Creation(subject))
@@ -192,7 +192,7 @@ internal class EventDownSyncTask @Inject constructor(
         return actions
     }
 
-    private suspend fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Creation? =
+    private fun createASubjectActionFromRecordCreation(enrolmentRecordCreation: EnrolmentRecordCreationInMove?): Creation? =
         enrolmentRecordCreation?.let {
             val subject = subjectFactory.buildSubjectFromMovePayload(it)
             if (subject.fingerprintSamples.isNotEmpty() || subject.faceSamples.isNotEmpty()) {
