@@ -25,6 +25,7 @@ import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayloa
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EventLabels
+import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
@@ -93,7 +94,16 @@ fun createEnrolmentCallbackEvent() = EnrolmentCallbackEvent(CREATED_AT, GUID1, e
 fun createErrorCallbackEvent() =
     ErrorCallbackEvent(CREATED_AT, DIFFERENT_PROJECT_ID_SIGNED_IN, eventLabels)
 
-fun createIdentificationCallbackEvent(): IdentificationCallbackEvent {
+fun createIdentificationCallbackEventV1(): IdentificationCallbackEvent {
+    val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
+    return IdentificationCallbackEvent(
+        GUID1, eventLabels,
+        IdentificationCallbackEvent.IdentificationCallbackPayload(CREATED_AT, 1, GUID1, listOf(comparisonScore)),
+        EventType.CALLBACK_IDENTIFICATION
+    )
+}
+
+fun createIdentificationCallbackEventV2(): IdentificationCallbackEvent {
     val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
     return IdentificationCallbackEvent(CREATED_AT, GUID1, listOf(comparisonScore), eventLabels)
 }
@@ -101,7 +111,16 @@ fun createIdentificationCallbackEvent(): IdentificationCallbackEvent {
 fun createRefusalCallbackEvent() =
     RefusalCallbackEvent(CREATED_AT, "some_reason", "extra", eventLabels)
 
-fun createVerificationCallbackEvent(): VerificationCallbackEvent {
+fun createVerificationCallbackEventV1(): VerificationCallbackEvent {
+    val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
+    return VerificationCallbackEvent(
+        GUID1, eventLabels,
+        VerificationCallbackEvent.VerificationCallbackPayload(CREATED_AT, 1, comparisonScore),
+        EventType.CALLBACK_VERIFICATION
+    )
+}
+
+fun createVerificationCallbackEventV2(): VerificationCallbackEvent {
     val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
     return VerificationCallbackEvent(CREATED_AT, comparisonScore, eventLabels)
 }

@@ -8,23 +8,36 @@ import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 
 @Keep
-internal class ApiCallbackComparisonScore(
-    val guid: String,
-    val confidence: Int,
-    val tier: ApiTier,
-    val confidenceMatch: ApiConfidenceMatch?,
-)
+internal sealed class ApiCallbackComparisonScore {
 
-internal fun CallbackComparisonScore.fromDomainToApi() = ApiCallbackComparisonScore(
-    guid,
-    confidence,
-    ApiTier.valueOf(tier.name),
-    confidenceMatch?.let { ApiConfidenceMatch.valueOf(it.name) } ?: ApiConfidenceMatch.NONE,
-)
+    @Keep
+    data class ApiCallbackComparisonScoreV1(
+        val guid: String,
+        val confidence: Int,
+        val tier: ApiTier,
+    ) : ApiCallbackComparisonScore()
 
-internal fun ApiCallbackComparisonScore.fromApiToDomain() = CallbackComparisonScore(
-    guid,
-    confidence,
-    IAppResponseTier.valueOf(tier.name),
-    confidenceMatch?.let { IAppMatchConfidence.valueOf(it.name) } ?: IAppMatchConfidence.NONE,
-)
+    @Keep
+    data class ApiCallbackComparisonScoreV2(
+        val guid: String,
+        val confidence: Int,
+        val tier: ApiTier,
+        val confidenceMatch: ApiConfidenceMatch = ApiConfidenceMatch.NONE,
+    ) : ApiCallbackComparisonScore()
+}
+
+
+internal fun CallbackComparisonScore.fromDomainToApi(version: Int) = when (version) {
+    1 -> ApiCallbackComparisonScore.ApiCallbackComparisonScoreV1(
+        guid,
+        confidence,
+        ApiTier.valueOf(tier.name),
+    )
+
+    else -> ApiCallbackComparisonScore.ApiCallbackComparisonScoreV2(
+        guid,
+        confidence,
+        ApiTier.valueOf(tier.name),
+        ApiConfidenceMatch.valueOf(confidenceMatch.name)
+    )
+}

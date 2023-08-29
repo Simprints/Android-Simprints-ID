@@ -9,5 +9,5 @@ data class CallbackComparisonScore(
     val guid: String,
     val confidence: Int,
     val tier: IAppResponseTier,
-    val confidenceMatch: IAppMatchConfidence?,
+    val confidenceMatch: IAppMatchConfidence = IAppMatchConfidence.NONE,
 )

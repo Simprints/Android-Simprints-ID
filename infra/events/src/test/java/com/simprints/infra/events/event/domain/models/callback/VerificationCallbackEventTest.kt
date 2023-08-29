@@ -7,6 +7,7 @@ import com.simprints.infra.events.event.domain.models.callback.VerificationCallb
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import org.junit.Test
 
@@ -15,7 +16,7 @@ class VerificationCallbackEventTest {
     @Test
     fun create_VerificationCallbackEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, null)
+        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, IAppMatchConfidence.NONE)
 
         val event = VerificationCallbackEvent(CREATED_AT, comparisonScore, labels)
         assertThat(event.id).isNotNull()
