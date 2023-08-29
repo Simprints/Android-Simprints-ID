@@ -15,7 +15,7 @@ class VerificationCallbackEventTest {
     @Test
     fun create_VerificationCallbackEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1)
+        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, null)
 
         val event = VerificationCallbackEvent(CREATED_AT, comparisonScore, labels)
         assertThat(event.id).isNotNull()

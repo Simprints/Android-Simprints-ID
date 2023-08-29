@@ -15,7 +15,7 @@ class IdentificationCallbackEventTest {
     @Test
     fun create_IdentificationCallbackEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1)
+        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, null)
 
         val event = IdentificationCallbackEvent(CREATED_AT, GUID1, listOf(comparisonScore), labels)
         assertThat(event.id).isNotNull()

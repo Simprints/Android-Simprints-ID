@@ -79,6 +79,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence.MEDIUM
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
 
@@ -93,7 +94,7 @@ fun createErrorCallbackEvent() =
     ErrorCallbackEvent(CREATED_AT, DIFFERENT_PROJECT_ID_SIGNED_IN, eventLabels)
 
 fun createIdentificationCallbackEvent(): IdentificationCallbackEvent {
-    val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1)
+    val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
     return IdentificationCallbackEvent(CREATED_AT, GUID1, listOf(comparisonScore), eventLabels)
 }
 
@@ -101,7 +102,7 @@ fun createRefusalCallbackEvent() =
     RefusalCallbackEvent(CREATED_AT, "some_reason", "extra", eventLabels)
 
 fun createVerificationCallbackEvent(): VerificationCallbackEvent {
-    val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1)
+    val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
     return VerificationCallbackEvent(CREATED_AT, comparisonScore, eventLabels)
 }
 
