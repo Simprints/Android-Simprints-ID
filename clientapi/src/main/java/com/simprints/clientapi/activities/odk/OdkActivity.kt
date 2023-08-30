@@ -13,6 +13,10 @@ import com.simprints.clientapi.clientrequests.extractors.odk.OdkIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
+import com.simprints.core.tools.utils.Tokenization
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Project
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -68,6 +72,21 @@ class OdkActivity : RequestActivity(), OdkContract.View {
 
     @Inject
     lateinit var presenterFactory: ClientApiModule.OdkPresenterFactory
+
+    @Inject
+    lateinit var tokenizationParam: Tokenization
+
+    @Inject
+    lateinit var configManager: ConfigManager
+
+    @Inject
+    lateinit var authStore: AuthStore
+
+    override val tokenization: Tokenization by lazy {
+        tokenizationParam
+    }
+
+    override suspend fun getProject(): Project = configManager.getProject(authStore.signedInProjectId)
 
     override val presenter: OdkContract.Presenter by lazy { presenterFactory.create(this, action) }
 

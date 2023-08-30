@@ -21,7 +21,7 @@ class BuildSubjectUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(params: EnrolLastBiometricParams): Subject =
-        subjectFactory.buildEncryptedSubject(
+        subjectFactory.buildSubject(
             subjectId = UUID.randomUUID().toString(),
             projectId = params.projectId,
             attendantId = params.userId,

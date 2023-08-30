@@ -5,3 +5,9 @@ package com.simprints.core.tools.extentions
 // https://youtrack.jetbrains.com/issue/KT-12380
 // https://stackoverflow.com/questions/38169933/force-compilation-error-with-sealed-classes
 val Any?.safeSealedWhens get() = Unit
+
+fun <T> tryOrNull(block: () -> T): T? = try {
+    block()
+} catch (e: Exception) {
+    null
+}
