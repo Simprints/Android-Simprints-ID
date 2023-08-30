@@ -1,7 +1,6 @@
 package com.simprints.core
 
 import android.content.Context
-import androidx.annotation.RequiresApi
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
 import com.simprints.core.tools.extentions.deviceHardwareId
@@ -53,8 +52,7 @@ object CoreModule {
     @Singleton
     fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImpl
 
-    @OptIn(ExperimentalStdlibApi::class)
-    @RequiresApi(34)
+
     @DeviceID
     @Provides
     fun provideDeviceId(
