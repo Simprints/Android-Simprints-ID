@@ -7,21 +7,22 @@
 
     <TextView
         android:id="@+id/configuration_txt"
+        style="@style/Text.Body1.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:text="@string/face_configuration_started"
-        android:textColor="@color/white"
+        android:textColor="@color/simprints_white"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@id/configuration_progress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/configuration_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminateTint="@color/white"
+        android:indeterminate="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

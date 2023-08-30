@@ -38,6 +38,7 @@ data class AlertScreenEvent(
             GUID_NOT_FOUND_ONLINE,
             GUID_NOT_FOUND_OFFLINE,
             BLUETOOTH_NOT_SUPPORTED,
+            BLUETOOTH_NO_PERMISSION,
             LOW_BATTERY,
             UNEXPECTED_ERROR,
             BACKEND_MAINTENANCE_ERROR,

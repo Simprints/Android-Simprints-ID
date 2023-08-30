@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.DashboardActivity
 import com.simprints.feature.dashboard.R
@@ -95,17 +96,14 @@ internal class SettingsFragment : PreferenceFragmentCompat() {
     private fun createLanguageSelectionDialog(): AlertDialog {
         val languagesOptions = viewModel.generalConfiguration.value?.languageOptions.orEmpty()
         val languagesCodeToName = computeAvailableLanguageCodeAndName(languagesOptions)
-        val languageNames = languagesCodeToName.map { it.second }
+        val languageNames = languagesCodeToName.map { it.second }.toTypedArray()
 
         val selectedLanguage = viewModel.languagePreference.value
             ?.let { selectedCode -> languagesCodeToName.indexOfFirst { selectedCode == it.first } }
             ?: ArrayAdapter.NO_SELECTION
 
-        return AlertDialog.Builder(requireContext())
-            .setSingleChoiceItems(
-                ArrayAdapter(requireContext(), android.R.layout.simple_list_item_single_choice, languageNames),
-                selectedLanguage
-            ) { _, which -> handleLanguageChange(languagesCodeToName[which].first) }
+        return MaterialAlertDialogBuilder(requireContext())
+            .setSingleChoiceItems(languageNames, selectedLanguage) { _, which -> handleLanguageChange(languagesCodeToName[which].first) }
             .create()
     }
 

@@ -29,12 +29,11 @@
 
     <TextView
         android:id="@+id/capture_title"
+        style="@style/Text.Headline5.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/title_preparation"
-        android:textAllCaps="true"
-        android:textColor="#ccffffff"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,7 +44,7 @@
         android:layout_height="242dp"
         android:indeterminate="false"
         android:visibility="gone"
-        app:dcp_color="@color/capture_green"
+        app:dcp_color="@color/simprints_green_light"
         app:dcp_max="10"
         app:layout_constraintBottom_toBottomOf="@id/capture_guide_frame"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,10 +53,12 @@
 
     <CheckedTextView
         android:id="@+id/capture_feedback_txt_title"
+        style="@style/Text.Headline6.Bold"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginTop="190dp"
         android:background="@drawable/feedback_chip_white"
+        android:textColor="@color/feedback_chip_text"
         android:drawablePadding="4dp"
         android:gravity="center"
         android:paddingStart="12dp"
@@ -65,26 +66,22 @@
         android:paddingEnd="12dp"
         android:paddingBottom="4dp"
         android:text="@string/capture_title_previewing"
-        android:textAllCaps="true"
-        android:textColor="@color/feedback_chip_text"
-        android:textSize="16sp"
-        android:fontFamily="@font/muli_semibold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/capture_guide_frame" />
 
     <TextView
         android:id="@+id/capture_feedback_txt_explanation"
+        style="@style/Text.Headline5.White"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:gravity="center"
-        android:textColor="#ffffff"
-        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_title" />
+        app:layout_constraintTop_toBottomOf="@id/capture_feedback_txt_title"
+        tools:text="Move closer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

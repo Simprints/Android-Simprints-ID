@@ -6,6 +6,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
@@ -13,8 +14,6 @@ import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
-import com.simprints.infra.images.ImageUpSyncScheduler
 
 internal class SignerManager @Inject constructor(
     private val configManager: ConfigManager,
@@ -30,7 +29,7 @@ internal class SignerManager @Inject constructor(
     val signedInProjectId: String
         get() = authStore.signedInProjectId
 
-    suspend fun signIn(projectId: String, userId: String, token: Token) = withContext(dispatcher) {
+    suspend fun signIn(projectId: String, token: Token) = withContext(dispatcher) {
         try {
             // Store Firebase token so it can be used by ConfigManager
             authStore.storeFirebaseToken(token)
@@ -40,7 +39,7 @@ internal class SignerManager @Inject constructor(
             // Only store credentials if all other calls succeeded. This avoids the undefined state
             // where credentials are store (i.e. user is considered logged in) but project configuration
             // is missing
-            authStore.storeCredentials(projectId, userId)
+            authStore.storeCredentials(projectId)
         } catch (e: Exception) {
             authStore.clearFirebaseToken()
             configManager.clearData()

@@ -17,7 +17,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import io.mockk.mockk
 
@@ -30,7 +29,8 @@ fun mockFingerprintCaptureStep(): Step {
         requestCode = 123,
         activityName = "com.simprints.id.MyFingerprintActivity",
         bundleKey = "BUNDLE_KEY",
-        request = request,
+        payloadType = Step.PayloadType.REQUEST,
+        payload = request,
         result = FingerprintCaptureResponse(
             captureResult =
             listOf(
@@ -40,7 +40,7 @@ fun mockFingerprintCaptureStep(): Step {
                         Finger.LEFT_THUMB,
                         templateQualityScore = 10,
                         template = "template".toByteArray(),
-                        format = FingerprintTemplateFormat.ISO_19794_2
+                        format = "ISO_19794_2"
                     )
                 )
             )
@@ -56,20 +56,22 @@ fun mockFingerprintMatchStep(includeHighMatch: Boolean = true): Step {
         requestCode = 234,
         activityName = "com.simprints.id.MyFingerprintActivity",
         bundleKey = "BUNDLE_KEY",
-        request = request,
+        payloadType = Step.PayloadType.REQUEST,
+        payload = request,
         result = FingerprintMatchResponse(buildMatchResults(includeHighMatch)),
         status = Step.Status.COMPLETED
     )
 }
 
 fun mockEmptyFingerprintMatchStep() = Step(
-        requestCode = 234,
-        activityName = "com.simprints.id.MyFingerprintActivity",
-        bundleKey = "BUNDLE_KEY",
-        request = FingerprintMatchRequest(mockk(), mockk()),
-        result = FingerprintMatchResponse(listOf()),
-        status = Step.Status.COMPLETED
-    )
+    requestCode = 234,
+    activityName = "com.simprints.id.MyFingerprintActivity",
+    bundleKey = "BUNDLE_KEY",
+    payloadType = Step.PayloadType.REQUEST,
+    payload = FingerprintMatchRequest(mockk(), mockk()),
+    result = FingerprintMatchResponse(listOf()),
+    status = Step.Status.COMPLETED
+)
 
 private fun buildMatchResults(includeHighMatch: Boolean) = if (includeHighMatch) {
     listOf(
@@ -105,7 +107,8 @@ fun mockFaceCaptureStep(): Step {
         requestCode = 321,
         activityName = "com.simprints.id.MyFaceActivity",
         bundleKey = "BUNDLE_KEY",
-        request = request,
+        payloadType = Step.PayloadType.REQUEST,
+        payload = request,
         result = response,
         status = Step.Status.COMPLETED
     )
@@ -121,29 +124,32 @@ fun mockFaceMatchStep(includeHighMatch: Boolean = true): Step {
         requestCode = 322,
         activityName = "com.simprints.id.MyFaceActivity",
         bundleKey = "BUNDLE_KEY",
-        request = request,
+        payloadType = Step.PayloadType.REQUEST,
+        payload = request,
         result = response,
         status = Step.Status.COMPLETED
     )
 }
 
 fun mockEmptyFaceMatchStep() = Step(
-        requestCode = 322,
-        activityName = "com.simprints.id.MyFaceActivity",
-        bundleKey = "BUNDLE_KEY",
-        request = FaceMatchRequest(mockk(), mockk()),
-        result = FaceMatchResponse(listOf()),
-        status = Step.Status.COMPLETED
-    )
+    requestCode = 322,
+    activityName = "com.simprints.id.MyFaceActivity",
+    bundleKey = "BUNDLE_KEY",
+    payloadType = Step.PayloadType.REQUEST,
+    payload = FaceMatchRequest(mockk(), mockk()),
+    result = FaceMatchResponse(listOf()),
+    status = Step.Status.COMPLETED
+)
 
 fun mockCoreExitFormResponse() = Step(
-        requestCode = 0,
-        activityName = "",
-        bundleKey = "",
-        request = mockk(),
-        result = ExitFormResponse(),
-        status = Step.Status.COMPLETED
-    )
+    requestCode = 0,
+    activityName = "",
+    bundleKey = "",
+    payloadType = Step.PayloadType.REQUEST,
+    payload = mockk(),
+    result = ExitFormResponse(),
+    status = Step.Status.COMPLETED
+)
 
 private fun buildMatchResultsForFace(includeHighMatch: Boolean) = if (includeHighMatch) {
     listOf(

@@ -55,7 +55,9 @@ include(
     ":fingerprint:controller",
     ":fingerprint:infra:scanner",
     ":fingerprint:infra:scannermock",
-    ":fingerprint:infra:matcher",
+    ":fingerprint:infra:base-bio-sdk",
+    ":fingerprint:infra:simprints-bio-sdk",
+    ":fingerprint:infra:simafis-wrapper",
 )
 
 // Modules to be refactored
@@ -67,6 +69,8 @@ include(
 
 // Feature modules
 include(
+    ":feature:client-api",
+    ":feature:orchestrator",
     ":feature:login",
     ":feature:fetch-subject",
     ":feature:select-subject",

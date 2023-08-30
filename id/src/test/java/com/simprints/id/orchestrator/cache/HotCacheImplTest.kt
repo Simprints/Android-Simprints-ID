@@ -171,8 +171,9 @@ class HotCacheImplTest {
     private fun mockStep(requestCode: Int = 123) = Step(
         requestCode = requestCode,
         activityName = "com.simprints.id.MyActivity",
+        payloadType = Step.PayloadType.REQUEST,
         bundleKey = "BUNDLE_KEY",
-        request = mockRequest(),
+        payload = mockRequest(),
         status = Step.Status.ONGOING
     )
 

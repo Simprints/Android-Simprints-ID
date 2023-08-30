@@ -27,12 +27,11 @@ class AuthenticationRemoteDataSourceTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
-        private const val USER_ID = "userId"
         private const val DEVICE_ID = "deviceId"
         private const val NONCE = "nonce_from_server"
         private const val PUBLIC_KEY = "public_key_from_server"
-        private val AUTH_REQUEST = AuthRequest("secret", "integrityToken", "deviceId")
-        private val API_AUTH_REQUEST_BODY = ApiAuthRequestBody("secret", "integrityToken", "deviceId")
+        private val AUTH_REQUEST = AuthRequest("secret", "integrityToken")
+        private val API_AUTH_REQUEST_BODY = ApiAuthRequestBody("secret", "integrityToken")
     }
 
     private val remoteInterface = mockk<AuthenticationRemoteInterface>()
@@ -58,7 +57,6 @@ class AuthenticationRemoteDataSourceTest {
             coEvery {
                 remoteInterface.requestAuthenticationData(
                     PROJECT_ID,
-                    USER_ID,
                     DEVICE_ID
                 )
             } returns ApiAuthenticationData(PUBLIC_KEY, NONCE)
@@ -66,7 +64,6 @@ class AuthenticationRemoteDataSourceTest {
             val actualAuthenticationData =
                 authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
-                    USER_ID,
                     DEVICE_ID
                 )
             val expectedAuthenticationData = AuthenticationData(PUBLIC_KEY, NONCE)
@@ -80,7 +77,6 @@ class AuthenticationRemoteDataSourceTest {
             coEvery {
                 remoteInterface.requestAuthenticationData(
                     PROJECT_ID,
-                    USER_ID,
                     DEVICE_ID
                 )
             } throws exception
@@ -88,7 +84,6 @@ class AuthenticationRemoteDataSourceTest {
             val receivedException = assertThrows<BackendMaintenanceException> {
                 authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
-                    USER_ID,
                     DEVICE_ID
                 )
             }
@@ -102,7 +97,6 @@ class AuthenticationRemoteDataSourceTest {
             coEvery {
                 remoteInterface.requestAuthenticationData(
                     PROJECT_ID,
-                    USER_ID,
                     DEVICE_ID
                 )
             } throws exception
@@ -110,7 +104,6 @@ class AuthenticationRemoteDataSourceTest {
             val receivedException = assertThrows<SyncCloudIntegrationException> {
                 authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
-                    USER_ID,
                     DEVICE_ID
                 )
             }
@@ -131,7 +124,6 @@ class AuthenticationRemoteDataSourceTest {
             coEvery {
                 remoteInterface.requestAuthenticationData(
                     PROJECT_ID,
-                    USER_ID,
                     DEVICE_ID
                 )
             } throws exception
@@ -139,7 +131,6 @@ class AuthenticationRemoteDataSourceTest {
             assertThrows<AuthRequestInvalidCredentialsException> {
                 authenticationRemoteDataSource.requestAuthenticationData(
                     PROJECT_ID,
-                    USER_ID,
                     DEVICE_ID
                 )
             }
@@ -153,12 +144,12 @@ class AuthenticationRemoteDataSourceTest {
                 ApiToken.FirebaseOptions("project", "api", "application", "url", "sender", "bucket")
             )
             coEvery {
-                remoteInterface.requestCustomTokens(PROJECT_ID, USER_ID, API_AUTH_REQUEST_BODY)
+                remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
             } returns apiToken
 
             val actualToken = authenticationRemoteDataSource.requestAuthToken(
                 PROJECT_ID,
-                USER_ID,
+                DEVICE_ID,
                 AUTH_REQUEST
             )
             val expectedToken = Token("token", "project", "api", "application")
@@ -170,13 +161,13 @@ class AuthenticationRemoteDataSourceTest {
         runTest(StandardTestDispatcher()) {
             val exception = BackendMaintenanceException(estimatedOutage = 100)
             coEvery {
-                remoteInterface.requestCustomTokens(PROJECT_ID, USER_ID, API_AUTH_REQUEST_BODY)
+                remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
             } throws exception
 
             val receivedException = assertThrows<BackendMaintenanceException> {
                 authenticationRemoteDataSource.requestAuthToken(
                     PROJECT_ID,
-                    USER_ID,
+                    DEVICE_ID,
                     AUTH_REQUEST
                 )
             }
@@ -188,13 +179,13 @@ class AuthenticationRemoteDataSourceTest {
         runTest(StandardTestDispatcher()) {
             val exception = SyncCloudIntegrationException(cause = Exception())
             coEvery {
-                remoteInterface.requestCustomTokens(PROJECT_ID, USER_ID, API_AUTH_REQUEST_BODY)
+                remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
             } throws exception
 
             val receivedException = assertThrows<SyncCloudIntegrationException> {
                 authenticationRemoteDataSource.requestAuthToken(
                     PROJECT_ID,
-                    USER_ID,
+                    DEVICE_ID,
                     AUTH_REQUEST
                 )
             }
@@ -213,13 +204,13 @@ class AuthenticationRemoteDataSourceTest {
                 )
             )
             coEvery {
-                remoteInterface.requestCustomTokens(PROJECT_ID, USER_ID, API_AUTH_REQUEST_BODY)
+                remoteInterface.requestCustomTokens(PROJECT_ID, DEVICE_ID, API_AUTH_REQUEST_BODY)
             } throws exception
 
             assertThrows<AuthRequestInvalidCredentialsException> {
                 authenticationRemoteDataSource.requestAuthToken(
                     PROJECT_ID,
-                    USER_ID,
+                    DEVICE_ID,
                     AUTH_REQUEST
                 )
             }

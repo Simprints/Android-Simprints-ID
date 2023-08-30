@@ -20,6 +20,7 @@ class AlertScreenEventKtTest {
         AlertError.DISCONNECTED to CoreAlertScreenEventType.DISCONNECTED,
         AlertError.LOW_BATTERY to CoreAlertScreenEventType.LOW_BATTERY,
         AlertError.UNEXPECTED_ERROR to CoreAlertScreenEventType.UNEXPECTED_ERROR,
+        AlertError.BLUETOOTH_NO_PERMISSION to CoreAlertScreenEventType.BLUETOOTH_NO_PERMISSION,
     ).forEach { (alert, event) ->
         assertThat(alert.fromFingerprintAlertToAlertTypeEvent()).isEqualTo(event)
     }

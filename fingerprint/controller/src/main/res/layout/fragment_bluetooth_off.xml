@@ -7,22 +7,17 @@
     android:background="@color/simprints_blue"
     tools:context=".activities.connect.issues.bluetoothoff.BluetoothOffFragment">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/turnOnBluetoothButton"
-        style="?android:attr/borderlessButtonStyle"
         android:layout_width="0dp"
-        android:layout_height="54dp"
-        android:background="@drawable/button_rounded_corners_orange"
-        android:fontFamily="@font/muli"
-        android:padding="8sp"
+        android:layout_height="wrap_content"
         android:text="@string/turn_on_bluetooth"
-        android:textColor="@color/simprints_white"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/bluetoothOffEndGuideline"
         app:layout_constraintStart_toStartOf="@+id/bluetoothOffStartGuideline"
         app:layout_constraintTop_toBottomOf="@+id/bluetoothOffImageGuideline"
-        app:layout_constraintVertical_bias="0.7" />
+        app:layout_constraintVertical_bias="0.7"
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/bluetoothOffImageView"
@@ -30,7 +25,7 @@
         android:layout_height="0dp"
         android:padding="0dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/bt_error_icon"
+        android:src="@drawable/ic_alert_bt"
         app:layout_constraintBottom_toTopOf="@+id/bluetoothOffImageGuideline"
         app:layout_constraintEnd_toStartOf="@+id/bluetoothOffEndGuideline"
         app:layout_constraintStart_toStartOf="@+id/bluetoothOffStartGuideline"
@@ -38,28 +33,27 @@
         app:layout_constraintVertical_weight="0.6"
         tools:ignore="ContentDescription" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/turnOnBluetoothProgressBar"
-        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:indeterminate="true"
         android:progressTint="@color/simprints_white"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/turnOnBluetoothButton"
         app:layout_constraintEnd_toEndOf="@id/turnOnBluetoothButton"
         app:layout_constraintStart_toStartOf="@id/turnOnBluetoothButton"
-        app:layout_constraintTop_toTopOf="@id/turnOnBluetoothButton" />
+        app:layout_constraintTop_toTopOf="@id/turnOnBluetoothButton"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/bluetoothOffTitleTextView"
+        style="@style/Text.Headline5.White.Bold"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:text="@string/bluetooth_off_title"
-        android:textColor="@color/simprints_white"
-        android:textSize="26sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/bluetoothOffImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

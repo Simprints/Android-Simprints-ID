@@ -6,7 +6,6 @@ import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
-import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -37,7 +36,7 @@ private class IFingerprintSampleImpl(
     override val fingerIdentifier: IFingerIdentifier,
     override val template: ByteArray,
     override val templateQualityScore: Int,
-    override val format: IFingerprintTemplateFormat,
+    override val format: String,
     override val imageRef: ISecuredImageRef?
 ) : IFingerprintSample
 

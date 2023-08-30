@@ -24,6 +24,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         FACE_LICENSE_MISSING,
         FACE_LICENSE_INVALID,
         FINGERPRINT_CONFIGURATION_ERROR,
+        BLUETOOTH_NO_PERMISSION,
         BACKEND_MAINTENANCE_ERROR,
         PROJECT_ENDING,
         PROJECT_PAUSED,

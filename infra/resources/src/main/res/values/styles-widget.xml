@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Default and variants styles for UI widgets.
+
+        Style naming convention:
+            * For widget styles "Widget.Simprints.<widget type>.<variant>"
+            * For theming styles "ThemeOverlay.Simprints.<widget type>.<variant>"
+
+        Within layouts use following priority order if not sure what style to apply
+            * default styling >> variant widget style >> theming style
+
+        To add new widget style:
+            1) Find the relevant component at https://m2.material.io/components?platform=android
+            2) Go to "Implementation" tab and "Theming section"
+            3) Add and adapt provided samples for Widget.* and ThemeOverlay.* definition
+            4) Add default widget style to the "Theme.Simprints" via appropriate property
+            5) Optional: Create variations of the style (e.g. Red/Green version) following the naming strategy
+     -->
+
+    <!-- This style sets the correct font for the views that are not available directly, e.g. preferences-->
+    <style name="Widget.Simprints.TextView" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/muli</item>
+        <item name="fontFamily">@font/muli</item>
+    </style>
+
+    <!-- Appbar and Toolbar ==================================================================== -->
+    <!-- https://m2.material.io/components/app-bars-top/android#theming-the-top-app-bar -->
+
+    <style name="Widget.Simprints.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Primary" />
+
+    <style name="Widget.Simprints.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light" />
+
+    <style name="Widget.Simprints.Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.Toolbar</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.Toolbar" parent="">
+        <item name="colorControlNormal">@color/simprints_text_white</item>
+        <item name="popupTheme">@style/Widget.Simprints.PopupOverlay</item>
+    </style>
+
+    <!-- Alert dialog ========================================================================== -->
+    <!-- https://m2.material.io/components/dialogs/android#theming-dialogs -->
+
+    <style name="ThemeOverlay.Simprints.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/Widget.Simprints.AlertDialog</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/Widget.Simprints.AlertDialog.Title
+        </item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Simprints.AlertDialog.Button</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Simprints.AlertDialog.Button</item>
+    </style>
+
+    <style name="Widget.Simprints.AlertDialog" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearance">@style/Shape.Simprints.MediumComponent</item>
+    </style>
+
+    <style name="Widget.Simprints.AlertDialog.Title" parent="MaterialAlertDialog.MaterialComponents.Title.Text" />
+
+    <style name="Widget.Simprints.AlertDialog.Button" parent="Widget.Simprints.Button.TextButton" />
+
+    <!-- Radio buttons ========================================================================= -->
+    <!-- https://m2.material.io/components/radio-buttons/android#theming-radio-buttons -->
+
+    <style name="Widget.Simprints.RadioButton" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.RadioButton</item>
+        <item name="android:textAppearance">@style/TextAppearance.Simprints.Body1</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.RadioButton" parent="">
+        <item name="colorOnSurface">@color/simprints_text_black</item>
+        <item name="colorSecondary">@color/simprints_orange</item>
+    </style>
+
+    <style name="Widget.Simprints.RadioButton.White">
+        <item name="android:textColor">@color/simprints_text_white</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.RadioButton.White</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.RadioButton.White" parent="">
+        <item name="colorOnSurface">@color/simprints_text_white</item>
+        <item name="colorSecondary">@color/simprints_orange</item>
+    </style>
+
+    <!-- Tab layout ============================================================================ -->
+    <!-- https://m2.material.io/components/tabs/android#theming-tabs -->
+
+    <style name="Widget.Simprints.TabLayout" parent="Widget.MaterialComponents.TabLayout">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TabLayout</item>
+        <item name="tabTextAppearance">@style/TextAppearance.Simprints.Button</item>
+        <item name="tabTextColor">@color/simprints_text_grey</item>
+        <item name="tabSelectedTextColor">@color/simprints_text_black</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.TabLayout" parent="">
+        <item name="colorPrimary">@color/simprints_orange</item>
+        <item name="colorSurface">@color/simprints_white</item>
+        <item name="colorOnSurface">@color/simprints_text_black</item>
+    </style>
+
+    <!-- Text input ============================================================================ -->
+    <!-- https://m2.material.io/components/text-fields/android#theming-text-fields -->
+
+    <style name="Widget.Simprints.FilledTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Simprints.TextInputLayout</item>
+        <item name="shapeAppearance">@style/Shape.Simprints.MediumComponent</item>
+        <item name="android:textColorHint">@color/simprints_text_grey_light</item>
+        <item name="endIconTint">@color/simprints_text_grey_light</item>
+        <item name="android:textColor">@color/simprints_text_black</item>
+    </style>
+
+    <style name="ThemeOverlay.Simprints.TextInputLayout" parent="">
+        <item name="colorPrimary">@color/simprints_orange</item>
+        <item name="colorOnSurface">@color/simprints_off_white</item>
+        <item name="colorError">@color/simprints_red</item>
+        <item name="editTextStyle">@style/Widget.Simprints.FilledTextInputEditTextStyle</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.Simprints.Body1</item>
+    </style>
+
+    <style name="Widget.Simprints.FilledTextInputEditTextStyle" parent="@style/Widget.MaterialComponents.TextInputEditText.FilledBox">
+        <item name="android:textColor">@color/simprints_text_grey</item>
+    </style>
+
+    <!-- Chips ================================================================================= -->
+    <!-- https://m2.material.io/components/text-fields/android#theming-text-fields -->
+
+    <style name="Widget.Simprints.Chip" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="android:textColor">@color/simprints_text_white</item>
+        <item name="closeIconTint">@color/simprints_text_white</item>
+        <item name="chipBackgroundColor">@color/simprints_orange</item>
+        <item name="chipStrokeColor">@color/simprints_orange</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="shapeAppearanceOverlay">@style/Shape.Simprints.SmallComponent</item>
+    </style>
+
+    <!-- Preferences =========================================================================== -->
+    <!-- Not a material components so theme properties have to be deduced from sources -->
+
+    <style name="ThemeOverlay.Simprints.Preferences" parent="PreferenceThemeOverlay">
+        <item name="preferenceCategoryTitleTextColor">@color/simprints_text_orange</item>
+    </style>
+
+</resources>

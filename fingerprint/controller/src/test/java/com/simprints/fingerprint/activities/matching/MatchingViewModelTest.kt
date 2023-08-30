@@ -13,8 +13,9 @@ import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
-import com.simprints.fingerprint.infra.matcher.FingerprintMatcher
-import com.simprints.fingerprint.infra.matcher.domain.MatchResult
+import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
+import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.infra.config.ConfigManager
@@ -29,7 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.Serializable
-import com.simprints.fingerprint.infra.matcher.domain.FingerprintIdentity as MatcherFingerprintIdentity
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity as MatcherFingerprintIdentity
 
 @RunWith(AndroidJUnit4::class)
 class MatchingViewModelTest {
@@ -42,7 +43,7 @@ class MatchingViewModelTest {
 
     private val dbManagerMock: FingerprintDbManager = mockk(relaxed = true)
     private val masterFlowManager: MasterFlowManager = mockk(relaxed = true)
-    private val mockMatcher: FingerprintMatcher = mockk()
+    private val mockFingerprintBioSdk: FingerprintBioSdk<Unit,Unit,Unit,Unit,Unit, SimAfisMatcherSettings> = mockk()
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>(relaxed = true)
     private val mockConfigManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
@@ -53,7 +54,7 @@ class MatchingViewModelTest {
         mockk(relaxed = true)
 
     private fun mockSuccessfulMatcher() {
-        every { mockMatcher.match(any(), any(), any(), any()) } coAnswers {
+        every { mockFingerprintBioSdk.match(any(), any(), any()) } answers  {
             val probe = this.firstArg<MatcherFingerprintIdentity>()
             this.secondArg<List<MatcherFingerprintIdentity>>()
                 .map {
@@ -71,11 +72,10 @@ class MatchingViewModelTest {
 
     private fun mockMatcherError() {
         coEvery {
-            mockMatcher.match(
+            mockFingerprintBioSdk.match(
                 any(),
                 any(),
                 any(),
-                any()
             )
         } throws Exception("Oops! Match failed")
     }
@@ -85,7 +85,7 @@ class MatchingViewModelTest {
     @Before
     fun setUp() {
         viewModel = MatchingViewModel(
-            mockMatcher,
+            mockFingerprintBioSdk,
             dbManagerMock,
             mockFingerprintSessionEventsManager,
             mockk(relaxed = true),

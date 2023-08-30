@@ -10,7 +10,7 @@ class EnrolLastBiometricsValidator(val extractor: EnrolLastBiometricsExtractor,
     : ClientRequestValidator(extractor) {
 
     override fun validateClientRequest() {
-        validateProjectId()
+        super.validateClientRequest()
         validateSessionId(extractor.getSessionId())
         if(!isCurrentSessionAnEnrolmentOrIdentification) {
             throw InvalidStateForIntentAction("Calling app wants to enrol last biometrics, but last flow was not an identification.")

@@ -1,10 +1,10 @@
 package com.simprints.infra.authlogic.authenticator.remote
 
+import com.simprints.infra.authlogic.authenticator.remote.models.ApiAuthRequestBody
 import com.simprints.infra.authstore.domain.models.AuthRequest
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.authlogic.authenticator.remote.models.ApiAuthRequestBody
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import javax.inject.Inject
@@ -15,12 +15,11 @@ internal class AuthenticationRemoteDataSource @Inject constructor(
 
     suspend fun requestAuthenticationData(
         projectId: String,
-        userId: String,
         deviceId: String
     ): AuthenticationData =
         try {
             getApiClient().executeCall {
-                it.requestAuthenticationData(projectId, userId, deviceId)
+                it.requestAuthenticationData(projectId, deviceId)
             }.toDomain()
         } catch (e: Exception) {
             if (e is SyncCloudIntegrationException && e.httpStatusCode() == NOT_FOUND_STATUS_CODE)
@@ -31,13 +30,13 @@ internal class AuthenticationRemoteDataSource @Inject constructor(
 
     suspend fun requestAuthToken(
         projectId: String,
-        userId: String,
+        deviceId: String,
         credentials: AuthRequest
     ): Token = try {
         getApiClient().executeCall {
             it.requestCustomTokens(
                 projectId,
-                userId,
+                deviceId,
                 ApiAuthRequestBody.fromDomain(credentials)
             )
         }.toDomain()

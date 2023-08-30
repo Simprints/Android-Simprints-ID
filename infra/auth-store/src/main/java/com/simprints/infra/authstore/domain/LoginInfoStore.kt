@@ -15,8 +15,6 @@ internal class LoginInfoStore @Inject constructor(
         private const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
         private const val PROJECT_ID: String = "PROJECT_ID"
         private const val PROJECT_ID_CLAIM: String = "PROJECT_ID_CLAIM"
-        private const val USER_ID_CLAIM: String = "USER_ID_CLAIM"
-        private const val USER_ID: String = "USER_ID"
         private const val CORE_FIREBASE_PROJECT_ID = "CORE_FIREBASE_PROJECT_ID"
         private const val CORE_FIREBASE_APPLICATION_ID = "CORE_FIREBASE_APPLICATION_ID"
         private const val CORE_FIREBASE_API_KEY = "CORE_FIREBASE_API_KEY"
@@ -30,13 +28,6 @@ internal class LoginInfoStore @Inject constructor(
         set(value) {
             field = value
             prefs.edit().putString(PROJECT_ID, field).apply()
-        }
-
-    var signedInUserId: String = ""
-        get() = prefs.getString(USER_ID, "").orEmpty()
-        set(value) {
-            field = value
-            prefs.edit().putString(USER_ID, field).apply()
         }
 
     // Core Firebase Project details. We store them to initialize the core Firebase project.
@@ -70,19 +61,11 @@ internal class LoginInfoStore @Inject constructor(
             prefs.edit().putString(PROJECT_ID_CLAIM, field ?: "").apply()
         }
 
-    var userIdTokenClaim: String? = ""
-        get() = prefs.getString(USER_ID_CLAIM, "")
-        set(value) {
-            field = value
-            prefs.edit().putString(USER_ID_CLAIM, field ?: "").apply()
-        }
-
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
         signedInProjectId.isNotEmpty() && signedInProjectId == possibleProjectId
 
     fun cleanCredentials() {
         signedInProjectId = ""
-        signedInUserId = ""
         prefs.edit().putString(ENCRYPTED_PROJECT_SECRET, "").apply()
 
         clearCachedTokenClaims()
@@ -90,14 +73,12 @@ internal class LoginInfoStore @Inject constructor(
 
     fun clearCachedTokenClaims() {
         projectIdTokenClaim = ""
-        userIdTokenClaim = ""
         coreFirebaseProjectId = ""
         coreFirebaseApplicationId = ""
         coreFirebaseApiKey = ""
     }
 
-    fun storeCredentials(projectId: String, userId: String) {
+    fun storeCredentials(projectId: String) {
         signedInProjectId = projectId
-        signedInUserId = userId
     }
 }

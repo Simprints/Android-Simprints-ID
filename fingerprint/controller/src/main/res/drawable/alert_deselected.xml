@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:bottom="33dp"
+        android:left="33dp"
+        android:right="33dp"
+        android:top="33dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/simprints_red_dark" />
+            <size
+                android:width="40dp"
+                android:height="40dp" />
+        </shape>
+    </item>
+</layer-list>

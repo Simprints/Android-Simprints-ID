@@ -2,7 +2,6 @@
 <com.simprints.feature.dashboard.views.SyncCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dashboardSyncCard"
-    style="@style/DashboardCardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".main.sync.SyncFragment" />

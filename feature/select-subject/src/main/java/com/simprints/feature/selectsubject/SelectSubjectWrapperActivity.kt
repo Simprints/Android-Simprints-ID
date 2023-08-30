@@ -4,17 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.Keep
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.selectsubject.databinding.ActivityGuidActionWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 // Wrapper activity must be public because it is being referenced by the classname from legacy orchestrator.
 @Keep
 @AndroidEntryPoint
-class SelectSubjectWrapperActivity : AppCompatActivity() {
+class SelectSubjectWrapperActivity : BaseActivity() {
 
     private val binding by viewBinding(ActivityGuidActionWrapperBinding::inflate)
 

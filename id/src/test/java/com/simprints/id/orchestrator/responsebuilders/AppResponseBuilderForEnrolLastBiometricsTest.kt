@@ -27,7 +27,8 @@ class AppResponseBuilderForEnrolLastBiometricsTest {
                 requestCode = CoreRequestCode.LAST_BIOMETRICS_CORE.value,
                 activityName = CoreStepProcessorImpl.LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
                 bundleKey = CoreResponse.CORE_STEP_BUNDLE,
-                request = EnrolLastBiometricsRequest(
+                payloadType = Step.PayloadType.REQUEST,
+                payload = EnrolLastBiometricsRequest(
                     DEFAULT_PROJECT_ID,
                     DEFAULT_USER_ID,
                     DEFAULT_MODULE_ID,
@@ -56,7 +57,8 @@ class AppResponseBuilderForEnrolLastBiometricsTest {
                 requestCode = CoreRequestCode.LAST_BIOMETRICS_CORE.value,
                 activityName = CoreStepProcessorImpl.LAST_BIOMETRICS_CORE_ACTIVITY_NAME,
                 bundleKey = CoreResponse.CORE_STEP_BUNDLE,
-                request = EnrolLastBiometricsRequest(
+                payloadType = Step.PayloadType.REQUEST,
+                payload = EnrolLastBiometricsRequest(
                     DEFAULT_PROJECT_ID,
                     DEFAULT_USER_ID,
                     DEFAULT_MODULE_ID,

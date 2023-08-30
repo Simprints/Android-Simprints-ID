@@ -6,11 +6,8 @@ import androidx.core.view.children
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
 import com.google.android.material.chip.ChipGroup
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.ShapeAppearanceModel
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
-import com.simprints.infra.resources.R as IDR
 
 internal class ModuleChipHelper(
     private val context: Context,
@@ -45,12 +42,6 @@ internal class ModuleChipHelper(
     }
 
     private fun createChipDrawable(): ChipDrawable {
-        return ChipDrawable.createFromResource(context, R.xml.module_selection_chip).apply {
-            setTextAppearanceResource(IDR.style.SimprintsStyle_TextView_Chip)
-            val cornerSize =
-                context.resources.getDimension(IDR.dimen.chip_corner_size_module_selection)
-            shapeAppearanceModel =
-                ShapeAppearanceModel.builder().setAllCorners(CornerFamily.CUT, cornerSize).build()
-        }
+        return ChipDrawable.createFromResource(context, R.xml.module_selection_chip)
     }
 }

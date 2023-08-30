@@ -110,19 +110,19 @@ class FirebaseAuthManagerTest {
     @Test
     fun `isSignedIn should return true if the project id claim is null`() {
         every { loginInfoStore.projectIdTokenClaim } returns null
-        assertThat(firebaseAuthManager.isSignedIn("", "")).isTrue()
+        assertThat(firebaseAuthManager.isSignedIn("")).isTrue()
     }
 
     @Test
     fun `isSignedIn should return true if the project id claim is the same as the project id`() {
         every { loginInfoStore.projectIdTokenClaim } returns "project id"
-        assertThat(firebaseAuthManager.isSignedIn("project id", "")).isTrue()
+        assertThat(firebaseAuthManager.isSignedIn("project id")).isTrue()
     }
 
     @Test
     fun `isSignedIn should return true if the project id claim is not the same as the project id`() {
         every { loginInfoStore.projectIdTokenClaim } returns "project id"
-        assertThat(firebaseAuthManager.isSignedIn("another project id", "")).isFalse()
+        assertThat(firebaseAuthManager.isSignedIn("another project id")).isFalse()
     }
 
     @Test
