@@ -16,16 +16,16 @@ class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, 
      * Initialize the SDK with the given parameters
      *
      */
-    fun initialize(initializationParams: SdkConfig? = null) =
+    suspend fun initialize(initializationParams: SdkConfig? = null) =
         sdkInitializer.initialize(initializationParams)
 
-    fun acquireFingerprintImage(settings: ImageRequestSettings? = null) =
+    suspend fun acquireFingerprintImage(settings: ImageRequestSettings? = null) =
         fingerprintImageProvider.acquireFingerprintImage(settings)
 
-    fun acquireFingerprintTemplate(settings: TemplateRequestSettings? = null) =
+    suspend fun acquireFingerprintTemplate(settings: TemplateRequestSettings? = null) =
         fingerprintTemplateProvider.acquireFingerprintTemplate(settings)
 
-    fun match(
+    suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
         matchingSettings: MatcherSettings?

@@ -32,14 +32,14 @@ import com.simprints.fingerprint.data.domain.images.deduceFileExtension
 import com.simprints.fingerprint.data.domain.images.isEager
 import com.simprints.fingerprint.data.domain.images.isImageTransferRequired
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
@@ -292,11 +292,11 @@ class CollectFingerprintsViewModel @Inject constructor(
         }
     }
 
-    private fun handleCaptureSuccess(captureFingerprintResponse: CaptureFingerprintResponse) {
+    private fun handleCaptureSuccess(acquireFingerprintTemplateResponse: AcquireFingerprintTemplateResponse) {
         val scanResult = ScanResult(
-            captureFingerprintResponse.imageQualityScore,
-            captureFingerprintResponse.template,
-            captureFingerprintResponse.templateFormat,
+            acquireFingerprintTemplateResponse.imageQualityScore,
+            acquireFingerprintTemplateResponse.template,
+            acquireFingerprintTemplateResponse.templateFormat,
             null,
             qualityThreshold()
         )
@@ -329,9 +329,9 @@ class CollectFingerprintsViewModel @Inject constructor(
         }
     }
 
-    private fun handleImageTransferSuccess(acquireImageResponse: AcquireImageResponse) {
+    private fun handleImageTransferSuccess(acquireFingerprintImageResponse: AcquireFingerprintImageResponse) {
         vibrate.postEvent()
-        updateCaptureState { it.toCollected(acquireImageResponse.imageBytes) }
+        updateCaptureState { it.toCollected(acquireFingerprintImageResponse.imageBytes) }
         handleCaptureFinished()
     }
 

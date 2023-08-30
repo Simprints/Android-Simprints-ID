@@ -1,16 +1,10 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
+import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnavailableVero2FeatureException
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
-import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
-import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2FeatureException
-import kotlinx.coroutines.flow.Flow
+import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 
 /**
  * A common interface for both Vero 1 and Vero 2. Some features are only available on later versions
@@ -40,10 +34,6 @@ interface ScannerWrapper {
     /** @throws UnavailableVero2FeatureException - if UN20 API version is less then 1.1 or if using Vero 1 */
     suspend fun stopLiveFeedback()
 
-    suspend fun captureFingerprint(captureDpi: Dpi?, timeOutMs: Int, qualityThreshold: Int): CaptureFingerprintResponse
-    /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    suspend fun acquireImage(): AcquireImageResponse
-
     suspend fun setUiIdle()
 
     fun registerTriggerListener(triggerListener: ScannerTriggerListener)
@@ -51,13 +41,4 @@ interface ScannerWrapper {
     fun versionInformation(): ScannerVersion
     fun batteryInformation(): BatteryInfo
 
-    /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep>
-    /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performStmOta(firmwareVersion: String): Flow<StmOtaStep>
-    /** @throws UnavailableVero2FeatureException - if using Vero 1 */
-    fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep>
-
-    val templateFormat: String
-        get() = "ISO_19794_2" // This is the only template format Veros support
 }

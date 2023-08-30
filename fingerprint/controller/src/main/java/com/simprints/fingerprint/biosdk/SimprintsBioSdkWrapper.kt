@@ -9,10 +9,10 @@ import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.Fingerpri
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateMetadata
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import javax.inject.Inject
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse as DomainFingerprintImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse as DomainFingerprintTemplateResponse
 
 
 class SimprintsBioSdkWrapper @Inject constructor(
@@ -34,28 +34,28 @@ class SimprintsBioSdkWrapper @Inject constructor(
         captureFingerprintStrategy: Vero2Configuration.CaptureStrategy?,
         timeOutMs: Int,
         qualityThreshold: Int
-    ): CaptureFingerprintResponse {
+    ): DomainFingerprintTemplateResponse {
         val settings = FingerprintTemplateAcquisitionSettings(
             captureFingerprintStrategy?.toDomain(),
             timeOutMs,
             qualityThreshold
         )
-        return bioSdk.acquireFingerprintTemplate(settings).toCaptureFingerprintResponse()
+        return bioSdk.acquireFingerprintTemplate(settings).toDomain()
     }
 
-    override suspend fun acquireFingerprintImage(): AcquireImageResponse {
-        return bioSdk.acquireFingerprintImage().toAcquireImageResponse()
+    override suspend fun acquireFingerprintImage(): DomainFingerprintImageResponse {
+        return bioSdk.acquireFingerprintImage().toDomain()
     }
 }
 
-private fun AcquireFingerprintImageResponse<Unit>.toAcquireImageResponse(): AcquireImageResponse =
-    AcquireImageResponse(this.imageBytes)
+private fun AcquireFingerprintImageResponse<Unit>.toDomain()=
+    DomainFingerprintImageResponse(this.imageBytes)
 
-private fun AcquireFingerprintTemplateResponse<FingerprintTemplateMetadata>.toCaptureFingerprintResponse(): CaptureFingerprintResponse {
-    require(templateMetadata == null) {
+private fun AcquireFingerprintTemplateResponse<FingerprintTemplateMetadata>.toDomain(): DomainFingerprintTemplateResponse {
+    require(templateMetadata != null) {
         "Template metadata should not be null"
     }
-    return CaptureFingerprintResponse(
+    return DomainFingerprintTemplateResponse(
         template,
         templateMetadata!!.templateFormat,
         templateMetadata!!.imageQualityScore

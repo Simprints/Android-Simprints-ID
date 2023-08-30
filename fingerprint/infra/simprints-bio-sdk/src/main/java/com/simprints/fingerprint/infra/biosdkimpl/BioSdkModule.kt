@@ -13,6 +13,7 @@ import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.Fingerpri
 import com.simprints.fingerprint.infra.biosdkimpl.initialization.SdkInitializerImpl
 import com.simprints.fingerprint.infra.biosdkimpl.matching.FingerprintMatcherImpl
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
+import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,12 +45,12 @@ object BioSdkModule {
     internal fun provideSdkInitializer(): SdkInitializer<Unit> = SdkInitializerImpl()
 
     @Provides
-    internal fun provideFingerprintImageProvider(): FingerprintImageProvider<Unit,Unit> =
-        FingerprintImageProviderImpl()
+    internal fun provideFingerprintImageProvider(fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory): FingerprintImageProvider<Unit,Unit> =
+        FingerprintImageProviderImpl(fingerprintCaptureWrapperFactory)
 
     @Provides
-    internal fun provideFingerprintTemplateProvider(): FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> =
-        FingerPrintTemplateProviderImpl()
+    internal fun provideFingerprintTemplateProvider(fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory): FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> =
+        FingerPrintTemplateProviderImpl(fingerprintCaptureWrapperFactory )
 
     @Provides
     internal fun provideFingerprintMatcher(simAfisMatcher: SimAfisMatcher): FingerprintMatcher<SimAfisMatcherSettings> =

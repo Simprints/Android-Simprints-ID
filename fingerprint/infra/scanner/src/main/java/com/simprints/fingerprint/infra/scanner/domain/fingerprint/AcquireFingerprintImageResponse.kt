@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.scanner.domain
+package com.simprints.fingerprint.infra.scanner.domain.fingerprint
 
 /**
  * This class represents the response from acquiring the bytes of the fingerprint image that was
@@ -6,6 +6,6 @@ package com.simprints.fingerprint.scanner.domain
  *
  * @property imageBytes  the bytes of the captured fingerprint image
  */
-class AcquireImageResponse(
+class AcquireFingerprintImageResponse(
     val imageBytes: ByteArray
 )

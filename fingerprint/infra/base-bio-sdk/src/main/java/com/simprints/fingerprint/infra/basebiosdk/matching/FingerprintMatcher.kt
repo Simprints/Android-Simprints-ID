@@ -14,7 +14,7 @@ fun interface FingerprintMatcher<MatcherSettings> {
      * @throws IllegalArgumentException if the TemplateFormats of the supplied [probe] or
      * [candidates] is not compatible with the desired [matchingAlgorithm].
      */
-    fun match(
+    suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
         settings: MatcherSettings?

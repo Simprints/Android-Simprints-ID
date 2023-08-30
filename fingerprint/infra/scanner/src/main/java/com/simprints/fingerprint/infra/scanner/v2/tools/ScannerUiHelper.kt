@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.scanner.ui
+package com.simprints.fingerprint.infra.scanner.v2.tools
 
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.DigitalValue
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.models.LedState

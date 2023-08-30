@@ -21,8 +21,6 @@ import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBlue
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.factory.ScannerFactory
-import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import dagger.Binds
@@ -46,9 +44,6 @@ abstract class FingerprintModule {
 
     @Binds
     abstract fun provideScannerManager(impl: ScannerManagerImpl): ScannerManager
-
-    @Binds
-    abstract fun provideScannerFactory(impl: ScannerFactoryImpl): ScannerFactory
 
     @Binds
     abstract fun provideFingerprintImageManager(impl: FingerprintImageManagerImpl): FingerprintImageManager
