@@ -9,8 +9,7 @@ import javax.inject.Inject
 class ConfigurationController @Inject constructor(
     private val simprintsBioSdkWrapper: SimprintsBioSdkWrapper,
     @ExternalScope private val externalScope: CoroutineScope,
-
-    ) {
+) {
 
     fun runConfiguration(@Suppress("UNUSED_PARAMETER") taskRequest: ConfigurationTaskRequest): ConfigurationTaskResult {
         externalScope.launch {
