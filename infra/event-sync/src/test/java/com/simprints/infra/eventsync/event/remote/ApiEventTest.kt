@@ -115,7 +115,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackEventApiModel(json)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -124,25 +124,43 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackEventApiModel(json)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
-    fun validate_callbackEventForIdentificationApiModel() {
-        val event = createIdentificationCallbackEvent()
+    fun validate_callbackEventForIdentificationApiV1Model() {
+        val event = createIdentificationCallbackEventV1()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackEventApiModel(json)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
-    fun validate_callbackEventForVerificationApiModel() {
-        val event = createVerificationCallbackEvent()
+    fun validate_callbackEventForIdentificationApiV2Model() {
+        val event = createIdentificationCallbackEventV2()
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackEventApiModel(json)
+        validateCallbackV2EventApiModel(json)
+    }
+
+    @Test
+    fun validate_callbackEventForVerificationV1ApiModel() {
+        val event = createVerificationCallbackEventV1()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateCallbackV1EventApiModel(json)
+    }
+
+    @Test
+    fun validate_callbackEventForVerificationV2ApiModel() {
+        val event = createVerificationCallbackEventV2()
+        val apiEvent = event.fromDomainToApi()
+        val json = JSONObject(jackson.writeValueAsString(apiEvent))
+
+        validateCallbackV2EventApiModel(json)
     }
 
     @Test
@@ -151,7 +169,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackEventApiModel(json)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test
@@ -160,7 +178,7 @@ class ApiEventTest {
         val apiEvent = event.fromDomainToApi()
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
-        validateCallbackEventApiModel(json)
+        validateCallbackV1EventApiModel(json)
     }
 
     @Test

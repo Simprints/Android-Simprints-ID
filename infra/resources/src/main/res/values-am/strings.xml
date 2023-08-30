@@ -64,7 +64,7 @@
     <string name="consent_parental_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና ልጁን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ:</string>
     <string name="consent_parental_confirmation">የልጅዎን የጣት አሻራ መጠቀም እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="consent_id_verify">ወደፊት %2$s የእርስዎን መረጃ ለማግኘት የጣት አሻራዎትን መጠቀም እፈልጋለሁ %1$s ::</string>
-    <string name="consent_share_data_yes">አሁን ያለ ተጠቃሚ: %1$s</string>
+    <string name="consent_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="consent_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና እርስዎን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ:</string>
     <string name="consent_confirmation">እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="launch_consent_decline_button">አለመቀበል</string>
@@ -163,7 +163,7 @@
 
     <string name="biometric_concat_modalities">እና</string>
     <string name="consent_collect_yes">ሲምፕሪንትስ መረጃውን ለጥናት አላማ ሊጠቀምበት ይችላል</string>
-    <string name="consent_share_data_no">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
+    <string name="consent_share_data_no">ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ  ለትርፍ ያልተቃቑመ ድርጅት, የ %1$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="dashboard_card_available_on_phone">ከስልከዎ ላይ ይገኛል</string>
     <string name="dashboard_card_enrol_title">የመጨረሻ ምዝገባ</string>
     <string name="dashboard_card_enrolment_info">የምዝገባ መረጃ</string>
@@ -349,4 +349,18 @@
         <item quantity="one">%d እጩ ተጭኗል</item>
         <item quantity="other">የተጫኑ %d እጩዎች</item>
     </plurals>
+
+    <string name="invalid_projectId_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_selectedId_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_sessionId_message">የተሳሳተ የቆይታ መለያ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_intentAction_message">በሲስተሙ ያልተፈቀደ ፍላጎት ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_metadata_message">ልተፈቀደ ሜታዳታ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_userId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ስላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_moduleId_message">የተሳሳተ የምዕራፍ መለያ ቁጥር ስላላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_verifyId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ማጣሪያ ስላደረጉ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="rooted_device_title">ዋናው መሳሪያ ተገኝቷል</string>
+    <string name="rooted_device_message">1. ተቆጣጣሪዎን ያግኙ-ዋናው መሳሪያ ተገኝቷል\n2. መዝጊያውን ይጫኑ</string>
+    <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
+    <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
+
 </resources>

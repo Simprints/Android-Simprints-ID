@@ -110,4 +110,7 @@
         <item quantity="other">Verifications</item>
     </plurals>
 
+    <string name="invalid_intentAction_message">در تنظیمات (invalid Intent Action) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
+    <string name="invalid_metadata_message">در تنظیمات (invalid metadata) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
+
 </resources>
