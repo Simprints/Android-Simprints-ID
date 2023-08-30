@@ -2,21 +2,19 @@ package com.simprints.fingerprint.biosdk
 
 import com.simprints.fingerprint.data.domain.fingerprint.toDomain
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
-import com.simprints.fingerprint.infra.basebiosdk.acquization.domain.AcquireFingerprintImageResponse
-import com.simprints.fingerprint.infra.basebiosdk.acquization.domain.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.basebiosdk.acquization.domain.ImageResponse
+import com.simprints.fingerprint.infra.basebiosdk.acquization.domain.TemplateResponse
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateMetadata
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
-import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
 import com.simprints.infra.config.domain.models.Vero2Configuration
 import javax.inject.Inject
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse as DomainFingerprintImageResponse
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse as DomainFingerprintTemplateResponse
 
 
 class SimprintsBioSdkWrapper @Inject constructor(
-    private val scannerManager: ScannerManager,
     private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings>
 ) : BioSdkWrapper {
 
@@ -34,7 +32,7 @@ class SimprintsBioSdkWrapper @Inject constructor(
         captureFingerprintStrategy: Vero2Configuration.CaptureStrategy?,
         timeOutMs: Int,
         qualityThreshold: Int
-    ): DomainFingerprintTemplateResponse {
+    ): AcquireFingerprintTemplateResponse {
         val settings = FingerprintTemplateAcquisitionSettings(
             captureFingerprintStrategy?.toDomain(),
             timeOutMs,
@@ -43,19 +41,18 @@ class SimprintsBioSdkWrapper @Inject constructor(
         return bioSdk.acquireFingerprintTemplate(settings).toDomain()
     }
 
-    override suspend fun acquireFingerprintImage(): DomainFingerprintImageResponse {
+    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse {
         return bioSdk.acquireFingerprintImage().toDomain()
     }
 }
 
-private fun AcquireFingerprintImageResponse<Unit>.toDomain()=
-    DomainFingerprintImageResponse(this.imageBytes)
+private fun ImageResponse<Unit>.toDomain() = AcquireFingerprintImageResponse(this.imageBytes)
 
-private fun AcquireFingerprintTemplateResponse<FingerprintTemplateMetadata>.toDomain(): DomainFingerprintTemplateResponse {
+private fun TemplateResponse<FingerprintTemplateMetadata>.toDomain(): AcquireFingerprintTemplateResponse {
     require(templateMetadata != null) {
         "Template metadata should not be null"
     }
-    return DomainFingerprintTemplateResponse(
+    return AcquireFingerprintTemplateResponse(
         template,
         templateMetadata!!.templateFormat,
         templateMetadata!!.imageQualityScore
