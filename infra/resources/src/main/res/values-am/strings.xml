@@ -64,7 +64,7 @@
     <string name="consent_parental_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና ልጁን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ:</string>
     <string name="consent_parental_confirmation">የልጅዎን የጣት አሻራ መጠቀም እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="consent_id_verify">ወደፊት %2$s የእርስዎን መረጃ ለማግኘት የጣት አሻራዎትን መጠቀም እፈልጋለሁ %1$s ::</string>
-    <string name="consent_share_data_yes">አሁን ያለ ተጠቃሚ: %1$s</string>
+    <string name="consent_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="consent_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና እርስዎን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ:</string>
     <string name="consent_confirmation">እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
     <string name="launch_consent_decline_button">አለመቀበል</string>
@@ -163,7 +163,7 @@
 
     <string name="biometric_concat_modalities">እና</string>
     <string name="consent_collect_yes">ሲምፕሪንትስ መረጃውን ለጥናት አላማ ሊጠቀምበት ይችላል</string>
-    <string name="consent_share_data_no">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
+    <string name="consent_share_data_no">ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ  ለትርፍ ያልተቃቑመ ድርጅት, የ %1$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="dashboard_card_available_on_phone">ከስልከዎ ላይ ይገኛል</string>
     <string name="dashboard_card_enrol_title">የመጨረሻ ምዝገባ</string>
     <string name="dashboard_card_enrolment_info">የምዝገባ መረጃ</string>
