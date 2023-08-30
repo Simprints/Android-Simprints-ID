@@ -349,4 +349,18 @@
         <item quantity="one">%d እጩ ተጭኗል</item>
         <item quantity="other">የተጫኑ %d እጩዎች</item>
     </plurals>
+
+    <string name="invalid_projectId_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_selectedId_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_sessionId_message">የተሳሳተ የቆይታ መለያ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_intentAction_message">በሲስተሙ ያልተፈቀደ ፍላጎት ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_metadata_message">ልተፈቀደ ሜታዳታ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_userId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ስላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_moduleId_message">የተሳሳተ የምዕራፍ መለያ ቁጥር ስላላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_verifyId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ማጣሪያ ስላደረጉ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="rooted_device_title">ዋናው መሳሪያ ተገኝቷል</string>
+    <string name="rooted_device_message">1. ተቆጣጣሪዎን ያግኙ-ዋናው መሳሪያ ተገኝቷል\n2. መዝጊያውን ይጫኑ</string>
+    <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
+    <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
+
 </resources>

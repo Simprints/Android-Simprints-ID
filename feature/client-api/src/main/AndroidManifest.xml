@@ -4,12 +4,12 @@
     <application>
 
         <activity
-            android:name=".activity.StubActivity"
+            android:name=".activity.ClientApiActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
 
-            <!-- TODO reroute this to ODK intent handling -->
+            <!-- ODK intent handling -->
             <intent-filter>
                 <action android:name="com.simprints.simodkadapter.REGISTER" />
                 <action android:name="com.simprints.simodkadapter.IDENTIFY" />
@@ -34,7 +34,7 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
 
-            <!-- TODO reroute this to LibSimprints intent handling -->
+            <!-- LibSimprints intent handling -->
             <intent-filter>
                 <action android:name="com.simprints.id.REGISTER" />
                 <action android:name="com.simprints.id.IDENTIFY" />
@@ -58,7 +58,7 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
 
-            <!-- TODO reroute this to CommCare intent handling -->
+            <!-- CommCare intent handling -->
             <intent-filter>
                 <action android:name="com.simprints.commcare.REGISTER" />
                 <action android:name="com.simprints.commcare.IDENTIFY" />
@@ -82,6 +82,9 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
+
+        <!-- TODO: Remove once orchestrator is done - https://simprints.atlassian.net/browse/CORE-2845-->
+        <activity android:name=".activity.StubActivity" />
 
     </application>
 

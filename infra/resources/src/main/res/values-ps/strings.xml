@@ -99,4 +99,7 @@
         <item quantity="other">Verifications</item>
     </plurals>
 
+    <string name="invalid_intentAction_message">د (invalid Intent Action)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="invalid_metadata_message">د (invalid metadata)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+
 </resources>
