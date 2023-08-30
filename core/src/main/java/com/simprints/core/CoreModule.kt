@@ -3,7 +3,6 @@ package com.simprints.core
 import android.content.Context
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
-import com.simprints.core.tools.extentions.deviceId
 import com.simprints.core.tools.extentions.packageVersionName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.KronosTimeHelperImpl
@@ -56,7 +55,7 @@ object CoreModule {
     @Provides
     fun provideDeviceId(
         @ApplicationContext context: Context
-    ): String = context.deviceId
+    ): String = "context.deviceId.toString()"
 
     @PackageVersionName
     @Provides

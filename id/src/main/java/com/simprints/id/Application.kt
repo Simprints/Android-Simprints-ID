@@ -1,10 +1,10 @@
 package com.simprints.id
 
 import android.content.Context
+import android.telephony.TelephonyManager
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.simprints.core.CoreApplication
-import com.simprints.core.tools.extentions.deviceId
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.DEVICE_ID
 import com.simprints.infra.logging.Simber
@@ -40,6 +40,7 @@ open class Application : CoreApplication(), Configuration.Provider {
     open fun initApplication() {
         handleUndeliverableExceptionInRxJava()
         SimberBuilder.initialize(this)
+        ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId()
         Simber.tag(DEVICE_ID, true).i(deviceId)
     }
 
