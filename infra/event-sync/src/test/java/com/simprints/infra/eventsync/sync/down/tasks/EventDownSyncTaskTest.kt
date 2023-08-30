@@ -106,8 +106,6 @@ class EventDownSyncTaskTest {
 
         subjectFactory = SubjectFactory(
             encodingUtils = EncodingUtilsImplForTests,
-            tokenization = tokenization,
-            configManager = configManager
         )
         eventDownSyncTask = EventDownSyncTask(
             enrolmentRecordManager,
