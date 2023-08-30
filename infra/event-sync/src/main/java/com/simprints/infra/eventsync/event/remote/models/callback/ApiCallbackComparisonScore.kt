@@ -2,14 +2,42 @@ package com.simprints.infra.eventsync.event.remote.models.callback
 
 import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
+import com.simprints.infra.eventsync.event.remote.models.ApiConfidenceMatch
 import com.simprints.infra.eventsync.event.remote.models.ApiTier
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 
 @Keep
-internal class ApiCallbackComparisonScore(val guid: String, val confidence: Int, val tier: ApiTier)
+internal sealed class ApiCallbackComparisonScore {
 
-internal fun CallbackComparisonScore.fromDomainToApi() =
-    ApiCallbackComparisonScore(guid, confidence, ApiTier.valueOf(tier.name))
+    @Keep
+    data class ApiCallbackComparisonScoreV1(
+        val guid: String,
+        val confidence: Int,
+        val tier: ApiTier,
+    ) : ApiCallbackComparisonScore()
 
-internal fun ApiCallbackComparisonScore.fromApiToDomain() =
-    CallbackComparisonScore(guid, confidence, IAppResponseTier.valueOf(tier.name))
+    @Keep
+    data class ApiCallbackComparisonScoreV2(
+        val guid: String,
+        val confidence: Int,
+        val tier: ApiTier,
+        val confidenceMatch: ApiConfidenceMatch = ApiConfidenceMatch.NONE,
+    ) : ApiCallbackComparisonScore()
+}
+
+
+internal fun CallbackComparisonScore.fromDomainToApi(version: Int) = when (version) {
+    1 -> ApiCallbackComparisonScore.ApiCallbackComparisonScoreV1(
+        guid,
+        confidence,
+        ApiTier.valueOf(tier.name),
+    )
+
+    else -> ApiCallbackComparisonScore.ApiCallbackComparisonScoreV2(
+        guid,
+        confidence,
+        ApiTier.valueOf(tier.name),
+        ApiConfidenceMatch.valueOf(confidenceMatch.name)
+    )
+}
