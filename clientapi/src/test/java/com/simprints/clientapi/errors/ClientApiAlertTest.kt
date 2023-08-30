@@ -1,11 +1,11 @@
 package com.simprints.clientapi.errors
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.clientapi.R
 import com.simprints.clientapi.errors.ClientApiAlert.*
 import com.simprints.clientapi.errors.ClientApiAlert.Companion.toAlertConfig
 import com.simprints.feature.alert.config.AlertColor.Red
 import com.simprints.feature.alert.config.AlertColor.Yellow
+import com.simprints.infra.resources.R
 import org.junit.Test
 
 class ClientApiAlertTest {
