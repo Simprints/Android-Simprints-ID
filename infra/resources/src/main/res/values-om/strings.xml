@@ -336,4 +336,18 @@
         <item quantity="one">Kaadhimamaa %d fe\'ameera.</item>
         <item quantity="other">Kaadhimamaa %d fe\'ameera.</item>
     </plurals>
+
+    <string name="invalid_projectId_message">Dogoggorri \'configuration\' uumameera (Projektii ID\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_selectedId_message">Dogoggorri \'configuration\' uumameera (ID\'n filatame sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_sessionId_message">Dogoggorri \'configuration\' uumameera (session ID\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_intentAction_message">Dogoggorri \'configuration\' uumameera (Intent action\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_metadata_message">Dogoggorri \'configuration\' uumameera (metadata\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_userId_message">Dogoggorri \'configuration\' uumameera (ID\'n fayyadamaa sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_moduleId_message">Dogoggorri \'configuration\' uumameera (ID\'n module sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_verifyId_message">Dogoggorri \'configuration\' uumameera (GUID\'n mirkanaa\'u sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="rooted_device_title">Meeshaa barbaadee argachuu</string>
+    <string name="rooted_device_message">1. Supparvaayzara kee quunnami-meeshaa barbaaddee argachuuf\n2. Tuqi cufi</string>
+    <string name="guid_selection_result_sent">Bu\'aan ergameera</string>
+    <string name="guid_selection_data_sent">Ragaan ergameera</string>
+
 </resources>
