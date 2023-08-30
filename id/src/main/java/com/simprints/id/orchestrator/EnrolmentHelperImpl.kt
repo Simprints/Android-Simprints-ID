@@ -97,7 +97,7 @@ class EnrolmentHelperImpl @Inject constructor(
         }
 
 
-    private suspend fun buildSubjectFromFingerprintAndFace(
+    private fun buildSubjectFromFingerprintAndFace(
         projectId: String,
         userId: String,
         moduleId: String,
@@ -106,7 +106,7 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return subjectFactory.buildEncryptedSubject(
+        return subjectFactory.buildSubject(
             subjectId = patientId,
             projectId = projectId,
             attendantId = userId,
@@ -117,7 +117,7 @@ class EnrolmentHelperImpl @Inject constructor(
         )
     }
 
-    private suspend fun buildSubjectFromFingerprint(
+    private fun buildSubjectFromFingerprint(
         projectId: String,
         userId: String,
         moduleId: String,
@@ -125,7 +125,7 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return subjectFactory.buildEncryptedSubject(
+        return subjectFactory.buildSubject(
             subjectId = patientId,
             projectId = projectId,
             attendantId = userId,
@@ -135,7 +135,7 @@ class EnrolmentHelperImpl @Inject constructor(
         )
     }
 
-    private suspend fun buildSubjectFromFace(
+    private fun buildSubjectFromFace(
         projectId: String,
         userId: String,
         moduleId: String,
@@ -143,7 +143,7 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return subjectFactory.buildEncryptedSubject(
+        return subjectFactory.buildSubject(
             subjectId = patientId,
             projectId = projectId,
             attendantId = userId,
