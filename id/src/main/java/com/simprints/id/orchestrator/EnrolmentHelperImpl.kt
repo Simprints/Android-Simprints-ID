@@ -13,7 +13,6 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
-import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
@@ -26,8 +25,7 @@ private const val TAG = "ENROLMENT"
 class EnrolmentHelperImpl @Inject constructor(
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val eventRepository: EventRepository,
-    private val timeHelper: TimeHelper,
-    private val subjectFactory: SubjectFactory
+    private val timeHelper: TimeHelper
 ) : EnrolmentHelper {
 
     override suspend fun enrol(subject: Subject) {
@@ -59,7 +57,7 @@ class EnrolmentHelperImpl @Inject constructor(
         )
     }
 
-    override suspend fun buildSubject(
+    override fun buildSubject(
         projectId: String,
         userId: String,
         moduleId: String,
@@ -106,7 +104,7 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return subjectFactory.buildSubject(
+        return Subject(
             subjectId = patientId,
             projectId = projectId,
             attendantId = userId,
@@ -125,7 +123,7 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return subjectFactory.buildSubject(
+        return Subject(
             subjectId = patientId,
             projectId = projectId,
             attendantId = userId,
@@ -143,7 +141,7 @@ class EnrolmentHelperImpl @Inject constructor(
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
-        return subjectFactory.buildSubject(
+        return Subject(
             subjectId = patientId,
             projectId = projectId,
             attendantId = userId,
