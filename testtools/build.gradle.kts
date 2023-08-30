@@ -28,7 +28,6 @@ dependencies {
 
     api(libs.testing.junit)
     api(libs.testing.mockito.core)
-    api(libs.testing.mockito.inline)
     api(libs.testing.mockito.kotlin)
     api(libs.testing.mockk.core)
     api(libs.testing.truth)

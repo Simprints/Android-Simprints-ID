@@ -45,10 +45,10 @@ abstract class Accumulator<in Fragment, in FragmentCollection, Element>(
     }
 
     fun takeElements(): Flowable<Element> =
-        Flowable.generate<Element> { emitter ->
+        Flowable.generate { emitter ->
             try {
                 if (containsCompleteElement()) {
-                    emitter.onNext(takeElement())
+                    emitter.onNext(takeElement()!!)
                 } else {
                     emitter.onComplete()
                 }
