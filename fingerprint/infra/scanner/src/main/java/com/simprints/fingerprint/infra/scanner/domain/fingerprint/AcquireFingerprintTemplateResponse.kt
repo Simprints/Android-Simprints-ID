@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.scanner.domain
+package com.simprints.fingerprint.infra.scanner.domain.fingerprint
 
 /**
  * This class represents the response from a fingerprint capture.
@@ -6,7 +6,7 @@ package com.simprints.fingerprint.scanner.domain
  * @property template  the generated biometric template that represents the fingerprint signature
  * @property imageQualityScore  the quality of the captured fingerprint image (in percentage).
  */
-class CaptureFingerprintResponse(
+class AcquireFingerprintTemplateResponse(
     val template: ByteArray,
     val templateFormat: String,
     val imageQualityScore: Int

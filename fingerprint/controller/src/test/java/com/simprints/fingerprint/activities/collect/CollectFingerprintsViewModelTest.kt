@@ -24,12 +24,12 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCap
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.testtools.assertEventReceived
@@ -1215,7 +1215,7 @@ class CollectFingerprintsViewModelTest {
         val subsequentMock = when {
             mockResponses[0] == NEVER_RETURNS -> initialMock.coAnswers { neverReturnResponse() }
             firstResponse is Throwable -> initialMock.throws(firstResponse)
-            else -> initialMock.returns(firstResponse as CaptureFingerprintResponse)
+            else -> initialMock.returns(firstResponse as AcquireFingerprintTemplateResponse)
         }
 
         // capture subsequent responses except the first.
@@ -1225,7 +1225,7 @@ class CollectFingerprintsViewModelTest {
                 when {
                     mockResponses[index] == NEVER_RETURNS -> subsequentMock.coAndThen { neverReturnResponse() }
                     response is Throwable -> subsequentMock.andThenThrows(response)
-                    else -> subsequentMock.andThen(response as CaptureFingerprintResponse)
+                    else -> subsequentMock.andThen(response as AcquireFingerprintTemplateResponse)
                 }
             }
         }
@@ -1235,7 +1235,7 @@ class CollectFingerprintsViewModelTest {
     private fun acquireImageResponses(response: MockAcquireImageResult) {
         val mock = coEvery { bioSdkWrapper.acquireFingerprintImage() }
         when (response) {
-            OK -> mock.returns(AcquireImageResponse(IMAGE))
+            OK -> mock.returns(AcquireFingerprintImageResponse(IMAGE))
             MockAcquireImageResult.DISCONNECTED -> mock.throws(ScannerDisconnectedException())
             MockAcquireImageResult.NEVER_RETURNS -> mock.coAnswers { neverReturnResponse() }
         }
@@ -1259,12 +1259,12 @@ class CollectFingerprintsViewModelTest {
 
 
         fun toCaptureFingerprintResponse(): Any = when (this) {
-            GOOD_SCAN -> CaptureFingerprintResponse(TEMPLATE, TEMPLATE_FORMAT, GOOD_QUALITY)
-            DIFFERENT_GOOD_SCAN -> CaptureFingerprintResponse(
+            GOOD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, GOOD_QUALITY)
+            DIFFERENT_GOOD_SCAN -> AcquireFingerprintTemplateResponse(
                 DIFFERENT_TEMPLATE, TEMPLATE_FORMAT, DIFFERENT_GOOD_QUALITY
             )
 
-            BAD_SCAN -> CaptureFingerprintResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
+            BAD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
             NO_FINGER_DETECTED -> NoFingerDetectedException()
             DISCONNECTED -> ScannerDisconnectedException()
             UNKNOWN_ERROR -> Error("Oops!")

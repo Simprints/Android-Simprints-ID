@@ -1,47 +1,27 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR
+import com.simprints.fingerprint.infra.scanner.capture.ScannerCallbackWrapper
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnavailableVero2Feature
+import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnavailableVero2FeatureException
+import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BLUETOOTH_DISABLED
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BLUETOOTH_NOT_SUPPORTED
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.BUSY
-import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.INTERRUPTED
-import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.INVALID_STATE
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.IO_ERROR
-import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.OUTDATED_SCANNER_INFO
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.SCANNER_UNBONDED
-import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.SCANNER_UNREACHABLE
-import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.TIMEOUT
-import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_INVALID_STATE
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_LOW_VOLTAGE
-import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR.UN20_SDK_ERROR
-import com.simprints.fingerprint.infra.scanner.v1.ScannerCallback
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.domain.ota.CypressOtaStep
-import com.simprints.fingerprint.scanner.domain.ota.StmOtaStep
-import com.simprints.fingerprint.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
-import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2Feature
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2FeatureException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -161,66 +141,6 @@ class ScannerWrapperV1(
 
     override fun isLiveFeedbackAvailable(): Boolean = false
 
-    override suspend fun captureFingerprint(
-        captureDpi: Dpi?,
-        timeOutMs: Int,
-        qualityThreshold: Int,
-    )  = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { cont ->
-            scannerV1.startContinuousCapture(qualityThreshold, timeOutMs.toLong(), continuousCaptureCallback(qualityThreshold, cont))
-
-            cont.invokeOnCancellation {
-                scannerV1.stopContinuousCapture()
-            }
-        }
-    }
-
-    private fun continuousCaptureCallback(qualityThreshold: Int, cont: Continuation<CaptureFingerprintResponse>) =
-        ScannerCallbackWrapper(
-            success = {
-                cont.resume(
-                    CaptureFingerprintResponse(
-                        scannerV1.template!!,
-                        templateFormat,
-                        scannerV1.imageQuality
-                    )
-                )
-            },
-            failure = {
-                if (it == TIMEOUT)
-                    scannerV1.forceCapture(qualityThreshold, forceCaptureCallback(cont))
-                else handleFingerprintCaptureError(it, cont)
-            }
-        )
-
-    private fun forceCaptureCallback(cont: Continuation<CaptureFingerprintResponse>) =
-        ScannerCallbackWrapper(
-            success = {
-                cont.resume(
-                    CaptureFingerprintResponse(
-                        scannerV1.template!!,
-                        templateFormat,
-                        scannerV1.imageQuality
-                    )
-                )
-            },
-            failure = {
-                handleFingerprintCaptureError(it, cont)
-            }
-        )
-
-    private fun handleFingerprintCaptureError(error: SCANNER_ERROR?, cont: Continuation<CaptureFingerprintResponse>) {
-        when (error) {
-            UN20_SDK_ERROR -> cont.resumeWithException(NoFingerDetectedException()) // If no finger is detected on the sensor
-            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO, IO_ERROR -> cont.resumeWithException(ScannerDisconnectedException())
-            BUSY, INTERRUPTED, TIMEOUT -> cont.resumeWithException(ScannerOperationInterruptedException())
-            else -> cont.resumeWithException(UnexpectedScannerException.forScannerError(error, "ScannerWrapperV1"))
-        }
-    }
-
-    override suspend fun acquireImage(): AcquireImageResponse =
-        throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
-
     override suspend fun setUiIdle()  = withContext(ioDispatcher) {
         suspendCoroutine { cont ->
             scannerV1.resetUI(ScannerCallbackWrapper(
@@ -246,25 +166,6 @@ class ScannerWrapperV1(
     override fun unregisterTriggerListener(triggerListener: ScannerTriggerListener) {
         triggerListenerToV1Map[triggerListener]?.let {
             scannerV1.unregisterButtonListener(it)
-        }
-    }
-
-    override fun performCypressOta(firmwareVersion: String): Flow<CypressOtaStep> =
-        throw UnavailableVero2FeatureException(UnavailableVero2Feature.OTA)
-
-    override fun performStmOta(firmwareVersion: String): Flow<StmOtaStep> =
-        throw UnavailableVero2FeatureException(UnavailableVero2Feature.OTA)
-
-    override fun performUn20Ota(firmwareVersion: String): Flow<Un20OtaStep> =
-        throw UnavailableVero2FeatureException(UnavailableVero2Feature.OTA)
-
-    private class ScannerCallbackWrapper(val success: () -> Unit, val failure: (scannerError: SCANNER_ERROR?) -> Unit) : ScannerCallback {
-        override fun onSuccess() {
-            success()
-        }
-
-        override fun onFailure(error: SCANNER_ERROR?) {
-            failure(error)
         }
     }
 }

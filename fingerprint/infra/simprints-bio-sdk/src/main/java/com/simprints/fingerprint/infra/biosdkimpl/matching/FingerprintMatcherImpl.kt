@@ -10,7 +10,7 @@ internal class FingerprintMatcherImpl @Inject constructor(
     private val simAfisMatcher: SimAfisMatcher
 ) : FingerprintMatcher<SimAfisMatcherSettings> {
 
-    override fun match(
+    override suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
         settings: SimAfisMatcherSettings?
