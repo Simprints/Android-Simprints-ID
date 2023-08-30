@@ -3,9 +3,25 @@ package com.simprints.infra.config.local
 import androidx.datastore.core.DataStore
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.AbsolutePath
-import com.simprints.infra.config.domain.models.*
+import com.simprints.infra.config.domain.models.ConsentConfiguration
+import com.simprints.infra.config.domain.models.DecisionPolicy
+import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.IdentificationConfiguration
 import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.local.models.*
+import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.domain.models.Vero1Configuration
+import com.simprints.infra.config.local.models.ProtoDeviceConfiguration
+import com.simprints.infra.config.local.models.ProtoProject
+import com.simprints.infra.config.local.models.ProtoProjectConfiguration
+import com.simprints.infra.config.local.models.toDomain
+import com.simprints.infra.config.local.models.toProto
 import kotlinx.coroutines.flow.first
 import java.io.File
 import javax.inject.Inject
@@ -118,11 +134,11 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                         Finger.LEFT_THUMB,
                         Finger.LEFT_INDEX_FINGER
                     ),
-                    qualityThreshold = 60,
                     decisionPolicy = DecisionPolicy(0, 0, 700),
                     allowedVeroGenerations = listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
                     comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                     displayHandIcons = true,
+                    vero1 = Vero1Configuration(60),
                     vero2 = null,
                 ),
                 consent = ConsentConfiguration(

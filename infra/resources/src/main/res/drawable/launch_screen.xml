@@ -8,10 +8,10 @@
     <item android:drawable="@color/simprints_blue" />
 
     <!-- Your product logo - 144dp color version of your app icon -->
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/simprints_logo" />
-    </item>
+    <item
+        android:width="100dp"
+        android:height="100dp"
+        android:drawable="@drawable/simprints_logo"
+        android:gravity="center" />
 
 </layer-list>

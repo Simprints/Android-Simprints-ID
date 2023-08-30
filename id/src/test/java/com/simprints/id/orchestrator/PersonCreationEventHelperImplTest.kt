@@ -9,7 +9,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.infra.config.domain.models.Finger
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
@@ -43,7 +42,7 @@ class PersonCreationEventHelperImplTest {
         template = EncodingUtilsImplForTests.base64ToBytes(
             "sometemplate"
         ),
-        format = FingerprintTemplateFormat.ISO_19794_2
+        format = "ISO_19794_2"
     )
 
     private val faceSample = FaceCaptureSample(

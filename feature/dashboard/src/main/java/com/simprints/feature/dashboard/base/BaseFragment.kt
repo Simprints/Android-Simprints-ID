@@ -15,7 +15,7 @@ internal class BaseFragment : Fragment(R.layout.fragment_base) {
 
     override fun onResume() {
         super.onResume()
-        if (authStore.signedInProjectId.isNotEmpty() && authStore.signedInUserId.isNotEmpty()) {
+        if (authStore.signedInProjectId.isNotEmpty()) {
             findNavController().navigate(R.id.action_baseFragment_to_mainFragment)
         } else {
             findNavController().navigate(R.id.action_baseFragment_to_requestLoginFragment)

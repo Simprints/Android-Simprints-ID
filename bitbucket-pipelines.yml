@@ -118,6 +118,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
+                    - ./gradlew feature:orchestrator:jacocoTestReport
+                    - ./gradlew feature:client-api:jacocoTestReport
                     - ./gradlew feature:alert:jacocoTestReport
                     - ./gradlew feature:exit-form:jacocoTestReport
                     - ./gradlew feature:consent:jacocoTestReport
@@ -127,6 +129,8 @@ definitions:
                     - ./gradlew feature:setup:jacocoTestReport
                     - ./gradlew feature:enrol-last-biometric:jacocoTestReport
                 artifacts:
+                    - feature/orchestrator/build/reports/**
+                    - feature/client-api/build/reports/**
                     - feature/alert/build/reports/**
                     - feature/exit-form/build/reports/**
                     - feature/consent/build/reports/**
@@ -185,14 +189,16 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew fingerprint:controller:jacocoTestReport
-                    - ./gradlew fingerprint:infra:matcher:jacocoTestReport
+                    - ./gradlew fingerprint:infra:simprints-bio-sdk:jacocoTestReport
                     - ./gradlew fingerprint:infra:scanner:jacocoTestReport
+                    - ./gradlew fingerprint:infra:simafis-wrapper:jacocoTestReport
 
 
                 artifacts:
                     - fingerprint/controller/build/reports/**
-                    - fingerprint/infra/matcher/build/reports/**
+                    - fingerprint/infra/simprints-bio-sdk/build/reports/**
                     - fingerprint/infra/scanner/build/reports/**
+                    - fingerprint/infra/simafis-wrapper/build/reports/**
 
 
         ######################################################################

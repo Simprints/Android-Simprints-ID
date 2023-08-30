@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.login.R
@@ -39,6 +38,7 @@ import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
@@ -68,7 +68,6 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
         initUi()
         observeUiState()
-        viewModel.init()
         playServicesChecker.check(requireActivity()) { finishWithError(it) }
     }
 
@@ -89,6 +88,9 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Login button clicked")
 
             binding.loginProgress.isVisible = true
+            binding.loginButtonScanQr.isEnabled = false
+            binding.loginButtonSignIn.isEnabled = false
+
             viewModel.signInClicked(
                 args.loginParams,
                 binding.loginProjectId.text.toString(),
@@ -106,6 +108,9 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     private fun handleSignInResult(result: SignInState) {
         binding.loginProgress.isVisible = false
         binding.loginErrorCard.isVisible = false
+        binding.loginButtonScanQr.isEnabled = true
+        binding.loginButtonSignIn.isEnabled = true
+
 
         when (result) {
             // Showing toast

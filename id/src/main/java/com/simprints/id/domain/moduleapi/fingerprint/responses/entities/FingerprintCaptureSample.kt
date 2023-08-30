@@ -6,13 +6,10 @@ import com.simprints.id.domain.moduleapi.fingerprint.models.fromModuleApiToDomai
 import com.simprints.id.domain.moduleapi.images.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.images.fromModuleApiToDomain
 import com.simprints.infra.config.domain.models.Finger
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintTemplateFormat
-import com.simprints.infra.events.event.domain.models.fingerprint.fromModuleApiToDomain
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
-import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
@@ -22,7 +19,7 @@ open class FingerprintCaptureSample(
     open val fingerIdentifier: Finger,
     open val template: ByteArray,
     open val templateQualityScore: Int,
-    val format: FingerprintTemplateFormat,
+    val format: String,
     open val imageRef: SecuredImageRef? = null
 ) : Parcelable {
 
@@ -37,7 +34,7 @@ fun FingerprintCaptureSample.fromDomainToModuleApi(): IFingerprintSample {
         fingerIdentifier.fromDomainToModuleApi(),
         template,
         templateQualityScore,
-        format.fromDomainToModuleApi(),
+        format,
         imageRef?.fromDomainToModuleApi()
     )
 }
@@ -47,7 +44,7 @@ fun IFingerprintSample.fromModuleApiToDomain(): FingerprintCaptureSample {
         fingerIdentifier.fromModuleApiToDomain(),
         template,
         templateQualityScore,
-        format.fromModuleApiToDomain(),
+        format,
         imageRef?.fromModuleApiToDomain()
     )
 }
@@ -57,6 +54,6 @@ private class FingerprintCaptureSampleImpl(
     override val fingerIdentifier: IFingerIdentifier,
     override val template: ByteArray,
     override val templateQualityScore: Int,
-    override val format: IFingerprintTemplateFormat,
+    override val format: String,
     override val imageRef: ISecuredImageRef?
 ) : IFingerprintSample, Parcelable

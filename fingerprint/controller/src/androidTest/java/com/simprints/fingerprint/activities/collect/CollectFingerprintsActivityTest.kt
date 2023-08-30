@@ -33,6 +33,7 @@ import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.tools.livedata.postEvent
@@ -72,9 +73,9 @@ class CollectFingerprintsActivityTest {
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns mockk {
-                every { qualityThreshold } returns 60
                 every { displayHandIcons } returns true
                 every { vero2 } returns mockk {
+                    every { qualityThreshold } returns 60
                     every { displayLiveFeedback } returns false
                     every { captureStrategy } returns Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI
                     every { imageSavingStrategy } returns Vero2Configuration.ImageSavingStrategy.NEVER
@@ -85,6 +86,9 @@ class CollectFingerprintsActivityTest {
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>(relaxUnitFun = true).apply {
         every { isLiveFeedbackAvailable() } returns false
         coEvery { disconnect() } just Runs
+        every { versionInformation() } returns mockk {
+            every { generation } returns ScannerGeneration.VERO_2
+        }
     }
     private val scannerManager: ScannerManager =
         spyk(ScannerManagerImpl(mockk(), mockk(), mockk(), mockk())) {
@@ -171,7 +175,7 @@ class CollectFingerprintsActivityTest {
         scenario.onActivity {
             state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toScanning() }
             state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState {
-                toTransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, null, 60))
+                toTransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60))
             }
             it.assertViewPager(count = 2, currentIndex = 0)
             it.assertScanButtonText(R.string.please_wait_button)
@@ -188,6 +192,7 @@ class CollectFingerprintsActivityTest {
                     ScanResult(
                         GOOD_QUALITY,
                         TEMPLATE,
+                        TEMPLATE_FORMAT,
                         null,
                         60
                     )
@@ -208,6 +213,7 @@ class CollectFingerprintsActivityTest {
                     ScanResult(
                         BAD_QUALITY,
                         TEMPLATE,
+                        TEMPLATE_FORMAT,
                         null,
                         60
                     )
@@ -228,6 +234,7 @@ class CollectFingerprintsActivityTest {
                     ScanResult(
                         GOOD_QUALITY,
                         TEMPLATE,
+                        TEMPLATE_FORMAT,
                         null,
                         60
                     )
@@ -247,11 +254,11 @@ class CollectFingerprintsActivityTest {
             fingerStates = listOf(
                 FingerState(
                     FOUR_FINGERS_IDS[0],
-                    listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, null, 60)))
+                    listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT,null, 60)))
                 ),
                 FingerState(
                     FOUR_FINGERS_IDS[1],
-                    listOf(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, null, 60)))
+                    listOf(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE,TEMPLATE_FORMAT, null, 60)))
                 )
             )
         )
@@ -396,7 +403,7 @@ class CollectFingerprintsActivityTest {
         const val BAD_QUALITY = 20
 
         val TEMPLATE = byteArrayOf(0x00, 0x01)
-
+        val TEMPLATE_FORMAT = "ISO_19794_2"
         private fun collectTaskRequest(fingersToCapture: List<FingerIdentifier>) =
             CollectFingerprintsTaskRequest(fingersToCapture)
 

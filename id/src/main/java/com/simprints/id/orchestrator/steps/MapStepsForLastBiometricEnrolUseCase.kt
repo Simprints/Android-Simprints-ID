@@ -20,7 +20,7 @@ import javax.inject.Inject
 class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
 
     operator fun invoke(steps: List<Step>) = steps.mapNotNull { step ->
-        when (step.request) {
+        when (step.payload) {
             is EnrolLastBiometricsRequest -> mapEnrolLastBiometricsStep(step)
             is FingerprintRequest -> mapFingerprintRequestStep(step)
             is FaceRequest -> mapFaceRequestStep(step)

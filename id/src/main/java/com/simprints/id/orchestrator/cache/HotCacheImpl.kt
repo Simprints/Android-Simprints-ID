@@ -39,12 +39,13 @@ class HotCacheImpl @Inject constructor(
         }
     }
 
-    override fun load(): List<Step> = try {
+    override fun load(): List<Step> {
         val stepsJson = sharedPrefs.getString(KEY_STEPS, "")
-        val encodedSteps = JsonHelper.fromJson<List<String>>(stepsJson !!)
-        encodedSteps.map { stepEncoder.decode(it) }
-    } catch (e: Throwable) {
-        emptyList()
+        if (stepsJson.isNullOrEmpty()) {
+            return emptyList()
+        }
+        val encodedSteps = JsonHelper.fromJson<List<String>>(stepsJson)
+        return encodedSteps.map { stepEncoder.decode(it) }
     }
 
     override fun clearSteps() {

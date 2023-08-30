@@ -1,7 +1,7 @@
 package com.simprints.feature.dashboard.tools
 
 import android.view.View
-import androidx.appcompat.widget.SearchView
+import android.widget.EditText
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.matcher.ViewMatchers
@@ -18,12 +18,12 @@ fun typeSearchViewText(text: String): ViewAction {
         override fun getConstraints(): Matcher<View> {
             return AllOf.allOf(
                 ViewMatchers.isDisplayed(),
-                ViewMatchers.isAssignableFrom(SearchView::class.java)
+                ViewMatchers.isAssignableFrom(EditText::class.java)
             )
         }
 
         override fun perform(uiController: UiController?, view: View?) {
-            (view as SearchView).setQuery(text, false)
+            (view as EditText).setText(text)
         }
     }
 }

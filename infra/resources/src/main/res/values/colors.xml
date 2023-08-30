@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#00B3D1</color>
-    <color name="colorPrimaryDark">#009CB6</color>
-    <color name="colorAccent">#FF7C00</color>
-
     <color name="simprints_blue">#00B3D1</color>
-    <color name="simprints_green_dark">#347046</color>
-    <color name="simprints_red_dark">#B8433F</color>
-    <color name="simprints_light_grey">#FFC0C0C0</color>
-    <color name="simprints_white">#ffffff</color>
-    <color name="simprints_grey">#FF888888</color>
+    <color name="simprints_blue_dark">#009CB6</color>
+
+    <color name="simprints_green_light">#40C057</color>
     <color name="simprints_green">#2B9962</color>
+    <color name="simprints_green_dark">#347046</color>
+
     <color name="simprints_red">#CE4141</color>
+    <color name="simprints_red_dark">#B8433F</color>
+
+    <color name="simprints_orange">#FF7C00</color>
+    <color name="simprints_orange_dark">#CC6300</color>
     <color name="simprints_yellow">#ffcc00</color>
+
+    <color name="simprints_white">#ffffff</color>
+    <color name="simprints_off_white">#FFEEEEEE</color>
+    <color name="simprints_grey">#FF888888</color>
+    <color name="simprints_grey_light">#FFC0C0C0</color>
+    <color name="simprints_black">#000000</color>
+    <color name="simprints_blue_grey_light">#A9B5C2</color>
+    <color name="simprints_blue_grey">#384553</color>
+
+    <color name="transparent">#00FFFFFF</color>
+    <color name="translucent">#80000000</color>
+
+    <!-- Text colors should slightly blend into background for better readability -->
+    <color name="simprints_text_white">#DEFFFFFF</color>
+    <color name="simprints_text_black">#DE000000</color>
+    <color name="simprints_text_grey">#99000000</color>
+    <color name="simprints_text_grey_light">#66000000</color>
+    <color name="simprints_text_blue">#DE00B3D1</color>
+    <color name="simprints_text_orange">#DEFF7C00</color>
+
 </resources>

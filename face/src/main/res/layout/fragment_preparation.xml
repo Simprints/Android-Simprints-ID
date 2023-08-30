@@ -22,13 +22,13 @@
 
     <TextView
         android:id="@+id/detection_onboarding_light_txt"
+        style="@style/Text.Body1.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:gravity="center"
         android:text="@string/onboarding_light"
-        android:textColor="@color/simprints_white"
         app:layout_constraintBottom_toTopOf="@id/detection_onboarding_fill_img"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,13 +46,13 @@
 
     <TextView
         android:id="@+id/detection_onboarding_fill_txt"
+        style="@style/Text.Body1.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:gravity="center"
         android:text="@string/onboarding_fill"
-        android:textColor="@color/simprints_white"
         app:layout_constraintBottom_toTopOf="@id/detection_onboarding_straight_img"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,13 +70,13 @@
 
     <TextView
         android:id="@+id/detection_onboarding_straight_txt"
+        style="@style/Text.Body1.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:gravity="center"
         android:text="@string/onboarding_straight"
-        android:textColor="@color/simprints_white"
         app:layout_constraintBottom_toTopOf="@id/detection_onboarding_txt_continue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -84,13 +84,12 @@
 
     <TextView
         android:id="@+id/detection_onboarding_txt_continue"
+        style="@style/Text.Headline6.White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:textSize="18sp"
         android:gravity="center"
         android:text="@string/onboarding_continue"
-        android:textColor="@color/simprints_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

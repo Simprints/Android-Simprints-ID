@@ -40,8 +40,7 @@ object FingerprintToDomainRequest {
         with(iFingerprintRequest) {
             FingerprintMatchRequest(probeFingerprintSamples.map {
                 Fingerprint(
-                    it.fingerIdentifier.fromModuleApiToDomain(),
-                    it.template
+                    it.fingerIdentifier.fromModuleApiToDomain(), it.template, it.format
                 )
             }, queryForCandidates)
         }

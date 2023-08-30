@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.remote.models.ApiEnrolmentRecord
 import com.simprints.infra.enrolment.records.remote.models.ApiEnrolmentRecords
@@ -12,13 +13,10 @@ import com.simprints.infra.enrolment.records.remote.models.face.ApiFaceTemplate
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFinger
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFingerprintReference
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFingerprintTemplate
-import com.simprints.infra.enrolment.records.remote.models.fingerprint.ApiFingerprintTemplateFormat
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import com.simprints.moduleapi.fingerprint.IFingerprintTemplateFormat
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
@@ -78,7 +76,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     IFingerIdentifier.LEFT_3RD_FINGER,
                     FINGERPRINT_TEMPLATE,
                     50,
-                    IFingerprintTemplateFormat.ISO_19794_2
+                    "ISO_19794_2"
                 )
             ),
             faceSamples = listOf(FaceSample(FACE_TEMPLATE, "faceTemplateFormat"))
@@ -97,7 +95,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                             finger = ApiFinger.LEFT_3RD_FINGER,
                         )
                     ),
-                    format = ApiFingerprintTemplateFormat.ISO_19794_2
+                    format = "ISO_19794_2"
                 ),
                 ApiFaceReference(
                     id = "b4a3ba90-6413-32b4-a4ea-a841a5a400ec",

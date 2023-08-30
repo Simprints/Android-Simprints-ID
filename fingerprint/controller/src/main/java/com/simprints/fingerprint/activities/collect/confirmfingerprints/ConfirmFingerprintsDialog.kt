@@ -1,24 +1,27 @@
 package com.simprints.fingerprint.activities.collect.confirmfingerprints
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.resources.nameTextId
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 class ConfirmFingerprintsDialog(private val context: Context,
                                 private val scannedFingers: List<Item>,
                                 private val callbackConfirm: () -> Unit,
                                 private val callbackRestart: () -> Unit) {
 
-    fun create(): AlertDialog =
-        AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.confirm_fingers_dialog_title))
-            .setMessage(getMapOfFingersAndQualityAsText())
-            .setPositiveButton(context.getString(R.string.confirm)) { _, _ -> callbackConfirm() }
-            .setNegativeButton(context.getString(R.string.restart)) { _, _ -> callbackRestart() }
-            .setCancelable(false).create()
+    fun create(): AlertDialog = MaterialAlertDialogBuilder(context)
+        .setTitle(context.getString(R.string.confirm_fingers_dialog_title))
+        .setMessage(getMapOfFingersAndQualityAsText())
+        .setPositiveButton(context.getString(R.string.confirm)) { _, _ -> callbackConfirm() }
+        .setNegativeButton(context.getString(R.string.restart)) { _, _ -> callbackRestart() }
+        .setCancelable(false)
+        .create()
 
     @SuppressLint("DefaultLocale")
     private fun getMapOfFingersAndQualityAsText(): String =

@@ -14,7 +14,8 @@ class FingerprintCaptureBiometricsEventTest {
             fingerprint = FingerprintCaptureBiometricsEvent.Fingerprint(
                 finger = FingerIdentifier.LEFT_3RD_FINGER,
                 quality = 0,
-                template = "sometwm"
+                template = "sometwm",
+                format = "someFormat"
             ),
             payloadId = "someId"
         )

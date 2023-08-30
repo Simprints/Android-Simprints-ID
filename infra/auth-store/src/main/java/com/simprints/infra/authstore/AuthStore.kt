@@ -9,16 +9,15 @@ import kotlin.reflect.KClass
 interface AuthStore {
 
     var signedInProjectId: String
-    var signedInUserId: String
 
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
     fun cleanCredentials()
-    fun storeCredentials(projectId: String, userId: String)
+    fun storeCredentials(projectId: String)
 
     suspend fun storeFirebaseToken(token: Token)
     fun clearFirebaseToken()
 
-    fun isSignedIn(projectId: String, userId: String): Boolean
+    fun isSignedIn(projectId: String): Boolean
 
     /**
      * Get the FirebaseApp that corresponds with the core backend. This FirebaseApp is only

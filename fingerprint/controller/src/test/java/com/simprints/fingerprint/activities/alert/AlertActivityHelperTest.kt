@@ -149,4 +149,16 @@ internal class AlertActivityHelperTest {
         verify { activity.startActivity(any()) }
         verify(exactly = 0) { activity.finish() }
     }
+
+    @Test
+    fun opensSettings_whenOpensAppSettings() {
+        helper.handleAlertResult(
+            activity,
+            result = AlertResult(AlertError.ACTION_APP_SETTINGS, Bundle()),
+            showRefusal = {},
+            retry = {}
+        )
+        verify { activity.startActivity(any()) }
+        verify(exactly = 0) { activity.finish() }
+    }
 }

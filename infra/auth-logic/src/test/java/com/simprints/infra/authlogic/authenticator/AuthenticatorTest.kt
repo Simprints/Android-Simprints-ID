@@ -3,12 +3,12 @@ package com.simprints.infra.authlogic.authenticator
 import com.google.android.play.core.integrity.model.IntegrityErrorCode
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.authlogic.model.AuthenticateDataResult
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
 import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
 import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
+import com.simprints.infra.authlogic.model.AuthenticateDataResult
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -119,7 +119,7 @@ internal class AuthenticatorTest {
     }
 
     private suspend fun mockException(exception: Exception): AuthenticateDataResult {
-        coEvery { projectAuthenticator.authenticate(any(), "", "") } throws exception
+        coEvery { projectAuthenticator.authenticate(any(), "") } throws exception
 
         return authenticator.authenticate("", "", "", "")
     }

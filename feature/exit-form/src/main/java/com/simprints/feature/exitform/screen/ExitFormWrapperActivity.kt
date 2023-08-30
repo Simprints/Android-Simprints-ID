@@ -2,18 +2,18 @@ package com.simprints.feature.exitform.screen
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.R
 import com.simprints.feature.exitform.databinding.ActivityExitFormWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-internal class ExitFormWrapperActivity : AppCompatActivity() {
+internal class ExitFormWrapperActivity : BaseActivity() {
 
     private val binding by viewBinding(ActivityExitFormWrapperBinding::inflate)
 

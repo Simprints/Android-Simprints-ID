@@ -4,9 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.BACKEND_MAINTENANCE_ERROR
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
@@ -18,7 +17,7 @@ class ErrorCallbackEventTest {
     @Test
     fun create_ErrorCallbackEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = ErrorCallbackEvent(CREATED_AT, DIFFERENT_PROJECT_ID_SIGNED_IN, labels)
+        val event = ErrorCallbackEvent(CREATED_AT, ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLBACK_ERROR)
@@ -27,14 +26,14 @@ class ErrorCallbackEventTest {
             assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(ErrorCallbackEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_ERROR)
-            assertThat(reason).isEqualTo(DIFFERENT_PROJECT_ID_SIGNED_IN)
+            assertThat(reason).isEqualTo(ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN)
         }
     }
 
     @Test
     fun create_BackendErrorCallbackEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = ErrorCallbackEvent(CREATED_AT, BACKEND_MAINTENANCE_ERROR, labels)
+        val event = ErrorCallbackEvent(CREATED_AT, ErrorReason.BACKEND_MAINTENANCE_ERROR, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLBACK_ERROR)
@@ -43,23 +42,30 @@ class ErrorCallbackEventTest {
             assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(ErrorCallbackEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_ERROR)
-            assertThat(reason).isEqualTo(BACKEND_MAINTENANCE_ERROR)
+            assertThat(reason).isEqualTo(ErrorReason.BACKEND_MAINTENANCE_ERROR)
         }
     }
 
     @Test
-    fun shouldMapCorrectly_fromAppResponseBackendErrorReasonToEventReason() {
-        val backendIAppReason = IAppErrorReason.BACKEND_MAINTENANCE_ERROR
-        val reason = BACKEND_MAINTENANCE_ERROR
-
-        assertThat(fromAppResponseErrorReasonToEventReason(backendIAppReason)).isEqualTo(reason)
-    }
-
-    @Test
-    fun shouldMapCorrectly_fromAppResponseIncompleteLoginErrorReasonToEventReason() {
-        val backendIAppReason = IAppErrorReason.LOGIN_NOT_COMPLETE
-        val reason = ErrorCallbackPayload.Reason.LOGIN_NOT_COMPLETE
-
-        assertThat(fromAppResponseErrorReasonToEventReason(backendIAppReason)).isEqualTo(reason)
+    fun `should map AppErrorReason correctly`() {
+        mapOf(
+            IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN to ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN,
+            IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN to ErrorReason.DIFFERENT_USER_ID_SIGNED_IN,
+            IAppErrorReason.GUID_NOT_FOUND_ONLINE to ErrorReason.GUID_NOT_FOUND_ONLINE,
+            IAppErrorReason.UNEXPECTED_ERROR to ErrorReason.UNEXPECTED_ERROR,
+            IAppErrorReason.BLUETOOTH_NOT_SUPPORTED to ErrorReason.BLUETOOTH_NOT_SUPPORTED,
+            IAppErrorReason.LOGIN_NOT_COMPLETE to ErrorReason.LOGIN_NOT_COMPLETE,
+            IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED to ErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED,
+            IAppErrorReason.FACE_LICENSE_MISSING to ErrorReason.FACE_LICENSE_MISSING,
+            IAppErrorReason.FACE_LICENSE_INVALID to ErrorReason.FACE_LICENSE_INVALID,
+            IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR to ErrorReason.FINGERPRINT_CONFIGURATION_ERROR,
+            IAppErrorReason.FACE_CONFIGURATION_ERROR to ErrorReason.FACE_CONFIGURATION_ERROR,
+            IAppErrorReason.BACKEND_MAINTENANCE_ERROR to ErrorReason.BACKEND_MAINTENANCE_ERROR,
+            IAppErrorReason.PROJECT_PAUSED to ErrorReason.PROJECT_PAUSED,
+            IAppErrorReason.PROJECT_ENDING to ErrorReason.PROJECT_ENDING,
+            IAppErrorReason.BLUETOOTH_NO_PERMISSION to ErrorReason.BLUETOOTH_NO_PERMISSION,
+        ).forEach {
+            assertThat(fromAppResponseErrorReasonToEventReason(it.key)).isEqualTo(it.value)
+        }
     }
 }

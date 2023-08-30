@@ -2,11 +2,10 @@ package com.simprints.infra.config.local.migrations.models
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.domain.models.*
 import org.json.JSONObject
+
 
 @Keep
 internal data class OldProjectConfig(
@@ -95,7 +94,6 @@ internal data class OldProjectConfig(
                 fingersToCapture = fingerprintsToCollect?.split(",")
                     ?.map { Finger.valueOf(it) }
                     ?: listOf(Finger.LEFT_THUMB, Finger.LEFT_INDEX_FINGER),
-                qualityThreshold = fingerprintQualityThreshold.toInt(),
                 decisionPolicy = fingerprintConfidenceThresholds?.let { parseDecisionPolicy(it) }
                     ?: DecisionPolicy(0, 0, 700),
                 allowedVeroGenerations = scannerGenerations?.split(",")
@@ -105,6 +103,7 @@ internal data class OldProjectConfig(
                     ?.let { FingerprintConfiguration.FingerComparisonStrategy.valueOf(it) }
                     ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
                 displayHandIcons = fingerImagesExist.toBoolean(),
+                vero1 = Vero1Configuration(fingerprintQualityThreshold.toInt()),
                 vero2 = vero2Configuration(),
             )
 
@@ -112,6 +111,7 @@ internal data class OldProjectConfig(
         if (captureFingerprintStrategy == null) null
         else
             Vero2Configuration(
+                fingerprintQualityThreshold!!.toInt(),
                 captureStrategy = Vero2Configuration.CaptureStrategy.valueOf(
                     captureFingerprintStrategy
                 ),
@@ -125,7 +125,13 @@ internal data class OldProjectConfig(
                 firmwareVersions = if (vero2FirmwareVersions.isNullOrEmpty()) {
                     emptyMap()
                 } else {
-                    ObjectMapper().readValue(vero2FirmwareVersions)
+                    // Construct a JavaType instance for Map<String, Vero2FirmwareVersions>
+                    val type = JsonHelper.jackson.typeFactory.constructMapType(
+                        Map::class.java,
+                        String::class.java,
+                        Vero2Configuration.Vero2FirmwareVersions::class.java
+                    )
+                    JsonHelper.fromJson(vero2FirmwareVersions, type)
                 },
             )
 
@@ -136,8 +142,10 @@ internal data class OldProjectConfig(
             collectConsent = consentRequired.toBoolean(),
             displaySimprintsLogo = logoExists.toBoolean(),
             allowParentalConsent = consentParentalExists.toBoolean(),
-            generalPrompt = fromJson<GeneralConsentOptions>(consentGeneralOptions).toDomain(),
-            parentalPrompt = fromJson<ParentalConsentOptions>(consentParentalOptions).toDomain(),
+            generalPrompt = JsonHelper.fromJson<GeneralConsentOptions>(consentGeneralOptions)
+                .toDomain(),
+            parentalPrompt = JsonHelper.fromJson<ParentalConsentOptions>(consentParentalOptions)
+                .toDomain(),
         )
 
     private fun identificationConfiguration(): IdentificationConfiguration =
@@ -198,13 +206,8 @@ internal data class OldProjectConfig(
             )
         }
 
-    private inline fun <reified T> fromJson(json: String): T {
-        return jacksonObjectMapper().readValue(json, T::class.java)
-    }
-
     companion object {
         private const val DEFAULT_FACE_FRAMES_TO_CAPTURE = 2
     }
-
 }
 

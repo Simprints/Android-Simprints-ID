@@ -1,5 +1,6 @@
 package com.simprints.infra.realm.config
 
+import androidx.annotation.Keep
 import com.simprints.infra.realm.BuildConfig
 import com.simprints.infra.realm.migration.RealmMigrations
 import com.simprints.infra.realm.models.DbFaceSample
@@ -9,8 +10,10 @@ import com.simprints.infra.realm.models.DbSubject
 import io.realm.RealmConfiguration
 import io.realm.annotations.RealmModule
 
+@Keep
 object RealmConfig {
 
+    @Keep
     @RealmModule(
         classes = [
             DbFingerprintSample::class,

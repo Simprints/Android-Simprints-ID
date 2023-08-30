@@ -52,6 +52,7 @@ data class ErrorCallbackEvent(
             BACKEND_MAINTENANCE_ERROR,
             PROJECT_ENDING,
             PROJECT_PAUSED,
+            BLUETOOTH_NO_PERMISSION,
             FACE_CONFIGURATION_ERROR;
 
             companion object {
@@ -72,6 +73,7 @@ data class ErrorCallbackEvent(
                         IAppErrorReason.PROJECT_PAUSED -> PROJECT_PAUSED
                         IAppErrorReason.ROOTED_DEVICE -> throw Throwable("Can't convert from rooted device")
                         IAppErrorReason.PROJECT_ENDING -> PROJECT_ENDING
+                        IAppErrorReason.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
                     }
             }
         }

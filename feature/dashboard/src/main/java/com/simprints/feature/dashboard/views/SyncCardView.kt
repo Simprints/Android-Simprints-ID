@@ -5,15 +5,15 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ProgressBar
-import androidx.cardview.widget.CardView
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import com.google.android.material.card.MaterialCardView
 import com.simprints.core.tools.utils.TimeUtils
 import com.simprints.feature.dashboard.databinding.LayoutCardSyncBinding
 import com.simprints.infra.resources.R
 import kotlin.math.min
 
-internal class SyncCardView : CardView {
+internal class SyncCardView : MaterialCardView {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
 
@@ -135,7 +135,7 @@ internal class SyncCardView : CardView {
         )
         binding.syncCardProgressMessage.setTextColor(getDefaultGrayTextColor())
 
-        setProgress(state.progress, state.total, R.color.colorPrimaryDark)
+        setProgress(state.progress, state.total, R.color.simprints_blue_dark)
     }
 
     private fun prepareSyncConnectingView(state: SyncCardState.SyncConnecting) {
@@ -146,7 +146,7 @@ internal class SyncCardView : CardView {
             resources.getString(R.string.dashboard_sync_card_connecting)
         binding.syncCardProgressMessage.setTextColor(getDefaultGrayTextColor())
 
-        setProgress(state.progress, state.total, R.color.colorPrimaryDark)
+        setProgress(state.progress, state.total, R.color.simprints_blue_dark)
     }
 
     private fun prepareSyncCompleteView() {

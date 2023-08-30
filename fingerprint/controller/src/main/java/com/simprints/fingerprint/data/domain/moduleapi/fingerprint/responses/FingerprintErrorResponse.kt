@@ -22,6 +22,7 @@ data class FingerprintErrorResponse(val reason: FingerprintErrorReason) : Finger
  */
 enum class FingerprintErrorReason {
     UNEXPECTED_ERROR,
+    BLUETOOTH_NO_PERMISSION,
     BLUETOOTH_NOT_SUPPORTED;
 
     companion object {
@@ -29,6 +30,7 @@ enum class FingerprintErrorReason {
             when (fingerprintAlert) {
                 AlertError.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                 AlertError.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+                AlertError.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
 
                 //User can not leave these alerts, so Fingerprint module should not produce any error response for them.
                 AlertError.BLUETOOTH_NOT_ENABLED,
