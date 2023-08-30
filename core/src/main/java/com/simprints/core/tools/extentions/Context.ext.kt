@@ -12,7 +12,7 @@ fun Context.showToast(@StringRes resId: Int, duration: Int = Toast.LENGTH_SHORT)
 }
 
 // TODO: consider switching to an instance ID for privacy reasons (read https://developer.android.com/training/articles/user-data-ids.html)
-val Context.deviceId: String
+val Context.deviceHardwareId: String
     @SuppressLint("HardwareIds")
     get() = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID) ?: "no-device-id"
 
