@@ -16,6 +16,8 @@ import com.simprints.feature.clientapi.session.DeleteSessionEventsIfNeededUseCas
 import com.simprints.feature.clientapi.session.GetEnrolmentCreationEventForSubjectUseCase
 import com.simprints.feature.clientapi.session.GetEventJsonForSessionUseCase
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
 import com.simprints.moduleapi.app.responses.IAppEnrolResponse
 import com.simprints.moduleapi.app.responses.IAppErrorReason
@@ -29,6 +31,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ClientApiViewModel @Inject constructor(
+    private val rootManager: SecurityManager,
     private val intentMapper: IntentToActionMapper,
     private val clientSessionManager: ClientSessionManager,
     private val getEventJsonForSession: GetEventJsonForSessionUseCase,
@@ -49,7 +52,13 @@ internal class ClientApiViewModel @Inject constructor(
     private val _showAlert = MutableLiveData<LiveDataEventWithContent<ClientApiError>>()
 
     fun handleIntent(action: String, extras: Map<String, Any>) = viewModelScope.launch {
-        validateActionAndProceed(action, extras)
+        try {
+            rootManager.checkIfDeviceIsRooted()
+            validateActionAndProceed(action, extras)
+        } catch (e: RootedDeviceException) {
+            Simber.e(e)
+            _showAlert.send(ClientApiError.ROOTED_DEVICE)
+        }
     }
 
     private suspend fun validateActionAndProceed(action: String, extras: Map<String, Any>) = try {
