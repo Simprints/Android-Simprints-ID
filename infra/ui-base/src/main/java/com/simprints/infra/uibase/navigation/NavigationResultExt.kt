@@ -73,10 +73,10 @@ fun <T : Parcelable> NavController.handleResult(
             handleResultFromChild(targetDestinationId, currentEntry, handler)
         }
     }
-    currentEntry.getLifecycle().addObserver(observer)
+    currentEntry.lifecycle.addObserver(observer)
     lifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
         if (event == Lifecycle.Event.ON_DESTROY) {
-            currentEntry.getLifecycle().removeObserver(observer)
+            currentEntry.lifecycle.removeObserver(observer)
         }
     })
 }

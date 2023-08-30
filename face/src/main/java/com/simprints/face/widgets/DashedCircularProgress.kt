@@ -64,7 +64,7 @@ class DashedCircularProgress(context: Context, attrs: AttributeSet) : FrameLayou
         )
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         progressPainter?.draw(canvas)
         invalidate()
