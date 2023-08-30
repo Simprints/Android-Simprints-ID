@@ -231,7 +231,6 @@ testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref
 testing-Robolectric-annotation = { module = "org.robolectric:annotations", version.ref = "robolectric_version" }
 #Testing-Mockito
 testing-Mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito_version" }
-testing-Mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito_version" } #Required to mock final classes
 testing-Mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito_version" } #Required to use Mock in AndroidTests
 testing-Mockito-kotlin = { module = "com.nhaarman.mockitokotlin2:mockito-kotlin", version.ref = "mockito_kotlin_version" }
 #Testing-Mockk
