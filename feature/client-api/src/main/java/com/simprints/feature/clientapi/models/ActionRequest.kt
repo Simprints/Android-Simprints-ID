@@ -11,29 +11,29 @@ internal sealed class ActionRequest(
         override val packageName: String,
         override val projectId: String,
         override val userId: String,
-        val moduleId: String,
+        override val moduleId: String,
         val metadata: String,
         override val unknownExtras: Map<String, Any?>,
-    ) : ActionRequest(packageName, projectId, userId, unknownExtras)
+    ) : ActionRequest(packageName, projectId, userId, unknownExtras), FlowAction
 
     data class IdentifyActionRequest(
         override val packageName: String,
         override val projectId: String,
         override val userId: String,
-        val moduleId: String,
+        override val moduleId: String,
         val metadata: String,
         override val unknownExtras: Map<String, Any?>,
-    ) : ActionRequest(packageName, projectId, userId, unknownExtras)
+    ) : ActionRequest(packageName, projectId, userId, unknownExtras), FlowAction
 
     data class VerifyActionRequest(
         override val packageName: String,
         override val projectId: String,
         override val userId: String,
-        val moduleId: String,
+        override val moduleId: String,
         val metadata: String,
         val verifyGuid: String,
         override val unknownExtras: Map<String, Any?>,
-    ) : ActionRequest(packageName, projectId, userId, unknownExtras)
+    ) : ActionRequest(packageName, projectId, userId, unknownExtras), FlowAction
 
     data class ConfirmActionRequest(
         override val packageName: String,
@@ -53,6 +53,10 @@ internal sealed class ActionRequest(
         val sessionId: String,
         override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(packageName, projectId, userId, unknownExtras), FollowUpAction
+
+    interface FlowAction {
+        val moduleId: String
+    }
 
     /**
      * Marker interface for requests that are always called as a follow up

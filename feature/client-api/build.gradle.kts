@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":infra:events"))
     implementation(project(":infra:security"))
     implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:recent-user-activity"))
 
     implementation(project(":moduleapi"))
 

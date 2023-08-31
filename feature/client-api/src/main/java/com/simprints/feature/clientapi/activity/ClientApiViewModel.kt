@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.feature.clientapi.activity.usecases.ExtractParametersForAnalyticsUseCase
+import com.simprints.feature.clientapi.session.ReportActionRequestEventsUseCase
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.IntentToActionMapper
 import com.simprints.feature.clientapi.models.ActionRequest
@@ -34,6 +36,8 @@ internal class ClientApiViewModel @Inject constructor(
     private val rootManager: SecurityManager,
     private val intentMapper: IntentToActionMapper,
     private val clientSessionManager: ClientSessionManager,
+    private val reportActionRequestEvents: ReportActionRequestEventsUseCase,
+    private val extractParametersForAnalytics: ExtractParametersForAnalyticsUseCase,
     private val getEventJsonForSession: GetEventJsonForSessionUseCase,
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
@@ -62,11 +66,15 @@ internal class ClientApiViewModel @Inject constructor(
     }
 
     private suspend fun validateActionAndProceed(action: String, extras: Map<String, Any>) = try {
-        val action = intentMapper(action, extras)
-        clientSessionManager.reportUnknownExtras(action.unknownExtras)
+        val actionRequest = intentMapper(action, extras)
 
+        reportActionRequestEvents(actionRequest)
+        extractParametersForAnalytics(actionRequest)
+
+        // TODO add special case for confirmation action
         // TODO proceed processing action
-        _proceedWithAction.send(action) // TODO replace with user flow builder
+        // TODO check login state
+        _proceedWithAction.send(actionRequest) // TODO replace with user flow builder
 
     } catch (validationException: InvalidRequestException) {
         Simber.e(validationException)
