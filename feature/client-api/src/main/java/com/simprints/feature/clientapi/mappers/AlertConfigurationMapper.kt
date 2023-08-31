@@ -25,7 +25,12 @@ class AlertConfigurationMapper @Inject constructor() {
 
     private fun getBackgroundColor(clientApiError: ClientApiError) = when (clientApiError) {
         ClientApiError.PROJECT_ENDING,
+        ClientApiError.GOOGLE_PLAY_SERVICES_OUTDATED,
+        ClientApiError.MISSING_GOOGLE_PLAY_SERVICES,
+        ClientApiError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
+        ClientApiError.INTEGRITY_SERVICE_ERROR,
         ClientApiError.ROOTED_DEVICE -> AlertColor.Red
+
         else -> AlertColor.Yellow
     }
 
@@ -33,6 +38,11 @@ class AlertConfigurationMapper @Inject constructor() {
         ClientApiError.PROJECT_PAUSED -> IDR.string.project_paused_title
         ClientApiError.PROJECT_ENDING -> IDR.string.project_ending_title
         ClientApiError.ROOTED_DEVICE -> IDR.string.rooted_device_title
+        ClientApiError.MISSING_GOOGLE_PLAY_SERVICES -> IDR.string.missing_google_play_services_alert_title
+        ClientApiError.GOOGLE_PLAY_SERVICES_OUTDATED -> IDR.string.outdated_google_play_services_alert_title
+        ClientApiError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> IDR.string.missing_or_outdated_google_play_store_app_alert_title
+        ClientApiError.INTEGRITY_SERVICE_ERROR -> IDR.string.error_occurred_title
+        ClientApiError.UNEXPECTED_LOGIN_ERROR -> IDR.string.error_occurred_title
         else -> IDR.string.configuration_error_title
     }
 
@@ -48,6 +58,11 @@ class AlertConfigurationMapper @Inject constructor() {
         ClientApiError.DIFFERENT_PROJECT_ID -> IDR.string.different_projectId_message
         ClientApiError.PROJECT_PAUSED -> IDR.string.project_paused_body
         ClientApiError.PROJECT_ENDING -> IDR.string.project_ending_body
+        ClientApiError.MISSING_GOOGLE_PLAY_SERVICES -> IDR.string.missing_google_play_services_alert_message
+        ClientApiError.GOOGLE_PLAY_SERVICES_OUTDATED -> IDR.string.outdated_google_play_services_alert_message
+        ClientApiError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> IDR.string.missing_or_outdated_google_play_store_app_alert_message
+        ClientApiError.INTEGRITY_SERVICE_ERROR -> IDR.string.unforeseen_error_message
+        ClientApiError.UNEXPECTED_LOGIN_ERROR -> IDR.string.unforeseen_error_message
         ClientApiError.ROOTED_DEVICE -> IDR.string.rooted_device_message
     }
 
@@ -69,6 +84,11 @@ class AlertConfigurationMapper @Inject constructor() {
         ClientApiError.DIFFERENT_PROJECT_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.DIFFERENT_PROJECT_ID
         ClientApiError.PROJECT_PAUSED -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.PROJECT_PAUSED
         ClientApiError.PROJECT_ENDING -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.PROJECT_ENDING
+        ClientApiError.MISSING_GOOGLE_PLAY_SERVICES -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.MISSING_GOOGLE_PLAY_SERVICES
+        ClientApiError.GOOGLE_PLAY_SERVICES_OUTDATED -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.GOOGLE_PLAY_SERVICES_OUTDATED
+        ClientApiError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP
+        ClientApiError.INTEGRITY_SERVICE_ERROR,
+        ClientApiError.UNEXPECTED_LOGIN_ERROR,
         ClientApiError.ROOTED_DEVICE -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
     }
 }

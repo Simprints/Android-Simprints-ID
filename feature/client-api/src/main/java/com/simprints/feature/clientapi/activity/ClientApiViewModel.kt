@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.clientapi.activity.usecases.ExtractParametersForAnalyticsUseCase
@@ -24,6 +23,8 @@ import com.simprints.feature.clientapi.session.DeleteSessionEventsIfNeededUseCas
 import com.simprints.feature.clientapi.session.GetEnrolmentCreationEventForSubjectUseCase
 import com.simprints.feature.clientapi.session.GetEventJsonForSessionUseCase
 import com.simprints.feature.clientapi.session.ReportActionRequestEventsUseCase
+import com.simprints.feature.login.LoginError
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -50,6 +51,8 @@ internal class ClientApiViewModel @Inject constructor(
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
 ) : ViewModel() {
+
+    private var cachedRequest: ActionRequest? = null
 
     val proceedWithAction: LiveData<LiveDataEventWithContent<ActionRequest>>
         get() = _proceedWithAction
@@ -98,7 +101,25 @@ internal class ClientApiViewModel @Inject constructor(
     }
 
     private fun startSignInAttempt(actionRequest: ActionRequest) {
+        cachedRequest = actionRequest
         _showLoginFlow.send(actionRequest)
+    }
+
+    fun handleLoginResult(result: LoginResult) {
+        val requestAction = cachedRequest?.takeIf { result.isSuccess }
+        if (requestAction != null) {
+            proceedWithAction(requestAction)
+        } else {
+            val error = when (result.error) {
+                LoginError.LoginNotCompleted -> TODO()
+                LoginError.IntegrityServiceError -> TODO()
+                LoginError.MissingPlayServices -> TODO()
+                LoginError.OutdatedPlayServices -> TODO()
+                LoginError.MissingOrOutdatedPlayServices -> TODO()
+                LoginError.Unknown, null -> TODO()
+            }
+            _showAlert.send(error)
+        }
     }
 
     private fun proceedWithAction(actionRequest: ActionRequest) {
