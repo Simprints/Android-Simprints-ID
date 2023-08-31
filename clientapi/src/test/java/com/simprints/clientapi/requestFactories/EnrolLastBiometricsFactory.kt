@@ -7,6 +7,8 @@ import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsVali
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
+import com.simprints.core.tools.utils.Tokenization
+import com.simprints.infra.config.domain.models.Project
 import io.mockk.every
 import io.mockk.mockk
 
@@ -23,10 +25,22 @@ object EnrolLastBiometricsFactory : RequestFactory() {
         )
 
     override fun getValidator(extractor: ClientRequestExtractor): EnrolLastBiometricsValidator =
-        EnrolLastBiometricsValidator(extractor as EnrolLastBiometricsExtractor, MOCK_SESSION_ID, true)
+        EnrolLastBiometricsValidator(
+            extractor as EnrolLastBiometricsExtractor,
+            MOCK_SESSION_ID,
+            true
+        )
 
-    override fun getBuilder(extractor: ClientRequestExtractor): EnrolLastBiometricsBuilder =
-        EnrolLastBiometricsBuilder(extractor as EnrolLastBiometricsExtractor, getValidator(extractor))
+    override fun getBuilder(extractor: ClientRequestExtractor): EnrolLastBiometricsBuilder {
+        val project = mockk<Project>()
+        val tokenization = mockk<Tokenization>()
+        return EnrolLastBiometricsBuilder(
+            extractor = extractor as EnrolLastBiometricsExtractor,
+            project = project,
+            tokenization = tokenization,
+            validator = getValidator(extractor)
+        )
+    }
 
     override fun getMockExtractor(): EnrolLastBiometricsExtractor {
         val mockEnrolLastBiometricsExtractor = mockk<EnrolLastBiometricsExtractor>()

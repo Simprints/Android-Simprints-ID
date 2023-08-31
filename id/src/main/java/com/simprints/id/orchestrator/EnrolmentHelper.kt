@@ -7,12 +7,13 @@ import com.simprints.infra.enrolment.records.domain.models.Subject
 
 interface EnrolmentHelper {
 
-    suspend fun buildSubject(projectId: String,
-                     userId: String,
-                     moduleId: String,
-                     fingerprintResponse: FingerprintCaptureResponse?,
-                     faceResponse: FaceCaptureResponse?,
-                     timeHelper: TimeHelper
+    fun buildSubject(
+        projectId: String,
+        userId: String,
+        moduleId: String,
+        fingerprintResponse: FingerprintCaptureResponse?,
+        faceResponse: FaceCaptureResponse?,
+        timeHelper: TimeHelper
     ): Subject
 
     suspend fun enrol(subject: Subject)
