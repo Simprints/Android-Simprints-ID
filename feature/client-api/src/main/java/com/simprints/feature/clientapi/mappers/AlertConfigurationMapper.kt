@@ -24,11 +24,14 @@ class AlertConfigurationMapper @Inject constructor() {
     }
 
     private fun getBackgroundColor(clientApiError: ClientApiError) = when (clientApiError) {
+        ClientApiError.PROJECT_ENDING,
         ClientApiError.ROOTED_DEVICE -> AlertColor.Red
         else -> AlertColor.Yellow
     }
 
     private fun getTitle(clientApiError: ClientApiError) = when (clientApiError) {
+        ClientApiError.PROJECT_PAUSED -> IDR.string.project_paused_title
+        ClientApiError.PROJECT_ENDING -> IDR.string.project_ending_title
         ClientApiError.ROOTED_DEVICE -> IDR.string.rooted_device_title
         else -> IDR.string.configuration_error_title
     }
@@ -42,10 +45,14 @@ class AlertConfigurationMapper @Inject constructor() {
         ClientApiError.INVALID_SESSION_ID -> IDR.string.invalid_sessionId_message
         ClientApiError.INVALID_USER_ID -> IDR.string.invalid_userId_message
         ClientApiError.INVALID_VERIFY_ID -> IDR.string.invalid_verifyId_message
+        ClientApiError.DIFFERENT_PROJECT_ID -> IDR.string.different_projectId_message
+        ClientApiError.PROJECT_PAUSED -> IDR.string.project_paused_body
+        ClientApiError.PROJECT_ENDING -> IDR.string.project_ending_body
         ClientApiError.ROOTED_DEVICE -> IDR.string.rooted_device_message
     }
 
     private fun getMessageIcon(clientApiError: ClientApiError) = when (clientApiError) {
+        ClientApiError.DIFFERENT_PROJECT_ID -> IDR.drawable.ic_alert_hint_key
         ClientApiError.ROOTED_DEVICE -> IDR.drawable.ic_alert_hint_cog
         else -> null
     }
@@ -59,6 +66,9 @@ class AlertConfigurationMapper @Inject constructor() {
         ClientApiError.INVALID_SESSION_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_SESSION_ID
         ClientApiError.INVALID_USER_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_USER_ID
         ClientApiError.INVALID_VERIFY_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.INVALID_VERIFY_ID
+        ClientApiError.DIFFERENT_PROJECT_ID -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.DIFFERENT_PROJECT_ID
+        ClientApiError.PROJECT_PAUSED -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.PROJECT_PAUSED
+        ClientApiError.PROJECT_ENDING -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.PROJECT_ENDING
         ClientApiError.ROOTED_DEVICE -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
     }
 }

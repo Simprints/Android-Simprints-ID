@@ -42,7 +42,7 @@ internal class AuthStoreImpl @Inject constructor(
         firebaseAuthManager.signOut()
     }
 
-    override fun isSignedIn(projectId: String): Boolean =
+    override fun isFirebaseSignedIn(projectId: String): Boolean =
         firebaseAuthManager.isSignedIn(projectId)
 
     override fun getCoreApp(): FirebaseApp =

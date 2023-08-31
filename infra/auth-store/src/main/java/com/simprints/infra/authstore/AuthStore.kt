@@ -17,7 +17,7 @@ interface AuthStore {
     suspend fun storeFirebaseToken(token: Token)
     fun clearFirebaseToken()
 
-    fun isSignedIn(projectId: String): Boolean
+    fun isFirebaseSignedIn(projectId: String): Boolean
 
     /**
      * Get the FirebaseApp that corresponds with the core backend. This FirebaseApp is only
