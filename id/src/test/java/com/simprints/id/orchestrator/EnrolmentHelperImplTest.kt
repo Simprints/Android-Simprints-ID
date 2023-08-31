@@ -36,9 +36,6 @@ class EnrolmentHelperImplTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
-    @MockK
-    lateinit var subjectFactory: SubjectFactory
-
     private lateinit var enrolmentHelper: EnrolmentHelper
     private val personCreationEvent = createPersonCreationEvent()
 
@@ -49,8 +46,7 @@ class EnrolmentHelperImplTest {
         enrolmentHelper = EnrolmentHelperImpl(
             enrolmentRecordManager = enrolmentRecordManager,
             eventRepository = eventRepository,
-            timeHelper = timeHelper,
-            subjectFactory = subjectFactory
+            timeHelper = timeHelper
         )
         every { timeHelper.now() } returns CREATED_AT
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()
