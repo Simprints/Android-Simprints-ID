@@ -4,8 +4,6 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtracto
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
-import com.simprints.clientapi.domain.requests.IdentifyRequest
-import com.simprints.core.tools.extentions.tryOrNull
 import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.TokenKeyType
