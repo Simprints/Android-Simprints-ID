@@ -1,9 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
 import android.annotation.SuppressLint
-import com.simprints.fingerprint.infra.scanner.capture.mapPotentialErrorFromScanner
-import com.simprints.fingerprint.infra.scanner.capture.wrapErrorFromScanner
-import com.simprints.fingerprint.infra.scanner.capture.wrapErrorsFromScanner
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnavailableVero2Feature
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnavailableVero2FeatureException
@@ -11,6 +8,8 @@ import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedS
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoReaderHelper
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
+import com.simprints.fingerprint.infra.scanner.v2.tools.mapPotentialErrorFromScanner
+import com.simprints.fingerprint.infra.scanner.v2.tools.wrapErrorFromScanner
 import com.simprints.fingerprint.scanner.controllers.v2.*
 import com.simprints.fingerprint.scanner.domain.*
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
@@ -140,7 +139,11 @@ class ScannerWrapperV2(
 
     private fun getImageQualityWhileSettingLEDState() =
         scannerV2.getImageQualityPreview().flatMapCompletable { quality ->
-            scannerV2.setSmileLedState(scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(quality))
+            scannerV2.setSmileLedState(
+                scannerUiHelper.deduceLedStateFromQualityForLiveFeedback(
+                    quality
+                )
+            )
         }.repeat()
 
     @SuppressLint("CheckResult")
@@ -158,15 +161,16 @@ class ScannerWrapperV2(
     }
 
 
-    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) = withContext(ioDispatcher) {
-        getUn20Status().flatMapCompletable { actualState ->
-            when {
-                desiredState && !actualState -> turnUn20OnAndAwaitStateChangeEvent()
-                !desiredState && actualState -> turnUn20OffAndAwaitStateChangeEvent()
-                else -> Completable.complete()
-            }
-        }.await()
-    }
+    private suspend fun ScannerV2.ensureUn20State(desiredState: Boolean) =
+        withContext(ioDispatcher) {
+            getUn20Status().flatMapCompletable { actualState ->
+                when {
+                    desiredState && !actualState -> turnUn20OnAndAwaitStateChangeEvent()
+                    !desiredState && actualState -> turnUn20OffAndAwaitStateChangeEvent()
+                    else -> Completable.complete()
+                }
+            }.await()
+        }
 
     override suspend fun setUiIdle() = withContext(ioDispatcher) {
         scannerV2
@@ -196,5 +200,8 @@ class ScannerWrapperV2(
             scannerV2.triggerButtonListeners.remove(it)
         }
     }
+
+    private fun Completable.wrapErrorsFromScanner() =
+        onErrorResumeNext { Completable.error(wrapErrorFromScanner(it)) }
 
 }

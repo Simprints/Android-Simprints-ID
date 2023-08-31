@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import com.simprints.fingerprint.infra.scanner.capture.mapPotentialErrorFromScanner
+import com.simprints.fingerprint.infra.scanner.v2.tools.mapPotentialErrorFromScanner
 import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
 import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
 import com.simprints.fingerprint.scanner.controllers.v2.Un20OtaHelper

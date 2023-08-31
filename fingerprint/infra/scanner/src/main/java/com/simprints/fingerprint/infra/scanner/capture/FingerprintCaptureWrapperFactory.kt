@@ -7,7 +7,6 @@ import javax.inject.Inject
 import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
-//TODO: Refactor this class to use hilt injection to create the instance
 class FingerprintCaptureWrapperFactory @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher,
     private val scannerUiHelper: ScannerUiHelper,
