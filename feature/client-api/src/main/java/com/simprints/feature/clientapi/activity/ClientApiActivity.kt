@@ -2,82 +2,39 @@ package com.simprints.feature.clientapi.activity
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import androidx.core.os.bundleOf
+import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
-import com.simprints.feature.alert.ShowAlertWrapper
-import com.simprints.feature.alert.toArgs
 import com.simprints.feature.clientapi.R
-import com.simprints.feature.clientapi.extensions.toMap
-import com.simprints.feature.clientapi.mappers.AlertConfigurationMapper
-import com.simprints.feature.clientapi.mappers.response.ActionToIntentMapper
-import com.simprints.feature.clientapi.models.LibSimprintsConstants
+import com.simprints.feature.clientapi.databinding.ActivityClientApiBinding
+import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
-internal class ClientApiActivity : BaseActivity(R.layout.activity_client_api) {
+internal class ClientApiActivity : BaseActivity() {
 
-    private var isActivityRestored = false
-    private var requestProcessed = false
-
-    @Inject
-    lateinit var alertConfigurationMapper: AlertConfigurationMapper
-
-    @Inject
-    lateinit var resultMapper: ActionToIntentMapper
-
-
-    private val vm by viewModels<ClientApiViewModel>()
-
-    private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
-        // TODO handle return from alert screen
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        isActivityRestored = true
-    }
+    private val binding by viewBinding(ActivityClientApiBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(binding.root)
 
-        vm.proceedWithAction.observe(this, LiveDataEventWithContentObserver { action ->
-            // TODO replace with proper flow
-            startActivity(StubActivity.getIntent(this, action.toString()))
-        })
-
-        vm.showAlert.observe(this, LiveDataEventWithContentObserver { error ->
-            showAlert.launch(
-                alertConfigurationMapper.buildAlertConfig(error)
-                    // .withPayload() // TODO add payload ot differentiate alert screens when returning
-                    .toArgs()
-            )
-        })
-
-        vm.returnResponse.observe(this, LiveDataEventWithContentObserver { response ->
-            val responseExtras = resultMapper(response)
-            val resultCode = responseExtras.getInt(LibSimprintsConstants.RESULT_CODE_OVERRIDE, RESULT_OK)
-            responseExtras.remove(LibSimprintsConstants.RESULT_CODE_OVERRIDE)
-
-            setResult(resultCode, Intent().putExtras(responseExtras))
+        binding.clientApiHost.handleResult<ClientApiFragment.ClientApiResult>(this, R.id.clientApiFragment) { result ->
+            setResult(result.resultCode, Intent().putExtras(result.extras))
             finish()
-        })
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (!isActivityRestored && !requestProcessed) {
-            requestProcessed = true
-            lifecycleScope.launch {
-                // TODO check login state
-                // TODO check root state
+    override fun onStart() {
+        super.onStart()
+        val action = intent.action.orEmpty()
+        val extras = intent.extras ?: bundleOf()
 
-                vm.handleIntent(intent.action.orEmpty(), intent.extras?.toMap().orEmpty())
-            }
-        }
+        findNavController(R.id.clientApiHost).setGraph(
+            R.navigation.graph_client_api,
+            ClientApiFragmentArgs(action, extras).toBundle()
+        )
     }
 
 }
