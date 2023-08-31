@@ -4,10 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.clientapi.activity.usecases.ExtractParametersForAnalyticsUseCase
-import com.simprints.feature.clientapi.session.ReportActionRequestEventsUseCase
+import com.simprints.feature.clientapi.activity.usecases.IsSignedToActiveProjectUseCase
+import com.simprints.feature.clientapi.activity.usecases.IsSignedToActiveProjectUseCase.SignedInState.MISMATCHED_PROJECT_ID
+import com.simprints.feature.clientapi.activity.usecases.IsSignedToActiveProjectUseCase.SignedInState.NOT_SIGNED_IN
+import com.simprints.feature.clientapi.activity.usecases.IsSignedToActiveProjectUseCase.SignedInState.PROJECT_ENDING
+import com.simprints.feature.clientapi.activity.usecases.IsSignedToActiveProjectUseCase.SignedInState.PROJECT_PAUSED
+import com.simprints.feature.clientapi.activity.usecases.IsSignedToActiveProjectUseCase.SignedInState.SIGNED_IN
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.IntentToActionMapper
 import com.simprints.feature.clientapi.models.ActionRequest
@@ -17,6 +23,7 @@ import com.simprints.feature.clientapi.session.ClientSessionManager
 import com.simprints.feature.clientapi.session.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.session.GetEnrolmentCreationEventForSubjectUseCase
 import com.simprints.feature.clientapi.session.GetEventJsonForSessionUseCase
+import com.simprints.feature.clientapi.session.ReportActionRequestEventsUseCase
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -38,6 +45,7 @@ internal class ClientApiViewModel @Inject constructor(
     private val clientSessionManager: ClientSessionManager,
     private val reportActionRequestEvents: ReportActionRequestEventsUseCase,
     private val extractParametersForAnalytics: ExtractParametersForAnalyticsUseCase,
+    private val isUserSignedIn: IsSignedToActiveProjectUseCase,
     private val getEventJsonForSession: GetEventJsonForSessionUseCase,
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
@@ -55,6 +63,11 @@ internal class ClientApiViewModel @Inject constructor(
         get() = _showAlert
     private val _showAlert = MutableLiveData<LiveDataEventWithContent<ClientApiError>>()
 
+    val showLoginFlow: LiveData<LiveDataEventWithContent<ActionRequest>>
+        get() = _showLoginFlow
+    private val _showLoginFlow = MutableLiveData<LiveDataEventWithContent<ActionRequest>>()
+
+
     fun handleIntent(action: String, extras: Map<String, Any>) = viewModelScope.launch {
         try {
             rootManager.checkIfDeviceIsRooted()
@@ -71,15 +84,27 @@ internal class ClientApiViewModel @Inject constructor(
         reportActionRequestEvents(actionRequest)
         extractParametersForAnalytics(actionRequest)
 
-        // TODO add special case for confirmation action
-        // TODO proceed processing action
-        // TODO check login state
-        _proceedWithAction.send(actionRequest) // TODO replace with user flow builder
-
+        when (isUserSignedIn(actionRequest)) {
+            MISMATCHED_PROJECT_ID -> _showAlert.send(ClientApiError.ROOTED_DEVICE)
+            PROJECT_PAUSED -> _showAlert.send(ClientApiError.PROJECT_PAUSED)
+            PROJECT_ENDING -> _showAlert.send(ClientApiError.PROJECT_ENDING)
+            NOT_SIGNED_IN -> startSignInAttempt(actionRequest)
+            SIGNED_IN -> proceedWithAction(actionRequest)
+        }
     } catch (validationException: InvalidRequestException) {
         Simber.e(validationException)
         clientSessionManager.addInvalidIntentEvent(action, extras)
         _showAlert.send(validationException.error)
+    }
+
+    private fun startSignInAttempt(actionRequest: ActionRequest) {
+        _showLoginFlow.send(actionRequest)
+    }
+
+    private fun proceedWithAction(actionRequest: ActionRequest) {
+        // TODO add special case for confirmation action
+
+        _proceedWithAction.send(actionRequest) // TODO replace with user flow builder
     }
 
     // TODO review if parameters should be replaced with :feature:orchestrator models
@@ -231,4 +256,3 @@ internal class ClientApiViewModel @Inject constructor(
     }
 
 }
-
