@@ -4,21 +4,21 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtracto
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 
 
 class ConfirmIdentifyBuilder(
     private val extractor: ConfirmIdentityExtractor,
     private val project: Project,
-    private val tokenization: Tokenization,
+    private val tokenizationManager: TokenizationManager,
     validator: ConfirmIdentityValidator
 ) : ClientRequestBuilder(validator) {
     override fun encryptIfNecessary(baseRequest: BaseRequest): BaseRequest {
         val request = (baseRequest as? ConfirmIdentityRequest) ?: return baseRequest
         val encryptedUserId =
-            encryptField(request.userId, project, TokenKeyType.AttendantId, tokenization)
+            encryptField(request.userId, project, TokenKeyType.AttendantId, tokenizationManager)
         return request.copy(userId = encryptedUserId)
     }
 
