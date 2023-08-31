@@ -39,21 +39,38 @@ abstract class RequestPresenter(
 ) : RequestContract.Presenter {
 
     override suspend fun processEnrolRequest() = validateAndSendRequest(
-        EnrolBuilder(view.enrolExtractor, EnrolValidator(view.enrolExtractor))
+        EnrolBuilder(
+            extractor = view.enrolExtractor,
+            project = view.getProject(),
+            tokenization = view.tokenization,
+            validator = EnrolValidator(view.enrolExtractor)
+        )
     )
 
     override suspend fun processIdentifyRequest() = validateAndSendRequest(
-        IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor))
+        IdentifyBuilder(
+            extractor = view.identifyExtractor,
+            project = view.getProject(),
+            tokenization = view.tokenization,
+            validator = IdentifyValidator(view.identifyExtractor)
+        )
     )
 
     override suspend fun processVerifyRequest() = validateAndSendRequest(
-        VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
+        VerifyBuilder(
+            extractor = view.verifyExtractor,
+            project = view.getProject(),
+            tokenization = view.tokenization,
+            validator = VerifyValidator(view.verifyExtractor)
+        )
     )
 
     override suspend fun processConfirmIdentityRequest() = validateAndSendRequest(
         ConfirmIdentifyBuilder(
-            view.confirmIdentityExtractor,
-            ConfirmIdentityValidator(
+            extractor = view.confirmIdentityExtractor,
+            project = view.getProject(),
+            tokenization = view.tokenization,
+            validator = ConfirmIdentityValidator(
                 view.confirmIdentityExtractor,
                 eventsManager.getCurrentSessionId(),
                 eventsManager.isSessionHasIdentificationCallback(view.confirmIdentityExtractor.getSessionId())
@@ -63,8 +80,10 @@ abstract class RequestPresenter(
 
     override suspend fun processEnrolLastBiometrics() = validateAndSendRequest(
         EnrolLastBiometricsBuilder(
-            view.enrolLastBiometricsExtractor,
-            EnrolLastBiometricsValidator(
+            extractor = view.enrolLastBiometricsExtractor,
+            project = view.getProject(),
+            tokenization = view.tokenization,
+            validator = EnrolLastBiometricsValidator(
                 view.enrolLastBiometricsExtractor,
                 eventsManager.getCurrentSessionId(),
                 eventsManager.isCurrentSessionAnIdentificationOrEnrolment()
