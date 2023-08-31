@@ -42,7 +42,7 @@ abstract class RequestPresenter(
         EnrolBuilder(
             extractor = view.enrolExtractor,
             project = view.getProject(),
-            tokenization = view.tokenization,
+            tokenizationManager = view.tokenizationManager,
             validator = EnrolValidator(view.enrolExtractor)
         )
     )
@@ -51,7 +51,7 @@ abstract class RequestPresenter(
         IdentifyBuilder(
             extractor = view.identifyExtractor,
             project = view.getProject(),
-            tokenization = view.tokenization,
+            tokenizationManager = view.tokenizationManager,
             validator = IdentifyValidator(view.identifyExtractor)
         )
     )
@@ -60,7 +60,7 @@ abstract class RequestPresenter(
         VerifyBuilder(
             extractor = view.verifyExtractor,
             project = view.getProject(),
-            tokenization = view.tokenization,
+            tokenizationManager = view.tokenizationManager,
             validator = VerifyValidator(view.verifyExtractor)
         )
     )
@@ -69,7 +69,7 @@ abstract class RequestPresenter(
         ConfirmIdentifyBuilder(
             extractor = view.confirmIdentityExtractor,
             project = view.getProject(),
-            tokenization = view.tokenization,
+            tokenizationManager = view.tokenizationManager,
             validator = ConfirmIdentityValidator(
                 view.confirmIdentityExtractor,
                 eventsManager.getCurrentSessionId(),
@@ -82,7 +82,7 @@ abstract class RequestPresenter(
         EnrolLastBiometricsBuilder(
             extractor = view.enrolLastBiometricsExtractor,
             project = view.getProject(),
-            tokenization = view.tokenization,
+            tokenizationManager = view.tokenizationManager,
             validator = EnrolLastBiometricsValidator(
                 view.enrolLastBiometricsExtractor,
                 eventsManager.getCurrentSessionId(),

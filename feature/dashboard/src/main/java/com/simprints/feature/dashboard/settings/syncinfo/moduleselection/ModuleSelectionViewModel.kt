@@ -5,18 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.TokenizationAction
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.eventsync.EventSyncManager
-import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -28,7 +27,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
     private val repository: ModuleRepository,
     private val eventSyncManager: EventSyncManager,
     private val configManager: ConfigManager,
-    private val tokenization: Tokenization,
+    private val tokenizationManager: TokenizationManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -48,9 +47,17 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     init {
         postUpdateModules {
-            val project = configManager.getProject(authStore.signedInProjectId)
             maxNumberOfModules = repository.getMaxNumberOfModules()
-            initialModules = repository.getModules().map { decryptModule(it, project) }
+            initialModules =
+                repository.getModules().map { module ->
+                    val decryptedName = tokenizationManager.tryTokenize(
+                        value = module.name,
+                        tokenKeyType = TokenKeyType.ModuleId,
+                        action = TokenizationAction.Decrypt,
+                        project = configManager.getProject(authStore.signedInProjectId)
+                    )
+                    module.copy(name = decryptedName)
+                }
             addAll(initialModules.map { it.copy() })
         }
     }
@@ -85,19 +92,18 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     fun saveModules() {
         externalScope.launch {
+            val modules = modules.map { module ->
+                val encryptedName = tokenizationManager.tryTokenize(
+                    value = module.name,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    action = TokenizationAction.Encrypt,
+                    project = configManager.getProject(authStore.signedInProjectId)
+                )
+                module.copy(name = encryptedName)
+            }
             repository.saveModules(modules)
             eventSyncManager.stop()
             eventSyncManager.sync()
-        }
-    }
-
-    private fun decryptModule(module: Module, project: Project): Module {
-        val moduleKeyset = project.tokenizationKeys[TokenKeyType.ModuleId] ?: return module
-        return try {
-            module.copy(name = tokenization.decrypt(module.name, moduleKeyset))
-        } catch (e: Exception) {
-            Simber.e(e)
-            module
         }
     }
 

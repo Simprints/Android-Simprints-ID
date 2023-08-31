@@ -2,9 +2,10 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.core.tools.utils.Tokenization
+import com.simprints.infra.config.domain.TokenizationAction
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 
 
 abstract class ClientRequestBuilder(private val validator: ClientRequestValidator) {
@@ -16,11 +17,13 @@ abstract class ClientRequestBuilder(private val validator: ClientRequestValidato
         value: String,
         project: Project,
         tokenKeyType: TokenKeyType,
-        tokenization: Tokenization
-    ): String {
-        val keysetJson = project.tokenizationKeys[tokenKeyType] ?: return value
-        return runCatching { tokenization.encrypt(value, keysetJson) }.getOrElse { value }
-    }
+        tokenizationManager: TokenizationManager
+    ): String = tokenizationManager.tryTokenize(
+        value = value,
+        tokenKeyType = tokenKeyType,
+        action = TokenizationAction.Encrypt,
+        project = project
+    )
 
     fun build(): BaseRequest {
         validator.validateClientRequest()

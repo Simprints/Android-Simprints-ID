@@ -4,23 +4,23 @@ import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtr
 import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 
 
 class EnrolLastBiometricsBuilder(
     private val extractor: EnrolLastBiometricsExtractor,
     private val project: Project,
-    private val tokenization: Tokenization,
+    private val tokenizationManager: TokenizationManager,
     validator: EnrolLastBiometricsValidator
 ) : ClientRequestBuilder(validator) {
     override fun encryptIfNecessary(baseRequest: BaseRequest): BaseRequest {
         val request = (baseRequest as? EnrolLastBiometricsRequest) ?: return baseRequest
         val encryptedUserId =
-            encryptField(request.userId, project, TokenKeyType.AttendantId, tokenization)
+            encryptField(request.userId, project, TokenKeyType.AttendantId, tokenizationManager)
         val encryptedModuleId =
-            encryptField(request.moduleId, project, TokenKeyType.ModuleId, tokenization)
+            encryptField(request.moduleId, project, TokenKeyType.ModuleId, tokenizationManager)
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }
 
