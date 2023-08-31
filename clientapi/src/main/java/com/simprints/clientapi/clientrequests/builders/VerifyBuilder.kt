@@ -20,7 +20,7 @@ class VerifyBuilder(
         val encryptedUserId =
             encryptField(request.userId, project, TokenKeyType.AttendantId, tokenization)
         val encryptedModuleId =
-            encryptField(request.userId, project, TokenKeyType.ModuleId, tokenization)
+            encryptField(request.moduleId, project, TokenKeyType.ModuleId, tokenization)
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }
 
