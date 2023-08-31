@@ -3,25 +3,19 @@ package com.simprints.fingerprint.infra.scanner.capture
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
-import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageFormatData
-import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
-import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
-import com.simprints.infra.logging.Simber
+import com.simprints.fingerprint.infra.scanner.v2.tools.wrapErrorFromScanner
 import io.reactivex.Completable
 import io.reactivex.Single
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class FingerprintCaptureWrapperV2(
     private val scannerV2: Scanner,
@@ -117,40 +111,8 @@ class FingerprintCaptureWrapperV2(
             10 // The image quality at which we decide a fingerprint wasn't detected
         private val IMAGE_FORMAT = ImageFormatData.WSQ(15)
     }
-
+    private fun <T> Single<T>.wrapErrorsFromScanner() =
+        onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
 
 }
 
-fun Completable.wrapErrorsFromScanner() =
-    onErrorResumeNext { Completable.error(wrapErrorFromScanner(it)) }
-
-fun <T> Single<T>.wrapErrorsFromScanner() =
-    onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
-
-fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
-    is NotConnectedException,
-    is IOException -> { // Disconnected or timed-out communications with Scanner
-        Simber.d(
-            e,
-            "IOException in ScannerWrapperV2, transformed to ScannerDisconnectedException"
-        )
-        ScannerDisconnectedException()
-    }
-
-    is IllegalStateException, // We're calling scanner methods out of order somehow
-    is IllegalArgumentException -> { // We've received unexpected/invalid bytes from the scanner
-        Simber.e(e)
-        UnexpectedScannerException(e)
-    }
-
-    is OtaFailedException -> { // Wrap the OTA failed exception to fingerprint domain exception
-        OtaFailedException("Wrapped OTA failed exception from scanner", e)
-    }
-
-    else -> { // Propagate error
-        e
-    }
-}
-
-fun <T> Flow<T>.mapPotentialErrorFromScanner() =
-    catch { ex -> throw wrapErrorFromScanner(ex) }
