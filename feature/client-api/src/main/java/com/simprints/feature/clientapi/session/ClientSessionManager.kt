@@ -5,6 +5,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.AuthorizationEvent
+import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
@@ -75,6 +77,15 @@ internal class ClientSessionManager @Inject constructor(
         externalScope.launch {
             coreEventRepository.addOrUpdateEvent(CompletionCheckEvent(timeHelper.now(), flowCompleted))
         }
+    }
+
+    suspend fun addAuthorizationEvent(request: ActionRequest, authorized: Boolean) {
+        val userInfo = request
+            .takeIf { authorized }
+            ?.let { AuthorizationEvent.AuthorizationPayload.UserInfo(it.projectId, it.userId) }
+        val result = if (authorized) AuthorizationResult.AUTHORIZED else AuthorizationResult.NOT_AUTHORIZED
+
+        coreEventRepository.addOrUpdateEvent(AuthorizationEvent(timeHelper.now(), result, userInfo))
     }
 
     suspend fun closeCurrentSessionNormally() {
