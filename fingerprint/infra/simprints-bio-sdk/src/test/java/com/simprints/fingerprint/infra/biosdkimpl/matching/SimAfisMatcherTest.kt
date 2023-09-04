@@ -12,7 +12,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.nio.ByteBuffer
@@ -33,7 +33,7 @@ class SimAfisMatcherTest {
     }
 
     @Test
-    fun `test same finger match`() = runBlocking {
+    fun `test same finger match`() = runTest {
         every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
         val candidate = FingerprintIdentity(
             "candidate",
@@ -54,7 +54,7 @@ class SimAfisMatcherTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun `test matching other template format fails`() = runBlocking {
+    fun `test matching other template format fails`() = runTest {
         every { jniLibAfis.identify(any(), any(), 1) } returns floatArrayOf(1F)
         val candidate = FingerprintIdentity(
             "candidate",
@@ -72,7 +72,7 @@ class SimAfisMatcherTest {
         //Then throws IllegalArgumentException
     }
     @Test
-    fun `test cross finger match`() = runBlocking {
+    fun `test cross finger match`() = runTest {
         mockkStatic("com.simprints.fingerprint.infra.biosdkimpl.matching.CrossMatchingKt")
 
         val probe = mockk<FingerprintIdentity>()

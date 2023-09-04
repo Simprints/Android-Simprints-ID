@@ -33,7 +33,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -165,7 +164,7 @@ internal class EventDownSyncScopeRepositoryTest {
 
     @Test
     fun insertOrUpdate_shouldInsertIntoTheDb() {
-        runBlocking {
+        runTest {
             eventDownSyncScopeRepository.insertOrUpdate(projectDownSyncScope.operations.first())
 
             coVerify { downSyncOperationOperationDao.insertOrUpdate(any()) }
@@ -174,7 +173,7 @@ internal class EventDownSyncScopeRepositoryTest {
 
     @Test
     fun deleteOperations_shouldDeleteOpsFromDb() {
-        runBlocking {
+        runTest {
 
             eventDownSyncScopeRepository.deleteOperations(
                 DEFAULT_MODULES.toList(),
@@ -194,7 +193,7 @@ internal class EventDownSyncScopeRepositoryTest {
 
     @Test
     fun deleteAll_shouldDeleteAllOpsFromDb() {
-        runBlocking {
+        runTest {
 
             eventDownSyncScopeRepository.deleteAll()
 

@@ -1224,7 +1224,7 @@ class CollectFingerprintsViewModelTest {
             // skip the first response
             if (index != 0) {
                 when {
-                    mockResponses[index] == NEVER_RETURNS -> subsequentMock.coAndThen { neverReturnResponse() }
+                    mockResponses[index] == NEVER_RETURNS -> subsequentMock.coAndanswers  { neverReturnResponse() }
                     response is Throwable -> subsequentMock.andThenThrows(response)
                     else -> subsequentMock.andThen(response as CaptureFingerprintResponse)
                 }

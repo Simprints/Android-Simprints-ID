@@ -2,17 +2,15 @@ package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.license.LicenseVendor
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.infra.license.LicenseVendor
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaType
@@ -165,7 +163,7 @@ class LicenseRemoteDataSourceImplTest {
     }
 
     @Test
-    fun `Get no license if is a backend maintenance exception`() = runBlocking {
+    fun `Get no license if is a backend maintenance exception`() = runTest {
         val newLicense =
             licenseRemoteDataSourceImpl.getLicense(
                 "backendMaintenanceErrorProject",

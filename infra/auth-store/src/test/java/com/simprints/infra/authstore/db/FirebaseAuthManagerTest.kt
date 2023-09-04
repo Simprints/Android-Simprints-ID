@@ -19,7 +19,6 @@ import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -152,7 +151,7 @@ class FirebaseAuthManagerTest {
     }
 
     @Test
-    fun `getCurrentToken success`() = runBlocking {
+    fun `getCurrentToken success`() = runTest {
         every { firebaseAuth.currentUser } returns firebaseUser
         every { firebaseUser.getIdToken(any()) } returns Tasks.forResult(GetTokenResult("Token", HashMap()))
 

@@ -13,15 +13,13 @@ import com.simprints.fingerprint.infra.scanner.v2.incoming.cypressota.CypressOta
 import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.fingerprint.infra.scanner.v2.tools.crc.Crc32Calculator
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.spy
-import com.simprints.testtools.common.syntax.verifyExactly
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenThis
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
@@ -61,8 +59,8 @@ class CypressOtaControllerTest {
 
         testObserver.awaitAndAssertSuccess()
 
-        verifyOnce(crc32Calculator) { calculateCrc32(anyNotNull()) }
-        verifyExactly(expectedNumberOfCalls, messageStreamMock.outgoing) { sendMessage(anyNotNull()) }
+        verify { crc32Calculator.calculateCrc32(any()) }
+        verify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
     @Test
@@ -114,8 +112,8 @@ class CypressOtaControllerTest {
         testObserver.assertError(OtaFailedException::class.java)
     }
 
-    private fun configureCrcCalculatorMock() = setupMock<Crc32Calculator> {
-        whenThis { calculateCrc32(anyNotNull()) } thenReturn 42
+    private fun configureCrcCalculatorMock() = mockk<Crc32Calculator> {
+        every { calculateCrc32(any()) } returns  42
     }
 
     private fun configureMessageStreamMock(errorPositions: List<Int> = listOf()): CypressOtaMessageChannel {
@@ -123,13 +121,13 @@ class CypressOtaControllerTest {
         val messageIndex = AtomicInteger(0)
 
         return CypressOtaMessageChannel(
-            spy(CypressOtaMessageInputStream(mock())).apply {
-                whenThis { connect(anyNotNull()) } thenDoNothing {}
+            spyk(CypressOtaMessageInputStream(mockk())) {
+                justRun { connect(any()) } 
                 cypressOtaResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },
-            setupMock {
-                whenThis { sendMessage(anyNotNull()) } then {
-                    val desirableResponse = when (it.arguments[0] as CypressOtaCommand) {
+            mockk {
+                every { sendMessage(any()) } answers  {
+                    val desirableResponse = when (args[0] as CypressOtaCommand) {
                         is SendImageChunk -> ContinueResponse()
                         else -> OkResponse()
                     }

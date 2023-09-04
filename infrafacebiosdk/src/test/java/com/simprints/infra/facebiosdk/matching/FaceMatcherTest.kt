@@ -3,7 +3,6 @@ package com.simprints.infra.facebiosdk.matching
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.spyk
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 import java.util.UUID
 import kotlin.random.Random
