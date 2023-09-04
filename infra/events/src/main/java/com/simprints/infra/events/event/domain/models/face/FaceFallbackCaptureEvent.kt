@@ -1,12 +1,13 @@
 package com.simprints.infra.events.event.domain.models.face
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class FaceFallbackCaptureEvent(
@@ -24,7 +25,12 @@ data class FaceFallbackCaptureEvent(
         UUID.randomUUID().toString(),
         labels,
         FaceFallbackCapturePayload(startTime, endTime, EVENT_VERSION),
-        FACE_FALLBACK_CAPTURE)
+        FACE_FALLBACK_CAPTURE
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, String> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this // No tokenized fields
 
     @Keep
     data class FaceFallbackCapturePayload(

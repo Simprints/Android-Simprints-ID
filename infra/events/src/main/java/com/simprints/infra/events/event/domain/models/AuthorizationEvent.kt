@@ -1,10 +1,11 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
 import com.simprints.infra.events.event.domain.models.EventType.AUTHORIZATION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class AuthorizationEvent(
@@ -23,15 +24,29 @@ data class AuthorizationEvent(
         UUID.randomUUID().toString(),
         labels,
         AuthorizationPayload(createdAt, EVENT_VERSION, result, userInfo),
-        AUTHORIZATION)
+        AUTHORIZATION
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, String> =
+        mapOf(TokenKeyType.AttendantId to payload.userInfo?.userId.orEmpty())
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this.copy(
+        payload = payload.copy(
+            userInfo = payload.userInfo?.copy(
+                userId = map[TokenKeyType.AttendantId] ?: payload.userInfo.userId
+            )
+        )
+    )
 
     @Keep
-    data class AuthorizationPayload(override val createdAt: Long,
-                                    override val eventVersion: Int,
-                                    val result: AuthorizationResult,
-                                    val userInfo: UserInfo?,
-                                    override val type: EventType = AUTHORIZATION,
-                                    override val endedAt: Long = 0) : EventPayload() {
+    data class AuthorizationPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val result: AuthorizationResult,
+        val userInfo: UserInfo?,
+        override val type: EventType = AUTHORIZATION,
+        override val endedAt: Long = 0
+    ) : EventPayload() {
 
         @Keep
         enum class AuthorizationResult {

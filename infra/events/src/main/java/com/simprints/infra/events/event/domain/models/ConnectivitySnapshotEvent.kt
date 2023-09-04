@@ -3,8 +3,9 @@ package com.simprints.infra.events.event.domain.models
 import androidx.annotation.Keep
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class ConnectivitySnapshotEvent(
@@ -24,6 +25,10 @@ data class ConnectivitySnapshotEvent(
         ConnectivitySnapshotPayload(createdAt, EVENT_VERSION, connections),
         CONNECTIVITY_SNAPSHOT
     )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, String> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this // No tokenized fields
 
     @Keep
     data class ConnectivitySnapshotPayload(

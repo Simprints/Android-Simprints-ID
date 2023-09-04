@@ -1,21 +1,49 @@
 package com.simprints.clientapi.activities.baserequest
 
 import androidx.annotation.Keep
-import com.simprints.clientapi.errors.ClientApiAlert.*
-import com.simprints.clientapi.clientrequests.builders.*
-import com.simprints.clientapi.clientrequests.validators.*
+import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
+import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
+import com.simprints.clientapi.clientrequests.builders.EnrolBuilder
+import com.simprints.clientapi.clientrequests.builders.EnrolLastBiometricsBuilder
+import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
+import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
+import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
+import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsValidator
+import com.simprints.clientapi.clientrequests.validators.EnrolValidator
+import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
+import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.exceptions.*
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_METADATA
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_MODULE_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_PROJECT_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_SELECTED_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_SESSION_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_USER_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_VERIFY_ID
+import com.simprints.clientapi.errors.ClientApiAlert.ROOTED_DEVICE
+import com.simprints.clientapi.exceptions.InvalidMetadataException
+import com.simprints.clientapi.exceptions.InvalidModuleIdException
+import com.simprints.clientapi.exceptions.InvalidProjectIdException
+import com.simprints.clientapi.exceptions.InvalidRequestException
+import com.simprints.clientapi.exceptions.InvalidSelectedIdException
+import com.simprints.clientapi.exceptions.InvalidSessionIdException
+import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
+import com.simprints.clientapi.exceptions.InvalidUserIdException
+import com.simprints.clientapi.exceptions.InvalidVerifyIdException
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.TokenizationAction
+import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.canCoSyncAllData
 import com.simprints.infra.config.domain.models.canCoSyncBiometricData
 import com.simprints.infra.config.domain.models.canCoSyncData
 import com.simprints.infra.config.domain.models.canSyncDataToSimprints
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
@@ -35,7 +63,8 @@ abstract class RequestPresenter(
     private val rootManager: SecurityManager,
     private val encoder: EncodingUtils = EncodingUtilsImpl,
     private val configManager: ConfigManager,
-    private val sessionEventsManager: ClientApiSessionEventsManager
+    private val sessionEventsManager: ClientApiSessionEventsManager,
+    private val tokenizationManager: TokenizationManager
 ) : RequestContract.Presenter {
 
     override suspend fun processEnrolRequest() = validateAndSendRequest(
@@ -149,7 +178,9 @@ abstract class RequestPresenter(
         jsonHelper: JsonHelper
     ): String? =
         if (configManager.getProjectConfiguration().canCoSyncData()) {
-            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
+            val events = sessionEventsManager
+                .getAllEventsForSession(sessionId).toList()
+                .decryptTokenizedFields(configManager.getProject(getProjectIdFromRequest()))
             jsonHelper.toJson(CoSyncEvents(events))
         } else {
             null
@@ -213,5 +244,17 @@ abstract class RequestPresenter(
                 encoder
             )
         )
+    }
+
+    private fun List<Event>.decryptTokenizedFields(project: Project): List<Event> = map {
+        val decryptedFieldsMap = it.getTokenizedFields().mapValues { entry ->
+            tokenizationManager.tryTokenize(
+                value = entry.value,
+                tokenKeyType = entry.key,
+                action = TokenizationAction.Decrypt,
+                project = project
+            )
+        }
+        return@map it.setTokenizedFields(decryptedFieldsMap)
     }
 }

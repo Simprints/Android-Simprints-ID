@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
@@ -44,6 +45,10 @@ data class FaceCaptureEvent(
         ),
         FACE_CAPTURE
     )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, String> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this // No tokenized fields
 
     @Keep
     data class FaceCapturePayload(
