@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.retrofit.okhttp)
 
     // Unit Tests
+    testImplementation(project(":testtools"))
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.coroutines)
