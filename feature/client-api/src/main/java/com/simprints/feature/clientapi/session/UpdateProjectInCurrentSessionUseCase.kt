@@ -21,6 +21,7 @@ internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(
             currentSessionEvent.updateModalities(projectConfiguration.general.modalities)
             eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
+
         val associatedEvents = eventRepository.observeEventsFromSession(currentSessionEvent.id)
         associatedEvents.collect {
             it.labels = it.labels.copy(projectId = signedProjectId)

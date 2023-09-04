@@ -10,11 +10,11 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(actionRequest: ActionRequest) {
-        clientSessionManager.reportUnknownExtras(actionRequest.unknownExtras)
+        clientSessionManager.addUnknownExtrasEvent(actionRequest.unknownExtras)
         if (actionRequest is ActionRequest.FlowAction) {
-            clientSessionManager.reportConnectivityState()
+            clientSessionManager.addConnectivityStateEvent()
         }
-        clientSessionManager.reportRequestActionEvent(actionRequest)
+        clientSessionManager.addRequestActionEvent(actionRequest)
 
         recentUserActivityManager.updateRecentUserActivity { recentActivity ->
             recentActivity.apply { lastUserUsed = actionRequest.userId }

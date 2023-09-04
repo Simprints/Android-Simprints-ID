@@ -40,7 +40,7 @@ internal class ClientSessionManager @Inject constructor(
         .toList()
         .any { it is IdentificationCallbackEvent }
 
-    fun reportUnknownExtras(unknownExtras: Map<String, Any?>) {
+    fun addUnknownExtrasEvent(unknownExtras: Map<String, Any?>) {
         if (unknownExtras.isNotEmpty()) {
             externalScope.launch {
                 coreEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), unknownExtras))
@@ -48,11 +48,11 @@ internal class ClientSessionManager @Inject constructor(
         }
     }
 
-    suspend fun reportConnectivityState() {
+    suspend fun addConnectivityStateEvent() {
         coreEventRepository.addOrUpdateEvent(ConnectivitySnapshotEvent(timeHelper.now(), simNetworkUtils.connectionsStates))
     }
 
-    suspend fun reportRequestActionEvent(request: ActionRequest) {
+    suspend fun addRequestActionEvent(request: ActionRequest) {
         val startTime = timeHelper.now()
         val event = with(request) {
             when (this) {

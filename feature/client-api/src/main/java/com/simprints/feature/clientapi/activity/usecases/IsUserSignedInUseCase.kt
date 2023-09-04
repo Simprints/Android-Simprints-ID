@@ -11,10 +11,11 @@ internal class IsUserSignedInUseCase @Inject constructor(
 ) {
 
     operator fun invoke(action: ActionRequest): SignedInState {
-        if (authStore.signedInProjectId.isEmpty()) {
+        val signedInProjectId = authStore.signedInProjectId
+
+        if (signedInProjectId.isEmpty()) {
             return SignedInState.NOT_SIGNED_IN
         }
-        val signedInProjectId = authStore.signedInProjectId
 
         if (signedInProjectId != action.projectId) {
             return SignedInState.MISMATCHED_PROJECT_ID
@@ -28,7 +29,7 @@ internal class IsUserSignedInUseCase @Inject constructor(
         }
 
         // Check if firebase app is valid
-        if (!authStore.isFirebaseSignedIn(authStore.signedInProjectId)) {
+        if (!authStore.isFirebaseSignedIn(signedInProjectId)) {
             return SignedInState.NOT_SIGNED_IN
         }
 

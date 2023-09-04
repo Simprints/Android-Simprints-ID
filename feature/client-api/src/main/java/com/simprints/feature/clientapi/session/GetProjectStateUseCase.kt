@@ -5,7 +5,7 @@ import com.simprints.infra.projectsecuritystore.securitystate.models.SecuritySta
 import javax.inject.Inject
 
 internal class GetProjectStateUseCase @Inject constructor(
-        private val securityStateRepository: SecurityStateRepository,
+    private val securityStateRepository: SecurityStateRepository,
 ) {
 
     operator fun invoke(): ProjectState {
