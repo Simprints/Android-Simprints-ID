@@ -1,8 +1,9 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class PersonCreationEvent(
@@ -22,8 +23,20 @@ data class PersonCreationEvent(
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        PersonCreationPayload(startTime, EVENT_VERSION, fingerprintCaptureIds, fingerprintReferenceId, faceCaptureIds, faceReferenceId),
-        PERSON_CREATION)
+        PersonCreationPayload(
+            createdAt = startTime,
+            eventVersion = EVENT_VERSION,
+            fingerprintCaptureIds = fingerprintCaptureIds,
+            fingerprintReferenceId = fingerprintReferenceId,
+            faceCaptureIds = faceCaptureIds,
+            faceReferenceId = faceReferenceId
+        ),
+        PERSON_CREATION
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, String> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this // No tokenized fields
 
 
     // At the end of the sequence of capture, we build a Person object used either for enrolment, verification or identification

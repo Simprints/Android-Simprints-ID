@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
@@ -42,9 +43,22 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNE
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SESSION_CAPTURE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
-import com.simprints.infra.events.event.domain.models.callback.*
-import com.simprints.infra.events.event.domain.models.callout.*
-import com.simprints.infra.events.event.domain.models.face.*
+import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent
+import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
@@ -79,7 +93,10 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
         name = FACE_CAPTURE_CONFIRMATION_KEY
     ),
     JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FaceCaptureBiometricsEvent::class, name = FACE_CAPTURE_BIOMETRICS_KEY),
+    JsonSubTypes.Type(
+        value = FaceCaptureBiometricsEvent::class,
+        name = FACE_CAPTURE_BIOMETRICS_KEY
+    ),
     JsonSubTypes.Type(value = FaceFallbackCaptureEvent::class, name = FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FaceOnboardingCompleteEvent::class,
@@ -97,7 +114,10 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
     JsonSubTypes.Type(value = EnrolmentEventV1::class, name = ENROLMENT_V1_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV2::class, name = ENROLMENT_V2_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FingerprintCaptureBiometricsEvent::class, name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureBiometricsEvent::class,
+        name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY
+    ),
     JsonSubTypes.Type(value = GuidSelectionEvent::class, name = GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingEvent::class, name = INTENT_PARSING_KEY),
     JsonSubTypes.Type(value = InvalidIntentEvent::class, name = INVALID_INTENT_KEY),
@@ -118,6 +138,9 @@ abstract class Event {
     abstract val id: String
     abstract var labels: EventLabels
     abstract val payload: EventPayload
+
+    abstract fun getTokenizedFields(): Map<TokenKeyType, String>
+    abstract fun setTokenizedFields(map: Map<TokenKeyType, String>): Event
 
     override fun equals(other: Any?): Boolean {
         return other is Event && other.id == id

@@ -1,12 +1,13 @@
 package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class ConfirmationCalloutEvent(
@@ -26,7 +27,12 @@ data class ConfirmationCalloutEvent(
         UUID.randomUUID().toString(),
         labels,
         ConfirmationCalloutPayload(createdAt, EVENT_VERSION, projectId, selectedGuid, sessionId),
-        CALLOUT_CONFIRMATION)
+        CALLOUT_CONFIRMATION
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, String> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this // No tokenized fields
 
     @Keep
     data class ConfirmationCalloutPayload(

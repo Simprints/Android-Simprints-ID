@@ -1,8 +1,9 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class CandidateReadEvent(
@@ -22,9 +23,20 @@ data class CandidateReadEvent(
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        CandidateReadPayload(createdAt, EVENT_VERSION, endTime, candidateId, localResult, remoteResult),
-        CANDIDATE_READ)
+        CandidateReadPayload(
+            createdAt = createdAt,
+            eventVersion = EVENT_VERSION,
+            endedAt = endTime,
+            candidateId = candidateId,
+            localResult = localResult,
+            remoteResult = remoteResult
+        ),
+        CANDIDATE_READ
+    )
 
+    override fun getTokenizedFields(): Map<TokenKeyType, String> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this // No tokenized fields
 
     @Keep
     data class CandidateReadPayload(

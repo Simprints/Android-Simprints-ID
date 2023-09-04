@@ -312,6 +312,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             timeHelper.now(),
             result,
             if (result == AuthorizationResult.AUTHORIZED) {
+                // TODO [CORE-2502] check if userId is encrypted at this point
                 UserInfo(authStore.signedInProjectId, appRequest.userId)
             } else {
                 null
