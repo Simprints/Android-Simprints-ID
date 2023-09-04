@@ -7,6 +7,7 @@ import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.feature.clientapi.R
 import com.simprints.feature.clientapi.databinding.ActivityClientApiBinding
+import com.simprints.feature.clientapi.models.ClientApiResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +21,7 @@ internal class ClientApiActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        binding.clientApiHost.handleResult<ClientApiFragment.ClientApiResult>(this, R.id.clientApiFragment) { result ->
+        binding.clientApiHost.handleResult<ClientApiResult>(this, R.id.clientApiFragment) { result ->
             setResult(result.resultCode, Intent().putExtras(result.extras))
             finish()
         }

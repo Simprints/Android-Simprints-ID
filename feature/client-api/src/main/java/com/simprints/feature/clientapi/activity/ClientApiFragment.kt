@@ -1,7 +1,6 @@
 package com.simprints.feature.clientapi.activity
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -16,6 +15,7 @@ import com.simprints.feature.clientapi.databinding.FragmentClientApiBinding
 import com.simprints.feature.clientapi.extensions.toMap
 import com.simprints.feature.clientapi.mappers.AlertConfigurationMapper
 import com.simprints.feature.clientapi.mappers.response.ActionToIntentMapper
+import com.simprints.feature.clientapi.models.ClientApiResult
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
@@ -24,7 +24,6 @@ import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -51,7 +50,6 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
             R.id.clientApiFragment,
             LoginContract.LOGIN_DESTINATION_ID,
         ) { result -> vm.handleLoginResult(result) }
-
 
         vm.proceedWithAction.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { action ->
             // TODO replace with proper flow
@@ -81,7 +79,6 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
             val responseExtras = resultMapper(response)
             val resultCode = responseExtras.getInt(LibSimprintsConstants.RESULT_CODE_OVERRIDE, AppCompatActivity.RESULT_OK)
             responseExtras.remove(LibSimprintsConstants.RESULT_CODE_OVERRIDE)
-
             findNavController().finishWithResult(this, ClientApiResult(resultCode, responseExtras))
         })
     }
@@ -98,9 +95,5 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
         }
     }
 
-    @Parcelize
-    data class ClientApiResult(
-        val resultCode: Int,
-        val extras: Bundle,
-    ) : Parcelable
 }
+
