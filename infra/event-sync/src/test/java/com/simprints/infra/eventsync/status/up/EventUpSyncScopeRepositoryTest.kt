@@ -1,20 +1,19 @@
 package com.simprints.infra.eventsync.status.up
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.SampleDefaults.TIME1
 import com.simprints.infra.eventsync.SampleSyncScopes.projectUpSyncScope
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.up.local.DbEventUpSyncOperationStateDao
 import com.simprints.infra.eventsync.status.up.local.DbEventsUpSyncOperationState
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -48,7 +47,7 @@ internal class EventUpSyncScopeRepositoryTest {
     }
 
     @Test
-    fun `test delete all`() = runBlocking {
+    fun `test delete all`() = runTest {
         //when
         eventUpSyncScopeRepository.deleteAll()
         // Then
@@ -56,7 +55,7 @@ internal class EventUpSyncScopeRepositoryTest {
     }
 
     @Test
-    fun `test insertOrUpdate shouldInsertIntoTheDb`() = runBlocking {
+    fun `test insertOrUpdate shouldInsertIntoTheDb`() = runTest {
         eventUpSyncScopeRepository.insertOrUpdate(projectUpSyncScope.operation)
 
         coVerify { upSyncOperationOperationDao.insertOrUpdate(any()) }

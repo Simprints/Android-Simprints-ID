@@ -15,7 +15,6 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy as CoreFingerComparisonStrategy

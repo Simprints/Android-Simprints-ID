@@ -5,8 +5,8 @@ import com.simprints.fingerprint.infra.scanner.v2.outgoing.common.OutputStreamDi
 import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
-import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.mockk
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -24,7 +24,7 @@ class OutputStreamDispatcherTest {
     @Test
     fun connectedThenDisconnected_callDispatch_throwsException() {
         val outputStreamDispatcher = OutputStreamDispatcher()
-        outputStreamDispatcher.connect(mock())
+        outputStreamDispatcher.connect(mockk())
         outputStreamDispatcher.disconnect()
         assertThrows<IllegalStateException> {
             outputStreamDispatcher.dispatch(listOf(byteArrayOf(0x01, 0x02, 0x03))).blockingAwait()

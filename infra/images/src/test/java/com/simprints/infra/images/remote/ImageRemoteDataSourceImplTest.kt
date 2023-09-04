@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.images.model.SecuredImageRef
-import com.simprints.infra.authstore.AuthStore
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -41,7 +40,7 @@ class ImageRemoteDataSourceImplTest {
             every { signedInProjectId } returns "projectId"
         }
 
-        val storageMock = setupStorageMock()
+        val storageMock = setupStoragemockk()
 
         every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
 
@@ -89,7 +88,7 @@ class ImageRemoteDataSourceImplTest {
         assert(!rtn.isUploadSuccessful())
     }
 
-    private fun setupStorageMock() = mockk<FirebaseStorage>(relaxed = true) {
+    private fun setupStoragemockk() = mockk<FirebaseStorage>(relaxed = true) {
         every { reference } returns mockk {
             every { child(any()) } returns mockk {
                 every { path } returns "testPath"

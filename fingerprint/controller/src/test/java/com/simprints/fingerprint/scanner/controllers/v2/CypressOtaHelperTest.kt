@@ -23,7 +23,7 @@ import io.reactivex.Single
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -57,7 +57,7 @@ class CypressOtaHelperTest {
     }
 
     @Test
-    fun performCypressOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runBlocking {
+    fun performCypressOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runTest {
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
             listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion, CypressOtaStep.UpdatingUnifiedVersionInformation)
@@ -78,7 +78,7 @@ class CypressOtaHelperTest {
 
     @Test(expected = ScannerV2OtaFailedException::class)
     fun
-        cypressOtaFailsDuringTransfer_propagatesError() = runBlocking<Unit> {
+        cypressOtaFailsDuringTransfer_propagatesError() = runTest {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             progressValues.map { CypressOtaStep.TransferInProgress(it) }
@@ -103,7 +103,7 @@ class CypressOtaHelperTest {
     }
 
     @Test(expected = IOException::class)
-    fun cypressOtaFailsDuringConnect_propagatesError() = runBlocking<Unit> {
+    fun cypressOtaFailsDuringConnect_propagatesError() = runTest {
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
             listOf(CypressOtaStep.ReconnectingAfterTransfer)
@@ -123,7 +123,7 @@ class CypressOtaHelperTest {
     }
 
     @Test(expected = OtaFailedException::class)
-    fun cypressOtaFailsToValidate_throwsOtaError() = runBlocking<Unit> {
+    fun cypressOtaFailsToValidate_throwsOtaError() = runTest {
         val expectedSteps = listOf(CypressOtaStep.EnteringOtaMode, CypressOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { CypressOtaStep.TransferInProgress(it) } +
             listOf(CypressOtaStep.ReconnectingAfterTransfer, CypressOtaStep.ValidatingNewFirmwareVersion)

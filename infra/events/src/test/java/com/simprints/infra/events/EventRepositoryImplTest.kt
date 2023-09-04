@@ -2,6 +2,7 @@ package com.simprints.infra.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
@@ -19,14 +20,17 @@ import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventV
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import com.simprints.infra.authstore.AuthStore
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -89,7 +93,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `create session should have the right session count`() {
-        runBlocking {
+        runTest {
             mockDbToHaveOneOpenSession()
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
 
@@ -105,7 +109,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `create session for empty project id`() {
-        runBlocking {
+        runTest {
             every { authStore.signedInProjectId } returns ""
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
 
@@ -118,7 +122,7 @@ internal class EventRepositoryImplTest {
 
     @Test(expected = DuplicateGuidSelectEventValidatorException::class)
     fun `create session report duplicate GUID select EventValidatorExceptionException`() {
-        runBlocking {
+        runTest {
             coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
             coEvery {
                 eventLocalDataSource.insertOrUpdate(any())
@@ -129,7 +133,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `create session should close open session events`() {
-        runBlocking {
+        runTest {
             val openSession = mockDbToHaveOneOpenSession()
 
             eventRepo.createSession()
@@ -150,7 +154,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `create session should add a new session event`() {
-        runBlocking {
+        runTest {
             mockDbToBeEmpty()
 
             eventRepo.createSession()
@@ -165,7 +169,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `add event into a session should store it into the DB with right labels`() {
-        runBlocking {
+        runTest {
             mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
 
@@ -187,7 +191,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `add event should store it into the DB with right labels`() {
-        runBlocking {
+        runTest {
             mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
             newEvent.labels = EventLabels()
@@ -210,7 +214,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `add event to current session should add event related to current session into DB`() {
-        runBlocking {
+        runTest {
             mockDbToHaveOneOpenSession(GUID1)
             val newEvent = createAlertScreenEvent()
 
@@ -232,7 +236,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `createSession should add artificial termination event to the previous one`() {
-        runBlocking {
+        runTest {
             mockDbToHaveOneOpenSession(GUID1)
 
             eventRepo.createSession()
@@ -311,7 +315,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `insert event into current open session`() {
-        runBlocking {
+        runTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
@@ -335,7 +339,7 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `insert event into current open session should invoke validators`() {
-        runBlocking {
+        runTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()

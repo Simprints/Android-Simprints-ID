@@ -1,29 +1,10 @@
 package com.simprints.testtools.common.syntax
 
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert
-import org.mockito.Mockito
-import org.mockito.verification.VerificationMode
 
-fun <T> verifyOnce(mock: T, methodCall: T.() -> Any?) =
-    verifyExactly(1, mock, methodCall)
-
-fun <T> verifyExactly(times: Int, mock: T, methodCall: T.() -> Any?) =
-    verify(Mockito::times, times, mock, methodCall)
-
-private fun <T> verify(mode: (Int) -> VerificationMode, times: Int, mock: T, methodCall: T.() -> Any?) =
-    verify(mock, mode(times)).methodCall()
-
-
-
-fun <T> verifyOnlyInteraction(mock: T, methodCall: T.() -> Any?) {
-    verify(mock).methodCall()
-    verifyNoMoreInteractions(mock)
-}
 
 inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
     try {

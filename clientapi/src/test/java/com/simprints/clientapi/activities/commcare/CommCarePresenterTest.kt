@@ -1,34 +1,48 @@
 package com.simprints.clientapi.activities.commcare
 
 import com.google.common.truth.Truth
-import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
+import com.simprints.clientapi.activities.commcare.CommCareAction.Enrol
+import com.simprints.clientapi.activities.commcare.CommCareAction.Identify
+import com.simprints.clientapi.activities.commcare.CommCareAction.Invalid
+import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
-import com.simprints.clientapi.requestFactories.*
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
+import com.simprints.clientapi.requestFactories.EnrolLastBiometricsFactory
+import com.simprints.clientapi.requestFactories.EnrolRequestFactory
+import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
+import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
 import com.simprints.libsimprints.Constants
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class CommCarePresenterTest {
 
@@ -51,7 +65,7 @@ class CommCarePresenterTest {
 
     @Before
     fun setup() {
-        BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
+        BaseUnitTestConfig().coroutinesMainThread()
     }
 
     @Test
@@ -60,7 +74,7 @@ class CommCarePresenterTest {
         every { view.enrolExtractor } returns enrolmentExtractor
 
         getNewPresenter(Enrol, mockSessionManagerToCreateSession()).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -78,7 +92,7 @@ class CommCarePresenterTest {
         every { view.identifyExtractor } returns identifyExtractor
 
         getNewPresenter(Identify, mockSessionManagerToCreateSession()).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -96,7 +110,7 @@ class CommCarePresenterTest {
         every { view.verifyExtractor } returns verificationExtractor
 
         getNewPresenter(Verify, mockSessionManagerToCreateSession()).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -118,7 +132,7 @@ class CommCarePresenterTest {
             coEvery { it.getCurrentSessionId() } returns MOCK_SESSION_ID
         }
 
-        getNewPresenter(ConfirmIdentity, sessionEventsManager).apply { runBlocking { start() } }
+        getNewPresenter(ConfirmIdentity, sessionEventsManager).apply { runTest { start() } }
 
         verify(exactly = 1) {
             view.sendSimprintsRequest(
@@ -132,8 +146,8 @@ class CommCarePresenterTest {
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         getNewPresenter(Invalid, mockSessionManagerToCreateSession()).apply {
-            runBlocking {
-                shouldThrow<InvalidIntentActionException> {
+            runTest {
+                assertThrows<InvalidIntentActionException> {
                     start()
                 }
             }

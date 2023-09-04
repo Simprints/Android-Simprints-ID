@@ -22,7 +22,6 @@ import io.reactivex.Single
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException

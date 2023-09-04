@@ -22,7 +22,7 @@ import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -93,7 +93,7 @@ class PersonCreationEventHelperImplTest {
 
     @Test
     fun addPersonCreationEventIfNeeded_shouldLoadEventsForCurrentSessions() {
-        runBlocking {
+        runTest {
             coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
 
             personCreationEventHelper.addPersonCreationEventIfNeeded(emptyList())
@@ -104,7 +104,7 @@ class PersonCreationEventHelperImplTest {
 
     @Test
     fun fingerprintsCapturing_personCreationEventShouldHaveFingerprintsFieldsSet() {
-        runBlocking {
+        runTest {
             coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
                 currentSession,
                 fingerprintCaptureBiometricsEvent
@@ -124,7 +124,7 @@ class PersonCreationEventHelperImplTest {
 
     @Test
     fun facesCapturing_personCreationEventShouldHaveFacesFieldsSet() {
-        runBlocking {
+        runTest {
             coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
                 currentSession,
                 faceCaptureBiometricsEvent
@@ -140,7 +140,7 @@ class PersonCreationEventHelperImplTest {
 
     @Test
     fun facesAndFingerprintsCapturing_personCreationEventShouldHaveFacesAndFingerprintsFieldsSet() {
-        runBlocking {
+        runTest {
             coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
                 currentSession,
                 fingerprintCaptureBiometricsEvent
@@ -161,7 +161,7 @@ class PersonCreationEventHelperImplTest {
 
     @Test
     fun personCreationEventAlreadyExistsInCurrentSession_nothingHappens() {
-        runBlocking {
+        runTest {
             coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
                 currentSession,
                 fingerprintCaptureBiometricsEvent,

@@ -16,7 +16,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.Completable
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException

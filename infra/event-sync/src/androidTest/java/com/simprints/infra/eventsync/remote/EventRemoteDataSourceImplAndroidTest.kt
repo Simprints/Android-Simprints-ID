@@ -39,7 +39,7 @@ package com.simprints.infra.eventsync.remote
 //        testProject = testProjectRule.testProject
 //        eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = testProject.id)
 //
-//        val firebaseTestToken = runBlocking {
+//        val firebaseTestToken = runTest {
 //            remoteTestingManager.generateFirebaseToken(
 //                projectId = testProject.id,
 //                userId = SIGNED_ID_USER
