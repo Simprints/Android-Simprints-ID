@@ -3,6 +3,7 @@ package com.simprints.infra.facebiosdk.matching
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.spyk
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.util.UUID
 import kotlin.random.Random
@@ -13,7 +14,7 @@ class FaceMatcherTest {
     private val probes = generateSequenceN(2) { getFaceSample() }.toList()
 
     @Test
-    fun `Get highest score for a candidate`() = runBlockingTest {
+    fun `Get highest score for a candidate`() = runTest {
         coEvery { faceMatcher.getComparisonScore(any(), any()) } returnsMany listOf(
             0.1f,
             0.2f,

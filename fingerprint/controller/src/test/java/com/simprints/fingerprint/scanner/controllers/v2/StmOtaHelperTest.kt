@@ -22,6 +22,7 @@ import io.reactivex.Single
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -49,7 +50,7 @@ class StmOtaHelperTest {
     }
 
     @Test
-    fun performStmOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runBlocking {
+    fun performStmOta_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runTest {
         val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
             StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
@@ -69,7 +70,7 @@ class StmOtaHelperTest {
     }
 
     @Test(expected = ScannerV2OtaFailedException::class)
-    fun stmOtaFailsDuringTransfer_propagatesError() = runBlocking<Unit> {
+    fun stmOtaFailsDuringTransfer_propagatesError() = runTest {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
         val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
             StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
@@ -92,7 +93,7 @@ class StmOtaHelperTest {
     }
 
     @Test(expected = IOException::class)
-    fun stmOtaFailsDuringConnectSecondTime_propagatesError() = runBlocking<Unit> {
+    fun stmOtaFailsDuringConnectSecondTime_propagatesError() = runTest {
         val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
             StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
@@ -114,7 +115,7 @@ class StmOtaHelperTest {
     }
 
     @Test(expected = OtaFailedException::class)
-    fun stmOtaFailsToValidate_throwsOtaError() = runBlocking<Unit> {
+    fun stmOtaFailsToValidate_throwsOtaError() = runTest {
         val expectedSteps = listOf(StmOtaStep.EnteringOtaModeFirstTime, StmOtaStep.ReconnectingAfterEnteringOtaMode,
             StmOtaStep.EnteringOtaModeSecondTime, StmOtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { StmOtaStep.TransferInProgress(it) } +
