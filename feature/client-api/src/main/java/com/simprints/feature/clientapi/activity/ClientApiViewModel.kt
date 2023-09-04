@@ -8,6 +8,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.clientapi.activity.usecases.ExtractCrashKeysUseCase
 import com.simprints.feature.clientapi.activity.usecases.ExtractParametersForAnalyticsUseCase
+import com.simprints.feature.clientapi.activity.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.activity.usecases.IsUserSignedInUseCase
 import com.simprints.feature.clientapi.activity.usecases.IsUserSignedInUseCase.SignedInState.MISMATCHED_PROJECT_ID
 import com.simprints.feature.clientapi.activity.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
@@ -16,8 +17,8 @@ import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.IntentToActionMapper
 import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.models.ActionResponse
-import com.simprints.feature.clientapi.models.ClientApiResultError
 import com.simprints.feature.clientapi.models.ClientApiError
+import com.simprints.feature.clientapi.models.ClientApiResultError
 import com.simprints.feature.clientapi.session.ClientSessionManager
 import com.simprints.feature.clientapi.session.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.session.GetEnrolmentCreationEventForSubjectUseCase
@@ -61,6 +62,7 @@ internal class ClientApiViewModel @Inject constructor(
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
+    private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase
 ) : ViewModel() {
 
     private var cachedRequest: ActionRequest? = null
@@ -289,7 +291,7 @@ internal class ClientApiViewModel @Inject constructor(
     ) = viewModelScope.launch {
         val currentSessionId = clientSessionManager.getCurrentSessionId()
 
-        val flowCompleted = isFlowCompletedWithCurrentError(errorResponse)
+        val flowCompleted = isFlowCompletedWithError(errorResponse)
         clientSessionManager.addCompletionCheckEvent(flowCompleted = flowCompleted)
         clientSessionManager.closeCurrentSessionNormally()
 
@@ -304,27 +306,4 @@ internal class ClientApiViewModel @Inject constructor(
             flowCompleted = flowCompleted,
         ))
     }
-
-    private fun isFlowCompletedWithCurrentError(errorResponse: IAppErrorResponse) = when (errorResponse.reason) {
-        IAppErrorReason.UNEXPECTED_ERROR,
-        IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN,
-        IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN,
-        IAppErrorReason.BLUETOOTH_NOT_SUPPORTED,
-        IAppErrorReason.BLUETOOTH_NO_PERMISSION,
-        IAppErrorReason.GUID_NOT_FOUND_ONLINE,
-        IAppErrorReason.PROJECT_PAUSED,
-        IAppErrorReason.PROJECT_ENDING,
-        -> true
-
-        IAppErrorReason.ROOTED_DEVICE,
-        IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED,
-        IAppErrorReason.LOGIN_NOT_COMPLETE,
-        IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR,
-        IAppErrorReason.FACE_LICENSE_MISSING,
-        IAppErrorReason.FACE_LICENSE_INVALID,
-        IAppErrorReason.FACE_CONFIGURATION_ERROR,
-        IAppErrorReason.BACKEND_MAINTENANCE_ERROR,
-        -> false
-    }
-
 }

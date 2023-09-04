@@ -40,7 +40,6 @@ internal class GetEventJsonForSessionUseCase @Inject constructor(
                 .filterNot { it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent }
 
             else -> emptyFlow()
-
         }
         return jsonHelper.toJson(CoSyncEvents(events.toList()))
     }
