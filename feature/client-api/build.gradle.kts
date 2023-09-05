@@ -13,6 +13,8 @@ dependencies {
 
     implementation(project(":infra:config"))
     implementation(project(":infra:events"))
+    implementation(project(":infra:event-sync"))
+    implementation(project(":infra:images"))
     implementation(project(":infra:security"))
     implementation(project(":infra:project-security-store"))
     implementation(project(":infra:auth-store"))
