@@ -2,6 +2,7 @@ package com.simprints.feature.clientapi.activity
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
+import com.simprints.feature.clientapi.activity.usecases.CancelBackgroundSyncUseCase
 import com.simprints.feature.clientapi.activity.usecases.ExtractCrashKeysUseCase
 import com.simprints.feature.clientapi.activity.usecases.ExtractParametersForAnalyticsUseCase
 import com.simprints.feature.clientapi.activity.usecases.IsFlowCompletedWithErrorUseCase
@@ -73,6 +74,9 @@ internal class ClientApiViewModelTest {
     lateinit var getEventJsonForSessionUseCase: GetEventJsonForSessionUseCase
 
     @MockK
+    lateinit var cancelBackgroundSync: CancelBackgroundSyncUseCase
+
+    @MockK
     lateinit var updateDatabaseCountsInCurrentSessionUseCase: UpdateDatabaseCountsInCurrentSessionUseCase
 
     @MockK
@@ -105,6 +109,7 @@ internal class ClientApiViewModelTest {
             isUserSignedInUseCase,
             getProjectStateUseCase,
             getEventJsonForSessionUseCase,
+            cancelBackgroundSync,
             updateDatabaseCountsInCurrentSessionUseCase,
             updateProjectStateUseCase,
             getEnrolmentCreationEventForSubjectUseCase,
@@ -190,7 +195,10 @@ internal class ClientApiViewModelTest {
 
         viewModel.handleIntent(TEST_ACTION, emptyMap())
 
-        coVerify { clientSessionManager.addAuthorizationEvent(any(), eq(false)) }
+        coVerify {
+            clientSessionManager.addAuthorizationEvent(any(), eq(false))
+            cancelBackgroundSync.invoke()
+        }
         viewModel.showLoginFlow.test().assertValue { it.peekContent() == FLOW_ACTION }
     }
 

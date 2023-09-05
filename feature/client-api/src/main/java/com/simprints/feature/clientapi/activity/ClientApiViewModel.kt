@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.feature.clientapi.activity.usecases.CancelBackgroundSyncUseCase
 import com.simprints.feature.clientapi.activity.usecases.ExtractCrashKeysUseCase
 import com.simprints.feature.clientapi.activity.usecases.ExtractParametersForAnalyticsUseCase
 import com.simprints.feature.clientapi.activity.usecases.IsFlowCompletedWithErrorUseCase
@@ -58,11 +59,12 @@ internal class ClientApiViewModel @Inject constructor(
     private val isUserSignedIn: IsUserSignedInUseCase,
     private val getProjectStatus: GetProjectStateUseCase,
     private val getEventJsonForSession: GetEventJsonForSessionUseCase,
+    private val cancelBackgroundSync: CancelBackgroundSyncUseCase,
     private val updateDatabaseCountsInCurrentSession: UpdateDatabaseCountsInCurrentSessionUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
-    private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase
+    private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase,
 ) : ViewModel() {
 
     private var cachedRequest: ActionRequest? = null
@@ -126,7 +128,7 @@ internal class ClientApiViewModel @Inject constructor(
         cachedRequest = actionRequest
         loginAlreadyTried.set(true)
 
-        // TODO syncManager.cancelBackgroundSyncs()
+        cancelBackgroundSync.invoke()
 
         _showLoginFlow.send(actionRequest)
     }
