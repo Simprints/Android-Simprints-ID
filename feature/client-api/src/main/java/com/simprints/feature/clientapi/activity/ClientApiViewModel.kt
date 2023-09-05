@@ -110,7 +110,7 @@ internal class ClientApiViewModel @Inject constructor(
 
     private suspend fun validateSignInAndProceed(actionRequest: ActionRequest) {
         when (isUserSignedIn(actionRequest)) {
-            MISMATCHED_PROJECT_ID -> _showAlert.send(ClientApiError.ROOTED_DEVICE)
+            MISMATCHED_PROJECT_ID -> _showAlert.send(ClientApiError.DIFFERENT_PROJECT_ID)
             NOT_SIGNED_IN -> startSignInAttempt(actionRequest)
             SIGNED_IN -> validateProjectAndProceed(actionRequest)
         }
