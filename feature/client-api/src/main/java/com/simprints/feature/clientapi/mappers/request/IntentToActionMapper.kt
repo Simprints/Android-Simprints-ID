@@ -22,52 +22,52 @@ import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidato
 import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.clientapi.models.CommCareConstants
+import com.simprints.feature.clientapi.models.IntegrationConstants
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.clientapi.models.OdkConstants
 import com.simprints.feature.clientapi.session.ClientSessionManager
-import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFY_INTENT
-import com.simprints.libsimprints.Constants.SIMPRINTS_REGISTER_INTENT
-import com.simprints.libsimprints.Constants.SIMPRINTS_REGISTER_LAST_BIOMETRICS_INTENT
-import com.simprints.libsimprints.Constants.SIMPRINTS_SELECT_GUID_INTENT
-import com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_INTENT
 import javax.inject.Inject
 
 internal class IntentToActionMapper @Inject constructor(
     private val sessionManager: ClientSessionManager,
 ) {
 
-    suspend operator fun invoke(action: String, extras: Map<String, Any>): ActionRequest =
-        when (val packageName = action.substringBeforeLast(".")) {
-            OdkConstants.PACKAGE_NAME -> mapOdkAction(packageName, action, extras)
-            CommCareConstants.PACKAGE_NAME -> mapCommCareAction(packageName, action, extras)
-            LibSimprintsConstants.PACKAGE_NAME -> mapLibSimprintsAction(packageName, action, extras)
+    suspend operator fun invoke(action: String, extras: Map<String, Any>): ActionRequest {
+        val packageName = action.substringBeforeLast(".")
+        val actionName = action.substringAfterLast(".")
+
+        return when (packageName) {
+            OdkConstants.PACKAGE_NAME -> mapOdkAction(packageName, actionName, extras)
+            CommCareConstants.PACKAGE_NAME -> mapCommCareAction(packageName, actionName, extras)
+            LibSimprintsConstants.PACKAGE_NAME -> mapLibSimprintsAction(packageName, actionName, extras)
             else -> throw InvalidRequestException("Unsupported package name", ClientApiError.INVALID_STATE_FOR_INTENT_ACTION)
         }
+    }
 
     private suspend fun mapOdkAction(packageName: String, actionName: String, extras: Map<String, Any>) = when (actionName) {
-        OdkConstants.ACTION_ENROL -> enrolBuilder(packageName, OdkEnrolRequestExtractor(extras, OdkConstants.acceptableExtras))
-        OdkConstants.ACTION_VERIFY -> verifyBuilder(packageName, OdkVerifyRequestExtractor(extras, OdkConstants.acceptableExtras))
-        OdkConstants.ACTION_IDENTIFY -> identifyBuilder(packageName, OdkIdentifyRequestExtractor(extras, OdkConstants.acceptableExtras))
-        OdkConstants.ACTION_ENROL_LAST_BIOMETRICS -> enrolLastBiometricsBuilder(packageName, EnrolLastBiometricsRequestExtractor(extras))
-        OdkConstants.ACTION_CONFIRM_IDENTITY -> confirmIdentifyBuilder(packageName, ConfirmIdentityRequestExtractor(extras))
+        IntegrationConstants.ACTION_ENROL -> enrolBuilder(packageName, OdkEnrolRequestExtractor(extras, OdkConstants.acceptableExtras))
+        IntegrationConstants.ACTION_VERIFY -> verifyBuilder(packageName, OdkVerifyRequestExtractor(extras, OdkConstants.acceptableExtras))
+        IntegrationConstants.ACTION_IDENTIFY -> identifyBuilder(packageName, OdkIdentifyRequestExtractor(extras, OdkConstants.acceptableExtras))
+        IntegrationConstants.ACTION_ENROL_LAST_BIOMETRICS -> enrolLastBiometricsBuilder(packageName, EnrolLastBiometricsRequestExtractor(extras))
+        IntegrationConstants.ACTION_CONFIRM_IDENTITY -> confirmIdentifyBuilder(packageName, ConfirmIdentityRequestExtractor(extras))
         else -> throw InvalidRequestException("Invalid ODK action", ClientApiError.INVALID_STATE_FOR_INTENT_ACTION)
     }.build()
 
     private suspend fun mapCommCareAction(packageName: String, actionName: String, extras: Map<String, Any>) = when (actionName) {
-        CommCareConstants.ACTION_REGISTER -> enrolBuilder(packageName, EnrolRequestExtractor(extras))
-        CommCareConstants.ACTION_VERIFY -> verifyBuilder(packageName, VerifyRequestExtractor(extras))
-        CommCareConstants.ACTION_IDENTIFY -> identifyBuilder(packageName, IdentifyRequestExtractor(extras))
-        CommCareConstants.ACTION_ENROL_LAST_BIOMETRICS -> enrolLastBiometricsBuilder(packageName, EnrolLastBiometricsRequestExtractor(extras))
-        CommCareConstants.ACTION_CONFIRM_IDENTITY -> confirmIdentifyBuilder(packageName, ConfirmIdentityRequestExtractor(extras))
+        IntegrationConstants.ACTION_ENROL -> enrolBuilder(packageName, EnrolRequestExtractor(extras))
+        IntegrationConstants.ACTION_VERIFY -> verifyBuilder(packageName, VerifyRequestExtractor(extras))
+        IntegrationConstants.ACTION_IDENTIFY -> identifyBuilder(packageName, IdentifyRequestExtractor(extras))
+        IntegrationConstants.ACTION_ENROL_LAST_BIOMETRICS -> enrolLastBiometricsBuilder(packageName, EnrolLastBiometricsRequestExtractor(extras))
+        IntegrationConstants.ACTION_CONFIRM_IDENTITY -> confirmIdentifyBuilder(packageName, ConfirmIdentityRequestExtractor(extras))
         else -> throw InvalidRequestException("Invalid CommCare action", ClientApiError.INVALID_STATE_FOR_INTENT_ACTION)
     }.build()
 
     private suspend fun mapLibSimprintsAction(packageName: String, actionName: String, extras: Map<String, Any>) = when (actionName) {
-        SIMPRINTS_REGISTER_INTENT -> enrolBuilder(packageName, EnrolRequestExtractor(extras))
-        SIMPRINTS_VERIFY_INTENT -> verifyBuilder(packageName, VerifyRequestExtractor(extras))
-        SIMPRINTS_IDENTIFY_INTENT -> identifyBuilder(packageName, IdentifyRequestExtractor(extras))
-        SIMPRINTS_REGISTER_LAST_BIOMETRICS_INTENT -> enrolLastBiometricsBuilder(packageName, EnrolLastBiometricsRequestExtractor(extras))
-        SIMPRINTS_SELECT_GUID_INTENT -> confirmIdentifyBuilder(packageName, ConfirmIdentityRequestExtractor(extras))
+        IntegrationConstants.ACTION_ENROL -> enrolBuilder(packageName, EnrolRequestExtractor(extras))
+        IntegrationConstants.ACTION_VERIFY -> verifyBuilder(packageName, VerifyRequestExtractor(extras))
+        IntegrationConstants.ACTION_IDENTIFY -> identifyBuilder(packageName, IdentifyRequestExtractor(extras))
+        IntegrationConstants.ACTION_ENROL_LAST_BIOMETRICS -> enrolLastBiometricsBuilder(packageName, EnrolLastBiometricsRequestExtractor(extras))
+        IntegrationConstants.ACTION_CONFIRM_IDENTITY -> confirmIdentifyBuilder(packageName, ConfirmIdentityRequestExtractor(extras))
         else -> throw InvalidRequestException("Invalid LibSimprints action", ClientApiError.INVALID_STATE_FOR_INTENT_ACTION)
     }.build()
 

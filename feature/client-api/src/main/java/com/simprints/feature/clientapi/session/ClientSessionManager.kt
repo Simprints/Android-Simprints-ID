@@ -4,11 +4,14 @@ import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.feature.clientapi.models.ActionRequest
+import com.simprints.feature.clientapi.models.CommCareConstants
+import com.simprints.feature.clientapi.models.OdkConstants
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
+import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
@@ -17,6 +20,8 @@ import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEv
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -28,6 +33,12 @@ internal class ClientSessionManager @Inject constructor(
     private val simNetworkUtils: SimNetworkUtils,
     @ExternalScope private val externalScope: CoroutineScope
 ) {
+
+    suspend fun createSession(integrationInfo: IntentParsingEvent.IntentParsingPayload.IntegrationInfo) {
+        val sessionEvent = coreEventRepository.createSession()
+        coreEventRepository.addOrUpdateEvent(IntentParsingEvent(timeHelper.now(), integrationInfo))
+        Simber.tag(LoggingConstants.CrashReportingCustomKeys.SESSION_ID, true).i(sessionEvent.id)
+    }
 
     suspend fun getCurrentSessionId(): String = coreEventRepository.getCurrentCaptureSessionEvent().id
 
