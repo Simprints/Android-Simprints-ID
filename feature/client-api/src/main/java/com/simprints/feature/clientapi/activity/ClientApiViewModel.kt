@@ -8,6 +8,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.clientapi.activity.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.models.ActionRequest
+import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 import com.simprints.feature.clientapi.models.ActionResponse
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.clientapi.session.ClientSessionManager
@@ -63,7 +64,7 @@ internal class ClientApiViewModel @Inject constructor(
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(ActionResponse.EnrolActionResponse(
-            request = action,
+            actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             enrolledGuid = enrolResponse.guid,
@@ -82,7 +83,7 @@ internal class ClientApiViewModel @Inject constructor(
         val coSyncEventsJson = getEventJsonForSession(currentSessionId)
 
         _returnResponse.send(ActionResponse.IdentifyActionResponse(
-            request = action,
+            actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             identifications = identifyResponse.identifications,
@@ -101,7 +102,7 @@ internal class ClientApiViewModel @Inject constructor(
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(ActionResponse.ConfirmActionResponse(
-            request = action,
+            actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             confirmed = confirmResponse.identificationOutcome,
@@ -121,7 +122,7 @@ internal class ClientApiViewModel @Inject constructor(
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(ActionResponse.VerifyActionResponse(
-            request = action,
+            actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             matchResult = verifyResponse.matchResult,
@@ -141,7 +142,7 @@ internal class ClientApiViewModel @Inject constructor(
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(ActionResponse.ExitFormActionResponse(
-            request = action,
+            actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             reason = exitFormResponse.reason,
@@ -150,8 +151,10 @@ internal class ClientApiViewModel @Inject constructor(
     }
 
     // TODO review if parameters should be replaced with :feature:orchestrator models
+    // Error is a special case where it might be called before action has been parsed,
+    // therefore it can only rely on the identifier from action string to be present
     fun handleErrorResponse(
-        action: ActionRequest,
+        actionIdentifier: ActionRequestIdentifier,
         errorResponse: IAppErrorResponse,
     ) = viewModelScope.launch {
         val currentSessionId = clientSessionManager.getCurrentSessionId()
@@ -164,7 +167,7 @@ internal class ClientApiViewModel @Inject constructor(
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(ActionResponse.ErrorActionResponse(
-            request = action,
+            actionIdentifier = actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             reason = errorResponse.reason,

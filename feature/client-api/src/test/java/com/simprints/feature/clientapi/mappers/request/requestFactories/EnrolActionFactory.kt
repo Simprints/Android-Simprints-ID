@@ -5,12 +5,19 @@ import com.simprints.feature.clientapi.mappers.request.builders.EnrolRequestBuil
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolValidator
+import com.simprints.feature.clientapi.models.ActionRequestIdentifier
+import com.simprints.feature.clientapi.models.IntegrationConstants
 import io.mockk.mockk
 
 internal object EnrolActionFactory : RequestActionFactory() {
 
-    override fun getValidSimprintsRequest() = ActionRequest.EnrolActionRequest(
+    override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
+        actionName = IntegrationConstants.ACTION_ENROL,
+    )
+
+    override fun getValidSimprintsRequest() = ActionRequest.EnrolActionRequest(
+        actionIdentifier = getIdentifier(),
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         metadata = MOCK_METADATA,
@@ -19,7 +26,7 @@ internal object EnrolActionFactory : RequestActionFactory() {
     )
 
     override fun getBuilder(extractor: ActionRequestExtractor): EnrolRequestBuilder =
-        EnrolRequestBuilder(MOCK_PACKAGE, extractor as EnrolRequestExtractor, getValidator(extractor))
+        EnrolRequestBuilder(getIdentifier(), extractor as EnrolRequestExtractor, getValidator(extractor))
 
     override fun getValidator(extractor: ActionRequestExtractor): EnrolValidator =
         EnrolValidator(extractor as EnrolRequestExtractor)

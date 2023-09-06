@@ -70,9 +70,9 @@ internal class LoginCheckViewModel @Inject constructor(
         get() = _proceedWithAction
     private val _proceedWithAction = MutableLiveData<LiveDataEventWithContent<ActionRequest>>()
 
-    val returnErrorResponse: LiveData<LiveDataEventWithContent<Pair<ActionRequest, ClientApiResultError>>>
+    val returnErrorResponse: LiveData<LiveDataEventWithContent<ClientApiResultError>>
         get() = _returnErrorResponse
-    private val _returnErrorResponse = MutableLiveData<LiveDataEventWithContent<Pair<ActionRequest, ClientApiResultError>>>()
+    private val _returnErrorResponse = MutableLiveData<LiveDataEventWithContent<ClientApiResultError>>()
 
 
     fun handleIntent(action: String, extras: Map<String, Any>) = viewModelScope.launch {
@@ -110,7 +110,7 @@ internal class LoginCheckViewModel @Inject constructor(
     private suspend fun startSignInAttempt(actionRequest: ActionRequest) {
         // Followup action should not trigger login, since there can not be a valid session open.
         if (loginAlreadyTried.get() || actionRequest is ActionRequest.FollowUpAction) {
-            _returnErrorResponse.send(actionRequest to ClientApiResultError(IAppErrorReason.LOGIN_NOT_COMPLETE))
+            _returnErrorResponse.send(ClientApiResultError(IAppErrorReason.LOGIN_NOT_COMPLETE))
             return
         }
         clientSessionManager.addAuthorizationEvent(actionRequest, false)
@@ -130,7 +130,7 @@ internal class LoginCheckViewModel @Inject constructor(
             when (result.error) {
                 null, LoginError.LoginNotCompleted -> {
                     if (cachedRequest != null) {
-                        _returnErrorResponse.send(cachedRequest!! to ClientApiResultError(IAppErrorReason.LOGIN_NOT_COMPLETE))
+                        _returnErrorResponse.send(ClientApiResultError(IAppErrorReason.LOGIN_NOT_COMPLETE))
                     } else {
                         // there is no other reasonable way to handle the error
                         _showAlert.send(ClientApiError.UNEXPECTED_LOGIN_ERROR)
@@ -156,8 +156,6 @@ internal class LoginCheckViewModel @Inject constructor(
     }
 
     private suspend fun proceedWithAction(actionRequest: ActionRequest) = viewModelScope.launch {
-        // TODO add special case for confirmation action
-
         updateProjectInCurrentSession()
         awaitAll(
             async { updateDatabaseCountsInCurrentSession() },
@@ -165,7 +163,7 @@ internal class LoginCheckViewModel @Inject constructor(
             async { extractParametersForCrashReport(actionRequest) }
         )
 
-        _proceedWithAction.send(actionRequest) // TODO replace with user flow builder
+        _proceedWithAction.send(actionRequest)
     }
 
 }
