@@ -15,10 +15,10 @@ abstract class ClientRequestBuilder(private val validator: ClientRequestValidato
 
     protected fun encryptField(
         value: String,
-        project: Project,
+        project: Project?,
         tokenKeyType: TokenKeyType,
         tokenizationManager: TokenizationManager
-    ): String = tokenizationManager.tryTokenize(
+    ): String = if(project == null) value else tokenizationManager.tryTokenize(
         value = value,
         tokenKeyType = tokenKeyType,
         action = TokenizationAction.Encrypt,

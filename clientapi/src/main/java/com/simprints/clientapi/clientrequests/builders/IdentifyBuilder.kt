@@ -11,7 +11,7 @@ import com.simprints.infra.config.tokenization.TokenizationManager
 
 class IdentifyBuilder(
     private val extractor: IdentifyExtractor,
-    private val project: Project,
+    private val project: Project?,
     private val tokenizationManager: TokenizationManager,
     validator: IdentifyValidator
 ) : ClientRequestBuilder(validator) {

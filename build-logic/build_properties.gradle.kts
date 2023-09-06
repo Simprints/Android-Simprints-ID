@@ -12,8 +12,10 @@ extra.apply {
      * on, and the version of the BFSID API being used. The version name is automatically set by the
      * CI. Read more about our versioning here:
      * https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+Simprints+ID
+     *
+     * Dev version >= 2023.3.1 is required for receiving encryption Tokens from BFSID [CORE-2502]
      */
-    set("VERSION_NAME", "0.0.0")
+    set("VERSION_NAME", "2023.3.1")
 
     /**
      * Build type. The version code describes which build type was used for the build.

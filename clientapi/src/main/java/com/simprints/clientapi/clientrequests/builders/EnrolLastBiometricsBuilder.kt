@@ -11,7 +11,7 @@ import com.simprints.infra.config.tokenization.TokenizationManager
 
 class EnrolLastBiometricsBuilder(
     private val extractor: EnrolLastBiometricsExtractor,
-    private val project: Project,
+    private val project: Project?,
     private val tokenizationManager: TokenizationManager,
     validator: EnrolLastBiometricsValidator
 ) : ClientRequestBuilder(validator) {
