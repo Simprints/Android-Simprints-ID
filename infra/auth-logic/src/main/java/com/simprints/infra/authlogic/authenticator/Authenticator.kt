@@ -1,5 +1,6 @@
 package com.simprints.infra.authlogic.authenticator
 
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
 import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
@@ -88,7 +89,7 @@ internal class Authenticator @Inject constructor(
         val event = AuthenticationEvent(
             loginStartTime,
             timeHelper.now(),
-            UserInfo(projectId, userId),
+            UserInfo(projectId, userId.asTokenizedRaw()),
             result
         )
         eventRepository.addOrUpdateEvent(event)

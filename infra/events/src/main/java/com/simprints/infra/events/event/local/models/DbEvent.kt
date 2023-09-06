@@ -19,7 +19,7 @@ internal data class DbEvent(
     var eventJson: String,
     val createdAt: Long,
     val endedAt: Long,
-    val sessionIsClosed: Boolean
+    val sessionIsClosed: Boolean,
 ) {
 
     companion object {
@@ -33,13 +33,13 @@ internal fun Event.fromDomainToDb(): DbEvent {
         else false
 
     return DbEvent(
-        id,
-        labels,
-        payload.type,
-        JsonHelper.toJson(this),
-        payload.createdAt,
-        payload.endedAt,
-        sessionIsClosed
+        id = id,
+        labels = labels,
+        type = payload.type,
+        eventJson = JsonHelper.toJson(this),
+        createdAt = payload.createdAt,
+        endedAt = payload.endedAt,
+        sessionIsClosed = sessionIsClosed
     )
 }
 

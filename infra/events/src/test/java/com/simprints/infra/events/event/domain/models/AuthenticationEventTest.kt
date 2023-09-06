@@ -1,8 +1,11 @@
 package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
@@ -52,7 +55,7 @@ class AuthenticationEventTest {
 
     private fun createAuthenticationEvent(result: AuthenticationPayload.Result) {
         val labels = EventLabels(sessionId = GUID1)
-        val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)
+        val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID.asTokenizedRaw())
         val event = AuthenticationEvent(CREATED_AT, ENDED_AT, userInfo, result, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

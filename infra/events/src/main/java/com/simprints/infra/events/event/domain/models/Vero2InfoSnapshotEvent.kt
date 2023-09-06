@@ -3,6 +3,7 @@ package com.simprints.infra.events.event.domain.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.tokenization.TokenizedString
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import java.util.UUID
@@ -33,9 +34,9 @@ data class Vero2InfoSnapshotEvent(
     )
 
 
-    override fun getTokenizedFields(): Map<TokenKeyType, String> = emptyMap()
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
 
     @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
@@ -88,8 +89,9 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             timeHelper.now(),
             subject.subjectId,
             subject.projectId,
-            subject.moduleId,
-            subject.attendantId,
+            // TODO [CORE-2502] review if encrypted at this point
+            subject.moduleId.asTokenizedEncrypted(),
+            subject.attendantId.asTokenizedEncrypted(),
             personCreationEvent.id
         ))
     }

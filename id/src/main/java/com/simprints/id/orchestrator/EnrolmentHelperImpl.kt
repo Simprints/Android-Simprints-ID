@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
@@ -50,8 +51,9 @@ class EnrolmentHelperImpl @Inject constructor(
                 timeHelper.now(),
                 subject.subjectId,
                 subject.projectId,
-                subject.moduleId,
-                subject.attendantId,
+                // TODO [CORE-2502] review if values are encrypted
+                subject.moduleId.asTokenizedEncrypted(),
+                subject.attendantId.asTokenizedEncrypted(),
                 personCreationEvent.id
             )
         )

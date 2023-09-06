@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent.Companion.EVENT_VERSION
@@ -19,7 +20,15 @@ class VerificationCalloutEventTest {
     @Test
     fun create_VerificationCalloutEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = VerificationCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, GUID1, DEFAULT_METADATA, labels)
+        val event = VerificationCalloutEvent(
+            createdAt = CREATED_AT,
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.asTokenizedRaw(),
+            moduleId = DEFAULT_MODULE_ID.asTokenizedRaw(),
+            verifyGuid = GUID1,
+            metadata = DEFAULT_METADATA,
+            labels = labels
+        )
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLOUT_VERIFICATION)
