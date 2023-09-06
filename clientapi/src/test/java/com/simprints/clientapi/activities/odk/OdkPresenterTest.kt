@@ -1,30 +1,46 @@
 package com.simprints.clientapi.activities.odk
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.clientapi.activities.odk.OdkAction.*
+import com.simprints.clientapi.activities.odk.OdkAction.Enrol
+import com.simprints.clientapi.activities.odk.OdkAction.Identify
+import com.simprints.clientapi.activities.odk.OdkAction.Invalid
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
+import com.simprints.clientapi.activities.odk.OdkAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.ODK
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence.HIGH
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence.LOW
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
-import com.simprints.clientapi.requestFactories.*
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
+import com.simprints.clientapi.requestFactories.EnrolLastBiometricsFactory
+import com.simprints.clientapi.requestFactories.EnrolRequestFactory
+import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory
+import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 @ExperimentalCoroutinesApi
 class OdkPresenterTest {
@@ -36,9 +52,7 @@ class OdkPresenterTest {
 
     @Before
     fun setup() {
-        BaseUnitTestConfig()
-            .rescheduleRxMainThread()
-            .coroutinesMainThread()
+        BaseUnitTestConfig().coroutinesMainThread()
 
 
         MockKAnnotations.init(this, relaxed = true)
@@ -53,7 +67,7 @@ class OdkPresenterTest {
         every { view.enrolExtractor } returns enrolmentExtractor
 
         OdkPresenter(view, Enrol, clientApiSessionEventsManager, mockk(), mockk()).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -77,7 +91,7 @@ class OdkPresenterTest {
             mockk(),
             mockk()
         ).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -95,7 +109,7 @@ class OdkPresenterTest {
         every { view.verifyExtractor } returns verifyExractor
 
         OdkPresenter(view, Verify, clientApiSessionEventsManager, mockk(), mockk()).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -116,8 +130,8 @@ class OdkPresenterTest {
             mockk(),
             mockk()
         ).apply {
-            runBlocking {
-                shouldThrow<InvalidIntentActionException> {
+            runTest {
+                assertThrows<InvalidIntentActionException> {
                     start()
                 }
             }
@@ -234,7 +248,7 @@ class OdkPresenterTest {
             mockk(),
             mockk()
         ).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -257,7 +271,7 @@ class OdkPresenterTest {
             clientApiSessionEventsManager,
             mockk(),
             mockk()
-        ).apply { runBlocking { start() } }
+        ).apply { runTest { start() } }
 
         verify(exactly = 1) {
             view.sendSimprintsRequest(
@@ -287,13 +301,13 @@ class OdkPresenterTest {
             mockk(),
             mockk()
         ).apply {
-            runBlocking {
+            runTest {
                 handleConfirmationResponse(mockk())
             }
         }
 
 
-        runBlocking {
+        runTest {
             val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
             assertThat(sessionId).isNotEqualTo(newSessionId)
             coVerify(exactly = 0) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
@@ -318,9 +332,9 @@ class OdkPresenterTest {
             clientApiSessionEventsManager,
             mockk(),
             mockk()
-        ).apply { runBlocking { handleEnrolResponse(mockk()) } }
+        ).apply { runTest { handleEnrolResponse(mockk()) } }
 
-        runBlocking {
+        runTest {
             val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
             assertThat(sessionId).isEqualTo(newSessionId)
             coVerify(exactly = 1) { clientApiSessionEventsManager.closeCurrentSessionNormally() }

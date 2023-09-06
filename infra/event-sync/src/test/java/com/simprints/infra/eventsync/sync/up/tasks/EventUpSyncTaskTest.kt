@@ -4,26 +4,36 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
+import com.simprints.infra.events.sampledata.createAlertScreenEvent
+import com.simprints.infra.events.sampledata.createAuthenticationEvent
+import com.simprints.infra.events.sampledata.createEnrolmentEventV2
+import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
+import com.simprints.infra.events.sampledata.createPersonCreationEvent
+import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.exceptions.NetworkConnectionException
-import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.*
+import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -169,7 +179,7 @@ internal class EventUpSyncTaskTest {
 
     @Test
     fun `should not upload sessions for not signed project`() = runTest {
-        shouldThrow<TryToUploadEventsForNotSignedProject> {
+        assertThrows<TryToUploadEventsForNotSignedProject> {
             eventUpSyncTask.upSync(EventUpSyncOperation(randomUUID())).toList()
         }
     }

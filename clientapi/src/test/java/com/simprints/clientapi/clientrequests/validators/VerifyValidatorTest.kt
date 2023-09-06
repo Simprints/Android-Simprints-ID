@@ -7,7 +7,7 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import org.junit.Assert
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class VerifyValidatorTest : AppRequestValidatorTest(VerifyRequestFactory) {
 

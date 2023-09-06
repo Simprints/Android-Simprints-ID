@@ -5,7 +5,7 @@ import com.simprints.infra.events.exceptions.validator.SessionEventCaptureAlread
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
-import io.kotest.assertions.throwables.shouldThrow
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class SessionCaptureEventValidatorTest {
@@ -17,7 +17,7 @@ class SessionCaptureEventValidatorTest {
 
     @Test
     fun alreadySessionCaptureEventPresent_addNewSessionCaptureEvent_fails() {
-        shouldThrow<SessionEventCaptureAlreadyExists> {
+        assertThrows<SessionEventCaptureAlreadyExists> {
             SessionCaptureEventValidator().validate(
                 listOf(createSessionCaptureEvent(GUID1)),
                     createSessionCaptureEvent(GUID2)
