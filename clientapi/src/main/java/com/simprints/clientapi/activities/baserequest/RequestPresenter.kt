@@ -37,7 +37,6 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.TokenizationAction
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.canCoSyncAllData
 import com.simprints.infra.config.domain.models.canCoSyncBiometricData
@@ -248,10 +247,9 @@ abstract class RequestPresenter(
 
     private fun List<Event>.decryptTokenizedFields(project: Project): List<Event> = map {
         val decryptedFieldsMap = it.getTokenizedFields().mapValues { entry ->
-            tokenizationManager.tryTokenize(
-                value = entry.value,
+            tokenizationManager.decrypt(
+                encrypted = entry.value,
                 tokenKeyType = entry.key,
-                action = TokenizationAction.Decrypt,
                 project = project
             )
         }

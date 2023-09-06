@@ -28,7 +28,7 @@ class ModalityFlowEnrolLastBiometrics @Inject constructor(
         listOf(
             coreStepProcessor.buildAppEnrolLastBiometricsStep(
                 appRequest.projectId,
-                appRequest.userId,
+                appRequest.userId.value,
                 appRequest.moduleId,
                 previousSteps,
                 appRequest.identificationSessionId

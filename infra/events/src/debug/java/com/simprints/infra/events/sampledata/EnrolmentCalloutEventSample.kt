@@ -1,5 +1,6 @@
 package com.simprints.infra.events.sampledata
 
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
@@ -16,8 +17,8 @@ object EnrolmentCalloutEventSample : SampleEvent() {
         return EnrolmentCalloutEvent(
             CREATED_AT,
             DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID,
+            DEFAULT_USER_ID.asTokenizedRaw(),
+            DEFAULT_MODULE_ID.asTokenizedRaw(),
             DEFAULT_METADATA,
             labels
         )

@@ -11,7 +11,11 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.tokenization.TokenizationManager
-import com.simprints.libsimprints.*
+import com.simprints.libsimprints.Constants
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.RefusalForm
+import com.simprints.libsimprints.Registration
+import com.simprints.libsimprints.Verification
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -37,7 +41,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         tokenizationManagerParam
     }
 
-    override suspend fun getProject(): Project = configManager.getProject(authStore.signedInProjectId)
+    override suspend fun getProject(): Project? = runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     override val presenter: LibSimprintsContract.Presenter by lazy {
         libSimprintsPresenterFactory.create(this, action)

@@ -24,8 +24,8 @@ internal data class ApiCalloutPayload(
         domainPayload.eventVersion,
         ApiEnrolmentCallout(
             domainPayload.projectId,
-            domainPayload.userId,
-            domainPayload.moduleId,
+            domainPayload.userId.value,
+            domainPayload.moduleId.value,
             domainPayload.metadata))
 
     constructor(domainPayload: IdentificationCalloutPayload) : this(
@@ -33,8 +33,8 @@ internal data class ApiCalloutPayload(
         domainPayload.eventVersion,
         ApiIdentificationCallout(
             domainPayload.projectId,
-            domainPayload.userId,
-            domainPayload.moduleId,
+            domainPayload.userId.value,
+            domainPayload.moduleId.value,
             domainPayload.metadata))
 
     constructor(domainPayload: VerificationCalloutPayload) : this(
@@ -42,8 +42,8 @@ internal data class ApiCalloutPayload(
         domainPayload.eventVersion,
         ApiVerificationCallout(
             domainPayload.projectId,
-            domainPayload.userId,
-            domainPayload.moduleId,
+            domainPayload.userId.value,
+            domainPayload.moduleId.value,
             domainPayload.metadata,
             domainPayload.verifyGuid))
 
@@ -59,8 +59,8 @@ internal data class ApiCalloutPayload(
         domainPayload.eventVersion,
         ApiEnrolmentLastBiometricsCallout(
             domainPayload.projectId,
-            domainPayload.userId,
-            domainPayload.moduleId,
+            domainPayload.userId.value,
+            domainPayload.moduleId.value,
             domainPayload.metadata,
             domainPayload.sessionId))
 }

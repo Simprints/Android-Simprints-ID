@@ -1,5 +1,6 @@
 package com.simprints.infra.events.sampledata
 
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
@@ -11,7 +12,7 @@ object AuthorizationEventSample : SampleEvent() {
         isClosed: Boolean
     ): AuthorizationEvent {
         val userInfo =
-            AuthorizationEvent.AuthorizationPayload.UserInfo(labels.projectId!!, DEFAULT_USER_ID)
+            AuthorizationEvent.AuthorizationPayload.UserInfo(labels.projectId!!, DEFAULT_USER_ID.asTokenizedRaw())
         return AuthorizationEvent(
             CREATED_AT,
             AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED,

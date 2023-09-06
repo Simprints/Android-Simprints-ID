@@ -3,8 +3,12 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import com.simprints.clientapi.ClientApiModule
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
+import com.simprints.clientapi.activities.odk.OdkAction.Enrol
+import com.simprints.clientapi.activities.odk.OdkAction.Identify
+import com.simprints.clientapi.activities.odk.OdkAction.Invalid
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction
+import com.simprints.clientapi.activities.odk.OdkAction.Verify
 import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
@@ -86,7 +90,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         tokenizationManagerParam
     }
 
-    override suspend fun getProject(): Project = configManager.getProject(authStore.signedInProjectId)
+    override suspend fun getProject(): Project? =
+        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     override val presenter: OdkContract.Presenter by lazy { presenterFactory.create(this, action) }
 
@@ -186,10 +191,12 @@ class OdkActivity : RequestActivity(), OdkContract.View {
                 ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE,
                 flowCompletedCheck
             )
+
             OdkActionFollowUpAction.EnrolLastBiometrics -> intent.putExtra(
                 ODK_REGISTER_BIOMETRICS_COMPLETE,
                 flowCompletedCheck
             )
+
             Enrol -> intent.putExtra(ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
             Verify -> intent.putExtra(ODK_VERIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
             Identify -> intent.putExtra(ODK_IDENTIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)

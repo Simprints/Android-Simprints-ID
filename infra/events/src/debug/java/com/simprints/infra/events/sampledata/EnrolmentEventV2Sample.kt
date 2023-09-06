@@ -1,5 +1,6 @@
 package com.simprints.infra.events.sampledata
 
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
@@ -18,8 +19,8 @@ object EnrolmentEventV2Sample : SampleEvent() {
             CREATED_AT,
             GUID1,
             DEFAULT_PROJECT_ID,
-            DEFAULT_MODULE_ID,
-            DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID.asTokenizedRaw(),
+            DEFAULT_USER_ID.asTokenizedRaw(),
             GUID2,
             labels
         )

@@ -61,7 +61,8 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         tokenizationManagerParam
     }
 
-    override suspend fun getProject(): Project = configManager.getProject(authStore.signedInProjectId)
+    override suspend fun getProject(): Project? =
+        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     override val presenter: CommCareContract.Presenter by lazy {
         presenterFactory.create(this, action)

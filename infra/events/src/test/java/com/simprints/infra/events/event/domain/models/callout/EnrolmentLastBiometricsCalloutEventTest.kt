@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.Companion.EVENT_VERSION
@@ -19,7 +20,15 @@ class EnrolmentLastBiometricsCalloutEventTest {
     @Test
     fun create_EnrolmentLastBiometricsCalloutEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = EnrolmentLastBiometricsCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, GUID1, labels)
+        val event = EnrolmentLastBiometricsCalloutEvent(
+            createdAt = CREATED_AT,
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.asTokenizedRaw(),
+            moduleId = DEFAULT_MODULE_ID.asTokenizedRaw(),
+            metadata = DEFAULT_METADATA,
+            sessionId = GUID1,
+            labels = labels
+        )
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLOUT_LAST_BIOMETRICS)

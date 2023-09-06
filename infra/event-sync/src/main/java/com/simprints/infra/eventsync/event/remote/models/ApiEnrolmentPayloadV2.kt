@@ -19,7 +19,7 @@ internal data class ApiEnrolmentPayloadV2(
         domainPayload.eventVersion,
         domainPayload.subjectId,
         domainPayload.projectId,
-        domainPayload.moduleId,
-        domainPayload.attendantId,
+        domainPayload.moduleId.value,
+        domainPayload.attendantId.value,
         domainPayload.personCreationEventId)
 }

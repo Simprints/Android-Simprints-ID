@@ -11,7 +11,6 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposit
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.TokenizationAction
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.tokenization.TokenizationManager
@@ -50,10 +49,9 @@ internal class ModuleSelectionViewModel @Inject constructor(
             maxNumberOfModules = repository.getMaxNumberOfModules()
             initialModules =
                 repository.getModules().map { module ->
-                    val decryptedName = tokenizationManager.tryTokenize(
-                        value = module.name,
+                    val decryptedName = tokenizationManager.decrypt(
+                        encrypted = module.name,
                         tokenKeyType = TokenKeyType.ModuleId,
-                        action = TokenizationAction.Decrypt,
                         project = configManager.getProject(authStore.signedInProjectId)
                     )
                     module.copy(name = decryptedName)
@@ -93,10 +91,9 @@ internal class ModuleSelectionViewModel @Inject constructor(
     fun saveModules() {
         externalScope.launch {
             val modules = modules.map { module ->
-                val encryptedName = tokenizationManager.tryTokenize(
-                    value = module.name,
+                val encryptedName = tokenizationManager.encrypt(
+                    decrypted = module.name,
                     tokenKeyType = TokenKeyType.ModuleId,
-                    action = TokenizationAction.Encrypt,
                     project = configManager.getProject(authStore.signedInProjectId)
                 )
                 module.copy(name = encryptedName)

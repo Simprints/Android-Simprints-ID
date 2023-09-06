@@ -4,6 +4,7 @@ import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrolValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolRequest
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.tokenization.TokenizationManager
@@ -11,7 +12,7 @@ import com.simprints.infra.config.tokenization.TokenizationManager
 
 class EnrolBuilder(
     private val extractor: EnrolExtractor,
-    private val project: Project,
+    private val project: Project?,
     private val tokenizationManager: TokenizationManager,
     validator: EnrolValidator
 ) : ClientRequestBuilder(validator) {
@@ -26,9 +27,9 @@ class EnrolBuilder(
 
     override fun buildAppRequest(): BaseRequest = EnrolRequest(
         projectId = extractor.getProjectId(),
-        userId = extractor.getUserId(),
+        userId = extractor.getUserId().asTokenizedRaw(),
         metadata = extractor.getMetadata(),
-        moduleId = extractor.getModuleId(),
+        moduleId = extractor.getModuleId().asTokenizedRaw(),
         unknownExtras = extractor.getUnknownExtras()
     )
 }

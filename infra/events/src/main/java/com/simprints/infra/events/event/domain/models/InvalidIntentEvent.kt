@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizedString
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.INVALID_INTENT
 import java.util.UUID
@@ -26,9 +27,9 @@ data class InvalidIntentEvent(
     )
 
 
-    override fun getTokenizedFields(): Map<TokenKeyType, String> = emptyMap()
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, String>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
 
     @Keep
     data class InvalidIntentPayload(

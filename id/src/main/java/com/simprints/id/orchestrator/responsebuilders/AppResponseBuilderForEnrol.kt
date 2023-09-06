@@ -36,7 +36,7 @@ class AppResponseBuilderForEnrol(
 
         val subject = enrolmentHelper.buildSubject(
             request.projectId,
-            request.userId,
+            request.userId.value,
             request.moduleId,
             fingerprintResponse,
             faceResponse,
