@@ -4,6 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
+import com.simprints.feature.clientapi.models.ActionRequestIdentifier
+import com.simprints.feature.clientapi.models.IntegrationConstants
 import org.junit.Test
 
 internal class VerifyRequestBuilderTest {
@@ -13,7 +15,14 @@ internal class VerifyRequestBuilderTest {
         val extractor = VerifyActionFactory.getMockExtractor()
         val validator = VerifyActionFactory.getValidator(extractor)
 
-        val action = VerifyRequestBuilder(RequestActionFactory.MOCK_PACKAGE, extractor, validator).build() as ActionRequest.VerifyActionRequest
+        val action = VerifyRequestBuilder(
+            ActionRequestIdentifier(
+                RequestActionFactory.MOCK_PACKAGE,
+                IntegrationConstants.ACTION_VERIFY,
+            ),
+            extractor,
+            validator
+        ).build() as ActionRequest.VerifyActionRequest
 
         assertThat(action.projectId).isEqualTo(RequestActionFactory.MOCK_PROJECT_ID)
         assertThat(action.userId).isEqualTo(RequestActionFactory.MOCK_USER_ID)

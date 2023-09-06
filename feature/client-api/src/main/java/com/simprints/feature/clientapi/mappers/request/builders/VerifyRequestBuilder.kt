@@ -3,16 +3,17 @@ package com.simprints.feature.clientapi.mappers.request.builders
 import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidator
+import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 
 
 internal class VerifyRequestBuilder(
-    val packageName: String,
+    private val actionIdentifier: ActionRequestIdentifier,
     private val extractor: VerifyRequestExtractor,
     validator: VerifyValidator,
 ) : ActionRequestBuilder(validator) {
 
     override fun buildAction(): ActionRequest = ActionRequest.VerifyActionRequest(
-        packageName = packageName,
+        actionIdentifier = actionIdentifier,
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId(),
         moduleId = extractor.getModuleId(),

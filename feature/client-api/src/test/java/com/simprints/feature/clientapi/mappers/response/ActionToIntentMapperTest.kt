@@ -39,7 +39,7 @@ class ActionToIntentMapperTest {
 
     @Test
     fun `Maps ODK package name to correct mapper`() {
-        mapper(stupActionResponse(OdkConstants.PACKAGE_NAME))
+        mapper(setupActionResponse(OdkConstants.PACKAGE_NAME))
 
         verify(exactly = 1) { odkResponseMapper(any()) }
         verify(exactly = 0) { commCareResponseMapper(any()) }
@@ -49,7 +49,7 @@ class ActionToIntentMapperTest {
 
     @Test
     fun `Maps CommCare package name to correct mapper`() {
-        mapper(stupActionResponse(CommCareConstants.PACKAGE_NAME))
+        mapper(setupActionResponse(CommCareConstants.PACKAGE_NAME))
 
         verify(exactly = 0) { odkResponseMapper(any()) }
         verify(exactly = 1) { commCareResponseMapper(any()) }
@@ -58,7 +58,7 @@ class ActionToIntentMapperTest {
 
     @Test
     fun `Maps LibSimprints package name to correct mapper`() {
-        mapper(stupActionResponse(LibSimprintsConstants.PACKAGE_NAME))
+        mapper(setupActionResponse(LibSimprintsConstants.PACKAGE_NAME))
 
         verify(exactly = 0) { odkResponseMapper(any()) }
         verify(exactly = 0) { commCareResponseMapper(any()) }
@@ -68,12 +68,12 @@ class ActionToIntentMapperTest {
     @Test
     fun `Throws exception for invalid package name`() {
         assertThrows<InvalidRequestException> {
-            mapper(stupActionResponse("invalid"))
+            mapper(setupActionResponse("invalid"))
         }
     }
 
-    private fun stupActionResponse(packageName: String) = ActionResponse.ConfirmActionResponse(
-        request = ConfirmIdentityActionFactory.getValidSimprintsRequest().copy(packageName = packageName),
+    private fun setupActionResponse(packageName: String) = ActionResponse.ConfirmActionResponse(
+        actionIdentifier = ConfirmIdentityActionFactory.getIdentifier().copy(packageName = packageName),
         sessionId = "sessionId",
         eventsJson = null,
         confirmed = true,

@@ -9,6 +9,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.feature.alert.AlertContract
+import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.clientapi.R
 import com.simprints.feature.clientapi.databinding.FragmentClientApiBinding
@@ -16,7 +18,9 @@ import com.simprints.feature.clientapi.extensions.toMap
 import com.simprints.feature.clientapi.logincheck.LoginCheckViewModel
 import com.simprints.feature.clientapi.mappers.AlertConfigurationMapper
 import com.simprints.feature.clientapi.mappers.response.ActionToIntentMapper
+import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 import com.simprints.feature.clientapi.models.ClientApiResult
+import com.simprints.feature.clientapi.models.ClientApiResultError
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
@@ -49,6 +53,17 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        findNavController().handleResult<AlertResult>(
+            viewLifecycleOwner,
+            R.id.clientApiFragment,
+            AlertContract.ALERT_DESTINATION_ID,
+        ) { alertResult ->
+            vm.handleErrorResponse(
+                ActionRequestIdentifier.fromIntentAction(args.requestAction),
+                ClientApiResultError(AlertConfigurationMapper.reasonFromPayload(alertResult.payload))
+            )
+        }
+
         findNavController().handleResult<LoginResult>(
             viewLifecycleOwner,
             R.id.clientApiFragment,
@@ -69,9 +84,7 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
         loginCheckVm.showAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
             findNavController().navigate(
                 R.id.action_clientApiFragment_to_alert,
-                alertConfigurationMapper.buildAlertConfig(error)
-                    // .withPayload() // TODO add payload ot differentiate alert screens when returning
-                    .toArgs()
+                alertConfigurationMapper.buildAlertConfig(error).toArgs()
             )
         })
 
@@ -82,12 +95,13 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
             )
         })
 
-        loginCheckVm.returnErrorResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { (request, error) ->
-            vm.handleErrorResponse(request, error)
+        loginCheckVm.returnErrorResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
+            vm.handleErrorResponse(ActionRequestIdentifier.fromIntentAction(args.requestAction), error)
         })
 
         loginCheckVm.proceedWithAction.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { action ->
-            // TODO replace with proper flow
+            // TODO add special case for confirmation action
+            // TODO replace with user flow builder
             findNavController().navigate(
                 R.id.action_clientApiFragment_to_stubFragment,
                 StubFragmentArgs(action.toString()).toBundle()
@@ -100,10 +114,7 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
 
         if (!isActivityRestored && !requestProcessed) {
             requestProcessed = true
-            lifecycleScope.launch {
-
-                loginCheckVm.handleIntent(args.requestAction, args.requestParams.toMap())
-            }
+            lifecycleScope.launch { loginCheckVm.handleIntent(args.requestAction, args.requestParams.toMap()) }
         }
     }
 

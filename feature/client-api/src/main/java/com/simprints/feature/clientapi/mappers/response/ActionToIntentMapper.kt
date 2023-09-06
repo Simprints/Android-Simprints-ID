@@ -15,7 +15,7 @@ internal class ActionToIntentMapper @Inject constructor(
     private val mapLibSimprintsResponse: LibSimprintsResponseMapper
 ) {
 
-    operator fun invoke(response: ActionResponse): Bundle = when (response.request.packageName) {
+    operator fun invoke(response: ActionResponse): Bundle = when (response.actionIdentifier.packageName) {
         OdkConstants.PACKAGE_NAME -> mapOdkResponse(response)
         CommCareConstants.PACKAGE_NAME -> mapCommCareResponse(response)
         LibSimprintsConstants.PACKAGE_NAME -> mapLibSimprintsResponse(response)

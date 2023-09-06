@@ -29,7 +29,7 @@ class LibSimprintsResponseMapperTest {
     @Test
     fun `correctly maps enrol response`() {
         val extras = mapper(ActionResponse.EnrolActionResponse(
-            request = EnrolActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             enrolledGuid = "guid",
@@ -44,7 +44,7 @@ class LibSimprintsResponseMapperTest {
     @Test
     fun `correctly maps identify response`() {
         val extras = mapper(ActionResponse.IdentifyActionResponse(
-            request = IdentifyRequestActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             identifications = listOf(
@@ -73,7 +73,7 @@ class LibSimprintsResponseMapperTest {
     @Test
     fun `correctly maps confirm response`() {
         val extras = mapper(ActionResponse.ConfirmActionResponse(
-            request = ConfirmIdentityActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             confirmed = true,
@@ -86,7 +86,7 @@ class LibSimprintsResponseMapperTest {
     @Test
     fun `correctly maps verify response`() {
         val extras = mapper(ActionResponse.VerifyActionResponse(
-            request = VerifyActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = VerifyActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             matchResult = StubMatchResult(
@@ -110,7 +110,7 @@ class LibSimprintsResponseMapperTest {
     @Test
     fun `correctly maps exit form response`() {
         val extras = mapper(ActionResponse.ExitFormActionResponse(
-            request = EnrolLastBiometricsActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = EnrolLastBiometricsActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             reason = "reason",
@@ -125,7 +125,7 @@ class LibSimprintsResponseMapperTest {
     @Test
     fun `correctly maps error response`() {
         val extras = mapper(ActionResponse.ErrorActionResponse(
-            request = EnrolActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             reason = IAppErrorReason.UNEXPECTED_ERROR,
@@ -158,7 +158,7 @@ class LibSimprintsResponseMapperTest {
             IAppErrorReason.PROJECT_ENDING to Constants.SIMPRINTS_PROJECT_ENDING,
         ).forEach { (reason, expectedCode) ->
             val extras = mapper(ActionResponse.ErrorActionResponse(
-                request = EnrolActionFactory.getValidSimprintsRequest(),
+                actionIdentifier = EnrolActionFactory.getIdentifier(),
                 sessionId = "sessionId",
                 eventsJson = null,
                 reason = reason,

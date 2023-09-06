@@ -1,5 +1,7 @@
 package com.simprints.feature.clientapi.mappers
 
+import android.os.Bundle
+import androidx.core.os.bundleOf
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.alert.AlertConfigurationBuilder
 import com.simprints.feature.alert.alertConfiguration
@@ -7,6 +9,7 @@ import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.moduleapi.app.responses.IAppErrorReason
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -21,6 +24,10 @@ class AlertConfigurationMapper @Inject constructor() {
         messageIcon = getMessageIcon(clientApiError)
         eventType = getEventType(clientApiError)
         leftButton = AlertButtonConfig.Close
+
+        payload = bundleOf(
+            PAYLOAD_KEY to clientApiError.name,
+        )
     }
 
     private fun getBackgroundColor(clientApiError: ClientApiError) = when (clientApiError) {
@@ -91,4 +98,34 @@ class AlertConfigurationMapper @Inject constructor() {
         ClientApiError.UNEXPECTED_LOGIN_ERROR,
         ClientApiError.ROOTED_DEVICE -> AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
     }
+
+    companion object {
+
+        fun reasonFromPayload(extras: Bundle): IAppErrorReason = extras.getString(PAYLOAD_KEY)?.let {
+            when (ClientApiError.valueOf(it)) {
+                ClientApiError.INVALID_STATE_FOR_INTENT_ACTION,
+                ClientApiError.INVALID_METADATA,
+                ClientApiError.INVALID_MODULE_ID,
+                ClientApiError.INVALID_PROJECT_ID,
+                ClientApiError.INVALID_SELECTED_ID,
+                ClientApiError.INVALID_SESSION_ID,
+                ClientApiError.INVALID_USER_ID,
+                ClientApiError.INVALID_VERIFY_ID,
+                ClientApiError.MISSING_GOOGLE_PLAY_SERVICES,
+                ClientApiError.GOOGLE_PLAY_SERVICES_OUTDATED,
+                ClientApiError.INTEGRITY_SERVICE_ERROR,
+                ClientApiError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
+                ClientApiError.UNEXPECTED_LOGIN_ERROR,
+                -> IAppErrorReason.UNEXPECTED_ERROR
+
+                ClientApiError.DIFFERENT_PROJECT_ID -> IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
+                ClientApiError.PROJECT_PAUSED -> IAppErrorReason.PROJECT_PAUSED
+                ClientApiError.PROJECT_ENDING -> IAppErrorReason.PROJECT_ENDING
+                ClientApiError.ROOTED_DEVICE -> IAppErrorReason.ROOTED_DEVICE
+            }
+        } ?: IAppErrorReason.UNEXPECTED_ERROR
+
+        private const val PAYLOAD_KEY = "alert_payload"
+    }
 }
+

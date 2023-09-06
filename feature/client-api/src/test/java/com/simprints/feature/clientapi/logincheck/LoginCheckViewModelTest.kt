@@ -167,7 +167,7 @@ internal class LoginCheckViewModelTest {
 
         viewModel.handleIntent(TEST_ACTION, emptyMap())
 
-        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second.reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
     }
 
     @Test
@@ -178,7 +178,7 @@ internal class LoginCheckViewModelTest {
         viewModel.handleIntent(TEST_ACTION, emptyMap())
         viewModel.handleIntent(TEST_ACTION, emptyMap())
 
-        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second.reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
     }
 
     @Test
@@ -203,7 +203,7 @@ internal class LoginCheckViewModelTest {
         viewModel.handleIntent(TEST_ACTION, emptyMap())
         viewModel.handleLoginResult(LoginResult(false, LoginError.LoginNotCompleted))
 
-        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second.reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
     }
 
     @Test
