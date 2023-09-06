@@ -1,4 +1,4 @@
-package com.simprints.feature.clientapi.session
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager

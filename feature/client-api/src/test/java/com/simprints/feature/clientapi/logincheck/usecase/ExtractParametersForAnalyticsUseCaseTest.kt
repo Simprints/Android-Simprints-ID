@@ -1,4 +1,4 @@
-package com.simprints.feature.clientapi.activity.usecases
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory

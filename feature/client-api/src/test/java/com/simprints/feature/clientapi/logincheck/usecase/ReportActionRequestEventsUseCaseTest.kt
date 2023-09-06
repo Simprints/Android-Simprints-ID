@@ -1,20 +1,17 @@
-package com.simprints.feature.clientapi.session
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
+import com.simprints.feature.clientapi.session.ClientSessionManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coInvoke
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.invoke
-import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.simprints.feature.clientapi.session
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository

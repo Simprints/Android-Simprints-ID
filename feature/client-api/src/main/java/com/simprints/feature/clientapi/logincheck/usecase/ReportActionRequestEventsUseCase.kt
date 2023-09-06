@@ -1,6 +1,7 @@
-package com.simprints.feature.clientapi.session
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.simprints.feature.clientapi.models.ActionRequest
+import com.simprints.feature.clientapi.session.ClientSessionManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import javax.inject.Inject
 

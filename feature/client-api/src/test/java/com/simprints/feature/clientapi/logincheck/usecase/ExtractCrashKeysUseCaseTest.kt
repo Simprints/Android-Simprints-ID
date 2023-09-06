@@ -1,4 +1,4 @@
-package com.simprints.feature.clientapi.activity.usecases
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.infra.authstore.AuthStore
@@ -11,9 +11,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkObject
-import io.mockk.mockkStatic
 import io.mockk.unmockkObject
-import io.mockk.unmockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.After

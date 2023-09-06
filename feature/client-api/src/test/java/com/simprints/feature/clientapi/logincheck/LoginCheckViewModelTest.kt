@@ -1,26 +1,22 @@
-package com.simprints.feature.clientapi.activity
+package com.simprints.feature.clientapi.logincheck
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
-import com.simprints.feature.clientapi.activity.usecases.CancelBackgroundSyncUseCase
-import com.simprints.feature.clientapi.activity.usecases.ExtractCrashKeysUseCase
-import com.simprints.feature.clientapi.activity.usecases.ExtractParametersForAnalyticsUseCase
-import com.simprints.feature.clientapi.activity.usecases.IsFlowCompletedWithErrorUseCase
-import com.simprints.feature.clientapi.activity.usecases.IsUserSignedInUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.CancelBackgroundSyncUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.ExtractCrashKeysUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.ExtractParametersForAnalyticsUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.IsUserSignedInUseCase
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.IntentToActionMapper
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
-import com.simprints.feature.clientapi.models.ActionResponse
 import com.simprints.feature.clientapi.models.ClientApiError
+import com.simprints.feature.clientapi.models.ClientApiResultError
 import com.simprints.feature.clientapi.session.ClientSessionManager
-import com.simprints.feature.clientapi.session.DeleteSessionEventsIfNeededUseCase
-import com.simprints.feature.clientapi.session.GetEnrolmentCreationEventForSubjectUseCase
-import com.simprints.feature.clientapi.session.GetEventJsonForSessionUseCase
-import com.simprints.feature.clientapi.session.GetProjectStateUseCase
-import com.simprints.feature.clientapi.session.ReportActionRequestEventsUseCase
-import com.simprints.feature.clientapi.session.UpdateDatabaseCountsInCurrentSessionUseCase
-import com.simprints.feature.clientapi.session.UpdateProjectInCurrentSessionUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.GetProjectStateUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.ReportActionRequestEventsUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.UpdateDatabaseCountsInCurrentSessionUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.UpdateProjectInCurrentSessionUseCase
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.security.SecurityManager
@@ -38,7 +34,7 @@ import org.junit.Rule
 import org.junit.Test
 
 
-internal class ClientApiViewModelTest {
+internal class LoginCheckViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -71,9 +67,6 @@ internal class ClientApiViewModelTest {
     lateinit var getProjectStateUseCase: GetProjectStateUseCase
 
     @MockK
-    lateinit var getEventJsonForSessionUseCase: GetEventJsonForSessionUseCase
-
-    @MockK
     lateinit var cancelBackgroundSync: CancelBackgroundSyncUseCase
 
     @MockK
@@ -82,24 +75,14 @@ internal class ClientApiViewModelTest {
     @MockK
     lateinit var updateProjectStateUseCase: UpdateProjectInCurrentSessionUseCase
 
-    @MockK
-    lateinit var getEnrolmentCreationEventForSubjectUseCase: GetEnrolmentCreationEventForSubjectUseCase
-
-    @MockK
-    lateinit var deleteSessionEventsIfNeededUseCase: DeleteSessionEventsIfNeededUseCase
-
-    @MockK
-    lateinit var isFlowCompletedWithErrorUseCase: IsFlowCompletedWithErrorUseCase
-
-
-    private lateinit var viewModel: ClientApiViewModel
+    private lateinit var viewModel: LoginCheckViewModel
 
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        viewModel = ClientApiViewModel(
+        viewModel = LoginCheckViewModel(
             rootMatchers,
             intentMapper,
             clientSessionManager,
@@ -108,13 +91,9 @@ internal class ClientApiViewModelTest {
             extractCrashKeysUseCase,
             isUserSignedInUseCase,
             getProjectStateUseCase,
-            getEventJsonForSessionUseCase,
             cancelBackgroundSync,
             updateDatabaseCountsInCurrentSessionUseCase,
             updateProjectStateUseCase,
-            getEnrolmentCreationEventForSubjectUseCase,
-            deleteSessionEventsIfNeededUseCase,
-            isFlowCompletedWithErrorUseCase
         )
     }
 
@@ -174,7 +153,7 @@ internal class ClientApiViewModelTest {
 
         viewModel.handleIntent(TEST_ACTION, emptyMap())
 
-        viewModel.returnResponse.test().assertValue { it.peekContent() is ActionResponse.ErrorActionResponse }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second is ClientApiResultError }
     }
 
     @Test
@@ -185,7 +164,7 @@ internal class ClientApiViewModelTest {
         viewModel.handleIntent(TEST_ACTION, emptyMap())
         viewModel.handleIntent(TEST_ACTION, emptyMap())
 
-        viewModel.returnResponse.test().assertValue { it.peekContent() is ActionResponse.ErrorActionResponse }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second is ClientApiResultError }
     }
 
     @Test
@@ -210,7 +189,7 @@ internal class ClientApiViewModelTest {
         viewModel.handleIntent(TEST_ACTION, emptyMap())
         viewModel.handleLoginResult(LoginResult(false, LoginError.LoginNotCompleted))
 
-        viewModel.returnResponse.test().assertValue { it.peekContent() is ActionResponse.ErrorActionResponse }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second is ClientApiResultError }
     }
 
     @Test

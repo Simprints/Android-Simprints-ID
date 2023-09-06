@@ -1,7 +1,7 @@
-package com.simprints.feature.clientapi.activity.usecases
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.clientapi.activity.usecases.IsUserSignedInUseCase.SignedInState
+import com.simprints.feature.clientapi.logincheck.usecase.IsUserSignedInUseCase.SignedInState
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory
 import com.simprints.infra.authstore.AuthStore
