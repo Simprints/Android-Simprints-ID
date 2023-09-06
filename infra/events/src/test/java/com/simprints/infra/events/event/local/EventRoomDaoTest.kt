@@ -16,7 +16,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import io.mockk.MockKAnnotations
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -53,7 +52,7 @@ internal class EventRoomDaoTest {
 
     @Test
     fun loadByProjectId() {
-        runBlocking {
+        runTest {
             val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(projectId = GUID1))
             addIntoDb(event, wrongEvent)
             verifyEvents(listOf(event), eventDao.loadFromProject(projectId = DEFAULT_PROJECT_ID))
@@ -62,7 +61,7 @@ internal class EventRoomDaoTest {
 
     @Test
     fun loadBySessionId() {
-        runBlocking {
+        runTest {
             val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
             addIntoDb(event, wrongEvent)
             verifyEvents(listOf(event), eventDao.loadFromSession(sessionId = GUID1))
@@ -71,7 +70,7 @@ internal class EventRoomDaoTest {
 
     @Test
     fun loadEventJsonFormSession() {
-        runBlocking {
+        runTest {
             addIntoDb(event)
             val results = eventDao.loadEventJsonFromSession(GUID1)
             assertThat(results).containsExactlyElementsIn(listOf(eventJson))
@@ -96,7 +95,7 @@ internal class EventRoomDaoTest {
 
     @Test
     fun loadAllClosedSessionIds() {
-        runBlocking {
+        runTest {
             val otherId = randomUUID()
             val closedEvent = event.copy(
                 id = otherId,
@@ -115,7 +114,7 @@ internal class EventRoomDaoTest {
 
     @Test
     fun loadAll() {
-        runBlocking {
+        runTest {
             val secondEvent = event.copy(id = randomUUID(), labels = EventLabels(deviceId = GUID2))
             addIntoDb(event, secondEvent)
             verifyEvents(listOf(event, secondEvent), eventDao.loadAll())
@@ -124,7 +123,7 @@ internal class EventRoomDaoTest {
 
     @Test
     fun count() {
-        runBlocking {
+        runTest {
             addIntoDb(event, event.copy(id = randomUUID()), event.copy(id = randomUUID()))
             assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(3)
         }
@@ -132,7 +131,7 @@ internal class EventRoomDaoTest {
 
     @Test
     fun deletion() {
-        runBlocking {
+        runTest {
             addIntoDb(event)
             db.eventDao.delete(listOf(event.id))
             assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(0)
@@ -141,7 +140,7 @@ internal class EventRoomDaoTest {
 
     @Test
     fun deletionBySessionId() {
-        runBlocking {
+        runTest {
             val eventSameSession =
                 event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID1))
             val eventDifferentSession =

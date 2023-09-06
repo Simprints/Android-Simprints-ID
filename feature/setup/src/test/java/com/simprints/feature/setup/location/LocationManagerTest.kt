@@ -16,7 +16,7 @@ import io.mockk.mockkStatic
 import io.mockk.slot
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
@@ -59,7 +59,7 @@ internal class LocationManagerTest {
 
 
     @Test
-    fun `test requestLocation success`() = runBlocking {
+    fun `test requestLocation success`() = runTest {
         // Given
         val fakeLocation = TestLocationData.buildFakeLocation()
         every { locationResponseTask.isSuccessful } returns true
@@ -71,7 +71,7 @@ internal class LocationManagerTest {
     }
 
     @Test
-    fun `test requestLocation failure`() = runBlocking {
+    fun `test requestLocation failure`() = runTest {
         // Given
         every { locationResponseTask.isSuccessful } returns false
         // When

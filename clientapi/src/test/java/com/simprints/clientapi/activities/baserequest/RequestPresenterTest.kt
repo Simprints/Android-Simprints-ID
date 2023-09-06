@@ -1,10 +1,15 @@
 package com.simprints.clientapi.activities.baserequest
 
-import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -30,8 +35,7 @@ class RequestPresenterTest {
 
     @Before
     fun setUp() {
-        BaseUnitTestConfig()
-            .coroutinesMainThread()
+        BaseUnitTestConfig().coroutinesMainThread()
 
         clientApiSessionEventsManagerMock = mockk(relaxed = true)
     }
