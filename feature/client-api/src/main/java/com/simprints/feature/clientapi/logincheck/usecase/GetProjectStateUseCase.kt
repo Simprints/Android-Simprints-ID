@@ -1,4 +1,4 @@
-package com.simprints.feature.clientapi.session
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState

@@ -1,4 +1,4 @@
-package com.simprints.feature.clientapi.activity.usecases
+package com.simprints.feature.clientapi.logincheck.usecase
 
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager

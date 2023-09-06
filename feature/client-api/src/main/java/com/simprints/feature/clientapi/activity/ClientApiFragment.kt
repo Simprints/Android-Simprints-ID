@@ -13,6 +13,7 @@ import com.simprints.feature.alert.toArgs
 import com.simprints.feature.clientapi.R
 import com.simprints.feature.clientapi.databinding.FragmentClientApiBinding
 import com.simprints.feature.clientapi.extensions.toMap
+import com.simprints.feature.clientapi.logincheck.LoginCheckViewModel
 import com.simprints.feature.clientapi.mappers.AlertConfigurationMapper
 import com.simprints.feature.clientapi.mappers.response.ActionToIntentMapper
 import com.simprints.feature.clientapi.models.ClientApiResult
@@ -39,7 +40,10 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
     lateinit var resultMapper: ActionToIntentMapper
 
     private val args by navArgs<ClientApiFragmentArgs>()
+
+    private val loginCheckVm by viewModels<LoginCheckViewModel>()
     private val vm by viewModels<ClientApiViewModel>()
+
     private val binding by viewBinding(FragmentClientApiBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,17 +53,20 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
             viewLifecycleOwner,
             R.id.clientApiFragment,
             LoginContract.LOGIN_DESTINATION_ID,
-        ) { result -> vm.handleLoginResult(result) }
+        ) { result -> loginCheckVm.handleLoginResult(result) }
 
-        vm.proceedWithAction.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { action ->
-            // TODO replace with proper flow
-            findNavController().navigate(
-                R.id.action_clientApiFragment_to_stubFragment,
-                StubFragmentArgs(action.toString()).toBundle()
-            )
+        observeLoginCheckVm()
+
+        vm.returnResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { response ->
+            val responseExtras = resultMapper(response)
+            val resultCode = responseExtras.getInt(LibSimprintsConstants.RESULT_CODE_OVERRIDE, AppCompatActivity.RESULT_OK)
+            responseExtras.remove(LibSimprintsConstants.RESULT_CODE_OVERRIDE)
+            findNavController().finishWithResult(this, ClientApiResult(resultCode, responseExtras))
         })
+    }
 
-        vm.showAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
+    private fun observeLoginCheckVm() {
+        loginCheckVm.showAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
             findNavController().navigate(
                 R.id.action_clientApiFragment_to_alert,
                 alertConfigurationMapper.buildAlertConfig(error)
@@ -68,18 +75,23 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
             )
         })
 
-        vm.showLoginFlow.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { request ->
+        loginCheckVm.showLoginFlow.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { request ->
             findNavController().navigate(
                 R.id.action_clientApiFragment_to_login,
                 LoginContract.toArgs(request.projectId, request.userId),
             )
         })
 
-        vm.returnResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { response ->
-            val responseExtras = resultMapper(response)
-            val resultCode = responseExtras.getInt(LibSimprintsConstants.RESULT_CODE_OVERRIDE, AppCompatActivity.RESULT_OK)
-            responseExtras.remove(LibSimprintsConstants.RESULT_CODE_OVERRIDE)
-            findNavController().finishWithResult(this, ClientApiResult(resultCode, responseExtras))
+        loginCheckVm.returnErrorResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { (request, error) ->
+            vm.handleErrorResponse(request, error)
+        })
+
+        loginCheckVm.proceedWithAction.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { action ->
+            // TODO replace with proper flow
+            findNavController().navigate(
+                R.id.action_clientApiFragment_to_stubFragment,
+                StubFragmentArgs(action.toString()).toBundle()
+            )
         })
     }
 
@@ -90,10 +102,9 @@ internal class ClientApiFragment : Fragment(R.layout.fragment_client_api) {
             requestProcessed = true
             lifecycleScope.launch {
 
-                vm.handleIntent(args.requestAction, args.requestParams.toMap())
+                loginCheckVm.handleIntent(args.requestAction, args.requestParams.toMap())
             }
         }
     }
 
 }
-
