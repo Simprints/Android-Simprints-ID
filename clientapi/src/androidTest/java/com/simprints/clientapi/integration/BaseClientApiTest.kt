@@ -52,7 +52,7 @@ open class BaseClientApiTest {
         Intents.init()
     }
 
-    private fun buildDummySessionEventsManagerMock(): EventRepository {
+    private fun buildDummySessionEventsManagermockk(): EventRepository {
         val sessionMock = mockk<SessionCaptureEvent>(relaxed = true)
         every { sessionMock.id } returns ""
         val repo = mockk<EventRepository>(relaxed = true)

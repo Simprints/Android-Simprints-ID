@@ -1,6 +1,6 @@
 package com.simprints.core.tools.json
 
-import io.kotest.assertions.throwables.shouldThrow
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class JsonHelperTest {
@@ -14,7 +14,7 @@ class JsonHelperTest {
     @Test
     fun validateJson_shouldThrownIfInvalid() {
         val json = """{"name": "Test }"""
-        shouldThrow<Throwable> {
+        assertThrows<Throwable> {
             JsonHelper.validateJsonOrThrow(json)
         }
     }

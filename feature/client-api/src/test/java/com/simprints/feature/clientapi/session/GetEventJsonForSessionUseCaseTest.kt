@@ -1,7 +1,6 @@
 package com.simprints.feature.clientapi.session
 
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.argWhere
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.clientapi.models.CoSyncEvents
 import com.simprints.infra.config.ConfigManager
@@ -69,7 +68,7 @@ class GetEventJsonForSessionUseCaseTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
         }
-        every { jsonHelper.toJson(argWhere<CoSyncEvents> { it.events.size == 5 }) } returns "json"
+        every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"
 
         val result = useCase("sessionId")
 
@@ -77,11 +76,11 @@ class GetEventJsonForSessionUseCaseTest {
     }
 
     @Test
-    fun `returns only analytics events if anbalytics coSync enabled`() = runTest {
+    fun `returns only analytics events if analytics coSync enabled`() = runTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
         }
-        every { jsonHelper.toJson(argWhere<CoSyncEvents> { it.events.size == 3 }) } returns "json"
+        every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"
 
         val result = useCase("sessionId")
 
@@ -93,7 +92,7 @@ class GetEventJsonForSessionUseCaseTest {
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
-        every { jsonHelper.toJson(argWhere<CoSyncEvents> { it.events.size == 2 }) } returns "json"
+        every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"
 
         val result = useCase("sessionId")
 

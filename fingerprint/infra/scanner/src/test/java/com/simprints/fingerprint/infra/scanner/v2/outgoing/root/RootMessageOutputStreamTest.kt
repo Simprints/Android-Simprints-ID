@@ -1,27 +1,26 @@
 package com.simprints.fingerprint.infra.scanner.v2.outgoing.root
 
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.eq
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.commands.EnterMainModeCommand
 import com.simprints.fingerprint.infra.scanner.v2.outgoing.common.OutputStreamDispatcher
 import com.simprints.fingerprint.infra.scanner.v2.tools.reactive.toFlowable
 import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class RootMessageOutputStreamTest {
 
-    private val rootMessageSerializerMock: RootMessageSerializer = mock()
+    private val rootMessageSerializerMock: RootMessageSerializer = mockk()
 
     @Test
     fun messageOutputStream_sendMessage_serializesAndDispatchesMessageCorrectly() {
         val message = EnterMainModeCommand()
         val expectedBytes = listOf(byteArrayOf(0x10, 0x20, 0x30), byteArrayOf(0x40, 0x50))
-        whenever(rootMessageSerializerMock) { serialize(eq(message)) } thenReturn expectedBytes
+        every {rootMessageSerializerMock.serialize(eq(message)) } returns expectedBytes
 
         val messageOutputStream = RootMessageOutputStream(rootMessageSerializerMock, OutputStreamDispatcher())
 

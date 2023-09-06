@@ -26,7 +26,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     resources.excludes.addAll(listOf(
                         "META-INF/*",
                     ))
-                    resources.pickFirsts += setOf("mockito-extensions/org.mockito.plugins.MockMaker")
                 }
 
                 buildFeatures.buildConfig = true

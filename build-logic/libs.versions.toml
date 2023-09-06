@@ -72,10 +72,7 @@ junit_version = "4.13.2"
 junit_ext_version = "1.1.5"
 truth_version = "1.1.5"
 livedata_testing_version = "1.3.0"
-koTest_version = "5.7.0"
 mockk_version = "1.13.7"
-mockito_version = "5.5.0"
-mockito_kotlin_version = "2.2.0"
 robolectric_version = "4.10.3"
 espresso_version = "3.5.1"
 espresso_accessibility_version = "4.0.0"
@@ -223,15 +220,9 @@ testing-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test",
 testing-live-data = { module = "com.jraska.livedata:testing-ktx", version.ref = "livedata_testing_version" }
 testing-fragment = { module = "androidx.fragment:fragment-testing", version.ref = "androidx_fragment_version" }
 testing-navigation = { module = "androidx.navigation:navigation-testing", version.ref = "androidx_navigation_version" }
-#Testing-koTest
-testing-koTest-kotlin-assert = { module = "io.kotest:kotest-assertions-core", version.ref = "koTest_version" }
 #Testing-Robolectric
 testing-Robolectric-core = { module = "org.robolectric:robolectric", version.ref = "robolectric_version" }
 testing-Robolectric-annotation = { module = "org.robolectric:annotations", version.ref = "robolectric_version" }
-#Testing-Mockito
-testing-Mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito_version" }
-testing-Mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito_version" } #Required to use Mock in AndroidTests
-testing-Mockito-kotlin = { module = "com.nhaarman.mockitokotlin2:mockito-kotlin", version.ref = "mockito_kotlin_version" }
 #Testing-Mockk
 testing-Mockk-core = { module = "io.mockk:mockk", version.ref = "mockk_version" }
 testing-Mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk_version" }

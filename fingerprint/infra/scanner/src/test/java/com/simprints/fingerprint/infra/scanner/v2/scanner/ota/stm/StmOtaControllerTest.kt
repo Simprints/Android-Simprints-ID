@@ -8,14 +8,13 @@ import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedExcept
 import com.simprints.fingerprint.infra.scanner.v2.incoming.stmota.StmOtaMessageInputStream
 import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.spy
-import com.simprints.testtools.common.syntax.verifyExactly
-import com.simprints.testtools.common.syntax.whenThis
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
@@ -56,7 +55,7 @@ class StmOtaControllerTest {
 
         testObserver.awaitAndAssertSuccess()
 
-        verifyExactly(expectedNumberOfCalls, messageStreamMock.outgoing) { sendMessage(anyNotNull()) }
+        verify (exactly =  expectedNumberOfCalls){ messageStreamMock.outgoing.sendMessage(any()) }
     }
 
     @Test
@@ -90,12 +89,12 @@ class StmOtaControllerTest {
         val messageIndex = AtomicInteger(0)
 
         return StmOtaMessageChannel(
-            spy(StmOtaMessageInputStream(mock())).apply {
-                whenThis { connect(anyNotNull()) } thenDoNothing {}
-                stmOtaResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+            spyk(StmOtaMessageInputStream(mockk())).apply {
+                justRun { connect(any()) }
+                every { stmOtaResponseStream } returns  responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },
-            setupMock {
-                whenThis { sendMessage(anyNotNull()) } then {
+            mockk {
+                every { sendMessage(any()) } answers  {
                     Completable.complete().doAfterTerminate {
                         responseSubject.onNext(CommandAcknowledgement(
                             if (nackPositions.contains(messageIndex.getAndIncrement())) {
