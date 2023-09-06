@@ -1,7 +1,7 @@
 package com.simprints.infra.network.coroutines
 
 import com.google.common.truth.Truth.assertThat
-import io.kotest.assertions.throwables.shouldThrow
+import com.simprints.testtools.common.syntax.assertThrows
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -29,7 +29,7 @@ class RetryHelperKtTest {
         runTest(StandardTestDispatcher()) {
             var nbCall = 0
             val exception = RuntimeException("exception")
-            val thrownException = shouldThrow<RuntimeException> {
+            val thrownException = assertThrows<RuntimeException> {
                 retryIO(
                     times = 5,
                     runBlock = {
@@ -48,7 +48,7 @@ class RetryHelperKtTest {
         runTest(StandardTestDispatcher()) {
             var nbCall = 0
             val exception = RuntimeException("exception")
-            val thrownException = shouldThrow<RuntimeException> {
+            val thrownException = assertThrows<RuntimeException> {
                 retryIO(
                     times = 5,
                     runBlock = {
@@ -68,7 +68,7 @@ class RetryHelperKtTest {
             var nbCall = 0
             val exception = RuntimeException("exception")
             val otherException = RuntimeException("other exception")
-            val thrownException = shouldThrow<RuntimeException> {
+            val thrownException = assertThrows<RuntimeException> {
                 retryIO(
                     times = 5,
                     runBlock = {

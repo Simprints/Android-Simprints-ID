@@ -16,7 +16,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.Completable
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
@@ -46,7 +46,7 @@ class ConnectionHelperTest {
     private val connectionHelper = ConnectionHelper(mockAdapter, testCoroutineRule.testCoroutineDispatcher)
 
     @Test
-    fun connect_successful_connectsScannerAndSocket() = runBlocking {
+    fun connect_successful_connectsScannerAndSocket() = runTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
@@ -59,14 +59,14 @@ class ConnectionHelperTest {
     }
 
     @Test(expected = BluetoothNotSupportedException::class)
-    fun connect_adapterIsNull_throwsBluetoothNotSupportedException() = runBlocking {
+    fun connect_adapterIsNull_throwsBluetoothNotSupportedException() = runTest {
         every { mockAdapter.isNull() } returns true
 
         connectionHelper.connectScanner(mockScanner, "mac address").collect()
     }
 
     @Test(expected = BluetoothNotEnabledException::class)
-    fun connect_adapterIsOff_throwsBluetoothNotEnabledException() = runBlocking {
+    fun connect_adapterIsOff_throwsBluetoothNotEnabledException() = runTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns false
 
@@ -74,7 +74,7 @@ class ConnectionHelperTest {
     }
 
     @Test(expected = ScannerNotPairedException::class)
-    fun connect_deviceNotPaired_throwsScannerNotPairedException() = runBlocking {
+    fun connect_deviceNotPaired_throwsScannerNotPairedException() = runTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns false
@@ -83,7 +83,7 @@ class ConnectionHelperTest {
     }
 
     @Test(expected = ScannerDisconnectedException::class)
-    fun connect_socketFailsToConnect_throwsScannerDisconnectedException() = runBlocking {
+    fun connect_socketFailsToConnect_throwsScannerDisconnectedException() = runTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
@@ -93,7 +93,7 @@ class ConnectionHelperTest {
     }
 
     @Test
-    fun connect_socketFailsFirstTimeThenConnects_completesSuccessfullyDueToRetry() = runBlocking {
+    fun connect_socketFailsFirstTimeThenConnects_completesSuccessfullyDueToRetry() = runTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
@@ -106,14 +106,14 @@ class ConnectionHelperTest {
     }
 
     @Test
-    fun disconnect_disconnectsScanner() = runBlocking {
+    fun disconnect_disconnectsScanner() = runTest {
         connectionHelper.disconnectScanner(mockScanner)
 
         verify { mockScanner.disconnect() }
     }
 
     @Test
-    fun connectThenDisconnect_disconnectsScannerAndSocket() = runBlocking {
+    fun connectThenDisconnect_disconnectsScannerAndSocket() = runTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true
@@ -129,7 +129,7 @@ class ConnectionHelperTest {
     }
 
     @Test
-    fun connectThenReconnect_reconnectsSocketAndScanner() = runBlocking {
+    fun connectThenReconnect_reconnectsSocketAndScanner() = runTest {
         every { mockAdapter.isNull() } returns false
         every { mockAdapter.isEnabled() } returns true
         every { mockDevice.isBonded() } returns true

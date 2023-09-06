@@ -2,6 +2,7 @@ package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType.*
@@ -18,19 +19,16 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import com.simprints.testtools.common.syntax.assertThrows
-import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
@@ -75,7 +73,7 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun count_shouldMakeANetworkRequest() {
-        runBlocking {
+        runTest {
             coEvery {
                 eventRemoteInterface.countEvents(
                     any(),
@@ -104,7 +102,7 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun errorForCountRequestFails_shouldThrowAnException() {
-        runBlocking {
+        runTest {
             coEvery {
                 eventRemoteInterface.countEvents(
                     any(),
@@ -116,7 +114,7 @@ class EventRemoteDataSourceTest {
                 )
             } throws Throwable("Request issue")
 
-            shouldThrow<Throwable> {
+            assertThrows<Throwable> {
                 eventRemoteDataSource.count(query)
             }
         }
@@ -124,7 +122,7 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun downloadEvents_shouldParseStreamAndEmitBatches() {
-        runBlocking {
+        runTest {
             val responseStreamWith6Events =
                 this.javaClass.classLoader?.getResourceAsStream("responses/down_sync_7events.json")!!
             val channel = mockk<ProducerScope<EnrolmentRecordEvent>>(relaxed = true)
@@ -166,7 +164,7 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun `Get events should throw the exception received when downloading events`() {
-        runBlocking {
+        runTest {
             val exception = BackendMaintenanceException(estimatedOutage = 100)
             coEvery {
                 eventRemoteInterface.downloadEvents(
@@ -188,7 +186,7 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun `Get events should map a SyncCloudIntegrationException with the status 429 to a TooManyRequestException`() {
-        runBlocking {
+        runTest {
             val exception = SyncCloudIntegrationException(
                 cause = HttpException(
                     Response.error<Event>(
@@ -216,7 +214,7 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun getEvents_shouldMakeTheRightRequest() {
-        runBlocking {
+        runTest {
             val mockedScope: CoroutineScope = mockk()
             mockkStatic("kotlinx.coroutines.channels.ProduceKt")
             every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
@@ -234,7 +232,7 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun postEvent_shouldUploadEvents() {
-        runBlocking {
+        runTest {
             coEvery { eventRemoteInterface.uploadEvents(any(), any(), any()) } returns mockk()
 
             val events = listOf(com.simprints.infra.events.sampledata.createSessionCaptureEvent())
@@ -255,7 +253,7 @@ class EventRemoteDataSourceTest {
 
     @Test
     fun postEventFails_shouldThrowAnException() {
-        runBlocking {
+        runTest {
             coEvery {
                 eventRemoteInterface.uploadEvents(
                     any(),
@@ -264,7 +262,7 @@ class EventRemoteDataSourceTest {
                 )
             } throws Throwable("Request issue")
 
-            shouldThrow<Throwable> {
+            assertThrows<Throwable> {
                 eventRemoteDataSource.post(DEFAULT_PROJECT_ID, listOf(com.simprints.infra.events.sampledata.createSessionCaptureEvent()))
             }
         }

@@ -5,11 +5,10 @@ import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.verify
-import io.kotest.matchers.ints.exactly
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 
@@ -58,8 +57,8 @@ internal class EncryptedSharedPreferencesBuilderImplTest {
     @Test
     fun `should build encrypted shared preferences using preference provider and master key provider`() {
         val result = builder.buildEncryptedSharedPreferences(filename)
-        verify(exactly(1)) { masterKeyProvider.provideMasterKey() }
-        verify(exactly(1)) {
+        verify(exactly = 1) { masterKeyProvider.provideMasterKey() }
+        verify(exactly = 1) {
             preferencesProvider.provideEncryptedSharedPreferences(
                 filename,
                 masterKey
@@ -74,7 +73,7 @@ internal class EncryptedSharedPreferencesBuilderImplTest {
             preferencesProvider.provideEncryptedSharedPreferences(any(), any())
         } throws Exception() andThen sharedPreferences
         builder.buildEncryptedSharedPreferences(filename)
-        verify(exactly(1)) { context.deleteSharedPreferences(filename) }
+        verify(exactly = 1) { context.deleteSharedPreferences(filename) }
     }
 
     @Test
@@ -83,8 +82,8 @@ internal class EncryptedSharedPreferencesBuilderImplTest {
             preferencesProvider.provideEncryptedSharedPreferences(any(), any())
         } throws Exception() andThen sharedPreferences
         val result = builder.buildEncryptedSharedPreferences(filename)
-        verify(exactly(2)) { masterKeyProvider.provideMasterKey() }
-        verify(exactly(2)) {
+        verify(exactly = 2) { masterKeyProvider.provideMasterKey() }
+        verify(exactly = 2) {
             preferencesProvider.provideEncryptedSharedPreferences(
                 filename,
                 masterKey
@@ -105,8 +104,7 @@ internal class EncryptedSharedPreferencesBuilderImplTest {
             preferencesProvider.provideEncryptedSharedPreferences(any(), any())
         } throws Exception() andThen sharedPreferences
         builder.buildEncryptedSharedPreferences(filename)
-        verify(exactly(0)) { context.deleteSharedPreferences(filename) }
-        verify(exactly(1)) { context.applicationInfo }
-        verify(exactly(1)) { applicationInfo.dataDir }
+        verify(exactly = 0) { context.deleteSharedPreferences(filename) }
+        verify(exactly = 1) { context.applicationInfo }
     }
 }

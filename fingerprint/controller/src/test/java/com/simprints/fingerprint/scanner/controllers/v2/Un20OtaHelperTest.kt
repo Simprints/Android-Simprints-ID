@@ -20,7 +20,7 @@ import io.reactivex.Single
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -49,7 +49,7 @@ class Un20OtaHelperTest {
     }
 
     @Test
-    fun performUn20Ota_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runBlocking {
+    fun performUn20Ota_allStepsPassing_succeedsWithCorrectStepsAndProgressValues() = runTest {
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
             listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
@@ -68,7 +68,7 @@ class Un20OtaHelperTest {
     }
 
     @Test(expected = ScannerV2OtaFailedException::class)
-    fun un20OtaFailsDuringTransfer_propagatesError() = runBlocking<Unit> {
+    fun un20OtaFailsDuringTransfer_propagatesError() = runTest {
         val progressValues = listOf(0.0f, 0.2f, 0.4f)
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             progressValues.map { Un20OtaStep.TransferInProgress(it) }
@@ -90,7 +90,7 @@ class Un20OtaHelperTest {
     }
 
     @Test(expected = IOException::class)
-    fun un20OtaFailsDuringTurningUn20OnSecondTime_propagatesError() = runBlocking<Unit> {
+    fun un20OtaFailsDuringTurningUn20OnSecondTime_propagatesError() = runTest {
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
             listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer)
@@ -113,7 +113,7 @@ class Un20OtaHelperTest {
     }
 
     @Test(expected = OtaFailedException::class)
-    fun un20OtaFailsToValidate_throwsOtaError() = runBlocking<Unit> {
+    fun un20OtaFailsToValidate_throwsOtaError() = runTest {
         val expectedSteps = listOf(Un20OtaStep.EnteringMainMode, Un20OtaStep.TurningOnUn20BeforeTransfer, Un20OtaStep.CommencingTransfer) +
             OTA_PROGRESS_VALUES.map { Un20OtaStep.TransferInProgress(it) } +
             listOf(Un20OtaStep.AwaitingCacheCommit, Un20OtaStep.TurningOffUn20AfterTransfer, Un20OtaStep.TurningOnUn20AfterTransfer,
