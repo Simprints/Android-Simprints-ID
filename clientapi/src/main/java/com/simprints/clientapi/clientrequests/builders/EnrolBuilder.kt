@@ -11,7 +11,7 @@ import com.simprints.infra.config.tokenization.TokenizationManager
 
 class EnrolBuilder(
     private val extractor: EnrolExtractor,
-    private val project: Project,
+    private val project: Project?,
     private val tokenizationManager: TokenizationManager,
     validator: EnrolValidator
 ) : ClientRequestBuilder(validator) {
