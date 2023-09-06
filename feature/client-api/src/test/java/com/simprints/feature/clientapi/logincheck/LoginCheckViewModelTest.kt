@@ -2,25 +2,26 @@ package com.simprints.feature.clientapi.logincheck
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
+import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.logincheck.usecase.CancelBackgroundSyncUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.logincheck.usecase.ExtractCrashKeysUseCase
 import com.simprints.feature.clientapi.logincheck.usecase.ExtractParametersForAnalyticsUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.GetProjectStateUseCase
 import com.simprints.feature.clientapi.logincheck.usecase.IsUserSignedInUseCase
-import com.simprints.feature.clientapi.exceptions.InvalidRequestException
+import com.simprints.feature.clientapi.logincheck.usecase.ReportActionRequestEventsUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.UpdateDatabaseCountsInCurrentSessionUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.UpdateProjectInCurrentSessionUseCase
 import com.simprints.feature.clientapi.mappers.request.IntentToActionMapper
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.models.ClientApiError
-import com.simprints.feature.clientapi.models.ClientApiResultError
 import com.simprints.feature.clientapi.session.ClientSessionManager
-import com.simprints.feature.clientapi.logincheck.usecase.GetProjectStateUseCase
-import com.simprints.feature.clientapi.logincheck.usecase.ReportActionRequestEventsUseCase
-import com.simprints.feature.clientapi.logincheck.usecase.UpdateDatabaseCountsInCurrentSessionUseCase
-import com.simprints.feature.clientapi.logincheck.usecase.UpdateProjectInCurrentSessionUseCase
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
+import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -50,6 +51,9 @@ internal class LoginCheckViewModelTest {
 
     @MockK
     lateinit var clientSessionManager: ClientSessionManager
+
+    @MockK
+    lateinit var createSessionIfRequiredUseCase: CreateSessionIfRequiredUseCase
 
     @MockK
     lateinit var reportActionRequestEventsUseCase: ReportActionRequestEventsUseCase
@@ -86,6 +90,7 @@ internal class LoginCheckViewModelTest {
             rootMatchers,
             intentMapper,
             clientSessionManager,
+            createSessionIfRequiredUseCase,
             reportActionRequestEventsUseCase,
             extractParametersForAnalyticsUseCase,
             extractCrashKeysUseCase,
@@ -104,6 +109,15 @@ internal class LoginCheckViewModelTest {
         viewModel.handleIntent(TEST_ACTION, emptyMap())
 
         viewModel.showAlert.test().assertValue { it.peekContent() == ClientApiError.ROOTED_DEVICE }
+    }
+
+    @Test
+    fun `Attempts to create session when mapping intent`() = runTest {
+        coEvery { intentMapper.invoke(any(), any()) } throws InvalidRequestException(error = ClientApiError.INVALID_SESSION_ID)
+
+        viewModel.handleIntent(TEST_ACTION, emptyMap())
+
+        coVerify { createSessionIfRequiredUseCase.invoke(any()) }
     }
 
     @Test
@@ -153,7 +167,7 @@ internal class LoginCheckViewModelTest {
 
         viewModel.handleIntent(TEST_ACTION, emptyMap())
 
-        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second is ClientApiResultError }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second.reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
     }
 
     @Test
@@ -164,7 +178,7 @@ internal class LoginCheckViewModelTest {
         viewModel.handleIntent(TEST_ACTION, emptyMap())
         viewModel.handleIntent(TEST_ACTION, emptyMap())
 
-        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second is ClientApiResultError }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second.reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
     }
 
     @Test
@@ -189,7 +203,7 @@ internal class LoginCheckViewModelTest {
         viewModel.handleIntent(TEST_ACTION, emptyMap())
         viewModel.handleLoginResult(LoginResult(false, LoginError.LoginNotCompleted))
 
-        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second is ClientApiResultError }
+        viewModel.returnErrorResponse.test().assertValue { it.peekContent().second.reason == IAppErrorReason.LOGIN_NOT_COMPLETE }
     }
 
     @Test

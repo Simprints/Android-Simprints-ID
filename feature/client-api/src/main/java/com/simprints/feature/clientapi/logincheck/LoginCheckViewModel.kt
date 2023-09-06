@@ -24,6 +24,7 @@ import com.simprints.feature.clientapi.logincheck.usecase.GetProjectStateUseCase
 import com.simprints.feature.clientapi.logincheck.usecase.ReportActionRequestEventsUseCase
 import com.simprints.feature.clientapi.logincheck.usecase.UpdateDatabaseCountsInCurrentSessionUseCase
 import com.simprints.feature.clientapi.logincheck.usecase.UpdateProjectInCurrentSessionUseCase
+import com.simprints.feature.clientapi.logincheck.usecase.CreateSessionIfRequiredUseCase
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
 import com.simprints.infra.logging.Simber
@@ -42,6 +43,7 @@ internal class LoginCheckViewModel @Inject constructor(
     private val rootManager: SecurityManager,
     private val intentMapper: IntentToActionMapper,
     private val clientSessionManager: ClientSessionManager,
+    private val createSessionIfRequiredUseCase: CreateSessionIfRequiredUseCase,
     private val reportActionRequestEvents: ReportActionRequestEventsUseCase,
     private val extractParametersForAnalytics: ExtractParametersForAnalyticsUseCase,
     private val extractParametersForCrashReport: ExtractCrashKeysUseCase,
@@ -84,6 +86,7 @@ internal class LoginCheckViewModel @Inject constructor(
     }
 
     private suspend fun validateActionAndProceed(action: String, extras: Map<String, Any>) = try {
+        createSessionIfRequiredUseCase(action)
         val actionRequest = intentMapper(action, extras)
 
         reportActionRequestEvents(actionRequest)

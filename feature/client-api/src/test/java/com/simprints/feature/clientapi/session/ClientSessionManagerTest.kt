@@ -13,6 +13,8 @@ import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
+import com.simprints.infra.events.event.domain.models.IntentParsingEvent
+import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
@@ -65,6 +67,19 @@ class ClientSessionManagerTest {
             simNetworkUtils,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
+    }
+
+    @Test
+    fun `createSession adds correct events`() = runTest {
+        // Given
+        coEvery { coreEventRepository.createSession() } returns mockk { coEvery { id } returns SESSION_ID }
+        // When
+        clientSessionManager.createSession(IntegrationInfo.STANDARD)
+        //Then
+        coVerify {
+            coreEventRepository.createSession()
+            coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(IntentParsingEvent::class.java)  })
+        }
     }
 
     @Test
