@@ -19,7 +19,7 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class FingerprintCaptureWrapperV1(
+internal class FingerprintCaptureWrapperV1(
     private val scannerV1: Scanner,
     private val ioDispatcher: CoroutineDispatcher,
 ) : FingerprintCaptureWrapper {

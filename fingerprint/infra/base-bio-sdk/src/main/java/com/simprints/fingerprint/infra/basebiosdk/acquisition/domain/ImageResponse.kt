@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.infra.basebiosdk.acquization.domain
+package com.simprints.fingerprint.infra.basebiosdk.acquisition.domain
 
 @Suppress("unused") // ImageMetadata maybe used in other SDKs
 class ImageResponse<T>(

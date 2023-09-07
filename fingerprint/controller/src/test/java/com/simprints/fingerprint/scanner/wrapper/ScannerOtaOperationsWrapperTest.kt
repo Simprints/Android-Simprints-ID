@@ -4,22 +4,28 @@ import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedExcept
 import com.simprints.fingerprint.scanner.controllers.v2.CypressOtaHelper
 import com.simprints.fingerprint.scanner.controllers.v2.StmOtaHelper
 import com.simprints.fingerprint.scanner.controllers.v2.Un20OtaHelper
+import io.mockk.MockKAnnotations
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class ScannerOtaOperationsWrapperTest {
+internal class ScannerOtaOperationsWrapperTest {
 
     private lateinit var scannerWrapper: ScannerOtaOperationsWrapper
-    private val cypressOtaHelper = mockk<CypressOtaHelper>()
-    private val stmOtaHelper = mockk<StmOtaHelper>()
-    private val un20OtaHelper = mockk<Un20OtaHelper>()
+    @MockK
+    private lateinit var cypressOtaHelper :CypressOtaHelper
+    @MockK
+    private lateinit var stmOtaHelper :StmOtaHelper
+    @MockK
+    private lateinit var un20OtaHelper :Un20OtaHelper
 
     @Before
     fun setUp() {
+        MockKAnnotations.init(this)
         scannerWrapper = ScannerOtaOperationsWrapper(
             "",
             mockk(),

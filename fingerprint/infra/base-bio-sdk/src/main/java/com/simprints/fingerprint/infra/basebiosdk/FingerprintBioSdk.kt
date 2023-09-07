@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.infra.basebiosdk
 
-import com.simprints.fingerprint.infra.basebiosdk.acquization.FingerprintImageProvider
-import com.simprints.fingerprint.infra.basebiosdk.acquization.FingerprintTemplateProvider
+import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintImageProvider
+import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
 import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity

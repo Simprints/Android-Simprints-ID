@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.infra.basebiosdk.acquization.domain
+package com.simprints.fingerprint.infra.basebiosdk.acquisition.domain
 
 class TemplateResponse<T>(
     val template: ByteArray,
