@@ -7,7 +7,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:orchestrator"))
     implementation(project(":feature:alert"))
     implementation(project(":feature:login"))
 
