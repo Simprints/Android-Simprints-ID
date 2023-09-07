@@ -8,7 +8,7 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLas
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
 import com.simprints.feature.clientapi.models.OdkConstants
-import com.simprints.feature.orchestrator.models.ActionResponse
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppResponseTier

@@ -4,9 +4,9 @@ import com.simprints.feature.clientapi.mappers.request.builders.ConfirmIdentifyR
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.ConfirmIdentityValidator
-import com.simprints.feature.clientapi.models.IntegrationConstants
-import com.simprints.feature.orchestrator.models.ActionRequest
-import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionConstants
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.every
 import io.mockk.mockk
 
@@ -14,7 +14,7 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
 
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
-        actionName = IntegrationConstants.ACTION_CONFIRM_IDENTITY,
+        actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.ConfirmActionRequest(

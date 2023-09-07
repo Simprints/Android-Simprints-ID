@@ -2,7 +2,7 @@ package com.simprints.feature.clientapi.usecases
 
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.clientapi.models.CommCareConstants
-import com.simprints.feature.clientapi.models.IntegrationConstants
+import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.feature.clientapi.models.OdkConstants
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
@@ -17,7 +17,7 @@ internal class CreateSessionIfRequiredUseCase @Inject constructor(
 
     suspend operator fun invoke(action: String) {
         val actionName = action.substringAfterLast('.')
-        if (actionName == IntegrationConstants.ACTION_CONFIRM_IDENTITY || actionName == IntegrationConstants.ACTION_ENROL_LAST_BIOMETRICS) {
+        if (actionName == ActionConstants.ACTION_CONFIRM_IDENTITY || actionName == ActionConstants.ACTION_ENROL_LAST_BIOMETRICS) {
             return
         }
         val integrationInfo = when (action.substringBeforeLast('.')) {

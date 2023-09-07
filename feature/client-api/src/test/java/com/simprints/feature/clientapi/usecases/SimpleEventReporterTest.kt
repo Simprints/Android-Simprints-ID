@@ -41,9 +41,6 @@ class SimpleEventReporterTest {
     @MockK
     private lateinit var timeHelper: TimeHelper
 
-    @MockK
-    private lateinit var simNetworkUtils: SimNetworkUtils
-
     private lateinit var simpleEventReporter: SimpleEventReporter
 
     @Before
@@ -57,92 +54,8 @@ class SimpleEventReporterTest {
         simpleEventReporter = SimpleEventReporter(
             coreEventRepository,
             timeHelper,
-            simNetworkUtils,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
-    }
-
-    @Test
-    fun `addUnknownExtrasEvent adds event if there are unknown extras`() = runTest {
-        // Given
-        val unknownExtras = mapOf("key" to "value")
-        // When
-        simpleEventReporter.addUnknownExtrasEvent(unknownExtras)
-        //Then
-        coVerify {
-            coreEventRepository.addOrUpdateEvent(any<SuspiciousIntentEvent>())
-        }
-    }
-
-    @Test
-    fun `addUnknownExtrasEvent does not add event if no extras`() = runTest {
-        // Given
-        val unknownExtras = emptyMap<String, Any>()
-        // When
-        simpleEventReporter.addUnknownExtrasEvent(unknownExtras)
-        //Then
-        coVerify(exactly = 0) { coreEventRepository.addOrUpdateEvent(any()) }
-    }
-
-    @Test
-    fun `addConnectivityStateEvent adds event`() = runTest {
-        every { simNetworkUtils.connectionsStates } returns emptyList()
-        // When
-        simpleEventReporter.addConnectivityStateEvent()
-        //Then
-        coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(ConnectivitySnapshotEvent::class.java) })
-        }
-    }
-
-    @Test
-    fun `addRequestActionEvent adds correct enrol event`() = runTest {
-        // When
-        simpleEventReporter.addRequestActionEvent(EnrolActionFactory.getValidSimprintsRequest())
-        //Then
-        coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(EnrolmentCalloutEvent::class.java) })
-        }
-    }
-
-    @Test
-    fun `addRequestActionEvent adds correct idetify event`() = runTest {
-        // When
-        simpleEventReporter.addRequestActionEvent(IdentifyRequestActionFactory.getValidSimprintsRequest())
-        //Then
-        coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(IdentificationCalloutEvent::class.java) })
-        }
-    }
-
-    @Test
-    fun `addRequestActionEvent adds correct verify event`() = runTest {
-        // When
-        simpleEventReporter.addRequestActionEvent(VerifyActionFactory.getValidSimprintsRequest())
-        //Then
-        coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(VerificationCalloutEvent::class.java) })
-        }
-    }
-
-    @Test
-    fun `addRequestActionEvent adds correct confirm event`() = runTest {
-        // When
-        simpleEventReporter.addRequestActionEvent(ConfirmIdentityActionFactory.getValidSimprintsRequest())
-        //Then
-        coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(ConfirmationCalloutEvent::class.java) })
-        }
-    }
-
-    @Test
-    fun `addRequestActionEvent adds correct enrol last event`() = runTest {
-        // When
-        simpleEventReporter.addRequestActionEvent(EnrolLastBiometricsActionFactory.getValidSimprintsRequest())
-        //Then
-        coVerify {
-            coreEventRepository.addOrUpdateEvent(withArg { assertThat(it).isInstanceOf(EnrolmentLastBiometricsCalloutEvent::class.java) })
-        }
     }
 
     @Test

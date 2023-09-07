@@ -9,7 +9,7 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLas
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
 import com.simprints.feature.clientapi.models.CommCareConstants
-import com.simprints.feature.orchestrator.models.ActionResponse
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration

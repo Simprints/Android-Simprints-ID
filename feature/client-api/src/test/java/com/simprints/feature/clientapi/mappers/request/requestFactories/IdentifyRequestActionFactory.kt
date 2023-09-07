@@ -4,16 +4,16 @@ import com.simprints.feature.clientapi.mappers.request.builders.IdentifyRequestB
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.IdentifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.IdentifyValidator
-import com.simprints.feature.clientapi.models.IntegrationConstants
-import com.simprints.feature.orchestrator.models.ActionRequest
-import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionConstants
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.mockk
 
 internal object IdentifyRequestActionFactory : RequestActionFactory() {
 
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
-        actionName = IntegrationConstants.ACTION_IDENTIFY,
+        actionName = ActionConstants.ACTION_IDENTIFY,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.IdentifyActionRequest(

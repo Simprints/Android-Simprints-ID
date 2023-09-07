@@ -4,16 +4,16 @@ import com.simprints.feature.clientapi.mappers.request.builders.EnrolRequestBuil
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolValidator
-import com.simprints.feature.clientapi.models.IntegrationConstants
-import com.simprints.feature.orchestrator.models.ActionRequest
-import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionConstants
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.mockk
 
 internal object EnrolActionFactory : RequestActionFactory() {
 
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
-        actionName = IntegrationConstants.ACTION_ENROL,
+        actionName = ActionConstants.ACTION_ENROL,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.EnrolActionRequest(

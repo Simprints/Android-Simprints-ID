@@ -3,9 +3,9 @@ package com.simprints.feature.clientapi.mappers.request.builders
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
-import com.simprints.feature.clientapi.models.IntegrationConstants
-import com.simprints.feature.orchestrator.models.ActionRequest
-import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionConstants
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import org.junit.Test
 
 internal class VerifyRequestBuilderTest {
@@ -18,7 +18,7 @@ internal class VerifyRequestBuilderTest {
         val action = VerifyRequestBuilder(
             ActionRequestIdentifier(
                 RequestActionFactory.MOCK_PACKAGE,
-                IntegrationConstants.ACTION_VERIFY,
+                ActionConstants.ACTION_VERIFY,
             ),
             extractor,
             validator

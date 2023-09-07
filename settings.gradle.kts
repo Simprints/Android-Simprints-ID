@@ -69,7 +69,9 @@ include(
 
 // Feature modules
 include(
+    ":feature:orchestrator",
     ":feature:client-api",
+    ":feature:login-check",
     ":feature:login",
     ":feature:fetch-subject",
     ":feature:select-subject",
@@ -98,6 +100,7 @@ include(
     ":infra:recent-user-activity",
     ":infra:resources",
     ":infra:security",
+    ":infra:orchestrator-data",
     ":infra:ui-base",
     ":infrafacebiosdk",
     ":infrarocwrapper",
