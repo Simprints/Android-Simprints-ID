@@ -4,6 +4,7 @@ import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.builders.ActionRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.RequestActionValidator
+import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 import io.mockk.every
 
 internal abstract class RequestActionFactory {
@@ -18,6 +19,8 @@ internal abstract class RequestActionFactory {
         const val MOCK_SESSION_ID = "ddf01a3c-3081-4d3e-b872-538731517cb9"
         const val MOCK_SELECTED_GUID = "5390ef82-9c1f-40a9-b833-2e97ab369208"
     }
+
+    abstract fun getIdentifier(): ActionRequestIdentifier
 
     abstract fun getValidator(extractor: ActionRequestExtractor): RequestActionValidator
 

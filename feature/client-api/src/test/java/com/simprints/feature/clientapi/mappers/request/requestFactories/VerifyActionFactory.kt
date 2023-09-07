@@ -5,13 +5,20 @@ import com.simprints.feature.clientapi.mappers.request.builders.VerifyRequestBui
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidator
+import com.simprints.feature.clientapi.models.ActionRequestIdentifier
+import com.simprints.feature.clientapi.models.IntegrationConstants
 import io.mockk.every
 import io.mockk.mockk
 
 internal object VerifyActionFactory : RequestActionFactory() {
 
-    override fun getValidSimprintsRequest() = ActionRequest.VerifyActionRequest(
+    override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
+        actionName = IntegrationConstants.ACTION_VERIFY,
+    )
+
+    override fun getValidSimprintsRequest() = ActionRequest.VerifyActionRequest(
+        actionIdentifier = getIdentifier(),
         projectId = MOCK_PROJECT_ID,
         moduleId = MOCK_MODULE_ID,
         userId = MOCK_USER_ID,
@@ -21,7 +28,7 @@ internal object VerifyActionFactory : RequestActionFactory() {
     )
 
     override fun getBuilder(extractor: ActionRequestExtractor): VerifyRequestBuilder =
-        VerifyRequestBuilder(MOCK_PACKAGE, extractor as VerifyRequestExtractor, getValidator(extractor))
+        VerifyRequestBuilder(getIdentifier(), extractor as VerifyRequestExtractor, getValidator(extractor))
 
     override fun getValidator(extractor: ActionRequestExtractor): VerifyValidator =
         VerifyValidator(extractor as VerifyRequestExtractor)
