@@ -4,7 +4,7 @@
     <application>
 
         <activity
-            android:name=".activity.ClientApiActivity"
+            android:name=".activity.OrchestratorActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
