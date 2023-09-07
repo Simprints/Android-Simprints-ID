@@ -17,7 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 
-class FingerprintCaptureWrapperV2(
+internal class FingerprintCaptureWrapperV2(
     private val scannerV2: Scanner,
     private val scannerUiHelper: ScannerUiHelper,
     private val ioDispatcher: CoroutineDispatcher,

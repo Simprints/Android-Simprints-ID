@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.capture
 
+import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.NullScannerException
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import kotlinx.coroutines.CoroutineDispatcher
@@ -8,7 +9,7 @@ import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
 class FingerprintCaptureWrapperFactory @Inject constructor(
-    private val ioDispatcher: CoroutineDispatcher,
+    @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
     private val scannerUiHelper: ScannerUiHelper,
 ) {
     private var _captureWrapper: FingerprintCaptureWrapper? = null

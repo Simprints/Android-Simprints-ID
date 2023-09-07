@@ -3,8 +3,8 @@ package com.simprints.fingerprint.biosdk
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.data.domain.fingerprint.toDomain
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
-import com.simprints.fingerprint.infra.basebiosdk.acquization.domain.ImageResponse
-import com.simprints.fingerprint.infra.basebiosdk.acquization.domain.TemplateResponse
+import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
+import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateMetadata
