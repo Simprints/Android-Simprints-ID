@@ -3,9 +3,9 @@ package com.simprints.feature.clientapi.mappers.request.builders
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory
-import com.simprints.feature.clientapi.models.IntegrationConstants
-import com.simprints.feature.orchestrator.models.ActionRequest
-import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionConstants
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import org.junit.Test
 
 internal class EnrolRequestBuilderTest {
@@ -18,7 +18,7 @@ internal class EnrolRequestBuilderTest {
         val action = EnrolRequestBuilder(
             ActionRequestIdentifier(
                 RequestActionFactory.MOCK_PACKAGE,
-                IntegrationConstants.ACTION_ENROL,
+                ActionConstants.ACTION_ENROL,
             ),
             extractor,
             validator

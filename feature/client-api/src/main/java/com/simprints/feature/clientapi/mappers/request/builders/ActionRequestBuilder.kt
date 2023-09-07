@@ -1,7 +1,7 @@
 package com.simprints.feature.clientapi.mappers.request.builders
 
 import com.simprints.feature.clientapi.mappers.request.validators.RequestActionValidator
-import com.simprints.feature.orchestrator.models.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequest
 
 
 internal abstract class ActionRequestBuilder(private val validator: RequestActionValidator) {

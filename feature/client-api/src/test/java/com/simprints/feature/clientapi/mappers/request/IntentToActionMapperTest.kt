@@ -5,7 +5,7 @@ import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.IsCurrentSessionAnIdentificationOrEnrolmentUseCase
 import com.simprints.feature.clientapi.usecases.SessionHasIdentificationCallbackUseCase
-import com.simprints.feature.orchestrator.models.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.libsimprints.Constants.SIMPRINTS_MODULE_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_PROJECT_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_SELECTED_GUID

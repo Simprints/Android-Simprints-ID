@@ -3,8 +3,8 @@ package com.simprints.feature.clientapi.mappers.request.requestFactories
 import com.simprints.feature.clientapi.mappers.request.builders.ActionRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.RequestActionValidator
-import com.simprints.feature.orchestrator.models.ActionRequest
-import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.every
 
 internal abstract class RequestActionFactory {

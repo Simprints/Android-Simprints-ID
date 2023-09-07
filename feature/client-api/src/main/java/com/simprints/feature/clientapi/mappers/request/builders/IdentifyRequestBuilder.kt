@@ -2,8 +2,8 @@ package com.simprints.feature.clientapi.mappers.request.builders
 
 import com.simprints.feature.clientapi.mappers.request.extractors.IdentifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.IdentifyValidator
-import com.simprints.feature.orchestrator.models.ActionRequest
-import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
 
 internal class IdentifyRequestBuilder(

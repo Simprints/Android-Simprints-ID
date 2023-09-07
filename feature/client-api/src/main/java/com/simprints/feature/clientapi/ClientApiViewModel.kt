@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi
 
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,7 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
+import com.simprints.feature.clientapi.extensions.toMap
 import com.simprints.feature.clientapi.mappers.request.IntentToActionMapper
+import com.simprints.feature.clientapi.mappers.response.ActionToIntentMapper
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.clientapi.usecases.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.usecases.DeleteSessionEventsIfNeededUseCase
@@ -16,10 +19,10 @@ import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubj
 import com.simprints.feature.clientapi.usecases.GetEventJsonForSessionUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
-import com.simprints.feature.orchestrator.models.ActionRequest
-import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
-import com.simprints.feature.orchestrator.models.ActionResponse
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
 import com.simprints.moduleapi.app.responses.IAppEnrolResponse
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
@@ -31,10 +34,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class ClientApiViewModel @Inject constructor(
+class ClientApiViewModel @Inject internal constructor(
+    private val intentMapper: IntentToActionMapper,
+    private val resultMapper: ActionToIntentMapper,
     private val simpleEventReporter: SimpleEventReporter,
     private val getCurrentSessionId: GetCurrentSessionIdUseCase,
-    private val intentMapper: IntentToActionMapper,
     private val createSessionIfRequiredUseCase: CreateSessionIfRequiredUseCase,
     private val getEventJsonForSession: GetEventJsonForSessionUseCase,
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
@@ -42,24 +46,27 @@ internal class ClientApiViewModel @Inject constructor(
     private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase,
 ) : ViewModel() {
 
-    val returnResponse: LiveData<LiveDataEventWithContent<ActionResponse>>
+    val returnResponse: LiveData<LiveDataEventWithContent<Bundle>>
         get() = _returnResponse
-    private val _returnResponse = MutableLiveData<LiveDataEventWithContent<ActionResponse>>()
+    private val _returnResponse = MutableLiveData<LiveDataEventWithContent<Bundle>>()
 
     val showAlert: LiveData<LiveDataEventWithContent<ClientApiError>>
         get() = _showAlert
     private val _showAlert = MutableLiveData<LiveDataEventWithContent<ClientApiError>>()
 
 
-    suspend fun handleIntent(action: String, extras: Map<String, Any>): ActionRequest? = try {
-        // Session must be created to be able to report invalid intents if mapping fails
-        createSessionIfRequiredUseCase(action)
-        intentMapper(action, extras)
-    } catch (validationException: InvalidRequestException) {
-        Simber.e(validationException)
-        simpleEventReporter.addInvalidIntentEvent(action, extras)
-        _showAlert.send(validationException.error)
-        null
+    suspend fun handleIntent(action: String, extras: Bundle): ActionRequest? {
+        val extrasMap = extras.toMap()
+        return try {
+            // Session must be created to be able to report invalid intents if mapping fails
+            createSessionIfRequiredUseCase(action)
+            intentMapper(action, extrasMap)
+        } catch (validationException: InvalidRequestException) {
+            Simber.e(validationException)
+            simpleEventReporter.addInvalidIntentEvent(action, extrasMap)
+            _showAlert.send(validationException.error)
+            null
+        }
     }
 
     // *********************************************************************************************
@@ -82,13 +89,13 @@ internal class ClientApiViewModel @Inject constructor(
 
         deleteSessionEventsIfNeeded(currentSessionId)
 
-        _returnResponse.send(ActionResponse.EnrolActionResponse(
+        _returnResponse.send(resultMapper(ActionResponse.EnrolActionResponse(
             actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             enrolledGuid = enrolResponse.guid,
             subjectActions = coSyncEnrolmentRecords,
-        ))
+        )))
     }
 
     // TODO review if parameters should be replaced with :feature:orchestrator models
@@ -101,12 +108,12 @@ internal class ClientApiViewModel @Inject constructor(
 
         val coSyncEventsJson = getEventJsonForSession(currentSessionId)
 
-        _returnResponse.send(ActionResponse.IdentifyActionResponse(
+        _returnResponse.send(resultMapper(ActionResponse.IdentifyActionResponse(
             actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             identifications = identifyResponse.identifications,
-        ))
+        )))
     }
 
     // TODO review if parameters should be replaced with :feature:orchestrator models
@@ -120,12 +127,12 @@ internal class ClientApiViewModel @Inject constructor(
         val coSyncEventsJson = getEventJsonForSession(currentSessionId)
         deleteSessionEventsIfNeeded(currentSessionId)
 
-        _returnResponse.send(ActionResponse.ConfirmActionResponse(
+        _returnResponse.send(resultMapper(ActionResponse.ConfirmActionResponse(
             actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             confirmed = confirmResponse.identificationOutcome,
-        ))
+        )))
     }
 
     // TODO review if parameters should be replaced with :feature:orchestrator models
@@ -140,12 +147,12 @@ internal class ClientApiViewModel @Inject constructor(
         val coSyncEventsJson = getEventJsonForSession(currentSessionId)
         deleteSessionEventsIfNeeded(currentSessionId)
 
-        _returnResponse.send(ActionResponse.VerifyActionResponse(
+        _returnResponse.send(resultMapper(ActionResponse.VerifyActionResponse(
             actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             matchResult = verifyResponse.matchResult,
-        ))
+        )))
     }
 
     // TODO review if parameters should be replaced with :feature:orchestrator models
@@ -160,13 +167,13 @@ internal class ClientApiViewModel @Inject constructor(
         val coSyncEventsJson = getEventJsonForSession(currentSessionId)
         deleteSessionEventsIfNeeded(currentSessionId)
 
-        _returnResponse.send(ActionResponse.ExitFormActionResponse(
+        _returnResponse.send(resultMapper(ActionResponse.ExitFormActionResponse(
             actionIdentifier = action.actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             reason = exitFormResponse.reason,
             extraText = exitFormResponse.extra,
-        ))
+        )))
     }
 
     // TODO review if parameters should be replaced with :feature:orchestrator models
@@ -185,12 +192,13 @@ internal class ClientApiViewModel @Inject constructor(
         val coSyncEventsJson = getEventJsonForSession(currentSessionId)
         deleteSessionEventsIfNeeded(currentSessionId)
 
-        _returnResponse.send(ActionResponse.ErrorActionResponse(
+        _returnResponse.send(resultMapper(ActionResponse.ErrorActionResponse(
             actionIdentifier = actionIdentifier,
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             reason = errorResponse.reason,
             flowCompleted = flowCompleted,
-        ))
+        )))
     }
+
 }

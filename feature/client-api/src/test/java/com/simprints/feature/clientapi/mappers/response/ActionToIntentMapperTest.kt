@@ -5,7 +5,7 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmI
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.clientapi.models.OdkConstants
-import com.simprints.feature.orchestrator.models.ActionResponse
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.MockK

@@ -7,8 +7,7 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolAct
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
-import com.simprints.feature.clientapi.models.LibSimprintsConstants
-import com.simprints.feature.orchestrator.models.ActionResponse
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -134,7 +133,7 @@ class LibSimprintsResponseMapperTest {
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
-        assertThat(extras.getInt(LibSimprintsConstants.RESULT_CODE_OVERRIDE)).isEqualTo(Constants.SIMPRINTS_UNEXPECTED_ERROR)
+        assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(Constants.SIMPRINTS_UNEXPECTED_ERROR)
     }
 
     @Test
@@ -165,7 +164,7 @@ class LibSimprintsResponseMapperTest {
                 flowCompleted = true,
             ))
 
-            assertThat(extras.getInt(LibSimprintsConstants.RESULT_CODE_OVERRIDE)).isEqualTo(expectedCode)
+            assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(expectedCode)
         }
     }
 }
