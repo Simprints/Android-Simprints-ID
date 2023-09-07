@@ -19,18 +19,22 @@ import com.simprints.feature.clientapi.mappers.request.validators.EnrolLastBiome
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolValidator
 import com.simprints.feature.clientapi.mappers.request.validators.IdentifyValidator
 import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidator
-import com.simprints.feature.clientapi.models.ActionRequest
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.feature.clientapi.models.IntegrationConstants
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.clientapi.models.OdkConstants
-import com.simprints.feature.clientapi.session.ClientSessionManager
+import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
+import com.simprints.feature.clientapi.usecases.IsCurrentSessionAnIdentificationOrEnrolmentUseCase
+import com.simprints.feature.clientapi.usecases.SessionHasIdentificationCallbackUseCase
+import com.simprints.feature.orchestrator.models.ActionRequest
+import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
 import javax.inject.Inject
 
 internal class IntentToActionMapper @Inject constructor(
-    private val sessionManager: ClientSessionManager,
+    private val getCurrentSessionId: GetCurrentSessionIdUseCase,
+    private val isCurrentSessionAnIdentificationOrEnrolment: IsCurrentSessionAnIdentificationOrEnrolmentUseCase,
+    private val sessionHasIdentificationCallback: SessionHasIdentificationCallbackUseCase,
 ) {
 
     suspend operator fun invoke(action: String, extras: Map<String, Any>): ActionRequest {
@@ -80,13 +84,13 @@ internal class IntentToActionMapper @Inject constructor(
     private suspend fun enrolLastBiometricsBuilder(actionIdentifier: ActionRequestIdentifier, extractor: EnrolLastBiometricsRequestExtractor) = EnrolLastBiometricsRequestBuilder(
         actionIdentifier,
         extractor,
-        EnrolLastBiometricsValidator(extractor, sessionManager.getCurrentSessionId(), sessionManager.isCurrentSessionAnIdentificationOrEnrolment())
+        EnrolLastBiometricsValidator(extractor, getCurrentSessionId(), isCurrentSessionAnIdentificationOrEnrolment())
     )
 
     private suspend fun confirmIdentifyBuilder(actionIdentifier: ActionRequestIdentifier, extractor: ConfirmIdentityRequestExtractor) = ConfirmIdentifyRequestBuilder(
         actionIdentifier,
         extractor,
-        ConfirmIdentityValidator(extractor, sessionManager.getCurrentSessionId(), sessionManager.sessionHasIdentificationCallback(extractor.getSessionId()))
+        ConfirmIdentityValidator(extractor, getCurrentSessionId(), sessionHasIdentificationCallback(extractor.getSessionId()))
     )
 
 }

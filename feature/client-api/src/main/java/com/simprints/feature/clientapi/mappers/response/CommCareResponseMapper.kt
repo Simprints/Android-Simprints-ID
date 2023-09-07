@@ -2,8 +2,8 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.simprints.feature.clientapi.models.ActionResponse
 import com.simprints.feature.clientapi.models.CommCareConstants
+import com.simprints.feature.orchestrator.models.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration

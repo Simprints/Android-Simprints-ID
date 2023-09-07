@@ -4,9 +4,9 @@ import com.simprints.feature.clientapi.mappers.request.builders.IdentifyRequestB
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.IdentifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.IdentifyValidator
-import com.simprints.feature.clientapi.models.ActionRequest
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 import com.simprints.feature.clientapi.models.IntegrationConstants
+import com.simprints.feature.orchestrator.models.ActionRequest
+import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
 import io.mockk.mockk
 
 internal object IdentifyRequestActionFactory : RequestActionFactory() {
