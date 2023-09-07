@@ -84,7 +84,7 @@
         </activity>
 
         <!-- TODO: Remove once orchestrator is done - https://simprints.atlassian.net/browse/CORE-2845-->
-        <activity android:name=".activity.StubActivity" />
+        <activity android:name=".activity.StubFragment" />
 
     </application>
 
