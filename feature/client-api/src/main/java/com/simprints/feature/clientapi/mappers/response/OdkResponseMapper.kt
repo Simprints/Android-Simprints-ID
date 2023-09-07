@@ -2,11 +2,10 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.simprints.feature.clientapi.models.ActionRequest
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
-import com.simprints.feature.clientapi.models.ActionResponse
 import com.simprints.feature.clientapi.models.IntegrationConstants
 import com.simprints.feature.clientapi.models.OdkConstants
+import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
+import com.simprints.feature.orchestrator.models.ActionResponse
 import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppMatchResult
 import javax.inject.Inject

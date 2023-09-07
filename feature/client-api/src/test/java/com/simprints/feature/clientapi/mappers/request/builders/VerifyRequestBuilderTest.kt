@@ -1,11 +1,11 @@
 package com.simprints.feature.clientapi.mappers.request.builders
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 import com.simprints.feature.clientapi.models.IntegrationConstants
+import com.simprints.feature.orchestrator.models.ActionRequest
+import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
 import org.junit.Test
 
 internal class VerifyRequestBuilderTest {

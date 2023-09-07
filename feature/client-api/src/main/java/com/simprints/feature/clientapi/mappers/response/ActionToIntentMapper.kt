@@ -2,11 +2,11 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
-import com.simprints.feature.clientapi.models.ActionResponse
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.feature.clientapi.models.LibSimprintsConstants
 import com.simprints.feature.clientapi.models.OdkConstants
+import com.simprints.feature.orchestrator.models.ActionResponse
 import javax.inject.Inject
 
 internal class ActionToIntentMapper @Inject constructor(

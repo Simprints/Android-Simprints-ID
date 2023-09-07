@@ -1,12 +1,12 @@
 package com.simprints.feature.clientapi.mappers.request.requestFactories
 
-import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.builders.VerifyRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidator
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 import com.simprints.feature.clientapi.models.IntegrationConstants
+import com.simprints.feature.orchestrator.models.ActionRequest
+import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
 import io.mockk.every
 import io.mockk.mockk
 

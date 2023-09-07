@@ -1,12 +1,12 @@
 package com.simprints.feature.clientapi.mappers.request.requestFactories
 
-import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.builders.EnrolRequestBuilder
-import com.simprints.feature.clientapi.mappers.request.extractors.EnrolRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
+import com.simprints.feature.clientapi.mappers.request.extractors.EnrolRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolValidator
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
 import com.simprints.feature.clientapi.models.IntegrationConstants
+import com.simprints.feature.orchestrator.models.ActionRequest
+import com.simprints.feature.orchestrator.models.ActionRequestIdentifier
 import io.mockk.mockk
 
 internal object EnrolActionFactory : RequestActionFactory() {

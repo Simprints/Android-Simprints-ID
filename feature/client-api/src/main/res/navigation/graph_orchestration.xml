@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/graph_client_api.xml"
+    app:startDestination="@id/orchestratorRootFragment">
+
+    <fragment
+        android:id="@+id/orchestratorRootFragment"
+        android:name="com.simprints.feature.orchestrator.ui.OrchestratorFragment"
+        android:label="ClientApiFragment"
+        tools:layout="@layout/fragment_orchestrator">
+
+        <argument
+            android:name="requestAction"
+            app:argType="string" />
+        <argument
+            android:name="requestParams"
+            app:argType="android.os.Bundle" />
+
+        <action
+            android:id="@+id/action_clientApiFragment_to_stubFragment"
+            app:destination="@id/stubFragment" />
+    </fragment>
+
+    <include app:graph="@navigation/graph_alert" />
+    <action
+        android:id="@+id/action_clientApiFragment_to_alert"
+        app:destination="@id/graph_alert" />
+
+    <include app:graph="@navigation/graph_login" />
+    <action
+        android:id="@+id/action_clientApiFragment_to_login"
+        app:destination="@id/graph_login" />
+
+    <fragment
+        android:id="@+id/stubFragment"
+        android:name="com.simprints.feature.orchestrator.ui.StubFragment"
+        android:label="StubFragment"
+        tools:layout="@layout/fragment_stub">
+
+        <argument
+            android:name="message"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+
+</navigation>
