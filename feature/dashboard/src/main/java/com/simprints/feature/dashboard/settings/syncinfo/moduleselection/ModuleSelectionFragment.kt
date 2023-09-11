@@ -154,7 +154,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
         val displayedModuleNames = chipHelper.findSelectedModuleNames(binding.chipGroup)
 
         modulesToSelect.forEach { module ->
-            val isModuleDisplayed = displayedModuleNames.contains(module.name)
+            val isModuleDisplayed = displayedModuleNames.contains(module.name.value)
             val isModuleSelected = module.isSelected
 
             when {
@@ -169,7 +169,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
 
     private fun getModulesSelectedTextForDialog() = StringBuilder().apply {
         modulesToSelect.filter { it.isSelected }.forEach { module ->
-            append(module.name + "\n")
+            append(module.name.value + "\n")
         }
     }.toString()
 

@@ -8,10 +8,10 @@ import com.simprints.clientapi.activities.commcare.CommCareAction.Companion.buil
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -49,7 +49,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     lateinit var presenterFactory: ClientApiModule.CommCarePresenterFactory
 
     @Inject
-    lateinit var tokenizationParam: Tokenization
+    lateinit var tokenizationManagerParam: TokenizationManager
 
     @Inject
     lateinit var configManager: ConfigManager
@@ -57,11 +57,12 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     @Inject
     lateinit var authStore: AuthStore
 
-    override val tokenization: Tokenization by lazy {
-        tokenizationParam
+    override val tokenizationManager: TokenizationManager by lazy {
+        tokenizationManagerParam
     }
 
-    override suspend fun getProject(): Project = configManager.getProject(authStore.signedInProjectId)
+    override suspend fun getProject(): Project? =
+        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     override val presenter: CommCareContract.Presenter by lazy {
         presenterFactory.create(this, action)

@@ -18,7 +18,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
     override suspend fun getModules(): List<Module> =
         configManager.getProjectConfiguration().synchronization.down.moduleOptions.map {
-            Module(it, isModuleSelected(it))
+            Module(it, isModuleSelected(it.value))
         }
 
     override suspend fun saveModules(modules: List<Module>) {
@@ -36,7 +36,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
     private suspend fun setSelectedModules(selectedModules: List<Module>) {
         configManager.updateDeviceConfiguration {
             it.apply {
-                this.selectedModules = selectedModules.map { module -> module.name }
+                this.selectedModules = selectedModules.map { module -> module.name.value }
                 logMessageForCrashReport("Modules set to ${this.selectedModules}")
                 setCrashlyticsKeyForModules(this.selectedModules)
             }
@@ -45,13 +45,13 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
     private suspend fun handleUnselectedModules(unselectedModules: List<Module>) {
         val queries = unselectedModules.map {
-            SubjectQuery(moduleId = it.name)
+            SubjectQuery(moduleId = it.name.value)
         }
         enrolmentRecordManager.delete(queries)
 
         // Delete operations for unselected modules to ensure full sync if they are reselected
         // in the future
-        eventSyncManager.deleteModules(unselectedModules.map { it.name })
+        eventSyncManager.deleteModules(unselectedModules.map { it.name.value })
     }
 
     private fun setCrashlyticsKeyForModules(modules: List<String>) {

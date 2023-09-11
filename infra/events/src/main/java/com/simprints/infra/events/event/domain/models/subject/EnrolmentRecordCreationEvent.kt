@@ -5,6 +5,7 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.face.uniqueId
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.uniqueId
+import com.simprints.core.domain.tokenization.TokenizedString
 import com.simprints.core.tools.utils.EncodingUtils
 import java.util.UUID
 
@@ -17,8 +18,8 @@ data class EnrolmentRecordCreationEvent(
     constructor(
         subjectId: String,
         projectId: String,
-        moduleId: String,
-        attendantId: String,
+        moduleId: TokenizedString,
+        attendantId: TokenizedString,
         biometricReferences: List<BiometricReference>,
     ) : this(
         UUID.randomUUID().toString(),
@@ -35,8 +36,8 @@ data class EnrolmentRecordCreationEvent(
     data class EnrolmentRecordCreationPayload(
         val subjectId: String,
         val projectId: String,
-        val moduleId: String,
-        val attendantId: String,
+        val moduleId: TokenizedString,
+        val attendantId: TokenizedString,
         val biometricReferences: List<BiometricReference>,
     )
 

@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.tokenization.TokenizedString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
@@ -59,8 +60,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     override fun buildSubject(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizedString,
+        moduleId: TokenizedString,
         fingerprintResponse: FingerprintCaptureResponse?,
         faceResponse: FaceCaptureResponse?,
         timeHelper: TimeHelper
@@ -97,8 +98,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFingerprintAndFace(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizedString,
+        moduleId: TokenizedString,
         fingerprintResponse: FingerprintCaptureResponse,
         faceResponse: FaceCaptureResponse,
         timeHelper: TimeHelper
@@ -117,8 +118,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFingerprint(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizedString,
+        moduleId: TokenizedString,
         fingerprintResponse: FingerprintCaptureResponse,
         timeHelper: TimeHelper
     ): Subject {
@@ -135,8 +136,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFace(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizedString,
+        moduleId: TokenizedString,
         faceResponse: FaceCaptureResponse,
         timeHelper: TimeHelper
     ): Subject {

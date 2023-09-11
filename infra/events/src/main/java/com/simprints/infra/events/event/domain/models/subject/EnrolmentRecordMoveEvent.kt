@@ -1,7 +1,8 @@
 package com.simprints.infra.events.event.domain.models.subject
 
 import androidx.annotation.Keep
-import java.util.*
+import com.simprints.core.domain.tokenization.TokenizedString
+import java.util.UUID
 
 @Keep
 data class EnrolmentRecordMoveEvent(
@@ -23,14 +24,14 @@ data class EnrolmentRecordMoveEvent(
     )
 
     data class EnrolmentRecordDeletionInMove(
-        val subjectId: String, val projectId: String, val moduleId: String, val attendantId: String
+        val subjectId: String, val projectId: String, val moduleId: TokenizedString, val attendantId: TokenizedString
     )
 
     data class EnrolmentRecordCreationInMove(
         val subjectId: String,
         val projectId: String,
-        val moduleId: String,
-        val attendantId: String,
+        val moduleId: TokenizedString,
+        val attendantId: TokenizedString,
         val biometricReferences: List<BiometricReference>?
     )
 }

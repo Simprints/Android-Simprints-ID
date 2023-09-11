@@ -1,8 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class CompletionCheckEvent(
@@ -20,7 +22,12 @@ data class CompletionCheckEvent(
         UUID.randomUUID().toString(),
         labels,
         CompletionCheckPayload(createdAt, EVENT_VERSION, completed),
-        COMPLETION_CHECK)
+        COMPLETION_CHECK
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
 
     @Keep
     data class CompletionCheckPayload(
@@ -28,7 +35,8 @@ data class CompletionCheckEvent(
         override val eventVersion: Int,
         val completed: Boolean,
         override val type: EventType = COMPLETION_CHECK,
-        override val endedAt: Long = 0) : EventPayload()
+        override val endedAt: Long = 0
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = 1

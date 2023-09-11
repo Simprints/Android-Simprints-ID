@@ -1,6 +1,8 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTION
 import java.util.UUID
 
@@ -20,7 +22,12 @@ data class ScannerConnectionEvent(
         UUID.randomUUID().toString(),
         labels,
         ScannerConnectionPayload(createdAt, EVENT_VERSION, scannerInfo),
-        SCANNER_CONNECTION)
+        SCANNER_CONNECTION
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
 
 
     @Keep
@@ -29,13 +36,16 @@ data class ScannerConnectionEvent(
         override val eventVersion: Int,
         val scannerInfo: ScannerInfo,
         override val type: EventType = SCANNER_CONNECTION,
-        override val endedAt: Long = 0) : EventPayload() {
+        override val endedAt: Long = 0
+    ) : EventPayload() {
 
         @Keep
-        data class ScannerInfo(val scannerId: String,
-                               val macAddress: String,
-                               val generation: ScannerGeneration,
-                               var hardwareVersion: String?)
+        data class ScannerInfo(
+            val scannerId: String,
+            val macAddress: String,
+            val generation: ScannerGeneration,
+            var hardwareVersion: String?
+        )
 
         @Keep
         enum class ScannerGeneration {

@@ -170,7 +170,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private suspend fun setLastUser() {
         recentUserActivityManager.updateRecentUserActivity {
             it.apply {
-                it.lastUserUsed = appRequest.userId
+                it.lastUserUsed = appRequest.userId.value
             }
         }
     }
@@ -192,9 +192,9 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private fun extractSessionParametersForAnalyticsManager() =
         with(appRequest) {
             if (this is AppRequestFlow) {
-                Simber.tag(AnalyticsUserProperties.USER_ID, true).i(userId)
+                Simber.tag(AnalyticsUserProperties.USER_ID, true).i(userId.value)
                 Simber.tag(AnalyticsUserProperties.PROJECT_ID).i(projectId)
-                Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId)
+                Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId.value)
                 Simber.tag(AnalyticsUserProperties.DEVICE_ID).i(deviceId)
             }
         }
@@ -300,7 +300,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         val projectConfiguration = configManager.getProjectConfiguration()
         val deviceConfiguration = configManager.getDeviceConfiguration()
         Simber.tag(PROJECT_ID, true).i(authStore.signedInProjectId)
-        Simber.tag(USER_ID, true).i(appRequest.userId)
+        Simber.tag(USER_ID, true).i(appRequest.userId.value)
         Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(projectConfiguration.synchronization.frequency.toString())
