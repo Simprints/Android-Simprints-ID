@@ -20,6 +20,7 @@ import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInS
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
 import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCase
+import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.UpdateDatabaseCountsInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
 import com.simprints.infra.logging.Simber
@@ -42,6 +43,7 @@ class LoginCheckViewModel @Inject internal constructor(
     private val addAuthorizationEvent: AddAuthorizationEventUseCase,
     private val isUserSignedIn: IsUserSignedInUseCase,
     private val getProjectStatus: GetProjectStateUseCase,
+    private val startBackgroundSync: StartBackgroundSyncUseCase,
     private val cancelBackgroundSync: CancelBackgroundSyncUseCase,
     private val updateDatabaseCountsInCurrentSession: UpdateDatabaseCountsInCurrentSessionUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
@@ -144,6 +146,7 @@ class LoginCheckViewModel @Inject internal constructor(
             async { extractParametersForCrashReport(actionRequest) }
         )
 
+        startBackgroundSync()
         _proceedWithAction.send(actionRequest)
     }
 
