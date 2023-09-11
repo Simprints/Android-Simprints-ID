@@ -1,54 +1,71 @@
 package com.simprints.id.domain.moduleapi.app.requests
 
 import android.os.Parcelable
+import com.simprints.core.domain.tokenization.TokenizedString
 import kotlinx.parcelize.Parcelize
 
-sealed class AppRequest(open val projectId: String,
-                        open val userId: String) : Parcelable {
+sealed class AppRequest(
+    open val projectId: String,
+    open val userId: TokenizedString
+) : Parcelable {
 
     companion object {
         const val BUNDLE_KEY = "ApiRequest"
     }
 
-    sealed class AppRequestFlow(override val projectId: String,
-                                override val userId: String,
-                                open val moduleId: String) : AppRequest(projectId, userId) {
+    sealed class AppRequestFlow(
+        override val projectId: String,
+        override val userId: TokenizedString,
+        open val moduleId: TokenizedString
+    ) : AppRequest(projectId, userId) {
 
         @Parcelize
-        data class AppEnrolRequest(override val projectId: String,
-                                   override val userId: String,
-                                   override val moduleId: String,
-                                   val metadata: String) : AppRequestFlow(projectId, userId, moduleId)
+        data class AppEnrolRequest(
+            override val projectId: String,
+            override val userId: TokenizedString,
+            override val moduleId: TokenizedString,
+            val metadata: String
+        ) : AppRequestFlow(projectId, userId, moduleId)
 
         @Parcelize
-        data class AppIdentifyRequest(override val projectId: String,
-                                      override val userId: String,
-                                      override val moduleId: String,
-                                      val metadata: String) : AppRequestFlow(projectId, userId, moduleId)
+        data class AppIdentifyRequest(
+            override val projectId: String,
+            override val userId: TokenizedString,
+            override val moduleId: TokenizedString,
+            val metadata: String
+        ) : AppRequestFlow(projectId, userId, moduleId)
 
         @Parcelize
-        data class AppVerifyRequest(override val projectId: String,
-                                    override val userId: String,
-                                    override val moduleId: String,
-                                    val metadata: String,
-                                    val verifyGuid: String) : AppRequestFlow(projectId, userId, moduleId)
+        data class AppVerifyRequest(
+            override val projectId: String,
+            override val userId: TokenizedString,
+            override val moduleId: TokenizedString,
+            val metadata: String,
+            val verifyGuid: String
+        ) : AppRequestFlow(projectId, userId, moduleId)
     }
 
-    sealed class AppRequestFollowUp(override val projectId: String,
-                                    override val userId: String) : AppRequest(projectId, userId) {
+    sealed class AppRequestFollowUp(
+        override val projectId: String,
+        override val userId: TokenizedString
+    ) : AppRequest(projectId, userId) {
 
         @Parcelize
-        data class AppEnrolLastBiometricsRequest(override val projectId: String,
-                                                 override val userId: String,
-                                                 val moduleId: String,
-                                                 val metadata: String,
-                                                 val identificationSessionId: String) : AppRequestFollowUp(projectId, userId)
+        data class AppEnrolLastBiometricsRequest(
+            override val projectId: String,
+            override val userId: TokenizedString,
+            val moduleId: TokenizedString,
+            val metadata: String,
+            val identificationSessionId: String
+        ) : AppRequestFollowUp(projectId, userId)
 
 
         @Parcelize
-        data class AppConfirmIdentityRequest(override val projectId: String,
-                                             override val userId: String,
-                                             val sessionId: String,
-                                             val selectedGuid: String) : AppRequestFollowUp(projectId, userId)
+        data class AppConfirmIdentityRequest(
+            override val projectId: String,
+            override val userId: TokenizedString,
+            val sessionId: String,
+            val selectedGuid: String
+        ) : AppRequestFollowUp(projectId, userId)
     }
 }

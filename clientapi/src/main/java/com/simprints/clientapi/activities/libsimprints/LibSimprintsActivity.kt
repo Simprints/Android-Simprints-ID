@@ -7,11 +7,15 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Compan
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
-import com.simprints.libsimprints.*
+import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.libsimprints.Constants
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.RefusalForm
+import com.simprints.libsimprints.Registration
+import com.simprints.libsimprints.Verification
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -25,7 +29,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     lateinit var libSimprintsPresenterFactory: ClientApiModule.LibSimprintsPresenterFactory
 
     @Inject
-    lateinit var tokenizationParam: Tokenization
+    lateinit var tokenizationManagerParam: TokenizationManager
 
     @Inject
     lateinit var configManager: ConfigManager
@@ -33,11 +37,12 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     @Inject
     lateinit var authStore: AuthStore
 
-    override val tokenization: Tokenization by lazy {
-        tokenizationParam
+    override val tokenizationManager: TokenizationManager by lazy {
+        tokenizationManagerParam
     }
 
-    override suspend fun getProject(): Project = configManager.getProject(authStore.signedInProjectId)
+    override suspend fun getProject(): Project? =
+        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     override val presenter: LibSimprintsContract.Presenter by lazy {
         libSimprintsPresenterFactory.create(this, action)

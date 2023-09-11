@@ -1,8 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
-import java.util.*
+import java.util.UUID
 
 
 @Keep
@@ -21,7 +23,12 @@ data class AlertScreenEvent(
         UUID.randomUUID().toString(),
         labels,
         AlertScreenPayload(createdAt, EVENT_VERSION, alertType),
-        ALERT_SCREEN)
+        ALERT_SCREEN
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
 
     @Keep
     data class AlertScreenPayload(

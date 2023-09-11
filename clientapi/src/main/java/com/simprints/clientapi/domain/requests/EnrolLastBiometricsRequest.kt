@@ -1,5 +1,6 @@
 package com.simprints.clientapi.domain.requests
 
+import com.simprints.core.domain.tokenization.TokenizedString
 import com.simprints.moduleapi.app.requests.IAppEnrolLastBiometricsRequest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import kotlinx.parcelize.Parcelize
@@ -7,15 +8,19 @@ import kotlinx.parcelize.Parcelize
 
 data class EnrolLastBiometricsRequest(
     override val projectId: String,
-    override val userId: String,
-    val moduleId: String,
+    override val userId: TokenizedString,
+    val moduleId: TokenizedString,
     val metadata: String,
     val sessionId: String,
     override val unknownExtras: Map<String, Any?>
 ) : BaseRequest {
 
     override fun convertToAppRequest(): IAppRequest = AppEnrolLastBiometricsRequest(
-        this.projectId, this.userId, this.moduleId, this.metadata, this.sessionId
+        projectId = this.projectId,
+        userId = this.userId.value,
+        moduleId = this.moduleId.value,
+        metadata = this.metadata,
+        sessionId = this.sessionId
     )
 
     @Parcelize

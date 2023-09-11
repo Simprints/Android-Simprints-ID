@@ -1,6 +1,8 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
 import java.util.*
 
@@ -22,6 +24,10 @@ data class EnrolmentEventV1(
         labels,
         EnrolmentPayload(createdAt, EVENT_VERSION, personId),
         ENROLMENT_V1)
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
 
     @Keep
     data class EnrolmentPayload(

@@ -3,8 +3,12 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import com.simprints.clientapi.ClientApiModule
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.activities.odk.OdkAction.*
 import com.simprints.clientapi.activities.odk.OdkAction.Companion.buildOdkAction
+import com.simprints.clientapi.activities.odk.OdkAction.Enrol
+import com.simprints.clientapi.activities.odk.OdkAction.Identify
+import com.simprints.clientapi.activities.odk.OdkAction.Invalid
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction
+import com.simprints.clientapi.activities.odk.OdkAction.Verify
 import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
@@ -13,10 +17,10 @@ import com.simprints.clientapi.clientrequests.extractors.odk.OdkIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.tokenization.TokenizationManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -74,7 +78,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     lateinit var presenterFactory: ClientApiModule.OdkPresenterFactory
 
     @Inject
-    lateinit var tokenizationParam: Tokenization
+    lateinit var tokenizationManagerParam: TokenizationManager
 
     @Inject
     lateinit var configManager: ConfigManager
@@ -82,11 +86,12 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     @Inject
     lateinit var authStore: AuthStore
 
-    override val tokenization: Tokenization by lazy {
-        tokenizationParam
+    override val tokenizationManager: TokenizationManager by lazy {
+        tokenizationManagerParam
     }
 
-    override suspend fun getProject(): Project = configManager.getProject(authStore.signedInProjectId)
+    override suspend fun getProject(): Project? =
+        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     override val presenter: OdkContract.Presenter by lazy { presenterFactory.create(this, action) }
 

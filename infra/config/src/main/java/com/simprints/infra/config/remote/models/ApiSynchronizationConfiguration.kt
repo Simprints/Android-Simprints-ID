@@ -1,6 +1,7 @@
 package com.simprints.infra.config.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.SynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
@@ -82,7 +83,7 @@ internal data class ApiSynchronizationConfiguration(
             DownSynchronizationConfiguration(
                 partitionType.toDomain(),
                 maxNbOfModules,
-                moduleOptions?: emptyList()
+                moduleOptions?.map(String::asTokenizedEncrypted) ?: emptyList()
             )
 
         @Keep

@@ -1,8 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.GUID_SELECTION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class GuidSelectionEvent(
@@ -20,14 +22,21 @@ data class GuidSelectionEvent(
         UUID.randomUUID().toString(),
         labels,
         GuidSelectionPayload(createdAt, EVENT_VERSION, selectedId),
-        GUID_SELECTION)
+        GUID_SELECTION
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
 
     @Keep
-    data class GuidSelectionPayload(override val createdAt: Long,
-                                    override val eventVersion: Int,
-                                    val selectedId: String,
-                                    override val type: EventType = GUID_SELECTION,
-                                    override val endedAt: Long = 0) : EventPayload()
+    data class GuidSelectionPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        val selectedId: String,
+        override val type: EventType = GUID_SELECTION,
+        override val endedAt: Long = 0
+    ) : EventPayload()
 
     companion object {
         const val EVENT_VERSION = 1

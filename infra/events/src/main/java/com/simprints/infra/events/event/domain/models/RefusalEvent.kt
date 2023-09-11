@@ -1,8 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.REFUSAL
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class RefusalEvent(
@@ -21,17 +23,30 @@ data class RefusalEvent(
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        RefusalPayload(createdAt, EVENT_VERSION, endTime, reason, otherText),
-        REFUSAL)
+        RefusalPayload(
+            createdAt = createdAt,
+            eventVersion = EVENT_VERSION,
+            endedAt = endTime,
+            reason = reason,
+            otherText = otherText
+        ),
+        REFUSAL
+    )
 
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
 
     @Keep
-    data class RefusalPayload(override val createdAt: Long,
-                              override val eventVersion: Int,
-                              override var endedAt: Long,
-                              val reason: Answer,
-                              val otherText: String,
-                              override val type: EventType = REFUSAL) : EventPayload() {
+    data class RefusalPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        override var endedAt: Long,
+        val reason: Answer,
+        val otherText: String,
+        override val type: EventType = REFUSAL
+    ) : EventPayload() {
 
         @Keep
         enum class Answer {

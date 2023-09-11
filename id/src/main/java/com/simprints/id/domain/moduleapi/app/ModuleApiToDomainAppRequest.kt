@@ -1,27 +1,62 @@
 package com.simprints.id.domain.moduleapi.app
 
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
-import com.simprints.moduleapi.app.requests.*
+import com.simprints.moduleapi.app.requests.IAppConfirmIdentityRequest
+import com.simprints.moduleapi.app.requests.IAppEnrolLastBiometricsRequest
+import com.simprints.moduleapi.app.requests.IAppEnrolRequest
+import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
+import com.simprints.moduleapi.app.requests.IAppRequest
+import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 
 fun IAppRequest.fromModuleApiToDomain(): AppRequest =
     when (this) {
         is IAppEnrolRequest ->
-            AppEnrolRequest(projectId, userId, moduleId, metadata)
+            AppEnrolRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                moduleId = moduleId.asTokenizedRaw(),
+                metadata = metadata
+            )
 
         is IAppIdentifyRequest ->
-            AppIdentifyRequest(projectId, userId, moduleId, metadata)
+            AppIdentifyRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                moduleId = moduleId.asTokenizedRaw(),
+                metadata = metadata
+            )
 
         is IAppVerifyRequest ->
-            AppVerifyRequest(projectId, userId, moduleId, metadata, verifyGuid)
+            AppVerifyRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                moduleId = moduleId.asTokenizedRaw(),
+                metadata = metadata,
+                verifyGuid = verifyGuid
+            )
 
         is IAppConfirmIdentityRequest ->
-            AppConfirmIdentityRequest(projectId, userId, sessionId, selectedGuid)
+            AppConfirmIdentityRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                sessionId = sessionId,
+                selectedGuid = selectedGuid
+            )
 
         is IAppEnrolLastBiometricsRequest ->
-            AppEnrolLastBiometricsRequest(projectId, userId, moduleId, metadata, sessionId)
+            AppEnrolLastBiometricsRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                moduleId = moduleId.asTokenizedRaw(),
+                metadata = metadata,
+                identificationSessionId = sessionId
+            )
 
         else -> throw IllegalArgumentException("Request not recognised")
     }

@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator
 
+import com.simprints.core.domain.tokenization.TokenizedString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -9,8 +10,8 @@ interface EnrolmentHelper {
 
     fun buildSubject(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizedString,
+        moduleId: TokenizedString,
         fingerprintResponse: FingerprintCaptureResponse?,
         faceResponse: FaceCaptureResponse?,
         timeHelper: TimeHelper
