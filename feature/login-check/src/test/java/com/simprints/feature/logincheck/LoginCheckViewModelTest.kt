@@ -13,6 +13,7 @@ import com.simprints.feature.logincheck.usecases.ExtractParametersForAnalyticsUs
 import com.simprints.feature.logincheck.usecases.GetProjectStateUseCase
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase
 import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCase
+import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.UpdateDatabaseCountsInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
 import com.simprints.infra.security.SecurityManager
@@ -60,6 +61,9 @@ internal class LoginCheckViewModelTest {
     lateinit var getProjectStateUseCase: GetProjectStateUseCase
 
     @MockK
+    lateinit var startBackgroundSync: StartBackgroundSyncUseCase
+
+    @MockK
     lateinit var cancelBackgroundSync: CancelBackgroundSyncUseCase
 
     @MockK
@@ -83,6 +87,7 @@ internal class LoginCheckViewModelTest {
             addAuthorizationEventUseCase,
             isUserSignedInUseCase,
             getProjectStateUseCase,
+            startBackgroundSync,
             cancelBackgroundSync,
             updateDatabaseCountsInCurrentSessionUseCase,
             updateProjectStateUseCase,
@@ -286,6 +291,7 @@ internal class LoginCheckViewModelTest {
             updateDatabaseCountsInCurrentSessionUseCase.invoke()
             addAuthorizationEventUseCase.invoke(any(), eq(true))
             extractCrashKeysUseCase.invoke(any())
+            startBackgroundSync.invoke()
         }
 
         viewModel.proceedWithAction.test().assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
