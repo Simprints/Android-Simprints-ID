@@ -54,8 +54,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
             AlertContract.ALERT_DESTINATION_ID,
         ) { alertResult ->
             clientApiVm.handleErrorResponse(
-                ActionRequestIdentifier.fromIntentAction(args.requestAction),
-                AppResultError(AlertConfigurationMapper.reasonFromPayload(alertResult.payload))
+                args.requestAction,
+                AppErrorResponse(AlertConfigurationMapper.reasonFromPayload(alertResult.payload))
             )
         }
 
@@ -85,10 +85,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         })
 
         loginCheckVm.returnLoginNotComplete.observe(viewLifecycleOwner, LiveDataEventObserver {
-            clientApiVm.handleErrorResponse(
-                ActionRequestIdentifier.fromIntentAction(args.requestAction),
-                AppResultError(IAppErrorReason.LOGIN_NOT_COMPLETE)
-            )
+            clientApiVm.handleErrorResponse(args.requestAction, AppErrorResponse(IAppErrorReason.LOGIN_NOT_COMPLETE))
         })
 
         loginCheckVm.proceedWithAction.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { action ->
