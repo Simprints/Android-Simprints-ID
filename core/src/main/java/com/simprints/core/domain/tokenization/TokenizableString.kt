@@ -31,6 +31,17 @@ sealed class TokenizableString : Parcelable {
     @JsonTypeName("Raw")
     @Parcelize
     data class Raw(override val value: String) : TokenizableString()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        return other is TokenizableString && other.value == value
+    }
+
+    override fun hashCode(): Int = value.hashCode()
+
+    override fun toString(): String = value
 }
 
 fun String.asTokenizedRaw() = Raw(this)
