@@ -266,7 +266,6 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         Simber.d("[CHECK_LOGIN] Added authorised event")
     }
 
-    //TODO check tokenization
     private suspend fun updateProjectInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 
