@@ -40,7 +40,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
     private fun reportUnknownExtras(actionRequest: ActionRequest) {
         if (actionRequest.unknownExtras.isNotEmpty()) {
             externalScope.launch {
-                coreEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras))
+                coreEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras.toMap()))
             }
         }
     }

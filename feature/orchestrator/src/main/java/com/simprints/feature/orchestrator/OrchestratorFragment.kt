@@ -21,6 +21,7 @@ import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.logincheck.LoginCheckViewModel
+import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.databinding.FragmentOrchestratorBinding
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
 import com.simprints.feature.selectsubject.SelectSubjectContract
@@ -64,6 +65,9 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
     @Inject
     lateinit var alertConfigurationMapper: AlertConfigurationMapper
+
+    @Inject
+    lateinit var orchestratorCache: OrchestratorCache
 
     private val args by navArgs<OrchestratorFragmentArgs>()
 
@@ -129,13 +133,15 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     }
 
     private fun observeClientApiVm() {
+        clientApiVm.newSessionCreated.observe(viewLifecycleOwner, LiveDataEventObserver {
+            orchestratorCache.clearSteps()
+        })
         clientApiVm.showAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
             findNavController().navigate(
                 R.id.action_orchestratorFragment_to_alert,
                 alertConfigurationMapper.buildAlertConfig(error).toArgs()
             )
         })
-
         clientApiVm.returnResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { responseExtras ->
             val resultCode = responseExtras.getResultCodeFromExtras()
             findNavController().finishWithResult(this, AppResult(resultCode, responseExtras))

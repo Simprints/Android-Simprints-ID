@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.model.OrchestratorResult
 import com.simprints.feature.orchestrator.model.responses.AppRefusalResponse
 import com.simprints.feature.orchestrator.steps.Step
@@ -25,12 +26,11 @@ import javax.inject.Inject
 @HiltViewModel
 internal class OrchestratorViewModel @Inject constructor(
     private val configManager: ConfigManager,
+    private val cache: OrchestratorCache,
     private val locationStore: LocationStore,
     private val stepsBuilder: StepsBuilder,
     private val appResponseBuilder: AppResponseBuilderUseCase,
 ) : ViewModel() {
-
-    private var cachedActionRequest: ActionRequest? = null
 
     private var steps = emptyList<Step>()
 
@@ -45,11 +45,10 @@ internal class OrchestratorViewModel @Inject constructor(
 
     fun handleAction(action: ActionRequest) = viewModelScope.launch {
         val projectConfiguration = configManager.getProjectConfiguration()
-
-        cachedActionRequest = action
         steps = stepsBuilder.build(action, projectConfiguration)
 
-        // TODO cache?
+        cache.actionRequest = action
+
         // TODO figure out restoring state for active session and follow-up actions
 
         doNextStep()
@@ -59,7 +58,7 @@ internal class OrchestratorViewModel @Inject constructor(
         Simber.i(result.toString())
         if (result is ExitFormResult) {
             _appResponse.send(OrchestratorResult(
-                cachedActionRequest,
+                cache.actionRequest,
                 AppRefusalResponse(result.submittedOption().answer.name, result.reason.orEmpty())
             ))
             // TODO cleanup?
@@ -71,6 +70,12 @@ internal class OrchestratorViewModel @Inject constructor(
             it.result = result
         }
         doNextStep()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        cache.steps = steps
+        // TODO cleanup?
     }
 
     private fun doNextStep() {
@@ -90,6 +95,8 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     private fun buildAppResponse() {
+        val cachedActionRequest = cache.actionRequest
+
         val appResponse = appResponseBuilder(cachedActionRequest, steps.mapNotNull { it.result })
         _appResponse.send(OrchestratorResult(cachedActionRequest, appResponse))
         // TODO update daily activity
