@@ -1,17 +1,17 @@
 package com.simprints.infra.config.local.models
 
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.exceptions.InvalidProtobufEnumException
 
 internal fun DownSynchronizationConfiguration.toProto(): ProtoDownSynchronizationConfiguration {
-    val isTokenized = moduleOptions.any { it is TokenizedString.Encrypted }
+    val isTokenized = moduleOptions.any { it is TokenizableString.Tokenized }
     return ProtoDownSynchronizationConfiguration.newBuilder()
         .setPartitionType(partitionType.toProto())
         .setMaxNbOfModules(maxNbOfModules)
-        .addAllModuleOptions(moduleOptions.map(TokenizedString::value))
+        .addAllModuleOptions(moduleOptions.map(TokenizableString::value))
         .setIsTokenized(isTokenized)
         .build()
 }

@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.steps.core
 
 import android.content.Intent
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.consent.ConsentType
 import com.simprints.id.orchestrator.steps.Step
 
@@ -17,8 +17,8 @@ interface CoreStepProcessor {
 
     fun buildAppEnrolLastBiometricsStep(
         projectId: String,
-        userId: TokenizedString,
-        moduleId: TokenizedString,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         previousSteps: List<Step>,
         sessionId: String?
     ): Step

@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.session
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
@@ -53,9 +53,9 @@ data class SessionCaptureEvent(
         this.labels = labels.copy(sessionId = id)
     }
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = emptyMap()
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class SessionCapturePayload(

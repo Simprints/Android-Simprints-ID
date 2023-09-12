@@ -1,6 +1,6 @@
 package com.simprints.infra.authlogic.authenticator
 
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
 import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
@@ -31,7 +31,7 @@ internal class Authenticator @Inject constructor(
     private var loginStartTime = 0L
 
     suspend fun authenticate(
-        userId: TokenizedString.Raw,
+        userId: TokenizableString.Raw,
         projectId: String,
         projectSecret: String,
         deviceId: String
@@ -84,7 +84,7 @@ internal class Authenticator @Inject constructor(
     private suspend fun addEventAndUpdateProjectIdIfRequired(
         result: AuthenticationEvent.AuthenticationPayload.Result,
         projectId: String,
-        userId: TokenizedString.Raw
+        userId: TokenizableString.Raw
     ) {
         val event = AuthenticationEvent(
             loginStartTime,

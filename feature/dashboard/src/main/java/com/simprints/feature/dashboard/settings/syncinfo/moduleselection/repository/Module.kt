@@ -1,5 +1,5 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 
-internal data class Module(val name: TokenizedString, var isSelected: Boolean)
+internal data class Module(val name: TokenizableString, var isSelected: Boolean)
