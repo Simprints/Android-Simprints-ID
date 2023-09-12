@@ -19,19 +19,44 @@
             app:argType="android.os.Bundle" />
 
         <action
-            android:id="@+id/action_clientApiFragment_to_stubFragment"
+            android:id="@+id/action_orchestratorFragment_to_stubFragment"
             app:destination="@id/stubFragment" />
     </fragment>
 
     <include app:graph="@navigation/graph_alert" />
     <action
-        android:id="@+id/action_clientApiFragment_to_alert"
+        android:id="@+id/action_orchestratorFragment_to_alert"
         app:destination="@id/graph_alert" />
 
     <include app:graph="@navigation/graph_login" />
     <action
-        android:id="@+id/action_clientApiFragment_to_login"
+        android:id="@+id/action_orchestratorFragment_to_login"
         app:destination="@id/graph_login" />
+
+    <include app:graph="@navigation/graph_setup" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_setup"
+        app:destination="@id/graph_setup" />
+
+    <include app:graph="@navigation/graph_consent" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_consent"
+        app:destination="@id/graph_consent" />
+
+    <include app:graph="@navigation/graph_enrol_last" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_enrolLast"
+        app:destination="@id/graph_enrol_last" />
+
+    <include app:graph="@navigation/graph_select_subject" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_selectSubject"
+        app:destination="@id/graph_select_subject" />
+
+    <include app:graph="@navigation/graph_fetch_subject" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_fetchSubject"
+        app:destination="@id/graph_fetch_subject" />
 
     <!-- TODO: Remove once orchestrator is done - https://simprints.atlassian.net/browse/CORE-2845-->
     <fragment

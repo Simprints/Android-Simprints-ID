@@ -72,14 +72,14 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     private fun observeLoginCheckVm() {
         loginCheckVm.showAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
             findNavController().navigate(
-                R.id.action_clientApiFragment_to_alert,
+                R.id.action_orchestratorFragment_to_alert,
                 alertConfigurationMapper.buildAlertConfig(error).toArgs()
             )
         })
 
         loginCheckVm.showLoginFlow.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { request ->
             findNavController().navigate(
-                R.id.action_clientApiFragment_to_login,
+                R.id.action_orchestratorFragment_to_login,
                 LoginContract.toArgs(request.projectId, request.userId),
             )
         })
@@ -104,7 +104,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     private fun observeClientApiVm() {
         clientApiVm.showAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { error ->
             findNavController().navigate(
-                R.id.action_clientApiFragment_to_alert,
+                R.id.action_orchestratorFragment_to_alert,
                 alertConfigurationMapper.buildAlertConfig(error).toArgs()
             )
         })
