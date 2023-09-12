@@ -46,7 +46,7 @@ class EventDownSyncScopeTest {
         with(modulesDownSyncScope.operations) {
             assertThat(this).hasSize(2)
             val query = this.first().queryEvent
-            checkModuleScope(query, DEFAULT_MODULE_ID)
+            checkModuleScope(query, DEFAULT_MODULE_ID.value)
 
             val query2 = this[1].queryEvent
             checkModuleScope(query2, DEFAULT_MODULE_ID_2)

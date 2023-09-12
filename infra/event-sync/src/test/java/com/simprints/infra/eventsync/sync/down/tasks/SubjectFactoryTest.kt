@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
@@ -21,8 +22,8 @@ class SubjectFactoryTest {
     private lateinit var factory: SubjectFactory
     private val projectId = "projectId"
     private val subjectId = "subjectId"
-    private val attendantId = "encryptedAttendantId"
-    private val moduleId = "encryptedModuleId"
+    private val attendantId = "encryptedAttendantId".asTokenizedRaw()
+    private val moduleId = "encryptedModuleId".asTokenizedRaw()
     private val base64Bytes = byteArrayOf(1)
     private val referenceId = "fpRefId"
     private val referenceFormat = "NEC_1"

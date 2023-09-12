@@ -178,7 +178,7 @@ class EventDownSyncTaskTest {
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
-            listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+            listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2),
             ""
         )
 
@@ -196,7 +196,7 @@ class EventDownSyncTaskTest {
             mockProgressEmission(listOf(eventToMoveToModule2))
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
-                listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+                listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2),
                 ""
             )
 
@@ -221,9 +221,9 @@ class EventDownSyncTaskTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf(DEFAULT_MODULE_ID),
-            ""
+            language = "",
+            selectedModules = listOf(DEFAULT_MODULE_ID.value),
+            lastInstructionId = ""
         )
 
         eventDownSyncTask.downSync(this, moduleOp).toList()

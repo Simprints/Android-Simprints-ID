@@ -183,7 +183,7 @@ internal class EventSyncManagerTest {
             )
         )
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, SampleDefaults.DEFAULT_MODULE_ID_2)
+            every { selectedModules } returns listOf(DEFAULT_MODULE_ID.value, SampleDefaults.DEFAULT_MODULE_ID_2)
         }
 
         val result = eventSyncManagerImpl.countEventsToDownload()
@@ -208,7 +208,7 @@ internal class EventSyncManagerTest {
             )
         )
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, SampleDefaults.DEFAULT_MODULE_ID_2)
+            every { selectedModules } returns listOf(DEFAULT_MODULE_ID.value, SampleDefaults.DEFAULT_MODULE_ID_2)
         }
 
         val result = eventSyncManagerImpl.countEventsToDownload()

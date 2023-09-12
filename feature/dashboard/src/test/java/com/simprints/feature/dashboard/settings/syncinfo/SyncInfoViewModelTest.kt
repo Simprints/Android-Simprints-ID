@@ -3,6 +3,7 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
@@ -351,7 +352,7 @@ class SyncInfoViewModelTest {
         every { frequency }.returns(SynchronizationConfiguration.Frequency.PERIODICALLY)
         every { down }.returns(DownSynchronizationConfiguration(
             partitionType = partitionType,
-            moduleOptions = modules,
+            moduleOptions = modules.map(String::asTokenizedRaw),
             maxNbOfModules = 0,
         ))
     }

@@ -74,7 +74,7 @@ internal class EventDownSyncScopeRepositoryTest {
 
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
-            every { lastUserUsed } returns DEFAULT_USER_ID
+            every { lastUserUsed } returns DEFAULT_USER_ID.value
         }
         coEvery { downSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
