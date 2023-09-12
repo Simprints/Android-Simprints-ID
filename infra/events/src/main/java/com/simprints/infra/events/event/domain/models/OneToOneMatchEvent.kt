@@ -46,7 +46,6 @@ data class OneToOneMatchEvent(
         override val createdAt: Long,
         override val eventVersion: Int,
         override var endedAt: Long,
-        // TODO [CORE-2502] Check if candidateId is the same as attendant id
         val candidateId: String,
         val matcher: String,
         val result: MatchEntry?,
