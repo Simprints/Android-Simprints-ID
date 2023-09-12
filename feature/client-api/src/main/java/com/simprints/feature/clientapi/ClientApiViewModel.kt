@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
@@ -50,6 +51,10 @@ class ClientApiViewModel @Inject internal constructor(
         get() = _returnResponse
     private val _returnResponse = MutableLiveData<LiveDataEventWithContent<Bundle>>()
 
+    val newSessionCreated: LiveData<LiveDataEvent>
+        get() = _newSessionCreated
+    private val _newSessionCreated = MutableLiveData<LiveDataEvent>()
+
     val showAlert: LiveData<LiveDataEventWithContent<ClientApiError>>
         get() = _showAlert
     private val _showAlert = MutableLiveData<LiveDataEventWithContent<ClientApiError>>()
@@ -59,7 +64,10 @@ class ClientApiViewModel @Inject internal constructor(
         val extrasMap = extras.toMap()
         return try {
             // Session must be created to be able to report invalid intents if mapping fails
-            createSessionIfRequiredUseCase(action)
+            if (createSessionIfRequiredUseCase(action)) {
+                _newSessionCreated.send()
+            }
+
             intentMapper(action, extrasMap)
         } catch (validationException: InvalidRequestException) {
             Simber.e(validationException)
