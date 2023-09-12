@@ -1,6 +1,6 @@
 package com.simprints.infra.config.tokenization
 
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.utils.StringTokenizer
@@ -20,14 +20,14 @@ class TokenizationManager @Inject constructor(
      * @param tokenKeyType corresponding key type of the provided string
      * @param project current project configuration containing tokenization keys
      *
-     * @return [TokenizedString.Encrypted] is case of successful tokenization, [TokenizedString.Raw]
+     * @return [TokenizableString.Tokenized] is case of successful tokenization, [TokenizableString.Raw]
      * with the [decrypted] value otherwise
      */
     fun encrypt(
-        decrypted: TokenizedString,
+        decrypted: TokenizableString.Raw,
         tokenKeyType: TokenKeyType,
         project: Project
-    ): TokenizedString {
+    ): TokenizableString {
         val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return decrypted
         return try {
             stringTokenizer.encrypt(decrypted.value, moduleKeyset).asTokenizedEncrypted()
@@ -44,14 +44,14 @@ class TokenizationManager @Inject constructor(
      * @param tokenKeyType corresponding key type of the provided string
      * @param project current project configuration containing tokenization keys
      *
-     * @return [TokenizedString.Encrypted] is case of successful tokenization, [TokenizedString.Raw]
+     * @return [TokenizableString.Tokenized] is case of successful tokenization, [TokenizableString.Raw]
      * with the [encrypted] value otherwise
      */
     fun decrypt(
-        encrypted: TokenizedString,
+        encrypted: TokenizableString.Tokenized,
         tokenKeyType: TokenKeyType,
         project: Project
-    ): TokenizedString {
+    ): TokenizableString {
         val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return encrypted
         return try {
             stringTokenizer.decrypt(encrypted.value, moduleKeyset).asTokenizedRaw()

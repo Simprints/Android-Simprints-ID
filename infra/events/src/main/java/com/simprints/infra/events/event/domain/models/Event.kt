@@ -3,7 +3,7 @@ package com.simprints.infra.events.event.domain.models
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
@@ -136,8 +136,8 @@ abstract class Event {
     abstract val payload: EventPayload
 
     @JsonIgnore
-    abstract fun getTokenizedFields(): Map<TokenKeyType, TokenizedString>
-    abstract fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>): Event
+    abstract fun getTokenizedFields(): Map<TokenKeyType, TokenizableString>
+    abstract fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event
 
     override fun equals(other: Any?): Boolean {
         return other is Event && other.id == id

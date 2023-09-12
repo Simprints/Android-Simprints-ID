@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
@@ -21,8 +21,8 @@ data class VerificationCalloutEvent(
     constructor(
         createdAt: Long,
         projectId: String,
-        userId: TokenizedString,
-        moduleId: TokenizedString,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         verifyGuid: String,
         metadata: String,
         labels: EventLabels = EventLabels()
@@ -41,12 +41,12 @@ data class VerificationCalloutEvent(
         CALLOUT_VERIFICATION
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> = mapOf(
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = mapOf(
         TokenKeyType.AttendantId to payload.userId,
         TokenKeyType.ModuleId to payload.moduleId
     )
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this.copy(
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this.copy(
         payload = payload.copy(
             userId = map[TokenKeyType.AttendantId] ?: payload.userId,
             moduleId = map[TokenKeyType.ModuleId] ?: payload.moduleId
@@ -58,8 +58,8 @@ data class VerificationCalloutEvent(
         override val createdAt: Long,
         override val eventVersion: Int,
         val projectId: String,
-        val userId: TokenizedString,
-        val moduleId: TokenizedString,
+        val userId: TokenizableString,
+        val moduleId: TokenizableString,
         val verifyGuid: String,
         val metadata: String,
         override val type: EventType = CALLOUT_VERIFICATION,

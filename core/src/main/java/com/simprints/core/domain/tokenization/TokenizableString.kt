@@ -4,15 +4,15 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonTypeName
-import com.simprints.core.domain.tokenization.TokenizedString.Encrypted
-import com.simprints.core.domain.tokenization.TokenizedString.Raw
+import com.simprints.core.domain.tokenization.TokenizableString.Raw
+import com.simprints.core.domain.tokenization.TokenizableString.Tokenized
 import kotlinx.parcelize.Parcelize
 
 /**
  * Sealed class for values that might be tokenized (symmetrically encrypted). Use this wrapping
  * class when there is a need to differentiate between the encrypted and unencrypted string values.
  *
- * Use [Encrypted] for the encrypted values
+ * Use [Tokenized] for the encrypted values
  * Use [Raw] for the unencrypted values
  */
 
@@ -21,22 +21,22 @@ import kotlinx.parcelize.Parcelize
     property = "className"
 )
 @Keep
-sealed class TokenizedString : Parcelable {
+sealed class TokenizableString : Parcelable {
     abstract val value: String
 
     @JsonTypeName("Encrypted")
     @Parcelize
-    data class Encrypted(override val value: String) : TokenizedString()
+    data class Tokenized(override val value: String) : TokenizableString()
 
     @JsonTypeName("Raw")
     @Parcelize
-    data class Raw(override val value: String) : TokenizedString()
+    data class Raw(override val value: String) : TokenizableString()
 }
 
 fun String.asTokenizedRaw() = Raw(this)
-fun String.asTokenizedEncrypted() = Encrypted(this)
+fun String.asTokenizedEncrypted() = Tokenized(this)
 
-fun TokenizedString.isTokenized() = when (this) {
-    is Encrypted -> true
+fun TokenizableString.isTokenized() = when (this) {
+    is Tokenized -> true
     is Raw -> false
 }

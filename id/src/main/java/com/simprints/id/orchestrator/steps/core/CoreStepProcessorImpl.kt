@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.core.os.bundleOf
-import com.simprints.core.domain.tokenization.TokenizedString
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
@@ -95,8 +95,8 @@ class CoreStepProcessorImpl @Inject constructor(
 
     override fun buildAppEnrolLastBiometricsStep(
         projectId: String,
-        userId: TokenizedString,
-        moduleId: TokenizedString,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         previousSteps: List<Step>,
         sessionId: String?
     ) = Step(
