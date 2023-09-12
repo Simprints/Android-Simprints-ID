@@ -156,7 +156,7 @@ class CheckLoginFromIntentPresenterTest {
 
             val updatedActivity =
                 updateConfigFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
-            assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID)
+            assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID.value)
         }
     }
 
