@@ -180,7 +180,7 @@ class ClientApiViewModel @Inject internal constructor(
     // Error is a special case where it might be called before action has been parsed,
     // therefore it can only rely on the identifier from action string to be present
     fun handleErrorResponse(
-        actionIdentifier: ActionRequestIdentifier,
+        action: String,
         errorResponse: IAppErrorResponse,
     ) = viewModelScope.launch {
         val currentSessionId = getCurrentSessionId()
@@ -193,7 +193,7 @@ class ClientApiViewModel @Inject internal constructor(
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(resultMapper(ActionResponse.ErrorActionResponse(
-            actionIdentifier = actionIdentifier,
+            actionIdentifier = ActionRequestIdentifier.fromIntentAction(action),
             sessionId = currentSessionId,
             eventsJson = coSyncEventsJson,
             reason = errorResponse.reason,
