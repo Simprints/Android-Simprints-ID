@@ -25,7 +25,7 @@ class RemoteEventQueryTest {
 
         with(api) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(userId).isEqualTo(DEFAULT_USER_ID)
+            assertThat(userId).isEqualTo(DEFAULT_USER_ID.value)
             assertThat(moduleIds).isEqualTo(DEFAULT_MODULES)
             assertThat(subjectId).isEqualTo(GUID1)
             assertThat(lastEventId).isEqualTo(GUID2)
