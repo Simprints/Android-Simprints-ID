@@ -10,23 +10,23 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class TokenizationTest {
+class StringTokenizerTest {
 
     private val keysetJson =
         "{\"primaryKeyId\":3444266861,\"key\":[{\"keyData\":{\"typeUrl\":\"type.googleapis.com/google.crypto.tink.AesSivKey\",\"value\":\"EkAnu5jmYn8LZCdFZ3a93CMmRirb38FJLVTCiqZNPHb4b/z5NqZm/wceHtsfuVjUcKNBcovgKHi/MfUastghymI9\",\"keyMaterialType\":\"SYMMETRIC\"},\"status\":\"ENABLED\",\"keyId\":3444266861,\"outputPrefixType\":\"TINK\"}]}"
 
-    private lateinit var tokenization: Tokenization
+    private lateinit var stringTokenizer: StringTokenizer
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
         DeterministicAeadConfig.register()
-        tokenization = Tokenization(EncodingUtilsImpl)
+        stringTokenizer = StringTokenizer(EncodingUtilsImpl)
     }
 
 
     @Test
-    fun `when value is encrypted then decryption returns the same value`() = with(tokenization) {
+    fun `when value is encrypted then decryption returns the same value`() = with(stringTokenizer) {
         val value = " some untrimmed value with speci@l ch@r#cters and numb3rs_  "
         val encrypted = encrypt(value, keysetJson)
         assertThat(decrypt(encrypted, keysetJson)).isEqualTo(value)
@@ -36,7 +36,7 @@ class TokenizationTest {
      * This test verifies that the tokenization process in SID produces the same result as in BFSID
      */
     @Test
-    fun `encryption should produce the same value as BFSID`() = with(tokenization) {
+    fun `encryption should produce the same value as BFSID`() = with(stringTokenizer) {
         val value = "module 1"
         val bfsidKeysetJson =
             "{\"primaryKeyId\":3444266861,\"key\":[{\"keyData\":{\"typeUrl\":\"type.googleapis.com/google.crypto.tink.AesSivKey\",\"value\":\"EkAnu5jmYn8LZCdFZ3a93CMmRirb38FJLVTCiqZNPHb4b/z5NqZm/wceHtsfuVjUcKNBcovgKHi/MfUastghymI9\",\"keyMaterialType\":\"SYMMETRIC\"},\"status\":\"ENABLED\",\"keyId\":3444266861,\"outputPrefixType\":\"TINK\"}]}"
