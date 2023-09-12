@@ -21,13 +21,13 @@ internal object SampleSyncScopes {
 
     val userDownSyncScope = EventDownSyncScope.SubjectUserScope(
         DEFAULT_PROJECT_ID,
-        DEFAULT_USER_ID,
+        DEFAULT_USER_ID.value,
         DEFAULT_MODES
     )
 
     val modulesDownSyncScope = EventDownSyncScope.SubjectModuleScope(
         DEFAULT_PROJECT_ID,
-        listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+        listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2),
         DEFAULT_MODES
     )
 
