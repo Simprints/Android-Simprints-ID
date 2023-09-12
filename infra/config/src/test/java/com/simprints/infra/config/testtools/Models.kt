@@ -1,5 +1,6 @@
 package com.simprints.infra.config.testtools
 
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.DecisionPolicy
@@ -255,7 +256,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
         1,
-        listOf("module1".asTokenizedRaw())
+        listOf("module1".asTokenizedEncrypted())
     )
 )
 

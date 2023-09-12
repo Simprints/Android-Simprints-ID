@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
@@ -53,7 +54,7 @@ class EventRemoteDataSourceTest {
     private val query = ApiRemoteEventQuery(
         projectId = DEFAULT_PROJECT_ID,
         userId = DEFAULT_USER_ID.value,
-        moduleIds = listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2),
+        moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).map(TokenizableString::value),
         subjectId = GUID1,
         lastEventId = GUID2,
         modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
@@ -93,7 +94,7 @@ class EventRemoteDataSourceTest {
             coVerify(exactly = 1) {
                 eventRemoteInterface.countEvents(
                     projectId = DEFAULT_PROJECT_ID,
-                    moduleIds = listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2),
+                    moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).map(TokenizableString::value),
                     attendantId = DEFAULT_USER_ID.value,
                     subjectId = GUID1,
                     modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),

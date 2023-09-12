@@ -1,5 +1,6 @@
 package com.simprints.infra.eventsync
 
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
@@ -27,7 +28,7 @@ internal object SampleSyncScopes {
 
     val modulesDownSyncScope = EventDownSyncScope.SubjectModuleScope(
         DEFAULT_PROJECT_ID,
-        listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2),
+        listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).map(TokenizableString::value),
         DEFAULT_MODES
     )
 

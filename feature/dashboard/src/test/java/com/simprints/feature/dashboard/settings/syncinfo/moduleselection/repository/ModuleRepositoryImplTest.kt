@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposi
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
@@ -77,7 +78,8 @@ class ModuleRepositoryImplTest {
         val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
         // Comparing string representation as when executing the lambda captured in the mock it will
         // not return an ArrayList but a LinkedHashMap.
-        assertThat(updatedConfig.selectedModules.toString()).isEqualTo(selectedModuleNames.toString())
+        assertThat(updatedConfig.selectedModules.toString())
+            .isEqualTo(selectedModuleNames.map(TokenizableString::value).toString())
     }
 
     @Test
