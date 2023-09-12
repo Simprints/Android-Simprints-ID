@@ -13,5 +13,5 @@ data class ExitFormResult(
         val reason: String? = null,
 ) : Parcelable {
 
-    fun submittedOption() = selectedOption?.takeIf { wasSubmitted }
+    fun submittedOption() = selectedOption?.takeIf { wasSubmitted } ?: ExitFormOption.Other
 }
