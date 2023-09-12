@@ -21,5 +21,6 @@ dependencies {
     implementation(project(":feature:exit-form"))
 
     implementation(project(":infra:orchestrator-data"))
+    implementation(project(":infra:config"))
     implementation(project(":infra:events"))
 }
