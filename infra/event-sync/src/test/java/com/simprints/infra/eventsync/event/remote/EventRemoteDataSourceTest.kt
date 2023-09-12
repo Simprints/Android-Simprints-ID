@@ -52,8 +52,8 @@ class EventRemoteDataSourceTest {
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
     private val query = ApiRemoteEventQuery(
         projectId = DEFAULT_PROJECT_ID,
-        userId = DEFAULT_USER_ID,
-        moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+        userId = DEFAULT_USER_ID.value,
+        moduleIds = listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2),
         subjectId = GUID1,
         lastEventId = GUID2,
         modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
@@ -92,11 +92,12 @@ class EventRemoteDataSourceTest {
             assertThat(count).isEqualTo(listOf(EventCount(EnrolmentRecordEventType.EnrolmentRecordCreation, 1)))
             coVerify(exactly = 1) {
                 eventRemoteInterface.countEvents(
-                    DEFAULT_PROJECT_ID,
-                    listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
-                    DEFAULT_USER_ID, GUID1,
-                    listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
-                    GUID2
+                    projectId = DEFAULT_PROJECT_ID,
+                    moduleIds = listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2),
+                    attendantId = DEFAULT_USER_ID.value,
+                    subjectId = GUID1,
+                    modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
+                    lastEventId = GUID2
                 )
             }
         }

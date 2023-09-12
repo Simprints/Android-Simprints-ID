@@ -1,5 +1,6 @@
 package com.simprints.infra.config.testtools
 
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.DeviceConfiguration
@@ -254,7 +255,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
         1,
-        listOf("module1")
+        listOf("module1".asTokenizedRaw())
     )
 )
 

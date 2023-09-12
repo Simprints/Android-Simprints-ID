@@ -9,7 +9,7 @@ object SampleDefaults {
     const val DEFAULT_PROJECT_ID = "DVXF1mu4CAa5FmiPWHXr"
     val DEFAULT_MODULE_ID = "0".asTokenizedRaw()
     const val DEFAULT_MODULE_ID_2 = "1"
-    val DEFAULT_MODULES = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
+    val DEFAULT_MODULES = listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2)
 
     val DEFAULT_USER_ID = "user_id".asTokenizedRaw()
     const val DEFAULT_USER_ID_2 = "user_id_2"

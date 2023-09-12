@@ -29,11 +29,11 @@ class AppResponseBuilderForEnrolLastBiometricsTest {
                 bundleKey = CoreResponse.CORE_STEP_BUNDLE,
                 payloadType = Step.PayloadType.REQUEST,
                 payload = EnrolLastBiometricsRequest(
-                    DEFAULT_PROJECT_ID,
-                    DEFAULT_USER_ID,
-                    DEFAULT_MODULE_ID,
-                    emptyList(),
-                    GUID1
+                    projectId = DEFAULT_PROJECT_ID,
+                    userId = DEFAULT_USER_ID.value,
+                    moduleId = DEFAULT_MODULE_ID.value,
+                    previousSteps = emptyList(),
+                    sessionId = GUID1
                 ),
                 status = Step.Status.NOT_STARTED
             )
@@ -59,11 +59,11 @@ class AppResponseBuilderForEnrolLastBiometricsTest {
                 bundleKey = CoreResponse.CORE_STEP_BUNDLE,
                 payloadType = Step.PayloadType.REQUEST,
                 payload = EnrolLastBiometricsRequest(
-                    DEFAULT_PROJECT_ID,
-                    DEFAULT_USER_ID,
-                    DEFAULT_MODULE_ID,
-                    emptyList(),
-                    GUID1
+                    projectId = DEFAULT_PROJECT_ID,
+                    userId = DEFAULT_USER_ID.value,
+                    moduleId = DEFAULT_MODULE_ID.value,
+                    previousSteps = emptyList(),
+                    sessionId = GUID1
                 ),
                 status = Step.Status.NOT_STARTED
             )

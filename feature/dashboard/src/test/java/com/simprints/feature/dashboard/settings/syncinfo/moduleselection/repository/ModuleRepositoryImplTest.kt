@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposi
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -44,7 +45,7 @@ class ModuleRepositoryImplTest {
         every { projectConfiguration.synchronization.down } returns downSynchronizationConfiguration
         coEvery { mockConfigManager.getProjectConfiguration() } returns projectConfiguration
 
-        every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d")
+        every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d").map(String::asTokenizedRaw)
         coEvery {
             mockConfigManager.getDeviceConfiguration()
         } returns DeviceConfiguration("", listOf("b", "c"), "")
@@ -62,11 +63,11 @@ class ModuleRepositoryImplTest {
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
         coEvery { mockConfigManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
         val modules = listOf(
-            Module("1", true),
-            Module("2", true),
-            Module("3", false),
-            Module("4", true),
-            Module("5", false)
+            Module("1".asTokenizedRaw(), true),
+            Module("2".asTokenizedRaw(), true),
+            Module("3".asTokenizedRaw(), false),
+            Module("4".asTokenizedRaw(), true),
+            Module("5".asTokenizedRaw(), false)
         )
 
         val selectedModuleNames = modules.filter { it.isSelected }.map { it.name }.toSet()
@@ -82,11 +83,11 @@ class ModuleRepositoryImplTest {
     @Test
     fun saveModules_shouldDeleteRecordsFromUnselectedModules() = runTest {
         val modules = listOf(
-            Module("1", true),
-            Module("2", true),
-            Module("3", false),
-            Module("4", true),
-            Module("5", false)
+            Module("1".asTokenizedRaw(), true),
+            Module("2".asTokenizedRaw(), true),
+            Module("3".asTokenizedRaw(), false),
+            Module("4".asTokenizedRaw(), true),
+            Module("5".asTokenizedRaw(), false)
         )
 
         repository.saveModules(modules)
@@ -97,10 +98,10 @@ class ModuleRepositoryImplTest {
     @Test
     fun saveModules_shouldDeleteOperationsForUnselectedModules() = runTest {
         val modules = listOf(
-            Module("a", true),
-            Module("b", false),
-            Module("c", false),
-            Module("d", true)
+            Module("a".asTokenizedRaw(), true),
+            Module("b".asTokenizedRaw(), false),
+            Module("c".asTokenizedRaw(), false),
+            Module("d".asTokenizedRaw(), true)
         )
 
         val unselectedModules = listOf("b", "c")
@@ -115,10 +116,10 @@ class ModuleRepositoryImplTest {
     @Test
     fun shouldReturnAllModules() = runTest {
         val expected = listOf(
-            Module("a", false),
-            Module("b", true),
-            Module("c", true),
-            Module("d", false)
+            Module("a".asTokenizedRaw(), false),
+            Module("b".asTokenizedRaw(), true),
+            Module("c".asTokenizedRaw(), true),
+            Module("d".asTokenizedRaw(), false)
         )
 
         val actual = repository.getModules()

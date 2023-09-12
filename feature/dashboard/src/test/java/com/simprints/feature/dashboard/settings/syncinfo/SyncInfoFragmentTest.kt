@@ -8,6 +8,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.feature.dashboard.R
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration
@@ -166,7 +167,7 @@ class SyncInfoFragmentTest {
                 every { down } returns DownSynchronizationConfiguration(
                     DownSynchronizationConfiguration.PartitionType.PROJECT,
                     3,
-                    listOf("module1")
+                    listOf("module1".asTokenizedRaw())
                 )
             }
         })
