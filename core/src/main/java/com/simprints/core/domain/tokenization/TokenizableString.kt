@@ -26,15 +26,22 @@ sealed class TokenizableString : Parcelable {
 
     @JsonTypeName("Encrypted")
     @Parcelize
-    data class Tokenized(override val value: String) : TokenizableString()
+    data class Tokenized(override val value: String) : TokenizableString() {
+        override fun hashCode() = super.hashCode()
+        override fun equals(other: Any?) = super.equals(other)
+        override fun toString() = super.toString()
+    }
 
     @JsonTypeName("Raw")
     @Parcelize
-    data class Raw(override val value: String) : TokenizableString()
+    data class Raw(override val value: String) : TokenizableString() {
+        override fun hashCode() = super.hashCode()
+        override fun equals(other: Any?) = super.equals(other)
+        override fun toString() = super.toString()
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
 
         return other is TokenizableString && other.value == value
     }
