@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
@@ -63,7 +64,10 @@ class AppResponseBuilderForEnrolTest {
     }
 
     private fun mockRequest() = AppEnrolRequest(
-        "projectId", "userId", "moduleId", "metadata"
+        projectId = "projectId",
+        userId = "userId".asTokenizedRaw(),
+        moduleId = "moduleId".asTokenizedRaw(),
+        metadata = "metadata"
     )
 
     private fun mockSteps(modalities: List<GeneralConfiguration.Modality>): List<Step> {

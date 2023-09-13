@@ -6,7 +6,7 @@ import com.google.crypto.tink.JsonKeysetReader
 import com.google.crypto.tink.daead.DeterministicAeadConfig
 import javax.inject.Inject
 
-class Tokenization @Inject constructor(
+class StringTokenizer @Inject constructor(
     private val encodingUtils: EncodingUtils
 ) {
 

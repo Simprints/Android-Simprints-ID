@@ -2,15 +2,22 @@ package com.simprints.infra.enrolment.records.local.models
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.realm.models.DbFaceSample
 import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.DbSubject
 import io.realm.RealmList
-import java.util.*
+import java.util.UUID
 
-internal fun DbSubject.fromDbToDomain(): Subject =
-    Subject(
+internal fun DbSubject.fromDbToDomain(): Subject {
+    val attendantId =
+        if (isAttendantIdTokenized) attendantId.asTokenizedEncrypted() else attendantId.asTokenizedRaw()
+    val moduleId =
+        if (isModuleIdTokenized) moduleId.asTokenizedEncrypted() else moduleId.asTokenizedRaw()
+    return Subject(
         subjectId = subjectId.toString(),
         projectId = projectId,
         attendantId = attendantId,
@@ -19,20 +26,24 @@ internal fun DbSubject.fromDbToDomain(): Subject =
         updatedAt = updatedAt,
         toSync = toSync,
         fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
-        faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain)
+        faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain),
     )
+}
 
-internal fun Subject.fromDomainToDb(): DbSubject =
-    DbSubject(
+internal fun Subject.fromDomainToDb(): DbSubject {
+    return DbSubject(
         subjectId = UUID.fromString(subjectId),
         projectId = projectId,
-        attendantId = attendantId,
-        moduleId = moduleId,
+        attendantId = attendantId.value,
+        moduleId = moduleId.value,
         createdAt = createdAt,
         updatedAt = updatedAt,
         toSync = toSync,
         fingerprintSamples = RealmList(
             *fingerprintSamples.map(FingerprintSample::fromDomainToDb).toTypedArray()
         ),
-        faceSamples = RealmList(*faceSamples.map(FaceSample::fromDomainToDb).toTypedArray())
+        faceSamples = RealmList(*faceSamples.map(FaceSample::fromDomainToDb).toTypedArray()),
+        isModuleIdTokenized = moduleId.isTokenized(),
+        isAttendantIdTokenized = attendantId.isTokenized(),
     )
+}

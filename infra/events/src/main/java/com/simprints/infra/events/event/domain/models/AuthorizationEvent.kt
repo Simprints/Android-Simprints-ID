@@ -1,8 +1,7 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
-import com.simprints.core.domain.tokenization.TokenizedString
-import com.simprints.core.domain.tokenization.orEmpty
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
@@ -29,10 +28,11 @@ data class AuthorizationEvent(
         AUTHORIZATION
     )
 
-    override fun getTokenizedFields(): Map<TokenKeyType, TokenizedString> =
-        mapOf(TokenKeyType.AttendantId to payload.userInfo?.userId.orEmpty())
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> =
+        if (payload.userInfo == null) emptyMap()
+        else mapOf(TokenKeyType.AttendantId to payload.userInfo.userId)
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizedString>) = this.copy(
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this.copy(
         payload = payload.copy(
             userInfo = payload.userInfo?.copy(
                 userId = map[TokenKeyType.AttendantId] ?: payload.userInfo.userId
@@ -56,7 +56,7 @@ data class AuthorizationEvent(
         }
 
         @Keep
-        data class UserInfo(val projectId: String, val userId: TokenizedString)
+        data class UserInfo(val projectId: String, val userId: TokenizableString)
     }
 
     companion object {

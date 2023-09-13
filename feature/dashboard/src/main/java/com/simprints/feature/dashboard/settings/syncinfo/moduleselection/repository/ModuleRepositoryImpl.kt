@@ -1,6 +1,5 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
@@ -19,7 +18,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
 
     override suspend fun getModules(): List<Module> =
         configManager.getProjectConfiguration().synchronization.down.moduleOptions.map {
-            Module(it.asTokenizedEncrypted(), isModuleSelected(it))
+            Module(it, isModuleSelected(it.value))
         }
 
     override suspend fun saveModules(modules: List<Module>) {

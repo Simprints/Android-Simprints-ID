@@ -18,10 +18,18 @@ class IdentifyBuilder(
 ) : ClientRequestBuilder(validator) {
     override fun encryptIfNecessary(baseRequest: BaseRequest): BaseRequest {
         val request = (baseRequest as? IdentifyRequest) ?: return baseRequest
-        val encryptedUserId =
-            encryptField(request.userId, project, TokenKeyType.AttendantId, tokenizationManager)
-        val encryptedModuleId =
-            encryptField(request.moduleId, project, TokenKeyType.ModuleId, tokenizationManager)
+        val encryptedUserId = encryptField(
+            value = request.userId,
+            project = project,
+            tokenKeyType = TokenKeyType.AttendantId,
+            tokenizationManager = tokenizationManager
+        )
+        val encryptedModuleId = encryptField(
+            value = request.moduleId,
+            project = project,
+            tokenKeyType = TokenKeyType.ModuleId,
+            tokenizationManager = tokenizationManager
+        )
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }
 

@@ -80,7 +80,12 @@ class ModalityFlowIdentify @Inject constructor(
 
         return stepRequested.also {
             with(appRequest) {
-                buildQueryAndAddMatchingStepIfRequired(result, projectId, userId.value, moduleId)
+                buildQueryAndAddMatchingStepIfRequired(
+                    result = result,
+                    projectId = projectId,
+                    userId = userId.value,
+                    moduleId = moduleId.value
+                )
             }
         }
     }

@@ -205,7 +205,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             if (this is AppRequestFlow) {
                 Simber.tag(AnalyticsUserProperties.USER_ID, true).i(userId.value)
                 Simber.tag(AnalyticsUserProperties.PROJECT_ID).i(projectId)
-                Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId)
+                Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId.value)
                 Simber.tag(AnalyticsUserProperties.DEVICE_ID).i(deviceId)
             }
         }
@@ -277,7 +277,6 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         Simber.d("[CHECK_LOGIN] Added authorised event")
     }
 
-    //TODO check tokenization
     private suspend fun updateProjectInCurrentSession() {
         val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
 

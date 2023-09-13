@@ -76,7 +76,12 @@ class ModalityFlowEnrol @Inject constructor (
         return stepForRequest?.apply { setResult(result) }.also {
             if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
                 with(appRequest) {
-                    buildQueryAndAddMatchingStepIfRequired(result, projectId, userId.value, moduleId)
+                    buildQueryAndAddMatchingStepIfRequired(
+                        result = result,
+                        projectId = projectId,
+                        userId = userId.value,
+                        moduleId = moduleId.value
+                    )
                 }
             }
         }

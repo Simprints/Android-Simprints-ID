@@ -17,19 +17,46 @@ import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 fun IAppRequest.fromModuleApiToDomain(): AppRequest =
     when (this) {
         is IAppEnrolRequest ->
-            AppEnrolRequest(projectId, userId.asTokenizedRaw(), moduleId, metadata)
+            AppEnrolRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                moduleId = moduleId.asTokenizedRaw(),
+                metadata = metadata
+            )
 
         is IAppIdentifyRequest ->
-            AppIdentifyRequest(projectId, userId.asTokenizedRaw(), moduleId, metadata)
+            AppIdentifyRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                moduleId = moduleId.asTokenizedRaw(),
+                metadata = metadata
+            )
 
         is IAppVerifyRequest ->
-            AppVerifyRequest(projectId, userId.asTokenizedRaw(), moduleId, metadata, verifyGuid)
+            AppVerifyRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                moduleId = moduleId.asTokenizedRaw(),
+                metadata = metadata,
+                verifyGuid = verifyGuid
+            )
 
         is IAppConfirmIdentityRequest ->
-            AppConfirmIdentityRequest(projectId, userId.asTokenizedRaw(), sessionId, selectedGuid)
+            AppConfirmIdentityRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                sessionId = sessionId,
+                selectedGuid = selectedGuid
+            )
 
         is IAppEnrolLastBiometricsRequest ->
-            AppEnrolLastBiometricsRequest(projectId, userId.asTokenizedRaw(), moduleId, metadata, sessionId)
+            AppEnrolLastBiometricsRequest(
+                projectId = projectId,
+                userId = userId.asTokenizedRaw(),
+                moduleId = moduleId.asTokenizedRaw(),
+                metadata = metadata,
+                identificationSessionId = sessionId
+            )
 
         else -> throw IllegalArgumentException("Request not recognised")
     }

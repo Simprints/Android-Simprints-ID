@@ -41,7 +41,8 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         tokenizationManagerParam
     }
 
-    override suspend fun getProject(): Project? = runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
+    override suspend fun getProject(): Project? =
+        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     override val presenter: LibSimprintsContract.Presenter by lazy {
         libSimprintsPresenterFactory.create(this, action)
