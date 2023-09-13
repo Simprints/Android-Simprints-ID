@@ -8,7 +8,7 @@ The face modality was created as a way to have contactless biometrics as an opti
 
 ## Flow overview
 
-SimprintsID start the face modality by creating an `Intent` to [FaceOrchestratorActivity](src/main/java/com/simprints/face/orchestrator/FaceOrchestratorActivity.kt). In this `Intent` an [IFaceRequest](../moduleapi/src/main/java/com/simprints/moduleapi/face/requests/IFaceRequest.kt) is mandatory. When getting the request from SimprintsID, `FaceOrchestratorViewModel` needs to transform it from a ModuleAPI interface to a domain class.
+SimprintsID start the face modality by creating an `Intent` to [FaceOrchestratorActivity](src/main/java/com/simprints/face/orchestrator/FaceOrchestratorActivity.kt). In this `Intent` an [IFaceRequest](../../moduleapi/src/main/java/com/simprints/moduleapi/face/requests/IFaceRequest.kt) is mandatory. When getting the request from SimprintsID, `FaceOrchestratorViewModel` needs to transform it from a ModuleAPI interface to a domain class.
 
 This first thing that the FaceOrchestrator needs to do is initialize the required SDK, loading the SDK library and making sure the SDK license is in place and is valid. This is done in  [FaceOrchestratorActivity](src/main/java/com/simprints/face/orchestrator/FaceOrchestratorActivity.kt) by using [RankOneInitializer](src/main/java/com/simprints/face/models/RankOneInitializer.kt).
 

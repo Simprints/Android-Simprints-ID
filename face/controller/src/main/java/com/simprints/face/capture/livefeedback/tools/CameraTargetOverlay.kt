@@ -6,7 +6,9 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import com.simprints.core.tools.extentions.dpToPx
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 class CameraTargetOverlay(
     context: Context,
     attrs: AttributeSet
