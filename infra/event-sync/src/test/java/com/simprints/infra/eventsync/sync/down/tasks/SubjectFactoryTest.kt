@@ -1,8 +1,11 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.FaceReference
@@ -19,34 +22,6 @@ import org.junit.Test
 
 class SubjectFactoryTest {
 
-    private lateinit var factory: SubjectFactory
-    private val projectId = "projectId"
-    private val subjectId = "subjectId"
-    private val attendantId = "encryptedAttendantId".asTokenizedRaw()
-    private val moduleId = "encryptedModuleId".asTokenizedRaw()
-    private val base64Bytes = byteArrayOf(1)
-    private val referenceId = "fpRefId"
-    private val referenceFormat = "NEC_1"
-    private val templateName = "template"
-    private val identifier = IFingerIdentifier.LEFT_THUMB
-    private val quality = 10
-    private val fingerprintReference = FingerprintReference(
-        id = referenceId,
-        format = referenceFormat,
-        templates = listOf(
-            FingerprintTemplate(
-                quality = quality,
-                template = templateName,
-                finger = identifier
-            )
-        )
-    )
-    private val faceReference = FaceReference(
-        id = referenceId,
-        templates = listOf(FaceTemplate(templateName)),
-        format = referenceFormat
-    )
-
     @MockK
     lateinit var encodingUtils: EncodingUtils
 
@@ -54,7 +29,7 @@ class SubjectFactoryTest {
     fun setup() {
         MockKAnnotations.init(this)
 
-        every { encodingUtils.base64ToBytes(any()) } returns base64Bytes
+        every { encodingUtils.base64ToBytes(any()) } returns BASE_64_BYTES
         factory = SubjectFactory(
             encodingUtils = encodingUtils
         )
@@ -63,55 +38,97 @@ class SubjectFactoryTest {
     @Test
     fun `when buildSubjectFromCreationPayload is called, correct samples are built`() {
         val payload = EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
-            subjectId = subjectId,
-            projectId = projectId,
-            attendantId = attendantId,
-            moduleId = moduleId,
-            biometricReferences = listOf(fingerprintReference, faceReference)
+            subjectId = SUBJECT_ID,
+            projectId = PROJECT_ID,
+            attendantId = ATTENDANT_ID,
+            moduleId = MODULE_ID,
+            biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference)
         )
         val result = factory.buildSubjectFromCreationPayload(payload)
-
-        assertThat(result.subjectId).isEqualTo(subjectId)
-        assertThat(result.projectId).isEqualTo(projectId)
-        assertThat(result.attendantId).isEqualTo(attendantId)
-        assertThat(result.moduleId).isEqualTo(moduleId)
-        with(result.fingerprintSamples.first()) {
-            assertThat(fingerIdentifier).isEqualTo(identifier)
-            assertThat(template).isEqualTo(base64Bytes)
-            assertThat(templateQualityScore).isEqualTo(quality)
-            assertThat(format).isEqualTo(referenceFormat)
-        }
-        with(result.faceSamples.first()) {
-            assertThat(template).isEqualTo(base64Bytes)
-            assertThat(format).isEqualTo(referenceFormat)
-        }
+        val expected = Subject(
+            subjectId = SUBJECT_ID,
+            projectId = PROJECT_ID,
+            attendantId = ATTENDANT_ID,
+            moduleId = MODULE_ID,
+            fingerprintSamples = listOf(
+                FingerprintSample(
+                    fingerIdentifier = IDENTIFIER,
+                    template = BASE_64_BYTES,
+                    templateQualityScore = QUALITY,
+                    format = REFERENCE_FORMAT
+                )
+            ),
+            faceSamples = listOf(
+                FaceSample(
+                    template = BASE_64_BYTES,
+                    format = REFERENCE_FORMAT
+                )
+            )
+        )
+        assertThat(result).isEqualTo(expected)
     }
 
     @Test
     fun `when buildSubjectFromMovePayload is called, correct samples are built`() {
         val payload = EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
-            subjectId = subjectId,
-            projectId = projectId,
-            attendantId = attendantId,
-            moduleId = moduleId,
-            biometricReferences = listOf(fingerprintReference, faceReference)
+            subjectId = SUBJECT_ID,
+            projectId = PROJECT_ID,
+            attendantId = ATTENDANT_ID,
+            moduleId = MODULE_ID,
+            biometricReferences = listOf(FINGERPRINT_REFERENCE, faceReference)
         )
         val result = factory.buildSubjectFromMovePayload(payload)
 
-        assertThat(result.subjectId).isEqualTo(subjectId)
-        assertThat(result.projectId).isEqualTo(projectId)
-        assertThat(result.attendantId).isEqualTo(attendantId)
-        assertThat(result.moduleId).isEqualTo(moduleId)
-        with(result.fingerprintSamples.first()) {
-            assertThat(fingerIdentifier).isEqualTo(identifier)
-            assertThat(template).isEqualTo(base64Bytes)
-            assertThat(templateQualityScore).isEqualTo(quality)
-            assertThat(format).isEqualTo(referenceFormat)
-        }
-        with(result.faceSamples.first()) {
-            assertThat(template).isEqualTo(base64Bytes)
-            assertThat(format).isEqualTo(referenceFormat)
-        }
+        val expected = Subject(
+            subjectId = SUBJECT_ID,
+            projectId = PROJECT_ID,
+            attendantId = ATTENDANT_ID,
+            moduleId = MODULE_ID,
+            fingerprintSamples = listOf(
+                FingerprintSample(
+                    fingerIdentifier = IDENTIFIER,
+                    template = BASE_64_BYTES,
+                    templateQualityScore = QUALITY,
+                    format = REFERENCE_FORMAT
+                )
+            ),
+            faceSamples = listOf(
+                FaceSample(
+                    template = BASE_64_BYTES,
+                    format = REFERENCE_FORMAT
+                )
+            )
+        )
+        assertThat(result).isEqualTo(expected)
     }
 
+    companion object {
+        private lateinit var factory: SubjectFactory
+        private const val PROJECT_ID = "projectId"
+        private const val SUBJECT_ID = "subjectId"
+        private val ATTENDANT_ID = "encryptedAttendantId".asTokenizedRaw()
+        private val MODULE_ID = "encryptedModuleId".asTokenizedRaw()
+        private val BASE_64_BYTES = byteArrayOf(1)
+        private const val REFERENCE_ID = "fpRefId"
+        private const val REFERENCE_FORMAT = "NEC_1"
+        private const val TEMPLATE_NAME = "template"
+        private val IDENTIFIER = IFingerIdentifier.LEFT_THUMB
+        private const val QUALITY = 10
+        private val FINGERPRINT_REFERENCE = FingerprintReference(
+            id = REFERENCE_ID,
+            format = REFERENCE_FORMAT,
+            templates = listOf(
+                FingerprintTemplate(
+                    quality = QUALITY,
+                    template = TEMPLATE_NAME,
+                    finger = IDENTIFIER
+                )
+            )
+        )
+        private val faceReference = FaceReference(
+            id = REFERENCE_ID,
+            templates = listOf(FaceTemplate(TEMPLATE_NAME)),
+            format = REFERENCE_FORMAT
+        )
+    }
 }
