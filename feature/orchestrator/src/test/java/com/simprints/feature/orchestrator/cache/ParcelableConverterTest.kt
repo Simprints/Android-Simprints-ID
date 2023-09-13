@@ -9,13 +9,19 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ParcelableConverterTest {
 
-    private val parcelableConverter = ParcelableConverter()
+    private lateinit var parcelableConverter: ParcelableConverter
+
+    @Before
+    fun setUp() {
+        parcelableConverter = ParcelableConverter()
+    }
 
     @Test
     fun `Correctly marshals and unmarshalls the action request`() {
@@ -29,9 +35,9 @@ class ParcelableConverterTest {
         )
 
         val bytes = parcelableConverter.marshall(OrchestratorCache.ActionRequestWrapper(request))
-        val resultRequst = parcelableConverter.unmarshall(bytes, OrchestratorCache.ActionRequestWrapper.CREATOR).request
+        val resultRequest = parcelableConverter.unmarshall(bytes, OrchestratorCache.ActionRequestWrapper.CREATOR).request
 
-        with(resultRequst as ActionRequest.EnrolActionRequest) {
+        with(resultRequest as ActionRequest.EnrolActionRequest) {
             assertThat(actionIdentifier).isEqualTo(ActionRequestIdentifier("action", "package"))
             assertThat(projectId).isEqualTo("projectId")
             assertThat(userId).isEqualTo("userId")
@@ -47,13 +53,38 @@ class ParcelableConverterTest {
             navigationActionId = 42,
             destinationId = 33,
             payload = bundleOf("key" to "value"),
-            resultType = StubParcelable::class.java,
             status = StepStatus.IN_PROGRESS,
+            resultType = StubParcelable::class.java,
+            result = null,
+        )
+
+        val bytes = parcelableConverter.marshall(step)
+        val resultStep = parcelableConverter.unmarshall(bytes, Step.CREATOR)
+
+        with(resultStep) {
+            assertThat(navigationActionId).isEqualTo(42)
+            assertThat(destinationId).isEqualTo(33)
+            assertThat(payload.getString("key")).isEqualTo("value")
+            assertThat(status).isEqualTo(StepStatus.IN_PROGRESS)
+
+            assertThat(resultType).isEqualTo(StubParcelable::class.java)
+            assertThat(result).isNull()
+        }
+    }
+
+    @Test
+    fun `Correctly marshals and unmarshalls the step with result`() {
+        val step = Step(
+            navigationActionId = 42,
+            destinationId = 33,
+            payload = bundleOf("key" to "value"),
+            status = StepStatus.IN_PROGRESS,
+            resultType = StubParcelable::class.java,
             result = StubParcelable(1, "text"),
         )
 
-        val bytes = parcelableConverter.marshall(OrchestratorCache.StepWrapper(step))
-        val resultStep = parcelableConverter.unmarshall(bytes, OrchestratorCache.StepWrapper.CREATOR).step
+        val bytes = parcelableConverter.marshall(step)
+        val resultStep = parcelableConverter.unmarshall(bytes, Step.CREATOR)
 
         with(resultStep) {
             assertThat(navigationActionId).isEqualTo(42)
@@ -75,9 +106,10 @@ class ParcelableConverterTest {
         val number: Int,
         val text: String,
     ) : Parcelable {
+
         constructor(parcel: Parcel) : this(
             parcel.readInt(),
-            parcel.readString().orEmpty(),
+            parcel.readString().orEmpty()
         )
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -85,18 +117,11 @@ class ParcelableConverterTest {
             parcel.writeString(text)
         }
 
-        override fun describeContents(): Int {
-            return 0
-        }
+        override fun describeContents(): Int = 0
 
         companion object CREATOR : Parcelable.Creator<StubParcelable> {
-            override fun createFromParcel(parcel: Parcel): StubParcelable {
-                return StubParcelable(parcel)
-            }
-
-            override fun newArray(size: Int): Array<StubParcelable?> {
-                return arrayOfNulls(size)
-            }
+            override fun createFromParcel(parcel: Parcel): StubParcelable = StubParcelable(parcel)
+            override fun newArray(size: Int): Array<StubParcelable?> = arrayOfNulls(size)
         }
     }
 

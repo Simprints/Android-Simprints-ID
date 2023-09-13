@@ -61,7 +61,10 @@ internal class OrchestratorViewModel @Inject constructor(
         if (result is ExitFormResult) {
             _appResponse.send(OrchestratorResult(
                 cache.actionRequest,
-                AppRefusalResponse(result.submittedOption().answer.name, result.reason.orEmpty())
+                AppRefusalResponse(
+                    result.submittedOption()?.answer?.name.orEmpty(),
+                    result.reason.orEmpty()
+                )
             ))
             // TODO cleanup?
             return

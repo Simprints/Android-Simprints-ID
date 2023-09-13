@@ -22,7 +22,7 @@ internal object EnrolActionFactory : RequestActionFactory() {
         userId = MOCK_USER_ID,
         metadata = MOCK_METADATA,
         moduleId = MOCK_MODULE_ID,
-        unknownExtras = emptyMap()
+        unknownExtras = emptyList()
     )
 
     override fun getBuilder(extractor: ActionRequestExtractor): EnrolRequestBuilder =

@@ -22,7 +22,7 @@ internal object IdentifyRequestActionFactory : RequestActionFactory() {
         moduleId = MOCK_MODULE_ID,
         userId = MOCK_USER_ID,
         metadata = MOCK_METADATA,
-        unknownExtras = emptyMap()
+        unknownExtras = emptyList()
     )
 
     override fun getValidator(extractor: ActionRequestExtractor): IdentifyValidator =

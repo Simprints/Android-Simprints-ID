@@ -1,6 +1,7 @@
-package com.simprints.infra.orchestration.data
+package com.simprints.infra.orcehstration.data
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import org.junit.Test
 
 class ActionRequestIdentifierTest {
