@@ -15,8 +15,11 @@ import com.simprints.clientapi.requestFactories.*
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotest.assertions.throwables.shouldThrow
@@ -37,7 +40,15 @@ class CommCarePresenterTest {
         const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
-    private val view = mockk<CommCareActivity>()
+    private val project: Project = mockk()
+    private val tokenizationManagerMock: TokenizationManager = mockk {
+        every { encrypt(RequestFactory.MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns RequestFactory.MOCK_USER_ID
+        every { encrypt(RequestFactory.MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns RequestFactory.MOCK_MODULE_ID
+    }
+    private val view = mockk<CommCareActivity> {
+        coEvery { getProject() } returns project
+        every { tokenizationManager } returns tokenizationManagerMock
+    }
     private val jsonHelper = JsonHelper
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {

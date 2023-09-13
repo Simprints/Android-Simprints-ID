@@ -2,7 +2,7 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.infra.config.domain.TokenizationAction
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.tokenization.TokenizationManager
@@ -14,16 +14,16 @@ abstract class ClientRequestBuilder(private val validator: ClientRequestValidato
     protected abstract fun encryptIfNecessary(baseRequest: BaseRequest): BaseRequest
 
     protected fun encryptField(
-        value: String,
+        value: TokenizableString,
         project: Project?,
         tokenKeyType: TokenKeyType,
         tokenizationManager: TokenizationManager
-    ): String = if(project == null) value else tokenizationManager.tryTokenize(
-        value = value,
-        tokenKeyType = tokenKeyType,
-        action = TokenizationAction.Encrypt,
-        project = project
-    )
+    ): TokenizableString =
+        if (project != null && value is TokenizableString.Raw) tokenizationManager.encrypt(
+            decrypted = value,
+            tokenKeyType = tokenKeyType,
+            project = project
+        ) else value
 
     fun build(): BaseRequest {
         validator.validateClientRequest()

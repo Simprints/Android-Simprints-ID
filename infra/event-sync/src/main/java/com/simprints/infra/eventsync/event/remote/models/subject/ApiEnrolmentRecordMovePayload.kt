@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.subject
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
@@ -46,16 +47,16 @@ internal fun ApiEnrolmentRecordMovePayload.fromApiToDomain() =
             EnrolmentRecordCreationInMove(
                 subjectId,
                 projectId,
-                moduleId,
-                attendantId,
+                moduleId.asTokenizedEncrypted(),
+                attendantId.asTokenizedEncrypted(),
                 biometricReferences?.map { it.fromApiToDomain() })
         },
         enrolmentRecordDeletion.let {
             EnrolmentRecordDeletionInMove(
                 it.subjectId,
                 it.projectId,
-                it.moduleId,
-                it.attendantId
+                it.moduleId.asTokenizedEncrypted(),
+                it.attendantId.asTokenizedEncrypted()
             )
         }
     )

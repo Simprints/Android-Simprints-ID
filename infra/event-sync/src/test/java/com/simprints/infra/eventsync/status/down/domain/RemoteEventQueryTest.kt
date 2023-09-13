@@ -15,17 +15,17 @@ class RemoteEventQueryTest {
     @Test
     fun remoteEventQuery_fromDomainToAPi() {
         val api = RemoteEventQuery(
-            DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID,
-            DEFAULT_MODULES,
-            GUID1,
-            GUID2,
-            DEFAULT_MODES,
+            projectId = DEFAULT_PROJECT_ID,
+            attendantId = DEFAULT_USER_ID.value,
+            moduleIds = DEFAULT_MODULES,
+            subjectId = GUID1,
+            lastEventId = GUID2,
+            modes = DEFAULT_MODES,
         ).fromDomainToApi()
 
         with(api) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(userId).isEqualTo(DEFAULT_USER_ID)
+            assertThat(userId).isEqualTo(DEFAULT_USER_ID.value)
             assertThat(moduleIds).isEqualTo(DEFAULT_MODULES)
             assertThat(subjectId).isEqualTo(GUID1)
             assertThat(lastEventId).isEqualTo(GUID2)

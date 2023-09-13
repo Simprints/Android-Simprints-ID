@@ -141,6 +141,7 @@ message ProtoDownSynchronizationConfiguration {
     PartitionType partition_type = 1;
     int32 max_nb_of_modules = 2;
     repeated string module_options = 3;
+    bool is_tokenized = 4;
 
     enum PartitionType {
         PROJECT = 0;

@@ -1,16 +1,15 @@
 package com.simprints.clientapi.requestFactories
 
-import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
 import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
-import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.VerifyRequest
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 import io.mockk.every
 import io.mockk.mockk
 
@@ -28,11 +27,14 @@ object VerifyRequestFactory : RequestFactory() {
 
     override fun getBuilder(extractor: ClientRequestExtractor): VerifyBuilder {
         val project = mockk<Project>()
-        val tokenization = mockk<Tokenization>()
+        val tokenizationManager = mockk<TokenizationManager> {
+            every { encrypt(MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns MOCK_USER_ID
+            every { encrypt(MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns MOCK_MODULE_ID
+        }
         return VerifyBuilder(
             extractor = extractor as VerifyExtractor,
             project = project,
-            tokenization = tokenization,
+            tokenizationManager = tokenizationManager,
             validator = getValidator(extractor)
         )
     }

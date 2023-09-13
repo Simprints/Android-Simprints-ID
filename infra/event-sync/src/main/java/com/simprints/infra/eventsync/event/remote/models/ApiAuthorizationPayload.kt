@@ -23,7 +23,7 @@ internal data class ApiAuthorizationPayload(
     data class ApiUserInfo(val projectId: String, val userId: String) {
 
         constructor(userInfoDomain: UserInfo) :
-            this(userInfoDomain.projectId, userInfoDomain.userId)
+            this(userInfoDomain.projectId, userInfoDomain.userId.value)
     }
 
     @Keep
