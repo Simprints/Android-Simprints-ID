@@ -1,7 +1,9 @@
 package com.simprints.infra.config.domain.models
 
+import com.simprints.core.domain.tokenization.TokenizableString
+
 data class DeviceConfiguration(
     var language: String,
-    var selectedModules: List<String>,
+    var selectedModules: List<TokenizableString>,
     var lastInstructionId: String
 )

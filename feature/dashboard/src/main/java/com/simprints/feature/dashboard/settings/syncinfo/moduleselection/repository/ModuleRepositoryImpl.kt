@@ -1,5 +1,7 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
@@ -30,15 +32,15 @@ internal class ModuleRepositoryImpl @Inject constructor(
         configManager.getProjectConfiguration().synchronization.down.maxNbOfModules
 
     private suspend fun isModuleSelected(moduleName: String): Boolean {
-        return configManager.getDeviceConfiguration().selectedModules.contains(moduleName)
+        return configManager.getDeviceConfiguration().selectedModules.values().contains(moduleName)
     }
 
     private suspend fun setSelectedModules(selectedModules: List<Module>) {
         configManager.updateDeviceConfiguration {
             it.apply {
-                this.selectedModules = selectedModules.map { module -> module.name.value }
+                this.selectedModules = selectedModules.map { module -> module.name }
                 logMessageForCrashReport("Modules set to ${this.selectedModules}")
-                setCrashlyticsKeyForModules(this.selectedModules)
+                setCrashlyticsKeyForModules(this.selectedModules.values())
             }
         }
     }

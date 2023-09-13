@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
@@ -186,7 +187,6 @@ internal class EventSyncManagerTest {
         )
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
-                .map(TokenizableString::value)
         }
 
         val result = eventSyncManagerImpl.countEventsToDownload()
@@ -212,7 +212,6 @@ internal class EventSyncManagerTest {
         )
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
-                .map(TokenizableString::value)
         }
 
         val result = eventSyncManagerImpl.countEventsToDownload()
