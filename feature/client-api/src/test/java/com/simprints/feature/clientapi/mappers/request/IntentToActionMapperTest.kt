@@ -2,8 +2,10 @@ package com.simprints.feature.clientapi.mappers.request
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.clientapi.exceptions.InvalidRequestException
-import com.simprints.feature.clientapi.models.ActionRequest
-import com.simprints.feature.clientapi.session.ClientSessionManager
+import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
+import com.simprints.feature.clientapi.usecases.IsCurrentSessionAnIdentificationOrEnrolmentUseCase
+import com.simprints.feature.clientapi.usecases.SessionHasIdentificationCallbackUseCase
+import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.libsimprints.Constants.SIMPRINTS_MODULE_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_PROJECT_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_SELECTED_GUID
@@ -27,7 +29,13 @@ class IntentToActionMapperTest {
     val coroutinesTestRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var sessionManager: ClientSessionManager
+    private lateinit var getCurrentSessionIdUseCase: GetCurrentSessionIdUseCase
+
+    @MockK
+    private lateinit var isCurrentSessionAnIdentificationOrEnrolment: IsCurrentSessionAnIdentificationOrEnrolmentUseCase
+
+    @MockK
+    private lateinit var sessionHasIdentificationCallback: SessionHasIdentificationCallbackUseCase
 
     private lateinit var mapper: IntentToActionMapper
 
@@ -35,11 +43,11 @@ class IntentToActionMapperTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { sessionManager.getCurrentSessionId() } returns SESSION_ID
-        coEvery { sessionManager.sessionHasIdentificationCallback(any()) } returns true
-        coEvery { sessionManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
+        coEvery { getCurrentSessionIdUseCase.invoke() } returns SESSION_ID
+        coEvery { sessionHasIdentificationCallback.invoke(any()) } returns true
+        coEvery { isCurrentSessionAnIdentificationOrEnrolment.invoke() } returns true
 
-        mapper = IntentToActionMapper(sessionManager)
+        mapper = IntentToActionMapper(getCurrentSessionIdUseCase, isCurrentSessionAnIdentificationOrEnrolment, sessionHasIdentificationCallback)
     }
 
     @Test

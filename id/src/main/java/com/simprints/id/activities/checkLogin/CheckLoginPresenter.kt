@@ -101,7 +101,7 @@ abstract class CheckLoginPresenter(
         }
     }
 
-    private fun isFirebaseTokenValid(): Boolean = authStore.isSignedIn(
+    private fun isFirebaseTokenValid(): Boolean = authStore.isFirebaseSignedIn(
         authStore.signedInProjectId,
     )
 

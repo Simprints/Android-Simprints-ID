@@ -2,8 +2,7 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.simprints.feature.clientapi.models.ActionResponse
-import com.simprints.feature.clientapi.models.LibSimprintsConstants
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -55,7 +54,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         is ActionResponse.ErrorActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
             Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK to response.flowCompleted,
-            LibSimprintsConstants.RESULT_CODE_OVERRIDE to response.reason.libSimprintsResultCode()
+            RESULT_CODE_OVERRIDE to response.reason.libSimprintsResultCode()
         ).appendCoSyncData(response.eventsJson)
     }
 
@@ -96,4 +95,7 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         */
     }
 
+    companion object {
+        internal const val RESULT_CODE_OVERRIDE = "result_code_override"
+    }
 }

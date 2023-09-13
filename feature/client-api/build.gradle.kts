@@ -7,14 +7,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:orchestrator"))
-    implementation(project(":feature:alert"))
 
     implementation(project(":infra:config"))
     implementation(project(":infra:events"))
     implementation(project(":infra:enrolment-records"))
 
-    implementation(project(":moduleapi"))
-
     implementation(libs.libsimprints)
+    implementation(project(":infra:orchestrator-data"))
 }
