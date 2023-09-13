@@ -18,13 +18,12 @@ class ConfirmIdentifyBuilder(
 ) : ClientRequestBuilder(validator) {
     override fun encryptIfNecessary(baseRequest: BaseRequest): BaseRequest {
         val request = (baseRequest as? ConfirmIdentityRequest) ?: return baseRequest
-        val encryptedUserId =
-            encryptField(
-                value = request.userId,
-                project = project,
-                tokenKeyType = TokenKeyType.AttendantId,
-                tokenizationManager = tokenizationManager
-            )
+        val encryptedUserId = encryptField(
+            value = request.userId,
+            project = project,
+            tokenKeyType = TokenKeyType.AttendantId,
+            tokenizationManager = tokenizationManager
+        )
         return request.copy(userId = encryptedUserId)
     }
 
