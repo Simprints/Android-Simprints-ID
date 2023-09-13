@@ -21,9 +21,11 @@ import com.simprints.infra.config.domain.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
+import javax.inject.Singleton
 import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
+@Singleton
 internal class ScannerFactory @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val configManager: ConfigManager,
