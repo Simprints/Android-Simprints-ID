@@ -27,6 +27,7 @@ import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.toInt
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.deduceFileExtension
 import com.simprints.fingerprint.data.domain.images.isEager
@@ -277,7 +278,7 @@ class CollectFingerprintsViewModel @Inject constructor(
             try {
                 scannerManager.scanner.setUiIdle()
                 val capturedFingerprint = bioSdk.acquireFingerprintTemplate(
-                    configuration.vero2?.captureStrategy,
+                    configuration.vero2?.captureStrategy?.toInt(),
                     scanningTimeoutMs.toInt(),
                     qualityThreshold()
                 )

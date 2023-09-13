@@ -37,8 +37,11 @@ internal class FingerprintCaptureWrapperV2(
         timeOutMs: Int,
         qualityThreshold: Int
     ): AcquireFingerprintTemplateResponse = withContext(ioDispatcher) {
+        require (captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
+            "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
+        }
         scannerV2
-            .captureFingerprint(captureDpi!!)
+            .captureFingerprint(captureDpi)
             .ensureCaptureResultOkOrError()
             .andThen(scannerV2.getImageQualityScore())
             .switchIfEmpty(Single.error(NoFingerDetectedException()))
@@ -110,6 +113,8 @@ internal class FingerprintCaptureWrapperV2(
         private const val NO_FINGER_IMAGE_QUALITY_THRESHOLD =
             10 // The image quality at which we decide a fingerprint wasn't detected
         private val IMAGE_FORMAT = ImageFormatData.WSQ(15)
+        private const val MIN_CAPTURE_DPI = 500
+        private const val MAX_CAPTURE_DPI = 1700
     }
     private fun <T> Single<T>.wrapErrorsFromScanner() =
         onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }

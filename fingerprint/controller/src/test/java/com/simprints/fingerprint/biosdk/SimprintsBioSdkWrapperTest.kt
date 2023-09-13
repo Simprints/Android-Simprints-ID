@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.biosdk
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.data.domain.fingerprint.toDomain
+import com.simprints.fingerprint.data.domain.fingerprint.toInt
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
@@ -60,8 +60,8 @@ class SimprintsBioSdkWrapperTest {
     @Test
     fun testAcquireFingerprintTemplate() = runTest {
         //Given
-        val captureFingerprintStrategy: Vero2Configuration.CaptureStrategy =
-            Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI
+        val captureFingerprintStrategy =
+            Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI.toInt()
         val captureTimeOutMs = 1000
         val captureQualityThreshold = 100
 
@@ -81,7 +81,7 @@ class SimprintsBioSdkWrapperTest {
         //Then
         coVerify { bioSdk.acquireFingerprintTemplate(any()) }
         with(settingsSlot.captured) {
-            assertThat(captureFingerprintDpi?.value).isEqualTo(captureFingerprintStrategy.toDomain().value)
+            assertThat(captureFingerprintDpi?.value).isEqualTo(captureFingerprintStrategy.toShort())
             assertThat(timeOutMs).isEqualTo(captureTimeOutMs)
             assertThat(qualityThreshold).isEqualTo(captureQualityThreshold)
         }

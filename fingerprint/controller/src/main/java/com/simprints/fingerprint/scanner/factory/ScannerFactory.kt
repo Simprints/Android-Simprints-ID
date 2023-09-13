@@ -24,7 +24,7 @@ import javax.inject.Inject
 import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
-class ScannerFactory @Inject constructor(
+internal class ScannerFactory @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val configManager: ConfigManager,
     private val scannerUiHelper: ScannerUiHelper,

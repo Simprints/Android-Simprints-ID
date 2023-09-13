@@ -4,7 +4,6 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.infra.config.domain.models.Vero2Configuration
 
 interface BioSdkWrapper {
     suspend fun initialize()
@@ -15,7 +14,7 @@ interface BioSdkWrapper {
     ): List<MatchResult>
 
     suspend fun acquireFingerprintTemplate(
-        captureFingerprintStrategy: Vero2Configuration.CaptureStrategy?,
+        capturingResolution: Int?,
         timeOutMs: Int,
         qualityThreshold: Int
     ): AcquireFingerprintTemplateResponse
