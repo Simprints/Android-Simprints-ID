@@ -12,16 +12,20 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
 import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.databinding.ActivityFaceMatchBinding
 import com.simprints.face.exceptions.InvalidFaceRequestException
-import com.simprints.face.match.FaceMatchViewModel.MatchState.*
+import com.simprints.face.match.FaceMatchViewModel.MatchState.Error
+import com.simprints.face.match.FaceMatchViewModel.MatchState.Finished
+import com.simprints.face.match.FaceMatchViewModel.MatchState.LoadingCandidates
+import com.simprints.face.match.FaceMatchViewModel.MatchState.Matching
+import com.simprints.face.match.FaceMatchViewModel.MatchState.NotStarted
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class FaceMatchActivity : FaceActivity() {
@@ -45,7 +49,7 @@ class FaceMatchActivity : FaceActivity() {
 
     private fun setTextInLayout() {
         binding.faceMatchPleaseWait.text =
-            getString(R.string.face_match_please_wait)
+            getString(IDR.string.face_match_please_wait)
     }
 
     private fun setIdentificationProgress(progress: Int) =
@@ -97,7 +101,7 @@ class FaceMatchActivity : FaceActivity() {
         binding.apply {
             faceMatchTvMatchingProgressStatus1.isVisible = true
             faceMatchTvMatchingProgressStatus1.text =
-                getString(R.string.face_match_loading_candidates)
+                getString(IDR.string.face_match_loading_candidates)
 
             faceMatchProgress.isVisible = true
         }
@@ -107,21 +111,21 @@ class FaceMatchActivity : FaceActivity() {
 
     private fun renderMatching() {
         binding.faceMatchTvMatchingProgressStatus1.text =
-            getString(R.string.face_match_matching_candidates)
+            getString(IDR.string.face_match_matching_candidates)
 
         setIdentificationProgress(50)
     }
 
     private fun renderFinished(matchState: Finished) {
         binding.faceMatchTvMatchingProgressStatus1.text = resources.getQuantityString(
-            R.plurals.face_match_matched_candidates,
+            IDR.plurals.face_match_matched_candidates,
             matchState.candidatesMatched,
             matchState.candidatesMatched
         )
 
         binding.faceMatchTvMatchingProgressStatus2.isVisible = true
         binding.faceMatchTvMatchingProgressStatus2.text = resources.getQuantityString(
-            R.plurals.face_match_returned_results,
+            IDR.plurals.face_match_returned_results,
             matchState.returnSize,
             matchState.returnSize
         )
@@ -129,7 +133,7 @@ class FaceMatchActivity : FaceActivity() {
         if (matchState.veryGoodMatches > 0) {
             binding.faceMatchTvMatchingResultStatus1.isVisible = true
             binding.faceMatchTvMatchingResultStatus1.text = resources.getQuantityString(
-                R.plurals.face_match_tier1or2_matches,
+                IDR.plurals.face_match_tier1or2_matches,
                 matchState.veryGoodMatches,
                 matchState.veryGoodMatches
             )
@@ -137,7 +141,7 @@ class FaceMatchActivity : FaceActivity() {
         if (matchState.goodMatches > 0) {
             binding.faceMatchTvMatchingResultStatus2.isVisible = true
             binding.faceMatchTvMatchingResultStatus2.text = resources.getQuantityString(
-                R.plurals.face_match_tier3_matches,
+                IDR.plurals.face_match_tier3_matches,
                 matchState.goodMatches,
                 matchState.goodMatches
             )
@@ -145,7 +149,7 @@ class FaceMatchActivity : FaceActivity() {
         if (matchState.veryGoodMatches < 1 && matchState.goodMatches < 1 || matchState.fairMatches > 1) {
             binding.faceMatchTvMatchingResultStatus3.isVisible = true
             binding.faceMatchTvMatchingResultStatus3.text = resources.getQuantityString(
-                R.plurals.face_match_tier4_matches,
+                IDR.plurals.face_match_tier4_matches,
                 matchState.fairMatches,
                 matchState.fairMatches
             )

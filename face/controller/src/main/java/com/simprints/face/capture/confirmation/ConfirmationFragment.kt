@@ -16,6 +16,7 @@ import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentConfirmationBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 /**
  * This class represents the screen the user is presented with once they have made a succesful capture
@@ -50,10 +51,10 @@ class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
 
     private fun setTextInLayout() {
         binding.apply {
-            faceConfirmTitle.text = getString(R.string.title_confirmation)
-            confirmationTxt.text = getString(R.string.captured_successfully)
-            recaptureBtn.text = getString(R.string.btn_recapture)
-            confirmationBtn.text = getString(R.string.btn_finish)
+            faceConfirmTitle.text = getString(IDR.string.title_confirmation)
+            confirmationTxt.text = getString(IDR.string.captured_successfully)
+            recaptureBtn.text = getString(IDR.string.btn_recapture)
+            confirmationBtn.text = getString(IDR.string.btn_finish)
         }
     }
 

@@ -8,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
@@ -24,9 +23,11 @@ import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.toArgs
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class FaceCaptureActivity : FaceActivity() {
@@ -77,8 +78,8 @@ class FaceCaptureActivity : FaceActivity() {
             findNavController(R.id.capture_host_fragment).navigate(
                 R.id.action_global_refusalFragment,
                 exitFormConfiguration {
-                    titleRes = R.string.why_did_you_skip_face_capture
-                    backButtonRes = R.string.exit_form_return_to_face_capture
+                    titleRes = IDR.string.why_did_you_skip_face_capture
+                    backButtonRes = IDR.string.exit_form_return_to_face_capture
                 }.toArgs()
             )
         })

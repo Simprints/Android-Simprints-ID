@@ -10,6 +10,7 @@ import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.events.model.FaceOnboardingCompleteEvent
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
 import com.simprints.face.databinding.FragmentPreparationBinding
+import com.simprints.infra.resources.R as IDR
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -41,10 +42,10 @@ class PreparationFragment : Fragment(R.layout.fragment_preparation) {
 
     private fun setTextInLayout() {
         binding.apply {
-            detectionOnboardingLightTxt.text = getString(R.string.onboarding_light)
-            detectionOnboardingFillTxt.text = getString(R.string.onboarding_fill)
-            detectionOnboardingStraightTxt.text = getString(R.string.onboarding_straight)
-            detectionOnboardingTxtContinue.text = getString(R.string.onboarding_continue)
+            detectionOnboardingLightTxt.text = getString(IDR.string.onboarding_light)
+            detectionOnboardingFillTxt.text = getString(IDR.string.onboarding_fill)
+            detectionOnboardingStraightTxt.text = getString(IDR.string.onboarding_straight)
+            detectionOnboardingTxtContinue.text = getString(IDR.string.onboarding_continue)
         }
     }
 
