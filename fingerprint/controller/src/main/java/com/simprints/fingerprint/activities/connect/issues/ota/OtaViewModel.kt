@@ -97,11 +97,11 @@ class OtaViewModel @Inject constructor(
         val otaStartedTime = timeHelper.now()
         return when (this) {
             AvailableOta.CYPRESS ->
-                scannerManager.scanner.performCypressOta(targetVersions(AvailableOta.CYPRESS))
+                scannerManager.otaOperationsWrapper.performCypressOta(targetVersions(AvailableOta.CYPRESS))
             AvailableOta.STM ->
-                scannerManager.scanner.performStmOta(targetVersions(AvailableOta.STM))
+                scannerManager.otaOperationsWrapper.performStmOta(targetVersions(AvailableOta.STM))
             AvailableOta.UN20 ->
-                scannerManager.scanner.performUn20Ota(targetVersions(AvailableOta.UN20))
+                scannerManager.otaOperationsWrapper.performUn20Ota(targetVersions(AvailableOta.UN20))
         }.onCompletion { error ->
             if (error == null) {
                 saveOtaEventInSession(this@toFlowOfSteps, otaStartedTime)

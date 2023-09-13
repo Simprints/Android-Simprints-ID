@@ -65,7 +65,7 @@ are some helper classes and tools:
 - [`ScannerPairingManager`](./pairing/ScannerPairingManager.kt) - For
   programmatic pairing of the scanner, helper functions for MAC
   addresses, and callbacks for once the scanner is paired.
-- [`ScannerUiHelper`](./ui/ScannerUiHelper.kt) - (For Vero 2 only) For
+- [`ScannerUiHelper`](../../../../../../../../infra/scanner/src/main/java/com/simprints/fingerprint/infra/scanner/v2/tools/ScannerUiHelper.kt) - (For Vero 2 only) For
   determining the correct LED state to send to Vero 2 based on different
   situations.
 - [`ScannerGenerationDeterminer`](./tools/ScannerGenerationDeterminer.kt)

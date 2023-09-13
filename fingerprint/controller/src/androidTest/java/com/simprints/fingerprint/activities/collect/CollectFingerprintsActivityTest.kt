@@ -105,7 +105,7 @@ class CollectFingerprintsActivityTest {
     private val vm: CollectFingerprintsViewModel = spyk(
         CollectFingerprintsViewModel(
             scannerManager, configManager, imageManager, timeHelper,
-            sessionEventsManager, mockk(), mockk(), EncodingUtilsImplForTests,
+            sessionEventsManager, mockk(), mockk(), EncodingUtilsImplForTests,mockk(),
             mockCoroutineScope,
         )
     ) {

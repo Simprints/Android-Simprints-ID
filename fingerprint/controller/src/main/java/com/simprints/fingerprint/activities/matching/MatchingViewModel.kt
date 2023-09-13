@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
+import com.simprints.fingerprint.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -16,8 +17,6 @@ import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.matching.MatchResult
-import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
-import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
@@ -35,7 +34,7 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult as
 
 @HiltViewModel
 class MatchingViewModel @Inject constructor(
-    private val fingerprintBioSdk: FingerprintBioSdk<Unit,Unit,Unit,Unit,Unit,SimAfisMatcherSettings>,
+    private val bioSdk: BioSdkWrapper,
     private val dbManager: FingerprintDbManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val timeHelper: FingerprintTimeHelper,
@@ -107,15 +106,15 @@ class MatchingViewModel @Inject constructor(
         }
     }
 
-    private fun runMatch(
+    private suspend fun runMatch(
         candidates: List<FingerprintIdentity>,
         probeFingerprints: List<Fingerprint>,
         isCrossFingerMatchingEnabled: Boolean
     ): List<MatchResult> =
-        fingerprintBioSdk.match(
+        bioSdk.match(
             probeFingerprints.toFingerprintIdentity().fromDomainToMatcher(),
             candidates.map { it.fromDomainToMatcher() },
-            SimAfisMatcherSettings(isCrossFingerMatchingEnabled)
+            isCrossFingerMatchingEnabled
         ).map { it.fromMatcherToDomain() }
 
     private fun handleMatchFailed(e: Throwable) {
