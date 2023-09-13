@@ -72,10 +72,9 @@ internal class OrchestratorCache @Inject constructor(
     internal class ActionRequestWrapper(val request: ActionRequest) : Parcelable {
         companion object {
             val CREATOR = object : Parcelable.Creator<ActionRequestWrapper> {
-                override fun createFromParcel(source: Parcel): ActionRequestWrapper {
-                    val request = source.readParcelable<ActionRequest>(ActionRequest::class.java.classLoader)!!
-                    return ActionRequestWrapper(request)
-                }
+                override fun createFromParcel(source: Parcel): ActionRequestWrapper = ActionRequestWrapper(
+                    source.readParcelable(ActionRequest::class.java.classLoader)!!
+                )
 
                 override fun newArray(size: Int): Array<ActionRequestWrapper?> = arrayOfNulls(size)
             }
@@ -86,10 +85,9 @@ internal class OrchestratorCache @Inject constructor(
     internal class StepWrapper(val step: Step) : Parcelable {
         companion object {
             val CREATOR = object : Parcelable.Creator<StepWrapper> {
-                override fun createFromParcel(source: Parcel): StepWrapper {
-                    val step = source.readParcelable<Step>(Step::class.java.classLoader)!!
-                    return StepWrapper(step)
-                }
+                override fun createFromParcel(source: Parcel): StepWrapper = StepWrapper(
+                    source.readParcelable(Step::class.java.classLoader)!!
+                )
 
                 override fun newArray(size: Int): Array<StepWrapper?> = arrayOfNulls(size)
             }

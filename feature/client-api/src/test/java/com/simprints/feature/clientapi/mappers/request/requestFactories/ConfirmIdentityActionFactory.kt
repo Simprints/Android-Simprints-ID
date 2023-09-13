@@ -23,7 +23,7 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
         userId = MOCK_USER_ID,
         sessionId = MOCK_SESSION_ID,
         selectedGuid = MOCK_SELECTED_GUID,
-        unknownExtras = emptyMap()
+        unknownExtras = emptyList()
     )
 
     override fun getValidator(extractor: ActionRequestExtractor): ConfirmIdentityValidator =
