@@ -171,7 +171,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private suspend fun setLastUser() {
         recentUserActivityManager.updateRecentUserActivity {
             it.apply {
-                it.lastUserUsed = appRequest.userId.value
+                it.lastUserUsed = appRequest.userId
             }
         }
     }
