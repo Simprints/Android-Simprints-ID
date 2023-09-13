@@ -21,28 +21,28 @@ enum class ErrorType(
     var customMessage: String? = null,
 ) {
     LICENSE_MISSING(
-        R.string.error_licence_missing_title,
-        R.string.error_licence_missing_message,
+        IDR.string.error_licence_missing_title,
+        IDR.string.error_licence_missing_message,
         alertType = FaceAlertType.FACE_LICENSE_MISSING,
     ),
     LICENSE_INVALID(
-        R.string.error_licence_invalid_title,
-        R.string.error_licence_invalid_message,
+        IDR.string.error_licence_invalid_title,
+        IDR.string.error_licence_invalid_message,
         alertType = FaceAlertType.FACE_LICENSE_INVALID,
     ),
     BACKEND_MAINTENANCE_ERROR(
-        R.string.error_backend_maintenance_title,
-        R.string.error_backend_maintenance_message,
+        IDR.string.error_backend_maintenance_title,
+        IDR.string.error_backend_maintenance_message,
         alertType = FaceAlertType.BACKEND_MAINTENANCE_ERROR,
     ),
     CONFIGURATION_ERROR(
-        R.string.error_configuration_error_title,
-        R.string.error_configuration_error_message,
+        IDR.string.error_configuration_error_title,
+        IDR.string.error_configuration_error_message,
         alertType = FaceAlertType.FACE_LICENSE_MISSING,
     ),
     UNEXPECTED_ERROR(
-        R.string.error_unexpected_error_title,
-        R.string.error_unexpected_error_message,
+        IDR.string.error_unexpected_error_title,
+        IDR.string.error_unexpected_error_message,
         backgroundColor = AlertColor.Red,
         alertType = FaceAlertType.UNEXPECTED_ERROR,
     ),

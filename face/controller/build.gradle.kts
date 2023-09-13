@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":infra:events"))
     implementation(project(":infra:license"))
     implementation(project(":infra:images"))
+    implementation(project(":infra:resources"))
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
 
