@@ -1,13 +1,15 @@
 package com.simprints.infra.events.event.domain.models.callback
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
 import com.simprints.moduleapi.app.responses.IAppErrorReason
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class ErrorCallbackEvent(
@@ -27,6 +29,10 @@ data class ErrorCallbackEvent(
         ErrorCallbackPayload(createdAt, EVENT_VERSION, reason),
         CALLBACK_ERROR
     )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class ErrorCallbackPayload(

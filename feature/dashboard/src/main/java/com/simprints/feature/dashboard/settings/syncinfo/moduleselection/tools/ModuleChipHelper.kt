@@ -31,7 +31,7 @@ internal class ModuleChipHelper(
 
         return Chip(context).apply {
             setChipDrawable(chipDrawable)
-            text = module.name
+            text = module.name.value
             tag = module.name
             isCheckable = false
             ellipsize = TextUtils.TruncateAt.END

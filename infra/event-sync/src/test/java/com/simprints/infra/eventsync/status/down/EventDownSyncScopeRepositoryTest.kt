@@ -74,7 +74,7 @@ internal class EventDownSyncScopeRepositoryTest {
 
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
-            every { lastUserUsed } returns DEFAULT_USER_ID
+            every { lastUserUsed } returns DEFAULT_USER_ID.value
         }
         coEvery { downSyncOperationOperationDao.load() } returns getSyncOperationsWithLastResult()
     }
@@ -241,7 +241,7 @@ internal class EventDownSyncScopeRepositoryTest {
         assertThat(syncScope).isInstanceOf(SubjectUserScope::class.java)
         with((syncScope as SubjectUserScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(attendantId).isEqualTo(DEFAULT_USER_ID)
+            assertThat(attendantId).isEqualTo(DEFAULT_USER_ID.value)
             assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
         }
     }
@@ -250,7 +250,7 @@ internal class EventDownSyncScopeRepositoryTest {
         assertThat(syncScope).isInstanceOf(SubjectModuleScope::class.java)
         with((syncScope as SubjectModuleScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(moduleIds).containsExactly(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
+            assertThat(moduleIds).containsExactly(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2.value)
             assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
         }
     }

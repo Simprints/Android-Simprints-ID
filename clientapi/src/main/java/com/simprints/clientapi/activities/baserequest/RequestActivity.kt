@@ -24,11 +24,9 @@ import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.core.tools.activity.BaseActivity
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.feature.alert.ShowAlertWrapper
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.alert.withPayload
-import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.logging.Simber
 import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
 import com.simprints.moduleapi.app.responses.IAppEnrolResponse
