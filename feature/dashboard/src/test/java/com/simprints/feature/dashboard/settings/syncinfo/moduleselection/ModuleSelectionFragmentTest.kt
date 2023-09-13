@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
@@ -48,9 +49,9 @@ class ModuleSelectionFragmentTest {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<List<Module>>>().onChanged(
                     listOf(
-                        Module("module12", true),
-                        Module("module2", false),
-                        Module("module3", false)
+                        Module("module12".asTokenizedRaw(), true),
+                        Module("module2".asTokenizedRaw(), false),
+                        Module("module3".asTokenizedRaw(), false)
                     )
                 )
             }
@@ -81,7 +82,7 @@ class ModuleSelectionFragmentTest {
         onView(allOf(withParent(withId(R.id.rvModules)), withParentIndex(0))).perform(click())
 
         verify(exactly = 1) {
-            viewModel.updateModuleSelection(Module("module2", false))
+            viewModel.updateModuleSelection(Module("module2".asTokenizedRaw(), false))
         }
     }
 
@@ -106,7 +107,7 @@ class ModuleSelectionFragmentTest {
         )
 
         verify(exactly = 1) {
-            viewModel.updateModuleSelection(Module("module12", true))
+            viewModel.updateModuleSelection(Module("module12".asTokenizedRaw(), true))
         }
     }
 

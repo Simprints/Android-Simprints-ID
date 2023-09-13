@@ -2,6 +2,7 @@ package com.simprints.feature.enrollast
 
 import android.os.Parcelable
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.domain.models.Finger
 import kotlinx.parcelize.Parcelize
 
@@ -9,8 +10,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class EnrolLastBiometricParams(
     val projectId: String,
-    val userId: String,
-    val moduleId: String,
+    val userId: TokenizableString,
+    val moduleId: TokenizableString,
     val steps: List<EnrolLastBiometricStepResult>,
 ) : Parcelable
 

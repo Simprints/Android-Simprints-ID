@@ -15,7 +15,7 @@ extra.apply {
      *
      * Dev version >= 2023.3.1 is required for receiving encryption Tokens from BFSID [CORE-2502]
      */
-    set("VERSION_NAME", "2023.3.1")
+    set("VERSION_NAME", "2023.3.2")
 
     /**
      * Build type. The version code describes which build type was used for the build.

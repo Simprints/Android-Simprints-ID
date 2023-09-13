@@ -12,8 +12,14 @@
     "createdAt": 43145678901,
     "endedAt": 0,
     "projectId": "TEST6Oai41ps1pBNrzBL",
-    "userId": "user1",
-    "moduleId": "module1",
+    "userId": {
+      "className": "Raw",
+      "value": "user1"
+    },
+    "moduleId": {
+      "className": "Raw",
+      "value": "module1"
+    },
     "sessionId": "e35c39f9-b81e-48f2-97e7-46ecc8399bb4",
     "metadata": "test"
   }

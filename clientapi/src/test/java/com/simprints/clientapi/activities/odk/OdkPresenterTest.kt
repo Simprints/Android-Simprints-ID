@@ -14,6 +14,9 @@ import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.requestFactories.*
+import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
@@ -34,6 +37,12 @@ class OdkPresenterTest {
     @MockK
     lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
 
+    private val project: Project = mockk()
+    private val tokenizationManagerMock: TokenizationManager = mockk {
+        every { encrypt(RequestFactory.MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns RequestFactory.MOCK_USER_ID
+        every { encrypt(RequestFactory.MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns RequestFactory.MOCK_MODULE_ID
+    }
+
     @Before
     fun setup() {
         BaseUnitTestConfig()
@@ -42,6 +51,8 @@ class OdkPresenterTest {
 
 
         MockKAnnotations.init(this, relaxed = true)
+        coEvery { view.getProject() } returns project
+        every { view.tokenizationManager } returns tokenizationManagerMock
         coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
         coEvery { clientApiSessionEventsManager.createSession(any()) } returns "session_id"

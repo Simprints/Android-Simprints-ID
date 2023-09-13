@@ -1,8 +1,9 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
@@ -48,8 +49,8 @@ class EventDownSyncTaskTest {
         val ENROLMENT_RECORD_CREATION = EnrolmentRecordCreationEvent(
             "subjectId",
             "projectId",
-            "moduleId",
-            "attendantId",
+            "moduleId".asTokenizedRaw(),
+            "attendantId".asTokenizedRaw(),
             listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
         )
         val ENROLMENT_RECORD_MOVE = EnrolmentRecordMoveEvent(
@@ -57,14 +58,14 @@ class EventDownSyncTaskTest {
                 "subjectId",
                 "projectId",
                 DEFAULT_MODULE_ID_2,
-                "attendantId",
+                "attendantId".asTokenizedRaw(),
                 listOf(FaceReference("id", listOf(FaceTemplate("template")), "format"))
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",
                 "projectId",
                 DEFAULT_MODULE_ID,
-                "attendantId",
+                "attendantId".asTokenizedRaw(),
             )
         )
     }
@@ -90,9 +91,6 @@ class EventDownSyncTaskTest {
 
     @MockK
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
-
-    @MockK
-    private lateinit var tokenization: Tokenization
 
     private lateinit var subjectFactory: SubjectFactory
 
@@ -181,7 +179,7 @@ class EventDownSyncTaskTest {
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
-            listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+            listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).map(TokenizableString::value),
             ""
         )
 
@@ -199,13 +197,13 @@ class EventDownSyncTaskTest {
             mockProgressEmission(listOf(eventToMoveToModule2))
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
-                listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+                listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).map(TokenizableString::value),
                 ""
             )
 
             val syncByModule2 = moduleOp.copy(
                 queryEvent = moduleOp.queryEvent.copy(
-                    moduleIds = listOf(DEFAULT_MODULE_ID_2)
+                    moduleIds = listOf(DEFAULT_MODULE_ID_2.value)
                 )
             )
             eventDownSyncTask.downSync(this, syncByModule2).toList()
@@ -224,9 +222,9 @@ class EventDownSyncTaskTest {
         val eventToMoveToModule2 = ENROLMENT_RECORD_MOVE
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf(DEFAULT_MODULE_ID),
-            ""
+            language = "",
+            selectedModules = listOf(DEFAULT_MODULE_ID.value),
+            lastInstructionId = ""
         )
 
         eventDownSyncTask.downSync(this, moduleOp).toList()
@@ -246,13 +244,13 @@ class EventDownSyncTaskTest {
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
-            listOf(DEFAULT_MODULE_ID_2),
+            listOf(DEFAULT_MODULE_ID_2.value),
             ""
         )
 
         val syncByModule2 = moduleOp.copy(
             queryEvent = moduleOp.queryEvent.copy(
-                moduleIds = listOf(DEFAULT_MODULE_ID_2)
+                moduleIds = listOf(DEFAULT_MODULE_ID_2.value)
             )
         )
         eventDownSyncTask.downSync(this, syncByModule2).toList()
