@@ -12,9 +12,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class StringTokenizerTest {
 
-    private val keysetJson =
-        "{\"primaryKeyId\":3444266861,\"key\":[{\"keyData\":{\"typeUrl\":\"type.googleapis.com/google.crypto.tink.AesSivKey\",\"value\":\"EkAnu5jmYn8LZCdFZ3a93CMmRirb38FJLVTCiqZNPHb4b/z5NqZm/wceHtsfuVjUcKNBcovgKHi/MfUastghymI9\",\"keyMaterialType\":\"SYMMETRIC\"},\"status\":\"ENABLED\",\"keyId\":3444266861,\"outputPrefixType\":\"TINK\"}]}"
-
     private lateinit var stringTokenizer: StringTokenizer
 
     @Before
@@ -28,8 +25,8 @@ class StringTokenizerTest {
     @Test
     fun `when value is encrypted then decryption returns the same value`() = with(stringTokenizer) {
         val value = " some untrimmed value with speci@l ch@r#cters and numb3rs_  "
-        val encrypted = encrypt(value, keysetJson)
-        assertThat(decrypt(encrypted, keysetJson)).isEqualTo(value)
+        val encrypted = encrypt(value, KEYSET_JSON)
+        assertThat(decrypt(encrypted, KEYSET_JSON)).isEqualTo(value)
     }
 
     /**
@@ -38,10 +35,45 @@ class StringTokenizerTest {
     @Test
     fun `encryption should produce the same value as BFSID`() = with(stringTokenizer) {
         val value = "module 1"
-        val bfsidKeysetJson =
-            "{\"primaryKeyId\":3444266861,\"key\":[{\"keyData\":{\"typeUrl\":\"type.googleapis.com/google.crypto.tink.AesSivKey\",\"value\":\"EkAnu5jmYn8LZCdFZ3a93CMmRirb38FJLVTCiqZNPHb4b/z5NqZm/wceHtsfuVjUcKNBcovgKHi/MfUastghymI9\",\"keyMaterialType\":\"SYMMETRIC\"},\"status\":\"ENABLED\",\"keyId\":3444266861,\"outputPrefixType\":\"TINK\"}]}"
         val expectedEncrypted = "Ac1LV23Dfoo6m8usBUX/U7hInen/DeNgJEUQLzo="
 
-        assertThat(encrypt(value, bfsidKeysetJson)).isEqualTo(expectedEncrypted)
+        assertThat(encrypt(value, BFSID_KEYSET_JSON)).isEqualTo(expectedEncrypted)
+    }
+
+    companion object {
+        private val KEYSET_JSON = """
+            {
+               "primaryKeyId":3444266861,
+               "key":[
+                  {
+                     "keyData":{
+                        "typeUrl":"type.googleapis.com/google.crypto.tink.AesSivKey",
+                        "value":"EkAnu5jmYn8LZCdFZ3a93CMmRirb38FJLVTCiqZNPHb4b/z5NqZm/wceHtsfuVjUcKNBcovgKHi/MfUastghymI9",
+                        "keyMaterialType":"SYMMETRIC"
+                     },
+                     "status":"ENABLED",
+                     "keyId":3444266861,
+                     "outputPrefixType":"TINK"
+                  }
+               ]
+            }
+        """.trimIndent()
+        private val BFSID_KEYSET_JSON = """
+            {
+               "primaryKeyId":3444266861,
+               "key":[
+                  {
+                     "keyData":{
+                        "typeUrl":"type.googleapis.com/google.crypto.tink.AesSivKey",
+                        "value":"EkAnu5jmYn8LZCdFZ3a93CMmRirb38FJLVTCiqZNPHb4b/z5NqZm/wceHtsfuVjUcKNBcovgKHi/MfUastghymI9",
+                        "keyMaterialType":"SYMMETRIC"
+                     },
+                     "status":"ENABLED",
+                     "keyId":3444266861,
+                     "outputPrefixType":"TINK"
+                  }
+               ]
+            }
+        """.trimIndent()
     }
 }
