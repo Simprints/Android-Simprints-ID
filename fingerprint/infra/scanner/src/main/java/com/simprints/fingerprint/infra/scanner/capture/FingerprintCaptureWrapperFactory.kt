@@ -5,9 +5,11 @@ import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.NullScanner
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
+import javax.inject.Singleton
 import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
+@Singleton
 class FingerprintCaptureWrapperFactory @Inject constructor(
     @DispatcherIO private val ioDispatcher: CoroutineDispatcher,
     private val scannerUiHelper: ScannerUiHelper,
