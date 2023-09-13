@@ -56,7 +56,6 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:project-security-store"))
 
-    implementation(project(":face"))
     implementation(project(":feature:login"))
     implementation(project(":feature:fetch-subject"))
     implementation(project(":feature:select-subject"))
@@ -66,7 +65,10 @@ dependencies {
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:consent"))
+
     implementation(project(":fingerprint:controller"))
+    implementation(project(":face:controller"))
+
     implementation(project(":infra:config"))
     implementation(project(":infra:enrolment-records"))
     implementation(project(":infra:recent-user-activity"))

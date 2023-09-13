@@ -7,5 +7,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":infrafacebiosdk"))
+    implementation(project(":face:infra:face-bio-sdk"))
 }
