@@ -39,7 +39,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
         configManager.updateDeviceConfiguration {
             it.apply {
                 this.selectedModules = selectedModules.map { module -> module.name }
-                logMessageForCrashReport("Modules set to ${this.selectedModules}")
+                logMessageForCrashReport("Modules set to ${this.selectedModules.values()}")
                 setCrashlyticsKeyForModules(this.selectedModules.values())
             }
         }
