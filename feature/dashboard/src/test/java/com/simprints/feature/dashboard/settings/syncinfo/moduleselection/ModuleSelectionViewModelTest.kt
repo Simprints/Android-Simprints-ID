@@ -3,13 +3,19 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -40,28 +46,51 @@ class ModuleSelectionViewModelTest {
     @MockK(relaxed = true)
     private lateinit var configManager: ConfigManager
 
+    @MockK(relaxed = true)
+    private lateinit var tokenizationManager: TokenizationManager
+
+    @MockK(relaxed = true)
+    private lateinit var authStore: AuthStore
+
+    @MockK
+    private lateinit var project: Project
+
     private lateinit var viewModel: ModuleSelectionViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
-        coEvery { repository.getModules() } returns listOf(
-            Module("a".asTokenizedRaw(), false),
-            Module("b".asTokenizedRaw(), false),
-            Module("c".asTokenizedRaw(), true),
-            Module("d".asTokenizedRaw(), false)
+        val modulesDefault = listOf(
+            Module("a".asTokenizedEncrypted(), false),
+            Module("b".asTokenizedEncrypted(), false),
+            Module("c".asTokenizedEncrypted(), true),
+            Module("d".asTokenizedEncrypted(), false)
         )
+        coEvery { repository.getModules() } returns modulesDefault
         coEvery { repository.getMaxNumberOfModules() } returns 2
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.settingsPassword } returns SettingsPasswordConfig.Locked("1234")
         }
+        every { authStore.signedInProjectId } returns PROJECT_ID
+        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        modulesDefault.forEach {
+            coEvery {
+                tokenizationManager.decrypt(
+                    encrypted = it.name as TokenizableString.Tokenized,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = project
+                )
+            } returns it.name.value.asTokenizedRaw()
+        }
 
         viewModel = ModuleSelectionViewModel(
-            repository,
-            eventSyncManager,
-            configManager,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+            authStore = authStore,
+            repository = repository,
+            eventSyncManager = eventSyncManager,
+            configManager = configManager,
+            tokenizationManager = tokenizationManager,
+            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
@@ -131,6 +160,15 @@ class ModuleSelectionViewModelTest {
             Module("c".asTokenizedRaw(), true),
             Module("d".asTokenizedRaw(), false)
         )
+        updatedModules.forEach { module ->
+            every {
+                tokenizationManager.encrypt(
+                    decrypted = module.name as TokenizableString.Raw,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = project
+                )
+            } returns module.name.value.asTokenizedEncrypted()
+        }
         viewModel.updateModuleSelection(Module("a".asTokenizedRaw(), false))
         viewModel.saveModules()
 
@@ -155,5 +193,9 @@ class ModuleSelectionViewModelTest {
         assertThat(viewModel.screenLocked.getOrAwaitValue()).isEqualTo(
             SettingsPasswordConfig.Unlocked
         )
+    }
+
+    companion object {
+        private const val PROJECT_ID = "projectId"
     }
 }
