@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.exitform.ExitFormResult
@@ -23,6 +24,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@ExcludedFromGeneratedTestCoverageReports("WIP, will be tested when final version is ready")
 @HiltViewModel
 internal class OrchestratorViewModel @Inject constructor(
     private val configManager: ConfigManager,

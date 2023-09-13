@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.steps
 
 import androidx.core.os.bundleOf
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
@@ -12,6 +13,7 @@ import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 
+@ExcludedFromGeneratedTestCoverageReports("Mapping code for steps")
 internal class StepsBuilder @Inject constructor() {
 
     fun build(action: ActionRequest, projectConfiguration: ProjectConfiguration): List<Step> =
