@@ -171,13 +171,13 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReport
-                    - ./gradlew infrafacebiosdk:jacocoTestReport
-                    - ./gradlew infrarocwrapper:jacocoTestReport
+                    - ./gradlew face:controller:jacocoTestReport
+                    - ./gradlew face:infra:face-bio-sdk:jacocoTestReport
+                    - ./gradlew face:infra:roc-wrapper:jacocoTestReport
                 artifacts:
-                    - face/build/reports/**
-                    - infrafacebiosdk/build/reports/**
-                    - infrarocwrapper/build/reports/**
+                    - face/controller/build/reports/**
+                    - face/infra/face-bio-sdk/build/reports/**
+                    - face/infra/roc-wrapper/build/reports/**
 
         ######################################################################
         # Run the Fingerprint unit tests with coverage and upload report to

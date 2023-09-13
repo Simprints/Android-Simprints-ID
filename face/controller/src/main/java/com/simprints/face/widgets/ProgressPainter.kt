@@ -4,6 +4,7 @@ import android.graphics.Canvas
 import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.RectF
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
 /**
  * This is the brawl that paints the progress bar to the screen.
@@ -13,6 +14,7 @@ import android.graphics.RectF
  * Every time [setValue] is called, [plusAngle] is changed. On the next [draw], this Painter will
  * created dashed lines up the angle defined.
  */
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 class ProgressPainter(
     progressColor: Int,
     var max: Int,
