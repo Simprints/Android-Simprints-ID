@@ -60,9 +60,15 @@ include(
     ":fingerprint:infra:simafis-wrapper",
 )
 
+// Face modality modules
+include(
+    ":face:controller",
+    ":face:infra:face-bio-sdk",
+    ":face:infra:roc-wrapper",
+)
+
 // Modules to be refactored
 include(
-    ":face",
     ":clientapi",
     ":moduleapi",
 )
@@ -102,8 +108,6 @@ include(
     ":infra:security",
     ":infra:orchestrator-data",
     ":infra:ui-base",
-    ":infrafacebiosdk",
-    ":infrarocwrapper",
 )
 
 // Tooling modules
