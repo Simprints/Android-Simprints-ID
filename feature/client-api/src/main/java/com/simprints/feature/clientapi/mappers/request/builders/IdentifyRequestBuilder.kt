@@ -1,17 +1,19 @@
 package com.simprints.feature.clientapi.mappers.request.builders
 
-import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.extractors.IdentifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.IdentifyValidator
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
 
 internal class IdentifyRequestBuilder(
-    val packageName: String, val extractor: IdentifyRequestExtractor,
+    private val actionIdentifier: ActionRequestIdentifier,
+    val extractor: IdentifyRequestExtractor,
     validator: IdentifyValidator,
 ) : ActionRequestBuilder(validator) {
 
     override fun buildAction(): ActionRequest = ActionRequest.IdentifyActionRequest(
-        packageName = packageName,
+        actionIdentifier = actionIdentifier,
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId(),
         moduleId = extractor.getModuleId(),

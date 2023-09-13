@@ -91,7 +91,7 @@ class AuthStoreImplTest {
     @Test
     fun `isSignedIn should call the correct method`() {
         every { firebaseAuthManager.isSignedIn(PROJECT_ID) } returns true
-        val receivedIsSignedIn = loginManagerManagerImpl.isSignedIn(PROJECT_ID)
+        val receivedIsSignedIn = loginManagerManagerImpl.isFirebaseSignedIn(PROJECT_ID)
 
         assertThat(receivedIsSignedIn).isTrue()
     }

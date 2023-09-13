@@ -44,7 +44,7 @@ dependencies {
     // by setting the USE_NEW_ORCHESTRATOR=true in the local.properties file.
     // TODO: Remove once orchestrator is done - https://simprints.atlassian.net/browse/CORE-2845
     if (gradleLocalProperties(rootDir)["USE_NEW_ORCHESTRATOR"] == "true") {
-        implementation(project(":feature:client-api"))
+        implementation(project(":feature:orchestrator"))
     } else {
         implementation(project(":clientapi"))
     }

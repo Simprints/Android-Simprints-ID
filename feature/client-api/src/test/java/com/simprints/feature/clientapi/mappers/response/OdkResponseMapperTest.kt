@@ -7,8 +7,8 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolAct
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
-import com.simprints.feature.clientapi.models.ActionResponse
 import com.simprints.feature.clientapi.models.OdkConstants
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppResponseTier
@@ -23,7 +23,7 @@ class OdkResponseMapperTest {
     @Test
     fun `correctly maps enrol response`() {
         val extras = mapper(ActionResponse.EnrolActionResponse(
-            request = EnrolActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             enrolledGuid = "guid",
@@ -38,7 +38,7 @@ class OdkResponseMapperTest {
     @Test
     fun `correctly maps identify response`() {
         val extras = mapper(ActionResponse.IdentifyActionResponse(
-            request = IdentifyRequestActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             identifications = listOf(
@@ -69,7 +69,7 @@ class OdkResponseMapperTest {
     @Test
     fun `correctly finds correct highest confidence for empty list`() {
         val extras = mapper(ActionResponse.IdentifyActionResponse(
-            request = IdentifyRequestActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             identifications = listOf()
@@ -81,7 +81,7 @@ class OdkResponseMapperTest {
     @Test
     fun `correctly maps confirm response`() {
         val extras = mapper(ActionResponse.ConfirmActionResponse(
-            request = ConfirmIdentityActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             confirmed = true,
@@ -94,7 +94,7 @@ class OdkResponseMapperTest {
     @Test
     fun `correctly maps verify response`() {
         val extras = mapper(ActionResponse.VerifyActionResponse(
-            request = VerifyActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = VerifyActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             matchResult = StubMatchResult(
@@ -115,7 +115,7 @@ class OdkResponseMapperTest {
     @Test
     fun `correctly maps exit form response`() {
         val extras = mapper(ActionResponse.ExitFormActionResponse(
-            request = EnrolLastBiometricsActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = EnrolLastBiometricsActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             reason = "reason",
@@ -131,7 +131,7 @@ class OdkResponseMapperTest {
     @Test
     fun `correctly maps error response`() {
         val extras = mapper(ActionResponse.ErrorActionResponse(
-            request = EnrolActionFactory.getValidSimprintsRequest(),
+            actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
             reason = IAppErrorReason.UNEXPECTED_ERROR,

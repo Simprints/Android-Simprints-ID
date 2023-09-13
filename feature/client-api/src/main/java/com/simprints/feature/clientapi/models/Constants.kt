@@ -1,14 +1,8 @@
 package com.simprints.feature.clientapi.models
 
-
 internal object OdkConstants {
 
     const val PACKAGE_NAME = "com.simprints.simodkadapter"
-    const val ACTION_ENROL = "$PACKAGE_NAME.REGISTER"
-    const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
-    const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
-    const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
-    const val ACTION_ENROL_LAST_BIOMETRICS = "$PACKAGE_NAME.REGISTER_LAST_BIOMETRICS"
 
     const val ODK_GUIDS_KEY = "odk-guids"
     const val ODK_BIOMETRICS_COMPLETE_CHECK_KEY = "odk-biometrics-complete"
@@ -53,11 +47,6 @@ internal object OdkConstants {
 
 internal object CommCareConstants {
     const val PACKAGE_NAME = "com.simprints.commcare"
-    const val ACTION_REGISTER = "$PACKAGE_NAME.REGISTER"
-    const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
-    const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
-    const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
-    const val ACTION_ENROL_LAST_BIOMETRICS = "$PACKAGE_NAME.REGISTER_LAST_BIOMETRICS"
 
     const val BIOMETRICS_COMPLETE_CHECK_KEY = "biometricsComplete"
     const val REGISTRATION_GUID_KEY = "guid"
@@ -77,5 +66,4 @@ internal object CommCareConstants {
 internal object LibSimprintsConstants {
 
     const val PACKAGE_NAME = "com.simprints.id"
-    const val RESULT_CODE_OVERRIDE = "result_code_override"
 }
