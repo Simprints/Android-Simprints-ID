@@ -8,8 +8,8 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolAct
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
-import com.simprints.feature.clientapi.models.ActionResponse
 import com.simprints.feature.clientapi.models.CommCareConstants
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration

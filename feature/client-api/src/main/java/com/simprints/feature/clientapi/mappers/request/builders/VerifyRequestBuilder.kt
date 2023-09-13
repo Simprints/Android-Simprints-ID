@@ -1,9 +1,9 @@
 package com.simprints.feature.clientapi.mappers.request.builders
 
-import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidator
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 
 
 internal class VerifyRequestBuilder(

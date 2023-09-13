@@ -4,9 +4,9 @@ import com.simprints.feature.clientapi.mappers.request.builders.EnrolLastBiometr
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolLastBiometricsRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.EnrolLastBiometricsValidator
-import com.simprints.feature.clientapi.models.ActionRequest
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
-import com.simprints.feature.clientapi.models.IntegrationConstants
+import com.simprints.infra.orchestration.data.ActionConstants
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.every
 import io.mockk.mockk
 
@@ -14,7 +14,7 @@ internal object EnrolLastBiometricsActionFactory : RequestActionFactory() {
 
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
-        actionName = IntegrationConstants.ACTION_ENROL_LAST_BIOMETRICS,
+        actionName = ActionConstants.ACTION_ENROL_LAST_BIOMETRICS,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.EnrolLastBiometricActionRequest(

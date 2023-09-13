@@ -2,11 +2,10 @@ package com.simprints.feature.clientapi.mappers.response
 
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import com.simprints.feature.clientapi.models.ActionRequest
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
-import com.simprints.feature.clientapi.models.ActionResponse
-import com.simprints.feature.clientapi.models.IntegrationConstants
+import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.feature.clientapi.models.OdkConstants
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppMatchResult
 import javax.inject.Inject
@@ -52,11 +51,11 @@ internal class OdkResponseMapper @Inject constructor() {
 
     private fun Bundle.addFlowCompletedCheckBasedOnAction(action: ActionRequestIdentifier, flowCompletedCheck: Boolean) = apply {
         when (action.actionName) {
-            IntegrationConstants.ACTION_ENROL -> putBoolean(OdkConstants.ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
-            IntegrationConstants.ACTION_ENROL_LAST_BIOMETRICS -> putBoolean(OdkConstants.ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
-            IntegrationConstants.ACTION_VERIFY -> putBoolean(OdkConstants.ODK_VERIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
-            IntegrationConstants.ACTION_IDENTIFY -> putBoolean(OdkConstants.ODK_IDENTIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
-            IntegrationConstants.ACTION_CONFIRM_IDENTITY -> putBoolean(OdkConstants.ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            ActionConstants.ACTION_ENROL -> putBoolean(OdkConstants.ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            ActionConstants.ACTION_ENROL_LAST_BIOMETRICS -> putBoolean(OdkConstants.ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            ActionConstants.ACTION_VERIFY -> putBoolean(OdkConstants.ODK_VERIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            ActionConstants.ACTION_IDENTIFY -> putBoolean(OdkConstants.ODK_IDENTIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
+            ActionConstants.ACTION_CONFIRM_IDENTITY -> putBoolean(OdkConstants.ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE, flowCompletedCheck)
         }
     }
 

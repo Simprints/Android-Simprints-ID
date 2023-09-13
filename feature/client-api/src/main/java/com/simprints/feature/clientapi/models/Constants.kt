@@ -1,14 +1,5 @@
 package com.simprints.feature.clientapi.models
 
-internal object IntegrationConstants {
-
-    const val ACTION_ENROL = "REGISTER"
-    const val ACTION_IDENTIFY = "IDENTIFY"
-    const val ACTION_VERIFY = "VERIFY"
-    const val ACTION_CONFIRM_IDENTITY = "CONFIRM_IDENTITY"
-    const val ACTION_ENROL_LAST_BIOMETRICS = "REGISTER_LAST_BIOMETRICS"
-}
-
 internal object OdkConstants {
 
     const val PACKAGE_NAME = "com.simprints.simodkadapter"
@@ -75,5 +66,4 @@ internal object CommCareConstants {
 internal object LibSimprintsConstants {
 
     const val PACKAGE_NAME = "com.simprints.id"
-    const val RESULT_CODE_OVERRIDE = "result_code_override"
 }
