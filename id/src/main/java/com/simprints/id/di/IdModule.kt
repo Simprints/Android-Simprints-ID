@@ -8,10 +8,6 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
-import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
-import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.orchestrator.*
@@ -105,13 +101,7 @@ abstract class IdAppModule {
 abstract class IdOrchestratorModule {
 
     @Binds
-    abstract fun provideFaceRequestFactory(impl: FaceRequestFactoryImpl): FaceRequestFactory
-
-    @Binds
     abstract fun provideFaceStepProcessor(impl: FaceStepProcessorImpl): FaceStepProcessor
-
-    @Binds
-    abstract fun provideFingerprintRequestFactory(impl: FingerprintRequestFactoryImpl): FingerprintRequestFactory
 
     @Binds
     abstract fun provideFingerprintStepProcessor(impl: FingerprintStepProcessorImpl): FingerprintStepProcessor
