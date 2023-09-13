@@ -37,14 +37,37 @@ internal class ScannerOtaOperationsWrapperTest {
     }
 
     @Test(expected = OtaFailedException::class)
-    fun `should throw OtaFailedException if performOtaSteps throws `(): Unit = runTest {
+    fun `should throw OtaFailedException if cypress performOtaSteps throws `(): Unit = runTest {
         every { cypressOtaHelper.performOtaSteps(any(), any(), any()) } throws OtaFailedException()
         scannerWrapper.performCypressOta("")
     }
     @Test
-    fun `should not throw OtaFailedException if performOtaSteps does not throw `(): Unit = runTest {
+    fun `should not throw OtaFailedException if cypress performOtaSteps does not throw `(): Unit = runTest {
+        every { cypressOtaHelper.performOtaSteps(any(), any(), any()) } returns mockk()
+        scannerWrapper.performCypressOta("")
+    }
+
+
+    @Test(expected = OtaFailedException::class)
+    fun `should throw OtaFailedException if stm performOtaSteps throws `(): Unit = runTest {
+        every { stmOtaHelper.performOtaSteps(any(), any(), any()) } throws OtaFailedException()
+        scannerWrapper.performStmOta("")
+    }
+    @Test
+    fun `should not throw OtaFailedException if stm performOtaSteps does not throw `(): Unit = runTest {
         every { stmOtaHelper.performOtaSteps(any(), any(), any()) } returns mockk()
         scannerWrapper.performStmOta("")
+    }
+
+    @Test(expected = OtaFailedException::class)
+    fun `should throw OtaFailedException if un20 performOtaSteps throws `(): Unit = runTest {
+        every { un20OtaHelper.performOtaSteps(any(), any(), any()) } throws OtaFailedException()
+        scannerWrapper.performUn20Ota("")
+    }
+    @Test
+    fun `should not throw OtaFailedException if un20 performOtaSteps does not throw `(): Unit = runTest {
+        every { un20OtaHelper.performOtaSteps(any(), any(), any()) } returns mockk()
+        scannerWrapper.performUn20Ota("")
     }
 
 }
