@@ -95,6 +95,7 @@ definitions:
                     - ./gradlew infra:project-security-store:jacocoTestReport
                     - ./gradlew infra:realm:jacocoTestReport
                     - ./gradlew infra:recent-user-activity:jacocoTestReport
+                    - ./gradlew infra:orchestrator-data:jacocoTestReport
                 artifacts:
                     - infra/config/build/reports/**
                     - infra/events/build/reports/**
@@ -104,6 +105,7 @@ definitions:
                     - infra/project-security-store/build/reports/**
                     - infra/realm/build/reports/**
                     - infra/recent-user-activity/build/reports/**
+                    - infra/orchestrator-data/build/reports/**
 
         ######################################################################
         # Run the feature unit tests with coverage and upload report to
@@ -120,6 +122,7 @@ definitions:
                     - source ci/pipeline/setup
                     - ./gradlew feature:orchestrator:jacocoTestReport
                     - ./gradlew feature:client-api:jacocoTestReport
+                    - ./gradlew feature:login-check:jacocoTestReport
                     - ./gradlew feature:alert:jacocoTestReport
                     - ./gradlew feature:exit-form:jacocoTestReport
                     - ./gradlew feature:consent:jacocoTestReport
@@ -131,6 +134,7 @@ definitions:
                 artifacts:
                     - feature/orchestrator/build/reports/**
                     - feature/client-api/build/reports/**
+                    - feature/login-check/build/reports/**
                     - feature/alert/build/reports/**
                     - feature/exit-form/build/reports/**
                     - feature/consent/build/reports/**

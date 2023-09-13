@@ -1,12 +1,12 @@
 package com.simprints.feature.clientapi.mappers.request.requestFactories
 
-import com.simprints.feature.clientapi.models.ActionRequest
 import com.simprints.feature.clientapi.mappers.request.builders.VerifyRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.validators.VerifyValidator
-import com.simprints.feature.clientapi.models.ActionRequestIdentifier
-import com.simprints.feature.clientapi.models.IntegrationConstants
+import com.simprints.infra.orchestration.data.ActionConstants
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import io.mockk.every
 import io.mockk.mockk
 
@@ -14,7 +14,7 @@ internal object VerifyActionFactory : RequestActionFactory() {
 
     override fun getIdentifier() = ActionRequestIdentifier(
         packageName = MOCK_PACKAGE,
-        actionName = IntegrationConstants.ACTION_VERIFY,
+        actionName = ActionConstants.ACTION_VERIFY,
     )
 
     override fun getValidSimprintsRequest() = ActionRequest.VerifyActionRequest(
