@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.domain.TokenizationAction
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -35,15 +35,14 @@ internal class ProjectDetailsViewModel @Inject constructor(
             val projectId = authStore.signedInProjectId
             val cachedProject = configManager.getProject(projectId)
             val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
-            val decryptedUserId = tokenizationManager.tryTokenize(
-                value = recentUserActivity.lastUserUsed,
+            val decryptedUserId = tokenizationManager.decrypt(
+                encrypted = recentUserActivity.lastUserUsed.asTokenizedEncrypted(),
                 tokenKeyType = TokenKeyType.AttendantId,
-                action = TokenizationAction.Decrypt,
                 project = cachedProject
             )
             DashboardProjectState(
                 title = cachedProject.name,
-                lastUser = decryptedUserId,
+                lastUser = decryptedUserId.value,
                 lastScanner = recentUserActivity.lastScannerUsed,
                 isLoaded = true
             )
