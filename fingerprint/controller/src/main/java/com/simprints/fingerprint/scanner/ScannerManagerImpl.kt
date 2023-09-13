@@ -12,7 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ScannerManagerImpl @Inject constructor(
+class ScannerManagerImpl @Inject  internal constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val scannerFactory: ScannerFactory,
     private val pairingManager: ScannerPairingManager,

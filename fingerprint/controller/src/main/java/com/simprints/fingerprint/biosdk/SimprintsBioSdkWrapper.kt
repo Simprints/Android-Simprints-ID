@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.biosdk
 
-import com.simprints.fingerprint.data.domain.fingerprint.toDomain
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
@@ -10,7 +9,7 @@ import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.Fingerpri
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import javax.inject.Inject
 
 
@@ -29,12 +28,12 @@ class SimprintsBioSdkWrapper @Inject constructor(
     ) = bioSdk.match(probe, candidates, SimAfisMatcherSettings(isCrossFingerMatchingEnabled))
 
     override suspend fun acquireFingerprintTemplate(
-        captureFingerprintStrategy: Vero2Configuration.CaptureStrategy?,
+        capturingResolution: Int?,
         timeOutMs: Int,
         qualityThreshold: Int
     ): AcquireFingerprintTemplateResponse {
         val settings = FingerprintTemplateAcquisitionSettings(
-            captureFingerprintStrategy?.toDomain(),
+            capturingResolution?.let { Dpi(it.toShort()) },
             timeOutMs,
             qualityThreshold
         )

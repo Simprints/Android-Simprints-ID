@@ -4,7 +4,6 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
-import com.simprints.infra.config.domain.models.Vero2Configuration
 
 @Suppress("unused") // This class will be used once we have the NEC SDK integrated
 class NECBioSdkWrapper: BioSdkWrapper {
@@ -21,7 +20,7 @@ class NECBioSdkWrapper: BioSdkWrapper {
     }
 
     override suspend fun acquireFingerprintTemplate(
-        captureFingerprintStrategy: Vero2Configuration.CaptureStrategy?,
+        capturingResolution: Int?,
         timeOutMs: Int,
         qualityThreshold: Int
     ): AcquireFingerprintTemplateResponse {

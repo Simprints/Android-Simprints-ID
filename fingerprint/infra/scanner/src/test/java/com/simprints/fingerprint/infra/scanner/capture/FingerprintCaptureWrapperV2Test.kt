@@ -42,6 +42,37 @@ class FingerprintCaptureWrapperV2Test {
     }
 
     @Test
+    fun `should throw illegal argument exception when capture DPI is null`() = runTest {
+        assertThrows<IllegalArgumentException> {
+            scannerWrapper.acquireFingerprintTemplate(
+                null,
+                1000,
+                50
+            )
+        }
+    }
+    @Test
+    fun `should throw illegal argument exception when capture DPI is less than 500`() = runTest {
+        assertThrows<IllegalArgumentException> {
+            scannerWrapper.acquireFingerprintTemplate(
+                Dpi(499),
+                1000,
+                50
+            )
+        }
+    }
+    @Test
+    fun `should throw illegal argument exception when capture DPI is greater than 1700`() = runTest {
+        assertThrows<IllegalArgumentException> {
+            scannerWrapper.acquireFingerprintTemplate(
+                Dpi(1701),
+                1000,
+                50
+            )
+        }
+    }
+
+    @Test
     fun `should throw corresponding errors when capture fingerprint result is not OK`() = runTest {
         every { scannerV2.captureFingerprint(any()) } answers {
             (Single.just(CaptureFingerprintResult.FINGERPRINT_NOT_FOUND))
