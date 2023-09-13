@@ -12,7 +12,6 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposit
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.TokenizationAction
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.tokenization.TokenizationManager
