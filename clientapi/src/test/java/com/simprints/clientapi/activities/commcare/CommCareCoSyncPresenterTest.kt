@@ -13,15 +13,22 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrolRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_MODULE_ID
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_USER_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
@@ -34,6 +41,7 @@ import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.libsimprints.Constants
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
+import com.simprints.testtools.common.syntax.mock
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +50,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 import java.util.*
 
@@ -52,6 +61,11 @@ class CommCareCoSyncPresenterTest {
         const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
+    private val project: Project = mockk()
+    private val tokenizationManagerMock: TokenizationManager = mockk {
+        every { encrypt(MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns MOCK_USER_ID
+        every { encrypt(MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns MOCK_MODULE_ID
+    }
     private val view = mockk<CommCareActivity> {
         every { extras } returns mapOf(
             Pair(
@@ -59,8 +73,11 @@ class CommCareCoSyncPresenterTest {
                 UUID.randomUUID().toString()
             )
         )
+        coEvery { getProject() } returns project
+        every { tokenizationManager } returns tokenizationManagerMock
     }
     private val jsonHelper = JsonHelper
+
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
@@ -159,8 +176,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     "projectId",
-                    "thales",
-                    "mod1",
+                    "thales".asTokenizedRaw(),
+                    "mod1".asTokenizedRaw(),
                     Date(),
                     null,
                     emptyList(),
@@ -235,8 +252,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     projectId,
-                    "thales",
-                    "mod1",
+                    "thales".asTokenizedRaw(),
+                    "mod1".asTokenizedRaw(),
                     Date(),
                     null,
                     emptyList(),
@@ -309,8 +326,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     projectId,
-                    "thales",
-                    "mod1",
+                    "thales".asTokenizedRaw(),
+                    "mod1".asTokenizedRaw(),
                     Date(),
                     null,
                     emptyList(),

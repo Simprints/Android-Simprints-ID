@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
@@ -51,9 +51,8 @@ class EnrolmentHelperImpl @Inject constructor(
                 timeHelper.now(),
                 subject.subjectId,
                 subject.projectId,
-                // TODO [CORE-2502] review if values are encrypted
-                subject.moduleId.asTokenizedEncrypted(),
-                subject.attendantId.asTokenizedEncrypted(),
+                subject.moduleId,
+                subject.attendantId,
                 personCreationEvent.id
             )
         )
@@ -61,8 +60,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     override fun buildSubject(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResponse?,
         faceResponse: FaceCaptureResponse?,
         timeHelper: TimeHelper
@@ -99,8 +98,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFingerprintAndFace(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResponse,
         faceResponse: FaceCaptureResponse,
         timeHelper: TimeHelper
@@ -119,8 +118,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFingerprint(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResponse,
         timeHelper: TimeHelper
     ): Subject {
@@ -137,8 +136,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFace(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         faceResponse: FaceCaptureResponse,
         timeHelper: TimeHelper
     ): Subject {

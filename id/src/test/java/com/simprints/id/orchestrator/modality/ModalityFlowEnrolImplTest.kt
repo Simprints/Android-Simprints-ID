@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -151,14 +152,16 @@ class ModalityFlowEnrolImplTest {
         coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
         coVerify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
-        assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(listOf(
-            SETUP_ACTIVITY_NAME,
-            FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
-            CONSENT_ACTIVITY_NAME,
-            FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
-        ))
+        assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(
+            listOf(
+                SETUP_ACTIVITY_NAME,
+                FACE_ACTIVITY_NAME,
+                FINGERPRINT_ACTIVITY_NAME,
+                CONSENT_ACTIVITY_NAME,
+                FACE_ACTIVITY_NAME,
+                FINGERPRINT_ACTIVITY_NAME,
+            )
+        )
     }
 
     @Test
@@ -169,14 +172,16 @@ class ModalityFlowEnrolImplTest {
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
         coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
 
-        assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(listOf(
-            SETUP_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
-            FACE_ACTIVITY_NAME,
-            CONSENT_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
-            FACE_ACTIVITY_NAME,
-        ))
+        assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(
+            listOf(
+                SETUP_ACTIVITY_NAME,
+                FINGERPRINT_ACTIVITY_NAME,
+                FACE_ACTIVITY_NAME,
+                CONSENT_ACTIVITY_NAME,
+                FINGERPRINT_ACTIVITY_NAME,
+                FACE_ACTIVITY_NAME,
+            )
+        )
     }
 
     @Test
@@ -188,13 +193,15 @@ class ModalityFlowEnrolImplTest {
         coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
         coVerify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
-        assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(listOf(
-            SETUP_ACTIVITY_NAME,
-            FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
-            FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
-        ))
+        assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(
+            listOf(
+                SETUP_ACTIVITY_NAME,
+                FACE_ACTIVITY_NAME,
+                FINGERPRINT_ACTIVITY_NAME,
+                FACE_ACTIVITY_NAME,
+                FINGERPRINT_ACTIVITY_NAME,
+            )
+        )
     }
 
     @Test
@@ -205,13 +212,15 @@ class ModalityFlowEnrolImplTest {
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
         coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
 
-        assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(listOf(
-            SETUP_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
-            FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
-            FACE_ACTIVITY_NAME,
-        ))
+        assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(
+            listOf(
+                SETUP_ACTIVITY_NAME,
+                FINGERPRINT_ACTIVITY_NAME,
+                FACE_ACTIVITY_NAME,
+                FINGERPRINT_ACTIVITY_NAME,
+                FACE_ACTIVITY_NAME,
+            )
+        )
     }
 
     @Test
@@ -263,7 +272,12 @@ class ModalityFlowEnrolImplTest {
     }
 
     private fun buildAppEnrolRequest() =
-        AppEnrolRequest(PROJECT_ID, "userId", "moduleId", "metadata")
+        AppEnrolRequest(
+            projectId = PROJECT_ID,
+            userId = "userId".asTokenizedRaw(),
+            moduleId = "moduleId".asTokenizedRaw(),
+            metadata = "metadata"
+        )
 
     private fun buildModalityFlowEnrol(
         collectConsent: Boolean,
