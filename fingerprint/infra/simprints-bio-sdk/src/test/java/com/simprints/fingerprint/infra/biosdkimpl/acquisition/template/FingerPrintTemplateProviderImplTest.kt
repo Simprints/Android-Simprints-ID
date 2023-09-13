@@ -13,7 +13,7 @@ import org.junit.Test
 
 class FingerPrintTemplateProviderImplTest {
 
-    private lateinit var fingerPrintTemplateProviderImpl: FingerPrintTemplateProviderImpl
+    private lateinit var fingerprintTemplateProviderImpl: FingerprintTemplateProviderImpl
 
     @MockK
     private lateinit var fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
@@ -21,14 +21,14 @@ class FingerPrintTemplateProviderImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        fingerPrintTemplateProviderImpl =
-            FingerPrintTemplateProviderImpl(fingerprintCaptureWrapperFactory)
+        fingerprintTemplateProviderImpl =
+            FingerprintTemplateProviderImpl(fingerprintCaptureWrapperFactory)
 
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun acquireFingerprintTemplateThrowsIfSettingsIsNull() = runTest {
-        val response = fingerPrintTemplateProviderImpl.acquireFingerprintTemplate(null)
+        val response = fingerprintTemplateProviderImpl.acquireFingerprintTemplate(null)
     }
 
     @Test
@@ -52,7 +52,7 @@ class FingerPrintTemplateProviderImplTest {
             )
         } returns templateResponse
         //When
-        val response = fingerPrintTemplateProviderImpl.acquireFingerprintTemplate(settings)
+        val response = fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
         //Then
         Truth.assertThat(response.template).isEqualTo(templateResponse.template)
         Truth.assertThat(response.templateMetadata?.templateFormat)
