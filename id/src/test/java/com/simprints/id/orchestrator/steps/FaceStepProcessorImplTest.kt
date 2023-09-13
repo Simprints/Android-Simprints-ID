@@ -3,8 +3,6 @@ package com.simprints.id.orchestrator.steps
 import android.app.Activity
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
-import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
@@ -35,7 +33,6 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
         }
     }
 
-    private val faceRequestFactory: FaceRequestFactory = FaceRequestFactoryImpl()
     private lateinit var faceStepProcess: FaceStepProcessor
 
     private lateinit var iFaceResponseMock: IFaceResponse
@@ -48,7 +45,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Before
     fun setUp() {
-        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory, configManager)
+        faceStepProcess = FaceStepProcessorImpl(configManager)
         mockFromModuleApiToDomainExt()
     }
 

@@ -5,9 +5,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FaceConfigurationRequest(
-    override val type: FaceRequestType = FaceRequestType.CONFIGURATION,
     val projectId: String,
-    val deviceId: String
+    val deviceId: String,
+    override val type: FaceRequestType = FaceRequestType.CONFIGURATION
 ) : FaceRequest
 
 fun FaceConfigurationRequest.fromDomainToModuleApi(): IFaceConfigurationRequest =
