@@ -20,10 +20,11 @@ import com.simprints.fingerprint.controllers.core.eventData.model.Vero2InfoSnaps
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.exceptions.safe.*
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager

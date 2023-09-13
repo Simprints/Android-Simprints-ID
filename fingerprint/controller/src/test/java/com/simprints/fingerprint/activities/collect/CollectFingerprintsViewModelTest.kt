@@ -17,18 +17,19 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.testtools.assertEventReceived
@@ -94,6 +95,7 @@ class CollectFingerprintsViewModelTest {
         }
     }
     private lateinit var scannerManager: ScannerManager
+    private lateinit var bioSdkWrapper: BioSdkWrapper
 
     private val imageManager: FingerprintImageManager = mockk(relaxed = true)
 
@@ -107,7 +109,7 @@ class CollectFingerprintsViewModelTest {
             every { scanner } returns this@CollectFingerprintsViewModelTest.scanner
             every { isScannerAvailable } returns true
         }
-
+        bioSdkWrapper = mockk()
         vm = CollectFingerprintsViewModel(
             scannerManager,
             configManager,
@@ -117,6 +119,7 @@ class CollectFingerprintsViewModelTest {
             FingerPriorityDeterminer(),
             StartingStateDeterminer(),
             EncodingUtilsImplForTests,
+            bioSdkWrapper,
             TestScope(),
         )
     }
@@ -247,9 +250,7 @@ class CollectFingerprintsViewModelTest {
 
         assertThat(vm.state.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
-                ScanResult(
-                    GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60
-                )
+                ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, IMAGE, 60)
             )
         )
         vm.vibrate.assertEventReceived()
@@ -320,9 +321,7 @@ class CollectFingerprintsViewModelTest {
     fun scanPressed_scannerDisconnectedDuringScan_updatesStateCorrectlyAndReconnects() {
         mockScannerSetUiIdle()
         coEvery {
-            scanner.captureFingerprint(
-                any(), any(), any()
-            )
+            bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any())
         } throws ScannerDisconnectedException()
         withImageTransfer()
 
@@ -389,7 +388,7 @@ class CollectFingerprintsViewModelTest {
         assertThat(vm.state.isShowingSplashScreen).isFalse()
         assertThat(vm.state.currentFingerIndex).isEqualTo(1)
 
-        coVerify(exactly = 1) { scanner.acquireImage(any()) }
+        coVerify(exactly = 1) { bioSdkWrapper.acquireFingerprintImage() }
         coVerify(exactly = 4) { sessionEventsManager.addEvent(any()) }
     }
 
@@ -1208,7 +1207,7 @@ class CollectFingerprintsViewModelTest {
 
     @ExperimentalTime
     private fun setupCaptureFingerprintResponses(vararg mockResponses: MockCaptureFingerprintResponse) {
-        val initialMock = coEvery { scanner.captureFingerprint(any(), any(), any()) }
+        val initialMock = coEvery { bioSdkWrapper.acquireFingerprintTemplate(any(), any(), any()) }
         val fingerprintResponses = mockResponses.map { it.toCaptureFingerprintResponse() }
 
         // capture the first response in the list
@@ -1216,7 +1215,7 @@ class CollectFingerprintsViewModelTest {
         val subsequentMock = when {
             mockResponses[0] == NEVER_RETURNS -> initialMock.coAnswers { neverReturnResponse() }
             firstResponse is Throwable -> initialMock.throws(firstResponse)
-            else -> initialMock.returns(firstResponse as CaptureFingerprintResponse)
+            else -> initialMock.returns(firstResponse as AcquireFingerprintTemplateResponse)
         }
 
         // capture subsequent responses except the first.
@@ -1226,7 +1225,7 @@ class CollectFingerprintsViewModelTest {
                 when {
                     mockResponses[index] == NEVER_RETURNS -> subsequentMock.coAndThen  { neverReturnResponse() }
                     response is Throwable -> subsequentMock.andThenThrows(response)
-                    else -> subsequentMock.andThen(response as CaptureFingerprintResponse)
+                    else -> subsequentMock.andThen(response as AcquireFingerprintTemplateResponse)
                 }
             }
         }
@@ -1234,9 +1233,9 @@ class CollectFingerprintsViewModelTest {
 
     @ExperimentalTime
     private fun acquireImageResponses(response: MockAcquireImageResult) {
-        val mock = coEvery { scanner.acquireImage(any()) }
+        val mock = coEvery { bioSdkWrapper.acquireFingerprintImage() }
         when (response) {
-            OK -> mock.returns(AcquireImageResponse(IMAGE))
+            OK -> mock.returns(AcquireFingerprintImageResponse(IMAGE))
             MockAcquireImageResult.DISCONNECTED -> mock.throws(ScannerDisconnectedException())
             MockAcquireImageResult.NEVER_RETURNS -> mock.coAnswers { neverReturnResponse() }
         }
@@ -1260,12 +1259,12 @@ class CollectFingerprintsViewModelTest {
 
 
         fun toCaptureFingerprintResponse(): Any = when (this) {
-            GOOD_SCAN -> CaptureFingerprintResponse(TEMPLATE, TEMPLATE_FORMAT, GOOD_QUALITY)
-            DIFFERENT_GOOD_SCAN -> CaptureFingerprintResponse(
+            GOOD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, GOOD_QUALITY)
+            DIFFERENT_GOOD_SCAN -> AcquireFingerprintTemplateResponse(
                 DIFFERENT_TEMPLATE, TEMPLATE_FORMAT, DIFFERENT_GOOD_QUALITY
             )
 
-            BAD_SCAN -> CaptureFingerprintResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
+            BAD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
             NO_FINGER_DETECTED -> NoFingerDetectedException()
             DISCONNECTED -> ScannerDisconnectedException()
             UNKNOWN_ERROR -> Error("Oops!")

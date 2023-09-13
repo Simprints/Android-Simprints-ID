@@ -3,6 +3,7 @@ package com.simprints.fingerprint.scanner
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
+import com.simprints.fingerprint.scanner.wrapper.ScannerOtaOperationsWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 
 /**
@@ -13,6 +14,7 @@ import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 interface ScannerManager {
 
     val scanner: ScannerWrapper
+    val otaOperationsWrapper: ScannerOtaOperationsWrapper
     var currentScannerId: String?
     var currentMacAddress: String?
     val isScannerAvailable: Boolean

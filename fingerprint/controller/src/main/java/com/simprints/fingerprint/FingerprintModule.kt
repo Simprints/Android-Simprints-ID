@@ -3,6 +3,8 @@ package com.simprints.fingerprint
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.nfc.NfcAdapter
+import com.simprints.fingerprint.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.biosdk.SimprintsBioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManagerImpl
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -19,8 +21,6 @@ import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBlue
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.factory.ScannerFactory
-import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.tools.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.tools.nfc.android.AndroidNfcAdapter
 import dagger.Binds
@@ -46,9 +46,6 @@ abstract class FingerprintModule {
     abstract fun provideScannerManager(impl: ScannerManagerImpl): ScannerManager
 
     @Binds
-    abstract fun provideScannerFactory(impl: ScannerFactoryImpl): ScannerFactory
-
-    @Binds
     abstract fun provideFingerprintImageManager(impl: FingerprintImageManagerImpl): FingerprintImageManager
 
     @Binds
@@ -62,6 +59,10 @@ abstract class FingerprintModule {
 
     @Binds
     abstract fun provideFingerprintApiClientFactory(impl: FingerprintApiClientFactoryImpl): FingerprintApiClientFactory
+
+    @Binds
+    abstract fun provideBioSdkWrapper(impl: SimprintsBioSdkWrapper): BioSdkWrapper
+
 }
 
 @Module

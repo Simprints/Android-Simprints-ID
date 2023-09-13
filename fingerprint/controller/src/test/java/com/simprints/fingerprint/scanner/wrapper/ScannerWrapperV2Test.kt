@@ -2,27 +2,19 @@ package com.simprints.fingerprint.scanner.wrapper
 
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.data.domain.fingerprint.CaptureFingerprintStrategy
-import com.simprints.fingerprint.data.domain.images.SaveFingerprintImagesStrategy
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.ImageData
-import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.TemplateData
-import com.simprints.fingerprint.infra.scanner.v2.exceptions.ota.OtaFailedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnavailableVero2FeatureException
+import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoReaderHelper
+import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
 import com.simprints.fingerprint.scanner.controllers.v2.*
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.BatteryInfo
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.*
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnavailableVero2FeatureException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
-import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -42,16 +34,22 @@ class ScannerWrapperV2Test {
 
     @MockK
     lateinit var scannerV2: Scanner
+
     @MockK
     lateinit var scannerUiHelper: ScannerUiHelper
+
     @MockK
     lateinit var scannerInitialSetupHelper: ScannerInitialSetupHelper
+
     @MockK
     lateinit var connectionHelper: ConnectionHelper
+
     @MockK
     lateinit var cypressOtaHelper: CypressOtaHelper
+
     @MockK
     lateinit var stmOtaHelper: StmOtaHelper
+
     @MockK
     lateinit var un20OtaHelper: Un20OtaHelper
 
@@ -68,9 +66,6 @@ class ScannerWrapperV2Test {
                 "Mock mac address",
                 scannerInitialSetupHelper,
                 connectionHelper,
-                cypressOtaHelper,
-                stmOtaHelper,
-                un20OtaHelper,
                 UnconfinedTestDispatcher(),
             ),
             recordPrivateCalls = true
@@ -169,209 +164,6 @@ class ScannerWrapperV2Test {
         assertThat(actualVersion).isEqualTo(expectedVersion)
     }
 
-    @Test
-    fun `should return actual image data in ImageResponse when appropriate image-save strategy is provided and image data is returned from scanner`() =
-        runTest {
-            val expectedImageResponse = AcquireImageResponse(imageBytes = byteArrayOf())
-            every { scannerV2.acquireImage(any()) } returns Maybe.just(
-                ImageData(expectedImageResponse.imageBytes, 128)
-            )
-
-            val actualImageResponse = scannerWrapper.acquireImage(
-                SaveFingerprintImagesStrategy.WSQ_15
-            )
-
-            assertThat(actualImageResponse.imageBytes).isEqualTo(expectedImageResponse.imageBytes)
-        }
-
-    @Test
-    fun `should throw NoFingerDetectedException when trying to acquire fingerprint image and scanner returns a null ImageData`() =
-        runTest {
-            every { scannerV2.acquireImage(any()) } returns Maybe.empty()
-
-            assertThrows<NoFingerDetectedException> {
-                scannerWrapper.acquireImage(
-                    SaveFingerprintImagesStrategy.WSQ_15
-                )
-            }
-        }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun `should throw UnexpectedScannerException when trying to acquire fingerprint image and save fingerprint strategy is NEVER`() =
-        runTest {
-            scannerWrapper.acquireImage(
-                SaveFingerprintImagesStrategy.NEVER
-            )
-
-        }
-
-    @Test(expected = UnexpectedScannerException::class)
-    fun `should throw UnexpectedScannerException when DPI_UNSUPPORTED error is returned during capture`() =
-        runTest {
-            every { scannerV2.captureFingerprint(any()) } returns Single.just(
-                CaptureFingerprintResult.DPI_UNSUPPORTED
-            )
-            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-            every { scannerV2.getImageQualityScore() } returns Maybe.empty()
-            // When
-            scannerWrapper.captureFingerprint(
-                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                timeOutMs = 30000,
-                qualityThreshold = 7
-            )
-        }
-
-
-    @Test
-    fun `should return correct capture response when capture result and image quality are OK`() =
-        runTest {
-            val qualityThreshold = 50
-            val expectedCaptureResponse = CaptureFingerprintResponse(
-                template = byteArrayOf(),
-                "ISO_19794_2",
-                imageQualityScore = qualityThreshold
-            )
-            every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold)
-            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-            every { scannerV2.captureFingerprint(any()) } answers {
-                (Single.just(CaptureFingerprintResult.OK))
-            }
-            every { scannerV2.acquireTemplate(any()) } returns Maybe.just(
-                TemplateData(
-                    expectedCaptureResponse.template
-                )
-            )
-
-
-            val actualResponse = scannerWrapper.captureFingerprint(
-                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                1000,
-                qualityThreshold
-            )
-
-            assertThat(expectedCaptureResponse.template).isEqualTo(actualResponse.template)
-            assertThat(expectedCaptureResponse.imageQualityScore).isEqualTo(actualResponse.imageQualityScore)
-        }
-
-    @Test
-    fun `should throw NoFingerDetectedException when no fingerprint template is returned after fingerprint is captured`() =
-        runTest {
-            val qualityThreshold = 50
-            every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold)
-            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-            every { scannerV2.captureFingerprint(any()) } answers {
-                (Single.just(CaptureFingerprintResult.OK))
-            }
-            every { scannerV2.acquireTemplate(any()) } returns Maybe.empty()
-
-
-            assertThrows<NoFingerDetectedException> {
-                scannerWrapper.captureFingerprint(
-                    CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                    1000,
-                    qualityThreshold
-                )
-            }
-        }
-
-    @Test
-    fun `should trigger bad_scan LED when captured fingerprint's image quality score is less than specified image quality_threshold`() =
-        runTest {
-            val qualityThreshold = 50
-            every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold - 10)
-            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-            every { scannerV2.captureFingerprint(any()) } answers {
-                (Single.just(CaptureFingerprintResult.OK))
-            }
-            every { scannerV2.acquireTemplate(any()) } returns Maybe.just(TemplateData(byteArrayOf()))
-
-            scannerWrapper.captureFingerprint(
-                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                1000,
-                qualityThreshold
-            )
-
-            verify(exactly = 1) { scannerUiHelper.badScanLedState() }
-        }
-
-    @Test
-    fun `should trigger good_scan LED when captured fingerprint's image quality score is greater or equal to specified image quality_threshold`() =
-        runTest {
-            val qualityThreshold = 50
-            every { scannerV2.getImageQualityScore() } returns Maybe.just(qualityThreshold + 10)
-            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-            every { scannerV2.captureFingerprint(any()) } answers {
-                (Single.just(CaptureFingerprintResult.OK))
-            }
-            every { scannerV2.acquireTemplate(any()) } returns Maybe.just(TemplateData(byteArrayOf()))
-
-            scannerWrapper.captureFingerprint(
-                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                1000,
-                qualityThreshold
-            )
-
-            verify(exactly = 1) { scannerUiHelper.goodScanLedState() }
-        }
-
-    @Test
-    fun `should throw NoFingerDetectedException when captured fingerprint's image quality score is less than no_image quality_threshold`() =
-        runTest {
-            every { scannerV2.getImageQualityScore() } returns Maybe.empty()
-            every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-            every { scannerV2.captureFingerprint(any()) } answers {
-                (Single.just(CaptureFingerprintResult.OK))
-            }
-
-            assertThrows<NoFingerDetectedException> {
-                scannerWrapper.captureFingerprint(
-                    CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                    1000,
-                    50
-                )
-            }
-        }
-
-    @Test
-    fun `should throw corresponding errors when capture fingerprint result is not OK`() = runTest {
-        every { scannerV2.captureFingerprint(any()) } answers {
-            (Single.just(CaptureFingerprintResult.FINGERPRINT_NOT_FOUND))
-        } andThenAnswer {
-            Single.just(CaptureFingerprintResult.DPI_UNSUPPORTED)
-        } andThenAnswer {
-            Single.just(CaptureFingerprintResult.UNKNOWN_ERROR)
-        }
-
-        every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
-        every { scannerWrapper["isLiveFeedbackAvailable"]() } returns true
-
-
-        // first throws NoFingerDetectedException
-        assertThrows<NoFingerDetectedException> {
-            scannerWrapper.captureFingerprint(
-                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                1000,
-                50
-            )
-        }
-        // and then throws UnexpectedScannerException
-        assertThrows<UnexpectedScannerException> {
-            scannerWrapper.captureFingerprint(
-                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                1000,
-                50
-            )
-        }
-        // and then throws UnknownScannerIssueException
-        assertThrows<UnknownScannerIssueException> {
-            scannerWrapper.captureFingerprint(
-                CaptureFingerprintStrategy.SECUGEN_ISO_1300_DPI,
-                1000,
-                50
-            )
-        }
-    }
-
 
     @Test
     fun `should throw UnavailableVero2FeatureException when startLiveFeedback is called and live feedback is not available`() =
@@ -417,10 +209,11 @@ class ScannerWrapperV2Test {
     }
 
     @Test(expected = ScannerDisconnectedException::class)
-    fun `should throw ScannerDisconnectedException if getUn20Status throws NotConnectedException`() = runTest {
-        every { scannerV2.getUn20Status() } throws NotConnectedException("")
-        scannerWrapper.sensorWakeUp()
-    }
+    fun `should throw ScannerDisconnectedException if getUn20Status throws NotConnectedException`() =
+        runTest {
+            every { scannerV2.getUn20Status() } throws NotConnectedException("")
+            scannerWrapper.sensorWakeUp()
+        }
 
 
     @Test
@@ -448,16 +241,16 @@ class ScannerWrapperV2Test {
             every { scannerV2.setSmileLedState(any()) } returns Completable.complete()
             every { scannerV2.getImageQualityPreview() } returns Maybe.just(50)
 
-        // get the job of the continuous feedback
-        val job = launch {
-            scannerWrapper.startLiveFeedback()
+            // get the job of the continuous feedback
+            val job = launch {
+                scannerWrapper.startLiveFeedback()
+            }
+
+            advanceTimeBy(500)
+
+            // force-stop the continuous live feedback
+            job.cancel()
         }
-
-        advanceTimeBy(500)
-
-        // force-stop the continuous live feedback
-        job.cancel()
-    }
 
     @Test
     fun `should complete execution successfully when startLiveFeedback is called and scanner disconnects`() =
@@ -502,9 +295,5 @@ class ScannerWrapperV2Test {
         assertThat(scannerWrapper.isImageTransferSupported()).isTrue()
     }
 
-    @Test (expected = OtaFailedException::class    )
-    fun `should throw OtaFailedException if performOtaSteps throws `()= runTest {
-        every { cypressOtaHelper.performOtaSteps(any(),any(),any()) } throws OtaFailedException()
-        scannerWrapper.performCypressOta("")
-    }
+
 }

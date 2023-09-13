@@ -18,12 +18,6 @@ fun byteArrayOf(vararg elements: Any): ByteArray {
     return bytes.toByteArray()
 }
 
-fun concatenateByteArrays(vararg byteArrays: ByteArray): ByteArray =
-    concatenateByteArrays(byteArrays.toList())
-
-fun concatenateByteArrays(byteArrays: Iterable<ByteArray>): ByteArray =
-    byteArrays.reduce { acc: ByteArray, bytes: ByteArray -> acc + bytes }
-
 /**
  * @throws IndexOutOfBoundsException if position includes a range outside of the buffer
  * @throws java.nio.BufferUnderflowException if position includes a range that is too short
