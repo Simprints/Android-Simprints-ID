@@ -19,7 +19,7 @@ internal class ModuleChipHelper(
     }
 
     fun removeModuleChip(parent: ChipGroup, module: Module) {
-        parent.removeView(parent.findViewWithTag<Chip>(module.name))
+        parent.removeView(parent.findViewWithTag<Chip>(module.name.value))
     }
 
     fun findSelectedModuleNames(parent: ChipGroup): List<String> {
@@ -32,7 +32,7 @@ internal class ModuleChipHelper(
         return Chip(context).apply {
             setChipDrawable(chipDrawable)
             text = module.name.value
-            tag = module.name
+            tag = module.name.value
             isCheckable = false
             ellipsize = TextUtils.TruncateAt.END
             setOnCloseIconClickListener {
