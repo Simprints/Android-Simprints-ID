@@ -22,7 +22,7 @@ internal fun RecentUserActivity.toProto(): ProtoRecentUserActivity {
 
 internal fun ProtoRecentUserActivity.toDomain(): RecentUserActivity {
     val lastUserUsed =
-        if (isUserIdTokenized) lastScannerUsed.asTokenizedEncrypted() else lastScannerUsed.asTokenizedRaw()
+        if (isUserIdTokenized) lastUserUsed.asTokenizedEncrypted() else lastUserUsed.asTokenizedRaw()
     return RecentUserActivity(
         lastScannerVersion = lastScannerVersion,
         lastScannerUsed = lastScannerUsed,

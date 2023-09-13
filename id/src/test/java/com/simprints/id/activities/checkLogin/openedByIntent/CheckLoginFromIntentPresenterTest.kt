@@ -1,6 +1,7 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.alert.AlertType
@@ -155,7 +156,7 @@ class CheckLoginFromIntentPresenterTest {
             presenter.onViewCreated(false)
 
             val updatedActivity =
-                updateConfigFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
+                updateConfigFn.captured(RecentUserActivity("", "", "".asTokenizedEncrypted(), 0, 0, 0, 0))
             assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID.value)
         }
     }
