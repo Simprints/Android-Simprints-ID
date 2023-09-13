@@ -2,6 +2,7 @@ package com.simprints.infra.enrolment.records.local
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
@@ -69,7 +70,7 @@ class SubjectLocalDataSourceImplTest {
             every {
                 equalTo(eq(SubjectLocalDataSourceImpl.USER_ID_FIELD), capture(captureUserId))
             } answers {
-                if (localSubjects.none { it.attendantId == captureUserId.captured }) {
+                if (localSubjects.none { it.attendantId.value == captureUserId.captured }) {
                     null
                 } else this@mockk
             }
@@ -139,7 +140,7 @@ class SubjectLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people =
-            subjectLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId))
+            subjectLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId.value))
                 .toList()
         listOf(fakePerson).zip(people)
             .forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
@@ -237,8 +238,8 @@ class SubjectLocalDataSourceImplTest {
         Subject(
             subjectId = patientId,
             projectId = projectId,
-            attendantId = userId,
-            moduleId = moduleId,
+            attendantId = userId.asTokenizedRaw(),
+            moduleId = moduleId.asTokenizedRaw(),
             faceSamples = faceSamples.toList()
         )
 }

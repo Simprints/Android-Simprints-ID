@@ -13,8 +13,14 @@
     "endedAt": 0,
     "subjectId": "9aa64aff-46b5-4ab4-90b5-82c0e6d9725f",
     "projectId": "TEST6Oai41ps1pBNrzBL",
-    "moduleId": "module1",
-    "attendantId": "user1",
+    "moduleId": {
+      "className": "Raw",
+      "value": "module1"
+    },
+    "attendantId": {
+      "className": "Raw",
+      "value": "user1"
+    },
     "personCreationEventId": "94828488-47ce-4c76-8ace-33d69b2a6d75"
   }
 }

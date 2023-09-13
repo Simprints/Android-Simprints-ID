@@ -19,8 +19,8 @@ internal data class ApiEnrolmentRecord(
 internal fun Subject.toEnrolmentRecord(encoder: EncodingUtils): ApiEnrolmentRecord =
     ApiEnrolmentRecord(
         subjectId,
-        moduleId,
-        attendantId,
+        moduleId.value,
+        attendantId.value,
         buildBiometricReferences(fingerprintSamples, faceSamples, encoder)
     )
 

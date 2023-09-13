@@ -3,6 +3,7 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
@@ -46,10 +47,10 @@ class ModuleSelectionViewModelTest {
         MockKAnnotations.init(this)
 
         coEvery { repository.getModules() } returns listOf(
-            Module("a", false),
-            Module("b", false),
-            Module("c", true),
-            Module("d", false)
+            Module("a".asTokenizedRaw(), false),
+            Module("b".asTokenizedRaw(), false),
+            Module("c".asTokenizedRaw(), true),
+            Module("d".asTokenizedRaw(), false)
         )
         coEvery { repository.getMaxNumberOfModules() } returns 2
         coEvery { configManager.getProjectConfiguration() } returns mockk {
@@ -68,10 +69,10 @@ class ModuleSelectionViewModelTest {
     fun `should initialize the live data with the correct values`() {
         assertThat(viewModel.modulesList.getOrAwaitValue()).isEqualTo(
             listOf(
-                Module("a", false),
-                Module("b", false),
-                Module("c", true),
-                Module("d", false)
+                Module("a".asTokenizedRaw(), false),
+                Module("b".asTokenizedRaw(), false),
+                Module("c".asTokenizedRaw(), true),
+                Module("d".asTokenizedRaw(), false)
             )
         )
     }
@@ -79,16 +80,16 @@ class ModuleSelectionViewModelTest {
     @Test
     fun `updateModuleSelection should throw a NoModuleSelectedException if trying to unselect the last selected module`() {
         assertThrows<NoModuleSelectedException> {
-            viewModel.updateModuleSelection(Module("c", true))
+            viewModel.updateModuleSelection(Module("c".asTokenizedRaw(), true))
         }
     }
 
     @Test
     fun `updateModuleSelection should throw a TooManyModulesSelectedException if trying to select more than the maximum number of modules`() {
-        viewModel.updateModuleSelection(Module("b", false))
+        viewModel.updateModuleSelection(Module("b".asTokenizedRaw(), false))
 
         val exception = assertThrows<TooManyModulesSelectedException> {
-            viewModel.updateModuleSelection(Module("a", false))
+            viewModel.updateModuleSelection(Module("a".asTokenizedRaw(), false))
         }
 
         assertThat(exception.maxNumberOfModules).isEqualTo(2)
@@ -97,27 +98,27 @@ class ModuleSelectionViewModelTest {
     @Test
     fun `updateModuleSelection should update the module selection correctly otherwise`() {
         val expectedModules = listOf(
-            Module("a", false),
-            Module("b", true),
-            Module("c", true),
-            Module("d", false)
+            Module("a".asTokenizedRaw(), false),
+            Module("b".asTokenizedRaw(), true),
+            Module("c".asTokenizedRaw(), true),
+            Module("d".asTokenizedRaw(), false)
         )
-        viewModel.updateModuleSelection(Module("b", false))
+        viewModel.updateModuleSelection(Module("b".asTokenizedRaw(), false))
 
         assertThat(viewModel.modulesList.getOrAwaitValue()).isEqualTo(expectedModules)
     }
 
     @Test
     fun `hasSelectionChanged should return true if the selection has changed`() {
-        viewModel.updateModuleSelection(Module("a", false))
+        viewModel.updateModuleSelection(Module("a".asTokenizedRaw(), false))
 
         assertThat(viewModel.hasSelectionChanged()).isEqualTo(true)
     }
 
     @Test
     fun `hasSelectionChanged should return false if the selection hasn't changed`() {
-        viewModel.updateModuleSelection(Module("a", false))
-        viewModel.updateModuleSelection(Module("a", true))
+        viewModel.updateModuleSelection(Module("a".asTokenizedRaw(), false))
+        viewModel.updateModuleSelection(Module("a".asTokenizedRaw(), true))
 
         assertThat(viewModel.hasSelectionChanged()).isEqualTo(false)
     }
@@ -125,12 +126,12 @@ class ModuleSelectionViewModelTest {
     @Test
     fun `saveModules should save the modules and trigger the sync`() {
         val updatedModules = listOf(
-            Module("a", true),
-            Module("b", false),
-            Module("c", true),
-            Module("d", false)
+            Module("a".asTokenizedRaw(), true),
+            Module("b".asTokenizedRaw(), false),
+            Module("c".asTokenizedRaw(), true),
+            Module("d".asTokenizedRaw(), false)
         )
-        viewModel.updateModuleSelection(Module("a", false))
+        viewModel.updateModuleSelection(Module("a".asTokenizedRaw(), false))
         viewModel.saveModules()
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }

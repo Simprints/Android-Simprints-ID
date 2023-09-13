@@ -1,42 +1,63 @@
 package com.simprints.infra.config.tokenization
 
-import com.simprints.core.tools.utils.Tokenization
-import com.simprints.infra.config.domain.TokenizationAction
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 class TokenizationManager @Inject constructor(
-    private val tokenization: Tokenization
+    private val stringTokenizer: StringTokenizer
 ) {
 
     /**
-     * Performs tokenization action on the provided [value] in safely manner. If encryption or decryption
-     * fails, then returns the initial [value].
+     * Tries to encrypt [decrypted] value in safely manner.
      *
-     * @param value string for tokenization action
+     * @param decrypted raw string value for encryption
      * @param tokenKeyType corresponding key type of the provided string
-     * @param action defines what to do with the string:
-     *  - [TokenizationAction.Encrypt] for encryption
-     *  - [TokenizationAction.Decrypt] for decryption
      * @param project current project configuration containing tokenization keys
+     *
+     * @return [TokenizableString.Tokenized] is case of successful tokenization, [TokenizableString.Raw]
+     * with the [decrypted] value otherwise
      */
-    fun tryTokenize(
-        value: String,
+    fun encrypt(
+        decrypted: TokenizableString.Raw,
         tokenKeyType: TokenKeyType,
-        action: TokenizationAction,
         project: Project
-    ): String {
-        val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return value
+    ): TokenizableString {
+        val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return decrypted
         return try {
-            when (action) {
-                TokenizationAction.Encrypt -> tokenization.encrypt(value, moduleKeyset)
-                TokenizationAction.Decrypt -> tokenization.decrypt(value, moduleKeyset)
-            }
+            stringTokenizer.encrypt(decrypted.value, moduleKeyset).asTokenizedEncrypted()
         } catch (e: Exception) {
             Simber.e(e)
-            value
+            decrypted
+        }
+    }
+
+    /**
+     * Tries to decrypt [encrypted] value in safely manner.
+     *
+     * @param encrypted raw string value for encryption
+     * @param tokenKeyType corresponding key type of the provided string
+     * @param project current project configuration containing tokenization keys
+     *
+     * @return [TokenizableString.Tokenized] is case of successful tokenization, [TokenizableString.Raw]
+     * with the [encrypted] value otherwise
+     */
+    fun decrypt(
+        encrypted: TokenizableString.Tokenized,
+        tokenKeyType: TokenKeyType,
+        project: Project
+    ): TokenizableString {
+        val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return encrypted
+        return try {
+            stringTokenizer.decrypt(encrypted.value, moduleKeyset).asTokenizedRaw()
+        } catch (e: Exception) {
+            Simber.e(e)
+            encrypted
         }
     }
 }

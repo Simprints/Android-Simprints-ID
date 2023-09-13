@@ -7,7 +7,7 @@ internal class ModuleQueryFilter {
 
     fun getFilteredList(items: List<Module>, query: String?): List<Module> {
         return if (isRelevantQuery(query) && items.isNotEmpty())
-            items.fuzzySearch(query, { it.name })
+            items.fuzzySearch(query, { it.name.value })
         else
             items
     }

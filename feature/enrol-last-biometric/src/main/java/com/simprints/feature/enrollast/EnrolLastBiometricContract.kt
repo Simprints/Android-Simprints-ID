@@ -1,5 +1,6 @@
 package com.simprints.feature.enrollast
 
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.enrollast.screen.EnrolLastBiometricFragmentArgs
 
 object EnrolLastBiometricContract {
@@ -8,8 +9,8 @@ object EnrolLastBiometricContract {
 
     fun getArgs(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         steps: List<EnrolLastBiometricStepResult>,
     ) = EnrolLastBiometricFragmentArgs(EnrolLastBiometricParams(
         projectId = projectId,

@@ -7,8 +7,8 @@ import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsVali
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
-import com.simprints.core.tools.utils.Tokenization
 import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.tokenization.TokenizationManager
 import io.mockk.every
 import io.mockk.mockk
 
@@ -33,11 +33,11 @@ object EnrolLastBiometricsFactory : RequestFactory() {
 
     override fun getBuilder(extractor: ClientRequestExtractor): EnrolLastBiometricsBuilder {
         val project = mockk<Project>()
-        val tokenization = mockk<Tokenization>()
+        val tokenizationManager = mockk<TokenizationManager>()
         return EnrolLastBiometricsBuilder(
             extractor = extractor as EnrolLastBiometricsExtractor,
             project = project,
-            tokenization = tokenization,
+            tokenizationManager = tokenizationManager,
             validator = getValidator(extractor)
         )
     }
@@ -46,8 +46,8 @@ object EnrolLastBiometricsFactory : RequestFactory() {
         val mockEnrolLastBiometricsExtractor = mockk<EnrolLastBiometricsExtractor>()
         setMockDefaultExtractor(mockEnrolLastBiometricsExtractor)
         every { mockEnrolLastBiometricsExtractor.getProjectId() } returns MOCK_PROJECT_ID
-        every { mockEnrolLastBiometricsExtractor.getUserId() } returns MOCK_USER_ID
-        every { mockEnrolLastBiometricsExtractor.getModuleId() } returns MOCK_MODULE_ID
+        every { mockEnrolLastBiometricsExtractor.getUserId() } returns MOCK_USER_ID.value
+        every { mockEnrolLastBiometricsExtractor.getModuleId() } returns MOCK_MODULE_ID.value
         every { mockEnrolLastBiometricsExtractor.getMetadata() } returns MOCK_METADATA
         every { mockEnrolLastBiometricsExtractor.getSessionId() } returns MOCK_SESSION_ID
         every { mockEnrolLastBiometricsExtractor.getUnknownExtras() } returns emptyMap()

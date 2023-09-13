@@ -30,11 +30,11 @@ class ModalityFlowEnrolLastBiometricsTest {
     @MockK
     lateinit var hotCache: HotCache
     private val appRequest = AppEnrolLastBiometricsRequestApi(
-        DEFAULT_PROJECT_ID,
-        DEFAULT_USER_ID,
-        DEFAULT_MODULE_ID,
-        DEFAULT_METADATA,
-        GUID1
+        projectId = DEFAULT_PROJECT_ID,
+        userId = DEFAULT_USER_ID.value,
+        moduleId = DEFAULT_MODULE_ID.value,
+        metadata = DEFAULT_METADATA,
+        sessionId = GUID1
     )
 
     @Before
