@@ -21,14 +21,14 @@ internal data class ApiEvent(
     }
 }
 
-internal fun Event.fromDomainToApi() {
+internal fun Event.fromDomainToApi(): ApiEvent {
     val tokenizedFields = getTokenizedFields().mapNotNull { tokenizedFieldEntry ->
         when (tokenizedFieldEntry.value) {
             is TokenizableString.Raw -> null
             is TokenizableString.Tokenized -> tokenizedFieldEntry.key.mapToTokenizedString()
         }
     }
-    ApiEvent(
+    return ApiEvent(
         id = id,
         labels = labels.fromDomainToApi(),
         payload = payload.fromDomainToApi(),
