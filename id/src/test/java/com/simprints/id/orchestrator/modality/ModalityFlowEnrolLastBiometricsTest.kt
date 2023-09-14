@@ -32,9 +32,11 @@ class ModalityFlowEnrolLastBiometricsTest {
     private val appRequest = AppEnrolLastBiometricsRequestApi(
         projectId = DEFAULT_PROJECT_ID,
         userId = DEFAULT_USER_ID.value,
+        isUserIdTokenized = false,
+        isModuleIdTokenized = false,
         moduleId = DEFAULT_MODULE_ID.value,
         metadata = DEFAULT_METADATA,
-        sessionId = GUID1
+        sessionId = GUID1,
     )
 
     @Before

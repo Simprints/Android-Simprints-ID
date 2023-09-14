@@ -22,6 +22,8 @@ class ModuleApiToDomainAppRequestKtTest {
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
             moduleId = DEFAULT_MODULE_ID.value,
+            isUserIdTokenized = false,
+            isModuleIdTokenized = false,
             metadata = DEFAULT_METADATA
         )
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppEnrolRequest
@@ -41,6 +43,8 @@ class ModuleApiToDomainAppRequestKtTest {
             userId = DEFAULT_USER_ID.value,
             moduleId = DEFAULT_MODULE_ID.value,
             metadata = DEFAULT_METADATA,
+            isUserIdTokenized = false,
+            isModuleIdTokenized = false,
             verifyGuid = toVerify
         )
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppVerifyRequest
@@ -59,6 +63,8 @@ class ModuleApiToDomainAppRequestKtTest {
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
             moduleId = DEFAULT_MODULE_ID.value,
+            isUserIdTokenized = false,
+            isModuleIdTokenized = false,
             metadata = DEFAULT_METADATA
         )
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppIdentifyRequest
@@ -77,6 +83,7 @@ class ModuleApiToDomainAppRequestKtTest {
         val iAppRequest = AppConfirmationConfirmIdentityRequestModuleApi(
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
+            isUserIdTokenized = false,
             sessionId = sessionId,
             selectedGuid = selectedGuid
         )
