@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.main.projectdetails
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.config.ConfigManager
@@ -24,7 +25,7 @@ class ProjectDetailsViewModelTest {
         private const val PROJECT_ID = "projectID"
         private const val PROJECT_NAME = "name"
         private const val LAST_SCANNER = "scanner"
-        private const val LAST_USER = "user"
+        private val LAST_USER = "user".asTokenizedEncrypted()
         private val PROJECT = Project(
             PROJECT_ID,
             PROJECT_NAME,
@@ -66,11 +67,11 @@ class ProjectDetailsViewModelTest {
     fun `should initialize the live data correctly`() = runTest {
         every {
             tokenizationManager.decrypt(
-                RECENT_USER_ACTIVITY.lastUserUsed.asTokenizedEncrypted(),
+                RECENT_USER_ACTIVITY.lastUserUsed as TokenizableString.Tokenized,
                 TokenKeyType.AttendantId,
                 PROJECT
             )
-        } returns RECENT_USER_ACTIVITY.lastUserUsed.asTokenizedRaw()
+        } returns RECENT_USER_ACTIVITY.lastUserUsed
         val viewModel = ProjectDetailsViewModel(
             configManager = configManager,
             authStore = authStore,
@@ -78,7 +79,7 @@ class ProjectDetailsViewModelTest {
             tokenizationManager = tokenizationManager
         )
 
-        val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER, LAST_SCANNER, true)
+        val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER.value, LAST_SCANNER, true)
         assertThat(viewModel.projectCardStateLiveData.value).isEqualTo(expectedState)
     }
 
