@@ -49,7 +49,7 @@ class ModuleRepositoryImplTest {
         every { downSynchronizationConfiguration.moduleOptions } returns listOf("a", "b", "c", "d").map(String::asTokenizedRaw)
         coEvery {
             mockConfigManager.getDeviceConfiguration()
-        } returns DeviceConfiguration("", listOf("b", "c"), "")
+        } returns DeviceConfiguration("", listOf("b", "c").map(TokenizableString::Tokenized), "")
 
 
         repository = ModuleRepositoryImpl(

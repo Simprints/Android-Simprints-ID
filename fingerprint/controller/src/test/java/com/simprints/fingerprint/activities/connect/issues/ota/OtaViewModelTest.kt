@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
@@ -51,7 +52,7 @@ class OtaViewModelTest {
         coEvery { getRecentUserActivity() } returns RecentUserActivity(
             HARDWARE_VERSION,
             "",
-            "",
+            "".asTokenizedRaw(),
             0,
             0,
             0,

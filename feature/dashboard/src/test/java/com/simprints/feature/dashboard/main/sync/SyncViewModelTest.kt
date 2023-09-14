@@ -3,7 +3,7 @@ package com.simprints.feature.dashboard.main.sync
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.ExternalScope
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
@@ -50,6 +50,11 @@ class SyncViewModelTest {
 
     companion object {
         private const val DATE = "2022-10-10"
+        private val deviceConfiguration = DeviceConfiguration(
+            language = "",
+            selectedModules = listOf("module 1".asTokenizedEncrypted()),
+            lastInstructionId = ""
+        )
     }
 
     @get:Rule
@@ -163,11 +168,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncOffline card state if the device is not connected`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = false
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
@@ -176,11 +177,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncConnecting card state if the sync is running but not info are available`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = null
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
@@ -190,11 +187,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncDefault card state if there is no sync history`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState("", 0, 0, listOf(), listOf())
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
@@ -204,11 +197,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncComplete card state if the sync is completed`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 0, 0, listOf(),
@@ -226,11 +215,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncPendingUpload card state if there are records to upload`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         coEvery { eventSyncManager.countEventsToUpload(any(), any()) }.returns(flowOf(2))
 
         isConnected.value = true
@@ -249,11 +234,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncProgress card state if the sync is in progress`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(),
@@ -271,11 +252,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncConnecting card state if the sync is enqueued`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(),
@@ -293,11 +270,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncTooManyRequests card state if there are too many sync requests`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
@@ -314,11 +287,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncFailed card state if the sync fails because of cloud integration`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
@@ -335,11 +304,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncFailedBackendMaintenance card state if the sync fails because of cloud maintenance`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(),
@@ -357,11 +322,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncFailedBackendMaintenance with estimated outage card state if the sync fails because of cloud maintenance with outage`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(), listOf(
@@ -381,11 +342,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should post a SyncTryAgain card state if the sync fails because of another thing`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 10, 40, listOf(),
@@ -403,11 +360,7 @@ class SyncViewModelTest {
 
     @Test
     fun `should logout when project is ending and sync is complete`() {
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
-            "",
-            listOf("module 1"),
-            ""
-        )
+        coEvery { configManager.getDeviceConfiguration() } returns deviceConfiguration
         every { securityStateRepository.getSecurityStatusFromLocal() } returns SecurityState.Status.PROJECT_ENDING
         isConnected.value = true
         syncState.value = EventSyncState(
