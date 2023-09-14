@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.connect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.permission.PermissionStatus
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel.Companion.MAX_RETRY_COUNT
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
@@ -191,7 +192,7 @@ class ConnectScannerViewModelTest {
             verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
             verify(exactly = 1) { sessionEventsManager.addEventInBackground(any()) }
             val updatedActivity =
-                updateActivityFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
+                updateActivityFn.captured(RecentUserActivity("", "", "".asTokenizedRaw(), 0, 0, 0, 0))
             assertThat(updatedActivity.lastScannerUsed).isNotEmpty()
             assertThat(updatedActivity.lastScannerVersion).isEqualTo("E-1")
         }
@@ -224,7 +225,7 @@ class ConnectScannerViewModelTest {
                 VERO_2_VERSION.hardwareVersion
             )
             val updatedActivity =
-                updateActivityFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
+                updateActivityFn.captured(RecentUserActivity("", "", "".asTokenizedRaw(), 0, 0, 0, 0))
             assertThat(updatedActivity.lastScannerUsed).isNotEmpty()
             assertThat(updatedActivity.lastScannerVersion).isEqualTo("E-1")
         }

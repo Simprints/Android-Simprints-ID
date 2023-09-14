@@ -10,6 +10,7 @@ message ProtoDeviceConfiguration {
     repeated string module_selected = 2;
     reserved 3;
     string last_instruction_id = 4;
+    bool is_tokenized = 5;
 
     message Language {
         string language = 1;

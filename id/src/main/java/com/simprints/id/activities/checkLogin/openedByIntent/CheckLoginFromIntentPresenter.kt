@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherBG
 import com.simprints.core.ExternalScope
+import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
@@ -170,7 +171,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private suspend fun setLastUser() {
         recentUserActivityManager.updateRecentUserActivity {
             it.apply {
-                it.lastUserUsed = appRequest.userId.value
+                it.lastUserUsed = appRequest.userId
             }
         }
     }
@@ -300,7 +301,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         val deviceConfiguration = configManager.getDeviceConfiguration()
         Simber.tag(PROJECT_ID, true).i(authStore.signedInProjectId)
         Simber.tag(USER_ID, true).i(appRequest.userId.value)
-        Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
+        Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.values().joinToString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(projectConfiguration.synchronization.frequency.toString())
         Simber.d("[CHECK_LOGIN] Added keys in CrashManager")
