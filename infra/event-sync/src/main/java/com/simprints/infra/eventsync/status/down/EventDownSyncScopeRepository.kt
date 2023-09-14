@@ -47,7 +47,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     }
 
     private suspend fun getUserId(): String {
-        val possibleUserId: String = recentUserActivityManager.getRecentUserActivity().lastUserUsed
+        val possibleUserId: String = recentUserActivityManager.getRecentUserActivity().lastUserUsed.value
         if (possibleUserId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }
