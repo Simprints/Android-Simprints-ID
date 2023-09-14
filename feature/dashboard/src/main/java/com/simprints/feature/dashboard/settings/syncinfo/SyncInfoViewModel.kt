@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
@@ -207,13 +208,16 @@ internal class SyncInfoViewModel @Inject constructor(
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
         configManager.getDeviceConfiguration().selectedModules.map { moduleName ->
             val count = enrolmentRecordManager.count(
-                SubjectQuery(projectId = projectId, moduleId = moduleName)
+                SubjectQuery(projectId = projectId, moduleId = moduleName.value)
             )
-            val decryptedName = tokenizationManager.decrypt(
-                encrypted = moduleName.asTokenizedEncrypted(),
-                tokenKeyType = TokenKeyType.ModuleId,
-                project = configManager.getProject(projectId)
-            )
+            val decryptedName = when (moduleName) {
+                is TokenizableString.Raw -> moduleName
+                is TokenizableString.Tokenized -> tokenizationManager.decrypt(
+                    encrypted = moduleName,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = configManager.getProject(projectId)
+                )
+            }
             return@map ModuleCount(name = decryptedName.value, count = count)
         }
 

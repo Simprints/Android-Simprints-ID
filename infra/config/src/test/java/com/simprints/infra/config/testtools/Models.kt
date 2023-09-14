@@ -352,11 +352,12 @@ internal val protoProject = ProtoProject.newBuilder()
     .build()
 
 internal val deviceConfiguration =
-    DeviceConfiguration("en", listOf("module1", "module2"), "instruction")
+    DeviceConfiguration("en", listOf("module1".asTokenizedEncrypted(), "module2".asTokenizedEncrypted()), "instruction")
 internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
     .setLanguage(
         ProtoDeviceConfiguration.Language.newBuilder().setLanguage("en").build()
     )
+    .setIsTokenized(true)
     .addAllModuleSelected(listOf("module1", "module2"))
     .setLastInstructionId("instruction")
     .build()

@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.sync.down
 
 import androidx.work.*
+import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -27,9 +28,9 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
         val deviceConfiguration = configManager.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            projectConfiguration.general.modalities.map { it.toMode() },
-            deviceConfiguration.selectedModules,
-            projectConfiguration.synchronization.down.partitionType.toGroup()
+            modes = projectConfiguration.general.modalities.map { it.toMode() },
+            selectedModuleIDs = deviceConfiguration.selectedModules.values(),
+            syncGroup = projectConfiguration.synchronization.down.partitionType.toGroup()
         )
 
         val uniqueDownSyncId = UUID.randomUUID().toString()

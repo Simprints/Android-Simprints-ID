@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
@@ -121,9 +122,9 @@ internal class EventSyncManagerImpl @Inject constructor(
         val deviceConfig = configManager.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            getProjectModes(projectConfig),
-            deviceConfig.selectedModules,
-            projectConfig.synchronization.down.partitionType.toGroup()
+            modes = getProjectModes(projectConfig),
+            selectedModuleIDs = deviceConfig.selectedModules.values(),
+            syncGroup = projectConfig.synchronization.down.partitionType.toGroup()
         )
 
         var creationsToDownload = 0
