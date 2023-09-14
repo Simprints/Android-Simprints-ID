@@ -1,14 +1,21 @@
 package com.simprints.infra.config.local.models
 
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.exceptions.InvalidProtobufEnumException
 
-internal fun DownSynchronizationConfiguration.toProto(): ProtoDownSynchronizationConfiguration =
-    ProtoDownSynchronizationConfiguration.newBuilder()
+internal fun DownSynchronizationConfiguration.toProto(): ProtoDownSynchronizationConfiguration {
+    val isTokenized = moduleOptions.any { it is TokenizableString.Tokenized }
+    return ProtoDownSynchronizationConfiguration.newBuilder()
         .setPartitionType(partitionType.toProto())
         .setMaxNbOfModules(maxNbOfModules)
-        .addAllModuleOptions(moduleOptions)
+        .addAllModuleOptions(moduleOptions.values())
+        .setIsTokenized(isTokenized)
         .build()
+}
 
 internal fun DownSynchronizationConfiguration.PartitionType.toProto(): ProtoDownSynchronizationConfiguration.PartitionType =
     when (this) {
@@ -21,7 +28,9 @@ internal fun ProtoDownSynchronizationConfiguration.toDomain(): DownSynchronizati
     DownSynchronizationConfiguration(
         partitionType.toDomain(),
         maxNbOfModules,
-        moduleOptionsList,
+        moduleOptionsList.map {
+            if (isTokenized) it.asTokenizedEncrypted() else it.asTokenizedRaw()
+        },
     )
 
 internal fun ProtoDownSynchronizationConfiguration.PartitionType.toDomain(): DownSynchronizationConfiguration.PartitionType =

@@ -2,8 +2,10 @@ package com.simprints.infra.events.event.domain.models
 
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.domain.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.INTENT_PARSING
-import java.util.*
+import java.util.UUID
 
 @androidx.annotation.Keep
 data class IntentParsingEvent(
@@ -21,7 +23,12 @@ data class IntentParsingEvent(
         UUID.randomUUID().toString(),
         labels,
         IntentParsingPayload(createdAt, EVENT_VERSION, integration),
-        INTENT_PARSING)
+        INTENT_PARSING
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class IntentParsingPayload(

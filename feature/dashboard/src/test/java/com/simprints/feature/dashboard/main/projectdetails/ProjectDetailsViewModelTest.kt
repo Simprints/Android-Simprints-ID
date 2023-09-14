@@ -2,6 +2,7 @@ package com.simprints.feature.dashboard.main.projectdetails
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.authstore.AuthStore
@@ -21,7 +22,7 @@ class ProjectDetailsViewModelTest {
         private const val PROJECT_ID = "projectID"
         private const val PROJECT_NAME = "name"
         private const val LAST_SCANNER = "scanner"
-        private const val LAST_USER = "user"
+        private val LAST_USER = "user".asTokenizedEncrypted()
         private val project = Project(PROJECT_ID, PROJECT_NAME, "description", "creator", "bucket", "", tokenizationKeys = emptyMap())
     }
 
@@ -57,7 +58,7 @@ class ProjectDetailsViewModelTest {
             recentUserActivityManager,
         )
 
-        val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER, LAST_SCANNER, true)
+        val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER.value, LAST_SCANNER, true)
         assertThat(viewModel.projectCardStateLiveData.value).isEqualTo(expectedState)
     }
 

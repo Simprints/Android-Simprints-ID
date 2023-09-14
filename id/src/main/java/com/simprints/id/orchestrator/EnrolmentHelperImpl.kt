@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
@@ -59,8 +60,8 @@ class EnrolmentHelperImpl @Inject constructor(
 
     override fun buildSubject(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResponse?,
         faceResponse: FaceCaptureResponse?,
         timeHelper: TimeHelper
@@ -97,18 +98,18 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFingerprintAndFace(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResponse,
         faceResponse: FaceCaptureResponse,
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
-            patientId,
-            projectId,
-            userId,
-            moduleId,
+            subjectId = patientId,
+            projectId = projectId,
+            attendantId = userId,
+            moduleId = moduleId,
             createdAt = Date(timeHelper.now()),
             fingerprintSamples = extractFingerprintSamples(fingerprintResponse),
             faceSamples = extractFaceSamples(faceResponse)
@@ -117,17 +118,17 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFingerprint(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         fingerprintResponse: FingerprintCaptureResponse,
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
-            patientId,
-            projectId,
-            userId,
-            moduleId,
+            subjectId = patientId,
+            projectId = projectId,
+            attendantId = userId,
+            moduleId = moduleId,
             createdAt = Date(timeHelper.now()),
             fingerprintSamples = extractFingerprintSamples(fingerprintResponse)
         )
@@ -135,17 +136,17 @@ class EnrolmentHelperImpl @Inject constructor(
 
     private fun buildSubjectFromFace(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         faceResponse: FaceCaptureResponse,
         timeHelper: TimeHelper
     ): Subject {
         val patientId = UUID.randomUUID().toString()
         return Subject(
-            patientId,
-            projectId,
-            userId,
-            moduleId,
+            subjectId = patientId,
+            projectId = projectId,
+            attendantId = userId,
+            moduleId = moduleId,
             createdAt = Date(timeHelper.now()),
             faceSamples = extractFaceSamples(faceResponse)
         )

@@ -3,6 +3,8 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
@@ -134,8 +136,8 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should initialize the moduleCounts live data correctly`() = runTest {
-        val module1 = "module1"
-        val module2 = "module2"
+        val module1 = "module1".asTokenizedEncrypted()
+        val module2 = "module2".asTokenizedEncrypted()
         val numberForModule1 = 10
         val numberForModule2 = 20
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
@@ -145,7 +147,7 @@ class SyncInfoViewModelTest {
             enrolmentRecordManager.count(
                 SubjectQuery(
                     projectId = PROJECT_ID,
-                    moduleId = module1
+                    moduleId = module1.value
                 )
             )
         } returns numberForModule1
@@ -153,7 +155,7 @@ class SyncInfoViewModelTest {
             enrolmentRecordManager.count(
                 SubjectQuery(
                     projectId = PROJECT_ID,
-                    moduleId = module2
+                    moduleId = module2.value
                 )
             )
         } returns numberForModule2
@@ -162,15 +164,15 @@ class SyncInfoViewModelTest {
 
         assertThat(viewModel.moduleCounts.getOrAwaitValue()).isEqualTo(
             listOf(
-                ModuleCount(module1, numberForModule1),
-                ModuleCount(module2, numberForModule2),
+                ModuleCount(module1.value, numberForModule1),
+                ModuleCount(module2.value, numberForModule2),
             )
         )
     }
 
     @Test
     fun `should initialize the recordsToDownSync and recordsToDelete live data to the count otherwise`() = runTest {
-        val module1 = "module1"
+        val module1 = "module1".asTokenizedEncrypted()
         val creationForModules = 10
         val deletionForModules = 5
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
@@ -351,7 +353,7 @@ class SyncInfoViewModelTest {
         every { frequency }.returns(SynchronizationConfiguration.Frequency.PERIODICALLY)
         every { down }.returns(DownSynchronizationConfiguration(
             partitionType = partitionType,
-            moduleOptions = modules,
+            moduleOptions = modules.map(String::asTokenizedRaw),
             maxNbOfModules = 0,
         ))
     }

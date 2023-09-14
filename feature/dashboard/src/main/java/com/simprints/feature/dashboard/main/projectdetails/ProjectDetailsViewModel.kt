@@ -33,7 +33,7 @@ internal class ProjectDetailsViewModel @Inject constructor(
             val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
             DashboardProjectState(
                 cachedProject.name,
-                recentUserActivity.lastUserUsed,
+                recentUserActivity.lastUserUsed.value,
                 recentUserActivity.lastScannerUsed,
                 true
             )

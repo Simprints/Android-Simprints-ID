@@ -24,15 +24,18 @@ class BuildSubjectUseCase @Inject constructor(
         params.userId,
         params.moduleId,
         createdAt = Date(timeHelper.now()),
-        fingerprintSamples = getFingerprintCaptureResult(params.steps)?.map(::fingerprintSample).orEmpty(),
+        fingerprintSamples = getFingerprintCaptureResult(params.steps)?.map(::fingerprintSample)
+            .orEmpty(),
         faceSamples = getFaceCaptureResult(params.steps)?.map(::faceSample).orEmpty()
     )
 
     private fun getFingerprintCaptureResult(steps: List<EnrolLastBiometricStepResult>) =
-        steps.filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>().firstOrNull()?.results
+        steps.filterIsInstance<EnrolLastBiometricStepResult.FingerprintCaptureResult>()
+            .firstOrNull()?.results
 
     private fun getFaceCaptureResult(steps: List<EnrolLastBiometricStepResult>) =
-        steps.filterIsInstance<EnrolLastBiometricStepResult.FaceCaptureResult>().firstOrNull()?.results
+        steps.filterIsInstance<EnrolLastBiometricStepResult.FaceCaptureResult>()
+            .firstOrNull()?.results
 
     private fun fingerprintSample(it: FingerTemplateCaptureResult) = FingerprintSample(
         fromDomainToModuleApi(it.finger),

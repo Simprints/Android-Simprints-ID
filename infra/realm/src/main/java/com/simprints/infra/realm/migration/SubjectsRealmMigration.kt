@@ -1,9 +1,27 @@
 package com.simprints.infra.realm.migration
 
-import com.simprints.infra.realm.migration.oldschemas.*
-import io.realm.*
+import com.simprints.infra.realm.migration.oldschemas.PeopleSchemaV1
+import com.simprints.infra.realm.migration.oldschemas.PeopleSchemaV2
+import com.simprints.infra.realm.migration.oldschemas.PeopleSchemaV3
+import com.simprints.infra.realm.migration.oldschemas.PeopleSchemaV4
+import com.simprints.infra.realm.migration.oldschemas.PeopleSchemaV5
+import com.simprints.infra.realm.migration.oldschemas.PeopleSchemaV6
+import com.simprints.infra.realm.migration.oldschemas.PeopleSchemaV7
+import com.simprints.infra.realm.migration.oldschemas.PeopleSchemaV9
+import com.simprints.infra.realm.migration.oldschemas.SubjectsSchemaV10
+import com.simprints.infra.realm.migration.oldschemas.SubjectsSchemaV11
+import com.simprints.infra.realm.migration.oldschemas.SubjectsSchemaV12
+import com.simprints.infra.realm.migration.oldschemas.SubjectsSchemaV13
+import com.simprints.infra.realm.migration.oldschemas.SubjectsSchemaV14
+import io.realm.DynamicRealm
+import io.realm.DynamicRealmObject
+import io.realm.FieldAttribute
 import io.realm.FieldAttribute.REQUIRED
-import java.util.*
+import io.realm.RealmMigration
+import io.realm.RealmObjectSchema
+import io.realm.RealmSchema
+import java.util.Date
+import java.util.UUID
 
 internal class RealmMigrations(private val projectId: String) : RealmMigration {
 
@@ -45,6 +63,7 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
                 10 -> migrateTo11(realm.schema)
                 11 -> migrateTo12(realm)
                 12 -> migrateTo13(realm.schema)
+                13 -> migrateTo14(realm.schema)
             }
         }
     }
@@ -256,7 +275,10 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
         // the primary key
         realm.where(PeopleSchemaV7.FINGERPRINT_TABLE).findAll().forEach { sample ->
             val count = realm.where(PeopleSchemaV7.FINGERPRINT_TABLE)
-                .equalTo(PeopleSchemaV7.FINGERPRINT_FIELD_ID, sample.getString(PeopleSchemaV7.FINGERPRINT_FIELD_ID))
+                .equalTo(
+                    PeopleSchemaV7.FINGERPRINT_FIELD_ID,
+                    sample.getString(PeopleSchemaV7.FINGERPRINT_FIELD_ID)
+                )
                 .count()
             if (count > 1) {
                 sample.setString(PeopleSchemaV7.FINGERPRINT_FIELD_ID, UUID.randomUUID().toString())
@@ -264,7 +286,10 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
         }
         realm.where(PeopleSchemaV7.FACE_TABLE).findAll().forEach { sample ->
             val count = realm.where(PeopleSchemaV7.FACE_TABLE)
-                .equalTo(PeopleSchemaV7.FACE_FIELD_ID, sample.getString(PeopleSchemaV7.FACE_FIELD_ID))
+                .equalTo(
+                    PeopleSchemaV7.FACE_FIELD_ID,
+                    sample.getString(PeopleSchemaV7.FACE_FIELD_ID)
+                )
                 .count()
             if (count > 1) {
                 sample.setString(PeopleSchemaV7.FACE_FIELD_ID, UUID.randomUUID().toString())
@@ -295,6 +320,25 @@ internal class RealmMigrations(private val projectId: String) : RealmMigration {
             )
             ?.markAsRequired(SubjectsSchemaV13.SUBJECT_ID_FIELD)
             ?.addPrimaryKey(SubjectsSchemaV13.SUBJECT_ID_FIELD)
+    }
+
+    /*
+    * [CORE-2502]
+    * Adding flags that specify whether the attendant and module IDs are tokenized (encrypted)
+    * Previous app versions do not support tokenization, therefore, these flags are 'false'
+    * by default. */
+    private fun migrateTo14(schema: RealmSchema) {
+        schema
+            .get(SubjectsSchemaV14.SUBJECT_TABLE)
+            ?.addField(
+                SubjectsSchemaV14.SUBJECT_IS_ATTENDANT_ID_TOKENIZED_FIELD,
+                Boolean::class.java
+            )
+            ?.addField(SubjectsSchemaV14.SUBJECT_IS_MODULE_ID_TOKENIZED_FIELD, Boolean::class.java)
+            ?.transform { obj: DynamicRealmObject ->
+                obj.setBoolean(SubjectsSchemaV14.SUBJECT_IS_ATTENDANT_ID_TOKENIZED_FIELD, false)
+                obj.setBoolean(SubjectsSchemaV14.SUBJECT_IS_MODULE_ID_TOKENIZED_FIELD, false)
+            }
     }
 
 
