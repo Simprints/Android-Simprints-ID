@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.navigation.findNavController
+import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.R
 import com.simprints.face.base.FaceActivity
 import com.simprints.face.capture.FaceCaptureActivity
@@ -16,9 +16,8 @@ import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.face.match.FaceMatchActivity
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
-import com.simprints.feature.alert.toArgs
-import com.simprints.feature.alert.withPayload
 import com.simprints.infra.uibase.navigation.handleResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,7 +38,7 @@ class FaceOrchestratorActivity : FaceActivity() {
 
         binding.orchestratorHostFragment.handleResult<AlertResult>(this, AlertContract.ALERT_DESTINATION_ID) { result ->
             if (result.isBackButtonPress()) {
-                result.payload.getString(ERROR_TYPE_KEY)?.let { viewModel.finishWithError(ErrorType.valueOf(it)) }
+                viewModel.finishWithError()
             }
         }
 
@@ -60,18 +59,10 @@ class FaceOrchestratorActivity : FaceActivity() {
         viewModel.startMatching.observe(this, LiveDataEventWithContentObserver {
             startActivityForResult(FaceMatchActivity.getStartingIntent(this, it), MATCH_REQUEST)
         })
-        viewModel.errorEvent.observe(this, LiveDataEventWithContentObserver {
+        viewModel.errorEvent.observe(this, LiveDataEventObserver {
             findNavController(R.id.orchestrator_host_fragment).navigate(
                 R.id.action_global_errorFragment,
-                it.toAlertConfiguration().withPayload(ERROR_TYPE_KEY to it.name).toArgs(),
-            )
-        })
-        viewModel.startConfiguration.observe(this, LiveDataEventWithContentObserver {
-            findNavController(R.id.orchestrator_host_fragment).navigate(
-                BlankFragmentDirections.actionBlankFragmentToConfigurationFragment(
-                    it.projectId,
-                    it.deviceId
-                )
+                ErrorType.toAlertConfiguration(),
             )
         })
     }
@@ -91,7 +82,5 @@ class FaceOrchestratorActivity : FaceActivity() {
     companion object {
         const val CAPTURE_REQUEST = 100
         const val MATCH_REQUEST = 101
-
-        private const val ERROR_TYPE_KEY = "error_type"
     }
 }

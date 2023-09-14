@@ -2,4 +2,4 @@ More information about configuration can be found in [id documentation](/id/doc/
 
 The visual flow for easy reference:
 
-![face configuration](/face/doc/face_configuration.png)
+![face configuration](img/face_configuration.png)

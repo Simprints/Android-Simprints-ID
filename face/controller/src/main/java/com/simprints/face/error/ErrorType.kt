@@ -1,66 +1,30 @@
 package com.simprints.face.error
 
 import androidx.annotation.Keep
-import androidx.annotation.StringRes
-import com.simprints.face.R
-import com.simprints.face.controllers.core.events.model.FaceAlertType
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.alertConfiguration
 import com.simprints.feature.alert.config.AlertButtonConfig
 import com.simprints.feature.alert.config.AlertColor
+import com.simprints.feature.alert.toArgs
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.resources.R as IDR
 
 @Keep
-enum class ErrorType(
-    @StringRes val title: Int,
-    @StringRes val message: Int,
-
-    val backgroundColor: AlertColor = AlertColor.Gray,
-    val alertType: FaceAlertType,
-    var customTitle: String? = null,
-    var customMessage: String? = null,
-) {
-    LICENSE_MISSING(
-        IDR.string.error_licence_missing_title,
-        IDR.string.error_licence_missing_message,
-        alertType = FaceAlertType.FACE_LICENSE_MISSING,
-    ),
-    LICENSE_INVALID(
-        IDR.string.error_licence_invalid_title,
-        IDR.string.error_licence_invalid_message,
-        alertType = FaceAlertType.FACE_LICENSE_INVALID,
-    ),
-    BACKEND_MAINTENANCE_ERROR(
-        IDR.string.error_backend_maintenance_title,
-        IDR.string.error_backend_maintenance_message,
-        alertType = FaceAlertType.BACKEND_MAINTENANCE_ERROR,
-    ),
-    CONFIGURATION_ERROR(
-        IDR.string.error_configuration_error_title,
-        IDR.string.error_configuration_error_message,
-        alertType = FaceAlertType.FACE_LICENSE_MISSING,
-    ),
-    UNEXPECTED_ERROR(
-        IDR.string.error_unexpected_error_title,
-        IDR.string.error_unexpected_error_message,
-        backgroundColor = AlertColor.Red,
-        alertType = FaceAlertType.UNEXPECTED_ERROR,
-    ),
-    ;
+@ExcludedFromGeneratedTestCoverageReports("Alert screen configuration")
+object ErrorType {
 
     fun toAlertConfiguration() = alertConfiguration {
-        color = this@ErrorType.backgroundColor
-        title = this@ErrorType.customTitle
-        titleRes = this@ErrorType.title
-        message = this@ErrorType.customMessage
-        messageRes = this@ErrorType.message
-        image = R.drawable.ic_exclamation_92dp
+        color = AlertColor.Red
+        titleRes = IDR.string.error_unexpected_error_title
+        messageRes = IDR.string.error_unexpected_error_message
+        image = IDR.drawable.ic_exclamation
         leftButton = AlertButtonConfig(
             text = null,
             textRes = IDR.string.close,
             resultKey = AlertContract.ALERT_BUTTON_PRESSED_BACK,
             closeOnClick = true,
         )
-        eventType = this@ErrorType.alertType.fromDomainToCore()
-    }
+        eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
+    }.toArgs()
 }

@@ -5,10 +5,8 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
@@ -124,16 +122,6 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
                 format = "format",
             )
         )))
-    }
-
-    @Test
-    fun `skips Face steps correctly`() {
-        val result = useCase(listOf(createStep(
-            mockk<FaceConfigurationRequest>(),
-            FaceConfigurationResponse()
-        )))
-
-        assertThat(result).isEmpty()
     }
 
     private fun createStep(request: Step.Request, result: Step.Result) = Step(

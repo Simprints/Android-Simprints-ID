@@ -68,6 +68,7 @@ dependencies {
 
     implementation(project(":fingerprint:controller"))
     implementation(project(":face:controller"))
+    implementation(project(":face:configuration"))
 
     implementation(project(":infra:config"))
     implementation(project(":infra:enrolment-records"))

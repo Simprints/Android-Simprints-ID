@@ -11,5 +11,4 @@ enum class FaceResponseType {
     MATCH,
     EXIT_FORM,
     ERROR,
-    CONFIGURATION
 }

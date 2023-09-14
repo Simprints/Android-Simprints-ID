@@ -2,10 +2,14 @@ package com.simprints.id.orchestrator.steps
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import com.simprints.face.configuration.FaceConfigurationContract
+import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
+import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
@@ -82,7 +86,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     fun stepProcessorShouldBuildRightStepForConfiguration() {
         val step = faceStepProcess.buildConfigurationStep("projectId", "deviceId")
 
-        verifyFaceIntent<FaceConfigurationRequest>(step, CONFIGURATION.value)
+        verifyFaceConfigurationIntent<Bundle>(step, CONFIGURATION.value)
     }
 
     @Test
@@ -108,9 +112,10 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessConfigurationResult() {
-        faceStepProcess.processResult(CONFIGURATION.value, Activity.RESULT_OK, result)
+        val configurationResult = Intent().putExtra(FaceConfigurationContract.RESULT, FaceConfigurationResult(true))
+        val result = faceStepProcess.processResult(CONFIGURATION.value, Activity.RESULT_OK, configurationResult)
 
-        verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
+        assertThat(result).isInstanceOf(FaceConfigurationResponse::class.java)
     }
 
     @Test
