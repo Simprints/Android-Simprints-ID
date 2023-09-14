@@ -7,6 +7,8 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidato
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
+import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.tokenization.TokenizationManager
 import io.mockk.every
 import io.mockk.mockk
 
@@ -22,10 +24,18 @@ object ConfirmIdentityFactory : RequestFactory() {
         )
 
     override fun getValidator(extractor: ClientRequestExtractor): ConfirmIdentityValidator =
-        ConfirmIdentityValidator(extractor as ConfirmIdentityExtractor, MOCK_SESSION_ID,true)
+        ConfirmIdentityValidator(extractor as ConfirmIdentityExtractor, MOCK_SESSION_ID, true)
 
-    override fun getBuilder(extractor: ClientRequestExtractor): ConfirmIdentifyBuilder =
-        ConfirmIdentifyBuilder(extractor as ConfirmIdentityExtractor, getValidator(extractor))
+    override fun getBuilder(extractor: ClientRequestExtractor): ConfirmIdentifyBuilder {
+        val project = mockk<Project>()
+        val tokenizationManager = mockk<TokenizationManager>()
+        return ConfirmIdentifyBuilder(
+            extractor = extractor as ConfirmIdentityExtractor,
+            project = project,
+            tokenizationManager = tokenizationManager,
+            validator = getValidator(extractor)
+        )
+    }
 
     override fun getMockExtractor(): ConfirmIdentityExtractor {
         val mockConfirmIdentifyExtractor = mockk<ConfirmIdentityExtractor>()

@@ -33,7 +33,7 @@ class EventDownSyncScopeTest {
             val query = this.first().queryEvent
             assertThat(query.projectId).isEqualTo(projectDownSyncScope.projectId)
             assertThat(query.modes).isEqualTo(projectDownSyncScope.modes)
-            assertThat(query.attendantId).isEqualTo(DEFAULT_USER_ID)
+            assertThat(query.attendantId).isEqualTo(DEFAULT_USER_ID.value)
 
             assertThat(query.subjectId).isNull()
             assertThat(query.moduleIds).isNull()
@@ -46,10 +46,10 @@ class EventDownSyncScopeTest {
         with(modulesDownSyncScope.operations) {
             assertThat(this).hasSize(2)
             val query = this.first().queryEvent
-            checkModuleScope(query, DEFAULT_MODULE_ID)
+            checkModuleScope(query, DEFAULT_MODULE_ID.value)
 
             val query2 = this[1].queryEvent
-            checkModuleScope(query2, DEFAULT_MODULE_ID_2)
+            checkModuleScope(query2, DEFAULT_MODULE_ID_2.value)
 
         }
     }

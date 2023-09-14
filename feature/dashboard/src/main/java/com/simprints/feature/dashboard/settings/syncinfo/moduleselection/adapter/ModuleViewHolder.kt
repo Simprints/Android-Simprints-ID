@@ -12,7 +12,7 @@ internal class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVi
 
     fun bindTo(module: Module, listener: ModuleSelectionListener) {
         with(txtModuleName) {
-            text = module.name
+            text = module.name.value
 
             setOnClickListener {
                 listener.onModuleSelected(module)

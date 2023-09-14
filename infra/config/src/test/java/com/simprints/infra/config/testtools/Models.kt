@@ -1,5 +1,6 @@
 package com.simprints.infra.config.testtools
 
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.infra.config.domain.models.ConsentConfiguration
 import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.DeviceConfiguration
@@ -254,7 +255,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
         1,
-        listOf("module1")
+        listOf("module1".asTokenizedEncrypted())
     )
 )
 
@@ -278,6 +279,7 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
         ProtoDownSynchronizationConfiguration.newBuilder()
             .setPartitionType(ProtoDownSynchronizationConfiguration.PartitionType.PROJECT)
             .setMaxNbOfModules(1)
+            .setIsTokenized(true)
             .addModuleOptions("module1")
     )
     .build()
@@ -350,11 +352,12 @@ internal val protoProject = ProtoProject.newBuilder()
     .build()
 
 internal val deviceConfiguration =
-    DeviceConfiguration("en", listOf("module1", "module2"), "instruction")
+    DeviceConfiguration("en", listOf("module1".asTokenizedEncrypted(), "module2".asTokenizedEncrypted()), "instruction")
 internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
     .setLanguage(
         ProtoDeviceConfiguration.Language.newBuilder().setLanguage("en").build()
     )
+    .setIsTokenized(true)
     .addAllModuleSelected(listOf("module1", "module2"))
     .setLastInstructionId("instruction")
     .build()

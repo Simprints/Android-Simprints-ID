@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:events"))
     implementation(project(":feature:alert"))
+    implementation(project(":infra:auth-store"))
 
     implementation(libs.libsimprints)
 }

@@ -73,10 +73,10 @@ class HotCacheImplTest {
     @Test
     fun shouldReadConfirmIdentityAppRequest() {
         val appRequest = AppConfirmIdentityRequest(
-            DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID,
-            DEFAULT_METADATA
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID,
+            sessionId = DEFAULT_MODULE_ID.value,
+            selectedGuid = DEFAULT_METADATA
         )
 
         hotCache.appRequest = appRequest

@@ -1,12 +1,37 @@
 package com.simprints.clientapi.activities.baserequest
 
 import androidx.annotation.Keep
-import com.simprints.clientapi.errors.ClientApiAlert.*
-import com.simprints.clientapi.clientrequests.builders.*
-import com.simprints.clientapi.clientrequests.validators.*
+import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
+import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
+import com.simprints.clientapi.clientrequests.builders.EnrolBuilder
+import com.simprints.clientapi.clientrequests.builders.EnrolLastBiometricsBuilder
+import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
+import com.simprints.clientapi.clientrequests.builders.VerifyBuilder
+import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
+import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsValidator
+import com.simprints.clientapi.clientrequests.validators.EnrolValidator
+import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
+import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.exceptions.*
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_METADATA
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_MODULE_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_PROJECT_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_SELECTED_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_SESSION_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_STATE_FOR_INTENT_ACTION
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_USER_ID
+import com.simprints.clientapi.errors.ClientApiAlert.INVALID_VERIFY_ID
+import com.simprints.clientapi.errors.ClientApiAlert.ROOTED_DEVICE
+import com.simprints.clientapi.exceptions.InvalidMetadataException
+import com.simprints.clientapi.exceptions.InvalidModuleIdException
+import com.simprints.clientapi.exceptions.InvalidProjectIdException
+import com.simprints.clientapi.exceptions.InvalidRequestException
+import com.simprints.clientapi.exceptions.InvalidSelectedIdException
+import com.simprints.clientapi.exceptions.InvalidSessionIdException
+import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
+import com.simprints.clientapi.exceptions.InvalidUserIdException
+import com.simprints.clientapi.exceptions.InvalidVerifyIdException
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
@@ -39,21 +64,38 @@ abstract class RequestPresenter(
 ) : RequestContract.Presenter {
 
     override suspend fun processEnrolRequest() = validateAndSendRequest(
-        EnrolBuilder(view.enrolExtractor, EnrolValidator(view.enrolExtractor))
+        EnrolBuilder(
+            extractor = view.enrolExtractor,
+            project = view.getProject(),
+            tokenizationManager = view.tokenizationManager,
+            validator = EnrolValidator(view.enrolExtractor)
+        )
     )
 
     override suspend fun processIdentifyRequest() = validateAndSendRequest(
-        IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor))
+        IdentifyBuilder(
+            extractor = view.identifyExtractor,
+            project = view.getProject(),
+            tokenizationManager = view.tokenizationManager,
+            validator = IdentifyValidator(view.identifyExtractor)
+        )
     )
 
     override suspend fun processVerifyRequest() = validateAndSendRequest(
-        VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
+        VerifyBuilder(
+            extractor = view.verifyExtractor,
+            project = view.getProject(),
+            tokenizationManager = view.tokenizationManager,
+            validator = VerifyValidator(view.verifyExtractor)
+        )
     )
 
     override suspend fun processConfirmIdentityRequest() = validateAndSendRequest(
         ConfirmIdentifyBuilder(
-            view.confirmIdentityExtractor,
-            ConfirmIdentityValidator(
+            extractor = view.confirmIdentityExtractor,
+            project = view.getProject(),
+            tokenizationManager = view.tokenizationManager,
+            validator = ConfirmIdentityValidator(
                 view.confirmIdentityExtractor,
                 eventsManager.getCurrentSessionId(),
                 eventsManager.isSessionHasIdentificationCallback(view.confirmIdentityExtractor.getSessionId())
@@ -63,8 +105,10 @@ abstract class RequestPresenter(
 
     override suspend fun processEnrolLastBiometrics() = validateAndSendRequest(
         EnrolLastBiometricsBuilder(
-            view.enrolLastBiometricsExtractor,
-            EnrolLastBiometricsValidator(
+            extractor = view.enrolLastBiometricsExtractor,
+            project = view.getProject(),
+            tokenizationManager = view.tokenizationManager,
+            validator = EnrolLastBiometricsValidator(
                 view.enrolLastBiometricsExtractor,
                 eventsManager.getCurrentSessionId(),
                 eventsManager.isCurrentSessionAnIdentificationOrEnrolment()

@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.status.down
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULES
@@ -138,7 +139,7 @@ internal class EventDownSyncScopeRepositoryTest {
     fun throwWhenUserIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
             coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
-                every { lastUserUsed } returns ""
+                every { lastUserUsed } returns "".asTokenizedEncrypted()
             }
 
             assertThrows<MissingArgumentForDownSyncScopeException> {
@@ -241,7 +242,7 @@ internal class EventDownSyncScopeRepositoryTest {
         assertThat(syncScope).isInstanceOf(SubjectUserScope::class.java)
         with((syncScope as SubjectUserScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(attendantId).isEqualTo(DEFAULT_USER_ID)
+            assertThat(attendantId).isEqualTo(DEFAULT_USER_ID.value)
             assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
         }
     }
@@ -250,7 +251,7 @@ internal class EventDownSyncScopeRepositoryTest {
         assertThat(syncScope).isInstanceOf(SubjectModuleScope::class.java)
         with((syncScope as SubjectModuleScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(moduleIds).containsExactly(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
+            assertThat(moduleIds).containsExactly(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2.value)
             assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
         }
     }

@@ -13,7 +13,9 @@ import com.simprints.infra.events.event.domain.models.subject.FingerprintReferen
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import javax.inject.Inject
 
-internal class SubjectFactory @Inject constructor(private val encodingUtils: EncodingUtils) {
+class SubjectFactory @Inject constructor(
+    private val encodingUtils: EncodingUtils
+) {
 
     fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
         with(payload) {
@@ -39,6 +41,7 @@ internal class SubjectFactory @Inject constructor(private val encodingUtils: Enc
             )
         }
 
+
     private fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
         biometricReferences?.filterIsInstance<FingerprintReference>()
             ?.firstOrNull()
@@ -57,10 +60,10 @@ internal class SubjectFactory @Inject constructor(private val encodingUtils: Enc
         format: String
     ): FingerprintSample {
         return FingerprintSample(
-            template.finger,
-            encodingUtils.base64ToBytes(template.template),
-            template.quality,
-            format
+            fingerIdentifier = template.finger,
+            template = encodingUtils.base64ToBytes(template.template),
+            templateQualityScore = template.quality,
+            format = format
         )
     }
 

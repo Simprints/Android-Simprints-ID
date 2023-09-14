@@ -1,24 +1,25 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import org.junit.Test
 
 class ModuleQueryFilterTest {
 
     private val items = listOf(
-        Module("Abama", false),
-        Module("Abama Dawet", false),
-        Module("Achura Mazegaja", false),
-        Module("Bangladesh rocks", false),
-        Module("Dache Gofara", false),
-        Module("Gara Goda", false),
-        Module("Gurumo Koysha", false),
-        Module("Hajo Salata", false),
-        Module("Legama", false),
-        Module("Madagascar", false),
-        Module("Tadisa", false),
-        Module("Wakanda", false)
+        Module("Abama".asTokenizedRaw(), false),
+        Module("Abama Dawet".asTokenizedRaw(), false),
+        Module("Achura Mazegaja".asTokenizedRaw(), false),
+        Module("Bangladesh rocks".asTokenizedRaw(), false),
+        Module("Dache Gofara".asTokenizedRaw(), false),
+        Module("Gara Goda".asTokenizedRaw(), false),
+        Module("Gurumo Koysha".asTokenizedRaw(), false),
+        Module("Hajo Salata".asTokenizedRaw(), false),
+        Module("Legama".asTokenizedRaw(), false),
+        Module("Madagascar".asTokenizedRaw(), false),
+        Module("Tadisa".asTokenizedRaw(), false),
+        Module("Wakanda".asTokenizedRaw(), false)
     )
     private val filter = ModuleQueryFilter()
 
@@ -60,9 +61,9 @@ class ModuleQueryFilterTest {
     fun withExactQuery_shouldReturnCorrectResult() {
         val query = "Legama"
         val expected = listOf(
-            Module(name = "Legama", isSelected = false),
-            Module(name = "Achura Mazegaja", isSelected = false),
-            Module(name = "Abama", isSelected = false)
+            Module(name = "Legama".asTokenizedRaw(), isSelected = false),
+            Module(name = "Achura Mazegaja".asTokenizedRaw(), isSelected = false),
+            Module(name = "Abama".asTokenizedRaw(), isSelected = false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -73,9 +74,9 @@ class ModuleQueryFilterTest {
     fun withLowercaseQuery_shouldReturnCorrectResult() {
         val query = "legama"
         val expected = listOf(
-            Module(name = "Legama", isSelected = false),
-            Module(name = "Achura Mazegaja", isSelected = false),
-            Module(name = "Abama", isSelected = false)
+            Module(name = "Legama".asTokenizedRaw(), isSelected = false),
+            Module(name = "Achura Mazegaja".asTokenizedRaw(), isSelected = false),
+            Module(name = "Abama".asTokenizedRaw(), isSelected = false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -86,12 +87,12 @@ class ModuleQueryFilterTest {
     fun withInexactQuery_shouldReturnAllPossibleResults() {
         val query = "abama"
         val expected = listOf(
-            Module("Abama", false),
-            Module("Abama Dawet", false),
-            Module("Legama", false),
-            Module("Achura Mazegaja", false),
-            Module("Hajo Salata", false),
-            Module("Wakanda", false)
+            Module("Abama".asTokenizedRaw(), false),
+            Module("Abama Dawet".asTokenizedRaw(), false),
+            Module("Legama".asTokenizedRaw(), false),
+            Module("Achura Mazegaja".asTokenizedRaw(), false),
+            Module("Hajo Salata".asTokenizedRaw(), false),
+            Module("Wakanda".asTokenizedRaw(), false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -102,7 +103,7 @@ class ModuleQueryFilterTest {
     fun withFuzzyQuery_shouldReturnAllPossibleResults() {
         val query = "binglodosh"
         val expected = listOf(
-            Module("Bangladesh rocks", false)
+            Module("Bangladesh rocks".asTokenizedRaw(), false)
         )
 
         val actual = filter.getFilteredList(items, query)

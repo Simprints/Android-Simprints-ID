@@ -10,7 +10,7 @@ android {
 dependencies {
 
     implementation(project(":feature:alert"))
-
+    implementation(project(":infra:event-sync"))
     implementation(project(":infra:config"))
     implementation(project(":infra:events"))
     implementation(project(":infra:enrolment-records"))

@@ -1,16 +1,17 @@
 package com.simprints.infra.events.sampledata
 
 import com.simprints.core.domain.modality.Modes
-import java.util.*
+import com.simprints.core.domain.tokenization.asTokenizedRaw
+import java.util.UUID
 
 object SampleDefaults {
     const val DEFAULT_DEVICE_ID = "device_id"
     const val DEFAULT_PROJECT_ID = "DVXF1mu4CAa5FmiPWHXr"
-    const val DEFAULT_MODULE_ID = "0"
-    const val DEFAULT_MODULE_ID_2 = "1"
-    val DEFAULT_MODULES = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
+    val DEFAULT_MODULE_ID = "0".asTokenizedRaw()
+    val DEFAULT_MODULE_ID_2 = "1".asTokenizedRaw()
+    val DEFAULT_MODULES = listOf(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2.value)
 
-    const val DEFAULT_USER_ID = "user_id"
+    val DEFAULT_USER_ID = "user_id".asTokenizedRaw()
     const val DEFAULT_USER_ID_2 = "user_id_2"
     const val DEFAULT_PROJECT_SECRET = "3xDCW0IL/m7nNBWPlVQljh4RzZgcho3Gp7WEj07YqgSER6ESXeY8tVczlNsxubug7co45/PsfG7JiC9oo/U54w=="
     const val DEFAULT_METADATA = "DEFAULT_METADATA"

@@ -2,6 +2,7 @@ package com.simprints.infra.config.local.migrations.models
 
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.domain.models.*
 import org.json.JSONObject
@@ -193,7 +194,7 @@ internal data class OldProjectConfig(
                     if (syncGroup == "GLOBAL") "PROJECT" else syncGroup
                 ),
                 maxNbOfModules = maxNbOfModules.toInt(),
-                moduleOptions = moduleIdOptions.split("|")
+                moduleOptions = moduleIdOptions.split("|").map(String::asTokenizedRaw)
             ),
         )
 

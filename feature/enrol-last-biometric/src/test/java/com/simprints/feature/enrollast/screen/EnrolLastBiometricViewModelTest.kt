@@ -3,6 +3,7 @@ package com.simprints.feature.enrollast.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -129,7 +130,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns success when no duplicate enrolments`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery {  buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
 
@@ -140,7 +141,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `saves event and record when no duplicate enrolments`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
 
@@ -151,7 +152,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns failure record saving fails`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any()) } returns subject
         coEvery { enrolmentRecordManager.performActions(any()) } throws Exception()
 
         viewModel.enrolBiometric(createParams(listOf()))
@@ -169,8 +170,8 @@ class EnrolLastBiometricViewModelTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
-        private const val USER_ID = "userId"
-        private const val MODULE_ID = "moduleId"
+        private val USER_ID = "userId".asTokenizedRaw()
+        private val MODULE_ID = "moduleId".asTokenizedRaw()
         private const val SESSION_ID = "sessionId"
     }
 }

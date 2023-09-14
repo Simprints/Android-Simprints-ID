@@ -193,8 +193,8 @@ internal class SyncInfoViewModel @Inject constructor(
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
         configManager.getDeviceConfiguration().selectedModules.map {
             ModuleCount(
-                it,
-                enrolmentRecordManager.count(SubjectQuery(projectId = projectId, moduleId = it))
+                it.value,
+                enrolmentRecordManager.count(SubjectQuery(projectId = projectId, moduleId = it.value))
             )
         }
 

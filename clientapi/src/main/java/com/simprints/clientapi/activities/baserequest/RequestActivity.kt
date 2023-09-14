@@ -44,7 +44,6 @@ abstract class RequestActivity : BaseActivity(), RequestContract.RequestView {
     private var requestProcessed = false
 
     abstract val guidSelectionNotifier: GuidSelectionNotifier
-
     override val intentAction: String?
         get() = intent.action
 

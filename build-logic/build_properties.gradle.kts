@@ -13,7 +13,7 @@ extra.apply {
      * CI. Read more about our versioning here:
      * https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+Simprints+ID
      */
-    set("VERSION_NAME", "0.0.0")
+    set("VERSION_NAME", "2023.3.2")
 
     /**
      * Build type. The version code describes which build type was used for the build.

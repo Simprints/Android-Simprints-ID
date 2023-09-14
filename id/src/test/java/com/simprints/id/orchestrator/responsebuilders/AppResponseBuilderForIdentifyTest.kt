@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppRefusalFormResponse
@@ -246,7 +247,10 @@ class AppResponseBuilderForIdentifyTest {
     }
 
     private fun mockRequest() = AppIdentifyRequest(
-        "projectId", "userId", "moduleId", "metadata"
+        projectId = "projectId",
+        userId = "userId".asTokenizedRaw(),
+        moduleId = "moduleId".asTokenizedRaw(),
+        metadata = "metadata"
     )
 
 
