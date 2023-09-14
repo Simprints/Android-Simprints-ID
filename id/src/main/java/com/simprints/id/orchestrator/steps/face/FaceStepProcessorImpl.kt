@@ -1,10 +1,14 @@
 package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
+import android.os.Parcelable
+import com.simprints.face.configuration.FaceConfigurationContract
+import com.simprints.face.configuration.FaceConfigurationResult
+import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceConfigurationRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
+import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
@@ -24,6 +28,7 @@ class FaceStepProcessorImpl @Inject constructor(
 
     companion object {
         const val ACTIVITY_CLASS_NAME = "com.simprints.face.orchestrator.FaceOrchestratorActivity"
+        const val CONFIGURATION_CLASS_NAME = "com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity"
     }
 
     override suspend fun buildCaptureStep(): Step = buildStep(
@@ -39,11 +44,6 @@ class FaceStepProcessorImpl @Inject constructor(
         FaceMatchRequest(probeFaceSample, query)
     )
 
-    override fun buildConfigurationStep(projectId: String, deviceId: String): Step = buildStep(
-        CONFIGURATION,
-        FaceConfigurationRequest(projectId, deviceId)
-    )
-
     private fun buildStep(requestCode: FaceRequestCode, request: FaceRequest) = Step(
         requestCode = requestCode.value,
         activityName = ACTIVITY_CLASS_NAME,
@@ -53,11 +53,32 @@ class FaceStepProcessorImpl @Inject constructor(
         status = Step.Status.NOT_STARTED
     )
 
-    override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Step.Result? =
-        if (isFaceResult(requestCode)) {
-            data?.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)?.fromModuleApiToDomain()
-        } else {
-            null
+    override fun buildConfigurationStep(projectId: String, deviceId: String): Step = Step(
+        requestCode = CONFIGURATION.value,
+        activityName = CONFIGURATION_CLASS_NAME,
+        bundleKey = FaceConfigurationWrapperActivity.FACE_CONFIGURATION_ARGS_EXTRA,
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = FaceConfigurationContract.getArgs(projectId, deviceId),
+        status = Step.Status.NOT_STARTED
+    )
+
+    override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Step.Result? {
+        if (!isFaceResult(requestCode)) {
+            return null
         }
+
+        val legacyFaceResult = data?.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)
+        if (legacyFaceResult != null) {
+            return legacyFaceResult.fromModuleApiToDomain()
+        }
+
+        if (data?.extras?.containsKey(FaceConfigurationContract.RESULT) == true) {
+            return when (data.getParcelableExtra<Parcelable>(FaceConfigurationContract.RESULT)) {
+                is FaceConfigurationResult -> FaceConfigurationResponse()
+                else -> null
+            }
+        }
+        return null
+    }
 
 }

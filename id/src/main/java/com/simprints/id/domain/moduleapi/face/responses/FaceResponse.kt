@@ -14,14 +14,13 @@ interface FaceResponse : Parcelable, Result {
 
 }
 
-fun IFaceResponse.fromModuleApiToDomain(): FaceResponse = when (type) {
+fun IFaceResponse.fromModuleApiToDomain(): FaceResponse? = when (type) {
     IFaceResponseType.CAPTURE -> (this as IFaceCaptureResponse).fromModuleApiToDomain()
     IFaceResponseType.MATCH -> (this as IFaceMatchResponse).fromModuleApiToDomain()
     IFaceResponseType.EXIT_FORM -> (this as IFaceExitFormResponse).fromModuleApiToDomain()
     IFaceResponseType.ERROR -> (this as IFaceErrorResponse).fromModuleApiToDomain()
-    IFaceResponseType.CONFIGURATION -> (this as IFaceConfigurationResponse).fromModuleApiToDomain()
+    IFaceResponseType.CONFIGURATION -> null
 }
-
 
 enum class FaceResponseType {
     CAPTURE,

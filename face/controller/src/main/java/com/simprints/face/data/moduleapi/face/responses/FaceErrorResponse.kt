@@ -1,7 +1,6 @@
 package com.simprints.face.data.moduleapi.face.responses
 
 import androidx.annotation.Keep
-import com.simprints.face.error.ErrorType
 import com.simprints.moduleapi.face.responses.IFaceErrorReason
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -28,15 +27,4 @@ enum class FaceErrorReason {
             CONFIGURATION_ERROR -> IFaceErrorReason.FACE_CONFIGURATION_ERROR
             BACKEND_MAINTENANCE_ERROR -> IFaceErrorReason.BACKEND_MAINTENANCE_ERROR
         }
-
-    companion object {
-        fun fromErrorType(errorType: ErrorType): FaceErrorReason =
-            when (errorType) {
-                ErrorType.LICENSE_MISSING -> LICENSE_MISSING
-                ErrorType.LICENSE_INVALID -> LICENSE_INVALID
-                ErrorType.CONFIGURATION_ERROR -> CONFIGURATION_ERROR
-                ErrorType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                ErrorType.BACKEND_MAINTENANCE_ERROR -> BACKEND_MAINTENANCE_ERROR
-            }
-    }
 }

@@ -12,7 +12,6 @@ object FaceToDomainRequest {
         when (faceRequest) {
             is IFaceCaptureRequest -> fromFaceToFaceCaptureRequest(faceRequest)
             is IFaceMatchRequest -> fromDomainToFaceMatchRequest(faceRequest)
-            is IFaceConfigurationRequest -> fromFaceToFaceConfigurationRequest(faceRequest)
             else -> throw InvalidFaceRequestException("Exception if not a Match, Capture or Configuration Request")
         }
 
@@ -25,6 +24,4 @@ object FaceToDomainRequest {
             faceRequest.queryForCandidates
         )
 
-    private fun fromFaceToFaceConfigurationRequest(faceRequest: IFaceConfigurationRequest) =
-        FaceConfigurationRequest(faceRequest.projectId, faceRequest.deviceId)
 }

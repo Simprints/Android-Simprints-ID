@@ -63,6 +63,7 @@ include(
 // Face modality modules
 include(
     ":face:controller",
+    ":face:configuration",
     ":face:infra:face-bio-sdk",
     ":face:infra:roc-wrapper",
 )

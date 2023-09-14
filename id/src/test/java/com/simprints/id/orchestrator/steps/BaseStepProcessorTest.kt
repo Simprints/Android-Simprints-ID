@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.steps
 
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
+import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
 import com.simprints.feature.consent.screens.ConsentWrapperActivity
 import com.simprints.feature.enrollast.EnrolLastBiometricWrapperActivity
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
@@ -30,6 +31,13 @@ open class BaseStepProcessorTest {
         expectedRequestCode,
         "com.simprints.face.orchestrator.FaceOrchestratorActivity",
         "FaceRequestBundleKey",
+    )
+
+    protected inline fun <reified T : Parcelable> verifyFaceConfigurationIntent(step: Step, expectedRequestCode: Int) = verifyStep<T>(
+        step,
+        expectedRequestCode,
+        "com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity",
+        FaceConfigurationWrapperActivity.FACE_CONFIGURATION_ARGS_EXTRA,
     )
 
     protected inline fun <reified T : Parcelable> verifyConsentIntent(step: Step) = verifyStep<T>(

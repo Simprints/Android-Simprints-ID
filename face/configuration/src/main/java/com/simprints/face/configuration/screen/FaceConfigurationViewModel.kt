@@ -1,10 +1,12 @@
-package com.simprints.face.configuration
+package com.simprints.face.configuration.screen
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.face.configuration.data.FaceConfigurationState
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseVendor
@@ -15,15 +17,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ConfigurationViewModel @Inject constructor(
+internal class FaceConfigurationViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
 ) : ViewModel() {
-    val configurationState: MutableLiveData<LiveDataEventWithContent<ConfigurationState>> = MutableLiveData()
+
+    val configurationState: LiveData<LiveDataEventWithContent<FaceConfigurationState>>
+        get() = _configurationState
+    private val _configurationState = MutableLiveData<LiveDataEventWithContent<FaceConfigurationState>>()
 
     fun retrieveLicense(projectId: String, deviceId: String) = viewModelScope.launch {
         licenseRepository.getLicenseStates(projectId, deviceId, LicenseVendor.RANK_ONE_FACE)
             .map { it.toConfigurationState() }
-            .collect { configurationState.send(it) }
+            .collect { _configurationState.send(it) }
     }
 
     fun deleteInvalidLicense() {
@@ -33,12 +38,12 @@ class ConfigurationViewModel @Inject constructor(
         }
     }
 
-    private fun LicenseState.toConfigurationState(): ConfigurationState =
+    private fun LicenseState.toConfigurationState(): FaceConfigurationState =
         when (this) {
-            LicenseState.Started -> ConfigurationState.Started
-            LicenseState.Downloading -> ConfigurationState.Downloading
-            is LicenseState.FinishedWithSuccess -> ConfigurationState.FinishedWithSuccess(license)
-            is LicenseState.FinishedWithError -> ConfigurationState.FinishedWithError(errorCode)
-            is LicenseState.FinishedWithBackendMaintenanceError -> ConfigurationState.FinishedWithBackendMaintenanceError(estimatedOutage)
+            LicenseState.Started -> FaceConfigurationState.Started
+            LicenseState.Downloading -> FaceConfigurationState.Downloading
+            is LicenseState.FinishedWithSuccess -> FaceConfigurationState.FinishedWithSuccess(license)
+            is LicenseState.FinishedWithError -> FaceConfigurationState.FinishedWithError(errorCode)
+            is LicenseState.FinishedWithBackendMaintenanceError -> FaceConfigurationState.FinishedWithBackendMaintenanceError(estimatedOutage)
         }
 }

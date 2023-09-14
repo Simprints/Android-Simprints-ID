@@ -3,7 +3,6 @@ package com.simprints.face.data.moduleapi.face
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.controllers.core.events.model.RefusalAnswer
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.face.data.moduleapi.face.responses.FaceConfigurationResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
@@ -138,15 +137,6 @@ class DomainToFaceResponseTest {
             assertThat(extra).isEqualTo("Some extra")
             assertThat(reason).isEqualTo(IFaceExitReason.OTHER)
         }
-    }
-
-    @Test
-    fun `Map to configuration response`() {
-        val response = FaceConfigurationResponse()
-
-        val iFaceResponse: IFaceResponse = DomainToFaceResponse.fromDomainToFaceResponse(response)
-
-        assertThat(iFaceResponse).isInstanceOf(IFaceConfigurationResponse::class.java)
     }
 
     private fun generateCaptureResult(): FaceCaptureResult {
