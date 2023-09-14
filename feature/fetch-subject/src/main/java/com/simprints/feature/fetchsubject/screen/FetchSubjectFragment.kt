@@ -44,7 +44,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
             state?.getContentIfNotHandled()?.let(::handleFetchState)
         }
 
-        tryFetchSubject()
+        viewModel.onViewCreated(args.projectId, args.subjectId)
     }
 
     private fun handleAlertResult(alertResult: AlertResult) {
