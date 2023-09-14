@@ -12,7 +12,6 @@ internal object FetchSubjectAlerts {
 
     const val ACTION_CLOSE = "action_close"
     const val ACTION_RETRY = "action_retry"
-    const val ACTION_WIFI_SETTINGS = "action_wifi_settings"
 
     private const val PAYLOAD_EXIT_FORM_ON_BACK = "show_exit_form_on_back"
 
@@ -44,9 +43,9 @@ internal object FetchSubjectAlerts {
             resultKey = ACTION_RETRY
         }
         rightButton = alertButton {
-            textRes = R.string.settings_label
+            textRes = R.string.close
             closeOnClick = true
-            resultKey = ACTION_WIFI_SETTINGS
+            resultKey = ACTION_CLOSE
         }
 
         payload = bundleOf(PAYLOAD_EXIT_FORM_ON_BACK to true)

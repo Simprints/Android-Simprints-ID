@@ -32,15 +32,6 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
     private val viewModel: FetchSubjectViewModel by viewModels()
     private val args: FetchSubjectFragmentArgs by navArgs()
 
-    private val openWifiSettings = registerForActivityResult(
-        object : ActivityResultContract<Unit, Unit>() {
-            override fun createIntent(context: Context, input: Unit) =
-                Intent(Settings.ACTION_WIFI_SETTINGS)
-
-            override fun parseResult(resultCode: Int, intent: Intent?) {}
-        }
-    ) { tryFetchSubject() }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -59,7 +50,6 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
     private fun handleAlertResult(alertResult: AlertResult) {
         when (alertResult.buttonKey) {
             FetchSubjectAlerts.ACTION_CLOSE -> finishWithResult(false)
-            FetchSubjectAlerts.ACTION_WIFI_SETTINGS -> openWifiSettings.launch(Unit)
             FetchSubjectAlerts.ACTION_RETRY -> tryFetchSubject()
             AlertContract.ALERT_BUTTON_PRESSED_BACK -> if (FetchSubjectAlerts.shouldShowExitForm(alertResult.payload)) {
                 viewModel.startExitForm()
