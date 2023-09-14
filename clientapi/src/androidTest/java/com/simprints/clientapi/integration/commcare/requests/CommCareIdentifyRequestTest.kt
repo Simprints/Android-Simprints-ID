@@ -37,10 +37,13 @@ class CommCareIdentifyRequestTest : BaseCommCareClientApiTest() {
         ActivityScenario.launch<CommCareActivity>(commCareBaseFlowIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
 
         val expectedAppRequest = AppIdentifyRequest(
-            projectIdField.value(),
-            userIdField.value(),
-            moduleIdField.value(),
-            metadataField.value())
+            projectId = projectIdField.value(),
+            userId = userIdField.value(),
+            isUserIdTokenized = false,
+            moduleId = moduleIdField.value(),
+            isModuleIdTokenized = false,
+            metadata = metadataField.value()
+        )
 
         intended(hasAction(APP_IDENTIFY_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))

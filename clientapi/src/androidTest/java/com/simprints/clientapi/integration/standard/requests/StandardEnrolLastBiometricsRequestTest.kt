@@ -47,11 +47,14 @@ class StandardEnrolLastBiometricsRequestTest : BaseStandardClientApiTest() {
         })
 
         val expectedAppRequest = AppEnrolLastBiometricsRequest(
-            projectIdField.value(),
-            userIdField.value(),
-            moduleIdField.value(),
-            metadataField.value(),
-            sessionIdField.value())
+            projectId = projectIdField.value(),
+            userId = userIdField.value(),
+            isUserIdTokenized = false,
+            moduleId = moduleIdField.value(),
+            isModuleIdTokenized = false,
+            metadata = metadataField.value(),
+            sessionId = sessionIdField.value()
+        )
 
         intended(hasAction(APP_ENROL_LAST_BIOMETRICS_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
