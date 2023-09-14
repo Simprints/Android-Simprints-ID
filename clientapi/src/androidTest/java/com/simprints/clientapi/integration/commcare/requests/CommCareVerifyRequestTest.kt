@@ -38,11 +38,14 @@ class CommCareVerifyRequestTest : BaseCommCareClientApiTest() {
         })
 
         val expectedAppRequest = AppVerifyRequest(
-            projectIdField.value(),
-            userIdField.value(),
-            moduleIdField.value(),
-            metadataField.value(),
-            verifyGuidField.value())
+            projectId = projectIdField.value(),
+            userId = userIdField.value(),
+            isUserIdTokenized = false,
+            moduleId = moduleIdField.value(),
+            isModuleIdTokenized = false,
+            metadata = metadataField.value(),
+            verifyGuid = verifyGuidField.value(),
+        )
 
         intended(hasAction(APP_VERIFICATION_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))

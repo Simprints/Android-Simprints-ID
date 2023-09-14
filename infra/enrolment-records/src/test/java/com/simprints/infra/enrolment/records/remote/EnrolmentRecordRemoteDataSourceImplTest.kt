@@ -96,14 +96,15 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                             finger = ApiFinger.LEFT_3RD_FINGER,
                         )
                     ),
-                    format = "ISO_19794_2"
+                    format = "ISO_19794_2",
                 ),
                 ApiFaceReference(
                     id = "b4a3ba90-6413-32b4-a4ea-a841a5a400ec",
                     templates = listOf(ApiFaceTemplate(template = BASE64_FACE_TEMPLATE)),
                     format = "faceTemplateFormat",
                 )
-            )
+            ),
+            tokenizedFields = listOf(MODULE_ID.value)
         )
         enrolmentRecordRemoteDataSourceImpl.uploadRecords(listOf(subject))
 
