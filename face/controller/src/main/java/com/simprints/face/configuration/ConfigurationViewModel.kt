@@ -7,7 +7,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
-import com.simprints.infra.license.LicenseVendor
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
@@ -18,10 +17,13 @@ import javax.inject.Inject
 class ConfigurationViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
 ) : ViewModel() {
+    companion object {
+        private const val RANK_ONE_FACE = "RANK_ONE_FACE"
+    }
     val configurationState: MutableLiveData<LiveDataEventWithContent<ConfigurationState>> = MutableLiveData()
 
     fun retrieveLicense(projectId: String, deviceId: String) = viewModelScope.launch {
-        licenseRepository.getLicenseStates(projectId, deviceId, LicenseVendor.RANK_ONE_FACE)
+        licenseRepository.getLicenseStates(projectId, deviceId, RANK_ONE_FACE)
             .map { it.toConfigurationState() }
             .collect { configurationState.send(it) }
     }
