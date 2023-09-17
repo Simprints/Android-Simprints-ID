@@ -5,20 +5,20 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.license.local.LicenseLocalDataSource
 import com.simprints.infra.license.local.LicenseLocalDataSourceImpl
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import kotlinx.coroutines.test.runTest
 import java.io.File
-import java.util.*
+import java.util.UUID
 
 class LicenseLocalDataSourceImplTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val filesFolder = "${app.filesDir}/${LicenseLocalDataSource.LICENSES_FOLDER}"
-    private val filePath = "$filesFolder/${LicenseLocalDataSource.LICENSE_NAME}"
+    private val licenseVendor = "vendor1"
+    private val filePath = "$filesFolder/$licenseVendor"
     private val licenseLocalDataSourceImpl = spyk(
         LicenseLocalDataSourceImpl(app, mockk(), UnconfinedTestDispatcher())
     )
@@ -31,7 +31,7 @@ class LicenseLocalDataSourceImplTest {
     @Test
     fun givenALicense_storeItEncrypted() = runTest {
         val license = UUID.randomUUID().toString()
-        licenseLocalDataSourceImpl.saveLicense(license)
+        licenseLocalDataSourceImpl.saveLicense(licenseVendor,license)
         val savedLicense = String(File(filePath).readBytes())
 
         assertThat(savedLicense).isNotEqualTo(license)
@@ -40,16 +40,11 @@ class LicenseLocalDataSourceImplTest {
     @Test
     fun givenAnEncryptedFile_decryptIt_shouldReturnTheRightContent() = runTest {
         val license = UUID.randomUUID().toString()
-        licenseLocalDataSourceImpl.saveLicense(license)
+        licenseLocalDataSourceImpl.saveLicense(licenseVendor,license)
 
-        val licenseRead = licenseLocalDataSourceImpl.getLicense()
+        val licenseRead = licenseLocalDataSourceImpl.getLicense(licenseVendor)
         assertThat(licenseRead).isEqualTo(license)
     }
 
-    @Test
-    fun ifLicenseInexistent_returnNull() = runTest {
-        every { licenseLocalDataSourceImpl.getFileFromAssets() } returns null
-        val licenseRead = licenseLocalDataSourceImpl.getLicense()
-        assertThat(licenseRead).isNull()
-    }
+
 }

@@ -1,27 +1,24 @@
 package com.simprints.infra.license.remote
 
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.simprints.infra.license.LicenseVendor
+import com.simprints.core.tools.json.JsonHelper
 
 /**
  * ApiLicense only populates some fields, based on which vendor was asked when retrieving the license.
  */
 @Keep
-internal data class ApiLicense(@JsonProperty("RANK_ONE_FACE") val rankOneLicense: RankOneLicense?) {
+internal data class ApiLicense(val licenses: Map<String, License> = emptyMap()) {
 
     /**
      * This method gets the correct license data based on which vendor is passed to it.
      * If the license doesn't contain data for that vendor, returns an empty string.
      */
-    fun getLicenseBasedOnVendor(licenseVendor: LicenseVendor): String =
-        when (licenseVendor) {
-            LicenseVendor.RANK_ONE_FACE -> rankOneLicense?.data ?: ""
-        }
+    fun getLicenseBasedOnVendor(vendor: String) = licenses[vendor]?.data ?: ""
+
 }
 
 @Keep
-internal data class RankOneLicense(val vendor: String, val expiration: String, val data: String)
+internal data class License(val vendor: String, val expiration: String, val data: String)
 
 /**
  * BFSID returns an error in the following format:
@@ -31,3 +28,34 @@ internal data class RankOneLicense(val vendor: String, val expiration: String, v
  */
 @Keep
 internal data class ApiLicenseError(val error: String)
+
+
+/**
+ * Parse api license
+
+ * example json:
+ *
+ * ```
+ * {
+ *  "RANK_ONE_FACE": {
+ *    "vendor": "RANK_ONE_FACE",
+ *    "expiration": "2023-12-31",
+ *    data: "..."
+ *    }
+ *    "NEC_FINGERPRINT": {
+ *    "vendor": "NEC_FINGERPRINT",
+ *    "expiration": "2023-12-31",
+ *    data: "..."
+ *    }
+ * }
+ *    ```
+ * @return ApiLicense
+ */
+internal fun String.parseApiLicense(): ApiLicense = JsonHelper.jackson.readTree(this).let {
+    return ApiLicense(
+        licenses = it.fields().asSequence().map { entry ->
+            entry.key to JsonHelper.jackson.treeToValue(entry.value, License::class.java)
+        }.toMap()
+    )
+}
+

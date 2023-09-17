@@ -16,27 +16,37 @@ internal class LicenseRepositoryImpl @Inject constructor(
     override fun getLicenseStates(
         projectId: String,
         deviceId: String,
-        licenseVendor: LicenseVendor
+        licenseVendor: String
     ): Flow<LicenseState> = flow {
         emit(LicenseState.Started)
 
-        val license = licenseLocalDataSource.getLicense()
+        val license = licenseLocalDataSource.getLicense(licenseVendor)
         if (license == null) {
             emit(LicenseState.Downloading)
-            licenseRemoteDataSource.getLicense(projectId, deviceId, licenseVendor).let { apiLicenseResult ->
-                when (apiLicenseResult) {
-                    is ApiLicenseResult.Success -> handleLicenseResultSuccess(apiLicenseResult)
-                    is ApiLicenseResult.Error -> handleLicenseResultError(apiLicenseResult)
-                    is ApiLicenseResult.BackendMaintenanceError -> handleLicenseResultBackendMaintenanceError(apiLicenseResult)
+            licenseRemoteDataSource.getLicense(projectId, deviceId, licenseVendor)
+                .let { apiLicenseResult ->
+                    when (apiLicenseResult) {
+                        is ApiLicenseResult.Success -> handleLicenseResultSuccess(
+                            licenseVendor,
+                            apiLicenseResult
+                        )
+
+                        is ApiLicenseResult.Error -> handleLicenseResultError(apiLicenseResult)
+                        is ApiLicenseResult.BackendMaintenanceError -> handleLicenseResultBackendMaintenanceError(
+                            apiLicenseResult
+                        )
+                    }
                 }
-            }
         } else {
             emit(LicenseState.FinishedWithSuccess(license))
         }
     }
 
-    private suspend fun FlowCollector<LicenseState>.handleLicenseResultSuccess(apiLicenseResult: ApiLicenseResult.Success) {
-        licenseLocalDataSource.saveLicense(apiLicenseResult.licenseJson)
+    private suspend fun FlowCollector<LicenseState>.handleLicenseResultSuccess(
+        licenseVendor: String,
+        apiLicenseResult: ApiLicenseResult.Success
+    ) {
+        licenseLocalDataSource.saveLicense(licenseVendor, apiLicenseResult.licenseJson)
         emit(LicenseState.FinishedWithSuccess(apiLicenseResult.licenseJson))
     }
 

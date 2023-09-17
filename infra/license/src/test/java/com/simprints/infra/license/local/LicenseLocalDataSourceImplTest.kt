@@ -12,13 +12,14 @@ import java.io.File
 
 class LicenseLocalDataSourceImplTest {
 
+    private val licenseVendor = "vendor1"
     @Test
     fun `check file directory is created`() = runTest(UnconfinedTestDispatcher()) {
 
         val path = "testpath"
         val file = File(path)
 
-        LicenseLocalDataSourceImpl(context = mockk() {
+        LicenseLocalDataSourceImpl(context = mockk {
             every { filesDir } returns file
         }, mockk(), UnconfinedTestDispatcher())
 
@@ -41,7 +42,7 @@ class LicenseLocalDataSourceImplTest {
 
 
         val fileName = "testfile"
-        localSource.saveLicense(fileName)
+        localSource.saveLicense(licenseVendor,fileName)
 
         verify(exactly = 1) { mockFile.openFileOutput() }
     }
@@ -60,7 +61,7 @@ class LicenseLocalDataSourceImplTest {
             every { filesDir } returns file
         }, encryptedFileMock, UnconfinedTestDispatcher())
 
-        localSource.getLicense()
+        localSource.getLicense(licenseVendor)
 
         verify(exactly = 1) { encryptedFileMock.getEncryptedFileBuilder(any(), any()) }
         verify(exactly = 1) { mockFile.openFileInput() }
@@ -78,7 +79,7 @@ class LicenseLocalDataSourceImplTest {
 
         localsource.deleteCachedLicense()
 
-        assert(!File("${path}/${LicenseLocalDataSource.LICENSES_FOLDER}/${LicenseLocalDataSource.LICENSE_NAME}").exists())
+        assert(!File("${path}/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists())
     }
 
 
