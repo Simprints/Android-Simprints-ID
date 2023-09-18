@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.core.DeviceID
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.feature.consent.ConsentType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppVerifyRequest
@@ -109,7 +110,7 @@ class ModalityFlowVerify @Inject constructor(
     }
 
     private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectQuery) {
-        steps.add(faceStepProcessor.buildStepMatch(probeSamples, query))
+        steps.add(faceStepProcessor.buildStepMatch(probeSamples, query, FlowProvider.FlowType.VERIFY))
     }
 
     private fun completeAllStepsIfFetchGuidResponseAndFailed(result: Step.Result?) {

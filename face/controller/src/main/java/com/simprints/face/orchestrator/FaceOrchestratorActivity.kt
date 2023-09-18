@@ -7,13 +7,12 @@ import androidx.activity.viewModels
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.face.R
-import com.simprints.face.base.FaceActivity
 import com.simprints.face.capture.FaceCaptureActivity
 import com.simprints.face.databinding.ActivityOrchestratorBinding
 import com.simprints.face.error.ErrorType
 import com.simprints.face.exceptions.InvalidFaceRequestException
-import com.simprints.face.match.FaceMatchActivity
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -23,7 +22,7 @@ import com.simprints.moduleapi.face.responses.IFaceResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FaceOrchestratorActivity : FaceActivity() {
+class FaceOrchestratorActivity : BaseActivity() {
 
     private val binding by viewBinding(ActivityOrchestratorBinding::inflate)
 
@@ -56,9 +55,6 @@ class FaceOrchestratorActivity : FaceActivity() {
             setResult(Activity.RESULT_OK, intent)
             finish()
         })
-        viewModel.startMatching.observe(this, LiveDataEventWithContentObserver {
-            startActivityForResult(FaceMatchActivity.getStartingIntent(this, it), MATCH_REQUEST)
-        })
         viewModel.errorEvent.observe(this, LiveDataEventObserver {
             findNavController(R.id.orchestrator_host_fragment).navigate(
                 R.id.action_global_errorFragment,
@@ -72,7 +68,6 @@ class FaceOrchestratorActivity : FaceActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 CAPTURE_REQUEST -> viewModel.captureFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
-                MATCH_REQUEST -> viewModel.matchFinished(data?.getParcelableExtra(IFaceResponse.BUNDLE_KEY))
             }
         } else {
             viewModel.unexpectedErrorHappened()
@@ -81,6 +76,5 @@ class FaceOrchestratorActivity : FaceActivity() {
 
     companion object {
         const val CAPTURE_REQUEST = 100
-        const val MATCH_REQUEST = 101
     }
 }

@@ -8,10 +8,10 @@ import androidx.activity.viewModels
 import androidx.navigation.findNavController
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.core.tools.whenNonNull
 import com.simprints.core.tools.whenNull
 import com.simprints.face.R
-import com.simprints.face.base.FaceActivity
 import com.simprints.face.controllers.core.events.model.RefusalAnswer.Companion.fromExitFormOption
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
@@ -30,7 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class FaceCaptureActivity : FaceActivity() {
+class FaceCaptureActivity : BaseActivity() {
     private val vm: FaceCaptureViewModel by viewModels()
 
     private val binding by viewBinding(ActivityFaceCaptureBinding::inflate)

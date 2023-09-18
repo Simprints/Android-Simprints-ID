@@ -2,11 +2,8 @@ package com.simprints.face.data.moduleapi.face
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
-import com.simprints.moduleapi.face.requests.IFaceConfigurationRequest
-import com.simprints.moduleapi.face.requests.IFaceMatchRequest
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import io.mockk.every
 import io.mockk.mockk
@@ -22,14 +19,6 @@ class FaceToDomainRequestTest {
 
         val faceRequest = FaceToDomainRequest.fromFaceToDomainRequest(request)
         assertThat(faceRequest).isInstanceOf(FaceCaptureRequest::class.java)
-    }
-
-    @Test
-    fun `Map match request`() {
-        val request = mockk<IFaceMatchRequest>(relaxed = true)
-
-        val faceRequest = FaceToDomainRequest.fromFaceToDomainRequest(request)
-        assertThat(faceRequest).isInstanceOf(FaceMatchRequest::class.java)
     }
 
     @Test(expected = InvalidFaceRequestException::class)

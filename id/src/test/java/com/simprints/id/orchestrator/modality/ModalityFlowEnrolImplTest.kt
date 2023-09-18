@@ -259,7 +259,7 @@ class ModalityFlowEnrolImplTest {
             mockk()
         )
 
-        verify(exactly = 1) { faceStepProcessor.buildStepMatch(any(), any()) }
+        verify(exactly = 1) { faceStepProcessor.buildStepMatch(any(), any(), any()) }
     }
 
     private fun buildAppEnrolRequest() =

@@ -2,14 +2,20 @@ package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
 import android.os.Parcelable
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
+import com.simprints.face.matcher.FaceMatchContract
+import com.simprints.face.matcher.FaceMatchParams
+import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.face.matcher.screen.FaceMatchWrapperActivity
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
+import com.simprints.id.domain.moduleapi.face.responses.entities.fromModuleApiToDomain
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
@@ -29,6 +35,7 @@ class FaceStepProcessorImpl @Inject constructor(
     companion object {
         const val ACTIVITY_CLASS_NAME = "com.simprints.face.orchestrator.FaceOrchestratorActivity"
         const val CONFIGURATION_CLASS_NAME = "com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity"
+        const val MATCHER_CLASS_NAME = "com.simprints.face.matcher.screen.FaceMatchWrapperActivity"
     }
 
     override suspend fun buildCaptureStep(): Step = buildStep(
@@ -38,10 +45,15 @@ class FaceStepProcessorImpl @Inject constructor(
 
     override fun buildStepMatch(
         probeFaceSample: List<FaceCaptureSample>,
-        query: SubjectQuery
-    ): Step = buildStep(
-        MATCH,
-        FaceMatchRequest(probeFaceSample, query)
+        query: SubjectQuery,
+        flowType: FlowProvider.FlowType,
+    ): Step = Step(
+        requestCode = MATCH.value,
+        activityName = MATCHER_CLASS_NAME,
+        bundleKey = FaceMatchWrapperActivity.FACE_MATCHER_ARGS_EXTRA,
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = FaceMatchContract.getArgs(probeFaceSample.map { FaceMatchParams.Sample(it.faceId, it.template) }, flowType, query),
+        status = Step.Status.NOT_STARTED
     )
 
     private fun buildStep(requestCode: FaceRequestCode, request: FaceRequest) = Step(
@@ -70,6 +82,13 @@ class FaceStepProcessorImpl @Inject constructor(
         val legacyFaceResult = data?.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)
         if (legacyFaceResult != null) {
             return legacyFaceResult.fromModuleApiToDomain()
+        }
+
+        if (data?.extras?.containsKey(FaceMatchContract.RESULT) == true) {
+            return when (val result = data.getParcelableExtra<Parcelable>(FaceMatchContract.RESULT)) {
+                is FaceMatchResult -> FaceMatchResponse(result.result.map { it.fromModuleApiToDomain() })
+                else -> null
+            }
         }
 
         if (data?.extras?.containsKey(FaceConfigurationContract.RESULT) == true) {

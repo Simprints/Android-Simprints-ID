@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/margin_large"
-    tools:context="com.simprints.face.match.FaceMatchActivity">
+    tools:context="com.simprints.face.matcher.screen.FaceMatchActivity">
 
     <TextView
         android:id="@+id/face_match_please_wait"
@@ -13,12 +13,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:text="@string/face_match_please_wait"
         app:layout_constraintBottom_toTopOf="@id/face_match_progress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:text="Loading candidates…" />
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/face_match_progress"

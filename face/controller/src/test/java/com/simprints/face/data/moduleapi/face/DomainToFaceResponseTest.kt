@@ -6,20 +6,16 @@ import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceExitFormResponse
-import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
-import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.Path
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
-import com.simprints.moduleapi.face.responses.IFaceConfigurationResponse
 import com.simprints.moduleapi.face.responses.IFaceErrorReason
 import com.simprints.moduleapi.face.responses.IFaceErrorResponse
 import com.simprints.moduleapi.face.responses.IFaceExitFormResponse
 import com.simprints.moduleapi.face.responses.IFaceExitReason
-import com.simprints.moduleapi.face.responses.IFaceMatchResponse
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import org.junit.Test
 import java.util.UUID
@@ -47,24 +43,6 @@ class DomainToFaceResponseTest {
             assertThat(sample?.imageRef?.path).isEqualTo(path)
 
             assertThat(sample?.format).isEqualTo(FACE_TEMPLATE_FORMAT)
-        }
-    }
-
-    @Test
-    fun `Map to match response`() {
-        val matchResults = listOf(generateMatchResult())
-        val response = FaceMatchResponse(matchResults)
-
-        val iFaceResponse: IFaceResponse = DomainToFaceResponse.fromDomainToFaceResponse(response)
-
-        assertThat(iFaceResponse).isInstanceOf(IFaceMatchResponse::class.java)
-
-        with(iFaceResponse as IFaceMatchResponse) {
-            assertThat(result.size).isEqualTo(1)
-
-            val first = result.first()
-            assertThat(first.guid).isEqualTo(matchResults.first().guid)
-            assertThat(first.confidence).isEqualTo(matchResults.first().confidence)
         }
     }
 
@@ -144,10 +122,6 @@ class DomainToFaceResponseTest {
         val sample =
             FaceSample(UUID.randomUUID().toString(), ByteArray(0), securedImageRef, FACE_TEMPLATE_FORMAT)
         return FaceCaptureResult(0, sample)
-    }
-
-    private fun generateMatchResult(): FaceMatchResult {
-        return FaceMatchResult(UUID.randomUUID().toString(), 0.9f)
     }
 
 }

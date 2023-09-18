@@ -23,6 +23,7 @@ import org.hamcrest.CoreMatchers.allOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.simprints.infra.resources.R as IDR
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -61,7 +62,7 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.face_confirm_title),
-                withText(R.string.title_confirmation)
+                withText(IDR.string.title_confirmation)
             )
         )
             .check(matches(isDisplayed()))
@@ -69,7 +70,7 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.confirmation_txt),
-                withText(R.string.captured_successfully)
+                withText(IDR.string.captured_successfully)
             )
         )
             .check(matches(isDisplayed()))
@@ -77,7 +78,7 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.recapture_btn),
-                withText(R.string.btn_recapture)
+                withText(IDR.string.btn_recapture)
             )
         )
             .check(matches(isDisplayed()))
@@ -85,7 +86,7 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.confirmation_btn),
-                withText(R.string.btn_finish)
+                withText(IDR.string.btn_finish)
             )
         )
             .check(matches(isDisplayed()))

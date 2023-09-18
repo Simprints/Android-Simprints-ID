@@ -18,9 +18,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation(project(":infra:config"))
-    implementation(project(":infra:enrolment-records"))
     implementation(project(":infra:events"))
-    implementation(project(":infra:license"))
     implementation(project(":infra:images"))
     implementation(project(":infra:resources"))
     implementation(project(":feature:alert"))
