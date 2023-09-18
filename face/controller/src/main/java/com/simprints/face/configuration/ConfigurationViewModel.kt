@@ -18,12 +18,12 @@ class ConfigurationViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
 ) : ViewModel() {
     companion object {
-        private const val RANK_ONE_FACE = "RANK_ONE_FACE"
+        private const val RANK_ONE_VENDOR_NAME = "RANK_ONE_FACE"
     }
     val configurationState: MutableLiveData<LiveDataEventWithContent<ConfigurationState>> = MutableLiveData()
 
     fun retrieveLicense(projectId: String, deviceId: String) = viewModelScope.launch {
-        licenseRepository.getLicenseStates(projectId, deviceId, RANK_ONE_FACE)
+        licenseRepository.getLicenseStates(projectId, deviceId, RANK_ONE_VENDOR_NAME)
             .map { it.toConfigurationState() }
             .collect { configurationState.send(it) }
     }

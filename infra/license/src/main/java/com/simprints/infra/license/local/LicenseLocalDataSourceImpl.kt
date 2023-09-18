@@ -17,11 +17,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
     @DispatcherIO private val dispatcherIo: CoroutineDispatcher,
 ) : LicenseLocalDataSource {
 
-    private val licensePath = "${context.filesDir}/${LICENSES_FOLDER}"
-
-    init {
-        createDirectoryIfNonExistent(licensePath)
-    }
+    private val licenseDirectoryPath = "${context.filesDir}/${LICENSES_FOLDER}"
 
 
     override suspend fun getLicense(vendor: String): String? = withContext(dispatcherIo) {
@@ -30,19 +26,19 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
     }
     private fun renameOldRocLicense() {
         // check if there is a ROC.lic file rename it to RANK_ONE_FACE to match the new license name
-        val oldLicensePath = "$licensePath/ROC.lic"
+        val oldLicensePath = "$licenseDirectoryPath/ROC.lic"
         val oldLicenseFile = File(oldLicensePath)
         if (oldLicenseFile.exists()) {
-            val newLicensePath = "$licensePath/RANK_ONE_FACE"
+            val newLicensePath = "$licenseDirectoryPath/RANK_ONE_FACE"
             oldLicenseFile.renameTo(File(newLicensePath))
         }
 
     }
     override suspend fun saveLicense(vendor: String, license: String): Unit =
         withContext(dispatcherIo) {
-            createDirectoryIfNonExistent(licensePath)
+            createDirectoryIfNonExistent(licenseDirectoryPath)
 
-            val file = File("$licensePath/$vendor")
+            val file = File("$licenseDirectoryPath/$vendor")
 
             try {
                 keyHelper.getEncryptedFileBuilder(file, context).openFileOutput()
@@ -53,17 +49,14 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         }
 
     private fun createDirectoryIfNonExistent(path: String) {
-        val file = File(path)
-        val fileName = file.name
-        val directory = File(path.replace(fileName, ""))
-
+        val directory = File(path)
         if (!directory.exists())
             directory.mkdirs()
     }
 
     override suspend fun deleteCachedLicense(): Unit = withContext(dispatcherIo) {
         try {
-            val deleted = File(licensePath).delete()
+            val deleted = File(licenseDirectoryPath).delete()
             Simber.d("Deleted cached licenses successfully = $deleted")
         } catch (t: Throwable) {
             Simber.e(t)
@@ -71,7 +64,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
     }
 
     private fun getFileFromStorage(vendor: String): String? = try {
-        val file = File("$licensePath/$vendor")
+        val file = File("$licenseDirectoryPath/$vendor")
         val encryptedFile = keyHelper.getEncryptedFileBuilder(file, context)
         encryptedFile.openFileInput().use { String(it.readBytes()) }
     } catch (t: Throwable) {
