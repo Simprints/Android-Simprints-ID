@@ -24,16 +24,20 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         renameOldRocLicense()// TODO: remove this after a few releases when all users have migrated to the 2023.3.0 version
         getFileFromStorage(vendor)
     }
+
     private fun renameOldRocLicense() {
         // check if there is a ROC.lic file rename it to RANK_ONE_FACE to match the new license name
         val oldLicensePath = "$licenseDirectoryPath/ROC.lic"
         val oldLicenseFile = File(oldLicensePath)
         if (oldLicenseFile.exists()) {
             val newLicensePath = "$licenseDirectoryPath/RANK_ONE_FACE"
-            oldLicenseFile.renameTo(File(newLicensePath))
+            if (!oldLicenseFile.renameTo(File(newLicensePath))) {
+                throw Exception("Failed to rename old ROC.lic license file to RANK_ONE_FACE")
+            }
         }
 
     }
+
     override suspend fun saveLicense(vendor: String, license: String): Unit =
         withContext(dispatcherIo) {
             createDirectoryIfNonExistent(licenseDirectoryPath)
