@@ -13,8 +13,7 @@ internal object FetchSubjectAlerts {
     const val ACTION_CLOSE = "action_close"
     const val ACTION_RETRY = "action_retry"
 
-    private const val PAYLOAD_EXIT_FORM_ON_BACK = "show_exit_form_on_back"
-    const val IS_ONLINE = "is_online"
+    private const val WAS_ONLINE = "was_online"
 
     fun subjectNotFoundOnline() = alertConfiguration {
         color = AlertColor.Gray
@@ -29,10 +28,7 @@ internal object FetchSubjectAlerts {
             resultKey = ACTION_CLOSE
         }
 
-        payload = bundleOf(
-            PAYLOAD_EXIT_FORM_ON_BACK to true,
-            IS_ONLINE to true
-        )
+        payload = bundleOf(WAS_ONLINE to true)
     }
 
     fun subjectNotFoundOffline() = alertConfiguration {
@@ -54,12 +50,9 @@ internal object FetchSubjectAlerts {
             resultKey = ACTION_CLOSE
         }
 
-        payload = bundleOf(
-            PAYLOAD_EXIT_FORM_ON_BACK to true,
-            IS_ONLINE to false
-        )
+        payload = bundleOf(WAS_ONLINE to false)
     }
 
-    fun shouldShowExitForm(bundle: Bundle) = bundle.getBoolean(PAYLOAD_EXIT_FORM_ON_BACK, false)
+    fun wasOnline(bundle: Bundle) = bundle.getBoolean(WAS_ONLINE, false)
 
 }

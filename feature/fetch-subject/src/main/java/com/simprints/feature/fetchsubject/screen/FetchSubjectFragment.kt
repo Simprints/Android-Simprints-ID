@@ -16,7 +16,6 @@ import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
 import com.simprints.feature.fetchsubject.FetchSubjectResult
-import com.simprints.feature.fetchsubject.screen.FetchSubjectAlerts.IS_ONLINE
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -46,13 +45,9 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
 
     private fun handleAlertResult(alertResult: AlertResult) {
         when (alertResult.buttonKey) {
-            FetchSubjectAlerts.ACTION_CLOSE -> finishWithResult(false, alertResult.payload.getBoolean(IS_ONLINE))
+            FetchSubjectAlerts.ACTION_CLOSE -> finishWithResult(false, FetchSubjectAlerts.wasOnline(alertResult.payload))
             FetchSubjectAlerts.ACTION_RETRY -> tryFetchSubject()
-            AlertContract.ALERT_BUTTON_PRESSED_BACK -> if (FetchSubjectAlerts.shouldShowExitForm(alertResult.payload)) {
-                viewModel.startExitForm()
-            } else {
-                finishWithResult(false)
-            }
+            AlertContract.ALERT_BUTTON_PRESSED_BACK -> viewModel.startExitForm()
         }
     }
 
