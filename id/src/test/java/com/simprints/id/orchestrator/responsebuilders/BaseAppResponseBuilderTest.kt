@@ -72,9 +72,18 @@ class BaseAppResponseBuilderTest {
     }
 
     @Test
-    fun `returns AppErrorResponse if steps contain FetchGUIDResponse(false)`() {
+    fun `returns AppErrorResponse if steps contain FetchGUIDResponse(false, false)`() {
         val response = builder.getErrorOrRefusalResponseIfAny(wrapIntoStepList(
-            FetchGUIDResponse(false)
+            FetchGUIDResponse(isGuidFound = false, wasOnline = false)
+        ))
+
+        assertThat(response).isInstanceOf(AppErrorResponse::class.java)
+    }
+
+    @Test
+    fun `returns AppErrorResponse if steps contain FetchGUIDResponse(false, true)`() {
+        val response = builder.getErrorOrRefusalResponseIfAny(wrapIntoStepList(
+            FetchGUIDResponse(isGuidFound = false, wasOnline = true)
         ))
 
         assertThat(response).isInstanceOf(AppErrorResponse::class.java)
