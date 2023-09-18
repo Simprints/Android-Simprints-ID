@@ -3,7 +3,6 @@ package com.simprints.infra.events.event.domain.models.callback
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
@@ -21,7 +20,7 @@ class ErrorCallbackEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLBACK_ERROR)
-        with(event.payload as ErrorCallbackPayload) {
+        with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(ErrorCallbackEvent.EVENT_VERSION)
@@ -37,7 +36,7 @@ class ErrorCallbackEventTest {
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLBACK_ERROR)
-        with(event.payload as ErrorCallbackPayload) {
+        with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(ErrorCallbackEvent.EVENT_VERSION)
@@ -52,6 +51,7 @@ class ErrorCallbackEventTest {
             IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN to ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN,
             IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN to ErrorReason.DIFFERENT_USER_ID_SIGNED_IN,
             IAppErrorReason.GUID_NOT_FOUND_ONLINE to ErrorReason.GUID_NOT_FOUND_ONLINE,
+            IAppErrorReason.GUID_NOT_FOUND_OFFLINE to ErrorReason.GUID_NOT_FOUND_OFFLINE,
             IAppErrorReason.UNEXPECTED_ERROR to ErrorReason.UNEXPECTED_ERROR,
             IAppErrorReason.BLUETOOTH_NOT_SUPPORTED to ErrorReason.BLUETOOTH_NOT_SUPPORTED,
             IAppErrorReason.LOGIN_NOT_COMPLETE to ErrorReason.LOGIN_NOT_COMPLETE,

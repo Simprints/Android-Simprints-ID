@@ -1,11 +1,7 @@
 package com.simprints.feature.fetchsubject.screen
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -20,6 +16,7 @@ import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
 import com.simprints.feature.fetchsubject.FetchSubjectResult
+import com.simprints.feature.fetchsubject.screen.FetchSubjectAlerts.IS_ONLINE
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -49,7 +46,7 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
 
     private fun handleAlertResult(alertResult: AlertResult) {
         when (alertResult.buttonKey) {
-            FetchSubjectAlerts.ACTION_CLOSE -> finishWithResult(false)
+            FetchSubjectAlerts.ACTION_CLOSE -> finishWithResult(false, alertResult.payload.getBoolean(IS_ONLINE))
             FetchSubjectAlerts.ACTION_RETRY -> tryFetchSubject()
             AlertContract.ALERT_BUTTON_PRESSED_BACK -> if (FetchSubjectAlerts.shouldShowExitForm(alertResult.payload)) {
                 viewModel.startExitForm()
@@ -99,8 +96,8 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
         findNavController().navigate(R.id.action_fetchSubjectFragment_to_exitFormFragment, exitFormArgs)
     }
 
-    private fun finishWithResult(found: Boolean) {
-        findNavController().finishWithResult(this, FetchSubjectResult(found))
+    private fun finishWithResult(found: Boolean, wasOnline: Boolean = false) {
+        findNavController().finishWithResult(this, FetchSubjectResult(found, wasOnline))
     }
 
     private fun handleExitFormResult(exiFormResult: ExitFormResult) {
