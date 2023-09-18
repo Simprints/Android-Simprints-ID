@@ -22,6 +22,7 @@ import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
 class LiveFeedbackFragmentTest {
@@ -53,7 +54,7 @@ class LiveFeedbackFragmentTest {
         onView(
             allOf(
                 withId(R.id.capture_feedback_txt_title),
-                withText(R.string.capture_title_previewing)
+                withText(IDR.string.capture_title_previewing)
             )
         )
             .check(matches(isDisplayed()))

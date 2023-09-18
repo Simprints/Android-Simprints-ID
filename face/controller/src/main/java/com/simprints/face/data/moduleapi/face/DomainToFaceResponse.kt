@@ -11,16 +11,12 @@ object DomainToFaceResponse {
     fun fromDomainToFaceResponse(faceResponse: FaceResponse): IFaceResponse =
         when (faceResponse.type) {
             FaceResponseType.CAPTURE -> fromDomainToFaceCaptureResponse(faceResponse as FaceCaptureResponse)
-            FaceResponseType.MATCH -> fromDomainToFaceMatchResponse(faceResponse as FaceMatchResponse)
             FaceResponseType.EXIT_FORM -> fromDomainToExitFormResponse(faceResponse as FaceExitFormResponse)
             FaceResponseType.ERROR -> fromDomainToErrorResponse(faceResponse as FaceErrorResponse)
         }
 
     private fun fromDomainToFaceCaptureResponse(faceCaptureResponse: FaceCaptureResponse): IFaceCaptureResponseImpl =
         IFaceCaptureResponseImpl(faceCaptureResponse.capturingResult)
-
-    private fun fromDomainToFaceMatchResponse(faceMatchResponse: FaceMatchResponse): IFaceMatchResponseImpl =
-        IFaceMatchResponseImpl(faceMatchResponse.result)
 
     private fun fromDomainToExitFormResponse(faceExitFormResponse: FaceExitFormResponse): IFaceExitFormResponseImpl =
         IFaceExitFormResponseImpl(
@@ -39,14 +35,6 @@ private class IFaceCaptureResponseImpl(
 ) : IFaceCaptureResponse {
     @IgnoredOnParcel
     override val type: IFaceResponseType = IFaceResponseType.CAPTURE
-}
-
-@Parcelize
-private class IFaceMatchResponseImpl(
-    override val result: List<IFaceMatchResult>
-) : IFaceMatchResponse {
-    @IgnoredOnParcel
-    override val type: IFaceResponseType = IFaceResponseType.MATCH
 }
 
 @Parcelize

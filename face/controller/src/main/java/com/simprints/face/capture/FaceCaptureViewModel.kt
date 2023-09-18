@@ -70,7 +70,7 @@ class FaceCaptureViewModel @Inject constructor(
 
     fun handleBackButton(backButtonContext: BackButtonContext) {
         when (backButtonContext) {
-            CAPTURE -> startExitForm()
+            CAPTURE -> exitFormEvent.send()
         }
     }
 
@@ -78,10 +78,6 @@ class FaceCaptureViewModel @Inject constructor(
         Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Starting face recapture flow")
         faceDetections = listOf()
         recaptureEvent.send()
-    }
-
-    private fun startExitForm() {
-        exitFormEvent.send()
     }
 
     private fun startNewAnalyticsSession() {

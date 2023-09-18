@@ -38,5 +38,3 @@ The reason behind returning `max` instead of `mean` is because there is a probab
 # Concurrency
 
 Because the process of matching can be expensive - it needs to match `n` probes against `f` candidate faces - we tried to run it in parallel. That way, we can run multiple matchings at the same time. Also, since the list will be ordered later, we don't need to care about the order that the results are returned as well.
-
-There is a bit of overhead when creating a new flow so there is a [test](../../../../../../../../core/src/test/java/com/simprints/core/tools/extentions/FlowKtTest.kt) that proves that even if the operation takes 1 millisecond, running in parallel it is times faster than sequential (not counting the overhead).

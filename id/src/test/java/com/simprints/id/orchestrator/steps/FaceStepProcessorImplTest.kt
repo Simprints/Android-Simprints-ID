@@ -7,9 +7,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
+import com.simprints.face.matcher.FaceMatchContract
+import com.simprints.face.matcher.FaceMatchResult
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
@@ -63,9 +66,9 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForVerify() {
-        val step = faceStepProcess.buildStepMatch(mockk(), mockk())
+        val step = faceStepProcess.buildStepMatch(mockk(), mockk(), mockk())
 
-        verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)
+        verifyFaceMatcherIntent<Bundle>(step)
     }
 
     @Test
@@ -77,16 +80,16 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForIdentify() = runTest {
-        val step = faceStepProcess.buildStepMatch(mockk(), mockk())
+        val step = faceStepProcess.buildStepMatch(mockk(), mockk(), mockk())
 
-        verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)
+        verifyFaceMatcherIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessorShouldBuildRightStepForConfiguration() {
         val step = faceStepProcess.buildConfigurationStep("projectId", "deviceId")
 
-        verifyFaceConfigurationIntent<Bundle>(step, CONFIGURATION.value)
+        verifyFaceConfigurationIntent<Bundle>(step)
     }
 
     @Test
@@ -98,9 +101,10 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessFaceIdentifyResult() {
-        faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, result)
+        val matchResult = Intent().putExtra(FaceMatchContract.RESULT, FaceMatchResult(emptyList()))
+        val result = faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, matchResult)
 
-        verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
+        assertThat(result).isInstanceOf(FaceMatchResponse::class.java)
     }
 
     @Test

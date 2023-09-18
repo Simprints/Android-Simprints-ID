@@ -8,7 +8,6 @@ import com.simprints.core.livedata.send
 import com.simprints.face.data.moduleapi.face.DomainToFaceResponse
 import com.simprints.face.data.moduleapi.face.FaceToDomainRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorReason
 import com.simprints.face.data.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceResponse
@@ -21,8 +20,6 @@ import javax.inject.Inject
 class FaceOrchestratorViewModel @Inject constructor() : ViewModel() {
     val startCapture: MutableLiveData<LiveDataEventWithContent<FaceCaptureRequest>> =
         MutableLiveData()
-    val startMatching: MutableLiveData<LiveDataEventWithContent<FaceMatchRequest>> =
-        MutableLiveData()
 
     val flowFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
 
@@ -31,19 +28,10 @@ class FaceOrchestratorViewModel @Inject constructor() : ViewModel() {
     fun start(iFaceRequest: IFaceRequest) {
         when (val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)) {
             is FaceCaptureRequest -> startCapture.send(request)
-            is FaceMatchRequest -> startMatching.send(request)
         }
     }
 
     fun captureFinished(faceCaptureResponse: FaceResponse?) {
-        if (faceCaptureResponse == null) {
-            flowFinished.value = null
-        } else {
-            flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(faceCaptureResponse))
-        }
-    }
-
-    fun matchFinished(faceCaptureResponse: FaceResponse?) {
         if (faceCaptureResponse == null) {
             flowFinished.value = null
         } else {

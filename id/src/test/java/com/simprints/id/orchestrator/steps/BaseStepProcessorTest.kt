@@ -3,12 +3,14 @@ package com.simprints.id.orchestrator.steps
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
+import com.simprints.face.matcher.screen.FaceMatchWrapperActivity
 import com.simprints.feature.consent.screens.ConsentWrapperActivity
 import com.simprints.feature.enrollast.EnrolLastBiometricWrapperActivity
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
 import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
 import com.simprints.feature.setup.SetupWrapperActivity
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 
 open class BaseStepProcessorTest {
 
@@ -33,11 +35,18 @@ open class BaseStepProcessorTest {
         "FaceRequestBundleKey",
     )
 
-    protected inline fun <reified T : Parcelable> verifyFaceConfigurationIntent(step: Step, expectedRequestCode: Int) = verifyStep<T>(
+    protected inline fun <reified T : Parcelable> verifyFaceConfigurationIntent(step: Step) = verifyStep<T>(
         step,
-        expectedRequestCode,
+        FaceRequestCode.CONFIGURATION.value,
         "com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity",
         FaceConfigurationWrapperActivity.FACE_CONFIGURATION_ARGS_EXTRA,
+    )
+
+    protected inline fun <reified T : Parcelable> verifyFaceMatcherIntent(step: Step) = verifyStep<T>(
+        step,
+        FaceRequestCode.MATCH.value,
+        "com.simprints.face.matcher.screen.FaceMatchWrapperActivity",
+        FaceMatchWrapperActivity.FACE_MATCHER_ARGS_EXTRA,
     )
 
     protected inline fun <reified T : Parcelable> verifyConsentIntent(step: Step) = verifyStep<T>(

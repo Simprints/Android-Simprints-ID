@@ -64,6 +64,7 @@ include(
 include(
     ":face:controller",
     ":face:configuration",
+    ":face:matcher",
     ":face:infra:face-bio-sdk",
     ":face:infra:roc-wrapper",
 )

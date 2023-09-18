@@ -11,17 +11,10 @@ object FaceToDomainRequest {
     fun fromFaceToDomainRequest(faceRequest: IFaceRequest): FaceRequest =
         when (faceRequest) {
             is IFaceCaptureRequest -> fromFaceToFaceCaptureRequest(faceRequest)
-            is IFaceMatchRequest -> fromDomainToFaceMatchRequest(faceRequest)
             else -> throw InvalidFaceRequestException("Exception if not a Match, Capture or Configuration Request")
         }
 
     private fun fromFaceToFaceCaptureRequest(faceRequest: IFaceCaptureRequest) =
         FaceCaptureRequest(faceRequest.nFaceSamplesToCapture)
-
-    private fun fromDomainToFaceMatchRequest(faceRequest: IFaceMatchRequest) =
-        FaceMatchRequest(
-            faceRequest.probeFaceSamples.map { it.fromModuleApiToDomainFaceSample() },
-            faceRequest.queryForCandidates
-        )
 
 }
