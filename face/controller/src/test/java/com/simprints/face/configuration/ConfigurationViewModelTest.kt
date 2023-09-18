@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
-import com.simprints.infra.license.LicenseVendor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.coEvery
@@ -88,7 +87,7 @@ class ConfigurationViewModelTest {
             licenseRepository.getLicenseStates(
                 projectId,
                 "",
-                LicenseVendor.RANK_ONE_FACE
+                "RANK_ONE_FACE"
             )
         } returns data
     }

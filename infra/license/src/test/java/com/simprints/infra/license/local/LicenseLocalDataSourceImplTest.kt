@@ -1,6 +1,7 @@
 package com.simprints.infra.license.local
 
 import androidx.security.crypto.EncryptedFile
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.infra.security.SecurityManager
 import io.mockk.every
 import io.mockk.mockk
@@ -8,28 +9,19 @@ import io.mockk.verify
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import org.junit.runner.RunWith
 import java.io.File
 
+@RunWith(AndroidJUnit4::class)
 class LicenseLocalDataSourceImplTest {
 
     private val licenseVendor = "vendor1"
-    @Test
-    fun `check file directory is created`() = runTest(UnconfinedTestDispatcher()) {
-
-        val path = "testpath"
-        val file = File(path)
-
-        LicenseLocalDataSourceImpl(context = mockk {
-            every { filesDir } returns file
-        }, mockk(), UnconfinedTestDispatcher())
-
-        assert(File("${path}/${LicenseLocalDataSource.LICENSES_FOLDER}").exists())
-    }
 
     @Test
-    fun `check saving the file opens a file output`() = runTest(UnconfinedTestDispatcher()) {
+    fun `check saving the file opens a file output`() = runTest {
 
-        val file = File("testpath")
+        val filesDirPath = "testpath"
+        val file = File(filesDirPath)
         val mockFile = mockk<EncryptedFile>()
 
         val encryptedFileMock = mockk<SecurityManager> {
@@ -42,13 +34,15 @@ class LicenseLocalDataSourceImplTest {
 
 
         val fileName = "testfile"
-        localSource.saveLicense(licenseVendor,fileName)
+        localSource.saveLicense(licenseVendor, fileName)
+
+        assert(File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}").exists())
 
         verify(exactly = 1) { mockFile.openFileOutput() }
     }
 
     @Test
-    fun `check getting the file requests the created file`() = runTest(UnconfinedTestDispatcher()) {
+    fun `check getting the file requests the created file`() = runTest {
 
         val file = File("testpath")
         val mockFile = mockk<EncryptedFile>()
@@ -68,7 +62,7 @@ class LicenseLocalDataSourceImplTest {
     }
 
     @Test
-    fun `check file delete deletes the dir`() = runTest(UnconfinedTestDispatcher()) {
+    fun `check file delete deletes the dir`() = runTest {
 
         val path = "testpath"
         val file = File(path)
