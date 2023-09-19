@@ -17,8 +17,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.work.await
-import com.simprints.face.R
-import com.simprints.face.databinding.FragmentLiveFeedbackBinding
+import com.simprints.face.capture.R
+import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable

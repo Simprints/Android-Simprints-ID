@@ -7,7 +7,7 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.simprints.core.tools.extentions.dpToPx
-import com.simprints.face.R
+import com.simprints.face.capture.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
 /**

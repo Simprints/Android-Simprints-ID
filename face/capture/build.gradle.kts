@@ -11,7 +11,7 @@ sonarqube {
 }
 
 android {
-    namespace = "com.simprints.face"
+    namespace = "com.simprints.face.capture"
 }
 
 dependencies {
