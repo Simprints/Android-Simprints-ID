@@ -17,6 +17,8 @@ import androidx.test.uiautomator.UiSelector
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.infra.logging.Simber
+import com.simprints.face.capture.screens.livefeedback.LiveFeedbackFragment
+import com.simprints.face.capture.screens.livefeedback.LiveFeedbackFragmentViewModel
 import io.mockk.mockk
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
@@ -45,7 +47,7 @@ class LiveFeedbackFragmentTest {
             launchFragmentInContainer<LiveFeedbackFragment>()
 
         liveFeedBackScenario.onFragment { liveFeedbackFragment ->
-            navController.setGraph(R.navigation.capture_graph)
+            navController.setGraph(R.navigation.face_capture_graph)
             Navigation.setViewNavController(liveFeedbackFragment.requireView(), navController)
         }
         allowPermissionsIfNeeded("Only this time")

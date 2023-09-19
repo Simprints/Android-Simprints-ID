@@ -22,7 +22,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.3" />
 
-    <com.simprints.face.capture.livefeedback.tools.CameraTargetOverlay
+    <com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
         android:id="@+id/capture_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -38,7 +38,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.simprints.face.widgets.DashedCircularProgress
+    <com.simprints.face.capture.screens.livefeedback.views.DashedCircularProgress
         android:id="@+id/capture_progress"
         android:layout_width="242dp"
         android:layout_height="242dp"

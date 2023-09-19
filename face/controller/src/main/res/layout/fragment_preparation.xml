@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    tools:context=".capture.livefeedback.PreparationFragment">
+    tools:context="com.simprints.face.capture.screens.preparation.PreparationFragment">
 
     <ImageView
         android:id="@+id/detection_onboarding_light_img"

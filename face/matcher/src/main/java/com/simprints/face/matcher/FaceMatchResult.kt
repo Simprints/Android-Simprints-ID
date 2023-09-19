@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FaceMatchResult(
-    val result: List<IFaceMatchResult>,
+    val results: List<IFaceMatchResult>,
 ) : Parcelable {
 
     @Parcelize

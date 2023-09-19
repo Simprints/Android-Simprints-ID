@@ -5,21 +5,19 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.face.matcher.FaceMatchContract
 import com.simprints.face.matcher.FaceMatchResult
-import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
-import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.infra.config.ConfigManager
-import com.simprints.moduleapi.face.responses.IFaceResponse
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -42,26 +40,9 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     private lateinit var faceStepProcess: FaceStepProcessor
 
-    private lateinit var iFaceResponseMock: IFaceResponse
-
-    val result by lazy {
-        Intent().apply {
-            putExtra(IFaceResponse.BUNDLE_KEY, iFaceResponseMock)
-        }
-    }
-
     @Before
     fun setUp() {
         faceStepProcess = FaceStepProcessorImpl(configManager)
-        mockFromModuleApiToDomainExt()
-    }
-
-    private fun mockFromModuleApiToDomainExt() {
-        mockkStatic("com.simprints.id.domain.moduleapi.face.responses.FaceResponseKt")
-        iFaceResponseMock = mockk()
-        every {
-            iFaceResponseMock.fromModuleApiToDomain()
-        } returns mockk()
     }
 
     @Test
@@ -75,7 +56,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     fun stepProcessorShouldBuildTheRightStepForEnrol() = runTest {
         val step = faceStepProcess.buildCaptureStep()
 
-        verifyFaceIntent<FaceCaptureRequest>(step, CAPTURE.value)
+        verifyFaceCaptureIntent<Bundle>(step)
     }
 
     @Test
@@ -94,9 +75,10 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessFaceEnrolResult() {
-        faceStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, result)
+        val captureResult = Intent().putExtra(FaceMatchContract.RESULT, FaceCaptureResult(emptyList()))
+        val result = faceStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, captureResult)
 
-        verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
+        assertThat(result).isInstanceOf(FaceCaptureResponse::class.java)
     }
 
     @Test
@@ -109,9 +91,10 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessFaceVerifyResult() {
-        faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, result)
+        val matchResult = Intent().putExtra(FaceMatchContract.RESULT, FaceMatchResult(emptyList()))
+        val result = faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, matchResult)
 
-        verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
+        assertThat(result).isInstanceOf(FaceMatchResponse::class.java)
     }
 
     @Test
@@ -124,9 +107,9 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldNotProcessNoFaceResult() {
-        faceStepProcess.processResult(0, Activity.RESULT_OK, result)
+        val result = faceStepProcess.processResult(0, Activity.RESULT_OK, Intent())
 
-        verify(exactly = 0) { iFaceResponseMock.fromModuleApiToDomain() }
+        assertThat(result).isNull()
     }
 
     @After

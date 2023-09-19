@@ -21,7 +21,6 @@ dependencies {
     implementation(project(":infra:events"))
     implementation(project(":infra:images"))
     implementation(project(":infra:resources"))
-    implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
 
     //BIO SDK
