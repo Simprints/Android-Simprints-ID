@@ -13,6 +13,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.face.R
 import com.simprints.face.controllers.core.events.FaceSessionEventsManager
 import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
+import com.simprints.face.capture.screens.preparation.PreparationFragment
 import io.mockk.mockk
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +33,7 @@ class PreparationFragmentTest {
             launchFragmentInContainer<PreparationFragment>()
 
         prepFragScenario.onFragment { prepFragment ->
-            navController.setGraph(R.navigation.capture_graph)
+            navController.setGraph(R.navigation.face_capture_graph)
             Navigation.setViewNavController(prepFragment.requireView(), navController)
         }
 

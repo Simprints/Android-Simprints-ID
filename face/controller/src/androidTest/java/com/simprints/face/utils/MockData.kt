@@ -1,7 +1,7 @@
 package com.simprints.face.utils
 
 import android.graphics.Bitmap
-import com.simprints.face.models.FaceDetection
+import com.simprints.face.capture.models.FaceDetection
 
 val mockFaceDetectionList = listOf(
     FaceDetection(

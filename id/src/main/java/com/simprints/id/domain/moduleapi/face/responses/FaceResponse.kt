@@ -14,13 +14,6 @@ interface FaceResponse : Parcelable, Result {
 
 }
 
-fun IFaceResponse.fromModuleApiToDomain(): FaceResponse? = when (type) {
-    IFaceResponseType.CAPTURE -> (this as IFaceCaptureResponse).fromModuleApiToDomain()
-    IFaceResponseType.EXIT_FORM -> (this as IFaceExitFormResponse).fromModuleApiToDomain()
-    IFaceResponseType.ERROR -> (this as IFaceErrorResponse).fromModuleApiToDomain()
-    IFaceResponseType.MATCH,
-    IFaceResponseType.CONFIGURATION -> null
-}
 
 enum class FaceResponseType {
     CAPTURE,

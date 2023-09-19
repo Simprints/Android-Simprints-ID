@@ -94,7 +94,7 @@ class OrchestratorManagerImplTest {
         orchestrator = buildOrchestratorManager()
         prepareModalFlowForFaceEnrol()
 
-        intending(toPackage(FaceStepProcessorImpl.ACTIVITY_CLASS_NAME))
+        intending(toPackage(FaceStepProcessorImpl.CAPTURE_ACTIVITY_NAME))
             .respondWith(ActivityResult(Activity.RESULT_OK, null))
     }
 
@@ -336,7 +336,7 @@ class OrchestratorManagerImplTest {
         mockSteps.add(
             Step(
                 requestCode = CAPTURE.value,
-                activityName = FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
+                activityName = FaceStepProcessorImpl.CAPTURE_ACTIVITY_NAME,
                 bundleKey = IFaceRequest.BUNDLE_KEY,
                 payloadType = Step.PayloadType.REQUEST,
                 payload = request,
@@ -412,7 +412,7 @@ class OrchestratorManagerImplTest {
         add(
             Step(
                 requestCode = CAPTURE.value,
-                activityName = FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
+                activityName = FaceStepProcessorImpl.CAPTURE_ACTIVITY_NAME,
                 bundleKey = IFaceRequest.BUNDLE_KEY,
                 payloadType = Step.PayloadType.REQUEST,
                 payload = FaceCaptureRequest(nFaceSamplesToCapture = 3),

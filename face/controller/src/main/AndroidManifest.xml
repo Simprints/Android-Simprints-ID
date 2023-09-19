@@ -3,18 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="LockedOrientationActivity">
 
-    <application
-        android:theme="@style/Theme.Simprints"
-        tools:ignore="GoogleAppIndexingWarning">
+    <application>
 
-        <activity
-            android:name=".orchestrator.FaceOrchestratorActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".capture.FaceCaptureActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity android:name="com.simprints.face.capture.screens.FaceCaptureWrapperActivity" />
 
     </application>
 

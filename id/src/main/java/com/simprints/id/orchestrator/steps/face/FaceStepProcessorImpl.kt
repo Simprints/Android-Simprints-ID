@@ -3,6 +3,9 @@ package com.simprints.id.orchestrator.steps.face
 import android.content.Intent
 import android.os.Parcelable
 import com.simprints.core.domain.common.FlowProvider
+import com.simprints.face.capture.FaceCaptureContract
+import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.face.capture.screens.FaceCaptureWrapperActivity
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
@@ -10,13 +13,14 @@ import com.simprints.face.matcher.FaceMatchContract
 import com.simprints.face.matcher.FaceMatchParams
 import com.simprints.face.matcher.FaceMatchResult
 import com.simprints.face.matcher.screen.FaceMatchWrapperActivity
-import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
+import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceExitReason
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.face.responses.entities.fromModuleApiToDomain
-import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CONFIGURATION
@@ -24,8 +28,6 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFace
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
-import com.simprints.moduleapi.face.requests.IFaceRequest
-import com.simprints.moduleapi.face.responses.IFaceResponse
 import javax.inject.Inject
 
 class FaceStepProcessorImpl @Inject constructor(
@@ -33,14 +35,20 @@ class FaceStepProcessorImpl @Inject constructor(
 ) : FaceStepProcessor {
 
     companion object {
-        const val ACTIVITY_CLASS_NAME = "com.simprints.face.orchestrator.FaceOrchestratorActivity"
-        const val CONFIGURATION_CLASS_NAME = "com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity"
-        const val MATCHER_CLASS_NAME = "com.simprints.face.matcher.screen.FaceMatchWrapperActivity"
+        const val CONFIGURATION_ACTIVITY_NAME = "com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity"
+        const val MATCHER_ACTIVITY_NAME = "com.simprints.face.matcher.screen.FaceMatchWrapperActivity"
+        const val CAPTURE_ACTIVITY_NAME = "com.simprints.face.capture.screens.FaceCaptureWrapperActivity"
     }
 
-    override suspend fun buildCaptureStep(): Step = buildStep(
-        CAPTURE,
-        FaceCaptureRequest(configManager.getProjectConfiguration().face?.nbOfImagesToCapture ?: 0)
+    override suspend fun buildCaptureStep(): Step = Step(
+        requestCode = CAPTURE.value,
+        activityName = CAPTURE_ACTIVITY_NAME,
+        bundleKey = FaceCaptureWrapperActivity.FACE_CAPTURE_ARGS_EXTRA,
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = FaceCaptureContract.getArgs(
+            configManager.getProjectConfiguration().face?.nbOfImagesToCapture ?: 0
+        ),
+        status = Step.Status.NOT_STARTED
     )
 
     override fun buildStepMatch(
@@ -49,25 +57,16 @@ class FaceStepProcessorImpl @Inject constructor(
         flowType: FlowProvider.FlowType,
     ): Step = Step(
         requestCode = MATCH.value,
-        activityName = MATCHER_CLASS_NAME,
+        activityName = MATCHER_ACTIVITY_NAME,
         bundleKey = FaceMatchWrapperActivity.FACE_MATCHER_ARGS_EXTRA,
         payloadType = Step.PayloadType.BUNDLE,
         payload = FaceMatchContract.getArgs(probeFaceSample.map { FaceMatchParams.Sample(it.faceId, it.template) }, flowType, query),
         status = Step.Status.NOT_STARTED
     )
 
-    private fun buildStep(requestCode: FaceRequestCode, request: FaceRequest) = Step(
-        requestCode = requestCode.value,
-        activityName = ACTIVITY_CLASS_NAME,
-        bundleKey = IFaceRequest.BUNDLE_KEY,
-        payloadType = Step.PayloadType.REQUEST,
-        payload = request,
-        status = Step.Status.NOT_STARTED
-    )
-
     override fun buildConfigurationStep(projectId: String, deviceId: String): Step = Step(
         requestCode = CONFIGURATION.value,
-        activityName = CONFIGURATION_CLASS_NAME,
+        activityName = CONFIGURATION_ACTIVITY_NAME,
         bundleKey = FaceConfigurationWrapperActivity.FACE_CONFIGURATION_ARGS_EXTRA,
         payloadType = Step.PayloadType.BUNDLE,
         payload = FaceConfigurationContract.getArgs(projectId, deviceId),
@@ -79,14 +78,20 @@ class FaceStepProcessorImpl @Inject constructor(
             return null
         }
 
-        val legacyFaceResult = data?.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)
-        if (legacyFaceResult != null) {
-            return legacyFaceResult.fromModuleApiToDomain()
+        if (data?.extras?.containsKey(FaceCaptureContract.RESULT) == true) {
+            val res = when (val result = data.getParcelableExtra<Parcelable>(FaceCaptureContract.RESULT)) {
+                is FaceCaptureResult -> FaceCaptureResponse(result.results.map { it.fromModuleApiToDomain() })
+                is ExitFormResult -> result.submittedOption()
+                    ?.let { FaceExitFormResponse(FaceExitReason.fromExitFormOption(it), result.reason.orEmpty()) }
+
+                else -> null
+            }
+            return res
         }
 
         if (data?.extras?.containsKey(FaceMatchContract.RESULT) == true) {
             return when (val result = data.getParcelableExtra<Parcelable>(FaceMatchContract.RESULT)) {
-                is FaceMatchResult -> FaceMatchResponse(result.result.map { it.fromModuleApiToDomain() })
+                is FaceMatchResult -> FaceMatchResponse(result.results.map { it.fromModuleApiToDomain() })
                 else -> null
             }
         }

@@ -14,6 +14,7 @@ import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.R
 import com.simprints.face.capture.FaceCaptureViewModel
 import com.simprints.face.utils.mockFaceDetectionList
+import com.simprints.face.capture.screens.confirmation.ConfirmationFragment
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -55,7 +56,7 @@ class ConfirmationFragmentTest {
             launchFragmentInContainer<ConfirmationFragment>()
 
         confirmationScenario.onFragment { confirmationFragment ->
-            navController.setGraph(R.navigation.capture_graph)
+            navController.setGraph(R.navigation.face_capture_graph)
             Navigation.setViewNavController(confirmationFragment.requireView(), navController)
         }
 
