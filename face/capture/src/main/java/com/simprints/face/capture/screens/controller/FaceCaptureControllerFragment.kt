@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
-import com.simprints.face.R
+import com.simprints.face.capture.R
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.exitFormConfiguration

@@ -171,11 +171,15 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew face:controller:jacocoTestReport
+                    - ./gradlew face:configuration:jacocoTestReport
+                    - ./gradlew face:capture:jacocoTestReport
+                    - ./gradlew face:matcher:jacocoTestReport
                     - ./gradlew face:infra:face-bio-sdk:jacocoTestReport
                     - ./gradlew face:infra:roc-wrapper:jacocoTestReport
                 artifacts:
-                    - face/controller/build/reports/**
+                    - face/configuration/build/reports/**
+                    - face/capture/build/reports/**
+                    - face/matcher/build/reports/**
                     - face/infra/face-bio-sdk/build/reports/**
                     - face/infra/roc-wrapper/build/reports/**
 

@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
-import com.simprints.face.R
-import com.simprints.face.databinding.ActivityFaceCaptureWrapperBinding
+import com.simprints.face.capture.R
+import com.simprints.face.capture.databinding.ActivityFaceCaptureWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.capture.FaceCaptureContract

@@ -6,8 +6,8 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.face.R
-import com.simprints.face.databinding.FragmentConfirmationBinding
+import com.simprints.face.capture.R
+import com.simprints.face.capture.databinding.FragmentConfirmationBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.capture.screens.FaceCaptureViewModel
 import dagger.hilt.android.AndroidEntryPoint

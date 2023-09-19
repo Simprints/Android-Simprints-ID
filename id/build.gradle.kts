@@ -67,7 +67,7 @@ dependencies {
     implementation(project(":feature:consent"))
 
     implementation(project(":fingerprint:controller"))
-    implementation(project(":face:controller"))
+    implementation(project(":face:capture"))
     implementation(project(":face:configuration"))
     implementation(project(":face:matcher"))
 
