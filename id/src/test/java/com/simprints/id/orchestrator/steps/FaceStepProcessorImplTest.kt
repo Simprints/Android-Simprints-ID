@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
@@ -75,7 +76,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessFaceEnrolResult() {
-        val captureResult = Intent().putExtra(FaceMatchContract.RESULT, FaceCaptureResult(emptyList()))
+        val captureResult = Intent().putExtra(FaceCaptureContract.RESULT, FaceCaptureResult(emptyList()))
         val result = faceStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, captureResult)
 
         assertThat(result).isInstanceOf(FaceCaptureResponse::class.java)

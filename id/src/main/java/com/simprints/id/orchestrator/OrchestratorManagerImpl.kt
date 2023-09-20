@@ -7,6 +7,7 @@ import com.simprints.core.domain.common.FlowProvider.FlowType.ENROL
 import com.simprints.core.domain.common.FlowProvider.FlowType.IDENTIFY
 import com.simprints.core.domain.common.FlowProvider.FlowType.VERIFY
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
@@ -25,6 +26,7 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import javax.inject.Inject
@@ -77,8 +79,9 @@ class OrchestratorManagerImpl @Inject constructor(
                     .all { it.getResult() is FingerprintCaptureResponse }
 
             val faceCaptureCompleted =
-                !modalities.contains(GeneralConfiguration.Modality.FACE) || modalitiesFlow.steps.filter { it.payload is FaceCaptureRequest }
-                    .all { it.getResult() is FaceCaptureResponse }
+                !modalities.contains(GeneralConfiguration.Modality.FACE) ||
+                    modalitiesFlow.steps.filter { it.requestCode == FaceRequestCode.CAPTURE.value }
+                        .all { it.getResult() is FaceCaptureResponse }
 
 
             if (fingerprintCaptureCompleted && faceCaptureCompleted) {

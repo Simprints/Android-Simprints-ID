@@ -11,9 +11,4 @@ enum class FaceRequestType {
     MATCH,
 }
 
-fun FaceRequest.fromDomainToModuleApi() = when (type) {
-    FaceRequestType.CAPTURE -> (this as FaceCaptureRequest).fromDomainToModuleApi()
-    FaceRequestType.MATCH -> (this as FaceMatchRequest).fromDomainToModuleApi()
-}
-
 
