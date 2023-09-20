@@ -39,7 +39,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
     }
 
     suspend fun addCaptureEvents(faceDetection: FaceDetection, attempt: Int, qualityThreshold: Float): String {
-        val payload = FaceCaptureEvent(
+        val faceCaptureEvent = FaceCaptureEvent(
             faceDetection.detectionStartTime,
             faceDetection.detectionEndTime,
             attempt,
@@ -50,8 +50,8 @@ internal class SimpleCaptureEventReporter @Inject constructor(
             payloadId = faceDetection.id,
         )
 
-        eventRepository.addOrUpdateEvent(payload)
-        if (payload.payload.result == FaceCapturePayload.Result.VALID) {
+        eventRepository.addOrUpdateEvent(faceCaptureEvent)
+        if (faceDetection.hasValidStatus()) {
             eventRepository.addOrUpdateEvent(FaceCaptureBiometricsEvent(
                 faceDetection.detectionStartTime,
                 mapDetectionToCaptureBometricPayloadFace(faceDetection),
@@ -59,7 +59,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
             ))
         }
 
-        return payload.id
+        return faceCaptureEvent.id
     }
 
     private fun mapDetectionStatusToPayloadResult(faceDetection: FaceDetection) =
