@@ -10,19 +10,13 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.R
-import com.simprints.face.controllers.core.events.FaceSessionEventsManager
-import com.simprints.face.controllers.core.timehelper.FaceTimeHelper
+import com.simprints.face.capture.R
 import com.simprints.face.capture.screens.preparation.PreparationFragment
-import io.mockk.mockk
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class PreparationFragmentTest {
-
-    private val faceTimeHelper: FaceTimeHelper = mockk(relaxed = true)
-    private val faceSessionEventsManager: FaceSessionEventsManager = mockk(relaxed = true)
 
     @Test
     fun testNavigationFromPreparationToLiveFeedBackFragment() {
@@ -33,7 +27,7 @@ class PreparationFragmentTest {
             launchFragmentInContainer<PreparationFragment>()
 
         prepFragScenario.onFragment { prepFragment ->
-            navController.setGraph(R.navigation.face_capture_graph)
+            navController.setGraph(R.navigation.graph_face_capture_internal)
             Navigation.setViewNavController(prepFragment.requireView(), navController)
         }
 

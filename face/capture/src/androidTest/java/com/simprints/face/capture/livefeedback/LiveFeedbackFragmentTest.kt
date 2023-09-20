@@ -14,8 +14,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiSelector
-import com.simprints.face.R
-import com.simprints.face.capture.FaceCaptureViewModel
+import com.simprints.face.capture.R
+import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.Simber
 import com.simprints.face.capture.screens.livefeedback.LiveFeedbackFragment
 import com.simprints.face.capture.screens.livefeedback.LiveFeedbackFragmentViewModel
@@ -47,7 +47,7 @@ class LiveFeedbackFragmentTest {
             launchFragmentInContainer<LiveFeedbackFragment>()
 
         liveFeedBackScenario.onFragment { liveFeedbackFragment ->
-            navController.setGraph(R.navigation.face_capture_graph)
+            navController.setGraph(R.navigation.graph_face_capture_internal)
             Navigation.setViewNavController(liveFeedbackFragment.requireView(), navController)
         }
         allowPermissionsIfNeeded("Only this time")
