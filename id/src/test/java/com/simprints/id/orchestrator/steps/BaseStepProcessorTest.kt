@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator.steps
 
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.face.capture.screens.FaceCaptureWrapperActivity
 import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
 import com.simprints.face.matcher.screen.FaceMatchWrapperActivity
@@ -32,7 +31,7 @@ open class BaseStepProcessorTest {
 
     protected inline fun <reified T : Parcelable> verifyFaceCaptureIntent(step: Step) = verifyStep<T>(
         step,
-        FaceRequestCode.CAPTURE.value
+        FaceRequestCode.CAPTURE.value,
         "com.simprints.face.capture.screens.FaceCaptureWrapperActivity",
         FaceCaptureWrapperActivity.FACE_CAPTURE_ARGS_EXTRA,
     )

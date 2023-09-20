@@ -10,8 +10,5 @@ data class FaceCaptureRequest(
     override val type: FaceRequestType = FaceRequestType.CAPTURE,
 ) : FaceRequest
 
-fun FaceCaptureRequest.fromDomainToModuleApi(): IFaceCaptureRequest =
-    IFaceCaptureRequestImpl(nFaceSamplesToCapture)
-
 @Parcelize
 private data class IFaceCaptureRequestImpl(override val nFaceSamplesToCapture: Int) : IFaceCaptureRequest
