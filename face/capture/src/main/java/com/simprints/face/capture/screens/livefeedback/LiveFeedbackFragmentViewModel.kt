@@ -17,7 +17,6 @@ import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -177,24 +176,19 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         }
     }
 
-    private fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
-        viewModelScope.launch {
-            val qualityThreshold = configManager.getProjectConfiguration().face!!.qualityThreshold.toFloat()
-            faceDetection.id = eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
-        }
-    }
-
     /**
      * Since events are saved in a blocking way in [SimpleCaptureEventReporter.addCaptureEvents],
      * to speed things up this method creates multiple async jobs and run them all in parallel.
-     *
-     * This is already running in a background Thread because of CameraView, don't worry about the runBlocking.
      */
     private fun sendAllCaptureEvents(attemptNumber: Int) = runBlocking {
-        val allDeferredEvents = mutableListOf<Deferred<Unit>>()
-        allDeferredEvents += userCaptures.map { async { sendCaptureEvent(it, attemptNumber) } }
-        allDeferredEvents += async { sendCaptureEvent(fallbackCapture, attemptNumber) }
-        allDeferredEvents.awaitAll()
+        userCaptures.map { async { sendCaptureEvent(it, attemptNumber) } }
+            .plus(async { sendCaptureEvent(fallbackCapture, attemptNumber) })
+            .awaitAll()
+    }
+
+    private suspend fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
+        val qualityThreshold = configManager.getProjectConfiguration().face!!.qualityThreshold.toFloat()
+        faceDetection.id = eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
