@@ -1,11 +1,7 @@
 package com.simprints.feature.fetchsubject.screen
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -32,15 +28,6 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
     private val viewModel: FetchSubjectViewModel by viewModels()
     private val args: FetchSubjectFragmentArgs by navArgs()
 
-    private val openWifiSettings = registerForActivityResult(
-        object : ActivityResultContract<Unit, Unit>() {
-            override fun createIntent(context: Context, input: Unit) =
-                Intent(Settings.ACTION_WIFI_SETTINGS)
-
-            override fun parseResult(resultCode: Int, intent: Intent?) {}
-        }
-    ) { tryFetchSubject() }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -53,19 +40,14 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
             state?.getContentIfNotHandled()?.let(::handleFetchState)
         }
 
-        tryFetchSubject()
+        viewModel.onViewCreated(args.projectId, args.subjectId)
     }
 
     private fun handleAlertResult(alertResult: AlertResult) {
         when (alertResult.buttonKey) {
-            FetchSubjectAlerts.ACTION_CLOSE -> finishWithResult(false)
-            FetchSubjectAlerts.ACTION_WIFI_SETTINGS -> openWifiSettings.launch(Unit)
+            FetchSubjectAlerts.ACTION_CLOSE -> finishWithResult(false, FetchSubjectAlerts.wasOnline(alertResult.payload))
             FetchSubjectAlerts.ACTION_RETRY -> tryFetchSubject()
-            AlertContract.ALERT_BUTTON_PRESSED_BACK -> if (FetchSubjectAlerts.shouldShowExitForm(alertResult.payload)) {
-                viewModel.startExitForm()
-            } else {
-                finishWithResult(false)
-            }
+            AlertContract.ALERT_BUTTON_PRESSED_BACK -> viewModel.startExitForm()
         }
     }
 
@@ -109,8 +91,8 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
         findNavController().navigate(R.id.action_fetchSubjectFragment_to_exitFormFragment, exitFormArgs)
     }
 
-    private fun finishWithResult(found: Boolean) {
-        findNavController().finishWithResult(this, FetchSubjectResult(found))
+    private fun finishWithResult(found: Boolean, wasOnline: Boolean = false) {
+        findNavController().finishWithResult(this, FetchSubjectResult(found, wasOnline))
     }
 
     private fun handleExitFormResult(exiFormResult: ExitFormResult) {

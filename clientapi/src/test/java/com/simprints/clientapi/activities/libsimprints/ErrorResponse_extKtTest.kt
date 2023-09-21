@@ -56,6 +56,14 @@ class ErrorResponseExtKtTest {
     }
 
     @Test
+    fun libSimprintsResultCode_GUID_NOT_FOUND_OFFLINE_mapCorrectly() {
+        val errorResponseReason = ErrorResponse.Reason.GUID_NOT_FOUND_OFFLINE
+        val libSimprintsreason = Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE
+
+        assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
+    }
+
+    @Test
     fun libSimprintsResultCode_UNEXPECTED_ERROR_mapCorrectly() {
         val errorResponseReason = ErrorResponse.Reason.UNEXPECTED_ERROR
         val libSimprintsreason = Constants.SIMPRINTS_UNEXPECTED_ERROR
@@ -182,6 +190,23 @@ class ErrorResponseExtKtTest {
 
         assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
     }
+
+    @Test
+    fun libSimprintsResultCode_PROJECT_ENDING_mapCorrectly() {
+        val errorResponseReason = ErrorResponse.Reason.PROJECT_ENDING
+        val libSimprintsreason = Constants.SIMPRINTS_PROJECT_ENDING
+
+        assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
+    }
+
+    @Test
+    fun libSimprintsResultCode_PROJECT_PAUSED_mapCorrectly() {
+        val errorResponseReason = ErrorResponse.Reason.PROJECT_PAUSED
+        val libSimprintsreason = Constants.SIMPRINTS_PROJECT_PAUSED
+
+        assertThat(errorResponseReason.libSimprintsResultCode()).isEqualTo(libSimprintsreason)
+    }
+
     @Test
     fun libSimprintsResultCode_BLUETOOTH_NO_PERMISSION_mapCorrectly() {
         val errorResponseReason = ErrorResponse.Reason.BLUETOOTH_NO_PERMISSION
