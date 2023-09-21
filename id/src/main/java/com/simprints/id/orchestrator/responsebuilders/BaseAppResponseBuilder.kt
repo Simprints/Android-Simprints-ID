@@ -61,7 +61,11 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
 
     private fun buildAppErrorResponse(fetchGUIDResponse: FetchGUIDResponse) =
         if (!fetchGUIDResponse.isGuidFound) {
-            AppErrorResponse(AppErrorResponse.Reason.GUID_NOT_FOUND_ONLINE)
+            if (fetchGUIDResponse.wasOnline) {
+                AppErrorResponse(AppErrorResponse.Reason.GUID_NOT_FOUND_ONLINE)
+            } else {
+                AppErrorResponse(AppErrorResponse.Reason.GUID_NOT_FOUND_OFFLINE)
+            }
         } else {
             null
         }

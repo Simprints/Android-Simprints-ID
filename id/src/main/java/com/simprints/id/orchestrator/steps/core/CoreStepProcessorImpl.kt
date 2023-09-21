@@ -132,7 +132,7 @@ class CoreStepProcessorImpl @Inject constructor(
         data.containsKey(FetchSubjectContract.FETCH_SUBJECT_RESULT) -> {
             when (val result = data.getParcelable<Parcelable>(FetchSubjectContract.FETCH_SUBJECT_RESULT)) {
                 is ExitFormResult -> mapExitFormResponse(result)
-                is FetchSubjectResult -> FetchGUIDResponse(result.found)
+                is FetchSubjectResult -> FetchGUIDResponse(result.found, result.wasOnline)
                 else -> null
             }
         }

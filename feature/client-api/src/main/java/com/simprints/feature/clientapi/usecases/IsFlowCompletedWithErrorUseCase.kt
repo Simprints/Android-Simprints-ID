@@ -15,6 +15,7 @@ internal class IsFlowCompletedWithErrorUseCase @Inject constructor() {
         IAppErrorReason.BLUETOOTH_NOT_SUPPORTED,
         IAppErrorReason.BLUETOOTH_NO_PERMISSION,
         IAppErrorReason.GUID_NOT_FOUND_ONLINE,
+        IAppErrorReason.GUID_NOT_FOUND_OFFLINE,
         IAppErrorReason.PROJECT_PAUSED,
         IAppErrorReason.PROJECT_ENDING,
         -> true
