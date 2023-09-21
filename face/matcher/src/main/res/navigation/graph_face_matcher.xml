@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/graph_face_matcher"
+    app:startDestination="@id/faceMatcherFragment">
+
+    <fragment
+        android:id="@+id/faceMatcherFragment"
+        android:name="com.simprints.face.matcher.screen.FaceMatchFragment"
+        android:label="FaceMatcherFragment">
+        <argument
+            android:name="params"
+            app:argType="com.simprints.face.matcher.FaceMatchParams" />
+    </fragment>
+</navigation>

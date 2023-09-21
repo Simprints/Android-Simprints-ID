@@ -8,4 +8,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class FetchSubjectResult(
     val found: Boolean,
+    val wasOnline: Boolean = false
 ) : Parcelable

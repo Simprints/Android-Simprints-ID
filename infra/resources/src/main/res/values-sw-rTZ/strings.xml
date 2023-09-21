@@ -141,7 +141,6 @@
     <string name="progress_sync_overlay">Inasawazisha...</string>
     <string name="privacy_notice_title">Taarifa zinazohusiana na kutoa idhin</string>
     <string name="enrol_last_biometrics_alert_message">1. Imeshindwa kuhifadhi rekodi ya %1$s \n 2. Gusa funga</string>
-    <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Alama ya kidole</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Alama ya Uso/Kidole</string>
     <string name="enrol_last_biometrics_success">Usajili uliofanikiwa</string>
@@ -349,4 +348,83 @@
     <string name="guid_selection_data_sent">Taarifa zimetumwa</string>
     <string name="guid_selection_result_sent">Matokeo yametumwa</string>
 
+    <string name="title_confirmation">Kuhakiki</string>
+    <string name="capture_title_howto">Unaskani vipi sura</string>
+    <string name="capture_title_previewing">Inaandaa kuskani</string>
+    <string name="capture_title_looks_good">Skani iko tayari</string>
+    <string name="capture_error_no_face">Hakikisha sura imejaa kwenye duara</string>
+    <string name="capture_error_face_too_far">Sogea karibu</string>
+    <string name="capture_error_face_too_close">Rudi nyuma</string>
+    <string name="capture_error_look_straight">Hakikisha mtu anaangalia kwa kunyooka kwenye kamera</string>
+    <string name="capture_ready" translatable="false">Tayari kwa kupiga picha</string>
+    <string name="capture_prep_begin_btn" translatable="false">Bonyeza ili kupiga picha</string>
+    <string name="capture_prep_begin_btn_capturing">Inapiga picha</string>
+    <string name="capture_title_scan_progress">Skani inaendelea</string>
+    <string name="capture_hold">Kaa hivohivo</string>
+    <string name="captured_successfully">Picha ya sura imefanikiwa kuchukuliwa</string>
+    <string name="title_preparation">Maandalizi</string>
+    <string name="btn_finish">Bonyeza ili kuendelea</string>
+    <string name="btn_capture_again">Piga tena</string>
+    <string name="captured_unsuccessful">Imeshindwa kuchukukua picha ya sura kwa sababu ya tatizo la kiufundi</string>
+    <string name="retry_tips">Hivi ndivyo unaweza kutatua tatizo\n\n1.Hakikisha uko kwenye mwanga.\n2.Hakikisha anayepigwa picha ameangalia kwa kunyooka.\n3. endelea kubaki na kukaa hivyohivyo</string>
+    <string name="onboarding_light">Tafuta mahali penye mwanga mzuri</string>
+    <string name="onboarding_fill">Jaza uso kwenye mduara wa fremu</string>
+    <string name="onboarding_straight">Hakikisha mtu anayepigwa picha anaangalia kwa kunyooka</string>
+    <string name="onboarding_continue">Bonyeza popote ili kuendelea</string>
+    <string name="capture_title_look_straight">Hajaangalia kwa kunyooka</string>
+    <string name="capture_title_no_face">Uso haujaonekana</string>
+    <string name="capture_title_too_close">Karibu sana</string>
+    <string name="capture_title_face_too_far">Mbali sana</string>
+    <string name="matching_x_records">Inafananisha na %s ya rekodi</string>
+    <string name="title_capturing">Picha ya hapohapo</string>
+    <string name="btn_recapture">Piga tena</string>
+    <string name="face_match_please_wait">Tafadhali subiri tunapoendelea na utambulisho</string>
+    <string name="face_match_loading_candidates">Inapakia wateja...</string>
+    <string name="face_match_matching_candidates">Inafananisha mteja</string>
+
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">Inalinganisha kwa mteja %d</item>
+        <item quantity="other">Inalinganisha kwa mteja %d</item>
+    </plurals>
+
+    <plurals name="face_match_returned_results">
+        <item quantity="one">Imerejesha matokeo %d</item>
+        <item quantity="other">Matokeo yamerudi %d</item>
+    </plurals>
+
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">Hakuna inazofanana nayo vizuri sana</item>
+        <item quantity="one">%d inafanana vizuri</item>
+        <item quantity="other">%d inafananisha vizuri sana</item>
+    </plurals>
+
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">Hakuna inazofanana nayo vizuri</item>
+        <item quantity="one">%d inayofanana nayo vizuri</item>
+        <item quantity="other">%d inayofanana nazo vizuri</item>
+    </plurals>
+
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">Hakuna zinazofanana nayo</item>
+        <item quantity="one">%d inayofanana</item>
+        <item quantity="other">%d inayofanana</item>
+    </plurals>
+
+
+    <string name="error_licence_invalid_title">Leseni batili</string>
+    <string name="error_licence_invalid_message">Leseni ya uchukuaji wa picha ya sura ni batili, tafadhali wasiliana na msimazi wa mfumo huu</string>
+    <string name="error_licence_invalid_button">Funga</string>
+    <string name="error_licence_missing_title">Leseni haipo</string>
+    <string name="error_licence_missing_button">Funga</string>
+    <string name="exit_form_return_to_face_capture">Rudi kwenye Simprints</string>
+    <string name="error_close_button">Funga</string>
+    <string name="error_licence_missing_message">Leseni ya uso haipo, tafadhali wasiliana na msimamizi wa mfumo huu</string>
+    <string name="face_configuration_started">Inasanidi muundo wa uso</string>
+    <string name="face_configuration_downloading">Inapakua faili zinazohitajika</string>
+    <string name="error_configuration_error_title">Hitilafu ya usanidi</string>
+    <string name="error_configuration_error_message">Kulikuwa na hitilafu wakati wa kusanidi muundo wa uso, tafadhali wasiliana na msimamizi wa mfumo wako</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">Uso</string>
+    <string name="exit_form_capture_face">Rudi kwenye Simprints</string>
+    <string name="error_unexpected_error_title">Kosa limetokea</string>
+    <string name="error_unexpected_error_message">Tafadhali jaribu tena na iwapo progrmu ya Simprints haitafanya kazi wasiliana na msimamizi wako wa huu mfumo</string>
 </resources>
