@@ -32,7 +32,7 @@ import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.ACTIVITY_CLASS_NAME as FACE_ACTIVITY_NAME
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.CAPTURE_ACTIVITY_NAME as FACE_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.ACTIVITY_CLASS_NAME as FINGERPRINT_ACTIVITY_NAME
 
 class ModalityFlowEnrolImplTest {
@@ -259,7 +259,7 @@ class ModalityFlowEnrolImplTest {
             mockk()
         )
 
-        verify(exactly = 1) { faceStepProcessor.buildStepMatch(any(), any()) }
+        verify(exactly = 1) { faceStepProcessor.buildStepMatch(any(), any(), any()) }
     }
 
     private fun buildAppEnrolRequest() =
