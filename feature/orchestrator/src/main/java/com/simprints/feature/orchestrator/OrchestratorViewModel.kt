@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.exitform.ExitFormResult
@@ -16,24 +15,29 @@ import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.feature.orchestrator.steps.StepsBuilder
 import com.simprints.feature.orchestrator.usecases.AppResponseBuilderUseCase
+import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
+import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.GeneralConfiguration
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ExcludedFromGeneratedTestCoverageReports("WIP, will be tested when final version is ready")
 @HiltViewModel
 internal class OrchestratorViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val cache: OrchestratorCache,
     private val locationStore: LocationStore,
     private val stepsBuilder: StepsBuilder,
+    private val shouldCreatePerson: ShouldCreatePersonUseCase,
+    private val createPersonEvent: CreatePersonEventUseCase,
     private val appResponseBuilder: AppResponseBuilderUseCase,
 ) : ViewModel() {
 
+    private var modalities = emptySet<GeneralConfiguration.Modality>()
     private var steps = emptyList<Step>()
 
     val currentStep: LiveData<LiveDataEventWithContent<Step?>>
@@ -47,6 +51,8 @@ internal class OrchestratorViewModel @Inject constructor(
 
     fun handleAction(action: ActionRequest) = viewModelScope.launch {
         val projectConfiguration = configManager.getProjectConfiguration()
+
+        modalities = projectConfiguration.general.modalities.toSet()
         steps = stepsBuilder.build(action, projectConfiguration)
 
         cache.actionRequest = action
@@ -61,10 +67,7 @@ internal class OrchestratorViewModel @Inject constructor(
         if (result is ExitFormResult) {
             _appResponse.send(OrchestratorResult(
                 cache.actionRequest,
-                AppRefusalResponse(
-                    result.submittedOption()?.answer?.name.orEmpty(),
-                    result.reason.orEmpty()
-                )
+                AppRefusalResponse.fromResult(result)
             ))
             // TODO cleanup?
             return
@@ -73,6 +76,10 @@ internal class OrchestratorViewModel @Inject constructor(
         steps.firstOrNull { it.resultType == result::class.java }?.let {
             it.status = StepStatus.COMPLETED
             it.result = result
+        }
+
+        if (shouldCreatePerson(cache.actionRequest, modalities, steps)) {
+            viewModelScope.launch { createPersonEvent(steps.mapNotNull { it.result }) }
         }
         doNextStep()
     }
@@ -99,12 +106,13 @@ internal class OrchestratorViewModel @Inject constructor(
         }
     }
 
-    private fun buildAppResponse() {
+    private fun buildAppResponse() = viewModelScope.launch {
         val cachedActionRequest = cache.actionRequest
-
         val appResponse = appResponseBuilder(cachedActionRequest, steps.mapNotNull { it.result })
+
         _appResponse.send(OrchestratorResult(cachedActionRequest, appResponse))
         // TODO update daily activity
     }
 
 }
+
