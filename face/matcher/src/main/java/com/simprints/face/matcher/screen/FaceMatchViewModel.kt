@@ -66,7 +66,6 @@ internal class FaceMatchViewModel @Inject constructor(
     private suspend fun loadCandidates(queryForCandidates: Serializable): Flow<FaceIdentity> {
         Simber.tag(CrashReportTag.FACE_MATCHING.name).i("Loading candidates")
 
-        println(MatchState.LoadingCandidates)
         _matchState.postValue(MatchState.LoadingCandidates)
         return loadPeopleFaceIdentities(queryForCandidates)
     }
@@ -121,6 +120,8 @@ internal class FaceMatchViewModel @Inject constructor(
         ) : MatchState()
     }
 
+    // TODO This configuration should be provided by SDK or project configuration
+    //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
         const val returnCount = 10
         const val veryGoodMatchThreshold = 50.0

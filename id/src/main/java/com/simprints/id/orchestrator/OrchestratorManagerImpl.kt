@@ -7,7 +7,6 @@ import com.simprints.core.domain.common.FlowProvider.FlowType.ENROL
 import com.simprints.core.domain.common.FlowProvider.FlowType.IDENTIFY
 import com.simprints.core.domain.common.FlowProvider.FlowType.VERIFY
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.setup.LocationStore
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
@@ -17,7 +16,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollo
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
-import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse

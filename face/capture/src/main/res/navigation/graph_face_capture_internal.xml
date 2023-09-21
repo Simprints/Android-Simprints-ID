@@ -3,47 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/graph_face_capture_internal"
-    app:startDestination="@id/preparationFragment">
+    app:startDestination="@id/facePreparationFragment">
 
     <fragment
-        android:id="@+id/preparationFragment"
+        android:id="@+id/facePreparationFragment"
         android:name="com.simprints.face.capture.screens.preparation.PreparationFragment"
         android:label="fragment_preparation"
         tools:layout="@layout/fragment_preparation">
         <action
-            android:id="@+id/action_preparationFragment_to_liveFeedbackFragment"
-            app:destination="@id/liveFeedbackFragment"
+            android:id="@+id/action_facePreparationFragment_to_faceLiveFeedbackFragment"
+            app:destination="@id/faceLiveFeedbackFragment"
             app:popUpTo="@+id/graph_face_capture_internal"
             app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
-        android:id="@+id/liveFeedbackFragment"
+        android:id="@+id/faceLiveFeedbackFragment"
         android:name="com.simprints.face.capture.screens.livefeedback.LiveFeedbackFragment"
         android:label="FaceDetectionFragment"
         tools:layout="@layout/fragment_live_feedback">
         <action
-            android:id="@+id/action_liveFeedbackFragment_to_confirmationFragment"
-            app:destination="@id/confirmationFragment"
+            android:id="@+id/action_faceLiveFeedbackFragment_to_faceConfirmationFragment"
+            app:destination="@id/faceConfirmationFragment"
             app:popUpTo="@+id/graph_face_capture_internal"
             app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
-        android:id="@+id/confirmationFragment"
+        android:id="@+id/faceConfirmationFragment"
         android:name="com.simprints.face.capture.screens.confirmation.ConfirmationFragment"
         android:label="ConfirmationFragment"
         tools:layout="@layout/fragment_confirmation">
         <action
-            android:id="@+id/action_confirmationFragment_to_liveFeedbackFragment"
-            app:destination="@id/liveFeedbackFragment"
+            android:id="@+id/action_faceConfirmationFragment_to_faceLiveFeedbackFragment"
+            app:destination="@id/faceLiveFeedbackFragment"
             app:popUpTo="@+id/graph_face_capture_internal"
             app:popUpToInclusive="true" />
     </fragment>
 
     <action
-        android:id="@+id/action_global_liveFeedback"
-        app:destination="@+id/liveFeedbackFragment"
+        android:id="@+id/action_global_faceLiveFeedback"
+        app:destination="@+id/faceLiveFeedbackFragment"
         app:popUpTo="@+id/graph_face_capture_internal"
         app:popUpToInclusive="true" />
 

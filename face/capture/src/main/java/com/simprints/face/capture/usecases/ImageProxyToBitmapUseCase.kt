@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Convert ImageProxy image To bitmap then crop and rotate it.
  * Image format should be RGBA_8888
  */
-internal class ImageToBitmapUseCase @Inject constructor() {
+internal class ImageProxyToBitmapUseCase @Inject constructor() {
 
     operator fun invoke(imageProxy: ImageProxy, cropRect: Rect): Bitmap {
         require(imageProxy.format == PixelFormat.RGBA_8888) {

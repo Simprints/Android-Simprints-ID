@@ -101,6 +101,6 @@ class ConfirmationFragmentTest {
             .check(matches(isDisplayed()))
 
         onView(withId(R.id.confirmation_btn)).perform(click())
-        assertThat(navController.currentDestination?.id).isEqualTo(R.id.preparationFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.facePreparationFragment)
     }
 }

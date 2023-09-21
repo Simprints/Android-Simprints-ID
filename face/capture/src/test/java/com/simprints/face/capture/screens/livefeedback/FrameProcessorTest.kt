@@ -6,7 +6,7 @@ import android.graphics.RectF
 import android.util.Size
 import androidx.camera.core.ImageProxy
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.capture.usecases.ImageToBitmapUseCase
+import com.simprints.face.capture.usecases.ImageProxyToBitmapUseCase
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -19,7 +19,7 @@ import org.junit.Test
 internal class FrameProcessorTest {
 
     @MockK
-    private lateinit var imageToBitmap: ImageToBitmapUseCase
+    private lateinit var imageToBitmap: ImageProxyToBitmapUseCase
 
     @MockK
     private lateinit var image: ImageProxy

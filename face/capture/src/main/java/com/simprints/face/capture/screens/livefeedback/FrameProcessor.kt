@@ -7,13 +7,13 @@ import android.util.Size
 import androidx.camera.core.ImageProxy
 import androidx.core.graphics.toRect
 import com.simprints.face.capture.screens.livefeedback.views.CameraTargetOverlay
-import com.simprints.face.capture.usecases.ImageToBitmapUseCase
+import com.simprints.face.capture.usecases.ImageProxyToBitmapUseCase
 import java.lang.Float.min
 import javax.inject.Inject
 
 
 internal class FrameProcessor @Inject constructor(
-    private val imageToBitmap: ImageToBitmapUseCase
+    private val imageProxyToBitmap: ImageProxyToBitmapUseCase
 ) {
 
     private var previewViewWidth: Int = 0
@@ -47,7 +47,7 @@ internal class FrameProcessor @Inject constructor(
             // The cropRect should be calculated once as its value will be the same for all images.
             calcRotatedCropRect(image)
         }
-        return imageToBitmap(image, cropRect)
+        return imageProxyToBitmap(image, cropRect)
     }
 
     private fun calcRotatedCropRect(image: ImageProxy) {

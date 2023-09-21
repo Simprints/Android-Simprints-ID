@@ -12,6 +12,7 @@ import com.simprints.infra.license.LicenseState
 import com.simprints.infra.license.LicenseVendor
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,14 +22,21 @@ internal class FaceConfigurationViewModel @Inject constructor(
     private val licenseRepository: LicenseRepository,
 ) : ViewModel() {
 
+    private var fetchAttempted = false
+
     val configurationState: LiveData<LiveDataEventWithContent<FaceConfigurationState>>
         get() = _configurationState
     private val _configurationState = MutableLiveData<LiveDataEventWithContent<FaceConfigurationState>>()
 
-    fun retrieveLicense(projectId: String, deviceId: String) = viewModelScope.launch {
-        licenseRepository.getLicenseStates(projectId, deviceId, LicenseVendor.RANK_ONE_FACE)
-            .map { it.toConfigurationState() }
-            .collect { _configurationState.send(it) }
+    fun retrieveLicense(projectId: String, deviceId: String) {
+        if (fetchAttempted) return
+
+        viewModelScope.launch {
+            fetchAttempted = true
+            licenseRepository.getLicenseStates(projectId, deviceId, LicenseVendor.RANK_ONE_FACE)
+                .map { it.toConfigurationState() }
+                .collect { _configurationState.send(it) }
+        }
     }
 
     fun deleteInvalidLicense() {

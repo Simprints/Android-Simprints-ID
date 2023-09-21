@@ -32,6 +32,6 @@ class PreparationFragmentTest {
         }
 
         onView(withId(R.id.detection_onboarding_frame)).perform(click())
-        assertThat(navController.currentDestination?.id).isEqualTo(R.id.liveFeedbackFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.faceLiveFeedbackFragment)
     }
 }
