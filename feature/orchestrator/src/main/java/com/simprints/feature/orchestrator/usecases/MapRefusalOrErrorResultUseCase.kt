@@ -14,7 +14,6 @@ import javax.inject.Inject
 class MapRefusalOrErrorResultUseCase @Inject constructor() {
 
     operator fun invoke(result: Parcelable): IAppResponse? = when (result) {
-        null -> null
         is ExitFormResult -> AppRefusalResponse.fromResult(result)
         is FetchSubjectResult -> result.takeUnless { it.found }?.let {
             AppErrorResponse(
