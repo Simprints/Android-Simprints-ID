@@ -35,9 +35,9 @@ internal class AddCallbackEventUseCase @Inject constructor(
             is IAppEnrolResponse -> buildEnrolmentCallbackEvent(result)
             is IAppIdentifyResponse -> buildIdentificationCallbackEvent(result)
             is IAppVerifyResponse -> buildVerificationCallbackEvent(result)
+            is IAppConfirmationResponse -> buildConfirmIdentityCallbackEvent(result)
             is IAppRefusalFormResponse -> buildRefusalCallbackEvent(result)
             is IAppErrorResponse -> buildErrorCallbackEvent(result)
-            is IAppConfirmationResponse -> buildConfirmIdentityCallbackEvent(result)
             else -> null
         }
 

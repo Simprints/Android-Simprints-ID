@@ -12,7 +12,6 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 
@@ -23,18 +22,27 @@ class CreatePersonEventUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(results: List<Parcelable>) {
-        val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-        val personCreationEventInSession = eventRepository.observeEventsFromSession(currentSession.id)
-            .filterIsInstance<PersonCreationEvent>().toList()
+        val currentSessionId = eventRepository.getCurrentCaptureSessionEvent().id
+        val sessionEvents = eventRepository.observeEventsFromSession(currentSessionId).toList()
 
         // If a personCreationEvent is already in the current session,
         // we don' want to add it again (the capture steps would still be the same)
-        if (personCreationEventInSession.isEmpty()) {
+        if (sessionEvents.none { it is PersonCreationEvent }) {
+            val faceCaptureBiometricsEvents = sessionEvents.filterIsInstance<FaceCaptureBiometricsEvent>()
+            val fingerprintCaptureBiometricsEvents = sessionEvents.filterIsInstance<FingerprintCaptureBiometricsEvent>()
+
             val faceSamples = extractFaceSamples(results)
+            val fingerprintSamples = extractFingerprintSamples(results)
 
-            // TODO val fingerprintSamples = extractFingerprintSamples(results)
-
-            addPersonCreationEvent(emptyList(), faceSamples)
+            val personCreationEvent = build(
+                faceCaptureBiometricsEvents,
+                fingerprintCaptureBiometricsEvents,
+                faceSamples,
+                fingerprintSamples
+            )
+            if (personCreationEvent.hasBiometricData()) {
+                eventRepository.addOrUpdateEvent(personCreationEvent)
+            }
         }
     }
 
@@ -44,39 +52,14 @@ class CreatePersonEventUseCase @Inject constructor(
         .mapNotNull { it.sample }
         .map { FaceSample(it.template, it.format) }
 
-    // TODO
-    //    private fun extractFingerprintSamples(responses: List<FingerprintCaptureResult>) = responses
-    //        .filterIsInstance<FingerprintCaptureResult>()
-    //        .flatMap { it.results }
-    //        .mapNotNull { it.sample }
-    //        .map { FingerprintSample(...) }
-
-    private suspend fun addPersonCreationEvent(
-        fingerprintSamples: List<FingerprintSample>,
-        faceSamples: List<FaceSample>
-    ) {
-        val currentCaptureSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-        val fingerprintCaptureBiometricsEvents =
-            eventRepository.observeEventsFromSession(currentCaptureSessionEvent.id)
-                .filterIsInstance<FingerprintCaptureBiometricsEvent>().toList()
-        val faceCaptureBiometricsEvents =
-            eventRepository.observeEventsFromSession(currentCaptureSessionEvent.id)
-                .filterIsInstance<FaceCaptureBiometricsEvent>().toList()
-
-        val personCreationEvent = build(
-            timeHelper,
-            faceCaptureBiometricsEvents,
-            fingerprintCaptureBiometricsEvents,
-            faceSamples,
-            fingerprintSamples
-        )
-        if (personCreationEvent.hasBiometricData()) {
-            eventRepository.addOrUpdateEvent(personCreationEvent)
-        }
-    }
+    private fun extractFingerprintSamples(responses: List<Parcelable>) = emptyList<FingerprintSample>()
+// TODO
+//        .filterIsInstance<FingerprintCaptureResult>()
+//        .flatMap { it.results }
+//        .mapNotNull { it.sample }
+//        .map { FingerprintSample(...) }
 
     private fun build(
-        timeHelper: TimeHelper,
         faceCaptureBiometricsEvents: List<FaceCaptureBiometricsEvent>,
         fingerprintCaptureBiometricsEvents: List<FingerprintCaptureBiometricsEvent>,
         faceSamplesForPersonCreation: List<FaceSample>?,
@@ -98,22 +81,18 @@ class CreatePersonEventUseCase @Inject constructor(
     private fun extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
         captureEvents: List<FingerprintCaptureBiometricsEvent>,
         personTemplates: List<String>?
-    ): List<String>? =
-        captureEvents
-            .filter {
-                personTemplates?.contains(it.payload.fingerprint.template) ?: false
-            }.map { it.payload.id }
-            .ifEmpty { null }
+    ): List<String>? = captureEvents
+        .filter { personTemplates?.contains(it.payload.fingerprint.template) == true }
+        .map { it.payload.id }
+        .ifEmpty { null }
 
     private fun extractFaceCaptureEventIdsBasedOnPersonTemplate(
         captureEvents: List<FaceCaptureBiometricsEvent>,
         personTemplates: List<String>?
-    ): List<String>? =
-        captureEvents
-            .filter {
-                personTemplates?.contains(it.payload.face.template) ?: false
-            }.map { it.payload.id }
-            .ifEmpty { null }
+    ): List<String>? = captureEvents
+        .filter { personTemplates?.contains(it.payload.face.template) == true }
+        .map { it.payload.id }
+        .ifEmpty { null }
 
     private fun PersonCreationEvent.hasBiometricData() =
         payload.fingerprintCaptureIds?.isNotEmpty() == true || payload.faceCaptureIds?.isNotEmpty() == true

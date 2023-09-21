@@ -10,9 +10,9 @@ import javax.inject.Inject
 internal class ShouldCreatePersonUseCase @Inject constructor() {
 
     operator fun invoke(
-            actionRequest: ActionRequest?,
-            modalities: Set<GeneralConfiguration.Modality>,
-            results: List<Step>
+        actionRequest: ActionRequest?,
+        modalities: Set<GeneralConfiguration.Modality>,
+        results: List<Step>
     ): Boolean {
         if (actionRequest !is ActionRequest.FlowAction) {
             return false
