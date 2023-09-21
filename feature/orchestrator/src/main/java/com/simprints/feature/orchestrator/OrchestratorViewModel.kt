@@ -7,15 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.model.OrchestratorResult
-import com.simprints.feature.orchestrator.model.responses.AppRefusalResponse
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.feature.orchestrator.steps.StepsBuilder
 import com.simprints.feature.orchestrator.usecases.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
+import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.config.ConfigManager
@@ -32,6 +31,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val cache: OrchestratorCache,
     private val locationStore: LocationStore,
     private val stepsBuilder: StepsBuilder,
+    private val mapRefusalOrErrorResult: MapRefusalOrErrorResultUseCase,
     private val shouldCreatePerson: ShouldCreatePersonUseCase,
     private val createPersonEvent: CreatePersonEventUseCase,
     private val appResponseBuilder: AppResponseBuilderUseCase,
@@ -48,7 +48,6 @@ internal class OrchestratorViewModel @Inject constructor(
         get() = _appResponse
     private val _appResponse = MutableLiveData<LiveDataEventWithContent<OrchestratorResult>>()
 
-
     fun handleAction(action: ActionRequest) = viewModelScope.launch {
         val projectConfiguration = configManager.getProjectConfiguration()
 
@@ -64,16 +63,16 @@ internal class OrchestratorViewModel @Inject constructor(
 
     fun handleResult(result: Parcelable) {
         Simber.i(result.toString())
-        if (result is ExitFormResult) {
-            _appResponse.send(OrchestratorResult(
-                cache.actionRequest,
-                AppRefusalResponse.fromResult(result)
-            ))
+        val errorResponse = mapRefusalOrErrorResult(result)
+        if (errorResponse != null) {
+            // Shortcut the flow execution if any refusal or error result is found
+
+            _appResponse.send(OrchestratorResult(cache.actionRequest, errorResponse))
             // TODO cleanup?
             return
         }
 
-        steps.firstOrNull { it.resultType == result::class.java }?.let {
+        steps.firstOrNull { it.status == StepStatus.IN_PROGRESS }?.let {
             it.status = StepStatus.COMPLETED
             it.result = result
         }
@@ -81,6 +80,9 @@ internal class OrchestratorViewModel @Inject constructor(
         if (shouldCreatePerson(cache.actionRequest, modalities, steps)) {
             viewModelScope.launch { createPersonEvent(steps.mapNotNull { it.result }) }
         }
+
+        // TODO matching step handling
+
         doNextStep()
     }
 
@@ -110,8 +112,9 @@ internal class OrchestratorViewModel @Inject constructor(
         val cachedActionRequest = cache.actionRequest
         val appResponse = appResponseBuilder(cachedActionRequest, steps.mapNotNull { it.result })
 
-        _appResponse.send(OrchestratorResult(cachedActionRequest, appResponse))
         // TODO update daily activity
+
+        _appResponse.send(OrchestratorResult(cachedActionRequest, appResponse))
     }
 
 }
