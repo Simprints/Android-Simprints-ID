@@ -12,6 +12,7 @@ import com.simprints.feature.orchestrator.model.OrchestratorResult
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.feature.orchestrator.steps.StepsBuilder
+import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
 import com.simprints.feature.orchestrator.usecases.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
@@ -35,6 +36,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val shouldCreatePerson: ShouldCreatePersonUseCase,
     private val createPersonEvent: CreatePersonEventUseCase,
     private val appResponseBuilder: AppResponseBuilderUseCase,
+    private val addCallbackEvent: AddCallbackEventUseCase,
 ) : ViewModel() {
 
     private var modalities = emptySet<GeneralConfiguration.Modality>()
@@ -66,7 +68,7 @@ internal class OrchestratorViewModel @Inject constructor(
         val errorResponse = mapRefusalOrErrorResult(result)
         if (errorResponse != null) {
             // Shortcut the flow execution if any refusal or error result is found
-
+            addCallbackEvent(errorResponse)
             _appResponse.send(OrchestratorResult(cache.actionRequest, errorResponse))
             // TODO cleanup?
             return
@@ -114,6 +116,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
         // TODO update daily activity
 
+        addCallbackEvent(appResponse)
         _appResponse.send(OrchestratorResult(cachedActionRequest, appResponse))
     }
 
