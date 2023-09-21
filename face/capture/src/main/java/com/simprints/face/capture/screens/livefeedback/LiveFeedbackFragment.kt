@@ -109,7 +109,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
                 LiveFeedbackFragmentViewModel.CapturingState.FINISHED -> {
                     mainVm.captureFinished(vm.sortedQualifyingCaptures)
-                    findNavController().navigate(R.id.action_liveFeedbackFragment_to_confirmationFragment)
+                    findNavController().navigate(R.id.action_faceLiveFeedbackFragment_to_faceConfirmationFragment)
                 }
 
             }

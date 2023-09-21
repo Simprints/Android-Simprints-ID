@@ -39,14 +39,14 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             if (option != null) {
                 findNavController().finishWithResult(this, it)
             } else {
-                internalNavController()?.navigate(R.id.action_global_liveFeedback)
+                internalNavController()?.navigate(R.id.action_global_faceLiveFeedback)
             }
         }
 
         viewModel.setupCapture(args.samplesToCapture)
 
         viewModel.recaptureEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
-            internalNavController()?.navigate(R.id.action_global_liveFeedback)
+            internalNavController()?.navigate(R.id.action_global_faceLiveFeedback)
         })
 
         viewModel.exitFormEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
@@ -69,8 +69,8 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             when (internalNavController()?.currentDestination?.id) {
-                R.id.preparationFragment,
-                R.id.liveFeedbackFragment -> viewModel.handleBackButton()
+                R.id.facePreparationFragment,
+                R.id.faceLiveFeedbackFragment -> viewModel.handleBackButton()
 
                 else -> findNavController().popBackStack()
             }

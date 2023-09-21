@@ -45,12 +45,10 @@ internal class FaceConfigurationFragment : Fragment(R.layout.fragment_configurat
             R.id.faceConfigurationFragment,
             AlertContract.ALERT_DESTINATION_ID,
         ) { result ->
-            if (result.isBackButtonPress()) {
-                findNavController().finishWithResult(
-                    this,
-                    FaceConfigurationResult(false, ErrorType.reasonFromPayload(result.payload))
-                )
-            }
+            findNavController().finishWithResult(
+                this,
+                FaceConfigurationResult(false, ErrorType.reasonFromPayload(result.payload))
+            )
         }
 
         observeViewModel()

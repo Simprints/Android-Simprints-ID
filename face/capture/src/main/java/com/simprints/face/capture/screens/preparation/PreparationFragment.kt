@@ -32,7 +32,7 @@ class PreparationFragment : Fragment(R.layout.fragment_preparation) {
 
         binding.detectionOnboardingFrame.setOnClickListener {
             mainVm.addOnboardingComplete(startTime)
-            findNavController().navigate(R.id.action_preparationFragment_to_liveFeedbackFragment)
+            findNavController().navigate(R.id.action_facePreparationFragment_to_faceLiveFeedbackFragment)
         }
     }
 }

@@ -2,7 +2,6 @@ package com.simprints.id.domain.moduleapi.face.responses
 
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormReason
-import com.simprints.id.exitformhandler.ExitFormReason
 import com.simprints.moduleapi.face.responses.IFaceExitFormResponse
 import com.simprints.moduleapi.face.responses.IFaceExitReason
 import kotlinx.parcelize.IgnoredOnParcel

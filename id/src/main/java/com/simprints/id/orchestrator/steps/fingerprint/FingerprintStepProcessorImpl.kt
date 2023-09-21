@@ -32,7 +32,7 @@ class FingerprintStepProcessorImpl @Inject constructor(
 
     override suspend fun buildStepToCapture(): Step = buildStep(
         CAPTURE,
-        FingerprintCaptureRequest(configManager.getProjectConfiguration().fingerprint!!.fingersToCapture)
+        FingerprintCaptureRequest(fingerprintsToCapture = configManager.getProjectConfiguration().fingerprint!!.fingersToCapture)
     )
 
     override fun buildStepToMatch(

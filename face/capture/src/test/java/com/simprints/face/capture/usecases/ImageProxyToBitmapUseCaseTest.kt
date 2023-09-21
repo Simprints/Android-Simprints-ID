@@ -14,7 +14,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class ImageToBitmapUseCaseTest {
+class ImageProxyToBitmapUseCaseTest {
 
     private var imageBytes: ByteArray = ByteArray(BYTEARRAY_SIZE)
     private val imageProxy = mockk<ImageProxy> {
@@ -29,7 +29,7 @@ class ImageToBitmapUseCaseTest {
         })
     }
 
-    private lateinit var useCase: ImageToBitmapUseCase
+    private lateinit var useCase: ImageProxyToBitmapUseCase
 
     private val bitmapMock = mockk<Bitmap> {
         justRun { copyPixelsFromBuffer(any()) }
@@ -43,7 +43,7 @@ class ImageToBitmapUseCaseTest {
         every { Bitmap.createBitmap(any(), any(), any()) } returns bitmapMock
         every { Bitmap.createBitmap(any(), any(), any(), any(), any(), any(), true) } returns bitmapMock
 
-        useCase = ImageToBitmapUseCase()
+        useCase = ImageProxyToBitmapUseCase()
     }
 
     @After

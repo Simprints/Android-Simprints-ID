@@ -53,12 +53,7 @@ internal enum class ErrorType(
         message = this@ErrorType.customMessage
         messageRes = this@ErrorType.message
         image = IDR.drawable.ic_exclamation
-        leftButton = AlertButtonConfig(
-            text = null,
-            textRes = IDR.string.close,
-            resultKey = AlertContract.ALERT_BUTTON_PRESSED_BACK,
-            closeOnClick = true,
-        )
+        leftButton = AlertButtonConfig.Close
         payload = bundleOf(PAYLOAD_TYPE_KEY to this@ErrorType.errorReason)
         eventType = this@ErrorType.alertType
     }.toArgs()

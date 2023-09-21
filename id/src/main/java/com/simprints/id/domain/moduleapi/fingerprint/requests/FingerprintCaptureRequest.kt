@@ -9,8 +9,8 @@ import kotlinx.parcelize.Parcelize
 //Do not change the order of the parameters. Parcelize is not able to marshall correctly if type is the 2nd param
 @Parcelize
 data class FingerprintCaptureRequest(
+    override val type: FingerprintRequestType = FingerprintRequestType.CAPTURE,
     val fingerprintsToCapture: List<Finger>,
-    override val type: FingerprintRequestType = FingerprintRequestType.CAPTURE
 ) : FingerprintRequest
 
 fun FingerprintCaptureRequest.fromDomainToModuleApi(): IFingerprintCaptureRequest =
