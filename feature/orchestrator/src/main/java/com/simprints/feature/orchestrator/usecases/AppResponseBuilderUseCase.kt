@@ -2,16 +2,11 @@ package com.simprints.feature.orchestrator.usecases
 
 import android.os.Parcelable
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
-import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.orchestrator.model.responses.AppConfirmationResponse
 import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
-import com.simprints.feature.orchestrator.model.responses.AppRefusalResponse
 import com.simprints.feature.selectsubject.SelectSubjectResult
-import com.simprints.feature.setup.SetupResult
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -28,7 +23,7 @@ class AppResponseBuilderUseCase @Inject constructor(
     ): IAppResponse = when (request) {
         is ActionRequest.EnrolActionRequest -> {
             // TODO perform adjudication first
-            handleRefusalOrErrorResponseIfAny(results) ?: handleEnrolment(results, request)
+            handleEnrolment(results, request)
         }
 
         is ActionRequest.IdentifyActionRequest -> {
@@ -44,21 +39,6 @@ class AppResponseBuilderUseCase @Inject constructor(
         null -> AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
     }
 
-    private fun handleRefusalOrErrorResponseIfAny(results: List<Parcelable>): IAppResponse? = results.firstNotNullOfOrNull { resultBundle ->
-        when (resultBundle) {
-            is ExitFormResult -> AppRefusalResponse.fromResult(resultBundle)
-            is FetchSubjectResult -> resultBundle.takeUnless { it.found }
-                ?.let { AppErrorResponse(IAppErrorReason.GUID_NOT_FOUND_ONLINE) }
-
-            is SetupResult -> resultBundle.takeUnless { it.permissionGranted }
-                ?.let { AppErrorResponse(IAppErrorReason.LOGIN_NOT_COMPLETE) }
-
-            is FaceConfigurationResult -> resultBundle.takeUnless { it.isSuccess }
-                ?.let { AppErrorResponse(it.error ?: IAppErrorReason.UNEXPECTED_ERROR) }
-
-            else -> null
-        }
-    }
 
     private suspend fun handleEnrolment(results: List<Parcelable>, request: ActionRequest.EnrolActionRequest): IAppResponse {
         val faceCapture = results.lastOrNull { it is FaceCaptureResult } as? FaceCaptureResult
