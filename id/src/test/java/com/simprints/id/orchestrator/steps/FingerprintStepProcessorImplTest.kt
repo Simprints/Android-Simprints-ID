@@ -3,8 +3,6 @@ package com.simprints.id.orchestrator.steps
 import android.app.Activity
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
@@ -36,8 +34,6 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
         }
     }
 
-    private val fingerprintRequestFactory: FingerprintRequestFactory =
-        FingerprintRequestFactoryImpl()
     private lateinit var fingerprintStepProcess: FingerprintStepProcessor
 
     private val fingerprintResponseMock: IFingerprintResponse = mockk()
@@ -47,10 +43,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Before
     fun setUp() {
-        fingerprintStepProcess = FingerprintStepProcessorImpl(
-            fingerprintRequestFactory,
-            configManager
-        )
+        fingerprintStepProcess = FingerprintStepProcessorImpl(configManager)
         mockFromModuleApiToDomainExt()
     }
 

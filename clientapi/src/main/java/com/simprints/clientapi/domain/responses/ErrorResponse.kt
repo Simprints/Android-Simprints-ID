@@ -27,6 +27,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
         GUID_NOT_FOUND_ONLINE,
+        GUID_NOT_FOUND_OFFLINE,
         LOGIN_NOT_COMPLETE,
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
@@ -49,6 +50,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
                     IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
                     IAppErrorReason.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
+                    IAppErrorReason.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
                     IAppErrorReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     IAppErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     IAppErrorReason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
