@@ -7,10 +7,10 @@ import androidx.annotation.IdRes
 
 
 data class Step(
+    val id: Int,
     @IdRes val navigationActionId: Int,
     @IdRes val destinationId: Int,
     val payload: Bundle,
-    val resultType: Class<out Parcelable>,
     var status: StepStatus = StepStatus.NOT_STARTED,
     var result: Parcelable? = null,
 ) : Parcelable {
@@ -20,17 +20,17 @@ data class Step(
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readInt(),
+        parcel.readInt(),
         parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle.EMPTY,
-        parcel.readSerializable() as Class<out Parcelable>,
         StepStatus.valueOf(parcel.readString().orEmpty()),
         parcel.readParcelable(Parcelable::class.java.classLoader)
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
         parcel.writeInt(navigationActionId)
         parcel.writeInt(destinationId)
         parcel.writeBundle(payload)
-        parcel.writeSerializable(resultType)
         parcel.writeString(status.name)
         parcel.writeParcelable(result, flags)
     }

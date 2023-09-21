@@ -50,11 +50,11 @@ class ParcelableConverterTest {
     @Test
     fun `Correctly marshals and unmarshalls the step`() {
         val step = Step(
+            id = 1,
             navigationActionId = 42,
             destinationId = 33,
             payload = bundleOf("key" to "value"),
             status = StepStatus.IN_PROGRESS,
-            resultType = StubParcelable::class.java,
             result = null,
         )
 
@@ -66,8 +66,6 @@ class ParcelableConverterTest {
             assertThat(destinationId).isEqualTo(33)
             assertThat(payload.getString("key")).isEqualTo("value")
             assertThat(status).isEqualTo(StepStatus.IN_PROGRESS)
-
-            assertThat(resultType).isEqualTo(StubParcelable::class.java)
             assertThat(result).isNull()
         }
     }
@@ -75,11 +73,11 @@ class ParcelableConverterTest {
     @Test
     fun `Correctly marshals and unmarshalls the step with result`() {
         val step = Step(
+            id = 1,
             navigationActionId = 42,
             destinationId = 33,
             payload = bundleOf("key" to "value"),
             status = StepStatus.IN_PROGRESS,
-            resultType = StubParcelable::class.java,
             result = StubParcelable(1, "text"),
         )
 
@@ -91,9 +89,6 @@ class ParcelableConverterTest {
             assertThat(destinationId).isEqualTo(33)
             assertThat(payload.getString("key")).isEqualTo("value")
             assertThat(status).isEqualTo(StepStatus.IN_PROGRESS)
-
-            assertThat(resultType).isEqualTo(StubParcelable::class.java)
-
             assertThat(result).isInstanceOf(StubParcelable::class.java)
             with(result as StubParcelable) {
                 assertThat(number).isEqualTo(1)
