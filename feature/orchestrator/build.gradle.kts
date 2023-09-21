@@ -20,7 +20,12 @@ dependencies {
     implementation(project(":feature:select-subject"))
     implementation(project(":feature:exit-form"))
 
+    implementation(project(":face:configuration"))
+    implementation(project(":face:capture"))
+    implementation(project(":face:matcher"))
+
     implementation(project(":infra:orchestrator-data"))
+    implementation(project(":infra:enrolment-records"))
     implementation(project(":infra:config"))
     implementation(project(":infra:events"))
 }

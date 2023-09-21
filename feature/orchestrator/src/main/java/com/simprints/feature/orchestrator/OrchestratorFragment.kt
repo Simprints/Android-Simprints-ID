@@ -10,6 +10,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.face.capture.FaceCaptureContract
+import com.simprints.face.configuration.FaceConfigurationContract
+import com.simprints.face.matcher.FaceMatchContract
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
@@ -102,6 +105,9 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(SelectSubjectContract.DESTINATION_ID, orchestratorVm::handleResult)
         handleResult(EnrolLastBiometricContract.DESTINATION_ID, orchestratorVm::handleResult)
         handleResult(ExitFormContract.DESTINATION_ID, orchestratorVm::handleResult)
+        handleResult(FaceConfigurationContract.DESTINATION_ID, orchestratorVm::handleResult)
+        handleResult(FaceMatchContract.DESTINATION_ID, orchestratorVm::handleResult)
+        handleResult(FaceCaptureContract.DESTINATION_ID, orchestratorVm::handleResult)
     }
 
     private fun <T : Parcelable> handleResult(destination: Int, block: (T) -> Unit) {

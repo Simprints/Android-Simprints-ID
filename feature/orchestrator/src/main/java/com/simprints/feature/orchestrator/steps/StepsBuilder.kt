@@ -1,7 +1,10 @@
 package com.simprints.feature.orchestrator.steps
 
 import androidx.core.os.bundleOf
+import com.simprints.core.DeviceID
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.face.capture.FaceCaptureContract
+import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
@@ -9,86 +12,126 @@ import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
+import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mapping code for steps")
-internal class StepsBuilder @Inject constructor() {
+internal class StepsBuilder @Inject constructor(
+    @DeviceID private val deviceId: String,
+) {
 
-    fun build(action: ActionRequest, projectConfiguration: ProjectConfiguration): List<Step> =
-        when (action) {
-            is ActionRequest.EnrolActionRequest -> listOf(
-                buildSetupStep(),
-                // TODO configure modalities
-                buildConsentStep(ConsentType.ENROL),
-                // TODO modality steps
-            )
+    fun build(action: ActionRequest, projectConfiguration: ProjectConfiguration) = when (action) {
+        is ActionRequest.EnrolActionRequest -> listOf(
+            buildSetupStep(),
+            buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
+            buildConsentStep(ConsentType.ENROL),
+            buildModalityCaptureSteps(projectConfiguration),
+            // TODO figure out how to add matching step
+        )
 
-            is ActionRequest.IdentifyActionRequest -> listOf(
-                buildSetupStep(),
-                // TODO configure modalities
-                buildConsentStep(ConsentType.IDENTIFY),
-                // TODO modality steps
-            )
+        is ActionRequest.IdentifyActionRequest -> listOf(
+            buildSetupStep(),
+            buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
+            buildConsentStep(ConsentType.IDENTIFY),
+            buildModalityCaptureSteps(projectConfiguration),
+            // TODO figure out how to add matching step
+        )
 
-            is ActionRequest.VerifyActionRequest -> listOf(
-                buildSetupStep(),
-                // TODO configure modalities
-                buildFetchGuidStep(action.projectId, action.verifyGuid),
-                buildConsentStep(ConsentType.VERIFY),
-                // TODO modality steps
-            )
+        is ActionRequest.VerifyActionRequest -> listOf(
+            buildSetupStep(),
+            buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
+            buildFetchGuidStep(action.projectId, action.verifyGuid),
+            buildConsentStep(ConsentType.VERIFY),
+            buildModalityCaptureSteps(projectConfiguration),
+            // TODO figure out how to add matching step
+        )
 
-            is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
-                buildLastBiometricStep(action),
-            )
+        is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
+            buildLastBiometricStep(action),
+        )
 
-            is ActionRequest.ConfirmActionRequest -> listOf(
-                buildConfirmIdentity(action),
-            )
-        }
+        is ActionRequest.ConfirmActionRequest -> listOf(
+            buildConfirmIdentityStep(action),
+        )
+    }.flatten()
 
-    private fun buildSetupStep() = Step(
+    private fun buildSetupStep() = listOf(Step(
+        id = StepId.SETUP,
         navigationActionId = R.id.action_orchestratorFragment_to_setup,
         destinationId = SetupContract.DESTINATION_ID,
-        resultType = SetupContract.RESULT_CLASS,
         payload = bundleOf(),
-    )
+    ))
 
-    private fun buildFetchGuidStep(projectId: String, subjectId: String) = Step(
+    private fun buildModalityConfigurationSteps(
+        projectConfiguration: ProjectConfiguration,
+        projectId: String,
+        deviceId: String,
+    ): List<Step> = projectConfiguration.general.modalities.map {
+        when (it) {
+            Modality.FINGERPRINT -> TODO("Fingerprint modality is not supported yet")
+
+            Modality.FACE -> Step(
+                id = StepId.FACE_CONFIGURATION,
+                navigationActionId = R.id.action_orchestratorFragment_to_faceConfiguration,
+                destinationId = FaceConfigurationContract.DESTINATION_ID,
+                payload = FaceConfigurationContract.getArgs(projectId, deviceId),
+            )
+        }
+    }
+
+    private fun buildFetchGuidStep(projectId: String, subjectId: String) = listOf(Step(
+        id = StepId.FETCH_GUID,
         navigationActionId = R.id.action_orchestratorFragment_to_fetchSubject,
         destinationId = FetchSubjectContract.DESTINATION_ID,
-        resultType = FetchSubjectContract.RESULT_CLASS,
         payload = FetchSubjectContract.getArgs(projectId, subjectId),
-    )
+    ))
 
-    private fun buildConsentStep(consentType: ConsentType) = Step(
+    private fun buildConsentStep(consentType: ConsentType) = listOf(Step(
+        id = StepId.CONSENT,
         navigationActionId = R.id.action_orchestratorFragment_to_consent,
         destinationId = ConsentContract.DESTINATION_ID,
-        resultType = ConsentContract.RESULT_CLASS,
         payload = ConsentContract.getArgs(consentType),
-    )
+    ))
 
-    private fun buildConfirmIdentity(action: ActionRequest.ConfirmActionRequest) = Step(
-        navigationActionId = R.id.action_orchestratorFragment_to_selectSubject,
-        destinationId = SelectSubjectContract.DESTINATION_ID,
-        resultType = SelectSubjectContract.RESULT_CLASS,
-        payload = SelectSubjectContract.getArgs(
-            projectId = action.projectId,
-            subjectId = action.selectedGuid,
-        ),
-    )
 
-    private fun buildLastBiometricStep(action: ActionRequest.EnrolLastBiometricActionRequest) = Step(
+    private fun buildModalityCaptureSteps(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities.map {
+        when (it) {
+            Modality.FINGERPRINT -> TODO("Fingerprint modality is not supported yet")
+
+            Modality.FACE -> {
+                val samplesToCapture = projectConfiguration.face?.nbOfImagesToCapture ?: 0
+                Step(
+                    id = StepId.FACE_CAPTURE,
+                    navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
+                    destinationId = FaceCaptureContract.DESTINATION_ID,
+                    payload = FaceCaptureContract.getArgs(samplesToCapture),
+                )
+            }
+        }
+    }
+
+    private fun buildLastBiometricStep(action: ActionRequest.EnrolLastBiometricActionRequest) = listOf(Step(
+        id = StepId.LAST_BIOMETRIC,
         navigationActionId = R.id.action_orchestratorFragment_to_enrolLast,
         destinationId = EnrolLastBiometricContract.DESTINATION_ID,
-        resultType = EnrolLastBiometricContract.RESULT_CLASS,
         payload = EnrolLastBiometricContract.getArgs(
             projectId = action.projectId,
             userId = action.userId,
             moduleId = action.moduleId,
             steps = emptyList(), // TODO add previous step results
         ),
-    )
+    ))
+
+    private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmActionRequest) = listOf(Step(
+        id = StepId.CONFIRM_IDENTITY,
+        navigationActionId = R.id.action_orchestratorFragment_to_selectSubject,
+        destinationId = SelectSubjectContract.DESTINATION_ID,
+        payload = SelectSubjectContract.getArgs(
+            projectId = action.projectId,
+            subjectId = action.selectedGuid,
+        ),
+    ))
+
 }
