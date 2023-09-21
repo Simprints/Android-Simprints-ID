@@ -9,13 +9,6 @@ interface FaceRequest : Request {
 enum class FaceRequestType {
     CAPTURE,
     MATCH,
-    CONFIGURATION
-}
-
-fun FaceRequest.fromDomainToModuleApi() = when (type) {
-    FaceRequestType.CAPTURE -> (this as FaceCaptureRequest).fromDomainToModuleApi()
-    FaceRequestType.MATCH -> (this as FaceMatchRequest).fromDomainToModuleApi()
-    FaceRequestType.CONFIGURATION -> (this as FaceConfigurationRequest).fromDomainToModuleApi()
 }
 
 

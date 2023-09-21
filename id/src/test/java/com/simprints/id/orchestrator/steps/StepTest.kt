@@ -38,14 +38,6 @@ class StepTest {
     }
 
     @Test
-    fun `should return IFaceRequest when request is a FaceRequest`() {
-        val faceRequest = mockk<FaceCaptureRequest>()
-        val parcelable = faceRequest.fromDomainToModuleApi()
-
-        assertThat(parcelable).isInstanceOf(IFaceCaptureRequest::class.java)
-    }
-
-    @Test
     fun `should return the same object when request is a CoreRequest`() {
         val coreRequest = mockk<CoreRequest>()
         val parcelable = coreRequest.fromDomainToModuleApi()
