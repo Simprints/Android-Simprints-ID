@@ -16,6 +16,7 @@ internal class AppResponseBuilderUseCase @Inject constructor(
     private val isNewEnrolment: IsNewEnrolmentUseCase,
     private val handleEnrolment: CreateEnrolResponseUseCase,
     private val handleIdentify: CreateIdentifyResponseUseCase,
+    private val handleVerify: CreateVerifyResponseUseCase,
 ) {
 
     suspend operator fun invoke(
@@ -30,11 +31,7 @@ internal class AppResponseBuilderUseCase @Inject constructor(
         }
 
         is ActionRequest.IdentifyActionRequest -> handleIdentify(projectConfiguration, results)
-
-        is ActionRequest.VerifyActionRequest -> {
-            TODO()
-        }
-
+        is ActionRequest.VerifyActionRequest -> handleVerify(projectConfiguration, results)
         is ActionRequest.ConfirmActionRequest -> buildConfirmResponse(results)
         is ActionRequest.EnrolLastBiometricActionRequest -> buildLastBiometricResponse(results)
         null -> AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
