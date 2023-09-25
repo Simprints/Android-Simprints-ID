@@ -7,23 +7,27 @@ import com.simprints.feature.orchestrator.model.responses.AppConfirmationRespons
 import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
 import com.simprints.feature.selectsubject.SelectSubjectResult
+import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
-class AppResponseBuilderUseCase @Inject constructor(
+internal class AppResponseBuilderUseCase @Inject constructor(
     private val buildSubject: BuildEnrolledSubjectUseCase,
     private val enrolSubject: EnrolSubjectUseCase,
+    private val isNewEnrolment: IsNewEnrolmentUseCase,
 ) {
 
     suspend operator fun invoke(
+        projectConfiguration: ProjectConfiguration,
         request: ActionRequest?,
         results: List<Parcelable>,
     ): IAppResponse = when (request) {
-        is ActionRequest.EnrolActionRequest -> {
-            // TODO perform adjudication first
+        is ActionRequest.EnrolActionRequest -> if (isNewEnrolment(projectConfiguration, results)) {
             handleEnrolment(results, request)
+        } else {
+            TODO("Handle as identification instead")
         }
 
         is ActionRequest.IdentifyActionRequest -> {
