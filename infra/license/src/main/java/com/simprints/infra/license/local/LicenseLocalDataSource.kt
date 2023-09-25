@@ -1,14 +1,15 @@
 package com.simprints.infra.license.local
 
-internal interface LicenseLocalDataSource {
-    suspend fun getLicense(): String?
+import com.simprints.infra.license.Vendor
 
-    suspend fun saveLicense(license: String)
+internal interface LicenseLocalDataSource {
+    suspend fun getLicense(vendor: Vendor): String?
+
+    suspend fun saveLicense(vendor: Vendor, license: String)
 
     suspend fun deleteCachedLicense()
 
     companion object {
         const val LICENSES_FOLDER = "licenses"
-        const val LICENSE_NAME = "ROC.lic"
     }
 }

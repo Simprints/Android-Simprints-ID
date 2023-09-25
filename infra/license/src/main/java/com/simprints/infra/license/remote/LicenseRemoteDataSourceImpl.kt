@@ -1,13 +1,13 @@
 package com.simprints.infra.license.remote
 
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.license.Vendor
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.infra.license.LicenseVendor
 import okhttp3.ResponseBody
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -25,12 +25,11 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     override suspend fun getLicense(
         projectId: String,
         deviceId: String,
-        licenseVendor: LicenseVendor
+        vendor: Vendor
     ): ApiLicenseResult = try {
         getProjectApiClient().executeCall {
-            val apiLicense = it.getLicense(projectId, deviceId, licenseVendor.name)
-
-            ApiLicenseResult.Success(licenseJson = apiLicense.getLicenseBasedOnVendor(licenseVendor))
+            val apiLicense = it.getLicense(projectId, deviceId, vendor).parseApiLicense()
+            ApiLicenseResult.Success(licenseJson = apiLicense.getLicenseBasedOnVendor(vendor))
         }
     } catch (t: Throwable) {
         when (t) {
