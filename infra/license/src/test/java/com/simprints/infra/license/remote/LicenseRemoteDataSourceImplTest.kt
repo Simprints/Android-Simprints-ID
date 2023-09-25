@@ -2,6 +2,7 @@ package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
@@ -228,6 +229,6 @@ class LicenseRemoteDataSourceImplTest {
         }
 
     companion object {
-        private const val RANK_ONE_FACE = "RANK_ONE_FACE"
+        private val RANK_ONE_FACE = Vendor("RANK_ONE_FACE")
     }
 }

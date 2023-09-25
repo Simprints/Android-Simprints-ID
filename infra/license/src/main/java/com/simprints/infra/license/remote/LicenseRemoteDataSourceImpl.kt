@@ -2,6 +2,7 @@ package com.simprints.infra.license.remote
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -24,7 +25,7 @@ internal class LicenseRemoteDataSourceImpl @Inject constructor(
     override suspend fun getLicense(
         projectId: String,
         deviceId: String,
-        vendor: String
+        vendor: Vendor
     ): ApiLicenseResult = try {
         getProjectApiClient().executeCall {
             val apiLicense = it.getLicense(projectId, deviceId, vendor).parseApiLicense()

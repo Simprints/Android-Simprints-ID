@@ -3,6 +3,7 @@ package com.simprints.infra.license.repository
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.license.LicenseRepositoryImpl
 import com.simprints.infra.license.LicenseState
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.local.LicenseLocalDataSource
 import com.simprints.infra.license.remote.ApiLicenseResult
 import com.simprints.infra.license.remote.LicenseRemoteDataSource
@@ -110,7 +111,11 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("validProjectBackendErrorTimed", "deviceId", RANK_ONE_FACE)
+        licenseRepositoryImpl.getLicenseStates(
+            "validProjectBackendErrorTimed",
+            "deviceId",
+            RANK_ONE_FACE
+        )
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -126,7 +131,11 @@ class LicenseRepositoryImplTest {
         coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
 
         val licenseStates = mutableListOf<LicenseState>()
-        licenseRepositoryImpl.getLicenseStates("validProjectBackendError", "deviceId", RANK_ONE_FACE)
+        licenseRepositoryImpl.getLicenseStates(
+            "validProjectBackendError",
+            "deviceId",
+            RANK_ONE_FACE
+        )
             .toCollection(licenseStates)
 
         with(licenseStates) {
@@ -136,8 +145,9 @@ class LicenseRepositoryImplTest {
             assertThat(get(2)).isEqualTo(LicenseState.FinishedWithBackendMaintenanceError(null))
         }
     }
-companion object {
-    private const val RANK_ONE_FACE = "RANK_ONE_FACE"
 
-}
+    companion object {
+        private val RANK_ONE_FACE = Vendor("RANK_ONE_FACE")
+
+    }
 }

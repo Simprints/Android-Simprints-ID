@@ -1,9 +1,11 @@
 package com.simprints.infra.license.local
 
-internal interface LicenseLocalDataSource {
-    suspend fun getLicense(vendor: String): String?
+import com.simprints.infra.license.Vendor
 
-    suspend fun saveLicense(vendor: String, license: String)
+internal interface LicenseLocalDataSource {
+    suspend fun getLicense(vendor: Vendor): String?
+
+    suspend fun saveLicense(vendor: Vendor, license: String)
 
     suspend fun deleteCachedLicense()
 

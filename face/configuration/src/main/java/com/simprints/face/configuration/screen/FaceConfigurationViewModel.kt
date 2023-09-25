@@ -9,6 +9,7 @@ import com.simprints.core.livedata.send
 import com.simprints.face.configuration.data.FaceConfigurationState
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
@@ -54,6 +55,6 @@ internal class FaceConfigurationViewModel @Inject constructor(
         }
 
     companion object {
-        private const val RANK_ONE_FACE_VENDOR = "RANK_ONE_FACE"
+        private val RANK_ONE_FACE_VENDOR = Vendor("RANK_ONE_FACE")
     }
 }
