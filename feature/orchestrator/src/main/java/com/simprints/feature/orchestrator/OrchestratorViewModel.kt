@@ -15,9 +15,9 @@ import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
-import com.simprints.feature.orchestrator.steps.StepsBuilder
+import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
-import com.simprints.feature.orchestrator.usecases.AppResponseBuilderUseCase
+import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
@@ -35,7 +35,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val cache: OrchestratorCache,
     private val locationStore: LocationStore,
-    private val stepsBuilder: StepsBuilder,
+    private val stepsBuilder: BuildStepsUseCase,
     private val mapRefusalOrErrorResult: MapRefusalOrErrorResultUseCase,
     private val shouldCreatePerson: ShouldCreatePersonUseCase,
     private val createPersonEvent: CreatePersonEventUseCase,

@@ -1,4 +1,4 @@
-package com.simprints.feature.orchestrator.usecases
+package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.tools.time.TimeHelper
