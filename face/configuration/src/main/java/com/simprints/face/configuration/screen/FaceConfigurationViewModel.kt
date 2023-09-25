@@ -9,10 +9,8 @@ import com.simprints.core.livedata.send
 import com.simprints.face.configuration.data.FaceConfigurationState
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.LicenseState
-import com.simprints.infra.license.LicenseVendor
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,7 +31,7 @@ internal class FaceConfigurationViewModel @Inject constructor(
 
         viewModelScope.launch {
             fetchAttempted = true
-            licenseRepository.getLicenseStates(projectId, deviceId, LicenseVendor.RANK_ONE_FACE)
+            licenseRepository.getLicenseStates(projectId, deviceId, RANK_ONE_FACE_VENDOR)
                 .map { it.toConfigurationState() }
                 .collect { _configurationState.send(it) }
         }
@@ -54,4 +52,8 @@ internal class FaceConfigurationViewModel @Inject constructor(
             is LicenseState.FinishedWithError -> FaceConfigurationState.FinishedWithError(errorCode)
             is LicenseState.FinishedWithBackendMaintenanceError -> FaceConfigurationState.FinishedWithBackendMaintenanceError(estimatedOutage)
         }
+
+    companion object {
+        private const val RANK_ONE_FACE_VENDOR = "RANK_ONE_FACE"
+    }
 }
