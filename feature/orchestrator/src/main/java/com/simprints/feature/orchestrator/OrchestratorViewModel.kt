@@ -7,9 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.face.matcher.FaceMatchParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.model.OrchestratorResult
+import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
+import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.feature.orchestrator.steps.StepsBuilder
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
@@ -77,13 +81,13 @@ internal class OrchestratorViewModel @Inject constructor(
         steps.firstOrNull { it.status == StepStatus.IN_PROGRESS }?.let {
             it.status = StepStatus.COMPLETED
             it.result = result
+
+            updateMatcherStepPayload(it, result)
         }
 
         if (shouldCreatePerson(cache.actionRequest, modalities, steps)) {
             viewModelScope.launch { createPersonEvent(steps.mapNotNull { it.result }) }
         }
-
-        // TODO matching step handling
 
         doNextStep()
     }
@@ -111,13 +115,36 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     private fun buildAppResponse() = viewModelScope.launch {
+        val projectConfiguration = configManager.getProjectConfiguration()
         val cachedActionRequest = cache.actionRequest
-        val appResponse = appResponseBuilder(cachedActionRequest, steps.mapNotNull { it.result })
+        val appResponse = appResponseBuilder(
+            projectConfiguration,
+            cachedActionRequest,
+            steps.mapNotNull { it.result },
+        )
 
         // TODO update daily activity
 
         addCallbackEvent(appResponse)
         _appResponse.send(OrchestratorResult(cachedActionRequest, appResponse))
+    }
+
+    private fun updateMatcherStepPayload(currentStep: Step, result: Parcelable) {
+        if (currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult) {
+            val matchingStep = steps.firstOrNull { it.id == StepId.FACE_MATCHER }
+
+            if (matchingStep != null) {
+                val faceSamples = result.results.mapNotNull { it.sample }.map { FaceMatchParams.Sample(it.faceId, it.template) }
+                val newPayload = matchingStep.payload
+                    .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
+                    ?.toFaceStepArgs(faceSamples)
+
+                if (newPayload != null) {
+                    matchingStep.payload = newPayload
+                }
+            }
+        }
+        // TODO fingerprint matching step payload handling
     }
 
 }

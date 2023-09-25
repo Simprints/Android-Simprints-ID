@@ -1,7 +1,6 @@
 package com.simprints.feature.orchestrator.usecases
 
 import android.os.Parcelable
-import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.orchestrator.model.responses.AppConfirmationResponse
 import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
@@ -14,9 +13,9 @@ import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 internal class AppResponseBuilderUseCase @Inject constructor(
-    private val buildSubject: BuildEnrolledSubjectUseCase,
-    private val enrolSubject: EnrolSubjectUseCase,
     private val isNewEnrolment: IsNewEnrolmentUseCase,
+    private val handleEnrolment: CreateEnrolResponseUseCase,
+    private val handleIdentify: CreateIdentifyResponseUseCase,
 ) {
 
     suspend operator fun invoke(
@@ -25,14 +24,12 @@ internal class AppResponseBuilderUseCase @Inject constructor(
         results: List<Parcelable>,
     ): IAppResponse = when (request) {
         is ActionRequest.EnrolActionRequest -> if (isNewEnrolment(projectConfiguration, results)) {
-            handleEnrolment(results, request)
+            handleEnrolment(request, results)
         } else {
-            TODO("Handle as identification instead")
+            handleIdentify(projectConfiguration, results)
         }
 
-        is ActionRequest.IdentifyActionRequest -> {
-            TODO()
-        }
+        is ActionRequest.IdentifyActionRequest -> handleIdentify(projectConfiguration, results)
 
         is ActionRequest.VerifyActionRequest -> {
             TODO()
@@ -43,20 +40,6 @@ internal class AppResponseBuilderUseCase @Inject constructor(
         null -> AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
     }
 
-
-    private suspend fun handleEnrolment(results: List<Parcelable>, request: ActionRequest.EnrolActionRequest): IAppResponse {
-        val faceCapture = results.lastOrNull { it is FaceCaptureResult } as? FaceCaptureResult
-        // TODO fingerprint capture
-        return try {
-            val subject = buildSubject(request.projectId, request.userId, request.moduleId, faceCapture)
-            enrolSubject(subject)
-
-            AppEnrolResponse(subject.subjectId)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
-        }
-    }
 
     private fun buildConfirmResponse(results: List<Parcelable>): IAppResponse = results
         .filterIsInstance(SelectSubjectResult::class.java)

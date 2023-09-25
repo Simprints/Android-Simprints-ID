@@ -10,7 +10,7 @@ data class Step(
     val id: Int,
     @IdRes val navigationActionId: Int,
     @IdRes val destinationId: Int,
-    val payload: Bundle,
+    var payload: Bundle,
     var status: StepStatus = StepStatus.NOT_STARTED,
     var result: Parcelable? = null,
 ) : Parcelable {
