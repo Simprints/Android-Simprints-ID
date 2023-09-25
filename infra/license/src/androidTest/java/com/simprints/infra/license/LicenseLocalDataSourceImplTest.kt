@@ -17,7 +17,7 @@ import java.util.UUID
 class LicenseLocalDataSourceImplTest {
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val filesFolder = "${app.filesDir}/${LicenseLocalDataSource.LICENSES_FOLDER}"
-    private val licenseVendor = "vendor1"
+    private val licenseVendor = Vendor("vendor1")
     private val filePath = "$filesFolder/$licenseVendor"
     private val licenseLocalDataSourceImpl = spyk(
         LicenseLocalDataSourceImpl(app, mockk(), UnconfinedTestDispatcher())
