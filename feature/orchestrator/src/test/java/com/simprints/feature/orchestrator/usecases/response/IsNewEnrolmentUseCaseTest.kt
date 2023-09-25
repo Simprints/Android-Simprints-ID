@@ -1,4 +1,4 @@
-package com.simprints.feature.orchestrator.usecases
+package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.matcher.FaceMatchResult

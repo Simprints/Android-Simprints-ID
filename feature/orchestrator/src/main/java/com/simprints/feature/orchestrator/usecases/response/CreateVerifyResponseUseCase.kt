@@ -1,4 +1,4 @@
-package com.simprints.feature.orchestrator.usecases
+package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
 import com.simprints.face.matcher.FaceMatchResult

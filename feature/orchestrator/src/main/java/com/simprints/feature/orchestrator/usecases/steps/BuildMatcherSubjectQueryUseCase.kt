@@ -1,4 +1,4 @@
-package com.simprints.feature.orchestrator.usecases
+package com.simprints.feature.orchestrator.usecases.steps
 
 import com.simprints.infra.config.domain.models.IdentificationConfiguration
 import com.simprints.infra.config.domain.models.ProjectConfiguration

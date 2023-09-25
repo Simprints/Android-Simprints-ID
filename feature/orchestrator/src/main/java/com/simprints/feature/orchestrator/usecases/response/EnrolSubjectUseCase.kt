@@ -1,4 +1,4 @@
-package com.simprints.feature.orchestrator.usecases
+package com.simprints.feature.orchestrator.usecases.response
 
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager

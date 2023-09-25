@@ -1,4 +1,4 @@
-package com.simprints.feature.orchestrator.steps
+package com.simprints.feature.orchestrator.usecases.steps
 
 import androidx.core.os.bundleOf
 import com.simprints.core.DeviceID
@@ -12,7 +12,9 @@ import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
-import com.simprints.feature.orchestrator.usecases.BuildMatcherSubjectQueryUseCase
+import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
+import com.simprints.feature.orchestrator.steps.Step
+import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
@@ -22,7 +24,7 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mapping code for steps")
-internal class StepsBuilder @Inject constructor(
+internal class BuildStepsUseCase @Inject constructor(
     @DeviceID private val deviceId: String,
     private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase
 ) {

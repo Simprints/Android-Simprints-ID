@@ -1,4 +1,4 @@
-package com.simprints.feature.orchestrator.usecases
+package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
 import com.simprints.face.capture.FaceCaptureResult
@@ -10,8 +10,8 @@ import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 internal class CreateEnrolResponseUseCase @Inject constructor(
-        private val buildSubject: BuildEnrolledSubjectUseCase,
-        private val enrolSubject: EnrolSubjectUseCase,
+    private val buildSubject: BuildEnrolledSubjectUseCase,
+    private val enrolSubject: EnrolSubjectUseCase,
 ) {
 
     suspend operator fun invoke(request: ActionRequest.EnrolActionRequest, results: List<Parcelable>): IAppResponse {
