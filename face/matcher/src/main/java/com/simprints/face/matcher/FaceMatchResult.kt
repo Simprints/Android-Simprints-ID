@@ -10,7 +10,7 @@ data class FaceMatchResult(
 ) : Parcelable {
 
     @Parcelize
-    internal data class Item(
+    data class Item(
         override val guid: String,
         override val confidence: Float,
     ) : IFaceMatchResult, Parcelable

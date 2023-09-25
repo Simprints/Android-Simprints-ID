@@ -3,23 +3,28 @@ package com.simprints.feature.orchestrator.steps
 import androidx.core.os.bundleOf
 import com.simprints.core.DeviceID
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.configuration.FaceConfigurationContract
+import com.simprints.face.matcher.FaceMatchContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
+import com.simprints.feature.orchestrator.usecases.BuildMatcherSubjectQueryUseCase
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mapping code for steps")
 internal class StepsBuilder @Inject constructor(
     @DeviceID private val deviceId: String,
+    private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase
 ) {
 
     fun build(action: ActionRequest, projectConfiguration: ProjectConfiguration) = when (action) {
@@ -28,7 +33,13 @@ internal class StepsBuilder @Inject constructor(
             buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
             buildConsentStep(ConsentType.ENROL),
             buildModalityCaptureSteps(projectConfiguration),
-            // TODO figure out how to add matching step
+            if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
+                buildModalityMatcherSteps(
+                    projectConfiguration,
+                    FlowProvider.FlowType.ENROL,
+                    buildMatcherSubjectQuery(projectConfiguration, action),
+                )
+            } else emptyList(),
         )
 
         is ActionRequest.IdentifyActionRequest -> listOf(
@@ -36,7 +47,11 @@ internal class StepsBuilder @Inject constructor(
             buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
             buildConsentStep(ConsentType.IDENTIFY),
             buildModalityCaptureSteps(projectConfiguration),
-            // TODO figure out how to add matching step
+            buildModalityMatcherSteps(
+                projectConfiguration,
+                FlowProvider.FlowType.IDENTIFY,
+                buildMatcherSubjectQuery(projectConfiguration, action),
+            )
         )
 
         is ActionRequest.VerifyActionRequest -> listOf(
@@ -45,7 +60,11 @@ internal class StepsBuilder @Inject constructor(
             buildFetchGuidStep(action.projectId, action.verifyGuid),
             buildConsentStep(ConsentType.VERIFY),
             buildModalityCaptureSteps(projectConfiguration),
-            // TODO figure out how to add matching step
+            buildModalityMatcherSteps(
+                projectConfiguration,
+                FlowProvider.FlowType.VERIFY,
+                SubjectQuery(subjectId = action.verifyGuid),
+            )
         )
 
         is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
@@ -112,6 +131,23 @@ internal class StepsBuilder @Inject constructor(
         }
     }
 
+    private fun buildModalityMatcherSteps(
+        projectConfiguration: ProjectConfiguration,
+        flowType: FlowProvider.FlowType,
+        subjectQuery: SubjectQuery,
+    ) = projectConfiguration.general.modalities.map {
+        when (it) {
+            Modality.FINGERPRINT -> TODO("Fingerprint modality is not supported yet")
+
+            Modality.FACE -> Step(
+                id = StepId.FACE_MATCHER,
+                navigationActionId = R.id.action_orchestratorFragment_to_faceMatcher,
+                destinationId = FaceMatchContract.DESTINATION_ID,
+                payload = bundleOf(MatchStepStubPayload.STUB_KEY to MatchStepStubPayload(flowType, subjectQuery)),
+            )
+        }
+    }
+
     private fun buildLastBiometricStep(action: ActionRequest.EnrolLastBiometricActionRequest) = listOf(Step(
         id = StepId.LAST_BIOMETRIC,
         navigationActionId = R.id.action_orchestratorFragment_to_enrolLast,
@@ -133,5 +169,4 @@ internal class StepsBuilder @Inject constructor(
             subjectId = action.selectedGuid,
         ),
     ))
-
 }
