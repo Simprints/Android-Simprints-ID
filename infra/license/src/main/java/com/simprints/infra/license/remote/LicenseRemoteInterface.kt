@@ -1,5 +1,6 @@
 package com.simprints.infra.license.remote
 
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -10,6 +11,6 @@ internal interface LicenseRemoteInterface : SimRemoteInterface {
     suspend fun getLicense(
         @Path("projectId") projectId: String,
         @Path("deviceId") deviceId: String,
-        @Query("vendor") vendor: String?
+        @Query("vendor") vendor: Vendor
     ): String
 }

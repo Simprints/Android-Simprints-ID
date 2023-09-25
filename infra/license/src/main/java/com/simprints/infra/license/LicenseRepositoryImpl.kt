@@ -16,7 +16,7 @@ internal class LicenseRepositoryImpl @Inject constructor(
     override fun getLicenseStates(
         projectId: String,
         deviceId: String,
-        licenseVendor: String
+        licenseVendor: Vendor
     ): Flow<LicenseState> = flow {
         emit(LicenseState.Started)
 
@@ -43,7 +43,7 @@ internal class LicenseRepositoryImpl @Inject constructor(
     }
 
     private suspend fun FlowCollector<LicenseState>.handleLicenseResultSuccess(
-        licenseVendor: String,
+        licenseVendor: Vendor,
         apiLicenseResult: ApiLicenseResult.Success
     ) {
         licenseLocalDataSource.saveLicense(licenseVendor, apiLicenseResult.licenseJson)

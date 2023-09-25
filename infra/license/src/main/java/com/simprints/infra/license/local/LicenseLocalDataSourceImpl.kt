@@ -2,6 +2,7 @@ package com.simprints.infra.license.local
 
 import android.content.Context
 import com.simprints.core.DispatcherIO
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.license.local.LicenseLocalDataSource.Companion.LICENSES_FOLDER
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -20,7 +21,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
     private val licenseDirectoryPath = "${context.filesDir}/${LICENSES_FOLDER}"
 
 
-    override suspend fun getLicense(vendor: String): String? = withContext(dispatcherIo) {
+    override suspend fun getLicense(vendor: Vendor): String? = withContext(dispatcherIo) {
         renameOldRocLicense()// TODO: remove this after a few releases when all users have migrated to the 2023.3.0 version
         getFileFromStorage(vendor)
     }
@@ -38,11 +39,11 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
 
     }
 
-    override suspend fun saveLicense(vendor: String, license: String): Unit =
+    override suspend fun saveLicense(vendor: Vendor, license: String): Unit =
         withContext(dispatcherIo) {
             createDirectoryIfNonExistent(licenseDirectoryPath)
 
-            val file = File("$licenseDirectoryPath/$vendor")
+            val file = File("$licenseDirectoryPath/${vendor}")
 
             try {
                 keyHelper.getEncryptedFileBuilder(file, context).openFileOutput()
@@ -67,7 +68,7 @@ internal class LicenseLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    private fun getFileFromStorage(vendor: String): String? = try {
+    private fun getFileFromStorage(vendor: Vendor): String? = try {
         val file = File("$licenseDirectoryPath/$vendor")
         val encryptedFile = keyHelper.getEncryptedFileBuilder(file, context)
         encryptedFile.openFileInput().use { String(it.readBytes()) }

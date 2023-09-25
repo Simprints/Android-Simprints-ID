@@ -2,18 +2,19 @@ package com.simprints.infra.license.remote
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.license.Vendor
 
 /**
  * ApiLicense only populates some fields, based on which vendor was asked when retrieving the license.
  */
 @Keep
-internal data class ApiLicense(val licenses: Map<String, License> = emptyMap()) {
+internal data class ApiLicense(val licenses: Map<Vendor, License> = emptyMap()) {
 
     /**
      * This method gets the correct license data based on which vendor is passed to it.
      * If the license doesn't contain data for that vendor, returns an empty string.
      */
-    fun getLicenseBasedOnVendor(vendor: String) = licenses[vendor]?.data ?: ""
+    fun getLicenseBasedOnVendor(vendor: Vendor) = licenses[vendor]?.data ?: ""
 
 }
 
@@ -54,7 +55,7 @@ internal data class ApiLicenseError(val error: String)
 internal fun String.parseApiLicense(): ApiLicense = JsonHelper.jackson.readTree(this).let {
     return ApiLicense(
         licenses = it.fields().asSequence().map { entry ->
-            entry.key to JsonHelper.jackson.treeToValue(entry.value, License::class.java)
+            Vendor(entry.key) to JsonHelper.jackson.treeToValue(entry.value, License::class.java)
         }.toMap()
     )
 }

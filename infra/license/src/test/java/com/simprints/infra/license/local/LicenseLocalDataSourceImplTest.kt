@@ -1,6 +1,7 @@
 package com.simprints.infra.license.local
 
 import androidx.security.crypto.EncryptedFile
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.security.SecurityManager
 import io.mockk.every
 import io.mockk.mockk
@@ -13,7 +14,7 @@ import java.io.File
 
 class LicenseLocalDataSourceImplTest {
 
-    private val licenseVendor = "vendor1"
+    private val licenseVendor = Vendor("vendor1")
     private val filesDirPath = "testpath"
 
     @Test
