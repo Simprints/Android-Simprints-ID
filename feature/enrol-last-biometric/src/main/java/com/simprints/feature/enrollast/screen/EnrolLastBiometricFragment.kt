@@ -34,7 +34,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,
             R.id.enrolLastBiometricFragment,
-            AlertContract.DESTINATION_ID
+            AlertContract.DESTINATION
         ) { finishWithSubjectId(null) }
 
         viewModel.finish.observe(viewLifecycleOwner) {

@@ -4,7 +4,7 @@ import com.simprints.feature.consent.screens.consent.ConsentFragmentArgs
 
 object ConsentContract {
 
-    val DESTINATION_ID = R.id.consentFragment
+    val DESTINATION = R.id.consentFragment
 
     const val CONSENT_RESULT = "consent_result"
 

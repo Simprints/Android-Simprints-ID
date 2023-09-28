@@ -85,29 +85,29 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
 
         observeLoginCheckVm()
         observeClientApiVm()
-        observeOrchestrator()
+        observeOrchestratorVm()
 
-        handleResult<AlertResult>(AlertContract.DESTINATION_ID) { alertResult ->
+        handleResult<AlertResult>(AlertContract.DESTINATION) { alertResult ->
             clientApiVm.handleErrorResponse(
                 args.requestAction,
                 AppErrorResponse(AlertConfigurationMapper.reasonFromPayload(alertResult.payload))
             )
         }
 
-        handleResult<LoginResult>(LoginContract.DESTINATION_ID) { result ->
+        handleResult<LoginResult>(LoginContract.DESTINATION) { result ->
             loginCheckVm.handleLoginResult(result)
         }
 
         // All step results are handled in unified way because some results
         // can be returned from any step (e.g. ExitFormResult)
-        handleResult(SetupContract.DESTINATION_ID, orchestratorVm::handleResult)
-        handleResult(ConsentContract.DESTINATION_ID, orchestratorVm::handleResult)
-        handleResult(SelectSubjectContract.DESTINATION_ID, orchestratorVm::handleResult)
-        handleResult(EnrolLastBiometricContract.DESTINATION_ID, orchestratorVm::handleResult)
-        handleResult(ExitFormContract.DESTINATION_ID, orchestratorVm::handleResult)
-        handleResult(FaceConfigurationContract.DESTINATION_ID, orchestratorVm::handleResult)
-        handleResult(FaceMatchContract.DESTINATION_ID, orchestratorVm::handleResult)
-        handleResult(FaceCaptureContract.DESTINATION_ID, orchestratorVm::handleResult)
+        handleResult(SetupContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(ConsentContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(SelectSubjectContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(EnrolLastBiometricContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(ExitFormContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(FaceConfigurationContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(FaceMatchContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(FaceCaptureContract.DESTINATION, orchestratorVm::handleResult)
     }
 
     private fun <T : Parcelable> handleResult(destination: Int, block: (T) -> Unit) {
@@ -154,7 +154,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         })
     }
 
-    private fun observeOrchestrator() {
+    private fun observeOrchestratorVm() {
         orchestratorVm.currentStep.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { step ->
             if (step != null) {
                 findNavController().navigate(step.navigationActionId, step.payload)

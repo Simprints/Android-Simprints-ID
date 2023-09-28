@@ -4,7 +4,7 @@ import com.simprints.feature.enrollast.screen.EnrolLastBiometricFragmentArgs
 
 object EnrolLastBiometricContract {
 
-    val DESTINATION_ID = R.id.enrolLastBiometricFragment
+    val DESTINATION = R.id.enrolLastBiometricFragment
 
     const val ENROL_LAST_RESULT = "enrol_last_biometric_result"
 

@@ -17,7 +17,7 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
         actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
     )
 
-    override fun getValidSimprintsRequest() = ActionRequest.ConfirmActionRequest(
+    override fun getValidSimprintsRequest() = ActionRequest.ConfirmIdentityActionRequest(
         actionIdentifier = getIdentifier(),
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,

@@ -43,7 +43,7 @@ sealed class ActionRequest(
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
     @Parcelize
-    data class ConfirmActionRequest(
+    data class ConfirmIdentityActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
         override val userId: String,

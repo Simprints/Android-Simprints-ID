@@ -132,7 +132,7 @@ class AlertFragmentTest {
             navController = navController,
             fragmentArgs = alertConfiguration {}.toArgs()
         ) {
-            handleResultDirectly<AlertResult>(AlertContract.DESTINATION_ID) { result ->
+            handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 resultKey = result.buttonKey
             }
         }
@@ -149,7 +149,7 @@ class AlertFragmentTest {
             navController = navController,
             fragmentArgs = alertConfiguration {}.withPayload("testKey" to 42).toArgs()
         ) {
-            handleResultDirectly<AlertResult>(AlertContract.DESTINATION_ID) { result ->
+            handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 payload = result.payload.getInt("testKey")
             }
         }
@@ -165,7 +165,7 @@ class AlertFragmentTest {
             navController = navController,
             fragmentArgs = alertConfiguration {}.withPayload("testKey" to 42).toArgs()
         ) {
-            handleResultDirectly<AlertResult>(AlertContract.DESTINATION_ID) { result ->
+            handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 payload = result.payload.getInt("testKey")
             }
         }
@@ -185,7 +185,7 @@ class AlertFragmentTest {
                 }
             }.withPayload("testKey" to 42).toArgs()
         ) {
-            handleResultDirectly<AlertResult>(AlertContract.DESTINATION_ID) { result ->
+            handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 payload = result.payload.getInt("testKey")
             }
         }
@@ -206,7 +206,7 @@ class AlertFragmentTest {
                 }
             }.toArgs()
         ) {
-            handleResultDirectly<AlertResult>(AlertContract.DESTINATION_ID) { result ->
+            handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 resultKey = result.buttonKey
             }
         }
@@ -227,7 +227,7 @@ class AlertFragmentTest {
                 }
             }.toArgs()
         ) {
-            handleResultDirectly<AlertResult>(AlertContract.DESTINATION_ID) { result ->
+            handleResultDirectly<AlertResult>(AlertContract.DESTINATION) { result ->
                 resultKey = result.buttonKey
             }
         }

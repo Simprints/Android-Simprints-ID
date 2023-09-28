@@ -32,19 +32,19 @@ internal class AppResponseBuilderUseCase @Inject constructor(
 
         is ActionRequest.IdentifyActionRequest -> handleIdentify(projectConfiguration, results)
         is ActionRequest.VerifyActionRequest -> handleVerify(projectConfiguration, results)
-        is ActionRequest.ConfirmActionRequest -> buildConfirmResponse(results)
-        is ActionRequest.EnrolLastBiometricActionRequest -> buildLastBiometricResponse(results)
+        is ActionRequest.ConfirmIdentityActionRequest -> buildConfirmIdentityResponse(results)
+        is ActionRequest.EnrolLastBiometricActionRequest -> buildEnrolLastBiometricResponse(results)
         null -> AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
     }
 
 
-    private fun buildConfirmResponse(results: List<Parcelable>): IAppResponse = results
+    private fun buildConfirmIdentityResponse(results: List<Parcelable>): IAppResponse = results
         .filterIsInstance(SelectSubjectResult::class.java)
         .lastOrNull()
         ?.let { AppConfirmationResponse(true) }
-        ?: AppErrorResponse(IAppErrorReason.GUID_NOT_FOUND_ONLINE)
+        ?: AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
 
-    private fun buildLastBiometricResponse(results: List<Parcelable>) = results
+    private fun buildEnrolLastBiometricResponse(results: List<Parcelable>) = results
         .filterIsInstance(EnrolLastBiometricResult::class.java)
         .lastOrNull()
         ?.newSubjectId

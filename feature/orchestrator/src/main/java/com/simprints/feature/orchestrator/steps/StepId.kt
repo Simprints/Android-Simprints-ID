@@ -13,7 +13,7 @@ object StepId {
     const val SETUP = STEP_BASE_CORE + 1
     const val FETCH_GUID = STEP_BASE_CORE + 2
     const val CONSENT = STEP_BASE_CORE + 3
-    const val LAST_BIOMETRIC = STEP_BASE_CORE + 4
+    const val ENROL_LAST_BIOMETRIC = STEP_BASE_CORE + 4
     const val CONFIRM_IDENTITY = STEP_BASE_CORE + 5
 
     // Face step ids

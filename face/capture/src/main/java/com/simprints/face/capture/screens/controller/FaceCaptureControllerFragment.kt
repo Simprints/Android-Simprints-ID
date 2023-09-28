@@ -34,7 +34,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        findNavController().handleResult<ExitFormResult>(this, R.id.faceCaptureControllerFragment, ExitFormContract.DESTINATION_ID) {
+        findNavController().handleResult<ExitFormResult>(this, R.id.faceCaptureControllerFragment, ExitFormContract.DESTINATION) {
             val option = it.submittedOption()
             if (option != null) {
                 findNavController().finishWithResult(this, it)
