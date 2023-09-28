@@ -38,7 +38,7 @@ internal class SimpleCaptureEventReporter @Inject constructor(
         eventRepository.addOrUpdateEvent(FaceFallbackCaptureEvent(startTime, endTime))
     }
 
-    suspend fun addCaptureEvents(faceDetection: FaceDetection, attempt: Int, qualityThreshold: Float): String {
+    suspend fun addCaptureEvents(faceDetection: FaceDetection, attempt: Int, qualityThreshold: Float) {
         val faceCaptureEvent = FaceCaptureEvent(
             faceDetection.detectionStartTime,
             faceDetection.detectionEndTime,
@@ -58,8 +58,6 @@ internal class SimpleCaptureEventReporter @Inject constructor(
                 payloadId = faceDetection.id,
             ))
         }
-
-        return faceCaptureEvent.id
     }
 
     private fun mapDetectionStatusToPayloadResult(faceDetection: FaceDetection) =

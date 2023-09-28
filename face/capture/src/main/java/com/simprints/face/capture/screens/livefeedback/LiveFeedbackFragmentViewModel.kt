@@ -188,7 +188,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
 
     private suspend fun sendCaptureEvent(faceDetection: FaceDetection, attemptNumber: Int) {
         val qualityThreshold = configManager.getProjectConfiguration().face!!.qualityThreshold.toFloat()
-        faceDetection.id = eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
+        eventReporter.addCaptureEvents(faceDetection, attemptNumber, qualityThreshold)
     }
 
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }

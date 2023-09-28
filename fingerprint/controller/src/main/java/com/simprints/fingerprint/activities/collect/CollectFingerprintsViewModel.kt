@@ -386,7 +386,7 @@ class CollectFingerprintsViewModel @Inject constructor(
                     )
                 else null
 
-            captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
+            captureEventIds[CaptureId(id, currentCaptureIndex)] = payloadId
 
             //It can not be done in background because then SID won't find the last capture event id
             runBlocking {
