@@ -87,7 +87,6 @@ internal class LiveFeedbackFragmentViewModelTest {
     @Test
     fun `Process fallback image when valid face correctly but not started capture`() = runTest {
         coEvery { faceDetector.analyze(previewFrame) } returns getFace()
-        coEvery { eventReporter.addCaptureEvents(any(), any(), any()) } returns ""
 
         viewModel.initFrameProcessor(1, 0, rectF, previewViewSize)
         viewModel.process(frame)
@@ -101,7 +100,6 @@ internal class LiveFeedbackFragmentViewModelTest {
     @Test
     fun `Process valid face correctly`() = runTest {
         coEvery { faceDetector.analyze(previewFrame) } returns getFace()
-        coEvery { eventReporter.addCaptureEvents(any(), any(), any()) } returns ""
 
         viewModel.initFrameProcessor(1, 0, rectF, previewViewSize)
         viewModel.process(frame)
