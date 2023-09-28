@@ -508,12 +508,7 @@ class CollectFingerprintsViewModel @Inject constructor(
     }
 
     private fun isScanningEndStateAchieved(): Boolean = with(state) {
-        if (everyActiveFingerHasSatisfiedTerminalCondition()) {
-            if (weHaveTheMinimumNumberOfAnyQualityScans() || weHaveTheMinimumNumberOfGoodScans()) {
-                return true
-            }
-        }
-        return false
+        return everyActiveFingerHasSatisfiedTerminalCondition() && (weHaveTheMinimumNumberOfAnyQualityScans() || weHaveTheMinimumNumberOfGoodScans())
     }
 
     private fun CollectFingerprintsState.everyActiveFingerHasSatisfiedTerminalCondition(): Boolean =
