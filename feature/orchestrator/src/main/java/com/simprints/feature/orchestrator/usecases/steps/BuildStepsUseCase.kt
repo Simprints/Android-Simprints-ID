@@ -74,10 +74,10 @@ internal class BuildStepsUseCase @Inject constructor(
         )
 
         is ActionRequest.EnrolLastBiometricActionRequest -> listOf(
-            buildLastBiometricStep(action),
+            buildEnrolLastBiometricStep(action),
         )
 
-        is ActionRequest.ConfirmActionRequest -> listOf(
+        is ActionRequest.ConfirmIdentityActionRequest -> listOf(
             buildConfirmIdentityStep(action),
         )
     }.flatten()
@@ -85,7 +85,7 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun buildSetupStep() = listOf(Step(
         id = StepId.SETUP,
         navigationActionId = R.id.action_orchestratorFragment_to_setup,
-        destinationId = SetupContract.DESTINATION_ID,
+        destinationId = SetupContract.DESTINATION,
         payload = bundleOf(),
     ))
 
@@ -100,7 +100,7 @@ internal class BuildStepsUseCase @Inject constructor(
             Modality.FACE -> Step(
                 id = StepId.FACE_CONFIGURATION,
                 navigationActionId = R.id.action_orchestratorFragment_to_faceConfiguration,
-                destinationId = FaceConfigurationContract.DESTINATION_ID,
+                destinationId = FaceConfigurationContract.DESTINATION,
                 payload = FaceConfigurationContract.getArgs(projectId, deviceId),
             )
         }
@@ -109,14 +109,14 @@ internal class BuildStepsUseCase @Inject constructor(
     private fun buildFetchGuidStep(projectId: String, subjectId: String) = listOf(Step(
         id = StepId.FETCH_GUID,
         navigationActionId = R.id.action_orchestratorFragment_to_fetchSubject,
-        destinationId = FetchSubjectContract.DESTINATION_ID,
+        destinationId = FetchSubjectContract.DESTINATION,
         payload = FetchSubjectContract.getArgs(projectId, subjectId),
     ))
 
     private fun buildConsentStep(consentType: ConsentType) = listOf(Step(
         id = StepId.CONSENT,
         navigationActionId = R.id.action_orchestratorFragment_to_consent,
-        destinationId = ConsentContract.DESTINATION_ID,
+        destinationId = ConsentContract.DESTINATION,
         payload = ConsentContract.getArgs(consentType),
     ))
 
@@ -130,7 +130,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 Step(
                     id = StepId.FACE_CAPTURE,
                     navigationActionId = R.id.action_orchestratorFragment_to_faceCapture,
-                    destinationId = FaceCaptureContract.DESTINATION_ID,
+                    destinationId = FaceCaptureContract.DESTINATION,
                     payload = FaceCaptureContract.getArgs(samplesToCapture),
                 )
             }
@@ -148,16 +148,16 @@ internal class BuildStepsUseCase @Inject constructor(
             Modality.FACE -> Step(
                 id = StepId.FACE_MATCHER,
                 navigationActionId = R.id.action_orchestratorFragment_to_faceMatcher,
-                destinationId = FaceMatchContract.DESTINATION_ID,
+                destinationId = FaceMatchContract.DESTINATION,
                 payload = bundleOf(MatchStepStubPayload.STUB_KEY to MatchStepStubPayload(flowType, subjectQuery)),
             )
         }
     }
 
-    private fun buildLastBiometricStep(action: ActionRequest.EnrolLastBiometricActionRequest) = listOf(Step(
-        id = StepId.LAST_BIOMETRIC,
+    private fun buildEnrolLastBiometricStep(action: ActionRequest.EnrolLastBiometricActionRequest) = listOf(Step(
+        id = StepId.ENROL_LAST_BIOMETRIC,
         navigationActionId = R.id.action_orchestratorFragment_to_enrolLast,
-        destinationId = EnrolLastBiometricContract.DESTINATION_ID,
+        destinationId = EnrolLastBiometricContract.DESTINATION,
         payload = EnrolLastBiometricContract.getArgs(
             projectId = action.projectId,
             userId = action.userId,
@@ -166,10 +166,10 @@ internal class BuildStepsUseCase @Inject constructor(
         ),
     ))
 
-    private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmActionRequest) = listOf(Step(
+    private fun buildConfirmIdentityStep(action: ActionRequest.ConfirmIdentityActionRequest) = listOf(Step(
         id = StepId.CONFIRM_IDENTITY,
         navigationActionId = R.id.action_orchestratorFragment_to_selectSubject,
-        destinationId = SelectSubjectContract.DESTINATION_ID,
+        destinationId = SelectSubjectContract.DESTINATION,
         payload = SelectSubjectContract.getArgs(
             projectId = action.projectId,
             subjectId = action.selectedGuid,

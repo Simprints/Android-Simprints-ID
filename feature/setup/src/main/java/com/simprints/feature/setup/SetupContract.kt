@@ -2,7 +2,7 @@ package com.simprints.feature.setup
 
 object SetupContract {
 
-    val DESTINATION_ID = R.id.setupFragment
+    val DESTINATION = R.id.setupFragment
 
     const val SETUP_RESULT = "setup_result"
 }

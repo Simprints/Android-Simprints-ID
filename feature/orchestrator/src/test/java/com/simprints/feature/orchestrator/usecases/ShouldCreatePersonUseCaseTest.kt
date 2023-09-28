@@ -35,7 +35,7 @@ class ShouldCreatePersonUseCaseTest {
     @Test
     fun `Returns false if followup action`() {
         assertThat(useCase(
-            actionRequest = ActionRequest.ConfirmActionRequest(
+            actionRequest = ActionRequest.ConfirmIdentityActionRequest(
                 ActionRequestIdentifier.fromIntentAction(""),
                 "", "", "", "", emptyList(),
             ),

@@ -20,7 +20,7 @@ internal object ActionFactory {
         metadata = "",
     )
 
-    fun getFolowUpRequest() = ActionRequest.ConfirmActionRequest(
+    fun getFolowUpRequest() = ActionRequest.ConfirmIdentityActionRequest(
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
