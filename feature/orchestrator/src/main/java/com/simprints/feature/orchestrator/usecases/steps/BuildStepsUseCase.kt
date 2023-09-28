@@ -12,9 +12,11 @@ import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
 import com.simprints.feature.fetchsubject.FetchSubjectContract
 import com.simprints.feature.orchestrator.R
+import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
+import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
@@ -26,7 +28,9 @@ import javax.inject.Inject
 @ExcludedFromGeneratedTestCoverageReports("Mapping code for steps")
 internal class BuildStepsUseCase @Inject constructor(
     @DeviceID private val deviceId: String,
-    private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase
+    private val buildMatcherSubjectQuery: BuildMatcherSubjectQueryUseCase,
+    private val cache: OrchestratorCache,
+    private val mapStepsForLastBiometrics: MapStepsForLastBiometricEnrolUseCase,
 ) {
 
     fun build(action: ActionRequest, projectConfiguration: ProjectConfiguration) = when (action) {
@@ -158,7 +162,7 @@ internal class BuildStepsUseCase @Inject constructor(
             projectId = action.projectId,
             userId = action.userId,
             moduleId = action.moduleId,
-            steps = emptyList(), // TODO add previous step results
+            steps = mapStepsForLastBiometrics(cache.steps.mapNotNull { it.result }),
         ),
     ))
 
