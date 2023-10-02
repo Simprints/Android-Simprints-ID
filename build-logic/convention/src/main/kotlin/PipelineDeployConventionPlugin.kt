@@ -49,6 +49,7 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         signingConfig = signingConfigs.getByName("stagingConfig")
 
                         firebaseAppDistribution {
+                            appId = "1:423867324644:android:7c4e84b7f391800f44b4f1"
                             artifactType = "APK"
                             artifactPath = "$rootDir/id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk"
                             serviceCredentialsFile = "id/src/staging/serviceCredentialsFile.json"
