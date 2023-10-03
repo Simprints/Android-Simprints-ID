@@ -1,10 +1,12 @@
 package com.simprints.face.matcher
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import kotlinx.parcelize.Parcelize
 
+@Keep
 @Parcelize
 data class FaceMatchParams(
     val probeFaceSamples: List<Sample>,
@@ -12,6 +14,7 @@ data class FaceMatchParams(
     val queryForCandidates: SubjectQuery,
 ) : Parcelable {
 
+    @Keep
     @Parcelize
     data class Sample(
         val faceId: String,
