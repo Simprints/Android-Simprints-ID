@@ -17,11 +17,6 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerState
-import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
@@ -34,11 +29,6 @@ import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerp
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
