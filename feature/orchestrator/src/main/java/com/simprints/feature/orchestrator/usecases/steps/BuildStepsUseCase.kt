@@ -149,7 +149,7 @@ internal class BuildStepsUseCase @Inject constructor(
                 id = StepId.FACE_MATCHER,
                 navigationActionId = R.id.action_orchestratorFragment_to_faceMatcher,
                 destinationId = FaceMatchContract.DESTINATION,
-                payload = bundleOf(MatchStepStubPayload.STUB_KEY to MatchStepStubPayload(flowType, subjectQuery)),
+                payload = MatchStepStubPayload.asBundle(flowType, subjectQuery),
             )
         }
     }
