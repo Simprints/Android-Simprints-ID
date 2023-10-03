@@ -17,10 +17,6 @@
         <argument
             android:name="requestParams"
             app:argType="android.os.Bundle" />
-
-        <action
-            android:id="@+id/action_orchestratorFragment_to_stubFragment"
-            app:destination="@id/stubFragment" />
     </fragment>
 
     <include app:graph="@navigation/graph_alert" />
@@ -72,18 +68,4 @@
     <action
         android:id="@+id/action_orchestratorFragment_to_faceMatcher"
         app:destination="@id/graph_face_matcher" />
-
-    <!-- TODO: Remove once orchestrator is done - https://simprints.atlassian.net/browse/CORE-2845-->
-    <fragment
-        android:id="@+id/stubFragment"
-        android:name="com.simprints.feature.orchestrator.StubFragment"
-        android:label="StubFragment"
-        tools:layout="@layout/fragment_stub">
-
-        <argument
-            android:name="message"
-            app:argType="string"
-            app:nullable="true" />
-    </fragment>
-
 </navigation>
