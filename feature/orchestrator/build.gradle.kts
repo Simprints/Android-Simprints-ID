@@ -26,6 +26,7 @@ dependencies {
 
     implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:recent-user-activity"))
     implementation(project(":infra:config"))
     implementation(project(":infra:events"))
 }

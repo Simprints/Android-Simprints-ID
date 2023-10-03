@@ -18,6 +18,7 @@ import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
 import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
+import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
@@ -77,6 +78,10 @@ internal class OrchestratorViewModelTest {
     @MockK
     private lateinit var addCallbackEvent: AddCallbackEventUseCase
 
+    @MockK
+    private lateinit var dailyActivityUseCase: UpdateDailyActivityUseCase
+
+
     private lateinit var viewModel: OrchestratorViewModel
 
     @Before
@@ -92,7 +97,8 @@ internal class OrchestratorViewModelTest {
             shouldCreatePerson,
             createPersonEvent,
             appResponseBuilder,
-            addCallbackEvent
+            addCallbackEvent,
+            dailyActivityUseCase,
         )
     }
 
@@ -159,6 +165,7 @@ internal class OrchestratorViewModelTest {
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
         coEvery { appResponseBuilder(any(), any(), any()) } returns mockk()
+        coJustRun { dailyActivityUseCase(any()) }
         justRun { addCallbackEvent(any()) }
 
         viewModel.handleAction(mockk())
