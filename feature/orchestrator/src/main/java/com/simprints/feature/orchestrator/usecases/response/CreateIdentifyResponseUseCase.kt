@@ -45,14 +45,14 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
     ) = if (faceDecisionPolicy != null) {
         val faceMatches = results.filterIsInstance(FaceMatchResult::class.java).lastOrNull()?.results.orEmpty()
-        val lowFilteredResults = faceMatches
+        val goodResults = faceMatches
             .filter { it.confidence >= faceDecisionPolicy.low }
-            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
             .sortedByDescending { it.confidence }
         // Attempt to include only high confidence matches
-        lowFilteredResults
+        goodResults
             .filter { it.confidence >= faceDecisionPolicy.high }
-            .ifEmpty { lowFilteredResults }
+            .ifEmpty { goodResults }
+            .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
             .map { AppMatchResult(it.guid, it.confidence, faceDecisionPolicy) }
     } else emptyList()
 }
