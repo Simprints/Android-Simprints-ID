@@ -9,20 +9,22 @@ import org.junit.Test
 class ConfirmIdentityRequestTest {
 
     @Test
-    fun `when converting to app request, tokenization flags are set correctly`() {
-        val result = confirmIdentityRequest.convertToAppRequest()
+    fun `when converting to app request, tokenization flags are set correctly to true`() {
+        val result = buildRequest(isTokenized = true).convertToAppRequest()
         assertThat(result.isUserIdTokenized).isTrue()
     }
 
-    companion object {
-        private val USER_ID_TOKENIZED = "userId".asTokenized(isTokenized = true)
-        private val confirmIdentityRequest = ConfirmIdentityRequest(
-            userId = USER_ID_TOKENIZED,
-            projectId = RequestFactory.MOCK_PROJECT_ID,
-            sessionId = RequestFactory.MOCK_SESSION_ID,
-            selectedGuid = RequestFactory.MOCK_SELECTED_GUID,
-            unknownExtras = emptyMap()
-        )
+    @Test
+    fun `when converting to app request, tokenization flags are set correctly to false`() {
+        val result = buildRequest(isTokenized = false).convertToAppRequest()
+        assertThat(result.isUserIdTokenized).isFalse()
     }
 
+    private fun buildRequest(isTokenized: Boolean) = ConfirmIdentityRequest(
+        userId = "userId".asTokenized(isTokenized),
+        projectId = RequestFactory.MOCK_PROJECT_ID,
+        sessionId = RequestFactory.MOCK_SESSION_ID,
+        selectedGuid = RequestFactory.MOCK_SELECTED_GUID,
+        unknownExtras = emptyMap()
+    )
 }

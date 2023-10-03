@@ -10,23 +10,25 @@ import org.junit.Test
 class VerifyRequestTest {
 
     @Test
-    fun `when converting to app request, tokenization flags are set correctly`() {
-        val result = verifyRequest.convertToAppRequest() as IAppVerifyRequest
+    fun `when converting to app request, tokenization flags are set correctly to true`() {
+        val result = buildRequest(isTokenized = true).convertToAppRequest() as IAppVerifyRequest
         assertThat(result.isUserIdTokenized).isTrue()
         assertThat(result.isModuleIdTokenized).isTrue()
     }
 
-    companion object {
-        private val USER_ID_TOKENIZED = "userId".asTokenized(isTokenized = true)
-        private val MODULE_ID_TOKENIZED = "moduleId".asTokenized(isTokenized = true)
-        private val verifyRequest = VerifyRequest(
-            projectId = RequestFactory.MOCK_PROJECT_ID,
-            moduleId = MODULE_ID_TOKENIZED,
-            userId = USER_ID_TOKENIZED,
-            metadata = RequestFactory.MOCK_METADATA,
-            verifyGuid = RequestFactory.MOCK_VERIFY_GUID,
-            unknownExtras = emptyMap()
-        )
+    @Test
+    fun `when converting to app request, tokenization flags are set correctly to false`() {
+        val result = buildRequest(isTokenized = false).convertToAppRequest() as IAppVerifyRequest
+        assertThat(result.isUserIdTokenized).isFalse()
+        assertThat(result.isModuleIdTokenized).isFalse()
     }
 
+    private fun buildRequest(isTokenized: Boolean) = VerifyRequest(
+        projectId = RequestFactory.MOCK_PROJECT_ID,
+        moduleId = "moduleId".asTokenized(isTokenized),
+        userId = "userId".asTokenized(isTokenized),
+        metadata = RequestFactory.MOCK_METADATA,
+        verifyGuid = RequestFactory.MOCK_VERIFY_GUID,
+        unknownExtras = emptyMap()
+    )
 }
