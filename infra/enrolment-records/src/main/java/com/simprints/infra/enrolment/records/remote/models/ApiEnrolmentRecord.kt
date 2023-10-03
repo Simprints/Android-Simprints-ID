@@ -3,9 +3,10 @@ package com.simprints.infra.enrolment.records.remote.models
 import androidx.annotation.Keep
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.takeIfTokenized
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.enrolment.records.remote.models.ApiEnrolmentRecord.Companion.ATTENDANT_ID
 import com.simprints.infra.enrolment.records.remote.models.ApiEnrolmentRecord.Companion.MODULE_ID
 import com.simprints.infra.enrolment.records.remote.models.face.toApi
 import com.simprints.infra.enrolment.records.remote.models.fingerprint.toApi
@@ -18,16 +19,16 @@ internal data class ApiEnrolmentRecord(
     val tokenizedFields: List<String>,
     val biometricReferences: List<ApiBiometricReference>
 ) {
-  companion object {
-      const val MODULE_ID = "moduleId"
-  }
+    companion object {
+        const val MODULE_ID = "moduleId"
+        const val ATTENDANT_ID = "attendantId"
+    }
 }
 
 internal fun Subject.toEnrolmentRecord(encoder: EncodingUtils): ApiEnrolmentRecord {
-    val tokenizedFields: List<String> = when(moduleId){
-        is TokenizableString.Raw -> emptyList()
-        is TokenizableString.Tokenized -> listOf(MODULE_ID)
-    }
+    val tokenizedFieldModuleId: String? = moduleId.takeIfTokenized(MODULE_ID)
+    val tokenizedFieldAttendantId: String? = attendantId.takeIfTokenized(ATTENDANT_ID)
+    val tokenizedFields = listOfNotNull(tokenizedFieldModuleId, tokenizedFieldAttendantId)
     return ApiEnrolmentRecord(
         subjectId = subjectId,
         moduleId = moduleId.value,

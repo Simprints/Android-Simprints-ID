@@ -10,23 +10,27 @@ import org.junit.Test
 class EnrollLastBiometricsRequestTest {
 
     @Test
-    fun `when converting to app request, tokenization flags are set correctly`() {
-        val result = enrolLastBiometricsRequest.convertToAppRequest() as IAppEnrolLastBiometricsRequest
+    fun `when converting to app request, tokenization flags are set correctly to true`() {
+        val result =
+            buildRequest(isTokenized = true).convertToAppRequest() as IAppEnrolLastBiometricsRequest
         assertThat(result.isUserIdTokenized).isTrue()
         assertThat(result.isModuleIdTokenized).isTrue()
     }
 
-    companion object {
-        private val USER_ID_TOKENIZED = "userId".asTokenized(isTokenized = true)
-        private val MODULE_ID_TOKENIZED = "moduleId".asTokenized(isTokenized = true)
-        private val enrolLastBiometricsRequest = EnrolLastBiometricsRequest(
-            projectId = RequestFactory.MOCK_PROJECT_ID,
-            userId = USER_ID_TOKENIZED,
-            moduleId = MODULE_ID_TOKENIZED,
-            metadata = RequestFactory.MOCK_METADATA,
-            sessionId = RequestFactory.MOCK_SESSION_ID,
-            unknownExtras = emptyMap()
-        )
+    @Test
+    fun `when converting to app request, tokenization flags are set correctly to false`() {
+        val result =
+            buildRequest(isTokenized = false).convertToAppRequest() as IAppEnrolLastBiometricsRequest
+        assertThat(result.isUserIdTokenized).isFalse()
+        assertThat(result.isModuleIdTokenized).isFalse()
     }
 
+    private fun buildRequest(isTokenized: Boolean) = EnrolLastBiometricsRequest(
+        projectId = RequestFactory.MOCK_PROJECT_ID,
+        moduleId = "moduleId".asTokenized(isTokenized),
+        userId = "userId".asTokenized(isTokenized),
+        metadata = RequestFactory.MOCK_METADATA,
+        sessionId = RequestFactory.MOCK_SESSION_ID,
+        unknownExtras = emptyMap()
+    )
 }

@@ -63,3 +63,8 @@ fun TokenizableString.isTokenized() = when (this) {
 }
 
 fun List<TokenizableString>.values(): List<String> = map(TokenizableString::value)
+
+fun <T> TokenizableString.takeIfTokenized(value: T): T? = when (this) {
+    is Raw -> null
+    is Tokenized -> value
+}

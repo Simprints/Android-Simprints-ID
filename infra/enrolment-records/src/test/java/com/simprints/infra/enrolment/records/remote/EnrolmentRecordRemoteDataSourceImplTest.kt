@@ -104,7 +104,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     format = "faceTemplateFormat",
                 )
             ),
-            tokenizedFields = listOf(MODULE_ID.value)
+            tokenizedFields = listOf(MODULE_ID.value, ATTENDANT_ID.value)
         )
         enrolmentRecordRemoteDataSourceImpl.uploadRecords(listOf(subject))
 
