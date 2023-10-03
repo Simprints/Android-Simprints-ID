@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.steps
 
 import android.os.Parcelable
+import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.matcher.FaceMatchContract
 import com.simprints.face.matcher.FaceMatchParams
@@ -29,5 +30,10 @@ internal data class MatchStepStubPayload(
 
     companion object {
         const val STUB_KEY = "match_step_stub_payload"
+
+        fun asBundle(
+            flowType: FlowProvider.FlowType,
+            subjectQuery: SubjectQuery,
+        ) = bundleOf(STUB_KEY to MatchStepStubPayload(flowType, subjectQuery))
     }
 }
