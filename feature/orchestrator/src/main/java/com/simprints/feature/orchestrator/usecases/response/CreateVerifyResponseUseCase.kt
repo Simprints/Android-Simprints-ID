@@ -30,7 +30,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         results.filterIsInstance(FaceMatchResult::class.java)
             .lastOrNull()
             ?.results
-            ?.firstOrNull()
+            ?.maxByOrNull { it.confidence }
             ?.let { AppMatchResult(it.guid, it.confidence, faceDecisionPolicy) }
     } else null
 }

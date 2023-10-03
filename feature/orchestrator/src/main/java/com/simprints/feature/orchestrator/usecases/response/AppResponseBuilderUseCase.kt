@@ -1,11 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
-import com.simprints.feature.enrollast.EnrolLastBiometricResult
-import com.simprints.feature.orchestrator.model.responses.AppConfirmationResponse
-import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
-import com.simprints.feature.selectsubject.SelectSubjectResult
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.moduleapi.app.responses.IAppErrorReason
@@ -17,6 +13,8 @@ internal class AppResponseBuilderUseCase @Inject constructor(
     private val handleEnrolment: CreateEnrolResponseUseCase,
     private val handleIdentify: CreateIdentifyResponseUseCase,
     private val handleVerify: CreateVerifyResponseUseCase,
+    private val handleConfirmIdentity: CreateConfirmIdentityResponseUseCase,
+    private val handleEnrolLastBiometric: CreateEnrolLastBiometricResponseUseCase,
 ) {
 
     suspend operator fun invoke(
@@ -32,22 +30,8 @@ internal class AppResponseBuilderUseCase @Inject constructor(
 
         is ActionRequest.IdentifyActionRequest -> handleIdentify(projectConfiguration, results)
         is ActionRequest.VerifyActionRequest -> handleVerify(projectConfiguration, results)
-        is ActionRequest.ConfirmIdentityActionRequest -> buildConfirmIdentityResponse(results)
-        is ActionRequest.EnrolLastBiometricActionRequest -> buildEnrolLastBiometricResponse(results)
+        is ActionRequest.ConfirmIdentityActionRequest -> handleConfirmIdentity(results)
+        is ActionRequest.EnrolLastBiometricActionRequest -> handleEnrolLastBiometric(results)
         null -> AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
     }
-
-
-    private fun buildConfirmIdentityResponse(results: List<Parcelable>): IAppResponse = results
-        .filterIsInstance(SelectSubjectResult::class.java)
-        .lastOrNull()
-        ?.let { AppConfirmationResponse(true) }
-        ?: AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
-
-    private fun buildEnrolLastBiometricResponse(results: List<Parcelable>) = results
-        .filterIsInstance(EnrolLastBiometricResult::class.java)
-        .lastOrNull()
-        ?.newSubjectId
-        ?.let { AppEnrolResponse(it) }
-        ?: AppErrorResponse(IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED)
 }

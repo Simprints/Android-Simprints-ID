@@ -52,9 +52,9 @@ class BuildEnrolledSubjectUseCase @Inject constructor(
         faceResponse: FaceCaptureResult,
         timeHelper: TimeHelper
     ): Subject {
-        val patientId = UUID.randomUUID().toString()
+        val subjectId = UUID.randomUUID().toString()
         return Subject(
-            patientId,
+            subjectId,
             projectId,
             userId,
             moduleId,
@@ -68,24 +68,25 @@ class BuildEnrolledSubjectUseCase @Inject constructor(
         .map { FaceSample(it.template, it.format) }
 
 
-    private fun buildSubjectFromFingerprintAndFace(
-        projectId: String,
-        userId: String,
-        moduleId: String,
-        // TODO fingerprintResponse: FingerprintCaptureResponse,
-        faceResponse: FaceCaptureResult,
-    ): Subject {
-        val patientId = UUID.randomUUID().toString()
-        return Subject(
-            patientId,
-            projectId,
-            userId,
-            moduleId,
-            createdAt = Date(timeHelper.now()),
-            // TODO fingerprintSamples = extractFingerprintSamples(fingerprintResponse),
-            faceSamples = extractFaceSamples(faceResponse)
-        )
-    }
+    // TODO
+    //    private fun buildSubjectFromFingerprintAndFace(
+    //        projectId: String,
+    //        userId: String,
+    //        moduleId: String,
+    //        fingerprintResponse: FingerprintCaptureResponse,
+    //        faceResponse: FaceCaptureResult,
+    //    ): Subject {
+    //        val patientId = UUID.randomUUID().toString()
+    //        return Subject(
+    //            patientId,
+    //            projectId,
+    //            userId,
+    //            moduleId,
+    //            createdAt = Date(timeHelper.now()),
+    //            fingerprintSamples = extractFingerprintSamples(fingerprintResponse),
+    //            faceSamples = extractFaceSamples(faceResponse)
+    //        )
+    //    }
 
 
     // TODO
