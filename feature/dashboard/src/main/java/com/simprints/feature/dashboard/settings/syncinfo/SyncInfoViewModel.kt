@@ -5,6 +5,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
@@ -21,6 +23,8 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -37,6 +41,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val authStore: AuthStore,
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
+    private val tokenizationManager: TokenizationManager
 ) : ViewModel() {
 
     val recordsInLocal: LiveData<Int?>
@@ -78,25 +83,31 @@ internal class SyncInfoViewModel @Inject constructor(
 
     init {
         _isSyncAvailable.addSource(lastSyncState) { lastSyncStateValue ->
-            _isSyncAvailable.postValue(emitSyncAvailable(
-                isSyncRunning = lastSyncStateValue?.isSyncRunning(),
-                isConnected = isConnected.value,
-                syncConfiguration = configuration.value?.synchronization,
-            ))
+            _isSyncAvailable.postValue(
+                emitSyncAvailable(
+                    isSyncRunning = lastSyncStateValue?.isSyncRunning(),
+                    isConnected = isConnected.value,
+                    syncConfiguration = configuration.value?.synchronization,
+                )
+            )
         }
         _isSyncAvailable.addSource(isConnected) { isConnectedValue ->
-            _isSyncAvailable.postValue(emitSyncAvailable(
-                isSyncRunning = lastSyncState.value?.isSyncRunning(),
-                isConnected = isConnectedValue,
-                syncConfiguration = configuration.value?.synchronization,
-            ))
+            _isSyncAvailable.postValue(
+                emitSyncAvailable(
+                    isSyncRunning = lastSyncState.value?.isSyncRunning(),
+                    isConnected = isConnectedValue,
+                    syncConfiguration = configuration.value?.synchronization,
+                )
+            )
         }
         _isSyncAvailable.addSource(_configuration) { config ->
-            _isSyncAvailable.postValue(emitSyncAvailable(
-                isSyncRunning = lastSyncState.value?.isSyncRunning(),
-                isConnected = isConnected.value,
-                syncConfiguration = config.synchronization,
-            ))
+            _isSyncAvailable.postValue(
+                emitSyncAvailable(
+                    isSyncRunning = lastSyncState.value?.isSyncRunning(),
+                    isConnected = isConnected.value,
+                    syncConfiguration = config.synchronization,
+                )
+            )
         }
     }
 
@@ -158,8 +169,12 @@ internal class SyncInfoViewModel @Inject constructor(
         isConnected: Boolean?,
         syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
     ) = isConnected == true
-        && isSyncRunning == false
-        && syncConfiguration?.let { !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(it) } == true
+            && isSyncRunning == false
+            && syncConfiguration?.let {
+        !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(
+            it
+        )
+    } == true
 
     private fun isModuleSync(syncConfiguration: DownSynchronizationConfiguration) =
         syncConfiguration.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
@@ -191,11 +206,19 @@ internal class SyncInfoViewModel @Inject constructor(
         }
 
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
-        configManager.getDeviceConfiguration().selectedModules.map {
-            ModuleCount(
-                it.value,
-                enrolmentRecordManager.count(SubjectQuery(projectId = projectId, moduleId = it.value))
+        configManager.getDeviceConfiguration().selectedModules.map { moduleName ->
+            val count = enrolmentRecordManager.count(
+                SubjectQuery(projectId = projectId, moduleId = moduleName.value)
             )
+            val decryptedName = when (moduleName) {
+                is TokenizableString.Raw -> moduleName
+                is TokenizableString.Tokenized -> tokenizationManager.decrypt(
+                    encrypted = moduleName,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = configManager.getProject(projectId)
+                )
+            }
+            return@map ModuleCount(name = decryptedName.value, count = count)
         }
 
 }

@@ -5,12 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.eventsync.EventSyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -19,9 +23,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ModuleSelectionViewModel @Inject constructor(
+    private val authStore: AuthStore,
     private val repository: ModuleRepository,
     private val eventSyncManager: EventSyncManager,
     private val configManager: ConfigManager,
+    private val tokenizationManager: TokenizationManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -36,12 +42,24 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     val screenLocked: LiveData<SettingsPasswordConfig>
         get() = _screenLocked
-    private val _screenLocked = MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
+    private val _screenLocked =
+        MutableLiveData<SettingsPasswordConfig>(SettingsPasswordConfig.NotSet)
 
     init {
         postUpdateModules {
             maxNumberOfModules = repository.getMaxNumberOfModules()
-            initialModules = repository.getModules()
+            initialModules =
+                repository.getModules().map { module ->
+                    val decryptedName = when (val name = module.name) {
+                        is TokenizableString.Raw -> name
+                        is TokenizableString.Tokenized -> tokenizationManager.decrypt(
+                            encrypted = name,
+                            tokenKeyType = TokenKeyType.ModuleId,
+                            project = configManager.getProject(authStore.signedInProjectId)
+                        )
+                    }
+                    module.copy(name = decryptedName)
+                }
             addAll(initialModules.map { it.copy() })
         }
     }
@@ -49,9 +67,9 @@ internal class ModuleSelectionViewModel @Inject constructor(
     fun loadPasswordSettings() {
         viewModelScope.launch {
             configManager.getProjectConfiguration()
-                    .general
-                    .settingsPassword
-                    .let { _screenLocked.postValue(it) }
+                .general
+                .settingsPassword
+                .let { _screenLocked.postValue(it) }
         }
     }
 
@@ -76,6 +94,18 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     fun saveModules() {
         externalScope.launch {
+            val modules = modules.map { module ->
+                val encryptedName = when (val name = module.name) {
+                    is TokenizableString.Raw -> tokenizationManager.encrypt(
+                        decrypted = name,
+                        tokenKeyType = TokenKeyType.ModuleId,
+                        project = configManager.getProject(authStore.signedInProjectId)
+                    )
+
+                    is TokenizableString.Tokenized -> name
+                }
+                module.copy(name = encryptedName)
+            }
             repository.saveModules(modules)
             eventSyncManager.stop()
             eventSyncManager.sync()
