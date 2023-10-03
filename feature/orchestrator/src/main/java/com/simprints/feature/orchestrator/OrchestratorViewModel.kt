@@ -21,6 +21,7 @@ import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUs
 import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
+import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.GeneralConfiguration
@@ -41,6 +42,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val createPersonEvent: CreatePersonEventUseCase,
     private val appResponseBuilder: AppResponseBuilderUseCase,
     private val addCallbackEvent: AddCallbackEventUseCase,
+    private val updateDailyActivity: UpdateDailyActivityUseCase,
 ) : ViewModel() {
 
     private var modalities = emptySet<GeneralConfiguration.Modality>()
@@ -123,8 +125,7 @@ internal class OrchestratorViewModel @Inject constructor(
             steps.mapNotNull { it.result },
         )
 
-        // TODO update daily activity
-
+        updateDailyActivity(appResponse)
         addCallbackEvent(appResponse)
         _appResponse.send(OrchestratorResult(cachedActionRequest, appResponse))
     }
@@ -146,6 +147,4 @@ internal class OrchestratorViewModel @Inject constructor(
         }
         // TODO fingerprint matching step payload handling
     }
-
 }
-
