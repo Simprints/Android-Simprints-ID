@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.alertConfiguration
@@ -37,9 +38,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
             AlertContract.ALERT_DESTINATION_ID
         ) { finishWithSubjectId(null) }
 
-        viewModel.finish.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let(::finishWithResult)
-        }
+        viewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { finishWithResult(it) })
         viewModel.enrolBiometric(args.params)
     }
 
@@ -65,7 +64,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         message = modalities.let {
             when {
                 it.size >= 2 -> IDR.string.enrol_last_biometrics_alert_message_all_param
-                it.contains(Modality.FACE) -> IDR.string.enrol_last_biometrics_alert_message_fingerprint_param
+                it.contains(Modality.FACE) -> IDR.string.enrol_last_biometrics_alert_message_face_param
                 it.contains(Modality.FINGERPRINT) -> IDR.string.enrol_last_biometrics_alert_message_fingerprint_param
                 else -> IDR.string.enrol_last_biometrics_alert_message_all_param
             }
