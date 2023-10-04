@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import com.simprints.infra.config.domain.ConfigService
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.eventsync.EventSyncManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 
@@ -16,24 +17,27 @@ internal class ConfigurationWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val authStore: AuthStore,
     private val configService: ConfigService,
+    private val eventSyncManager: EventSyncManager,
 ) : CoroutineWorker(context, params) {
 
     private val tag = ConfigurationWorker::class.java.name
 
     override suspend fun doWork(): Result = try {
-       val projectId = authStore.signedInProjectId
+        val projectId = authStore.signedInProjectId
 
-       // if the user is not signed in, we shouldn't try again
-       if (projectId.isEmpty()) {
-           Result.failure()
-       } else {
-           configService.refreshProject(projectId)
-           configService.refreshConfiguration(projectId)
-           Simber.tag(tag).i("Successfully refresh the project configuration")
-           Result.success()
-       }
-   } catch (e: Exception) {
-       Simber.tag(tag).i("Failed to refresh the project configuration")
-       Result.failure()
-   }
+        // if the user is not signed in, we shouldn't try again
+        if (projectId.isEmpty()) {
+            Result.failure()
+        } else {
+            configService.refreshProject(projectId).also { project ->
+                eventSyncManager.tokenizeLocalEvents(project)
+            }
+            configService.refreshConfiguration(projectId)
+            Simber.tag(tag).i("Successfully refresh the project configuration")
+            Result.success()
+        }
+    } catch (e: Exception) {
+        Simber.tag(tag).i("Failed to refresh the project configuration")
+        Result.failure()
+    }
 }

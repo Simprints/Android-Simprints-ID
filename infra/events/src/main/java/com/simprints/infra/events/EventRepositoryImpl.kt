@@ -153,6 +153,9 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun getEventsFromSession(sessionId: String): List<Event> =
         eventLocalDataSource.loadAllFromSession(sessionId)
 
+    override suspend fun getEventsFromProject(projectId: String): List<Event> =
+        eventLocalDataSource.loadAllFromProject(projectId)
+
     override suspend fun getEventsJsonFromSession(sessionId: String): List<String> =
         eventLocalDataSource.loadAllEventJsonFromSession(sessionId)
 
