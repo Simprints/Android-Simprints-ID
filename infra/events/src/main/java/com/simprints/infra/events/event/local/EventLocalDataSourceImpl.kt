@@ -6,6 +6,7 @@ import com.simprints.core.DispatcherIO
 import com.simprints.core.NonCancellableIO
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
@@ -87,6 +88,11 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
     override suspend fun loadAllFromSession(sessionId: String): List<Event> =
         useRoom(readingDispatcher) {
             eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }
+        }
+
+    override suspend fun loadAllFromProject(projectId: String): List<Event> =
+        useRoom(readingDispatcher) {
+            eventDao.loadFromProject(projectId).map(DbEvent::fromDbToDomain)
         }
 
     override suspend fun loadOpenedSessions(): Flow<Event> =

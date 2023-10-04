@@ -33,6 +33,8 @@ interface EventRepository {
 
     suspend fun getEventsFromSession(sessionId: String): List<Event>
 
+    suspend fun getEventsFromProject(projectId: String): List<Event>
+
     suspend fun getEventsJsonFromSession(sessionId: String): List<String>
 
     suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int>

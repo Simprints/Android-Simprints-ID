@@ -4,10 +4,14 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.domain.models.Project
 import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
@@ -41,6 +45,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val configManager: ConfigManager,
+    private val tokenizationManager: TokenizationManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
 
@@ -176,6 +181,30 @@ internal class EventSyncManagerImpl @Inject constructor(
 
     override suspend fun resetDownSyncInfo() {
         downSyncScopeRepository.deleteAll()
+    }
+
+    override suspend fun tokenizeLocalEvents(project: Project) {
+        eventRepository.getEventsFromProject(project.id)
+            .map { event -> tokenizeEventRawFields(event, project) }
+            .onEach { tokenizedEvent -> eventRepository.addOrUpdateEvent(tokenizedEvent) }
+    }
+
+    private fun tokenizeEventRawFields(event: Event, project: Project): Event {
+        val tokenizedFields = event.getTokenizedFields().entries.associate { entry ->
+            when (val field = entry.value) {
+                is TokenizableString.Raw -> {
+                    val tokenizedField = tokenizationManager.encrypt(
+                        decrypted = field,
+                        tokenKeyType = entry.key,
+                        project = project
+                    )
+                    return@associate entry.key to tokenizedField
+                }
+
+                is TokenizableString.Tokenized -> entry.key to entry.value
+            }
+        }
+        return event.setTokenizedFields(tokenizedFields)
     }
 
 }
