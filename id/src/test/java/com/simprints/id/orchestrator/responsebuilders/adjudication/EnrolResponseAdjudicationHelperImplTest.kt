@@ -6,8 +6,8 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.infra.config.domain.models.DecisionPolicy
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test

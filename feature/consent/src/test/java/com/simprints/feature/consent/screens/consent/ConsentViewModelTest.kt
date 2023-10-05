@@ -8,9 +8,9 @@ import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.consent.screens.consent.helpers.GeneralConsentTextHelper
 import com.simprints.feature.consent.screens.consent.helpers.ParentalConsentTextHelper
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
