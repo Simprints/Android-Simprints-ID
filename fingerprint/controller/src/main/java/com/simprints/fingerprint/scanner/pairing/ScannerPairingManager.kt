@@ -9,7 +9,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScanner
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import javax.inject.Inject
 

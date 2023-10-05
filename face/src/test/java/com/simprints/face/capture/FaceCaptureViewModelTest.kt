@@ -3,7 +3,7 @@ package com.simprints.face.capture
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.simprints.face.controllers.core.image.FaceImageManager
 import com.simprints.face.models.FaceDetection
-import com.simprints.infra.config.domain.models.FaceConfiguration.ImageSavingStrategy
+import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.coVerify

@@ -2,7 +2,7 @@ package com.simprints.infra.events.event.domain.models.session
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT

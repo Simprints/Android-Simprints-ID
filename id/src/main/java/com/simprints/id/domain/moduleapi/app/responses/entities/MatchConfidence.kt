@@ -1,6 +1,6 @@
 package com.simprints.id.domain.moduleapi.app.responses.entities
 
-import com.simprints.infra.config.domain.models.DecisionPolicy
+import com.simprints.infra.config.store.models.DecisionPolicy
 
 enum class MatchConfidence {
     NONE,
