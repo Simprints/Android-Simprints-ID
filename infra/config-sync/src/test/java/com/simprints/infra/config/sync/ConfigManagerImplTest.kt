@@ -1,11 +1,11 @@
-package com.simprints.infra.config
+package com.simprints.infra.config.sync
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.config.testtools.deviceConfiguration
-import com.simprints.infra.config.testtools.project
-import com.simprints.infra.config.testtools.projectConfiguration
+import com.simprints.infra.config.sync.testtools.deviceConfiguration
+import com.simprints.infra.config.sync.testtools.project
+import com.simprints.infra.config.sync.testtools.projectConfiguration
 import com.simprints.infra.config.sync.worker.ConfigurationScheduler
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -20,8 +20,8 @@ class ConfigManagerImplTest {
         private const val LANGUAGE = "fr"
     }
 
-    private val configRepository = mockk<com.simprints.config.store.domain.ConfigService>(relaxed = true)
-    private val configurationScheduler = mockk<worker.ConfigurationScheduler>(relaxed = true)
+    private val configRepository = mockk<ConfigService>(relaxed = true)
+    private val configurationScheduler = mockk<ConfigurationScheduler>(relaxed = true)
     private val configManager =
         ConfigManagerImpl(configRepository, configurationScheduler)
 

@@ -7,6 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.infra.config.store.local.models.toDomain
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.local.serializer.DeviceConfigurationSerializer

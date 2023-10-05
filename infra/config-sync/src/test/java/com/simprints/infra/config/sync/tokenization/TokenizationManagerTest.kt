@@ -1,4 +1,4 @@
-package com.simprints.infra.config.tokenization
+package com.simprints.infra.config.sync.tokenization
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizedEncrypted
