@@ -1,4 +1,4 @@
-package com.simprints.infra.config.worker
+package com.simprints.infra.config.sync.worker
 
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -14,7 +14,7 @@ class ConfigurationSchedulerImplTest {
 
     private val ctx = mockk<Context>()
     private val workManager = mockk<WorkManager>(relaxed = true)
-    private lateinit var configurationSchedulerImpl: worker.ConfigurationSchedulerImpl
+    private lateinit var configurationSchedulerImpl: ConfigurationSchedulerImpl
 
     @Before
     fun setup() {
@@ -22,7 +22,7 @@ class ConfigurationSchedulerImplTest {
         every { WorkManager.getInstance(ctx) } returns workManager
 
         configurationSchedulerImpl =
-            worker.ConfigurationSchedulerImpl(ctx)
+            ConfigurationSchedulerImpl(ctx)
     }
 
     @Test
@@ -31,7 +31,7 @@ class ConfigurationSchedulerImplTest {
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                worker.ConfigurationSchedulerImpl.WORK_NAME,
+                ConfigurationSchedulerImpl.WORK_NAME,
                 ExistingPeriodicWorkPolicy.KEEP,
                 any(),
             )
@@ -42,6 +42,6 @@ class ConfigurationSchedulerImplTest {
     fun `cancelSync should cancel the worker`() {
         configurationSchedulerImpl.cancelScheduledSync()
 
-        verify { workManager.cancelUniqueWork(worker.ConfigurationSchedulerImpl.WORK_NAME) }
+        verify { workManager.cancelUniqueWork(ConfigurationSchedulerImpl.WORK_NAME) }
     }
 }

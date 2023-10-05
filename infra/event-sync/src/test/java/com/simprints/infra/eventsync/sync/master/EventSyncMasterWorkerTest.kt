@@ -5,7 +5,7 @@ import androidx.work.*
 import androidx.work.ListenableWorker.Result.Success
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
@@ -82,7 +82,7 @@ internal class EventSyncMasterWorkerTest {
     lateinit var projectConfiguration: ProjectConfiguration
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigService
 
     @MockK
     lateinit var securityStateRepository: SecurityStateRepository
@@ -113,7 +113,7 @@ internal class EventSyncMasterWorkerTest {
 
         every { synchronizationConfiguration.up.simprints } returns bfsidUpSynchronizationConfiguration
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
-        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
+        coEvery { configRepository.getConfiguration() } returns projectConfiguration
 
         masterWorker = EventSyncMasterWorker(
             appContext = ctx,
@@ -122,7 +122,7 @@ internal class EventSyncMasterWorkerTest {
             },
             downSyncWorkerBuilder = downSyncWorkerBuilder,
             upSyncWorkerBuilder = upSyncWorkerBuilder,
-            configManager = configManager,
+            configRepository = configRepository,
             eventSyncCache = eventSyncCache,
             securityStateRepository = securityStateRepository,
             eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
@@ -240,7 +240,7 @@ internal class EventSyncMasterWorkerTest {
 
     @Test
     fun `doWork should fail if there is an exception`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } throws Throwable()
+        coEvery { configRepository.getConfiguration() } throws Throwable()
         val result = masterWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -274,7 +274,7 @@ internal class EventSyncMasterWorkerTest {
         syncConfig: SynchronizationConfiguration.Frequency
     ): ListenableWorker.Result {
         coEvery { securityStateRepository.getSecurityStatusFromLocal() } returns securityStatus
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getConfiguration() } returns mockk {
             every { synchronization } returns mockk {
                 every { frequency } returns syncConfig
                 every { up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE

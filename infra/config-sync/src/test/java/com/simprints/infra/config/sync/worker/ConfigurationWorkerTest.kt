@@ -1,10 +1,10 @@
-package com.simprints.infra.config.worker
+package com.simprints.infra.config.sync.worker
 
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigService
-import com.simprints.infra.config.testtools.project
-import com.simprints.infra.config.testtools.projectConfiguration
+import com.simprints.infra.config.sync.testtools.project
+import com.simprints.infra.config.sync.testtools.projectConfiguration
 import com.simprints.infra.authstore.AuthStore
 import io.mockk.coEvery
 import io.mockk.every
@@ -19,9 +19,9 @@ class ConfigurationWorkerTest {
     }
 
     private val authStore = mockk<AuthStore>()
-    private val configService = mockk<com.simprints.config.store.domain.ConfigService>(relaxed = true)
+    private val configService = mockk<ConfigService>(relaxed = true)
     private val configurationWorker =
-        worker.ConfigurationWorker(
+        ConfigurationWorker(
             mockk(),
             mockk(relaxed = true),
             authStore,
