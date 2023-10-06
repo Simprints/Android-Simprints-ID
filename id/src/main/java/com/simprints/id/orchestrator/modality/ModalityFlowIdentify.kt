@@ -18,8 +18,8 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.IdentificationConfiguration.PoolType
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.IdentificationConfiguration.PoolType
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import javax.inject.Inject
 

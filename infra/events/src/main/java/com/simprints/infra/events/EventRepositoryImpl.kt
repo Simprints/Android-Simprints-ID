@@ -5,8 +5,8 @@ import android.os.Build.VERSION
 import com.simprints.core.DeviceID
 import com.simprints.core.LibSimprintsVersionName
 import com.simprints.core.PackageVersionName
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
@@ -20,6 +20,9 @@ import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -38,7 +41,8 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     private val sessionDataCache: SessionDataCache,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigService,
+    private val tokenizationManager: TokenizationManager
 ) : EventRepository {
 
     companion object {
@@ -56,8 +60,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         closeAllSessions(NEW_SESSION)
 
         return reportException {
-            val projectConfiguration = configManager.getProjectConfiguration()
-            val deviceConfiguration = configManager.getDeviceConfiguration()
+            val projectConfiguration = configRepository.getConfiguration()
+            val deviceConfiguration = configRepository.getDeviceConfiguration()
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
             val sessionCaptureEvent = SessionCaptureEvent(
                 id = UUID.randomUUID().toString(),
@@ -227,4 +231,30 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.delete(eventIds)
 
     override suspend fun deleteAll() = eventLocalDataSource.deleteAll()
+
+
+    override suspend fun tokenizeLocalEvents(project: Project) {
+        getEventsFromProject(project.id)
+            .map { event -> tokenizeEventRawFields(event, project) }
+            .onEach { tokenizedEvent -> addOrUpdateEvent(tokenizedEvent) }
+    }
+
+    private fun tokenizeEventRawFields(event: Event, project: Project): Event {
+        val tokenizedFields = event.getTokenizedFields().entries.associate { entry ->
+            when (val field = entry.value) {
+                is TokenizableString.Raw -> {
+                    val tokenizedField = tokenizationManager.encrypt(
+                        decrypted = field,
+                        tokenKeyType = entry.key,
+                        project = project
+                    )
+                    return@associate entry.key to tokenizedField
+                }
+
+                is TokenizableString.Tokenized -> entry.key to entry.value
+            }
+        }
+        return event.setTokenizedFields(tokenizedFields)
+    }
+
 }

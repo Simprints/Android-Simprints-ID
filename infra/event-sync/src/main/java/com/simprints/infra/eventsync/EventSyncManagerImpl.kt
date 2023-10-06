@@ -4,14 +4,12 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.core.DispatcherIO
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.values
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.tokenization.TokenizationManager
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
@@ -44,7 +42,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigService,
     private val tokenizationManager: TokenizationManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
@@ -123,8 +121,8 @@ internal class EventSyncManagerImpl @Inject constructor(
         eventRepository.observeEventCount(projectId, type)
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
-        val projectConfig = configManager.getProjectConfiguration()
-        val deviceConfig = configManager.getDeviceConfiguration()
+        val projectConfig = configRepository.getConfiguration()
+        val deviceConfig = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = getProjectModes(projectConfig),
@@ -156,7 +154,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         val op = EventDownSyncOperation(RemoteEventQuery(
             projectId = projectId,
             subjectId = subjectId,
-            modes = getProjectModes(configManager.getProjectConfiguration()),
+            modes = getProjectModes(configRepository.getConfiguration()),
         ))
         downSyncTask.downSync(this, op).toList()
     }
@@ -167,7 +165,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(
             unselectedModules,
-            modes = getProjectModes(configManager.getProjectConfiguration()),
+            modes = getProjectModes(configRepository.getConfiguration()),
         )
     }
 
@@ -183,28 +181,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         downSyncScopeRepository.deleteAll()
     }
 
-    override suspend fun tokenizeLocalEvents(project: Project) {
-        eventRepository.getEventsFromProject(project.id)
-            .map { event -> tokenizeEventRawFields(event, project) }
-            .onEach { tokenizedEvent -> eventRepository.addOrUpdateEvent(tokenizedEvent) }
-    }
 
-    private fun tokenizeEventRawFields(event: Event, project: Project): Event {
-        val tokenizedFields = event.getTokenizedFields().entries.associate { entry ->
-            when (val field = entry.value) {
-                is TokenizableString.Raw -> {
-                    val tokenizedField = tokenizationManager.encrypt(
-                        decrypted = field,
-                        tokenKeyType = entry.key,
-                        project = project
-                    )
-                    return@associate entry.key to tokenizedField
-                }
-
-                is TokenizableString.Tokenized -> entry.key to entry.value
-            }
-        }
-        return event.setTokenizedFields(tokenizedFields)
-    }
-
+    override suspend fun tokenizeLocalEvents(project: Project) =
+        eventRepository.tokenizeLocalEvents(project)
 }

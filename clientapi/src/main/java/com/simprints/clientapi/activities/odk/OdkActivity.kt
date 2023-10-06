@@ -18,9 +18,9 @@ import com.simprints.clientapi.clientrequests.extractors.odk.OdkVerifyExtractor
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

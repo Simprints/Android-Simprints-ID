@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.feature.dashboard.databinding.ItemFingerSelectionBinding
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.resources.R as IDR
 
 internal class FingerSelectionItemAdapter(

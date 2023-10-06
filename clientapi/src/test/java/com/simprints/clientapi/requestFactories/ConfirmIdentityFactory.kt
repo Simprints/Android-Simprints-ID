@@ -7,8 +7,8 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidato
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationManager
 import io.mockk.every
 import io.mockk.mockk
 

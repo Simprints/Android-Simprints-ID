@@ -13,7 +13,7 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import io.mockk.*
 import kotlinx.coroutines.test.runTest

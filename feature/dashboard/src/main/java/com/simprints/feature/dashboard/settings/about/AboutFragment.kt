@@ -16,7 +16,7 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale

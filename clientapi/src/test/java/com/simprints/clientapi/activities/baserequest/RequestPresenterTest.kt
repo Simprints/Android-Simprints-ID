@@ -6,7 +6,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.core.domain.tokenization.asTokenizedRaw
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.unit.BaseUnitTestConfig

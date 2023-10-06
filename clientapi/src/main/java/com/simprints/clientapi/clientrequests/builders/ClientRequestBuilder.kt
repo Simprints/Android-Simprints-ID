@@ -3,9 +3,9 @@ package com.simprints.clientapi.clientrequests.builders
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.domain.models.TokenKeyType
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationManager
 
 
 abstract class ClientRequestBuilder(private val validator: ClientRequestValidator) {

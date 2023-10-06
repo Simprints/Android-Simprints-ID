@@ -2,7 +2,7 @@ package com.simprints.id.domain.moduleapi.fingerprint.responses.entities
 
 import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromModuleApiToDomain
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult
 import kotlinx.parcelize.Parcelize
 

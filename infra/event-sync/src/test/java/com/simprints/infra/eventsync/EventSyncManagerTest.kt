@@ -8,13 +8,10 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.values
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -69,7 +66,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigService
 
     private lateinit var eventSyncManagerImpl: EventSyncManagerImpl
 
@@ -80,7 +77,7 @@ internal class EventSyncManagerTest {
         mockkStatic(WorkManager::class)
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every { synchronization.down.partitionType.toGroup() } returns GROUP.MODULE
         }
@@ -94,7 +91,7 @@ internal class EventSyncManagerTest {
             eventSyncCache,
             downSyncTask,
             eventRemoteDataSource,
-            configManager,
+            configRepository,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -185,7 +182,7 @@ internal class EventSyncManagerTest {
                 EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 11),
             )
         )
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
         }
 
@@ -210,7 +207,7 @@ internal class EventSyncManagerTest {
                 EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 5),
             )
         )
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
         }
 
