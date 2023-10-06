@@ -3,8 +3,8 @@ package com.simprints.fingerprint.scanner.data.worker
 import android.content.Context
 import androidx.work.*
 import com.simprints.fingerprint.BuildConfig
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

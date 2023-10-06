@@ -8,7 +8,7 @@ import com.simprints.feature.exitform.toArgs
 import com.simprints.id.exitformhandler.ExitFormReason.Companion.fromExitFormOption
 import com.simprints.id.orchestrator.steps.core.response.CoreResponse
 import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.resources.R
 import javax.inject.Inject
 

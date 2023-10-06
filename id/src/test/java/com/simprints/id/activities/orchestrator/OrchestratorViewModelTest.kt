@@ -11,8 +11,8 @@ import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.ENROL
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID

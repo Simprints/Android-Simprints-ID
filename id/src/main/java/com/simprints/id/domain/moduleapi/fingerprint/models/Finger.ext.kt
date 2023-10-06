@@ -1,6 +1,6 @@
 package com.simprints.id.domain.moduleapi.fingerprint.models
 
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 fun Finger.fromDomainToModuleApi() = when (this) {
