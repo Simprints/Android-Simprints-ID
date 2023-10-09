@@ -1,13 +1,13 @@
 package com.simprints.fingerprint.controllers.fingerprint.config
 
 import com.simprints.core.ExternalScope
-import com.simprints.fingerprint.biosdk.SimprintsBioSdkWrapper
+import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ConfigurationController @Inject constructor(
-    private val simprintsBioSdkWrapper: SimprintsBioSdkWrapper,
+    private val simprintsBioSdkWrapper: BioSdkWrapper,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
