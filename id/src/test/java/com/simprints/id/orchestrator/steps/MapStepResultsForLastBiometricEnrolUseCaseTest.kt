@@ -11,12 +11,9 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintConfigurationRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintConfigurationResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponseType
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequest
@@ -79,16 +76,6 @@ class MapStepResultsForLastBiometricEnrolUseCaseTest {
                 format = "NEC_1",
             )
         )))
-    }
-
-    @Test
-    fun `skips Fingerprint steps correctly`() {
-        val result = useCase(listOf(createStep(
-            mockk<FingerprintConfigurationRequest>(),
-            FingerprintConfigurationResponse(FingerprintResponseType.CONFIGURATION)
-        )))
-
-        assertThat(result).isEmpty()
     }
 
     @Test

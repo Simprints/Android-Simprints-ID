@@ -37,7 +37,7 @@ abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRe
      * @param getTaskResult  the closure that uses a provided bundle-key to read a [TaskResult]
      */
     fun handleActivityTaskResult(resultCode: ResultCode, getTaskResult: (bundleKey: String) -> TaskResult) {
-        (getCurrentTask() as FingerprintTask.ActivityTask).apply {
+        getCurrentTask().apply {
             lastResultCode = resultCode
             when (resultCode) {
                 ResultCode.OK -> {
@@ -52,18 +52,6 @@ abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRe
                 ResultCode.REFUSED -> {
                     taskResults[REFUSED_TASK_KEY] = getTaskResult(RefusalTaskResult.BUNDLE_KEY)
                 }
-            }
-        }
-    }
-
-    fun handleRunnableTaskResult(taskResult: TaskResult?) {
-        (getCurrentTask() as FingerprintTask.RunnableTask).apply {
-            if (taskResult != null) {
-                lastResultCode = ResultCode.OK
-                taskResults[taskResultKey] = taskResult
-                currentTaskIndex++
-            } else {
-                lastResultCode = ResultCode.CANCELLED
             }
         }
     }

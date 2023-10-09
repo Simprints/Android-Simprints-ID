@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintConfigurationRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
@@ -11,7 +10,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDo
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CAPTURE
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CONFIGURATION
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.infra.config.ConfigManager
@@ -39,11 +37,6 @@ class FingerprintStepProcessorImpl @Inject constructor(
         probeSamples: List<FingerprintCaptureSample>,
         query: SubjectQuery
     ): Step = buildStep(MATCH, FingerprintMatchRequest(probeSamples, query))
-
-    override fun buildConfigurationStep(): Step = buildStep(
-        CONFIGURATION,
-        FingerprintConfigurationRequest()
-    )
 
     private fun buildStep(requestCode: FingerprintRequestCode, request: FingerprintRequest): Step {
         return Step(
