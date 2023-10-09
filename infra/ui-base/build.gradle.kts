@@ -25,7 +25,6 @@ dependencies {
 
     api(libs.support.material)
 
-    api(libs.androidX.ui.activity)
     api(libs.androidX.ui.fragment)
     api(libs.androidX.ui.constraintlayout)
     api(libs.androidX.ui.coordinatorlayout)

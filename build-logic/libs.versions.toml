@@ -6,7 +6,6 @@ android_gradlePlugin_version = "8.1.2"
 androidx_version = "1.5.2"
 androidx_core_version = "1.12.0"
 androidx_app_compat_version = "1.6.1"
-androidx_activity_version = "1.7.2"
 androidx_fragment_version = "1.6.1"
 androidx_navigation_version = "2.7.3"
 androidx_lifecycle_version = "2.6.2"
@@ -112,7 +111,6 @@ androidX-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-lived
 androidX-uI-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx_constraint_version" }
 androidX-uI-coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "androidx_coordinator_version" }
 androidX-uI-cardview = { module = "androidx.cardview:cardview", version.ref = "androidx_cardview_version" }
-androidX-uI-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx_activity_version" }
 androidX-uI-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx_fragment_version" }
 androidX-uI-preference = { module = "androidx.preference:preference", version.ref = "androidx_preferences_version" }
 androidX-uI-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "androidx_viewpager_version" }
