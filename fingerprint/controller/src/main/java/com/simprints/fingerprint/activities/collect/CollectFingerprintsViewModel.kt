@@ -133,6 +133,7 @@ class CollectFingerprintsViewModel @Inject constructor(
 
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         runBlocking {
+            bioSdk.initialize()
             // Configuration must be initialised when start returns for UI to be initialised correctly,
             // and since fetching happens on IO thread execution must be suspended until it is available
             configuration = configManager.getProjectConfiguration().fingerprint!!
