@@ -81,7 +81,6 @@ dependencies {
 
     implementation(libs.androidX.core)
     implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.ui.activity)
     implementation(libs.androidX.ui.fragment)
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.ui.cardview)
