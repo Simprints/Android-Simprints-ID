@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.fingerprint.config
 
-import com.simprints.fingerprint.biosdk.SimprintsBioSdkWrapper
+import com.simprints.fingerprint.infra.biosdk.SimprintsBioSdkWrapper
 import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.mockk

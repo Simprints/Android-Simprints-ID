@@ -1,7 +1,6 @@
-package com.simprints.fingerprint.biosdk
+package com.simprints.fingerprint.infra.biosdk
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.data.domain.fingerprint.toInt
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
@@ -9,7 +8,6 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateMetadata
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
-import com.simprints.infra.config.domain.models.Vero2Configuration
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -60,8 +58,7 @@ class SimprintsBioSdkWrapperTest {
     @Test
     fun testAcquireFingerprintTemplate() = runTest {
         //Given
-        val captureFingerprintStrategy =
-            Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI.toInt()
+        val captureFingerprintStrategy = 1000
         val captureTimeOutMs = 1000
         val captureQualityThreshold = 100
 
