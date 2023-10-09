@@ -3,6 +3,7 @@ package com.simprints.feature.orchestrator.usecases.response
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import java.util.Date
 import java.util.UUID
@@ -41,7 +42,7 @@ class BuildEnrolledSubjectUseCase @Inject constructor(
 
             faceResponse != null -> buildSubjectFromFace(projectId, userId, moduleId, faceResponse, timeHelper)
 
-            else -> throw IllegalStateException("Missing capture results")
+            else -> throw MissingCaptureException()
         }
 
 
