@@ -24,8 +24,6 @@ object FingerprintToDomainRequest {
                 fromFingerprintToDomainCaptureRequest(iFingerprintRequest)
             is IFingerprintMatchRequest ->
                 fromFingerprintToDomainMatchRequest(iFingerprintRequest)
-            is IFingerprintConfigurationRequest ->
-                fromFingerprintToDomainConfigurationRequest(iFingerprintRequest)
             else -> throw InvalidRequestForFingerprintException("Could not convert to domain request")
         }
 
@@ -44,8 +42,4 @@ object FingerprintToDomainRequest {
                 )
             }, queryForCandidates)
         }
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun fromFingerprintToDomainConfigurationRequest(iFingerprintRequest: IFingerprintConfigurationRequest): FingerprintConfigurationRequest =
-        FingerprintConfigurationRequest()
 }

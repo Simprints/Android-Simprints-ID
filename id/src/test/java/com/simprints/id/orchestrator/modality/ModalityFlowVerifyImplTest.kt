@@ -88,7 +88,6 @@ class ModalityFlowVerifyImplTest {
 
         coEvery { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
         coEvery { faceStepProcessor.buildCaptureStep() } returns faceStepMock
-        every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
         every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildFetchGuidStep(any(), any()) } returns verifyCoreStepMock
         every { coreStepProcessor.buildStepSetup() } returns setupStepMock
@@ -116,7 +115,6 @@ class ModalityFlowVerifyImplTest {
 
         assertThat(modalityFlowVerify.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FETCH_GUID_ACTIVITY_NAME,
             CONSENT_ACTIVITY_NAME,
             FINGERPRINT_ACTIVITY_NAME,
@@ -131,7 +129,6 @@ class ModalityFlowVerifyImplTest {
         assertThat(modalityFlowVerify.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FETCH_GUID_ACTIVITY_NAME,
             CONSENT_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
@@ -146,7 +143,6 @@ class ModalityFlowVerifyImplTest {
 
         assertThat(modalityFlowVerify.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
             FETCH_GUID_ACTIVITY_NAME,
             CONSENT_ACTIVITY_NAME,
@@ -175,7 +171,6 @@ class ModalityFlowVerifyImplTest {
 
         assertThat(modalityFlowVerify.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FETCH_GUID_ACTIVITY_NAME,
             FINGERPRINT_ACTIVITY_NAME,
         ))
@@ -189,7 +184,6 @@ class ModalityFlowVerifyImplTest {
         assertThat(modalityFlowVerify.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FETCH_GUID_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
             FINGERPRINT_ACTIVITY_NAME,
@@ -203,7 +197,6 @@ class ModalityFlowVerifyImplTest {
 
         assertThat(modalityFlowVerify.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
             FETCH_GUID_ACTIVITY_NAME,
             FINGERPRINT_ACTIVITY_NAME,

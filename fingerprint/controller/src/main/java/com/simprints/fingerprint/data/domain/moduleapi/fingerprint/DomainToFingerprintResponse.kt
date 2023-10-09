@@ -72,10 +72,6 @@ object DomainToFingerprintResponse {
             BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
             BLUETOOTH_NO_PERMISSION -> IFingerprintErrorReason.BLUETOOTH_NO_PERMISSION
         }
-
-    fun fromDomainToFingerprintConfigurationResponse(@Suppress("UNUSED_PARAMETER") configurationResponse: FingerprintConfigurationResponse): IFingerprintConfigurationResponse =
-        IFingerprintConfigurationResponseImpl()
-
 }
 
 // The following classes represent the corresponding implementation of ModuleApi response interfaces.
@@ -140,9 +136,3 @@ private class ISecuredImageRefImpl(
 private class IPathImpl(
     override val parts: Array<String>
 ) : IPath
-
-@Parcelize
-private class IFingerprintConfigurationResponseImpl : Parcelable, IFingerprintConfigurationResponse {
-    @IgnoredOnParcel
-    override val type: IFingerprintResponseType = IFingerprintResponseType.CONFIGURATION
-}

@@ -43,6 +43,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -109,7 +110,9 @@ class CollectFingerprintsViewModelTest {
             every { scanner } returns this@CollectFingerprintsViewModelTest.scanner
             every { isScannerAvailable } returns true
         }
-        bioSdkWrapper = mockk()
+        bioSdkWrapper = mockk {
+            coJustRun { initialize() }
+        }
         vm = CollectFingerprintsViewModel(
             scannerManager,
             configManager,

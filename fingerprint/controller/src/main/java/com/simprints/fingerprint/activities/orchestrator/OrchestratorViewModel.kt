@@ -10,7 +10,6 @@ import com.simprints.fingerprint.exceptions.unexpected.result.NoTaskResultExcept
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.models.FinalResult
-import com.simprints.fingerprint.orchestrator.runnable.RunnableTaskDispatcher
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
@@ -22,7 +21,6 @@ import javax.inject.Inject
 @HiltViewModel
 class OrchestratorViewModel @Inject constructor(
     private val orchestrator: Orchestrator,
-    private val runnableTaskDispatcher: RunnableTaskDispatcher,
     private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
 ) : ViewModel() {
 
@@ -59,20 +57,9 @@ class OrchestratorViewModel @Inject constructor(
         }
     }
 
-    private fun executeNextTask() =
-        when (val task = orchestrator.getNextTask()) {
-            is FingerprintTask.ActivityTask -> postNextActivityTask(task)
-            is FingerprintTask.RunnableTask -> dispatchRunnableTaskThenExecuteNextTask(task)
-        }
+    private fun executeNextTask() = postNextActivityTask(orchestrator.getNextTask())
 
-    private fun dispatchRunnableTaskThenExecuteNextTask(runnableTask: FingerprintTask.RunnableTask) {
-        runnableTaskDispatcher.dispatch(runnableTask) {
-            orchestrator.handleRunnableTaskResult(it)
-        }
-        executeNextTaskOrFinish()
-    }
-
-    private fun postNextActivityTask(activityTask: FingerprintTask.ActivityTask) {
+    private fun postNextActivityTask(activityTask: FingerprintTask) {
         nextActivityCall.postValue(activityTask.toActivityCall())
     }
 
@@ -82,7 +69,7 @@ class OrchestratorViewModel @Inject constructor(
 
     data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
 
-    private fun FingerprintTask.ActivityTask.toActivityCall() =
+    private fun FingerprintTask.toActivityCall() =
         ActivityCall(requestCode.value) { context ->
             Intent(context, targetActivity).apply {
                 putExtra(
