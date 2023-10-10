@@ -3,7 +3,7 @@ package com.simprints.feature.enrollast
 import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 import kotlinx.parcelize.Parcelize
 
 @Keep

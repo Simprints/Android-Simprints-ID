@@ -5,8 +5,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.consent.ConsentType
-import com.simprints.infra.config.domain.models.ConsentConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.resources.R
 import org.junit.Test
 import org.junit.runner.RunWith

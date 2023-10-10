@@ -22,9 +22,9 @@ import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager

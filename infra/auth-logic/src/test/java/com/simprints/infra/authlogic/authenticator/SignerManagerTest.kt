@@ -3,8 +3,8 @@ package com.simprints.infra.authlogic.authenticator
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Project
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler

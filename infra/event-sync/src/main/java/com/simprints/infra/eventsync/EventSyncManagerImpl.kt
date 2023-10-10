@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.work.*
 import com.simprints.core.DispatcherIO
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.core.domain.tokenization.values
+import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
@@ -39,7 +40,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val configManager: ConfigManager,
+    private val configService: ConfigService,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
 
@@ -117,13 +118,13 @@ internal class EventSyncManagerImpl @Inject constructor(
         eventRepository.observeEventCount(projectId, type)
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
-        val projectConfig = configManager.getProjectConfiguration()
-        val deviceConfig = configManager.getDeviceConfiguration()
+        val projectConfig = configService.getConfiguration()
+        val deviceConfig = configService.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            getProjectModes(projectConfig),
-            deviceConfig.selectedModules,
-            projectConfig.synchronization.down.partitionType.toGroup()
+            modes = getProjectModes(projectConfig),
+            selectedModuleIDs = deviceConfig.selectedModules.values(),
+            syncGroup = projectConfig.synchronization.down.partitionType.toGroup()
         )
 
         var creationsToDownload = 0
@@ -150,7 +151,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         val op = EventDownSyncOperation(RemoteEventQuery(
             projectId = projectId,
             subjectId = subjectId,
-            modes = getProjectModes(configManager.getProjectConfiguration()),
+            modes = getProjectModes(configService.getConfiguration()),
         ))
         downSyncTask.downSync(this, op).toList()
     }
@@ -161,7 +162,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(
             unselectedModules,
-            modes = getProjectModes(configManager.getProjectConfiguration()),
+            modes = getProjectModes(configService.getConfiguration()),
         )
     }
 

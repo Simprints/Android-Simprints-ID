@@ -7,9 +7,9 @@ import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTok
 import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.syntax.assertThrows

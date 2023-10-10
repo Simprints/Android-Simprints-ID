@@ -5,11 +5,13 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DeviceConfiguration
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
@@ -31,7 +33,7 @@ import org.junit.Test
 class EventDownSyncWorkersBuilderTest {
 
     companion object {
-        private val SELECTED_MODULE = listOf("MODULE_1")
+        private val SELECTED_MODULE = listOf("MODULE_1".asTokenizedEncrypted())
     }
 
     @MockK
@@ -41,7 +43,7 @@ class EventDownSyncWorkersBuilderTest {
     private lateinit var downSyncConfiguration: DownSynchronizationConfiguration
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configService: ConfigService
 
     @MockK
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -52,12 +54,12 @@ class EventDownSyncWorkersBuilderTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configService.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             SELECTED_MODULE,
             ""
         )
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configService.getConfiguration() } returns mockk {
             every { general } returns generalConfiguration
             every { synchronization } returns mockk {
                 every { down } returns downSyncConfiguration
@@ -67,7 +69,7 @@ class EventDownSyncWorkersBuilderTest {
         eventDownSyncWorkersBuilder = EventDownSyncWorkersBuilder(
             eventDownSyncScopeRepository,
             JsonHelper,
-            configManager
+            configService
         )
     }
 
@@ -77,9 +79,9 @@ class EventDownSyncWorkersBuilderTest {
         every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                listOf(Modes.FINGERPRINT),
-                SELECTED_MODULE,
-                GROUP.GLOBAL,
+                modes = listOf(Modes.FINGERPRINT),
+                selectedModuleIDs = SELECTED_MODULE.values(),
+                syncGroup = GROUP.GLOBAL,
             )
         } returns SampleSyncScopes.projectDownSyncScope
 
@@ -98,9 +100,9 @@ class EventDownSyncWorkersBuilderTest {
         every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.USER
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                listOf(Modes.FINGERPRINT),
-                SELECTED_MODULE,
-                GROUP.USER
+                modes = listOf(Modes.FINGERPRINT),
+                selectedModuleIDs = SELECTED_MODULE.values(),
+                syncGroup = GROUP.USER
             )
         } returns SampleSyncScopes.userDownSyncScope
 
@@ -118,9 +120,9 @@ class EventDownSyncWorkersBuilderTest {
         every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.MODULE
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                listOf(Modes.FINGERPRINT),
-                SELECTED_MODULE,
-                GROUP.MODULE
+                modes = listOf(Modes.FINGERPRINT),
+                selectedModuleIDs = SELECTED_MODULE.values(),
+                syncGroup = GROUP.MODULE
             )
         } returns SampleSyncScopes.modulesDownSyncScope
 
@@ -138,9 +140,9 @@ class EventDownSyncWorkersBuilderTest {
         every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                listOf(Modes.FACE),
-                SELECTED_MODULE,
-                GROUP.GLOBAL
+                modes = listOf(Modes.FACE),
+                selectedModuleIDs = SELECTED_MODULE.values(),
+                syncGroup = GROUP.GLOBAL
             )
         } returns SampleSyncScopes.projectDownSyncScope
         val uniqueSyncId = "uniqueSyncId"
@@ -159,9 +161,9 @@ class EventDownSyncWorkersBuilderTest {
         every { downSyncConfiguration.partitionType } returns DownSynchronizationConfiguration.PartitionType.PROJECT
         coEvery {
             eventDownSyncScopeRepository.getDownSyncScope(
-                listOf(Modes.FINGERPRINT),
-                SELECTED_MODULE,
-                GROUP.GLOBAL
+                modes = listOf(Modes.FINGERPRINT),
+                selectedModuleIDs = SELECTED_MODULE.values(),
+                syncGroup = GROUP.GLOBAL
             )
         } returns SampleSyncScopes.projectDownSyncScope
 

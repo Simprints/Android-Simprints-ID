@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.scanner.data
 
 import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration
 
 object FirmwareTestData {
     internal const val HARDWARE_VERSION = "E-1"

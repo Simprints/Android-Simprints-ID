@@ -5,6 +5,7 @@ import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherBG
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
@@ -124,7 +125,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             relativeStarTime,
             request.projectId,
             request.userId,
-            request.moduleId.asTokenizedRaw(),
+            request.moduleId,
             request.metadata,
             request.identificationSessionId
         )
@@ -149,7 +150,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
                 createdAt = relativeStartTime,
                 projectId = projectId,
                 userId = userId,
-                moduleId = moduleId.asTokenizedRaw(),
+                moduleId = moduleId,
                 metadata = metadata
             )
         }
@@ -160,7 +161,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
                 createdAt = relativeStartTime,
                 projectId = projectId,
                 userId = userId,
-                moduleId = moduleId.asTokenizedRaw(),
+                moduleId = moduleId,
                 verifyGuid = verifyGuid,
                 metadata = metadata
             )
@@ -173,7 +174,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
                 createdAt = relativeStartTime,
                 projectId = projectId,
                 userId = userId,
-                moduleId = moduleId.asTokenizedRaw(),
+                moduleId = moduleId,
                 metadata = metadata
             )
         }
@@ -181,7 +182,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private suspend fun setLastUser() {
         recentUserActivityManager.updateRecentUserActivity {
             it.apply {
-                it.lastUserUsed = appRequest.userId.value
+                it.lastUserUsed = appRequest.userId
             }
         }
     }
@@ -311,7 +312,7 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         val deviceConfiguration = configManager.getDeviceConfiguration()
         Simber.tag(PROJECT_ID, true).i(authStore.signedInProjectId)
         Simber.tag(USER_ID, true).i(appRequest.userId.value)
-        Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
+        Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.values().joinToString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(projectConfiguration.synchronization.frequency.toString())
         Simber.d("[CHECK_LOGIN] Added keys in CrashManager")
@@ -322,7 +323,6 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
             timeHelper.now(),
             result,
             if (result == AuthorizationResult.AUTHORIZED) {
-                // TODO [CORE-2502] check if userId is encrypted at this point
                 UserInfo(authStore.signedInProjectId, appRequest.userId)
             } else {
                 null

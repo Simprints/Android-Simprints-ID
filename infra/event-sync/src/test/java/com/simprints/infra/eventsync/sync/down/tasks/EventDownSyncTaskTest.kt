@@ -1,11 +1,10 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
@@ -87,7 +86,7 @@ class EventDownSyncTaskTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configManager: ConfigService
 
     @MockK
     private lateinit var eventRemoteDataSource: EventRemoteDataSource
@@ -179,7 +178,7 @@ class EventDownSyncTaskTest {
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
-            listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).map(TokenizableString::value),
+            listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
             ""
         )
 
@@ -197,7 +196,7 @@ class EventDownSyncTaskTest {
             mockProgressEmission(listOf(eventToMoveToModule2))
             coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
                 "",
-                listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).map(TokenizableString::value),
+                listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
                 ""
             )
 
@@ -223,7 +222,7 @@ class EventDownSyncTaskTest {
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             language = "",
-            selectedModules = listOf(DEFAULT_MODULE_ID.value),
+            selectedModules = listOf(DEFAULT_MODULE_ID),
             lastInstructionId = ""
         )
 
@@ -244,7 +243,7 @@ class EventDownSyncTaskTest {
         mockProgressEmission(listOf(eventToMoveToModule2))
         coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
-            listOf(DEFAULT_MODULE_ID_2.value),
+            listOf(DEFAULT_MODULE_ID_2),
             ""
         )
 

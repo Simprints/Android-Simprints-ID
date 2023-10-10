@@ -9,7 +9,8 @@ android {
 
 dependencies {
     implementation(project(":infra:events"))
-    implementation(project(":infra:config"))
+    implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
 
     implementation(libs.playServices.location)
     implementation(libs.workManager.work)

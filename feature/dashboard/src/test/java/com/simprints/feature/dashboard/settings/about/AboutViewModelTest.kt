@@ -2,15 +2,16 @@ package com.simprints.feature.dashboard.settings.about
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.IdentificationConfiguration
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.domain.models.SettingsPasswordConfig
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.IdentificationConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -42,13 +43,13 @@ class AboutViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     private val recentUserActivity = RecentUserActivity(
-        "version",
-        "scanner",
-        "user",
-        10,
-        20,
-        30,
-        10000,
+        lastScannerVersion = "version",
+        lastScannerUsed = "scanner",
+        lastUserUsed = "user".asTokenizedEncrypted(),
+        enrolmentsToday = 10,
+        identificationsToday = 20,
+        verificationsToday = 30,
+        lastActivityTime = 10000,
     )
     private val eventSyncManager = mockk<EventSyncManager>()
 

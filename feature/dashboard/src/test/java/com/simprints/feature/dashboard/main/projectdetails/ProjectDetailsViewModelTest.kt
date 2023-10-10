@@ -2,9 +2,12 @@ package com.simprints.feature.dashboard.main.projectdetails
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -21,8 +24,25 @@ class ProjectDetailsViewModelTest {
         private const val PROJECT_ID = "projectID"
         private const val PROJECT_NAME = "name"
         private const val LAST_SCANNER = "scanner"
-        private const val LAST_USER = "user"
-        private val project = Project(PROJECT_ID, PROJECT_NAME, "description", "creator", "bucket", "", tokenizationKeys = emptyMap())
+        private val LAST_USER = "user".asTokenizedEncrypted()
+        private val PROJECT = Project(
+            PROJECT_ID,
+            PROJECT_NAME,
+            "description",
+            "creator",
+            "bucket",
+            "",
+            tokenizationKeys = emptyMap()
+        )
+        private val RECENT_USER_ACTIVITY = RecentUserActivity(
+            lastScannerVersion = "",
+            lastScannerUsed = LAST_SCANNER,
+            lastUserUsed = LAST_USER,
+            enrolmentsToday = 0,
+            identificationsToday = 0,
+            verificationsToday = 0,
+            lastActivityTime = 0
+        )
     }
 
     @get:Rule
@@ -35,29 +55,30 @@ class ProjectDetailsViewModelTest {
         every { signedInProjectId } returns PROJECT_ID
     }
     private val configManager = mockk<ConfigManager> {
-        coEvery { getProject(PROJECT_ID) } returns project
+        coEvery { getProject(PROJECT_ID) } returns PROJECT
     }
+    private val tokenizationManager = mockk<TokenizationManager>()
     private val recentUserActivityManager = mockk<RecentUserActivityManager> {
-        coEvery { getRecentUserActivity() } returns RecentUserActivity(
-            "",
-            LAST_SCANNER,
-            LAST_USER,
-            0,
-            0,
-            0,
-            0
-        )
+        coEvery { getRecentUserActivity() } returns RECENT_USER_ACTIVITY
     }
 
     @Test
     fun `should initialize the live data correctly`() = runTest {
+        every {
+            tokenizationManager.decrypt(
+                RECENT_USER_ACTIVITY.lastUserUsed as TokenizableString.Tokenized,
+                TokenKeyType.AttendantId,
+                PROJECT
+            )
+        } returns RECENT_USER_ACTIVITY.lastUserUsed
         val viewModel = ProjectDetailsViewModel(
-            configManager,
-            authStore,
-            recentUserActivityManager,
+            configManager = configManager,
+            authStore = authStore,
+            recentUserActivityManager = recentUserActivityManager,
+            tokenizationManager = tokenizationManager
         )
 
-        val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER, LAST_SCANNER, true)
+        val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER.value, LAST_SCANNER, true)
         assertThat(viewModel.projectCardStateLiveData.value).isEqualTo(expectedState)
     }
 
@@ -67,9 +88,10 @@ class ProjectDetailsViewModelTest {
             coEvery { getProject(PROJECT_ID) } throws Exception()
         }
         val viewModel = ProjectDetailsViewModel(
-            configManager,
-            authStore,
-            recentUserActivityManager,
+            configManager = configManager,
+            authStore = authStore,
+            recentUserActivityManager = recentUserActivityManager,
+            tokenizationManager = tokenizationManager
         )
 
         val expectedState = DashboardProjectState(isLoaded = false)
