@@ -105,4 +105,55 @@
     <string name="invalid_intentAction_message">در تنظیمات (invalid Intent Action) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
     <string name="invalid_metadata_message">در تنظیمات (invalid metadata) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
 
+    <!-- This language is Afghan Farsi - more commonly known as Dari -->
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- App Name -->
+    <!-- Activity Titles -->
+    <string name="register_title">شامل شدن</string>
+    <string name="identify_title">مشخص کردن</string>
+    <string name="verify_title">تشخیص</string>
+    <string name="refusal_label">فورم انکار</string>
+
+    <!-- SetupActivity : the loading screen -->
+    <!-- Consent Text -->
+    <!-- Loading Messages-->
+    <string name="connect_scanner_bt_connect">در حال تماس با Vero..</string>
+    <string name="connect_scanner_wake_un20">بر حال کردن UN20..</string>
+    <string name="connect_scanner_setup">آماده ساختن Vero..</string>
+
+    <!-- CollectFingerprintsActivity : screen where the scanning happens -->
+    <!-- Screen Text -->
+    <string name="good_scan_direction">برای انگشت دیگر بالای صفحه به طرف چپ حرکت کنید</string>
+    <string name="please_scan">لطفاً اسکن نمایید</string>
+    <string name="poor_scan_direction">لطفا دوباره اسکن کنید</string>
+    <string name="scanning">در حال اسکن کردن ....</string>
+    <string name="good_scan_message">اسکن خوب</string>
+    <string name="poor_scan_message">اسکن ضعیف</string>
+    <string name="reconnecting_message">وصل شده دوباره</string>
+    <!-- Button Labels -->
+    <string name="rescan_label">اسکن دوباره</string>
+    <string name="rescan_label_question">اسکن دوباره ؟</string>
+    <string name="scan_label">اسکن</string>
+   <string name="scan">اسکن</string>
+    <!-- Content Descriptions -->
+
+    <!-- MatchingActivity : the waiting screen after an identification -->
+    <!-- Screen Text -->
+    <string name="please_wait">صبر کنید تا ما به شناسایی ادامه دهیم</string>
+    <!-- Loading text -->
+    <string name="loading_candidates">در حال آماده سازی اشتراک کنندگان</string>
+    <string name="matching_fingerprints">در حال مطابقت نشان انگشتان</string>
+
+    <!-- AlertActivity : the Simprints ID reason message screen -->
+    <!-- Error Message Titles -->
+    <string name="low_battery_title">چارچ بطری کم است</string>
+    <!-- Error Message Text -->
+    <string name="bluetooth_not_supported_message">در این دستگاه بلوتوت کار نمیدهد، لطفاً با ادمین تماس بگیرید</string>
+    <string name="bluetooth_not_enabled_message">بلوتوت فعال نیست، لطفاْ مطمین شوید که بلوتوت در تنظیمات فعال گردیده و دوباره کوشش نمایید</string>
+    <string name="multiple_scanners_found_message">بیشتر از یک اسکنر با این موبایل وصل گردید، لطفا اسکنر را که نیاز ندارید ارتباط اش را با موبایل قطع کنید</string>
+    <string name="low_battery_message">بطری اسکنر ضعیف است. لطفاً اسکنر را چارچ کنید</string>
+
+    <!-- Refusal Selection Points -->
+    <string name="refusal_other">دیگر</string>
 </resources>

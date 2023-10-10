@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -17,9 +16,10 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentScannerOffBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import com.simprints.infra.resources.R as CR
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class ScannerOffFragment : FingerprintFragment() {
@@ -58,9 +58,9 @@ class ScannerOffFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        binding.tryAgainButton.text = getString(R.string.try_again_label)
-        binding.scannerOffInstructionsTextView.text = getString(R.string.scanner_off_instructions)
-        binding.scannerOffTitleTextView.text = getString(R.string.scanner_off_title)
+        binding.tryAgainButton.text = getString(IDR.string.try_again_label)
+        binding.scannerOffInstructionsTextView.text = getString(IDR.string.scanner_off_instructions)
+        binding.scannerOffTitleTextView.text = getString(IDR.string.scanner_off_title)
     }
 
     private fun initTryAgainButton() {
@@ -74,7 +74,7 @@ class ScannerOffFragment : FingerprintFragment() {
             binding.couldNotConnectTextView.paintFlags =
                 binding.couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
             binding.couldNotConnectTextView.text =
-                String.format(getString(R.string.not_my_scanner), scannerIdEvent.peekContent())
+                String.format(getString(IDR.string.not_my_scanner), scannerIdEvent.peekContent())
             binding.couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
             binding.couldNotConnectTextView.visibility = View.VISIBLE
         }
@@ -113,8 +113,8 @@ class ScannerOffFragment : FingerprintFragment() {
             couldNotConnectTextView.visibility = View.INVISIBLE
             tryAgainButton.visibility = View.VISIBLE
             tryAgainButton.isEnabled = false
-            tryAgainButton.text = getString(R.string.scanner_on)
-            tryAgainButton.setBackgroundColor(resources.getColor(CR.color.simprints_green, null))
+            tryAgainButton.text = getString(IDR.string.scanner_on)
+            tryAgainButton.setBackgroundColor(resources.getColor(IDR.color.simprints_green, null))
         }
 
         Handler().postDelayed(

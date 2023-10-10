@@ -14,7 +14,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -28,10 +27,12 @@ import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
 import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class SerialEntryPairFragment : FingerprintFragment() {
@@ -93,11 +94,11 @@ class SerialEntryPairFragment : FingerprintFragment() {
 
     private fun setTextInLayout() {
         binding.apply {
-            serialEntryOkButton.text = getString(R.string.serial_entry_ok)
-            serialEntryPairInstructionsTextView.text = getString(R.string.enter_scanner_number)
-            serialEntryPairTitleTextView.text = getString(R.string.serial_entry_pair_title)
+            serialEntryOkButton.text = getString(IDR.string.serial_entry_ok)
+            serialEntryPairInstructionsTextView.text = getString(IDR.string.enter_scanner_number)
+            serialEntryPairTitleTextView.text = getString(IDR.string.serial_entry_pair_title)
             serialEntryPairInstructionsDetailTextView.text =
-                getString(R.string.enter_scanner_number_detail)
+                getString(IDR.string.enter_scanner_number_detail)
         }
     }
 
@@ -153,7 +154,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
             )
             viewModel.startPairing(serialNumber)
         } catch (e: NumberFormatException) {
-            context?.showToast(getString(R.string.serial_entry_pair_toast_invalid))
+            context?.showToast(getString(IDR.string.serial_entry_pair_toast_invalid))
         }
     }
 
@@ -181,10 +182,10 @@ class SerialEntryPairFragment : FingerprintFragment() {
             binding.serialEntryOkButton.visibility = View.VISIBLE
             binding.serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
             binding.serialEntryPairInstructionsTextView.text = if (pairingRejected) {
-                getString(R.string.serial_entry_pair_rejected)
+                getString(IDR.string.serial_entry_pair_rejected)
             } else {
                 getString(
-                    R.string.serial_entry_pair_failed,
+                    IDR.string.serial_entry_pair_failed,
                     serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
                 )
             }

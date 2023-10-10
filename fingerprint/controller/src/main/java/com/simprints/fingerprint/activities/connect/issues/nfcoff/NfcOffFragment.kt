@@ -19,7 +19,7 @@ import com.simprints.fingerprint.controllers.fingerprint.NfcManager
 import com.simprints.fingerprint.databinding.FragmentNfcOffBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import com.simprints.infra.resources.R as CR
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class NfcOffFragment : FingerprintFragment() {
@@ -65,8 +65,8 @@ class NfcOffFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        binding.turnOnNfcButton.text = getString(R.string.turn_on_nfc)
-        binding.nfcOffTitleTextView.text = getString(R.string.nfc_off_title)
+        binding.turnOnNfcButton.text = getString(IDR.string.turn_on_nfc)
+        binding.nfcOffTitleTextView.text = getString(IDR.string.nfc_off_title)
     }
 
     override fun onResume() {
@@ -89,10 +89,10 @@ class NfcOffFragment : FingerprintFragment() {
         if (handlingNfcEnabled) return
         handlingNfcEnabled = true
         binding.turnOnNfcButton.isEnabled = false
-        binding.turnOnNfcButton.text = getString(R.string.nfc_on)
+        binding.turnOnNfcButton.text = getString(IDR.string.nfc_on)
         binding.turnOnNfcButton.setBackgroundColor(
             resources.getColor(
-                CR.color.simprints_green,
+                IDR.color.simprints_green,
                 null
             )
         )
