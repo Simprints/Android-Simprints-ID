@@ -6,6 +6,9 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 
 object FaceMatchContract {
 
+    val DESTINATION = R.id.faceMatcherFragment
+    val RESULT_CLASS = FaceMatchResult::class.java
+
     const val RESULT = "face_match_result"
 
     fun getArgs(

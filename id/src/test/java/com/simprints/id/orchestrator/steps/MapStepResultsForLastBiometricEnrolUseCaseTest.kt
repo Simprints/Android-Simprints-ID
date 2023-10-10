@@ -26,13 +26,13 @@ import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
-class MapStepsForLastBiometricEnrolUseCaseTest {
+class MapStepResultsForLastBiometricEnrolUseCaseTest {
 
-    private lateinit var useCase: MapStepsForLastBiometricEnrolUseCase
+    private lateinit var useCase: MapStepResultsForLastBiometricEnrolUseCase
 
     @Before
     fun setUp() {
-        useCase = MapStepsForLastBiometricEnrolUseCase()
+        useCase = MapStepResultsForLastBiometricEnrolUseCase()
     }
 
     @Test

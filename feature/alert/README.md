@@ -49,13 +49,13 @@ implementation(project(":feature:alert"))
 
 // In orchestrator activity
 binding.orchestratorHostFragment
-    .handleResult<AlertResult>(this, AlertContract.ALERT_DESTINATION_ID) { }
+    .handleResult<AlertResult>(this, AlertContract.ALERT_DESTINATION) { }
 
 // In fragment within navigation graph
 findNavController().handleResult<AlertResult>(
     this, 
     R.id.currentScreen,
-    AlertContract.ALERT_DESTINATION_ID,
+    AlertContract.ALERT_DESTINATION,
 ) { }
 
 // Navigate to screen

@@ -38,7 +38,7 @@ import org.robolectric.annotation.Config
 class CoreStepProcessorImplTest : BaseStepProcessorTest() {
 
     @MockK
-    private lateinit var mapStepsForLastBiometricEnrol: MapStepsForLastBiometricEnrolUseCase
+    private lateinit var mapStepsForLastBiometricEnrol: MapStepResultsForLastBiometricEnrolUseCase
 
     private lateinit var coreStepProcessor: CoreStepProcessorImpl
 

@@ -16,8 +16,11 @@ import com.simprints.id.orchestrator.steps.core.requests.EnrolLastBiometricsRequ
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
 import javax.inject.Inject
 
-// Last biometric enrolment heavily depends on the previous execution step results
-class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
+/**
+ * Last biometric enrolment heavily depends on the previous execution step results
+ * and this use case is responsible for mapping those results to respective internal models.
+ */
+class MapStepResultsForLastBiometricEnrolUseCase @Inject constructor() {
 
     operator fun invoke(steps: List<Step>) = steps.mapNotNull { step ->
         when (step.payload) {

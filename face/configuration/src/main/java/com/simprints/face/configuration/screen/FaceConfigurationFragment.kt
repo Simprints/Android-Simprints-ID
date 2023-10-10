@@ -43,7 +43,7 @@ internal class FaceConfigurationFragment : Fragment(R.layout.fragment_configurat
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,
             R.id.faceConfigurationFragment,
-            AlertContract.ALERT_DESTINATION_ID,
+            AlertContract.DESTINATION,
         ) { result ->
             findNavController().finishWithResult(
                 this,

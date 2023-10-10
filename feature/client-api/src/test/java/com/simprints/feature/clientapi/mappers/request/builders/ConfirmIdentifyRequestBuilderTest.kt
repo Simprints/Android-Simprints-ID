@@ -22,7 +22,7 @@ internal class ConfirmIdentifyRequestBuilderTest {
             ),
             extractor,
             validator
-        ).build() as ActionRequest.ConfirmActionRequest
+        ).build() as ActionRequest.ConfirmIdentityActionRequest
 
         assertThat(action.projectId).isEqualTo(RequestActionFactory.MOCK_PROJECT_ID)
         assertThat(action.userId).isEqualTo(RequestActionFactory.MOCK_USER_ID)

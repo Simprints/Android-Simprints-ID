@@ -44,13 +44,13 @@ implementation(project(":feature:exit-form"))
 
 // In orchestrator activity
 binding.orchestratorHostFragment
-    .handleResult<ExitFormResult>(this, ExitFormContract.DESTINATION_ID) { }
+    .handleResult<ExitFormResult>(this, ExitFormContract.DESTINATION) { }
 
 // In fragment within navigation graph
 findNavController().handleResult<ExitFormResult>(
     this,
     R.id.currentScreen,
-    ExitFormContract.DESTINATION_ID,
+    ExitFormContract.DESTINATION,
 ) { }
 
 // Navigate to screen
