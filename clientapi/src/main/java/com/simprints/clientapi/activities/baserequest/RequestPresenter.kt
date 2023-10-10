@@ -1,6 +1,7 @@
 package com.simprints.clientapi.activities.baserequest
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
 import com.simprints.clientapi.clientrequests.builders.EnrolBuilder
@@ -34,6 +35,7 @@ import com.simprints.clientapi.exceptions.InvalidUserIdException
 import com.simprints.clientapi.exceptions.InvalidVerifyIdException
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.serialization.TokenizationAsStringSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
@@ -181,7 +183,10 @@ abstract class RequestPresenter(
             val events = sessionEventsManager
                 .getAllEventsForSession(sessionId).toList()
                 .decryptTokenizedFields(configManager.getProject(getProjectIdFromRequest()))
-            jsonHelper.toJson(CoSyncEvents(events))
+            val serializationModule = SimpleModule().apply {
+                addSerializer(TokenizableString::class.java, TokenizationAsStringSerializer())
+            }
+            jsonHelper.toJson(CoSyncEvents(events), module = serializationModule)
         } else {
             null
         }
