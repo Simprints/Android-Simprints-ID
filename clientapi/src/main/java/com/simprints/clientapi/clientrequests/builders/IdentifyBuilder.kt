@@ -4,7 +4,7 @@ import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.sync.tokenization.TokenizationManager
@@ -35,8 +35,8 @@ class IdentifyBuilder(
 
     override fun buildAppRequest(): BaseRequest = IdentifyRequest(
         projectId = extractor.getProjectId(),
-        userId = extractor.getUserId().asTokenizedRaw(),
-        moduleId = extractor.getModuleId().asTokenizedRaw(),
+        userId = extractor.getUserId().asTokenizableRaw(),
+        moduleId = extractor.getModuleId().asTokenizableRaw(),
         metadata = extractor.getMetadata(),
         unknownExtras = extractor.getUnknownExtras()
     )

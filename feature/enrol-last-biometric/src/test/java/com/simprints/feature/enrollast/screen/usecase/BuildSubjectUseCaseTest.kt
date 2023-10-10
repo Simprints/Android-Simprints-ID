@@ -1,7 +1,7 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -108,7 +108,7 @@ class BuildSubjectUseCaseTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
-        private val USER_ID = "userId".asTokenizedRaw()
-        private val MODULE_ID = "moduleId".asTokenizedRaw()
+        private val USER_ID = "userId".asTokenizableRaw()
+        private val MODULE_ID = "moduleId".asTokenizableRaw()
     }
 }
