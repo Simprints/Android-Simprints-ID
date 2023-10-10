@@ -15,8 +15,6 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:realm"))
 
-    implementation(libs.workManager.work)
-
     implementation(libs.datastore)
 
     implementation(libs.retrofit.core)

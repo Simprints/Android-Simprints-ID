@@ -36,7 +36,7 @@ internal class EventUpSyncTask @Inject constructor(
     private val eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
-    private val configRepository: ConfigService
+    private val configService: ConfigService
 ) {
 
     fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
@@ -46,7 +46,7 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val config = configRepository.getConfiguration()
+        val config = configService.getConfiguration()
         var lastOperation = operation.copy()
         var count = 0
         try {

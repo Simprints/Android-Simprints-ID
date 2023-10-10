@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import java.net.URL
 import javax.inject.Inject
 
-class ConfigRemoteDataSourceImpl(
+internal class ConfigRemoteDataSourceImpl(
     private val authStore: AuthStore,
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
     private val urlDownloader: (String) -> String
