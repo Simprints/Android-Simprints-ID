@@ -18,7 +18,7 @@ class AuthorizationEventTest {
     @Test
     fun create_AuthorizationEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID.asTokenizedRaw())
+        val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)
         val event = AuthorizationEvent(CREATED_AT, AUTHORIZED, userInfo, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)

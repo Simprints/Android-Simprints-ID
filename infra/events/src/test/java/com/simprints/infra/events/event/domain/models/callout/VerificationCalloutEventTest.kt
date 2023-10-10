@@ -23,8 +23,8 @@ class VerificationCalloutEventTest {
         val event = VerificationCalloutEvent(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
-            userId = DEFAULT_USER_ID.asTokenizedRaw(),
-            moduleId = DEFAULT_MODULE_ID.asTokenizedRaw(),
+            userId = DEFAULT_USER_ID,
+            moduleId = DEFAULT_MODULE_ID,
             verifyGuid = GUID1,
             metadata = DEFAULT_METADATA,
             labels = labels

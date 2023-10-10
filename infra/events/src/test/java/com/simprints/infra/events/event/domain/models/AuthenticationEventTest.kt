@@ -55,7 +55,7 @@ class AuthenticationEventTest {
 
     private fun createAuthenticationEvent(result: AuthenticationPayload.Result) {
         val labels = EventLabels(sessionId = GUID1)
-        val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID.asTokenizedRaw())
+        val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)
         val event = AuthenticationEvent(CREATED_AT, ENDED_AT, userInfo, result, labels)
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
