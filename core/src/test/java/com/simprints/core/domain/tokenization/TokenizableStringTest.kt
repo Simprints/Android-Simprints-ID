@@ -1,6 +1,11 @@
 package com.simprints.core.domain.tokenization
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import org.junit.Test
 
 
@@ -31,11 +36,13 @@ class TokenizableStringTest {
         val value = "value"
         assertThat(value.asTokenizedEncrypted()).isEqualTo(TokenizableString.Tokenized(value))
     }
+
     @Test
     fun `isTokenized should return true when string is TokenizableString_Tokenized`() {
         val value = "value".asTokenizedEncrypted()
         assertThat(value.isTokenized()).isTrue()
     }
+
     @Test
     fun `isTokenized should return false when string is TokenizableString_Raw`() {
         val value = "value".asTokenizedRaw()

@@ -2,8 +2,6 @@ package com.simprints.core.domain.tokenization
 
 import android.os.Parcelable
 import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeName
 import com.simprints.core.domain.tokenization.TokenizableString.Raw
 import com.simprints.core.domain.tokenization.TokenizableString.Tokenized
 import kotlinx.parcelize.Parcelize
@@ -16,15 +14,10 @@ import kotlinx.parcelize.Parcelize
  * Use [Raw] for the unencrypted values
  */
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    property = "className"
-)
 @Keep
 sealed class TokenizableString : Parcelable {
     abstract val value: String
 
-    @JsonTypeName("Encrypted")
     @Parcelize
     data class Tokenized(override val value: String) : TokenizableString() {
         override fun hashCode() = super.hashCode()
@@ -32,7 +25,6 @@ sealed class TokenizableString : Parcelable {
         override fun toString() = super.toString()
     }
 
-    @JsonTypeName("Raw")
     @Parcelize
     data class Raw(override val value: String) : TokenizableString() {
         override fun hashCode() = super.hashCode()
@@ -51,6 +43,7 @@ sealed class TokenizableString : Parcelable {
     override fun toString(): String = value
 }
 
+fun String.asTokenized(isTokenized: Boolean) = if(isTokenized) Tokenized(this) else Raw(this)
 fun String.asTokenizedRaw() = Raw(this)
 fun String.asTokenizedEncrypted() = Tokenized(this)
 

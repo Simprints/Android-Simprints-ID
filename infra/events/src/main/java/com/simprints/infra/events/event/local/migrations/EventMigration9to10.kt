@@ -2,6 +2,9 @@ package com.simprints.infra.events.event.local.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.simprints.core.domain.tokenization.serialization.FIELD_CLASS_NAME
+import com.simprints.core.domain.tokenization.serialization.FIELD_VALUE
+import com.simprints.core.domain.tokenization.serialization.RAW
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.infra.logging.Simber
 
@@ -66,7 +69,7 @@ internal fun String.migrateJsonStringToTokenizableString(vararg fieldsToMigrate:
     fieldsToMigrate.fold(this) { json, field ->
         val modifiedJson = StringBuilder(json)
         val searchField = "\"$field\":\""
-        val classNameValue = "Raw"
+        val classNameValue = RAW
 
         val startIndex = modifiedJson.indexOf(searchField)
 
@@ -76,7 +79,7 @@ internal fun String.migrateJsonStringToTokenizableString(vararg fieldsToMigrate:
                 val userIdValue =
                     modifiedJson.substring(startIndex + searchField.length, endIndex)
                 val replacement =
-                    "\"$field\":{\"className\":\"$classNameValue\",\"value\":\"$userIdValue\"}"
+                    "\"$field\":{\"$FIELD_CLASS_NAME\":\"$classNameValue\",\"$FIELD_VALUE\":\"$userIdValue\"}"
                 modifiedJson.replace(startIndex, endIndex + 1, replacement)
             }
         }
