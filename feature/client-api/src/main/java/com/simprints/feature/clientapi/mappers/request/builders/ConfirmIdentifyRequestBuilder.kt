@@ -12,7 +12,7 @@ internal class ConfirmIdentifyRequestBuilder(
     validator: ConfirmIdentityValidator,
 ) : ActionRequestBuilder(validator) {
 
-    override fun buildAction(): ActionRequest = ActionRequest.ConfirmActionRequest(
+    override fun buildAction(): ActionRequest = ActionRequest.ConfirmIdentityActionRequest(
         actionIdentifier = actionIdentifier,
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId(),
