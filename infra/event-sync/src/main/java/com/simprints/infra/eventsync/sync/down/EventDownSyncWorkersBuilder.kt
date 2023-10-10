@@ -1,8 +1,9 @@
 package com.simprints.infra.eventsync.sync.down
 
 import androidx.work.*
+import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
@@ -19,17 +20,17 @@ import javax.inject.Inject
 internal class EventDownSyncWorkersBuilder @Inject constructor(
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val jsonHelper: JsonHelper,
-    private val configManager: ConfigManager,
+    private val configService: ConfigService,
 ) {
 
     suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
-        val projectConfiguration = configManager.getProjectConfiguration()
-        val deviceConfiguration = configManager.getDeviceConfiguration()
+        val projectConfiguration = configService.getConfiguration()
+        val deviceConfiguration = configService.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            projectConfiguration.general.modalities.map { it.toMode() },
-            deviceConfiguration.selectedModules,
-            projectConfiguration.synchronization.down.partitionType.toGroup()
+            modes = projectConfiguration.general.modalities.map { it.toMode() },
+            selectedModuleIDs = deviceConfiguration.selectedModules.values(),
+            syncGroup = projectConfiguration.synchronization.down.partitionType.toGroup()
         )
 
         val uniqueDownSyncId = UUID.randomUUID().toString()

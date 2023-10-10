@@ -17,7 +17,7 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposit
 import com.simprints.feature.dashboard.tools.clickCloseChipIcon
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.feature.dashboard.tools.typeSearchViewText
-import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

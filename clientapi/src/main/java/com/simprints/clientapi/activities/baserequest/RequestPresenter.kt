@@ -33,16 +33,17 @@ import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.exceptions.InvalidUserIdException
 import com.simprints.clientapi.exceptions.InvalidVerifyIdException
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.domain.models.canCoSyncAllData
-import com.simprints.infra.config.domain.models.canCoSyncBiometricData
-import com.simprints.infra.config.domain.models.canCoSyncData
-import com.simprints.infra.config.domain.models.canSyncDataToSimprints
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.canCoSyncAllData
+import com.simprints.infra.config.store.models.canCoSyncBiometricData
+import com.simprints.infra.config.store.models.canCoSyncData
+import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
@@ -247,11 +248,14 @@ abstract class RequestPresenter(
 
     private fun List<Event>.decryptTokenizedFields(project: Project): List<Event> = map {
         val decryptedFieldsMap = it.getTokenizedFields().mapValues { entry ->
-            tokenizationManager.decrypt(
-                encrypted = entry.value,
-                tokenKeyType = entry.key,
-                project = project
-            )
+            when (val value = entry.value) {
+                is TokenizableString.Raw -> value
+                is TokenizableString.Tokenized -> tokenizationManager.decrypt(
+                    encrypted = value,
+                    tokenKeyType = entry.key,
+                    project = project
+                )
+            }
         }
         return@map it.setTokenizedFields(decryptedFieldsMap)
     }

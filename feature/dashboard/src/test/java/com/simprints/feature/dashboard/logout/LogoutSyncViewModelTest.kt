@@ -3,9 +3,8 @@ package com.simprints.feature.dashboard.logout
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authlogic.AuthManager
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations

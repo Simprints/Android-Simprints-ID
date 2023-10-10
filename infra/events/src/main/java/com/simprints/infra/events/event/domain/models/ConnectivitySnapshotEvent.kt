@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
-import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
 import java.util.UUID
 

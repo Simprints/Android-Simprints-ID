@@ -8,7 +8,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.feature.dashboard.R
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.resources.R as IDR
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule

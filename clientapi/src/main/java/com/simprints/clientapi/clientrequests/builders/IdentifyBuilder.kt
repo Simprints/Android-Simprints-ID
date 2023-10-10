@@ -5,9 +5,9 @@ import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
 import com.simprints.core.domain.tokenization.asTokenizedRaw
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.domain.models.TokenKeyType
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 
 
 class IdentifyBuilder(

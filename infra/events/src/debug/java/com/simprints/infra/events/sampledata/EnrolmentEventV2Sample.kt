@@ -19,8 +19,8 @@ object EnrolmentEventV2Sample : SampleEvent() {
             CREATED_AT,
             GUID1,
             DEFAULT_PROJECT_ID,
-            DEFAULT_MODULE_ID.asTokenizedRaw(),
-            DEFAULT_USER_ID.asTokenizedRaw(),
+            DEFAULT_MODULE_ID,
+            DEFAULT_USER_ID,
             GUID2,
             labels
         )

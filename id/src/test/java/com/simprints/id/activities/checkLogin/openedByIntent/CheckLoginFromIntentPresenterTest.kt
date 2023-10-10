@@ -1,6 +1,7 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.alert.AlertType
@@ -13,8 +14,8 @@ import com.simprints.id.exceptions.safe.secure.ProjectEndingException
 import com.simprints.id.exceptions.safe.secure.ProjectPausedException
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
@@ -155,8 +156,8 @@ class CheckLoginFromIntentPresenterTest {
             presenter.onViewCreated(false)
 
             val updatedActivity =
-                updateConfigFn.captured(RecentUserActivity("", "", "", 0, 0, 0, 0))
-            assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID.value)
+                updateConfigFn.captured(RecentUserActivity("", "", "".asTokenizedRaw(), 0, 0, 0, 0))
+            assertThat(updatedActivity.lastUserUsed).isEqualTo(DEFAULT_USER_ID)
         }
     }
 

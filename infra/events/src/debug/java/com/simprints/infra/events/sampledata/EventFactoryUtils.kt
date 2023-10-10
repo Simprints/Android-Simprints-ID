@@ -4,7 +4,7 @@ import android.os.Build
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
@@ -112,8 +112,8 @@ fun createConfirmationCalloutEvent() =
 fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = EnrolmentCalloutEvent(
     CREATED_AT,
     projectId,
-    DEFAULT_USER_ID.asTokenizedRaw(),
-    DEFAULT_MODULE_ID.asTokenizedRaw(),
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
     DEFAULT_METADATA,
     eventLabels,
     projectId
@@ -122,8 +122,8 @@ fun createEnrolmentCalloutEvent(projectId: String = DEFAULT_PROJECT_ID) = Enrolm
 fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(
     CREATED_AT,
     DEFAULT_PROJECT_ID,
-    DEFAULT_USER_ID.asTokenizedRaw(),
-    DEFAULT_MODULE_ID.asTokenizedRaw(),
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
     DEFAULT_METADATA,
     eventLabels
 )
@@ -131,8 +131,8 @@ fun createIdentificationCalloutEvent() = IdentificationCalloutEvent(
 fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCalloutEvent(
     CREATED_AT,
     DEFAULT_PROJECT_ID,
-    DEFAULT_USER_ID.asTokenizedRaw(),
-    DEFAULT_MODULE_ID.asTokenizedRaw(),
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
     DEFAULT_METADATA,
     GUID2,
     eventLabels
@@ -141,8 +141,8 @@ fun createLastBiometricsEnrolmentCalloutEvent() = EnrolmentLastBiometricsCallout
 fun createVerificationCalloutEvent() = VerificationCalloutEvent(
     CREATED_AT,
     DEFAULT_PROJECT_ID,
-    DEFAULT_USER_ID.asTokenizedRaw(),
-    DEFAULT_MODULE_ID.asTokenizedRaw(),
+    DEFAULT_USER_ID,
+    DEFAULT_MODULE_ID,
     DEFAULT_METADATA,
     GUID2,
     eventLabels
@@ -231,7 +231,7 @@ fun createAuthenticationEvent() =
     AuthenticationEvent(
         CREATED_AT,
         ENDED_AT,
-        UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID.asTokenizedRaw()),
+        UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID),
         AUTHENTICATED,
         eventLabels
     )
@@ -239,7 +239,7 @@ fun createAuthenticationEvent() =
 fun createAuthorizationEvent() = AuthorizationEvent(
     CREATED_AT,
     AUTHORIZED,
-    AuthorizationPayload.UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID.asTokenizedRaw()),
+    AuthorizationPayload.UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID),
     eventLabels
 )
 
@@ -267,8 +267,8 @@ fun createEnrolmentEventV2() =
         CREATED_AT,
         GUID1,
         DEFAULT_PROJECT_ID,
-        DEFAULT_MODULE_ID.asTokenizedRaw(),
-        DEFAULT_USER_ID.asTokenizedRaw(),
+        DEFAULT_MODULE_ID,
+        DEFAULT_USER_ID,
         GUID2,
         eventLabels
     )

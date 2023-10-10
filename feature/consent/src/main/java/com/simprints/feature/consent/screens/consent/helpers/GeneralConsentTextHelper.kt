@@ -2,8 +2,8 @@ package com.simprints.feature.consent.screens.consent.helpers
 
 import android.content.Context
 import com.simprints.feature.consent.ConsentType
-import com.simprints.infra.config.domain.models.ConsentConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.resources.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

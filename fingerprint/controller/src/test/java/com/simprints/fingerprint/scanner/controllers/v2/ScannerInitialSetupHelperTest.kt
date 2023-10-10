@@ -15,8 +15,8 @@ import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.tools.BatteryLevelChecker
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
 import io.mockk.coVerify

@@ -6,7 +6,6 @@ import com.simprints.core.DeviceID
 import com.simprints.core.LibSimprintsVersionName
 import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
@@ -20,6 +19,7 @@ import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -38,7 +38,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     private val sessionDataCache: SessionDataCache,
-    private val configManager: ConfigManager,
+    private val configService: ConfigService
 ) : EventRepository {
 
     companion object {
@@ -56,8 +56,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         closeAllSessions(NEW_SESSION)
 
         return reportException {
-            val projectConfiguration = configManager.getProjectConfiguration()
-            val deviceConfiguration = configManager.getDeviceConfiguration()
+            val projectConfiguration = configService.getConfiguration()
+            val deviceConfiguration = configService.getDeviceConfiguration()
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
             val sessionCaptureEvent = SessionCaptureEvent(
                 id = UUID.randomUUID().toString(),

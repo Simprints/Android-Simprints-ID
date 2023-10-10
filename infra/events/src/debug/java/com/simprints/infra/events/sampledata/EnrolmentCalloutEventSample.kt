@@ -17,8 +17,8 @@ object EnrolmentCalloutEventSample : SampleEvent() {
         return EnrolmentCalloutEvent(
             CREATED_AT,
             DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID.asTokenizedRaw(),
-            DEFAULT_MODULE_ID.asTokenizedRaw(),
+            DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID,
             DEFAULT_METADATA,
             labels
         )

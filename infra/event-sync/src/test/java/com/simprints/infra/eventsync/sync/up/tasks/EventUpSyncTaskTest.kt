@@ -4,10 +4,9 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.domain.models.SynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -20,6 +19,7 @@ import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
@@ -60,7 +60,7 @@ internal class EventUpSyncTaskTest {
     private lateinit var projectConfiguration: ProjectConfiguration
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configService: ConfigService
 
     @Before
     fun setUp() {
@@ -70,7 +70,7 @@ internal class EventUpSyncTaskTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
-        coEvery { configManager.getProjectConfiguration() } returns projectConfiguration
+        coEvery { configService.getConfiguration() } returns projectConfiguration
 
         eventUpSyncTask = EventUpSyncTask(
             authStore,
@@ -78,7 +78,7 @@ internal class EventUpSyncTaskTest {
             eventRepo,
             eventRemoteDataSource,
             timeHelper,
-            configManager
+            configService
         )
     }
 

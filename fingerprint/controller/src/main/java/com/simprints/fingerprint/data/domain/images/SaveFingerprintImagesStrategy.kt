@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.data.domain.images
 
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration
 
 enum class SaveFingerprintImagesStrategy {
     NEVER,          // Never save fingerprint images

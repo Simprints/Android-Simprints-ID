@@ -12,7 +12,7 @@ object AuthorizationEventSample : SampleEvent() {
         isClosed: Boolean
     ): AuthorizationEvent {
         val userInfo =
-            AuthorizationEvent.AuthorizationPayload.UserInfo(labels.projectId!!, DEFAULT_USER_ID.asTokenizedRaw())
+            AuthorizationEvent.AuthorizationPayload.UserInfo(labels.projectId!!, DEFAULT_USER_ID)
         return AuthorizationEvent(
             CREATED_AT,
             AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED,
