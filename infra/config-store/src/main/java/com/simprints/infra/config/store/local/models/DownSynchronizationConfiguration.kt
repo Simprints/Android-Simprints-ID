@@ -1,8 +1,8 @@
 package com.simprints.infra.config.store.local.models
 
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.exceptions.InvalidProtobufEnumException
@@ -29,7 +29,7 @@ internal fun ProtoDownSynchronizationConfiguration.toDomain(): DownSynchronizati
         partitionType.toDomain(),
         maxNbOfModules,
         moduleOptionsList.map {
-            if (isTokenized) it.asTokenizedEncrypted() else it.asTokenizedRaw()
+            if (isTokenized) it.asTokenizableEncrypted() else it.asTokenizableRaw()
         },
     )
 

@@ -2,8 +2,8 @@ package com.simprints.feature.dashboard.main.dailyactivity
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -37,7 +37,7 @@ class DailyActivityViewModelTest {
         coEvery { getRecentUserActivity() } returns RecentUserActivity(
             "",
             "",
-            "".asTokenizedEncrypted(),
+            "".asTokenizableEncrypted(),
             ENROLMENTS_COUNT,
             IDENTIFICATIONS_COUNT,
             VERIFICATIONS_COUNT,

@@ -1,6 +1,6 @@
 package com.simprints.infra.config.sync.testtools
 
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.store.models.ConsentConfiguration
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.DeviceConfiguration
@@ -84,7 +84,7 @@ internal val synchronizationConfiguration = SynchronizationConfiguration(
     DownSynchronizationConfiguration(
         DownSynchronizationConfiguration.PartitionType.PROJECT,
         1,
-        listOf("module1".asTokenizedEncrypted())
+        listOf("module1".asTokenizableEncrypted())
     )
 )
 
@@ -119,6 +119,6 @@ internal val project = Project(
 internal val deviceConfiguration =
     DeviceConfiguration(
         "en",
-        listOf("module1".asTokenizedEncrypted(), "module2".asTokenizedEncrypted()),
+        listOf("module1".asTokenizableEncrypted(), "module2".asTokenizableEncrypted()),
         "instruction"
     )

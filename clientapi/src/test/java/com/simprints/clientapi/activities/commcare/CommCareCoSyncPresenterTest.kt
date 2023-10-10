@@ -18,7 +18,7 @@ import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SE
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_USER_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -173,8 +173,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     "projectId",
-                    "thales".asTokenizedRaw(),
-                    "mod1".asTokenizedRaw(),
+                    "thales".asTokenizableRaw(),
+                    "mod1".asTokenizableRaw(),
                     Date(),
                     null,
                     emptyList(),
@@ -249,8 +249,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     projectId,
-                    "thales".asTokenizedRaw(),
-                    "mod1".asTokenizedRaw(),
+                    "thales".asTokenizableRaw(),
+                    "mod1".asTokenizableRaw(),
                     Date(),
                     null,
                     emptyList(),
@@ -323,8 +323,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     projectId,
-                    "thales".asTokenizedRaw(),
-                    "mod1".asTokenizedRaw(),
+                    "thales".asTokenizableRaw(),
+                    "mod1".asTokenizableRaw(),
                     Date(),
                     null,
                     emptyList(),

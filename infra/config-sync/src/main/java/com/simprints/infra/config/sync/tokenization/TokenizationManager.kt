@@ -1,8 +1,8 @@
 package com.simprints.infra.config.sync.tokenization
 
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -30,7 +30,7 @@ class TokenizationManager @Inject constructor(
     ): TokenizableString {
         val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return decrypted
         return try {
-            stringTokenizer.encrypt(decrypted.value, moduleKeyset).asTokenizedEncrypted()
+            stringTokenizer.encrypt(decrypted.value, moduleKeyset).asTokenizableEncrypted()
         } catch (e: Exception) {
             Simber.e(e)
             decrypted
@@ -54,7 +54,7 @@ class TokenizationManager @Inject constructor(
     ): TokenizableString {
         val moduleKeyset = project.tokenizationKeys[tokenKeyType] ?: return encrypted
         return try {
-            stringTokenizer.decrypt(encrypted.value, moduleKeyset).asTokenizedRaw()
+            stringTokenizer.decrypt(encrypted.value, moduleKeyset).asTokenizableRaw()
         } catch (e: Exception) {
             Simber.e(e)
             encrypted
