@@ -60,7 +60,7 @@ internal class EventUpSyncTaskTest {
     private lateinit var projectConfiguration: ProjectConfiguration
 
     @MockK
-    private lateinit var configRepository: ConfigService
+    private lateinit var configService: ConfigService
 
     @Before
     fun setUp() {
@@ -70,7 +70,7 @@ internal class EventUpSyncTaskTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
-        coEvery { configRepository.getConfiguration() } returns projectConfiguration
+        coEvery { configService.getConfiguration() } returns projectConfiguration
 
         eventUpSyncTask = EventUpSyncTask(
             authStore,
@@ -78,7 +78,7 @@ internal class EventUpSyncTaskTest {
             eventRepo,
             eventRemoteDataSource,
             timeHelper,
-            configRepository
+            configService
         )
     }
 

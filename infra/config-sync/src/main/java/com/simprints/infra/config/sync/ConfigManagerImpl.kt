@@ -10,28 +10,28 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal class ConfigManagerImpl @Inject constructor(
-    private val configRepository: ConfigService,
+    private val configService: ConfigService,
     private val configurationScheduler: ConfigurationScheduler
 ) :
     ConfigManager {
 
     override suspend fun refreshProject(projectId: String): Project =
-        configRepository.refreshProject(projectId)
+        configService.refreshProject(projectId)
 
     override suspend fun getProject(projectId: String): Project =
-        configRepository.getProject(projectId)
+        configService.getProject(projectId)
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration =
-        configRepository.getConfiguration()
+        configService.getConfiguration()
 
     override suspend fun refreshProjectConfiguration(projectId: String): ProjectConfiguration =
-        configRepository.refreshConfiguration(projectId)
+        configService.refreshConfiguration(projectId)
 
     override suspend fun getDeviceConfiguration(): DeviceConfiguration =
-        configRepository.getDeviceConfiguration()
+        configService.getDeviceConfiguration()
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
-        configRepository.updateDeviceConfiguration(update)
+        configService.updateDeviceConfiguration(update)
 
     override fun scheduleSyncConfiguration() =
         configurationScheduler.scheduleSync()
@@ -40,11 +40,11 @@ internal class ConfigManagerImpl @Inject constructor(
         configurationScheduler.cancelScheduledSync()
 
     override suspend fun clearData() =
-        configRepository.clearData()
+        configService.clearData()
 
     override suspend fun getPrivacyNotice(
         projectId: String,
         language: String
     ): Flow<PrivacyNoticeResult> =
-        configRepository.getPrivacyNotice(projectId, language)
+        configService.getPrivacyNotice(projectId, language)
 }

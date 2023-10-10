@@ -34,7 +34,7 @@ internal class EventDownSyncTask @Inject constructor(
     private val subjectRepository: EnrolmentRecordManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
-    private val configRepository: ConfigService,
+    private val configService: ConfigService,
     private val timeHelper: TimeHelper,
     private val eventRemoteDataSource: EventRemoteDataSource,
 ) {
@@ -217,7 +217,7 @@ internal class EventDownSyncTask @Inject constructor(
         op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
 
     private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
-        moduleId.value.partOf(configRepository.getDeviceConfiguration().selectedModules.values())
+        moduleId.value.partOf(configService.getDeviceConfiguration().selectedModules.values())
 
     private fun String.partOf(modules: List<String>) = modules.contains(this)
 
