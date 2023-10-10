@@ -1,6 +1,8 @@
 package com.simprints.infra.events
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizedEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
@@ -20,6 +22,13 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.sampledata.SampleDefaults
+import com.simprints.infra.events.sampledata.SampleDefaults.STATIC_GUID
+import com.simprints.infra.events.sampledata.createAuthenticationEvent
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
@@ -31,6 +40,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import java.util.UUID
 
 internal class EventRepositoryImplTest {
 
@@ -57,6 +67,9 @@ internal class EventRepositoryImplTest {
     @MockK
     lateinit var configManager: ConfigService
 
+    @MockK
+    lateinit var tokenizationManager: TokenizationManager
+
     @Before
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
@@ -75,15 +88,16 @@ internal class EventRepositoryImplTest {
         }
 
         eventRepo = EventRepositoryImpl(
-            DEVICE_ID,
-            APP_VERSION_NAME,
-            LIB_VERSION_NAME,
-            authStore,
-            eventLocalDataSource,
-            timeHelper,
-            sessionEventValidatorsFactory,
-            sessionDataCache,
-            configManager,
+            deviceId = DEVICE_ID,
+            appVersionName = APP_VERSION_NAME,
+            libSimprintsVersionName = LIB_VERSION_NAME,
+            authStore = authStore,
+            eventLocalDataSource = eventLocalDataSource,
+            timeHelper = timeHelper,
+            validatorsFactory = sessionEventValidatorsFactory,
+            sessionDataCache = sessionDataCache,
+            configRepository = configManager,
+            tokenizationManager = tokenizationManager
         )
     }
 
@@ -402,8 +416,10 @@ internal class EventRepositoryImplTest {
     fun `when observeEventCount called with type return events of type`() = runTest {
         coEvery { eventLocalDataSource.observeCount(any(), any()) } returns flowOf(7)
 
-        assertThat(eventRepo.observeEventCount("test", CALLBACK_ENROLMENT)
-            .firstOrNull()).isEqualTo(7)
+        assertThat(
+            eventRepo.observeEventCount("test", CALLBACK_ENROLMENT)
+                .firstOrNull()
+        ).isEqualTo(7)
 
         coVerify(exactly = 0) { eventLocalDataSource.observeCount(any()) }
         coVerify(exactly = 1) { eventLocalDataSource.observeCount(any(), any()) }
@@ -466,9 +482,56 @@ internal class EventRepositoryImplTest {
         coVerify { eventLocalDataSource.deleteAll() }
     }
 
+    @Test
+    fun `given the event has untokenized field, when tokenization key exists, then fields should be tokenized`() =
+        runTest {
+            mockUUID(STATIC_GUID)
+            val project = mockk<Project>()
+            val tokenizedUserId = "tokenizedUserId".asTokenizedEncrypted()
+            val event = createAuthenticationEvent().copy(
+                labels = EventLabels(
+                    sessionId = STATIC_GUID,
+                    deviceId = DEVICE_ID,
+                    projectId = DEFAULT_PROJECT_ID
+                )
+            )
+            val expectedEvent = event.copy(
+                payload = event.payload.copy(
+                    userInfo = event.payload.userInfo.copy(userId = tokenizedUserId)
+                )
+            )
+
+            coEvery { eventLocalDataSource.loadAllFromProject(any()) } returns listOf(event)
+            every {
+                tokenizationManager.encrypt(
+                    decrypted = event.payload.userInfo.userId as TokenizableString.Raw,
+                    tokenKeyType = TokenKeyType.AttendantId,
+                    project = project
+                )
+            } returns tokenizedUserId
+            every { sessionDataCache.eventCache } returns emptyMap<String, Event>().toMutableMap()
+            eventRepo.tokenizeLocalEvents(project)
+
+            verify {
+                tokenizationManager.encrypt(
+                    decrypted = event.payload.userInfo.userId as TokenizableString.Raw,
+                    tokenKeyType = TokenKeyType.AttendantId,
+                    project = project
+                )
+            }
+
+            coVerify(atLeast = 1) {  eventLocalDataSource.insertOrUpdate(expectedEvent) }
+        }
+
     private fun mockSignedId() =
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
+    private fun mockUUID(result: String) {
+        mockkStatic(UUID::class)
+        val guid = mockk<UUID>()
+        every { guid.toString() } returns result
+        every { UUID.randomUUID() } returns guid
+    }
     companion object {
         const val DEVICE_ID = "DEVICE_ID"
         const val APP_VERSION_NAME = "APP_VERSION_NAME"
