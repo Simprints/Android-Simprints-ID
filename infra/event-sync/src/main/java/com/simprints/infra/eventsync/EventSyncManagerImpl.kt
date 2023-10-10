@@ -42,8 +42,8 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val configRepository: ConfigService,
     private val tokenizationManager: TokenizationManager,
+    private val configService: ConfigService,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
 
@@ -121,8 +121,8 @@ internal class EventSyncManagerImpl @Inject constructor(
         eventRepository.observeEventCount(projectId, type)
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
-        val projectConfig = configRepository.getConfiguration()
-        val deviceConfig = configRepository.getDeviceConfiguration()
+        val projectConfig = configService.getConfiguration()
+        val deviceConfig = configService.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = getProjectModes(projectConfig),
@@ -154,7 +154,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         val op = EventDownSyncOperation(RemoteEventQuery(
             projectId = projectId,
             subjectId = subjectId,
-            modes = getProjectModes(configRepository.getConfiguration()),
+            modes = getProjectModes(configService.getConfiguration()),
         ))
         downSyncTask.downSync(this, op).toList()
     }
@@ -165,7 +165,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(
             unselectedModules,
-            modes = getProjectModes(configRepository.getConfiguration()),
+            modes = getProjectModes(configService.getConfiguration()),
         )
     }
 
@@ -180,7 +180,6 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun resetDownSyncInfo() {
         downSyncScopeRepository.deleteAll()
     }
-
 
     override suspend fun tokenizeLocalEvents(project: Project) =
         eventRepository.tokenizeLocalEvents(project)

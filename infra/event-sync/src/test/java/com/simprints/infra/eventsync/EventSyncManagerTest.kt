@@ -66,7 +66,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
-    lateinit var configRepository: ConfigService
+    lateinit var configService: ConfigService
 
     private lateinit var eventSyncManagerImpl: EventSyncManagerImpl
 
@@ -77,7 +77,7 @@ internal class EventSyncManagerTest {
         mockkStatic(WorkManager::class)
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { configRepository.getConfiguration() } returns mockk {
+        coEvery { configService.getConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every { synchronization.down.partitionType.toGroup() } returns GROUP.MODULE
         }
@@ -91,7 +91,7 @@ internal class EventSyncManagerTest {
             eventSyncCache,
             downSyncTask,
             eventRemoteDataSource,
-            configRepository,
+            configService,
             testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -182,7 +182,7 @@ internal class EventSyncManagerTest {
                 EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 11),
             )
         )
-        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
+        coEvery { configService.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
         }
 
@@ -207,7 +207,7 @@ internal class EventSyncManagerTest {
                 EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 5),
             )
         )
-        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
+        coEvery { configService.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
         }
 

@@ -20,12 +20,12 @@ import javax.inject.Inject
 internal class EventDownSyncWorkersBuilder @Inject constructor(
     private val downSyncScopeRepository: EventDownSyncScopeRepository,
     private val jsonHelper: JsonHelper,
-    private val configRepository: ConfigService,
+    private val configService: ConfigService,
 ) {
 
     suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
-        val projectConfiguration = configRepository.getConfiguration()
-        val deviceConfiguration = configRepository.getDeviceConfiguration()
+        val projectConfiguration = configService.getConfiguration()
+        val deviceConfiguration = configService.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = projectConfiguration.general.modalities.map { it.toMode() },

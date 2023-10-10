@@ -41,8 +41,8 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     private val sessionDataCache: SessionDataCache,
-    private val configRepository: ConfigService,
-    private val tokenizationManager: TokenizationManager
+    private val tokenizationManager: TokenizationManager,
+    private val configService: ConfigService
 ) : EventRepository {
 
     companion object {
@@ -60,8 +60,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         closeAllSessions(NEW_SESSION)
 
         return reportException {
-            val projectConfiguration = configRepository.getConfiguration()
-            val deviceConfiguration = configRepository.getDeviceConfiguration()
+            val projectConfiguration = configService.getConfiguration()
+            val deviceConfiguration = configService.getDeviceConfiguration()
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
             val sessionCaptureEvent = SessionCaptureEvent(
                 id = UUID.randomUUID().toString(),
