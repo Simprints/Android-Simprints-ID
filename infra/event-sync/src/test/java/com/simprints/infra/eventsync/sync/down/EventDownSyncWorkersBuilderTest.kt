@@ -43,7 +43,7 @@ class EventDownSyncWorkersBuilderTest {
     private lateinit var downSyncConfiguration: DownSynchronizationConfiguration
 
     @MockK
-    private lateinit var configRepository: ConfigService
+    private lateinit var configService: ConfigService
 
     @MockK
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -54,12 +54,12 @@ class EventDownSyncWorkersBuilderTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configRepository.getDeviceConfiguration() } returns DeviceConfiguration(
+        coEvery { configService.getDeviceConfiguration() } returns DeviceConfiguration(
             "",
             SELECTED_MODULE,
             ""
         )
-        coEvery { configRepository.getConfiguration() } returns mockk {
+        coEvery { configService.getConfiguration() } returns mockk {
             every { general } returns generalConfiguration
             every { synchronization } returns mockk {
                 every { down } returns downSyncConfiguration
@@ -69,7 +69,7 @@ class EventDownSyncWorkersBuilderTest {
         eventDownSyncWorkersBuilder = EventDownSyncWorkersBuilder(
             eventDownSyncScopeRepository,
             JsonHelper,
-            configRepository
+            configService
         )
     }
 

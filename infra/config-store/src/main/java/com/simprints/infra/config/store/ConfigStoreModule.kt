@@ -37,7 +37,7 @@ abstract class ConfigManagerModule {
 
 
     @Binds
-    internal abstract fun provideConfigRepository(service: ConfigServiceImpl): ConfigService
+    internal abstract fun provideconfigService(service: ConfigServiceImpl): ConfigService
 
     @Binds
     internal abstract fun provideConfigRemoteDataSource(remoteDataSource: ConfigRemoteDataSourceImpl): ConfigRemoteDataSource
