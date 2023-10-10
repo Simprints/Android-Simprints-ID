@@ -66,7 +66,7 @@ class OtaFailedFragment : FingerprintFragment() {
 
     private fun setTextInLayout(fetchOtaResult: FetchOtaResult?) {
         binding.apply {
-            otaFailedTitleTextView.text = getString(R.string.ota_failed_title)
+            otaFailedTitleTextView.text = getString(IDR.string.ota_failed_title)
             otaFailedInstructionsTextView.text = if (fetchOtaResult?.isMaintenanceMode == true) {
                 if (fetchOtaResult.estimatedOutage != null && fetchOtaResult.estimatedOutage != 0L) {
                     getString(
@@ -76,8 +76,8 @@ class OtaFailedFragment : FingerprintFragment() {
                 } else {
                     getString(IDR.string.error_backend_maintenance_message)
                 }
-            } else getString(R.string.ota_failed_instructions)
-            continueButton.text = getString(R.string.continue_button)
+            } else getString(IDR.string.ota_failed_instructions)
+            continueButton.text = getString(IDR.string.continue_button)
         }
     }
 }
