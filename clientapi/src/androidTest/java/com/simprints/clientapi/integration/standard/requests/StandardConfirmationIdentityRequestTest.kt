@@ -32,10 +32,12 @@ class StandardConfirmationIdentityRequestTest : BaseStandardClientApiTest() {
         ActivityScenario.launch<LibSimprintsActivity>(standardConfirmIntentRequest.apply { action = STANDARD_CONFIRM_IDENTITY_ACTION })
 
         val expectedAppRequest = AppConfirmIdentityRequest(
-            projectIdField.value(),
-            userIdField.value(),
-            sessionIdField.value(),
-            selectedGuidField.value())
+            projectId = projectIdField.value(),
+            userId = userIdField.value(),
+            isUserIdTokenized = false,
+            sessionId = sessionIdField.value(),
+            selectedGuid = selectedGuidField.value()
+        )
 
         Intents.intended(IntentMatchers.hasAction(APP_CONFIRM_ACTION))
         Intents.intended(IntentMatchers.hasExtras(BundleMatchers.hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
