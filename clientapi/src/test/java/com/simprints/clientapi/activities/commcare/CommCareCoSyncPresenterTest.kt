@@ -1,11 +1,19 @@
 package com.simprints.clientapi.activities.commcare
 
-import com.simprints.clientapi.activities.commcare.CommCareAction.*
 import com.simprints.clientapi.activities.commcare.CommCareAction.CommCareActionFollowUpAction.ConfirmIdentity
+import com.simprints.clientapi.activities.commcare.CommCareAction.Enrol
+import com.simprints.clientapi.activities.commcare.CommCareAction.Identify
+import com.simprints.clientapi.activities.commcare.CommCareAction.Invalid
+import com.simprints.clientapi.activities.commcare.CommCareAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchConfidence
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
@@ -18,15 +26,18 @@ import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SE
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_USER_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
-import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.Subject
@@ -41,7 +52,11 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
 import com.simprints.libsimprints.Constants
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
 import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
@@ -49,7 +64,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 class CommCareCoSyncPresenterTest {
 
@@ -173,8 +189,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     "projectId",
-                    "thales".asTokenizedRaw(),
-                    "mod1".asTokenizedRaw(),
+                    "thales".asTokenizableRaw(),
+                    "mod1".asTokenizableRaw(),
                     Date(),
                     null,
                     emptyList(),
@@ -249,8 +265,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     projectId,
-                    "thales".asTokenizedRaw(),
-                    "mod1".asTokenizedRaw(),
+                    "thales".asTokenizableRaw(),
+                    "mod1".asTokenizableRaw(),
                     Date(),
                     null,
                     emptyList(),
@@ -323,8 +339,8 @@ class CommCareCoSyncPresenterTest {
                 Subject(
                     registerId,
                     projectId,
-                    "thales".asTokenizedRaw(),
-                    "mod1".asTokenizedRaw(),
+                    "thales".asTokenizableRaw(),
+                    "mod1".asTokenizableRaw(),
                     Date(),
                     null,
                     emptyList(),

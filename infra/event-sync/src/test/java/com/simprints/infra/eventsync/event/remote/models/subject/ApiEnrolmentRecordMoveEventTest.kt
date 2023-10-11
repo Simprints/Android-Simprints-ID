@@ -1,8 +1,8 @@
 package com.simprints.infra.eventsync.event.remote.models.subject
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
@@ -42,8 +42,8 @@ class ApiEnrolmentRecordMoveEventTest {
             EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove(
                 "subjectId",
                 "projectId",
-                "moduleId1".asTokenizedEncrypted(),
-                "attendantId".asTokenizedEncrypted(),
+                "moduleId1".asTokenizableEncrypted(),
+                "attendantId".asTokenizableEncrypted(),
                 listOf(
                     FingerprintReference(
                         "fpRefId",
@@ -57,8 +57,8 @@ class ApiEnrolmentRecordMoveEventTest {
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",
                 "projectId",
-                "moduleId2".asTokenizedEncrypted(),
-                "attendantId".asTokenizedEncrypted(),
+                "moduleId2".asTokenizableEncrypted(),
+                "attendantId".asTokenizableEncrypted(),
             )
         )
 

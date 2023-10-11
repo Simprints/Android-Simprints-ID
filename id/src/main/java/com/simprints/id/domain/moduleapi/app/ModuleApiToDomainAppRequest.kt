@@ -1,7 +1,6 @@
 package com.simprints.id.domain.moduleapi.app
 
-import com.simprints.core.domain.tokenization.asTokenized
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizable
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
@@ -20,24 +19,24 @@ fun IAppRequest.fromModuleApiToDomain(): AppRequest =
         is IAppEnrolRequest ->
             AppEnrolRequest(
                 projectId = projectId,
-                userId = userId.asTokenized(isUserIdTokenized),
-                moduleId = moduleId.asTokenized(isModuleIdTokenized),
+                userId = userId.asTokenizable(isUserIdTokenized),
+                moduleId = moduleId.asTokenizable(isModuleIdTokenized),
                 metadata = metadata
             )
 
         is IAppIdentifyRequest ->
             AppIdentifyRequest(
                 projectId = projectId,
-                userId = userId.asTokenized(isUserIdTokenized),
-                moduleId = moduleId.asTokenized(isModuleIdTokenized),
+                userId = userId.asTokenizable(isUserIdTokenized),
+                moduleId = moduleId.asTokenizable(isModuleIdTokenized),
                 metadata = metadata
             )
 
         is IAppVerifyRequest ->
             AppVerifyRequest(
                 projectId = projectId,
-                userId = userId.asTokenized(isUserIdTokenized),
-                moduleId = moduleId.asTokenized(isModuleIdTokenized),
+                userId = userId.asTokenizable(isUserIdTokenized),
+                moduleId = moduleId.asTokenizable(isModuleIdTokenized),
                 metadata = metadata,
                 verifyGuid = verifyGuid
             )
@@ -45,7 +44,7 @@ fun IAppRequest.fromModuleApiToDomain(): AppRequest =
         is IAppConfirmIdentityRequest ->
             AppConfirmIdentityRequest(
                 projectId = projectId,
-                userId = userId.asTokenized(isUserIdTokenized),
+                userId = userId.asTokenizable(isUserIdTokenized),
                 sessionId = sessionId,
                 selectedGuid = selectedGuid
             )
@@ -53,8 +52,8 @@ fun IAppRequest.fromModuleApiToDomain(): AppRequest =
         is IAppEnrolLastBiometricsRequest ->
             AppEnrolLastBiometricsRequest(
                 projectId = projectId,
-                userId = userId.asTokenized(isUserIdTokenized),
-                moduleId = moduleId.asTokenized(isModuleIdTokenized),
+                userId = userId.asTokenizable(isUserIdTokenized),
+                moduleId = moduleId.asTokenizable(isModuleIdTokenized),
                 metadata = metadata,
                 identificationSessionId = sessionId
             )

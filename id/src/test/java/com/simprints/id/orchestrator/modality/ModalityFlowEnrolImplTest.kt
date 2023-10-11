@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -274,8 +274,8 @@ class ModalityFlowEnrolImplTest {
     private fun buildAppEnrolRequest() =
         AppEnrolRequest(
             projectId = PROJECT_ID,
-            userId = "userId".asTokenizedRaw(),
-            moduleId = "moduleId".asTokenizedRaw(),
+            userId = "userId".asTokenizableRaw(),
+            moduleId = "moduleId".asTokenizableRaw(),
             metadata = "metadata"
         )
 

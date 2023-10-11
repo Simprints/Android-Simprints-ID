@@ -10,7 +10,7 @@ import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.errors.ClientApiAlert
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.security.SecurityManager
@@ -27,8 +27,8 @@ import org.junit.Test
 class RequestPresenterTest {
 
     private val projectIdField = "some_project_id"
-    private val moduleIdField = "some_module_id".asTokenizedRaw()
-    private val userIdField = "some_user_id".asTokenizedRaw()
+    private val moduleIdField = "some_module_id".asTokenizableRaw()
+    private val userIdField = "some_user_id".asTokenizableRaw()
     private val metadataField = "{\"key\": \"some_metadata\"}"
     private val extraField = mapOf("extraField" to "someExtraField")
 
