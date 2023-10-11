@@ -1,6 +1,5 @@
 package com.simprints.infra.events.sampledata
 
-import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT

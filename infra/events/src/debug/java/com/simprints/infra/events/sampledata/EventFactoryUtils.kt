@@ -1,7 +1,6 @@
 package com.simprints.infra.events.sampledata
 
 import android.os.Build
-import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality

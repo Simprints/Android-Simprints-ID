@@ -2,7 +2,6 @@ package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent.Companion.EVENT_VERSION

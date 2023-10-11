@@ -3,11 +3,10 @@ package com.simprints.core.domain.tokenization.serialization
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import org.junit.Test
 
 
@@ -15,8 +14,8 @@ class TokenizationSerializerTest {
 
     @Test
     fun `class name tokenization serialization and deserialization should produce same result`() {
-        val encrypted = "encrypted".asTokenizedEncrypted()
-        val raw = "raw".asTokenizedRaw()
+        val encrypted = "encrypted".asTokenizableEncrypted()
+        val raw = "raw".asTokenizableRaw()
 
         val module = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
@@ -39,8 +38,8 @@ class TokenizationSerializerTest {
 
     @Test
     fun `string tokenization serialization should produce plain string`() {
-        val encrypted = "encrypted".asTokenizedEncrypted()
-        val raw = "raw".asTokenizedRaw()
+        val encrypted = "encrypted".asTokenizableEncrypted()
+        val raw = "raw".asTokenizableRaw()
 
         val module = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationAsStringSerializer())
