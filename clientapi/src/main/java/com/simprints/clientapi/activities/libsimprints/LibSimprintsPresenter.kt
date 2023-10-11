@@ -46,7 +46,7 @@ class LibSimprintsPresenter @AssistedInject constructor(
     private val timeHelper: ClientApiTimeHelper,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val jsonHelper: JsonHelper,
-    private val tokenizationManager: TokenizationManager,
+    tokenizationManager: TokenizationManager,
     configManager: ConfigManager
 ) : RequestPresenter(
     view = view,
