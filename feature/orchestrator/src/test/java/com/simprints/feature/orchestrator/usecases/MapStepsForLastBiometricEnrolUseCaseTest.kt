@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.matcher.FaceMatchResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult

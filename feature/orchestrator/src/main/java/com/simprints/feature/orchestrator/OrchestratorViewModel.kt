@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.face.matcher.MatchParams
+import com.simprints.matcher.MatchParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.model.OrchestratorResult
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload

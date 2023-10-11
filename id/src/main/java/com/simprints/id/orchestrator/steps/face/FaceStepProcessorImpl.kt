@@ -9,10 +9,10 @@ import com.simprints.face.capture.screens.FaceCaptureWrapperActivity
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
-import com.simprints.face.matcher.MatchContract
-import com.simprints.face.matcher.MatchParams
-import com.simprints.face.matcher.FaceMatchResult
-import com.simprints.face.matcher.screen.MatchWrapperActivity
+import com.simprints.matcher.MatchContract
+import com.simprints.matcher.MatchParams
+import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.screen.MatchWrapperActivity
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
@@ -37,7 +37,7 @@ class FaceStepProcessorImpl @Inject constructor(
 
     companion object {
         const val CONFIGURATION_ACTIVITY_NAME = "com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity"
-        const val MATCHER_ACTIVITY_NAME = "com.simprints.face.matcher.screen.MatchWrapperActivity"
+        const val MATCHER_ACTIVITY_NAME = "com.simprints.matcher.screen.MatchWrapperActivity"
         const val CAPTURE_ACTIVITY_NAME = "com.simprints.face.capture.screens.FaceCaptureWrapperActivity"
     }
 

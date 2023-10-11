@@ -3,10 +3,10 @@ package com.simprints.id.orchestrator.steps.fingerprint
 import android.content.Intent
 import android.os.Parcelable
 import com.simprints.core.domain.common.FlowProvider
-import com.simprints.face.matcher.FingerprintMatchResult
-import com.simprints.face.matcher.MatchContract
-import com.simprints.face.matcher.MatchParams
-import com.simprints.face.matcher.screen.MatchWrapperActivity
+import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchContract
+import com.simprints.matcher.MatchParams
+import com.simprints.matcher.screen.MatchWrapperActivity
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
@@ -31,7 +31,7 @@ class FingerprintStepProcessorImpl @Inject constructor(
 ) : FingerprintStepProcessor {
 
     companion object {
-        const val MATCHER_ACTIVITY_NAME = "com.simprints.face.matcher.screen.MatchWrapperActivity"
+        const val MATCHER_ACTIVITY_NAME = "com.simprints.matcher.screen.MatchWrapperActivity"
         const val ACTIVITY_CLASS_NAME =
             "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
     }

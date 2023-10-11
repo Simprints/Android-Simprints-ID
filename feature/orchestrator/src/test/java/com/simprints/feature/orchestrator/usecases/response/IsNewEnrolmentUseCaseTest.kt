@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.matcher.FaceMatchResult
 import com.simprints.infra.config.domain.models.DecisionPolicy
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import io.mockk.MockKAnnotations
