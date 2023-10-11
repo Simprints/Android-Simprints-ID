@@ -96,7 +96,7 @@ internal class EventRepositoryImplTest {
             timeHelper = timeHelper,
             validatorsFactory = sessionEventValidatorsFactory,
             sessionDataCache = sessionDataCache,
-            configRepository = configManager,
+            configService = configManager,
             tokenizationManager = tokenizationManager
         )
     }
