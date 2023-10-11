@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.settings.about
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
@@ -45,7 +45,7 @@ class AboutViewModelTest {
     private val recentUserActivity = RecentUserActivity(
         lastScannerVersion = "version",
         lastScannerUsed = "scanner",
-        lastUserUsed = "user".asTokenizedEncrypted(),
+        lastUserUsed = "user".asTokenizableEncrypted(),
         enrolmentsToday = 10,
         identificationsToday = 20,
         verificationsToday = 30,

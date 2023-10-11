@@ -4,7 +4,7 @@ import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.VerifyRequest
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.sync.tokenization.TokenizationManager
@@ -35,8 +35,8 @@ class VerifyBuilder(
 
     override fun buildAppRequest(): BaseRequest = VerifyRequest(
         projectId = extractor.getProjectId(),
-        userId = extractor.getUserId().asTokenizedRaw(),
-        moduleId = extractor.getModuleId().asTokenizedRaw(),
+        userId = extractor.getUserId().asTokenizableRaw(),
+        moduleId = extractor.getModuleId().asTokenizableRaw(),
         metadata = extractor.getMetadata(),
         verifyGuid = extractor.getVerifyGuid(),
         unknownExtras = extractor.getUnknownExtras()

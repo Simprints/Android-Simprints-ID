@@ -8,7 +8,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.setup.LocationStore
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
@@ -76,8 +76,8 @@ class OrchestratorManagerImplTest {
 
     private val appEnrolRequest = AppEnrolRequest(
         projectId = "some_project_id",
-        userId = "some_user_id".asTokenizedRaw(),
-        moduleId = "some_module_id".asTokenizedRaw(),
+        userId = "some_user_id".asTokenizableRaw(),
+        moduleId = "some_module_id".asTokenizableRaw(),
         metadata = "{\"key\": \"some_metadata\"}"
     )
 
