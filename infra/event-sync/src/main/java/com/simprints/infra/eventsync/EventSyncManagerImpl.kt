@@ -42,7 +42,6 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val tokenizationManager: TokenizationManager,
     private val configService: ConfigService,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {

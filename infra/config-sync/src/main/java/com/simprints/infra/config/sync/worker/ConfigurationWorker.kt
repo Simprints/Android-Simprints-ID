@@ -17,8 +17,7 @@ internal class ConfigurationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val authStore: AuthStore,
-    private val configManager: ConfigManager,
-    private val eventRepository: EventRepository,
+    private val configManager: ConfigManager
 ) : CoroutineWorker(context, params) {
 
     private val tag = ConfigurationWorker::class.java.name
