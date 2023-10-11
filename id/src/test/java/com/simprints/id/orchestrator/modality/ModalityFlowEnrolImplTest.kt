@@ -233,7 +233,7 @@ class ModalityFlowEnrolImplTest {
             mockk()
         )
 
-        verify(exactly = 1) { fingerprintStepProcessor.buildStepToMatch(any(), any()) }
+        verify(exactly = 1) { fingerprintStepProcessor.buildStepToMatch(any(), any(), any()) }
     }
 
     @Test

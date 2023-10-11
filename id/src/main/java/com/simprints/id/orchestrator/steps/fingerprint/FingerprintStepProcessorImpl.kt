@@ -1,9 +1,15 @@
 package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
+import android.os.Parcelable
+import com.simprints.core.domain.common.FlowProvider
+import com.simprints.face.matcher.FingerprintMatchResult
+import com.simprints.face.matcher.MatchContract
+import com.simprints.face.matcher.MatchParams
+import com.simprints.face.matcher.screen.MatchWrapperActivity
+import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
@@ -17,6 +23,7 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import javax.inject.Inject
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult as FingerprintMatchResponseResult
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY as RESPONSE_BUNDLE_KEY
 
 class FingerprintStepProcessorImpl @Inject constructor(
@@ -24,40 +31,61 @@ class FingerprintStepProcessorImpl @Inject constructor(
 ) : FingerprintStepProcessor {
 
     companion object {
+        const val MATCHER_ACTIVITY_NAME = "com.simprints.face.matcher.screen.MatchWrapperActivity"
         const val ACTIVITY_CLASS_NAME =
             "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
     }
 
-    override suspend fun buildStepToCapture(): Step = buildStep(
-        CAPTURE,
-        FingerprintCaptureRequest(fingerprintsToCapture = configManager.getProjectConfiguration().fingerprint!!.fingersToCapture)
+    override suspend fun buildStepToCapture(): Step = Step(
+        requestCode = CAPTURE.value,
+        activityName = ACTIVITY_CLASS_NAME,
+        bundleKey = IFingerprintRequest.BUNDLE_KEY,
+        payloadType = Step.PayloadType.REQUEST,
+        payload = FingerprintCaptureRequest(fingerprintsToCapture = configManager.getProjectConfiguration().fingerprint!!.fingersToCapture),
+        status = NOT_STARTED
     )
 
     override fun buildStepToMatch(
         probeSamples: List<FingerprintCaptureSample>,
-        query: SubjectQuery
-    ): Step = buildStep(MATCH, FingerprintMatchRequest(probeSamples, query))
-
-    private fun buildStep(requestCode: FingerprintRequestCode, request: FingerprintRequest): Step {
-        return Step(
-            requestCode = requestCode.value,
-            activityName = ACTIVITY_CLASS_NAME,
-            bundleKey = IFingerprintRequest.BUNDLE_KEY,
-            payloadType = Step.PayloadType.REQUEST,
-            payload = request,
-            status = NOT_STARTED
-        )
-    }
+        query: SubjectQuery,
+        flowType: FlowProvider.FlowType,
+    ): Step = Step(
+        requestCode = MATCH.value,
+        activityName = MATCHER_ACTIVITY_NAME,
+        bundleKey = MatchWrapperActivity.MATCHER_ARGS_EXTRA,
+        payloadType = Step.PayloadType.BUNDLE,
+        payload = MatchContract.getArgs(
+            fingerprintSamples = probeSamples.map { sample ->
+                MatchParams.FingerprintSample(
+                    sample.fingerIdentifier.fromDomainToModuleApi(),
+                    sample.format,
+                    sample.template,
+                )
+            },
+            flowType = flowType,
+            subjectQuery = query,
+        ),
+        status = NOT_STARTED
+    )
 
     override fun processResult(
         requestCode: Int,
         resultCode: Int,
         data: Intent?
-    ): FingerprintResponse? =
-        if (isFingerprintResult(requestCode)) {
-            data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)?.fromModuleApiToDomain()
-        } else {
-            null
+    ): FingerprintResponse? {
+        if (!isFingerprintResult(requestCode)) {
+            return null
         }
+
+        if (data?.extras?.containsKey(MatchContract.RESULT) == true) {
+            return when (val result = data.getParcelableExtra<Parcelable>(MatchContract.RESULT)) {
+                is FingerprintMatchResult -> FingerprintMatchResponse(result.results.map { FingerprintMatchResponseResult(it.guid, it.confidence) })
+                else -> null
+            }
+        }
+
+        // TODO handle capture result after refactoring
+        return data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)?.fromModuleApiToDomain()
+    }
 
 }

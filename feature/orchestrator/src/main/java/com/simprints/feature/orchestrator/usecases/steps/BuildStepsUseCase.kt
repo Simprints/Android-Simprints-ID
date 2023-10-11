@@ -6,7 +6,7 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.configuration.FaceConfigurationContract
-import com.simprints.face.matcher.FaceMatchContract
+import com.simprints.face.matcher.MatchContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
@@ -93,9 +93,9 @@ internal class BuildStepsUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         projectId: String,
         deviceId: String,
-    ): List<Step> = projectConfiguration.general.modalities.map {
+    ): List<Step> = projectConfiguration.general.modalities.mapNotNull {
         when (it) {
-            Modality.FINGERPRINT -> TODO("Fingerprint modality is not supported yet")
+            Modality.FINGERPRINT -> null
 
             Modality.FACE -> Step(
                 id = StepId.FACE_CONFIGURATION,
@@ -148,7 +148,7 @@ internal class BuildStepsUseCase @Inject constructor(
             Modality.FACE -> Step(
                 id = StepId.FACE_MATCHER,
                 navigationActionId = R.id.action_orchestratorFragment_to_faceMatcher,
-                destinationId = FaceMatchContract.DESTINATION,
+                destinationId = MatchContract.DESTINATION,
                 payload = MatchStepStubPayload.asBundle(flowType, subjectQuery),
             )
         }
