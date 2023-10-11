@@ -1,12 +1,18 @@
 package com.simprints.clientapi.activities.baserequest
 
-import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.EnrolRequest
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -51,11 +57,12 @@ class RequestPresenterTest {
             }
 
             val presenter = ImplRequestPresenter(
-                mockk(relaxed = true),
-                clientApiSessionEventsManagerMock,
-                mockk(relaxed = true),
-                mockk(relaxed = true),
-                mockk(relaxed = true)
+                view = mockk(relaxed = true),
+                clientApiSessionEventsManager = clientApiSessionEventsManagerMock,
+                rootManager = mockk(relaxed = true),
+                configManager = mockk(relaxed = true),
+                sessionEventsManager = mockk(relaxed = true),
+                tokenizationManager = mockk(relaxed = true)
             )
             presenter.validateAndSendRequest(requestBuilder)
 
@@ -79,11 +86,12 @@ class RequestPresenterTest {
             }
 
             val presenter = ImplRequestPresenter(
-                mockk(relaxed = true),
-                clientApiSessionEventsManagerMock,
-                mockk(relaxed = true),
-                mockk(relaxed = true),
-                mockk(relaxed = true)
+                view = mockk(relaxed = true),
+                clientApiSessionEventsManager = clientApiSessionEventsManagerMock,
+                rootManager = mockk(relaxed = true),
+                configManager = mockk(relaxed = true),
+                sessionEventsManager = mockk(relaxed = true),
+                tokenizationManager = mockk(relaxed = true)
             )
             presenter.validateAndSendRequest(requestBuilder)
 
@@ -99,11 +107,12 @@ class RequestPresenterTest {
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
         val presenter = ImplRequestPresenter(
-            mockView,
-            mockk(relaxed = true),
-            mockDeviceManager,
-            mockk(relaxed = true),
-            mockk(relaxed = true)
+            view = mockView,
+            clientApiSessionEventsManager = mockk(relaxed = true),
+            rootManager = mockDeviceManager,
+            configManager = mockk(relaxed = true),
+            sessionEventsManager = mockk(relaxed = true),
+            tokenizationManager = mockk(relaxed = true)
         )
 
         presenter.start()
@@ -118,13 +127,15 @@ class ImplRequestPresenter(
     clientApiSessionEventsManager: ClientApiSessionEventsManager,
     rootManager: SecurityManager,
     configManager: ConfigManager,
-    sessionEventsManager: ClientApiSessionEventsManager
+    sessionEventsManager: ClientApiSessionEventsManager,
+    tokenizationManager: TokenizationManager
 ) : RequestPresenter(
     view = view,
     eventsManager = clientApiSessionEventsManager,
     rootManager = rootManager,
     configManager = configManager,
-    sessionEventsManager = sessionEventsManager
+    sessionEventsManager = sessionEventsManager,
+    tokenizationManager = tokenizationManager
 ) {
 
     override suspend fun start() {

@@ -45,7 +45,7 @@ class CommCarePresenter @AssistedInject constructor(
     private val jsonHelper: JsonHelper,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val timeHelper: ClientApiTimeHelper,
-    private val tokenizationManager: TokenizationManager,
+    tokenizationManager: TokenizationManager,
     rootManager: SecurityManager,
     configManager: ConfigManager,
     @Assisted private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Default),

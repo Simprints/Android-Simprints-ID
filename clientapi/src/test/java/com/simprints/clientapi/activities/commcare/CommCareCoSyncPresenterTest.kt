@@ -729,16 +729,17 @@ class CommCareCoSyncPresenterTest {
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
         configManager: ConfigManager = mockk(),
     ): CommCarePresenter = CommCarePresenter(
-        view,
-        action,
-        clientApiSessionEventsManager,
-        sharedPreferencesManager,
-        jsonHelper,
-        enrolmentRecordManager,
-        mockTimeHelper(),
-        mockk(),
-        configManager,
-        coroutineScope
+        view = view,
+        action = action,
+        sessionEventsManager = clientApiSessionEventsManager,
+        sharedPreferencesManager = sharedPreferencesManager,
+        jsonHelper = jsonHelper,
+        enrolmentRecordManager = enrolmentRecordManager,
+        timeHelper = mockTimeHelper(),
+        tokenizationManager = tokenizationManagerMock,
+        rootManager = mockk(),
+        configManager = configManager,
+        coroutineScope = coroutineScope,
     )
 
     private val sessionCaptureEvent = SessionCaptureEvent(
