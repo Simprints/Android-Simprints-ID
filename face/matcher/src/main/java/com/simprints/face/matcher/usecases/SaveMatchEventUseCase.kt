@@ -2,8 +2,9 @@ package com.simprints.face.matcher.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.FlowProvider
-import com.simprints.face.matcher.FaceMatchParams
+import com.simprints.face.matcher.MatchParams
 import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.face.matcher.MatchResultItem
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.MatchEntry
@@ -21,17 +22,17 @@ internal class SaveMatchEventUseCase @Inject constructor(
     operator fun invoke(
         startTime: Long,
         endTime: Long,
-        faceRequest: FaceMatchParams,
+        matchParams: MatchParams,
         candidatesCount: Int,
-        faceMatcherName: String,
-        results: List<FaceMatchResult.Item>
+        matcherName: String,
+        results: List<MatchResultItem>
     ) {
         externalScope.launch {
             val matchEntries = results.map { MatchEntry(it.guid, it.confidence) }
-            val event = if (faceRequest.flowType == FlowProvider.FlowType.VERIFY) {
-                getOneToOneEvent(startTime, endTime, faceMatcherName, faceRequest.queryForCandidates, matchEntries.firstOrNull())
+            val event = if (matchParams.flowType == FlowProvider.FlowType.VERIFY) {
+                getOneToOneEvent(startTime, endTime, matcherName, matchParams.queryForCandidates, matchEntries.firstOrNull())
             } else {
-                getOneToManyEvent(startTime, endTime, faceMatcherName, faceRequest.queryForCandidates, candidatesCount, matchEntries)
+                getOneToManyEvent(startTime, endTime, matcherName, matchParams.queryForCandidates, candidatesCount, matchEntries)
             }
             eventRepository.addOrUpdateEvent(event)
         }

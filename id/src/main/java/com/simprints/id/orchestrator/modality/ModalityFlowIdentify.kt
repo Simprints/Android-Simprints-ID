@@ -66,11 +66,13 @@ class ModalityFlowIdentify @Inject constructor(
                 resultCode,
                 data
             )
+
             isFaceResult(requestCode) -> faceStepProcessor.processResult(
                 requestCode,
                 resultCode,
                 data
             )
+
             else -> throw IllegalStateException("Invalid result from intent")
         }
 
@@ -125,11 +127,8 @@ class ModalityFlowIdentify @Inject constructor(
         }
 
 
-    private fun addMatchingStepForFinger(
-        probeSamples: List<FingerprintCaptureSample>,
-        query: SubjectQuery
-    ) {
-        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
+    private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery) {
+        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query, FlowProvider.FlowType.IDENTIFY))
     }
 
     private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectQuery) {

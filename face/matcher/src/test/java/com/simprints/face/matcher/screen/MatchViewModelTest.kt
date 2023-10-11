@@ -1,0 +1,161 @@
+package com.simprints.face.matcher.screen
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.google.common.truth.Truth.assertThat
+import com.jraska.livedata.test
+import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.face.matcher.FingerprintMatchResult
+import com.simprints.face.matcher.MatchParams
+import com.simprints.face.matcher.usecases.FaceMatcherUseCase
+import com.simprints.face.matcher.usecases.FingerprintMatcherUseCase
+import com.simprints.face.matcher.usecases.SaveMatchEventUseCase
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.livedata.getOrAwaitValue
+import io.mockk.CapturingSlot
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coJustRun
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import java.util.UUID
+import kotlin.random.Random
+
+internal class MatchViewModelTest {
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+
+    @MockK
+    lateinit var faceMatcherUseCase: FaceMatcherUseCase
+
+    @MockK
+    lateinit var fingerprintMatcherUseCase: FingerprintMatcherUseCase
+
+    @MockK
+    lateinit var saveMatchEvent: SaveMatchEventUseCase
+
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+    private lateinit var cb1: CapturingSlot<(String) -> Unit>
+    private lateinit var cb2: CapturingSlot<(String) -> Unit>
+
+    private lateinit var viewModel: MatchViewModel
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        cb1 = slot()
+        cb2 = slot()
+
+        every { timeHelper.now() } returns 0
+        every { faceMatcherUseCase.matcherName } returns MATCHER_NAME
+        every { fingerprintMatcherUseCase.matcherName } returns MATCHER_NAME
+
+        viewModel = MatchViewModel(faceMatcherUseCase, fingerprintMatcherUseCase, saveMatchEvent, timeHelper)
+    }
+
+    @Test
+    fun `Handle face match request correctly`() = runTest {
+        val responseItems = listOf(
+            FaceMatchResult.Item("1", 90f),
+            FaceMatchResult.Item("1", 80f),
+            FaceMatchResult.Item("1", 55f),
+            FaceMatchResult.Item("1", 40f),
+            FaceMatchResult.Item("1", 36f),
+            FaceMatchResult.Item("1", 20f),
+            FaceMatchResult.Item("1", 10f),
+        )
+
+        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1), capture(cb2)) } answers {
+            cb1.captured.invoke("tag1")
+            cb2.captured.invoke("tag2")
+            responseItems
+        }
+        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
+
+        val states = viewModel.matchState.test()
+        viewModel.setupMatch(MatchParams(
+            probeFaceSamples = listOf(getFaceSample()),
+            flowType = FlowProvider.FlowType.ENROL,
+            queryForCandidates = mockk {}
+        ))
+
+        assertThat(states.valueHistory()).isEqualTo(listOf(
+            MatchViewModel.MatchState.NotStarted,
+            MatchViewModel.MatchState.LoadingCandidates,
+            MatchViewModel.MatchState.Matching,
+            MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1)
+        ))
+        assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
+            FaceMatchResult(responseItems)
+        )
+
+        verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
+    }
+
+    @Test
+    fun `Handle fingerprint match request correctly`() = runTest {
+        val responseItems = listOf(
+            FingerprintMatchResult.Item("1", 90f),
+            FingerprintMatchResult.Item("1", 80f),
+            FingerprintMatchResult.Item("1", 55f),
+            FingerprintMatchResult.Item("1", 40f),
+            FingerprintMatchResult.Item("1", 36f),
+            FingerprintMatchResult.Item("1", 20f),
+            FingerprintMatchResult.Item("1", 10f),
+        )
+
+        coEvery { fingerprintMatcherUseCase.invoke(any(), capture(cb1), capture(cb2)) } answers {
+            cb1.captured.invoke("tag1")
+            cb2.captured.invoke("tag2")
+            responseItems
+        }
+        coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
+
+        val states = viewModel.matchState.test()
+
+        viewModel.setupMatch(MatchParams(
+            probeFingerprintSamples = listOf(getFingerprintSample()),
+            flowType = FlowProvider.FlowType.ENROL,
+            queryForCandidates = mockk {}
+        ))
+
+        assertThat(states.valueHistory()).isEqualTo(listOf(
+            MatchViewModel.MatchState.NotStarted,
+            MatchViewModel.MatchState.LoadingCandidates,
+            MatchViewModel.MatchState.Matching,
+            MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1)
+        ))
+        assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
+            FingerprintMatchResult(responseItems)
+        )
+
+        verify { saveMatchEvent.invoke(any(), any(), any(), eq(7), eq(MATCHER_NAME), any()) }
+    }
+
+    private fun getFaceSample(): MatchParams.FaceSample =
+        MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
+
+    private fun getFingerprintSample(): MatchParams.FingerprintSample =
+        MatchParams.FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, "format", Random.nextBytes(20))
+
+    companion object {
+        const val MATCHER_NAME = "any matcher"
+    }
+}

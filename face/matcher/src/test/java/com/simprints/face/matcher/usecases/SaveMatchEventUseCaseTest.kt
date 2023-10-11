@@ -2,8 +2,8 @@ package com.simprints.face.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowProvider
-import com.simprints.face.matcher.FaceMatchParams
 import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.face.matcher.MatchParams
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
@@ -48,10 +48,9 @@ class SaveMatchEventUseCaseTest {
         useCase.invoke(
             1L,
             2L,
-            FaceMatchParams(
-                emptyList(),
-                FlowProvider.FlowType.VERIFY,
-                SubjectQuery(subjectId = "subjectId"),
+            MatchParams(
+                flowType = FlowProvider.FlowType.VERIFY,
+                queryForCandidates = SubjectQuery(subjectId = "subjectId"),
             ),
             2,
             "faceMatcherName",
@@ -80,7 +79,8 @@ class SaveMatchEventUseCaseTest {
         useCase.invoke(
             1L,
             2L,
-            FaceMatchParams(
+            MatchParams(
+                emptyList(),
                 emptyList(),
                 FlowProvider.FlowType.IDENTIFY,
                 SubjectQuery(),
@@ -111,10 +111,9 @@ class SaveMatchEventUseCaseTest {
         useCase.invoke(
             1L,
             2L,
-            FaceMatchParams(
-                emptyList(),
-                FlowProvider.FlowType.IDENTIFY,
-                SubjectQuery(attendantId = "userId"),
+            MatchParams(
+                flowType = FlowProvider.FlowType.IDENTIFY,
+                queryForCandidates = SubjectQuery(attendantId = "userId"),
             ),
             0,
             "faceMatcherName",
@@ -135,10 +134,9 @@ class SaveMatchEventUseCaseTest {
         useCase.invoke(
             1L,
             2L,
-            FaceMatchParams(
-                emptyList(),
-                FlowProvider.FlowType.IDENTIFY,
-                SubjectQuery(moduleId = "moduleId"),
+            MatchParams(
+                flowType = FlowProvider.FlowType.IDENTIFY,
+                queryForCandidates = SubjectQuery(moduleId = "moduleId"),
             ),
             0,
             "faceMatcherName",
@@ -158,10 +156,10 @@ class SaveMatchEventUseCaseTest {
         useCase.invoke(
             1L,
             2L,
-            FaceMatchParams(
+            MatchParams(
                 emptyList(),
-                FlowProvider.FlowType.IDENTIFY,
-                SubjectQuery()
+                flowType = FlowProvider.FlowType.IDENTIFY,
+                queryForCandidates = SubjectQuery()
             ),
             0,
             "faceMatcherName",

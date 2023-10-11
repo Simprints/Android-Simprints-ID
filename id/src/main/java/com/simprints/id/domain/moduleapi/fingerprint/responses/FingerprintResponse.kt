@@ -18,7 +18,6 @@ interface FingerprintResponse : Parcelable, Result {
 @ExcludedFromGeneratedTestCoverageReports("Deprecated code")
 fun IFingerprintResponse.fromModuleApiToDomain(): FingerprintResponse? = when (type) {
     IFingerprintResponseType.CAPTURE -> (this as IFingerprintCaptureResponse).fromModuleApiToDomain()
-    IFingerprintResponseType.MATCH -> (this as IFingerprintMatchResponse).fromModuleApiToDomain()
     IFingerprintResponseType.REFUSAL -> (this as IFingerprintExitFormResponse).fromModuleApiToDomain()
     IFingerprintResponseType.ERROR -> (this as IFingerprintErrorResponse).fromModuleApiToDomain()
     else -> null

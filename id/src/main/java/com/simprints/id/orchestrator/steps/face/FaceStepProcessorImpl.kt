@@ -9,10 +9,10 @@ import com.simprints.face.capture.screens.FaceCaptureWrapperActivity
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
-import com.simprints.face.matcher.FaceMatchContract
-import com.simprints.face.matcher.FaceMatchParams
+import com.simprints.face.matcher.MatchContract
+import com.simprints.face.matcher.MatchParams
 import com.simprints.face.matcher.FaceMatchResult
-import com.simprints.face.matcher.screen.FaceMatchWrapperActivity
+import com.simprints.face.matcher.screen.MatchWrapperActivity
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
@@ -29,6 +29,7 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import javax.inject.Inject
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult as FaceMatchResponseResult
 
 class FaceStepProcessorImpl @Inject constructor(
     private val configManager: ConfigManager,
@@ -36,7 +37,7 @@ class FaceStepProcessorImpl @Inject constructor(
 
     companion object {
         const val CONFIGURATION_ACTIVITY_NAME = "com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity"
-        const val MATCHER_ACTIVITY_NAME = "com.simprints.face.matcher.screen.FaceMatchWrapperActivity"
+        const val MATCHER_ACTIVITY_NAME = "com.simprints.face.matcher.screen.MatchWrapperActivity"
         const val CAPTURE_ACTIVITY_NAME = "com.simprints.face.capture.screens.FaceCaptureWrapperActivity"
     }
 
@@ -58,9 +59,13 @@ class FaceStepProcessorImpl @Inject constructor(
     ): Step = Step(
         requestCode = MATCH.value,
         activityName = MATCHER_ACTIVITY_NAME,
-        bundleKey = FaceMatchWrapperActivity.FACE_MATCHER_ARGS_EXTRA,
+        bundleKey = MatchWrapperActivity.MATCHER_ARGS_EXTRA,
         payloadType = Step.PayloadType.BUNDLE,
-        payload = FaceMatchContract.getArgs(probeFaceSample.map { FaceMatchParams.Sample(it.faceId, it.template) }, flowType, query),
+        payload = MatchContract.getArgs(
+            faceSamples = probeFaceSample.map { MatchParams.FaceSample(it.faceId, it.template) },
+            flowType = flowType,
+            subjectQuery = query,
+        ),
         status = Step.Status.NOT_STARTED
     )
 
@@ -89,9 +94,9 @@ class FaceStepProcessorImpl @Inject constructor(
             return res
         }
 
-        if (data?.extras?.containsKey(FaceMatchContract.RESULT) == true) {
-            return when (val result = data.getParcelableExtra<Parcelable>(FaceMatchContract.RESULT)) {
-                is FaceMatchResult -> FaceMatchResponse(result.results.map { it.fromModuleApiToDomain() })
+        if (data?.extras?.containsKey(MatchContract.RESULT) == true) {
+            return when (val result = data.getParcelableExtra<Parcelable>(MatchContract.RESULT)) {
+                is FaceMatchResult -> FaceMatchResponse(result.results.map { FaceMatchResponseResult(it.guid, it.confidence) })
                 else -> null
             }
         }

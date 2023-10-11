@@ -9,7 +9,7 @@ import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
-import com.simprints.face.matcher.FaceMatchContract
+import com.simprints.face.matcher.MatchContract
 import com.simprints.face.matcher.FaceMatchResult
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
@@ -84,7 +84,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessFaceIdentifyResult() {
-        val matchResult = Intent().putExtra(FaceMatchContract.RESULT, FaceMatchResult(emptyList()))
+        val matchResult = Intent().putExtra(MatchContract.RESULT, FaceMatchResult(emptyList()))
         val result = faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, matchResult)
 
         assertThat(result).isInstanceOf(FaceMatchResponse::class.java)
@@ -92,7 +92,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessFaceVerifyResult() {
-        val matchResult = Intent().putExtra(FaceMatchContract.RESULT, FaceMatchResult(emptyList()))
+        val matchResult = Intent().putExtra(MatchContract.RESULT, FaceMatchResult(emptyList()))
         val result = faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, matchResult)
 
         assertThat(result).isInstanceOf(FaceMatchResponse::class.java)

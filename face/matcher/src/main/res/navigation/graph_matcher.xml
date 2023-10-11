@@ -2,14 +2,14 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/graph_face_matcher"
-    app:startDestination="@id/faceMatcherFragment">
+    app:startDestination="@id/matcherFragment">
 
     <fragment
-        android:id="@+id/faceMatcherFragment"
-        android:name="com.simprints.face.matcher.screen.FaceMatchFragment"
+        android:id="@+id/matcherFragment"
+        android:name="com.simprints.face.matcher.screen.MatchFragment"
         android:label="FaceMatcherFragment">
         <argument
             android:name="params"
-            app:argType="com.simprints.face.matcher.FaceMatchParams" />
+            app:argType="com.simprints.face.matcher.MatchParams" />
     </fragment>
 </navigation>

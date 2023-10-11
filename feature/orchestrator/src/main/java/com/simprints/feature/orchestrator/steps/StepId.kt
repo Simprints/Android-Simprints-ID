@@ -18,7 +18,6 @@ object StepId {
 
     // Face step ids
     private const val STEP_BASE_FINGERPRINT = 300
-    const val FINGERPRINT_CONFIGURATION = STEP_BASE_FINGERPRINT + 1
     const val FINGERPRINT_CAPTURE = STEP_BASE_FINGERPRINT + 2
     const val FINGERPRINT_MATCHER = STEP_BASE_FINGERPRINT + 3
 

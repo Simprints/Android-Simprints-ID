@@ -2,6 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
-        <activity android:name="com.simprints.face.matcher.screen.FaceMatchWrapperActivity" />
+        <activity android:name="com.simprints.face.matcher.screen.MatchWrapperActivity" />
     </application>
 </manifest>
