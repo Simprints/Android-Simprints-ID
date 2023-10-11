@@ -5,7 +5,7 @@ import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import io.mockk.every
 import io.mockk.mockk
@@ -32,7 +32,7 @@ class RecentUserActivityLocalSourceImplTest {
 
     @Test
     fun `should clear the old activity before returning the recent user activity`() = runTest {
-        val user = "user".asTokenizedEncrypted()
+        val user = "user".asTokenizableEncrypted()
         every { timeHelper.now() } returns 20000
         recentUserActivityLocalSourceImpl.updateRecentUserActivity {
             it.apply {
@@ -49,7 +49,7 @@ class RecentUserActivityLocalSourceImplTest {
 
     @Test
     fun `should clear the old activity before updating the recent user activity`() = runTest {
-        val user = "user".asTokenizedEncrypted()
+        val user = "user".asTokenizableEncrypted()
         every { timeHelper.now() } returnsMany listOf(0, 11000)
         every { timeHelper.tomorrowInMillis() } returns 20000
         recentUserActivityLocalSourceImpl.updateRecentUserActivity {

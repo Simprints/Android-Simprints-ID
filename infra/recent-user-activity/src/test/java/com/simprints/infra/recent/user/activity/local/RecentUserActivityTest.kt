@@ -1,7 +1,7 @@
 package com.simprints.infra.recent.user.activity.local
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.recent.user.activity.ProtoRecentUserActivity
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import org.junit.Test
@@ -12,7 +12,7 @@ class RecentUserActivityTest {
         private val recentUserActivity = RecentUserActivity(
             "version",
             "scanner",
-            "user".asTokenizedEncrypted(),
+            "user".asTokenizableEncrypted(),
             10,
             20,
             30,
