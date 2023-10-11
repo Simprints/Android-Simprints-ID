@@ -12,8 +12,14 @@ import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -36,6 +42,9 @@ class EnrolmentHelperImplTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
+    @MockK
+    lateinit var subjectFactory: SubjectFactory
+
     private lateinit var enrolmentHelper: EnrolmentHelper
     private val personCreationEvent = createPersonCreationEvent()
 
@@ -46,7 +55,8 @@ class EnrolmentHelperImplTest {
         enrolmentHelper = EnrolmentHelperImpl(
             enrolmentRecordManager = enrolmentRecordManager,
             eventRepository = eventRepository,
-            timeHelper = timeHelper
+            timeHelper = timeHelper,
+            subjectFactory = subjectFactory
         )
         every { timeHelper.now() } returns CREATED_AT
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createSessionCaptureEvent()

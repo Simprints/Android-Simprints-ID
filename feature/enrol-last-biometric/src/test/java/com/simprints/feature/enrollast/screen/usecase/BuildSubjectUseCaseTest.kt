@@ -8,6 +8,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -22,12 +23,15 @@ class BuildSubjectUseCaseTest {
 
     private lateinit var useCase: BuildSubjectUseCase
 
+    @MockK
+    lateinit var subjectFactory: SubjectFactory
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() }.returns(1L)
 
-        useCase = BuildSubjectUseCase(timeHelper)
+        useCase = BuildSubjectUseCase(timeHelper = timeHelper, subjectFactory = subjectFactory)
     }
 
     @Test
