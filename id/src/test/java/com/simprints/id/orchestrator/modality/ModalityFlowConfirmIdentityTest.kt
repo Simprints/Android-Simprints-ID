@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
@@ -39,6 +40,7 @@ class ModalityFlowConfirmIdentityTest {
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
             sessionId = GUID1,
+            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
             selectedGuid = GUID2
         )
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain())
@@ -53,6 +55,7 @@ class ModalityFlowConfirmIdentityTest {
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
             sessionId = GUID1,
+            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
             selectedGuid = GUID2
         )
         val step = mockk<Step>()
@@ -72,6 +75,7 @@ class ModalityFlowConfirmIdentityTest {
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
             sessionId = GUID1,
+            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
             selectedGuid = GUID2
         )
         val step = mockk<Step>()
