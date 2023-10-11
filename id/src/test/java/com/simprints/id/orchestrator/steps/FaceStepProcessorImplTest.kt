@@ -9,8 +9,8 @@ import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.face.configuration.FaceConfigurationResult
-import com.simprints.face.matcher.MatchContract
-import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.matcher.MatchContract
+import com.simprints.matcher.FaceMatchResult
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceConfigurationResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse

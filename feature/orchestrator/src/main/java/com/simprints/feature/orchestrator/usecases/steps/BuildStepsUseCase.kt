@@ -6,7 +6,7 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.configuration.FaceConfigurationContract
-import com.simprints.face.matcher.MatchContract
+import com.simprints.matcher.MatchContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract

@@ -65,7 +65,6 @@ include(
 include(
     ":face:configuration",
     ":face:capture",
-    ":face:matcher",
     ":face:infra:face-bio-sdk",
     ":face:infra:roc-wrapper",
 )
@@ -90,6 +89,7 @@ include(
     ":feature:exit-form",
     ":feature:consent",
     ":feature:setup",
+    ":feature:matcher",
 )
 
 // Infra modules

@@ -19,10 +19,10 @@ dependencies {
     implementation(project(":feature:fetch-subject"))
     implementation(project(":feature:select-subject"))
     implementation(project(":feature:exit-form"))
+    implementation(project(":feature:matcher"))
 
     implementation(project(":face:configuration"))
     implementation(project(":face:capture"))
-    implementation(project(":face:matcher"))
 
     implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:enrolment-records"))

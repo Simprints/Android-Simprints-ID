@@ -65,11 +65,11 @@ dependencies {
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:consent"))
+    implementation(project(":feature:matcher"))
 
     implementation(project(":fingerprint:controller"))
     implementation(project(":face:capture"))
     implementation(project(":face:configuration"))
-    implementation(project(":face:matcher"))
 
     implementation(project(":infra:config"))
     implementation(project(":infra:enrolment-records"))

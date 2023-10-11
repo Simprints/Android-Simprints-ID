@@ -4,7 +4,7 @@ import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.screens.FaceCaptureWrapperActivity
 import com.simprints.face.configuration.screen.FaceConfigurationWrapperActivity
-import com.simprints.face.matcher.screen.MatchWrapperActivity
+import com.simprints.matcher.screen.MatchWrapperActivity
 import com.simprints.feature.consent.screens.ConsentWrapperActivity
 import com.simprints.feature.enrollast.EnrolLastBiometricWrapperActivity
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
