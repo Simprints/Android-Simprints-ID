@@ -3,7 +3,7 @@ package com.simprints.feature.dashboard.main.sync
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
@@ -52,7 +52,7 @@ class SyncViewModelTest {
         private const val DATE = "2022-10-10"
         private val deviceConfiguration = DeviceConfiguration(
             language = "",
-            selectedModules = listOf("module 1".asTokenizedEncrypted()),
+            selectedModules = listOf("module 1".asTokenizableEncrypted()),
             lastInstructionId = ""
         )
     }

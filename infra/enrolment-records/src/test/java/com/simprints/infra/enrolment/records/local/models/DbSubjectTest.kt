@@ -3,7 +3,7 @@ package com.simprints.infra.enrolment.records.local.models
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Test
@@ -16,8 +16,8 @@ class DbSubjectTest {
     companion object {
         private const val GUID = "3f0f8e9a-0a0c-456c-846e-577b1440b6fb"
         private const val PROJECT_ID = "projectId"
-        private val ATTENDANT_ID = "user1".asTokenizedEncrypted()
-        private val MODULE_ID = "module".asTokenizedEncrypted()
+        private val ATTENDANT_ID = "user1".asTokenizableEncrypted()
+        private val MODULE_ID = "module".asTokenizableEncrypted()
     }
 
     @Test

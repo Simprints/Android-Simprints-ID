@@ -1,7 +1,7 @@
 package com.simprints.infra.recent.user.activity.local
 
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.infra.recent.user.activity.ProtoRecentUserActivity
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -22,7 +22,7 @@ internal fun RecentUserActivity.toProto(): ProtoRecentUserActivity {
 
 internal fun ProtoRecentUserActivity.toDomain(): RecentUserActivity {
     val lastUserUsed =
-        if (isUserIdTokenized) lastUserUsed.asTokenizedEncrypted() else lastUserUsed.asTokenizedRaw()
+        if (isUserIdTokenized) lastUserUsed.asTokenizableEncrypted() else lastUserUsed.asTokenizableRaw()
     return RecentUserActivity(
         lastScannerVersion = lastScannerVersion,
         lastScannerUsed = lastScannerUsed,
