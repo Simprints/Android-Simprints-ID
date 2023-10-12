@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
@@ -14,7 +15,46 @@ import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayloa
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EventPayload
-import com.simprints.infra.events.event.domain.models.EventType.*
+import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
+import com.simprints.infra.events.event.domain.models.EventType.ARTIFICIAL_TERMINATION
+import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
+import com.simprints.infra.events.event.domain.models.EventType.AUTHORIZATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_IDENTIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_REFUSAL
+import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_ENROLMENT
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_VERIFICATION
+import com.simprints.infra.events.event.domain.models.EventType.CANDIDATE_READ
+import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
+import com.simprints.infra.events.event.domain.models.EventType.CONNECTIVITY_SNAPSHOT
+import com.simprints.infra.events.event.domain.models.EventType.CONSENT
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V1
+import com.simprints.infra.events.event.domain.models.EventType.ENROLMENT_V2
+import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
+import com.simprints.infra.events.event.domain.models.EventType.FACE_FALLBACK_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
+import com.simprints.infra.events.event.domain.models.EventType.FINGERPRINT_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.FINGERPRINT_CAPTURE_BIOMETRICS
+import com.simprints.infra.events.event.domain.models.EventType.GUID_SELECTION
+import com.simprints.infra.events.event.domain.models.EventType.INTENT_PARSING
+import com.simprints.infra.events.event.domain.models.EventType.INVALID_INTENT
+import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_MANY_MATCH
+import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_ONE_MATCH
+import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
+import com.simprints.infra.events.event.domain.models.EventType.REFUSAL
+import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTION
+import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
+import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
+import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent.InvalidIntentPayload
@@ -48,7 +88,11 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayload
-import com.simprints.infra.eventsync.event.remote.models.face.*
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureBiometricsPayload
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConfirmationPayload
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceFallbackCapturePayload
+import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceOnboardingCompletePayload
 import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionCapturePayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
@@ -89,7 +133,11 @@ internal abstract class ApiEventPayload(
     val type: ApiEventPayloadType,
     open val version: Int,
     open val startTime: Long
-)
+) {
+
+    abstract fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String?
+
+}
 
 internal fun EventPayload.fromDomainToApi(): ApiEventPayload =
     when (this.type) {

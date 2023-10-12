@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent.OneToOneMatchPayload
 
 @Keep
@@ -27,5 +28,8 @@ internal data class ApiOneToOneMatchPayload(
             domainPayload.result?.let { ApiMatchEntry(it) },
             domainPayload.fingerComparisonStrategy?.fromDomainToApi()
         )
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }
 

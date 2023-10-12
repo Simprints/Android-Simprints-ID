@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.callout
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent.ConfirmationCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent.EnrolmentCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
@@ -63,4 +64,10 @@ internal data class ApiCalloutPayload(
             domainPayload.moduleId.value,
             domainPayload.metadata,
             domainPayload.sessionId))
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
+        TokenKeyType.AttendantId -> "callout.userId"
+        TokenKeyType.ModuleId -> "callout.moduleId"
+        TokenKeyType.Unknown -> null
+    }
 }
