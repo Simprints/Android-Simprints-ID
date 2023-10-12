@@ -2,7 +2,7 @@ package com.simprints.infra.enrolment.records.local
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
@@ -238,8 +238,8 @@ class SubjectLocalDataSourceImplTest {
         Subject(
             subjectId = patientId,
             projectId = projectId,
-            attendantId = userId.asTokenizedRaw(),
-            moduleId = moduleId.asTokenizedRaw(),
+            attendantId = userId.asTokenizableRaw(),
+            moduleId = moduleId.asTokenizableRaw(),
             faceSamples = faceSamples.toList()
         )
 }

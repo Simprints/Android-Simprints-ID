@@ -5,7 +5,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.ConfigService
@@ -33,7 +33,7 @@ import org.junit.Test
 class EventDownSyncWorkersBuilderTest {
 
     companion object {
-        private val SELECTED_MODULE = listOf("MODULE_1".asTokenizedEncrypted())
+        private val SELECTED_MODULE = listOf("MODULE_1".asTokenizableEncrypted())
     }
 
     @MockK

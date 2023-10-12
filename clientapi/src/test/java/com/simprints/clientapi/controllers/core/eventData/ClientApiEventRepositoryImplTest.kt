@@ -2,7 +2,7 @@ package com.simprints.clientapi.controllers.core.eventData
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -178,8 +178,8 @@ class ClientApiEventRepositoryImplTest {
             createdAt = 23,
             subjectId = "siD",
             projectId = "pId",
-            moduleId = "mId".asTokenizedRaw(),
-            attendantId = "aiD".asTokenizedRaw(),
+            moduleId = "mId".asTokenizableRaw(),
+            attendantId = "aiD".asTokenizableRaw(),
             personCreationEventId = "pCId",
             labels = EventLabels()
         ),

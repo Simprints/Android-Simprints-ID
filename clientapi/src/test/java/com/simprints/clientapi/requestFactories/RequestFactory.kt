@@ -5,15 +5,15 @@ import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import io.mockk.every
 
 abstract class RequestFactory {
 
     companion object {
         const val MOCK_PROJECT_ID = "xppPLwmR2eUmyN6LS3SN"
-        val MOCK_USER_ID = "userId".asTokenizedRaw()
-        val MOCK_MODULE_ID = "moduleId".asTokenizedRaw()
+        val MOCK_USER_ID = "userId".asTokenizableRaw()
+        val MOCK_MODULE_ID = "moduleId".asTokenizableRaw()
         const val MOCK_METADATA = ""
         const val MOCK_VERIFY_GUID = "1d3a92c1-3410-40fb-9e88-4570c9abd150"
         const val MOCK_SESSION_ID = "ddf01a3c-3081-4d3e-b872-538731517cb9"

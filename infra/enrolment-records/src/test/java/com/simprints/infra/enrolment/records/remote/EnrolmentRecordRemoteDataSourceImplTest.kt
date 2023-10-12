@@ -3,7 +3,7 @@ package com.simprints.infra.enrolment.records.remote
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.enrolment.records.domain.models.Subject
@@ -33,8 +33,8 @@ class EnrolmentRecordRemoteDataSourceImplTest {
     companion object {
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
-        private val MODULE_ID = "moduleId".asTokenizedEncrypted()
-        private val ATTENDANT_ID = "attendantId".asTokenizedEncrypted()
+        private val MODULE_ID = "moduleId".asTokenizableEncrypted()
+        private val ATTENDANT_ID = "attendantId".asTokenizableEncrypted()
         private val FINGERPRINT_TEMPLATE = byteArrayOf(1, 2, 3)
         private const val BASE64_FINGERPRINT_TEMPLATE = "base64Fingerprint"
         private val FACE_TEMPLATE = byteArrayOf(4, 5, 6)
