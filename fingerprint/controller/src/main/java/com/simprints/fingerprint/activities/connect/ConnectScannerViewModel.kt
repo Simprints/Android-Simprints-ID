@@ -26,8 +26,8 @@ import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.FingerprintConfiguration.VeroGeneration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.FingerprintConfiguration.VeroGeneration
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.MAC_ADDRESS
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties.SCANNER_ID
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag

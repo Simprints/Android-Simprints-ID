@@ -3,8 +3,8 @@ package com.simprints.feature.enrollast.screen.usecase
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.MatchResult
-import com.simprints.infra.config.domain.models.DecisionPolicy
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before

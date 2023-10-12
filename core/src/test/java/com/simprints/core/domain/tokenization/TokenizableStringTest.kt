@@ -21,24 +21,24 @@ class TokenizableStringTest {
     }
 
     @Test
-    fun `asTokenizedRaw should return TokenizedString_Raw`() {
+    fun `asTokenizableRaw should return TokenizedString_Raw`() {
         val value = "value"
-        assertThat(value.asTokenizedRaw()).isEqualTo(TokenizableString.Raw(value))
+        assertThat(value.asTokenizableRaw()).isEqualTo(TokenizableString.Raw(value))
     }
 
     @Test
-    fun `asTokenizedEncrypted should return TokenizedString_Tokenized`() {
+    fun `asTokenizableEncrypted should return TokenizedString_Tokenized`() {
         val value = "value"
-        assertThat(value.asTokenizedEncrypted()).isEqualTo(TokenizableString.Tokenized(value))
+        assertThat(value.asTokenizableEncrypted()).isEqualTo(TokenizableString.Tokenized(value))
     }
     @Test
     fun `isTokenized should return true when string is TokenizedString_Tokenized`() {
-        val value = "value".asTokenizedEncrypted()
+        val value = "value".asTokenizableEncrypted()
         assertThat(value.isTokenized()).isTrue()
     }
     @Test
     fun `isTokenized should return false when string is TokenizedString_Raw`() {
-        val value = "value".asTokenizedRaw()
+        val value = "value".asTokenizableRaw()
         assertThat(value.isTokenized()).isFalse()
     }
 }

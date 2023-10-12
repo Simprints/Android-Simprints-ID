@@ -8,13 +8,13 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.R
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.domain.models.SynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.resetThemeResources
@@ -167,7 +167,7 @@ class SyncInfoFragmentTest {
                 every { down } returns DownSynchronizationConfiguration(
                     DownSynchronizationConfiguration.PartitionType.PROJECT,
                     3,
-                    listOf("module1".asTokenizedRaw())
+                    listOf("module1".asTokenizableRaw())
                 )
             }
         })

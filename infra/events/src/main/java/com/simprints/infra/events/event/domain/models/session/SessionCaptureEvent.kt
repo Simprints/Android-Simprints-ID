@@ -2,8 +2,8 @@ package com.simprints.infra.events.event.domain.models.session
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
-import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload

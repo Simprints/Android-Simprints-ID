@@ -87,7 +87,8 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew infra:config:jacocoTestReport
+                    - ./gradlew infra:config-store:jacocoTestReport
+                    - ./gradlew infra:config-sync:jacocoTestReport
                     - ./gradlew infra:events:jacocoTestReport
                     - ./gradlew infra:enrolment-records:jacocoTestReport
                     - ./gradlew infra:auth-store:jacocoTestReport
@@ -96,7 +97,8 @@ definitions:
                     - ./gradlew infra:realm:jacocoTestReport
                     - ./gradlew infra:recent-user-activity:jacocoTestReport
                 artifacts:
-                    - infra/config/build/reports/**
+                    - infra/config-store/build/reports/**
+                    - infra/config-sync/build/reports/**
                     - infra/events/build/reports/**
                     - infra/enrolment-records/build/reports/**
                     - infra/auth-store/build/reports/**
