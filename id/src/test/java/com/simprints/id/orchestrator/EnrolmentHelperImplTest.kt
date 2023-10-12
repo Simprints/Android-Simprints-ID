@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator
 
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
@@ -192,8 +192,8 @@ class EnrolmentHelperImplTest {
             format = "ISO_19794_2"
         )
         private val projectId = "projectId"
-        private val userId = "userId".asTokenizedRaw()
-        private val moduleId = "moduleId".asTokenizedRaw()
+        private val userId = "userId".asTokenizableRaw()
+        private val moduleId = "moduleId".asTokenizableRaw()
         private val fingerprintResponse = FingerprintCaptureResponse(
             captureResult = listOf(
                 FingerprintCaptureResult(
