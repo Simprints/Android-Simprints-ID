@@ -4,7 +4,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.infra.resources.R
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
     when (this) {
@@ -24,6 +26,7 @@ fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @ColorRes
 fun CaptureState.buttonBackgroundColour(): Int =
     when (this) {
@@ -39,6 +42,7 @@ fun CaptureState.buttonBackgroundColour(): Int =
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 fun CaptureState.resultTextId(): Int =
     when (this) {
@@ -58,6 +62,7 @@ fun CaptureState.resultTextId(): Int =
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @ColorRes
 fun CaptureState.resultTextColour(): Int =
     when (this) {
