@@ -1,7 +1,6 @@
-package com.simprints.fingerprint.biosdk
+package com.simprints.fingerprint.infra.biosdk
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.data.domain.fingerprint.toInt
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
@@ -9,7 +8,7 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateMetadata
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -34,7 +33,7 @@ class SimprintsBioSdkWrapperTest {
     }
 
     @Test
-    fun testInitialize() = runTest {
+    fun `Initializes bio sdk`() = runTest {
         //When
         simprintsBioSdkWrapper.initialize()
         //Then
@@ -44,7 +43,7 @@ class SimprintsBioSdkWrapperTest {
     }
 
     @Test
-    fun testMatch() = runTest {
+    fun `Calls match on bio sdk`() = runTest {
         //Given
         val probe = mockk<FingerprintIdentity>()
         val candidates = listOf(mockk<FingerprintIdentity>())
@@ -58,17 +57,16 @@ class SimprintsBioSdkWrapperTest {
     }
 
     @Test
-    fun testAcquireFingerprintTemplate() = runTest {
+    fun `Calls fingerprint template acquisition from sdk`() = runTest {
         //Given
-        val captureFingerprintStrategy =
-            Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI.toInt()
+        val captureFingerprintStrategy = 1000
         val captureTimeOutMs = 1000
         val captureQualityThreshold = 100
 
         val bioSdkResponse = TemplateResponse(
             byteArrayOf(1, 2, 3), FingerprintTemplateMetadata(
-                "TemplateFormat", 100
-            )
+            "TemplateFormat", 100
+        )
         )
         val settingsSlot = slot<FingerprintTemplateAcquisitionSettings>()
         coEvery { bioSdk.acquireFingerprintTemplate(capture(settingsSlot)) } returns bioSdkResponse
@@ -91,7 +89,16 @@ class SimprintsBioSdkWrapperTest {
     }
 
     @Test
-    fun testAcquireFingerprintImage() = runTest {
+    fun `Fails if template does not have meta data`() = runTest {
+        coEvery { bioSdk.acquireFingerprintTemplate(any()) } returns TemplateResponse(byteArrayOf(1, 2, 3), null)
+
+        assertThrows<IllegalArgumentException> {
+            simprintsBioSdkWrapper.acquireFingerprintTemplate(1, 1, 1)
+        }
+    }
+
+    @Test
+    fun `Calls fingerprint image acquisition from sdk`() = runTest {
         //Given
         val imageBytes = byteArrayOf(1, 2, 3)
         val bioSdkResponse = ImageResponse<Unit>(imageBytes)
@@ -102,7 +109,6 @@ class SimprintsBioSdkWrapperTest {
         //Then
         coVerify { bioSdk.acquireFingerprintImage() }
         assertThat(bioSdkResponse.imageBytes).isEqualTo(response.imageBytes)
-
-
     }
+
 }

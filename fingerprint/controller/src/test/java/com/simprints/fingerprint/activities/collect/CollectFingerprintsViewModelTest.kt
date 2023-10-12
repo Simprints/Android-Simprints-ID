@@ -17,7 +17,7 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
-import com.simprints.fingerprint.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
@@ -43,6 +43,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -109,7 +110,9 @@ class CollectFingerprintsViewModelTest {
             every { scanner } returns this@CollectFingerprintsViewModelTest.scanner
             every { isScannerAvailable } returns true
         }
-        bioSdkWrapper = mockk()
+        bioSdkWrapper = mockk {
+            coJustRun { initialize() }
+        }
         vm = CollectFingerprintsViewModel(
             scannerManager,
             configManager,

@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.biosdk
+package com.simprints.fingerprint.infra.biosdk
 
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult

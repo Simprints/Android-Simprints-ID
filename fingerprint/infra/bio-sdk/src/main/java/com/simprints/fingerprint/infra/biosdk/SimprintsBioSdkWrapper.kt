@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.biosdk
+package com.simprints.fingerprint.infra.biosdk
 
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageResponse
@@ -13,7 +13,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import javax.inject.Inject
 
 
-class SimprintsBioSdkWrapper @Inject constructor(
+internal class SimprintsBioSdkWrapper @Inject constructor(
     private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings>
 ) : BioSdkWrapper {
 

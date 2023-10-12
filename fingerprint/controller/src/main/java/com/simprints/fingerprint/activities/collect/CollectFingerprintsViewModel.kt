@@ -19,7 +19,7 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
-import com.simprints.fingerprint.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
@@ -133,6 +133,7 @@ class CollectFingerprintsViewModel @Inject constructor(
 
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         runBlocking {
+            bioSdk.initialize()
             // Configuration must be initialised when start returns for UI to be initialised correctly,
             // and since fetching happens on IO thread execution must be suspended until it is available
             configuration = configManager.getProjectConfiguration().fingerprint!!
