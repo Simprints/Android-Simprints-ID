@@ -6,7 +6,9 @@ import androidx.annotation.StringRes
 import com.simprints.infra.resources.R as IDR
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
 fun FingerIdentifier.fingerDrawable(): Int =
     when (this) {
@@ -22,6 +24,7 @@ fun FingerIdentifier.fingerDrawable(): Int =
         FingerIdentifier.LEFT_5TH_FINGER -> R.drawable.hand_bb_l5_c4
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 fun FingerIdentifier.nameTextId(): Int =
     when (this) {
@@ -37,6 +40,7 @@ fun FingerIdentifier.nameTextId(): Int =
         FingerIdentifier.LEFT_5TH_FINGER -> IDR.string.l_5_finger_name
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @ColorRes
 fun FingerIdentifier.nameTextColour(): Int =

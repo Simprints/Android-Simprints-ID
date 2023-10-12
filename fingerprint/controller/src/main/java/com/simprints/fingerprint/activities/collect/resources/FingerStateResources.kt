@@ -6,12 +6,15 @@ import androidx.annotation.StringRes
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.activities.collect.state.FingerState
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.resources.R as IDR
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
 fun FingerState.indicatorDrawableId(selected: Boolean): Int =
     if (selected) indicatorSelectedDrawableId() else indicatorDeselectedDrawableId()
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
 fun FingerState.indicatorSelectedDrawableId(): Int =
     when (this.currentCapture()) {
@@ -27,6 +30,7 @@ fun FingerState.indicatorSelectedDrawableId(): Int =
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
 fun FingerState.indicatorDeselectedDrawableId(): Int =
     when (this.currentCapture()) {
@@ -42,16 +46,19 @@ fun FingerState.indicatorDeselectedDrawableId(): Int =
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @ColorRes
 fun FingerState.nameTextColour(): Int =
     IDR.color.simprints_blue
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @StringRes
 fun FingerState.captureNumberTextId(): Int =
     IDR.string.capture_number_text
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 fun FingerState.directionTextId(isLastFinger: Boolean): Int =
     when (val currentCapture = this.currentCapture()) {
@@ -67,6 +74,7 @@ fun FingerState.directionTextId(isLastFinger: Boolean): Int =
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @ColorRes
 fun FingerState.directionTextColour(): Int =
