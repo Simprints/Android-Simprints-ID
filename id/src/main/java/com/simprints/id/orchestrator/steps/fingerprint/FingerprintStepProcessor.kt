@@ -20,6 +20,4 @@ interface FingerprintStepProcessor {
                       resultCode: Int,
                       data: Intent?): Step.Result?
 
-    fun buildConfigurationStep(): Step
-
 }

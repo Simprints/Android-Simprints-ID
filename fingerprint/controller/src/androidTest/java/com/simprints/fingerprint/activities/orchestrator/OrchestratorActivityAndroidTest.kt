@@ -50,7 +50,6 @@ class OrchestratorActivityAndroidTest {
     val orchestratorViewModel = spyk(
         OrchestratorViewModel(
             orchestratorMock,
-            mockk(relaxed = true),
             firmwareFileUpdateSchedulerMock,
         )
     )
