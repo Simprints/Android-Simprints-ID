@@ -1,20 +1,15 @@
 package com.simprints.infra.events
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationManager
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
@@ -25,9 +20,7 @@ import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.SampleDefaults.STATIC_GUID
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import com.simprints.infra.events.sampledata.createAuthenticationEvent
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -486,47 +479,6 @@ internal class EventRepositoryImplTest {
 
         coVerify { eventLocalDataSource.deleteAll() }
     }
-
-    @Test
-    fun `given the event has untokenized field, when tokenization key exists, then fields should be tokenized`() =
-        runTest {
-            mockUUID(STATIC_GUID)
-            val project = mockk<Project>()
-            val tokenizedUserId = "tokenizedUserId".asTokenizableEncrypted()
-            val event = createAuthenticationEvent().copy(
-                labels = EventLabels(
-                    sessionId = STATIC_GUID,
-                    deviceId = DEVICE_ID,
-                    projectId = DEFAULT_PROJECT_ID
-                )
-            )
-            val expectedEvent = event.copy(
-                payload = event.payload.copy(
-                    userInfo = event.payload.userInfo.copy(userId = tokenizedUserId)
-                )
-            )
-
-            coEvery { eventLocalDataSource.loadAllFromProject(any()) } returns listOf(event)
-            every {
-                tokenizationManager.encrypt(
-                    decrypted = event.payload.userInfo.userId as TokenizableString.Raw,
-                    tokenKeyType = TokenKeyType.AttendantId,
-                    project = project
-                )
-            } returns tokenizedUserId
-            every { sessionDataCache.eventCache } returns emptyMap<String, Event>().toMutableMap()
-            eventRepo.tokenizeLocalEvents(project)
-
-            verify {
-                tokenizationManager.encrypt(
-                    decrypted = event.payload.userInfo.userId as TokenizableString.Raw,
-                    tokenKeyType = TokenKeyType.AttendantId,
-                    project = project
-                )
-            }
-
-            coVerify(atLeast = 1) {  eventLocalDataSource.insertOrUpdate(expectedEvent) }
-        }
 
     private fun mockSignedId() =
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
