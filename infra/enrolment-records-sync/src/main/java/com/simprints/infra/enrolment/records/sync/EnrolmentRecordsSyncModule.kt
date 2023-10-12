@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class EnrolmentRecordsModule {
+abstract class EnrolmentRecordsSyncModule {
 
     @Binds
     internal abstract fun bindEnrolmentRecordManager(impl: EnrolmentRecordManagerImpl): EnrolmentRecordManager
