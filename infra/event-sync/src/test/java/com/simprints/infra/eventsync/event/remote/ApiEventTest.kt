@@ -1,16 +1,14 @@
 package com.simprints.infra.eventsync.event.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.*
-import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.eventsync.event.*
 import com.simprints.infra.eventsync.event.remote.models.ApiEvent
@@ -18,8 +16,6 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.mapToTokenizedString
-import io.mockk.every
-import io.mockk.mockk
 import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -404,22 +400,22 @@ class ApiEventTest {
 
     @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
-        validateUserIdTokenization(attendantId = "attendantId".asTokenizedEncrypted())
+        validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
 
     @Test
     fun `when event contains raw attendant id, then tokenizedField in ApiEvent should be empty`() {
-        validateUserIdTokenization(attendantId = "attendantId".asTokenizedRaw())
+        validateUserIdTokenization(attendantId = "attendantId".asTokenizableRaw())
     }
 
     @Test
     fun `when event contains tokenized module id, then ApiEvent should contain tokenizedField`() {
-        validateModuleIdTokenization(moduleId = "moduleId".asTokenizedEncrypted())
+        validateModuleIdTokenization(moduleId = "moduleId".asTokenizableEncrypted())
     }
 
     @Test
     fun `when event contains raw module id, then tokenizedField in ApiEvent should be empty`() {
-        validateModuleIdTokenization(moduleId = "moduleId".asTokenizedRaw())
+        validateModuleIdTokenization(moduleId = "moduleId".asTokenizableRaw())
     }
 
     private fun validateModuleIdTokenization(moduleId: TokenizableString) {
