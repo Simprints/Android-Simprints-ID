@@ -2,13 +2,19 @@ package com.simprints.infra.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationManager
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
@@ -19,18 +25,17 @@ import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigService
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
-import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.SampleDefaults.STATIC_GUID
+import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createAuthenticationEvent
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -487,7 +492,7 @@ internal class EventRepositoryImplTest {
         runTest {
             mockUUID(STATIC_GUID)
             val project = mockk<Project>()
-            val tokenizedUserId = "tokenizedUserId".asTokenizedEncrypted()
+            val tokenizedUserId = "tokenizedUserId".asTokenizableEncrypted()
             val event = createAuthenticationEvent().copy(
                 labels = EventLabels(
                     sessionId = STATIC_GUID,
