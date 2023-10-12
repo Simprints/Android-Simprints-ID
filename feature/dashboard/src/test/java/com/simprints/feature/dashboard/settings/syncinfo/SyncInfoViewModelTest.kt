@@ -3,17 +3,17 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.config.domain.models.SynchronizationConfiguration
-import com.simprints.infra.config.domain.models.TokenKeyType
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
@@ -148,8 +148,8 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should initialize the moduleCounts live data correctly`() = runTest {
-        val module1 = "module1".asTokenizedEncrypted()
-        val module2 = "module2".asTokenizedEncrypted()
+        val module1 = "module1".asTokenizableEncrypted()
+        val module2 = "module2".asTokenizableEncrypted()
         val numberForModule1 = 10
         val numberForModule2 = 20
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
@@ -194,7 +194,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the recordsToDownSync and recordsToDelete live data to the count otherwise`() =
         runTest {
-            val module1 = "module1".asTokenizedEncrypted()
+            val module1 = "module1".asTokenizableEncrypted()
             val creationForModules = 10
             val deletionForModules = 5
             coEvery { configManager.getDeviceConfiguration() } returns mockk {
@@ -426,7 +426,7 @@ class SyncInfoViewModelTest {
         every { down }.returns(
             DownSynchronizationConfiguration(
                 partitionType = partitionType,
-                moduleOptions = modules.map(String::asTokenizedRaw),
+                moduleOptions = modules.map(String::asTokenizableRaw),
                 maxNbOfModules = 0,
             )
         )

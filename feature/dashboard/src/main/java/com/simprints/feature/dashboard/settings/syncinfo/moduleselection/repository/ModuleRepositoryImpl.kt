@@ -1,8 +1,7 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository
 
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.values
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.EventSyncManager

@@ -3,8 +3,8 @@ package com.simprints.infra.enrolment.records.worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import io.mockk.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher

@@ -9,9 +9,9 @@ import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier

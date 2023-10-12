@@ -3,7 +3,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.infra.config.domain.models.TokenKeyType
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.INTENT_PARSING
 import java.util.UUID
 

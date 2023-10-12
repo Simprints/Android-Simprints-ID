@@ -3,12 +3,11 @@ package com.simprints.feature.dashboard.main.projectdetails
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.domain.models.TokenKeyType
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -25,7 +24,7 @@ class ProjectDetailsViewModelTest {
         private const val PROJECT_ID = "projectID"
         private const val PROJECT_NAME = "name"
         private const val LAST_SCANNER = "scanner"
-        private val LAST_USER = "user".asTokenizedEncrypted()
+        private val LAST_USER = "user".asTokenizableEncrypted()
         private val PROJECT = Project(
             PROJECT_ID,
             PROJECT_NAME,

@@ -35,9 +35,9 @@ import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Vero1Configuration
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Vero1Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests

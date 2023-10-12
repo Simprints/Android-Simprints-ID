@@ -4,10 +4,10 @@ import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtr
 import com.simprints.clientapi.clientrequests.validators.EnrolLastBiometricsValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
-import com.simprints.core.domain.tokenization.asTokenizedRaw
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.domain.models.TokenKeyType
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 
 
 class EnrolLastBiometricsBuilder(
@@ -35,8 +35,8 @@ class EnrolLastBiometricsBuilder(
 
     override fun buildAppRequest(): BaseRequest = EnrolLastBiometricsRequest(
         projectId = extractor.getProjectId(),
-        userId = extractor.getUserId().asTokenizedRaw(),
-        moduleId = extractor.getModuleId().asTokenizedRaw(),
+        userId = extractor.getUserId().asTokenizableRaw(),
+        moduleId = extractor.getModuleId().asTokenizableRaw(),
         metadata = extractor.getMetadata(),
         sessionId = extractor.getSessionId(),
         unknownExtras = extractor.getUnknownExtras()

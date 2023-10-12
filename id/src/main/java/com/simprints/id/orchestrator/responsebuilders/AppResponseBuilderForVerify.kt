@@ -10,8 +10,8 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.exceptions.unexpected.MissingCaptureResponse
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 
 class AppResponseBuilderForVerify(private val projectConfiguration: ProjectConfiguration) :
     BaseAppResponseBuilder() {

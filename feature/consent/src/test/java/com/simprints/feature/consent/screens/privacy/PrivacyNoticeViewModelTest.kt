@@ -2,9 +2,9 @@ package com.simprints.feature.consent.screens.privacy
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DeviceConfiguration
-import com.simprints.infra.config.domain.models.PrivacyNoticeResult
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.testtools.common.coroutines.TestCoroutineRule

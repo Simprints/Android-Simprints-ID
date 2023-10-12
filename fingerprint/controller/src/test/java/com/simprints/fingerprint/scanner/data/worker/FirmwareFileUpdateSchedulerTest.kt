@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.scanner.data.worker
 
 import androidx.work.WorkManager
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.After

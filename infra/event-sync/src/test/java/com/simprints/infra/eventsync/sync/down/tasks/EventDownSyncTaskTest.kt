@@ -1,11 +1,10 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.TokenizableString
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DeviceConfiguration
+import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
@@ -49,8 +48,8 @@ class EventDownSyncTaskTest {
         val ENROLMENT_RECORD_CREATION = EnrolmentRecordCreationEvent(
             "subjectId",
             "projectId",
-            "moduleId".asTokenizedRaw(),
-            "attendantId".asTokenizedRaw(),
+            "moduleId".asTokenizableRaw(),
+            "attendantId".asTokenizableRaw(),
             listOf(FaceReference("id", listOf(FaceTemplate("template")), "format")),
         )
         val ENROLMENT_RECORD_MOVE = EnrolmentRecordMoveEvent(
@@ -58,14 +57,14 @@ class EventDownSyncTaskTest {
                 "subjectId",
                 "projectId",
                 DEFAULT_MODULE_ID_2,
-                "attendantId".asTokenizedRaw(),
+                "attendantId".asTokenizableRaw(),
                 listOf(FaceReference("id", listOf(FaceTemplate("template")), "format"))
             ),
             EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove(
                 "subjectId",
                 "projectId",
                 DEFAULT_MODULE_ID,
-                "attendantId".asTokenizedRaw(),
+                "attendantId".asTokenizableRaw(),
             )
         )
     }
@@ -87,7 +86,7 @@ class EventDownSyncTaskTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configManager: ConfigService
 
     @MockK
     private lateinit var eventRemoteDataSource: EventRemoteDataSource

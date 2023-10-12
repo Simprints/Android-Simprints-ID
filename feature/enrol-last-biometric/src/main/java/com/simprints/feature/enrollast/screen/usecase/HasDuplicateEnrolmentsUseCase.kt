@@ -2,7 +2,7 @@ package com.simprints.feature.enrollast.screen.usecase
 
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.MatchResult
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject

@@ -3,14 +3,14 @@ package com.simprints.feature.enrollast.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.events.EventRepository
@@ -170,8 +170,8 @@ class EnrolLastBiometricViewModelTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
-        private val USER_ID = "userId".asTokenizedRaw()
-        private val MODULE_ID = "moduleId".asTokenizedRaw()
+        private val USER_ID = "userId".asTokenizableRaw()
+        private val MODULE_ID = "moduleId".asTokenizableRaw()
         private const val SESSION_ID = "sessionId"
     }
 }

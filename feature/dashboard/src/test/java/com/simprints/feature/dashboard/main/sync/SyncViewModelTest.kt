@@ -3,7 +3,7 @@ package com.simprints.feature.dashboard.main.sync
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
@@ -17,12 +17,12 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
 import com.simprints.infra.authlogic.AuthManager
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.DeviceConfiguration
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.SynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
@@ -52,7 +52,7 @@ class SyncViewModelTest {
         private const val DATE = "2022-10-10"
         private val deviceConfiguration = DeviceConfiguration(
             language = "",
-            selectedModules = listOf("module 1".asTokenizedEncrypted()),
+            selectedModules = listOf("module 1".asTokenizableEncrypted()),
             lastInstructionId = ""
         )
     }

@@ -9,7 +9,7 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.fetchsubject.screen.usecase.FetchSubjectUseCase
 import com.simprints.feature.fetchsubject.screen.usecase.SaveSubjectFetchEventUseCase
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
