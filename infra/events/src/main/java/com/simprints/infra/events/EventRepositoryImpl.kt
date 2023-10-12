@@ -5,29 +5,29 @@ import android.os.Build.VERSION
 import com.simprints.core.DeviceID
 import com.simprints.core.LibSimprintsVersionName
 import com.simprints.core.PackageVersionName
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.event.domain.models.*
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
+import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
+import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
-import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigService
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.tokenization.TokenizationManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -157,9 +157,6 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun getEventsFromSession(sessionId: String): List<Event> =
         eventLocalDataSource.loadAllFromSession(sessionId)
 
-    override suspend fun getEventsFromProject(projectId: String): List<Event> =
-        eventLocalDataSource.loadAllFromProject(projectId)
-
     override suspend fun getEventsJsonFromSession(sessionId: String): List<String> =
         eventLocalDataSource.loadAllEventJsonFromSession(sessionId)
 
@@ -231,30 +228,5 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.delete(eventIds)
 
     override suspend fun deleteAll() = eventLocalDataSource.deleteAll()
-
-
-    override suspend fun tokenizeLocalEvents(project: Project) {
-        getEventsFromProject(project.id)
-            .map { event -> tokenizeEventRawFields(event, project) }
-            .onEach { tokenizedEvent -> addOrUpdateEvent(tokenizedEvent) }
-    }
-
-    private fun tokenizeEventRawFields(event: Event, project: Project): Event {
-        val tokenizedFields = event.getTokenizedFields().entries.associate { entry ->
-            when (val field = entry.value) {
-                is TokenizableString.Raw -> {
-                    val tokenizedField = tokenizationManager.encrypt(
-                        decrypted = field,
-                        tokenKeyType = entry.key,
-                        project = project
-                    )
-                    return@associate entry.key to tokenizedField
-                }
-
-                is TokenizableString.Tokenized -> entry.key to entry.value
-            }
-        }
-        return event.setTokenizedFields(tokenizedFields)
-    }
 
 }

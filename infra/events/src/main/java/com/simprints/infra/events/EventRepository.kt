@@ -1,6 +1,5 @@
 package com.simprints.infra.events
 
-import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.infra.events.event.domain.models.Event
@@ -34,8 +33,6 @@ interface EventRepository {
 
     suspend fun getEventsFromSession(sessionId: String): List<Event>
 
-    suspend fun getEventsFromProject(projectId: String): List<Event>
-
     suspend fun getEventsJsonFromSession(sessionId: String): List<String>
 
     suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int>
@@ -51,6 +48,5 @@ interface EventRepository {
     suspend fun delete(eventIds: List<String>)
 
     suspend fun deleteAll()
-    suspend fun tokenizeLocalEvents(project: Project)
 
 }
