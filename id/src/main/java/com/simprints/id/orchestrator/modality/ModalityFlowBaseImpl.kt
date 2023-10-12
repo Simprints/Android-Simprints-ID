@@ -12,8 +12,8 @@ import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.authstore.AuthStore
 
 abstract class ModalityFlowBaseImpl(

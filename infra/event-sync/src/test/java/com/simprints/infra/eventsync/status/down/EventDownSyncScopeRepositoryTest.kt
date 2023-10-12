@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.status.down
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
 import com.simprints.core.domain.modality.Modes
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODES
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULES
@@ -139,7 +139,7 @@ internal class EventDownSyncScopeRepositoryTest {
     fun throwWhenUserIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
             coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
-                every { lastUserUsed } returns "".asTokenizedEncrypted()
+                every { lastUserUsed } returns "".asTokenizableEncrypted()
             }
 
             assertThrows<MissingArgumentForDownSyncScopeException> {

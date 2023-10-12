@@ -14,9 +14,9 @@ import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.requestFactories.*
-import com.simprints.infra.config.domain.models.Project
-import com.simprints.infra.config.domain.models.TokenKeyType
-import com.simprints.infra.config.tokenization.TokenizationManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*

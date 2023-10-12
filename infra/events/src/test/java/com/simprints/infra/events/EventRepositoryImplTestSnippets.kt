@@ -2,7 +2,7 @@ package com.simprints.infra.events
 
 import android.os.Build
 import android.os.Build.VERSION
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload

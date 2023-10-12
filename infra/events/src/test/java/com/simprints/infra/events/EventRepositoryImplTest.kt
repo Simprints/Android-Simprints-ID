@@ -2,8 +2,7 @@ package com.simprints.infra.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
@@ -20,6 +19,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigService
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
@@ -55,7 +55,7 @@ internal class EventRepositoryImplTest {
     lateinit var sessionDataCache: SessionDataCache
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configManager: ConfigService
 
     @Before
     fun setup() {
@@ -65,7 +65,7 @@ internal class EventRepositoryImplTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configManager.getConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
             }

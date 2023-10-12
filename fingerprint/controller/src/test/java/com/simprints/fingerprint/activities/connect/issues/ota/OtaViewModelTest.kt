@@ -2,7 +2,7 @@ package com.simprints.fingerprint.activities.connect.issues.ota
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
@@ -15,8 +15,8 @@ import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -52,7 +52,7 @@ class OtaViewModelTest {
         coEvery { getRecentUserActivity() } returns RecentUserActivity(
             HARDWARE_VERSION,
             "",
-            "".asTokenizedRaw(),
+            "".asTokenizableRaw(),
             0,
             0,
             0,

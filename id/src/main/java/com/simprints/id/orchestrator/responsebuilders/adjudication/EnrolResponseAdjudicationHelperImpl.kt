@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.responsebuilders.adjudication
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import javax.inject.Inject
 
 class EnrolResponseAdjudicationHelperImpl @Inject constructor(): EnrolResponseAdjudicationHelper {

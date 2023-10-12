@@ -2,13 +2,13 @@ package com.simprints.clientapi.controllers.core.eventData
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.core.domain.tokenization.asTokenizedRaw
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.NFC_NOT_ENABLED
@@ -178,8 +178,8 @@ class ClientApiEventRepositoryImplTest {
             createdAt = 23,
             subjectId = "siD",
             projectId = "pId",
-            moduleId = "mId".asTokenizedRaw(),
-            attendantId = "aiD".asTokenizedRaw(),
+            moduleId = "mId".asTokenizableRaw(),
+            attendantId = "aiD".asTokenizableRaw(),
             personCreationEventId = "pCId",
             labels = EventLabels()
         ),

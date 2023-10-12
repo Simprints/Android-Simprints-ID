@@ -51,11 +51,10 @@ sealed class TokenizableString : Parcelable {
     override fun toString(): String = value
 }
 
+fun String.asTokenizableRaw() = Raw(this)
+fun String.asTokenizableEncrypted() = Tokenized(this)
 fun String.asTokenized(isTokenized: Boolean) =
-    if (isTokenized) this.asTokenizedEncrypted() else this.asTokenizedRaw()
-
-fun String.asTokenizedRaw() = Raw(this)
-fun String.asTokenizedEncrypted() = Tokenized(this)
+    if (isTokenized) this.asTokenizableEncrypted() else this.asTokenizableRaw()
 
 fun TokenizableString.isTokenized() = when (this) {
     is Tokenized -> true

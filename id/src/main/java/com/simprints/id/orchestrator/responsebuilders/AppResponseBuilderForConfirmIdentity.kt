@@ -5,7 +5,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppConfirmationResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.GuidSelectionResponse
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 
 class AppResponseBuilderForConfirmIdentity : BaseAppResponseBuilder() {
 

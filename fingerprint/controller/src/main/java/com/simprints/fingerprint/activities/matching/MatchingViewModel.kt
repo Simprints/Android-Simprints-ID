@@ -19,8 +19,8 @@ import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.infra.basebiosdk.FingerprintBioSdk
 import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherSettings
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.count

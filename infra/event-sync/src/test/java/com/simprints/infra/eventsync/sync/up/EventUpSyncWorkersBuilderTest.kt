@@ -4,8 +4,8 @@ import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.domain.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository

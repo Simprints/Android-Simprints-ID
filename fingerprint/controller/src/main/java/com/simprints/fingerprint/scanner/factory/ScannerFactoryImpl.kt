@@ -14,8 +14,8 @@ import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV2
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject

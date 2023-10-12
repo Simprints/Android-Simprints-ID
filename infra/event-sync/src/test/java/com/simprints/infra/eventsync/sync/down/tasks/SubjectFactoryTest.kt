@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
@@ -106,8 +106,8 @@ class SubjectFactoryTest {
         private lateinit var factory: SubjectFactory
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
-        private val ATTENDANT_ID = "encryptedAttendantId".asTokenizedRaw()
-        private val MODULE_ID = "encryptedModuleId".asTokenizedRaw()
+        private val ATTENDANT_ID = "encryptedAttendantId".asTokenizableRaw()
+        private val MODULE_ID = "encryptedModuleId".asTokenizableRaw()
         private val BASE_64_BYTES = byteArrayOf(1)
         private const val REFERENCE_ID = "fpRefId"
         private const val REFERENCE_FORMAT = "NEC_1"

@@ -15,13 +15,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.core.DeviceID
 import com.simprints.core.PackageVersionName
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.R
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -66,7 +66,7 @@ class AboutFragmentTest {
         every { recentUserActivity } returns mockk {
             every { observe(any(), any()) } answers {
                 secondArg<Observer<RecentUserActivity>>().onChanged(
-                    RecentUserActivity(SCANNER_VERSION, "", "".asTokenizedEncrypted(), 0, 0, 0, 0)
+                    RecentUserActivity(SCANNER_VERSION, "", "".asTokenizableEncrypted(), 0, 0, 0, 0)
                 )
             }
         }

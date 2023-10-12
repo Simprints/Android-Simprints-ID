@@ -17,7 +17,7 @@ import com.simprints.face.models.FaceDetection
 import com.simprints.face.models.FaceTarget
 import com.simprints.face.models.FloatRange
 import com.simprints.face.models.SymmetricTarget
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import dagger.hilt.android.lifecycle.HiltViewModel

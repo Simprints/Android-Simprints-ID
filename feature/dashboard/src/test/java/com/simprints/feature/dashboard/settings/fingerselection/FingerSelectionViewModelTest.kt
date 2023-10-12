@@ -2,9 +2,9 @@ package com.simprints.feature.dashboard.settings.fingerselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Finger.*
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Finger.*
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every

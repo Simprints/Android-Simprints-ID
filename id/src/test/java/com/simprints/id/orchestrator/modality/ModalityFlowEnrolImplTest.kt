@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -16,13 +16,13 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ConsentConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FACE
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality.FINGERPRINT
-import com.simprints.infra.config.domain.models.IdentificationConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FACE
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.config.store.models.IdentificationConfiguration
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -274,8 +274,8 @@ class ModalityFlowEnrolImplTest {
     private fun buildAppEnrolRequest() =
         AppEnrolRequest(
             projectId = PROJECT_ID,
-            userId = "userId".asTokenizedRaw(),
-            moduleId = "moduleId".asTokenizedRaw(),
+            userId = "userId".asTokenizableRaw(),
+            moduleId = "moduleId".asTokenizableRaw(),
             metadata = "metadata"
         )
 
