@@ -66,6 +66,7 @@ class EventMigration1to2Test {
 
         validateEnrolmentMigration(db, enrolmentEventId)
         validateSessionCaptureMigration(db, openSessionCaptureEventId, closedSessionCaptureEventId)
+        db.close()
     }
 
     private fun createEnrolmentEvent(id: String) = ContentValues().apply {

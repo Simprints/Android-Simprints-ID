@@ -18,6 +18,8 @@ import com.simprints.infra.events.local.*
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.flow.flowOf
@@ -29,9 +31,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 internal class EventLocalDataSourceImplTest {
 
     private lateinit var db: EventRoomDatabase

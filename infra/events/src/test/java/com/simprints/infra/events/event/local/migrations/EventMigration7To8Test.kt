@@ -185,6 +185,7 @@ class EventMigration7To8Test {
         assertThat(fingerprintCaptureBiometricsEvent.type).isEqualTo(
             expectedFingerprintCaptureBiometricsEvent.type
         )
+        db.close()
     }
 
     @Test
@@ -233,6 +234,7 @@ class EventMigration7To8Test {
             MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
+        db.close()
     }
 
     @Test
@@ -280,6 +282,7 @@ class EventMigration7To8Test {
             MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
+        db.close()
     }
 
     @Test
@@ -343,6 +346,7 @@ class EventMigration7To8Test {
         assertThat(faceCaptureBiometricsEvent.labels).isEqualTo(expectedFaceCaptureBiometricsEvent.labels)
         assertThat(faceCaptureBiometricsEvent.payload).isEqualTo(expectedFaceCaptureBiometricsEvent.payload)
         assertThat(faceCaptureBiometricsEvent.type).isEqualTo(expectedFaceCaptureBiometricsEvent.type)
+        db.close()
     }
 
     @Test
@@ -384,6 +388,7 @@ class EventMigration7To8Test {
             MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
+        db.close()
     }
 
     @Test
@@ -425,6 +430,7 @@ class EventMigration7To8Test {
             MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
+        db.close()
     }
 
     private fun setupV7DbWithEvents(
