@@ -25,7 +25,7 @@ internal data class ApiEnrolmentPayloadV2(
         domainPayload.personCreationEventId)
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
-        TokenKeyType.AttendantId -> "userId"
+        TokenKeyType.AttendantId -> "attendantId"
         TokenKeyType.ModuleId -> "moduleId"
         TokenKeyType.Unknown -> null
     }
