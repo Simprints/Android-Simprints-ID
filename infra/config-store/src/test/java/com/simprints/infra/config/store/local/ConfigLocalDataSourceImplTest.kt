@@ -5,7 +5,7 @@ import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.store.local.models.toDomain
 import com.simprints.infra.config.store.models.DeviceConfiguration
@@ -120,7 +120,7 @@ class ConfigLocalDataSourceImplTest {
             configLocalDataSourceImpl.updateDeviceConfiguration {
                 it.apply {
                     it.language = "fr"
-                    it.selectedModules = listOf("module1".asTokenizedEncrypted())
+                    it.selectedModules = listOf("module1".asTokenizableEncrypted())
                 }
             }
             val projectConfigurationToSave = projectConfiguration
@@ -130,7 +130,7 @@ class ConfigLocalDataSourceImplTest {
             val updatedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = "fr",
-                selectedModules = listOf("module1".asTokenizedEncrypted()),
+                selectedModules = listOf("module1".asTokenizableEncrypted()),
                 lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)
@@ -142,7 +142,7 @@ class ConfigLocalDataSourceImplTest {
         runTest(UnconfinedTestDispatcher()) {
             configLocalDataSourceImpl.updateDeviceConfiguration {
                 it.apply {
-                    it.selectedModules = listOf("module1".asTokenizedEncrypted())
+                    it.selectedModules = listOf("module1".asTokenizableEncrypted())
                 }
             }
             val projectConfigurationToSave = projectConfiguration
@@ -152,7 +152,7 @@ class ConfigLocalDataSourceImplTest {
             val updatedDeviceConfiguration = configLocalDataSourceImpl.getDeviceConfiguration()
             val expectedDeviceConfiguration = DeviceConfiguration(
                 language = projectConfiguration.general.defaultLanguage,
-                selectedModules = listOf("module1".asTokenizedEncrypted()),
+                selectedModules = listOf("module1".asTokenizableEncrypted()),
                 lastInstructionId = ""
             )
             assertThat(savedProjectConfiguration).isEqualTo(projectConfiguration)

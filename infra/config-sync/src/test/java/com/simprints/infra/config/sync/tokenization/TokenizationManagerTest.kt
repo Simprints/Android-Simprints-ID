@@ -1,8 +1,8 @@
 package com.simprints.infra.config.sync.tokenization
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -31,16 +31,16 @@ class TokenizationManagerTest {
     @Test
     fun `when tokenization key is presented, should encrypt value`() {
         val result = manager.encrypt(
-            decrypted = raw.asTokenizedRaw(),
+            decrypted = raw.asTokenizableRaw(),
             tokenKeyType = tokenKeyType,
             project = project
         )
-        assertThat(result).isEqualTo(encrypted.asTokenizedEncrypted())
+        assertThat(result).isEqualTo(encrypted.asTokenizableEncrypted())
     }
     @Test
     fun `when tokenization key is not presented, should not encrypt value`() {
         every { project.tokenizationKeys } returns emptyMap()
-        val decrypted = raw.asTokenizedRaw()
+        val decrypted = raw.asTokenizableRaw()
         val result = manager.encrypt(
             decrypted = decrypted,
             tokenKeyType = tokenKeyType,
@@ -51,7 +51,7 @@ class TokenizationManagerTest {
     @Test
     fun `when encryption throws exception, should return unencrypted value`() {
         every { stringTokenizer.encrypt(any(),any()) } throws Exception()
-        val decrypted = raw.asTokenizedRaw()
+        val decrypted = raw.asTokenizableRaw()
         val result = manager.encrypt(
             decrypted = decrypted,
             tokenKeyType = tokenKeyType,
@@ -62,16 +62,16 @@ class TokenizationManagerTest {
     @Test
     fun `when tokenization key is presented, should decrypt value`() {
         val result = manager.decrypt(
-            encrypted = raw.asTokenizedEncrypted(),
+            encrypted = raw.asTokenizableEncrypted(),
             tokenKeyType = tokenKeyType,
             project = project
         )
-        assertThat(result).isEqualTo(raw.asTokenizedRaw())
+        assertThat(result).isEqualTo(raw.asTokenizableRaw())
     }
     @Test
     fun `when tokenization key is not presented, should not decrypt value`() {
         every { project.tokenizationKeys } returns emptyMap()
-        val encrypted = raw.asTokenizedEncrypted()
+        val encrypted = raw.asTokenizableEncrypted()
         val result = manager.decrypt(
             encrypted = encrypted,
             tokenKeyType = tokenKeyType,
@@ -82,7 +82,7 @@ class TokenizationManagerTest {
     @Test
     fun `when decryption throws exception, should return encrypted value`() {
         every { stringTokenizer.encrypt(any(),any()) } throws Exception()
-        val encrypted = raw.asTokenizedEncrypted()
+        val encrypted = raw.asTokenizableEncrypted()
         val result = manager.decrypt(
             encrypted = encrypted,
             tokenKeyType = tokenKeyType,

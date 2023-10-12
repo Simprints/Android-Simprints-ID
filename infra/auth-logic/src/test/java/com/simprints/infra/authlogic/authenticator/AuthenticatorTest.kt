@@ -2,7 +2,7 @@ package com.simprints.infra.authlogic.authenticator
 
 import com.google.android.play.core.integrity.model.IntegrityErrorCode
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
 import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
@@ -124,7 +124,7 @@ internal class AuthenticatorTest {
         coEvery { projectAuthenticator.authenticate(any(), "") } throws exception
 
         return authenticator.authenticate(
-            userId = "".asTokenizedRaw(),
+            userId = "".asTokenizableRaw(),
             projectId = "",
             projectSecret = "",
             deviceId = ""
@@ -134,7 +134,7 @@ internal class AuthenticatorTest {
     @Test
     fun `should return AUTHENTICATED if no exception`() = runBlocking {
         val result = authenticator.authenticate(
-            userId = "".asTokenizedRaw(),
+            userId = "".asTokenizableRaw(),
             projectId = "",
             projectSecret = "",
             deviceId = ""
