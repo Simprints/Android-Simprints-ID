@@ -29,7 +29,8 @@ dependencies {
     implementation(project(":infra:events"))
 
     implementation(project(":infra:event-sync"))
-    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:enrolment-records-sync"))
+    implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:images"))
     implementation(project(":infra:recent-user-activity"))
 

@@ -5,7 +5,7 @@ import com.simprints.fingerprint.activities.matching.MatchTask.Companion.MATCHER
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.CapturingSlot

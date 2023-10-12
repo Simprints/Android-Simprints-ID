@@ -6,19 +6,17 @@ import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.worker.ConfigurationScheduler
-import com.simprints.infra.events.EventRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal class ConfigManagerImpl @Inject constructor(
-    private val eventRepository: EventRepository,
     private val configService: ConfigService,
     private val configurationScheduler: ConfigurationScheduler
 ) :
     ConfigManager {
 
     override suspend fun refreshProject(projectId: String): Project =
-        configService.refreshProject(projectId).also { eventRepository.tokenizeLocalEvents(it) }
+        configService.refreshProject(projectId)
 
     override suspend fun getProject(projectId: String): Project =
         configService.getProject(projectId)
