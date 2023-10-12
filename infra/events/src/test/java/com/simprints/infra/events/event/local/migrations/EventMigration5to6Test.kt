@@ -59,6 +59,7 @@ class EventMigration5to6Test {
 
         Truth.assertThat(event).isInstanceOf(ConnectivitySnapshotEvent::class.java)
         assert(event.payload.eventVersion == 2)
+        db.close()
     }
 
     @Test
@@ -105,6 +106,7 @@ class EventMigration5to6Test {
         migrationSpy.migrateConnectivityEvents(db)
 
         verify(exactly = 1) { db.query(any<SupportSQLiteQuery>()) }
+        db.close()
     }
 
     private fun createEvent(id: String) = ContentValues().apply {

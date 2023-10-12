@@ -58,7 +58,7 @@ class EventMigration3to4Test {
         Truth.assertThat(event).isInstanceOf(ConnectivitySnapshotEvent::class.java)
         assert(event.payload.eventVersion == 2)
         assert(!jsonObject.has("networkType"))
-
+        db.close()
     }
 
     @Test
@@ -105,6 +105,7 @@ class EventMigration3to4Test {
         migrationSpy.migrateConnectivityEvents(db)
 
         verify(exactly = 1) { db.query(any<SupportSQLiteQuery>()) }
+        db.close()
     }
 
     private fun createEvent(id: String) = ContentValues().apply {
