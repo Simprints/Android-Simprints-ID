@@ -4,7 +4,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
 
 interface EnrolmentHelper {
 

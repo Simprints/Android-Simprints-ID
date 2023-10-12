@@ -6,8 +6,8 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
-import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
