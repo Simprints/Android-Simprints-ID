@@ -1,8 +1,8 @@
 package com.simprints.infra.eventsync.event.remote.models.subject
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
@@ -33,8 +33,8 @@ class ApiEnrolmentRecordCreationEventTest {
         val expectedPayload = EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload(
             "subjectId",
             "projectId",
-            "moduleId".asTokenizedEncrypted(),
-            "attendantId".asTokenizedEncrypted(),
+            "moduleId".asTokenizableEncrypted(),
+            "attendantId".asTokenizableEncrypted(),
             listOf(
                 FingerprintReference(
                     "fpRefId",

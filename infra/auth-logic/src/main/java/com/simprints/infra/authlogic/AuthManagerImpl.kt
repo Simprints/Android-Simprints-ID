@@ -1,6 +1,6 @@
 package com.simprints.infra.authlogic
 
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authlogic.authenticator.Authenticator
 import com.simprints.infra.authlogic.authenticator.SignerManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
@@ -19,7 +19,7 @@ internal class AuthManagerImpl @Inject constructor(
         deviceId: String
     ) =
         authenticator.authenticate(
-            userId = userId.asTokenizedRaw(),
+            userId = userId.asTokenizableRaw(),
             projectId = projectId,
             projectSecret = projectSecret,
             deviceId = deviceId

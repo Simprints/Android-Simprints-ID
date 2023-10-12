@@ -3,8 +3,8 @@ package com.simprints.feature.dashboard.settings.syncinfo
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.asTokenizedEncrypted
-import com.simprints.core.domain.tokenization.asTokenizedRaw
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
@@ -148,8 +148,8 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `should initialize the moduleCounts live data correctly`() = runTest {
-        val module1 = "module1".asTokenizedEncrypted()
-        val module2 = "module2".asTokenizedEncrypted()
+        val module1 = "module1".asTokenizableEncrypted()
+        val module2 = "module2".asTokenizableEncrypted()
         val numberForModule1 = 10
         val numberForModule2 = 20
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
@@ -194,7 +194,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the recordsToDownSync and recordsToDelete live data to the count otherwise`() =
         runTest {
-            val module1 = "module1".asTokenizedEncrypted()
+            val module1 = "module1".asTokenizableEncrypted()
             val creationForModules = 10
             val deletionForModules = 5
             coEvery { configManager.getDeviceConfiguration() } returns mockk {
@@ -426,7 +426,7 @@ class SyncInfoViewModelTest {
         every { down }.returns(
             DownSynchronizationConfiguration(
                 partitionType = partitionType,
-                moduleOptions = modules.map(String::asTokenizedRaw),
+                moduleOptions = modules.map(String::asTokenizableRaw),
                 maxNbOfModules = 0,
             )
         )
