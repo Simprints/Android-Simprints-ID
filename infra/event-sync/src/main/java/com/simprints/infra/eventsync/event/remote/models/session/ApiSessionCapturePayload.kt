@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.session
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.session.Location
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
@@ -44,6 +45,9 @@ internal data class ApiSessionCapturePayload(
         domainPayload.databaseInfo.fromDomainToApi(),
         domainPayload.location.fromDomainToApi()
     )
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }
 
 internal fun Location?.fromDomainToApi() =

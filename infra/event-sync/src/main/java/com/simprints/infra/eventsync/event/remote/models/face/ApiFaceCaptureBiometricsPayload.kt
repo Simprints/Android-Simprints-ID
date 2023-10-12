@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.face
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
@@ -36,4 +37,7 @@ internal class ApiFaceCaptureBiometricsPayload(
         domainPayload.id,
         Face(domainPayload.face)
     )
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }

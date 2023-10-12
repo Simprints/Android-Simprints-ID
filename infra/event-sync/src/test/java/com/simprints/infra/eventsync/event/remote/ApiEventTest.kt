@@ -7,15 +7,12 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.*
 import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.eventsync.event.*
-import com.simprints.infra.eventsync.event.remote.models.ApiEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
-import com.simprints.infra.eventsync.event.remote.models.mapToTokenizedString
 import org.json.JSONObject
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -387,18 +384,6 @@ class ApiEventTest {
     }
 
     @Test
-    fun `TokenKeyType is mapped to the correct TokenizedField`() {
-        TokenKeyType.values().forEach {
-            val expected = when (it) {
-                TokenKeyType.AttendantId -> ApiEvent.CALLOUT_USER_ID
-                TokenKeyType.ModuleId -> ApiEvent.CALLOUT_MODULE_ID
-                TokenKeyType.Unknown -> null
-            }
-            assertThat(it.mapToTokenizedString()).isEqualTo(expected)
-        }
-    }
-
-    @Test
     fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
         validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
     }
@@ -426,7 +411,7 @@ class ApiEventTest {
             when (moduleId) {
                 is TokenizableString.Raw -> assertThat(size).isEqualTo(0)
                 is TokenizableString.Tokenized -> {
-                    assertThat(first()).isEqualTo(ApiEvent.CALLOUT_MODULE_ID)
+                    assertThat(first()).isEqualTo("moduleId")
                     assertThat(size).isEqualTo(1)
                 }
             }
@@ -440,7 +425,7 @@ class ApiEventTest {
             when (attendantId) {
                 is TokenizableString.Raw -> assertThat(size).isEqualTo(0)
                 is TokenizableString.Tokenized -> {
-                    assertThat(first()).isEqualTo(ApiEvent.CALLOUT_USER_ID)
+                    assertThat(first()).isEqualTo("userId")
                     assertThat(size).isEqualTo(1)
                 }
             }

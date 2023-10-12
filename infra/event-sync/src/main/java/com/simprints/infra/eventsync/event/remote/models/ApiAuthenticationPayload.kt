@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
@@ -46,6 +47,11 @@ internal data class ApiAuthenticationPayload(
             domainPayload.endedAt,
             ApiUserInfo(domainPayload.userInfo),
             domainPayload.result.fromDomainToApi())
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
+        TokenKeyType.AttendantId -> "userInfo.userId"
+        else -> null
+    }
 }
 
 
