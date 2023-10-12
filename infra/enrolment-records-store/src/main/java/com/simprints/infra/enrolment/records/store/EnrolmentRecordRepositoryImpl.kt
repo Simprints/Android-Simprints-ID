@@ -2,11 +2,17 @@ package com.simprints.infra.enrolment.records.store
 
 import android.content.Context
 import com.simprints.core.DispatcherIO
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -14,6 +20,7 @@ internal class EnrolmentRecordRepositoryImpl(
     context: Context,
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
     private val subjectRepository: SubjectRepository,
+    private val tokenizationManager: TokenizationManager,
     private val dispatcher: CoroutineDispatcher,
     private val batchSize: Int,
 ) : EnrolmentRecordRepository {
@@ -23,8 +30,16 @@ internal class EnrolmentRecordRepositoryImpl(
         @ApplicationContext context: Context,
         remoteDataSource: EnrolmentRecordRemoteDataSource,
         subjectRepository: SubjectRepository,
+        tokenizationManager: TokenizationManager,
         @DispatcherIO dispatcher: CoroutineDispatcher,
-    ) : this(context, remoteDataSource, subjectRepository, dispatcher, BATCH_SIZE)
+    ) : this(
+        context = context,
+        remoteDataSource = remoteDataSource,
+        subjectRepository = subjectRepository,
+        tokenizationManager = tokenizationManager,
+        dispatcher = dispatcher,
+        batchSize = BATCH_SIZE
+    )
 
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 
@@ -58,5 +73,29 @@ internal class EnrolmentRecordRepositoryImpl(
             remoteDataSource.uploadRecords(subjects)
         }
         prefs.edit().remove(PROGRESS_KEY).apply()
+    }
+
+    override suspend fun tokenizeExistingRecords(project: Project) {
+        val query = SubjectQuery(projectId = project.id)
+        val tokenizedSubjectsCreateAction = subjectRepository.load(query).toList().map { subject ->
+            val moduleId = when (val moduleId = subject.moduleId) {
+                is TokenizableString.Tokenized -> moduleId
+                is TokenizableString.Raw -> tokenizationManager.encrypt(
+                    decrypted = moduleId,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = project
+                )
+            }
+            val attendantId = when (val attendantId = subject.attendantId) {
+                is TokenizableString.Tokenized -> attendantId
+                is TokenizableString.Raw -> tokenizationManager.encrypt(
+                    decrypted = attendantId,
+                    tokenKeyType = TokenKeyType.AttendantId,
+                    project = project
+                )
+            }
+            return@map subject.copy(moduleId = moduleId, attendantId = attendantId)
+        }.map(SubjectAction::Creation)
+        subjectRepository.performActions(tokenizedSubjectsCreateAction)
     }
 }
