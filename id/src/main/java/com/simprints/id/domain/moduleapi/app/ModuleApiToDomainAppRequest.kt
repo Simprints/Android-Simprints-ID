@@ -1,7 +1,6 @@
 package com.simprints.id.domain.moduleapi.app
 
 import com.simprints.core.domain.tokenization.asTokenized
-import com.simprints.core.domain.tokenization.asTokenizedRaw
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest

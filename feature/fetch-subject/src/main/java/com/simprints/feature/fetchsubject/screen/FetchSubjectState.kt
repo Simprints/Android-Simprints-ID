@@ -1,6 +1,6 @@
 package com.simprints.feature.fetchsubject.screen
 
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 
 internal sealed class FetchSubjectState {
 

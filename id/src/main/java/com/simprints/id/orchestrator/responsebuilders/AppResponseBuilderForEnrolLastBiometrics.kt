@@ -7,7 +7,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.E
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.EnrolLastBiometricsResponse
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 
 class AppResponseBuilderForEnrolLastBiometrics : BaseAppResponseBuilder() {
 

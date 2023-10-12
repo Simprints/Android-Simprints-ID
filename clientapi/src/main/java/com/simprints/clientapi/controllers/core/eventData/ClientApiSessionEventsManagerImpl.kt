@@ -5,10 +5,10 @@ import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.workflow.WorkflowCacheClearer
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.canCoSyncAllData
-import com.simprints.infra.config.domain.models.canCoSyncAnalyticsData
-import com.simprints.infra.config.domain.models.canCoSyncBiometricData
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.canCoSyncAllData
+import com.simprints.infra.config.store.models.canCoSyncAnalyticsData
+import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
