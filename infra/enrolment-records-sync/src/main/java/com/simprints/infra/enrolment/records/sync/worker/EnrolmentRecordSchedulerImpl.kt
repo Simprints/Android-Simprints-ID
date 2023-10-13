@@ -1,4 +1,4 @@
-package com.simprints.infra.enrolment.records.worker
+package com.simprints.infra.enrolment.records.sync.worker
 
 import android.content.Context
 import androidx.work.*

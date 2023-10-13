@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposi
 
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants

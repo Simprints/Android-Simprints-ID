@@ -17,7 +17,7 @@ import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState

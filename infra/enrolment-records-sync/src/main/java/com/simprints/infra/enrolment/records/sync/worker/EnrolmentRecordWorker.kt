@@ -1,4 +1,4 @@
-package com.simprints.infra.enrolment.records.worker
+package com.simprints.infra.enrolment.records.sync.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
