@@ -5,7 +5,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintConfigu
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.infra.config.store.models.Finger
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 
 interface FingerprintRequestFactory {
 
