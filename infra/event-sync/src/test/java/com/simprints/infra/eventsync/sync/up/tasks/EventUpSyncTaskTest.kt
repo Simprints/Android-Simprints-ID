@@ -19,7 +19,7 @@ import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.*
@@ -60,7 +60,7 @@ internal class EventUpSyncTaskTest {
     private lateinit var projectConfiguration: ProjectConfiguration
 
     @MockK
-    private lateinit var configService: ConfigService
+    private lateinit var configRepository: ConfigRepository
 
     @Before
     fun setUp() {
@@ -70,7 +70,7 @@ internal class EventUpSyncTaskTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
-        coEvery { configService.getConfiguration() } returns projectConfiguration
+        coEvery { configRepository.getConfiguration() } returns projectConfiguration
 
         eventUpSyncTask = EventUpSyncTask(
             authStore,
@@ -78,7 +78,7 @@ internal class EventUpSyncTaskTest {
             eventRepo,
             eventRemoteDataSource,
             timeHelper,
-            configService
+            configRepository
         )
     }
 
