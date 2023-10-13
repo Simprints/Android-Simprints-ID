@@ -2,7 +2,7 @@ package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.EventSyncManager

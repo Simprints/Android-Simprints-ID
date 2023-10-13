@@ -1,4 +1,4 @@
-package com.simprints.infra.enrolment.records
+package com.simprints.infra.enrolment.records.sync
 
 import com.simprints.infra.enrolment.records.store.domain.models.*
 import kotlinx.coroutines.flow.Flow

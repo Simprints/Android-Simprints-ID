@@ -1,4 +1,4 @@
-package com.simprints.infra.enrolment.records.worker
+package com.simprints.infra.enrolment.records.sync.worker
 
 interface EnrolmentRecordScheduler {
     fun upload(id: String, subjectIds: List<String>)
