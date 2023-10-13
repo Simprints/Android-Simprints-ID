@@ -2,6 +2,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
@@ -11,6 +12,7 @@ import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
+import java.util.Date
 import javax.inject.Inject
 
 class SubjectFactory @Inject constructor(
@@ -19,7 +21,7 @@ class SubjectFactory @Inject constructor(
 
     fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
         with(payload) {
-            Subject(
+            buildSubject(
                 subjectId = subjectId,
                 projectId = projectId,
                 attendantId = attendantId,
@@ -31,7 +33,7 @@ class SubjectFactory @Inject constructor(
 
     fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) =
         with(payload) {
-            Subject(
+            buildSubject(
                 subjectId = subjectId,
                 projectId = projectId,
                 attendantId = attendantId,
@@ -41,6 +43,25 @@ class SubjectFactory @Inject constructor(
             )
         }
 
+    fun buildSubject(
+        subjectId: String,
+        projectId: String,
+        attendantId: TokenizableString,
+        moduleId: TokenizableString,
+        createdAt: Date? = null,
+        updatedAt: Date? = null,
+        fingerprintSamples: List<FingerprintSample> = emptyList(),
+        faceSamples: List<FaceSample> = emptyList()
+    ) = Subject(
+        subjectId = subjectId,
+        projectId = projectId,
+        attendantId = attendantId,
+        moduleId = moduleId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        fingerprintSamples = fingerprintSamples,
+        faceSamples = faceSamples
+    )
 
     private fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
         biometricReferences?.filterIsInstance<FingerprintReference>()

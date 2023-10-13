@@ -102,6 +102,39 @@ class SubjectFactoryTest {
         assertThat(result).isEqualTo(expected)
     }
 
+    @Test
+    fun `when buildsubject is called, correct subject is built`() {
+        val expected = Subject(
+            subjectId = SUBJECT_ID,
+            projectId = PROJECT_ID,
+            attendantId = ATTENDANT_ID,
+            moduleId = MODULE_ID,
+            fingerprintSamples = listOf(
+                FingerprintSample(
+                    fingerIdentifier = IDENTIFIER,
+                    template = BASE_64_BYTES,
+                    templateQualityScore = QUALITY,
+                    format = REFERENCE_FORMAT
+                )
+            ),
+            faceSamples = listOf(
+                FaceSample(
+                    template = BASE_64_BYTES,
+                    format = REFERENCE_FORMAT
+                )
+            )
+        )
+
+        val result = factory.buildSubject(
+            subjectId = expected.subjectId,
+            projectId = expected.projectId,
+            attendantId = expected.attendantId,
+            moduleId = expected.moduleId,
+            fingerprintSamples = expected.fingerprintSamples,
+            faceSamples = expected.faceSamples
+        )
+        assertThat(result).isEqualTo(expected)
+    }
     companion object {
         private lateinit var factory: SubjectFactory
         private const val PROJECT_ID = "projectId"
