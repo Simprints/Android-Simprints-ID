@@ -5,7 +5,9 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordSchedulerImpl
+import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordWorker
 import io.mockk.*
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest

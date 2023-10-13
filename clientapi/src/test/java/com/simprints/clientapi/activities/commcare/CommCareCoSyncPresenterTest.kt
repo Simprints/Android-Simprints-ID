@@ -28,7 +28,7 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Co
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
 import com.simprints.infra.config.store.tokenization.TokenizationManager
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.event.domain.models.RefusalEvent

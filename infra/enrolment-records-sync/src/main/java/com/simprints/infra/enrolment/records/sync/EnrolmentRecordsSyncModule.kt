@@ -1,7 +1,7 @@
-package com.simprints.infra.enrolment.records
+package com.simprints.infra.enrolment.records.sync
 
-import com.simprints.infra.enrolment.records.worker.EnrolmentRecordScheduler
-import com.simprints.infra.enrolment.records.worker.EnrolmentRecordSchedulerImpl
+import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordScheduler
+import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordSchedulerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
