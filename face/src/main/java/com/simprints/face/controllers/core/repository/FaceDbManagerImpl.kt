@@ -1,6 +1,6 @@
 package com.simprints.face.controllers.core.repository
 
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.facebiosdk.matching.FaceIdentity
 import com.simprints.infra.facebiosdk.matching.FaceSample
 import kotlinx.coroutines.flow.Flow

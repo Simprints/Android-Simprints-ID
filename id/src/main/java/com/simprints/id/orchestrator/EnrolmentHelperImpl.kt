@@ -8,9 +8,9 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.exceptions.unexpected.MissingCaptureResponse
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.enrolment.records.domain.models.Subject
-import com.simprints.infra.enrolment.records.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
