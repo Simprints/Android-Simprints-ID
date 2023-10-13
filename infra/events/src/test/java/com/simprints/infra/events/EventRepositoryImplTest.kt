@@ -19,7 +19,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.flow.emptyFlow
@@ -55,7 +55,7 @@ internal class EventRepositoryImplTest {
     lateinit var sessionDataCache: SessionDataCache
 
     @MockK
-    lateinit var configManager: ConfigService
+    lateinit var configManager: ConfigRepository
 
     @Before
     fun setup() {
