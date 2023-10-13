@@ -1,7 +1,7 @@
 package com.simprints.infra.authlogic.worker
 
 import com.simprints.infra.authlogic.authenticator.SignerManager
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageRepository
