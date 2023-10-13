@@ -17,7 +17,7 @@ import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 
 interface RequestContract {
@@ -31,7 +31,7 @@ interface RequestContract {
         val identifyExtractor: IdentifyExtractor
         val confirmIdentityExtractor: ConfirmIdentityExtractor
         val enrolLastBiometricsExtractor: EnrolLastBiometricsExtractor
-        val tokenizationManager: TokenizationManager
+        val tokenizationProcessor: TokenizationProcessor
         suspend fun getProject(): Project?
         fun sendSimprintsRequest(request: BaseRequest)
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)

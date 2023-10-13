@@ -20,7 +20,7 @@ import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -78,7 +78,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     lateinit var presenterFactory: ClientApiModule.OdkPresenterFactory
 
     @Inject
-    lateinit var tokenizationManagerParam: TokenizationManager
+    lateinit var tokenizationProcessorParam: TokenizationProcessor
 
     @Inject
     lateinit var configManager: ConfigManager
@@ -86,8 +86,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     @Inject
     lateinit var authStore: AuthStore
 
-    override val tokenizationManager: TokenizationManager by lazy {
-        tokenizationManagerParam
+    override val tokenizationProcessor: TokenizationProcessor by lazy {
+        tokenizationProcessorParam
     }
 
     override suspend fun getProject(): Project? =
