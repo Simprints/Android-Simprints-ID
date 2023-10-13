@@ -6,17 +6,21 @@ import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.sync.worker.ConfigurationScheduler
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal class ConfigManagerImpl @Inject constructor(
     private val configService: ConfigService,
-    private val configurationScheduler: ConfigurationScheduler
+    private val configurationScheduler: ConfigurationScheduler,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository
 ) :
     ConfigManager {
 
     override suspend fun refreshProject(projectId: String): Project =
-        configService.refreshProject(projectId)
+        configService.refreshProject(projectId).also { project ->
+            enrolmentRecordRepository.tokenizeExistingRecords(project)
+        }
 
     override suspend fun getProject(projectId: String): Project =
         configService.getProject(projectId)
