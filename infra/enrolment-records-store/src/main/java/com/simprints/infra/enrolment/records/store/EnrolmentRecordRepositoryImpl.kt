@@ -78,24 +78,31 @@ internal class EnrolmentRecordRepositoryImpl(
     override suspend fun tokenizeExistingRecords(project: Project) {
         val query = SubjectQuery(projectId = project.id)
         val tokenizedSubjectsCreateAction = subjectRepository.load(query).toList().map { subject ->
-            val moduleId = when (val moduleId = subject.moduleId) {
-                is TokenizableString.Tokenized -> moduleId
-                is TokenizableString.Raw -> tokenizationManager.encrypt(
-                    decrypted = moduleId,
-                    tokenKeyType = TokenKeyType.ModuleId,
-                    project = project
-                )
-            }
-            val attendantId = when (val attendantId = subject.attendantId) {
-                is TokenizableString.Tokenized -> attendantId
-                is TokenizableString.Raw -> tokenizationManager.encrypt(
-                    decrypted = attendantId,
-                    tokenKeyType = TokenKeyType.AttendantId,
-                    project = project
-                )
-            }
+            val moduleId = tokenizeIfNecessary(
+                value = subject.moduleId,
+                tokenKeyType = TokenKeyType.ModuleId,
+                project = project
+            )
+            val attendantId = tokenizeIfNecessary(
+                value = subject.attendantId,
+                tokenKeyType = TokenKeyType.AttendantId,
+                project = project
+            )
             return@map subject.copy(moduleId = moduleId, attendantId = attendantId)
         }.map(SubjectAction::Creation)
         subjectRepository.performActions(tokenizedSubjectsCreateAction)
+    }
+
+    private fun tokenizeIfNecessary(
+        value: TokenizableString,
+        tokenKeyType: TokenKeyType,
+        project: Project
+    ) = when (value) {
+        is TokenizableString.Tokenized -> value
+        is TokenizableString.Raw -> tokenizationManager.encrypt(
+            decrypted = value,
+            tokenKeyType = tokenKeyType,
+            project = project
+        )
     }
 }
