@@ -55,7 +55,7 @@ internal class EventRepositoryImplTest {
     lateinit var sessionDataCache: SessionDataCache
 
     @MockK
-    lateinit var configManager: ConfigRepository
+    lateinit var configRepository: ConfigRepository
 
     @Before
     fun setup() {
@@ -65,12 +65,12 @@ internal class EventRepositoryImplTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
-        coEvery { configManager.getConfiguration() } returns mockk {
+        coEvery { configRepository.getConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
             }
         }
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { language } returns LANGUAGE
         }
 
@@ -83,7 +83,7 @@ internal class EventRepositoryImplTest {
             timeHelper,
             sessionEventValidatorsFactory,
             sessionDataCache,
-            configManager,
+            configRepository,
         )
     }
 
