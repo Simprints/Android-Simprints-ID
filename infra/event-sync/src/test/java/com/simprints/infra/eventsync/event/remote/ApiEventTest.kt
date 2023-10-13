@@ -425,7 +425,7 @@ class ApiEventTest {
             when (attendantId) {
                 is TokenizableString.Raw -> assertThat(size).isEqualTo(0)
                 is TokenizableString.Tokenized -> {
-                    assertThat(first()).isEqualTo("userId")
+                    assertThat(first()).isEqualTo("attendantId")
                     assertThat(size).isEqualTo(1)
                 }
             }
