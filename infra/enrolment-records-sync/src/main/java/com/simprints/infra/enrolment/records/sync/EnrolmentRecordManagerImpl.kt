@@ -1,9 +1,9 @@
-package com.simprints.infra.enrolment.records
+package com.simprints.infra.enrolment.records.sync
 
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.*
-import com.simprints.infra.enrolment.records.worker.EnrolmentRecordScheduler
+import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordScheduler
 import kotlinx.coroutines.flow.Flow
 import java.io.Serializable
 import javax.inject.Inject

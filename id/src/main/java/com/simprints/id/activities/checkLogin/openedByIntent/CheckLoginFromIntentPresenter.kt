@@ -17,7 +17,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollo
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult

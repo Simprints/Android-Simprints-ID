@@ -16,7 +16,7 @@ import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_DEVICE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA

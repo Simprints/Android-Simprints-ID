@@ -11,7 +11,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.infra.config.store.models.Finger
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2

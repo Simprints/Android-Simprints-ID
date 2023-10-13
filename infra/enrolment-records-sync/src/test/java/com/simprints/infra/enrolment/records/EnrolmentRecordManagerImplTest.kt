@@ -4,7 +4,8 @@ import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.worker.EnrolmentRecordScheduler
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManagerImpl
+import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordScheduler
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest

@@ -17,8 +17,8 @@ import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.config.store.tokenization.TokenizationManager
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 
 interface RequestContract {
 
