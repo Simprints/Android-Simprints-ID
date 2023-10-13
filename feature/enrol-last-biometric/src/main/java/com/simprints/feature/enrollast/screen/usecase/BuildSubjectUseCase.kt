@@ -8,6 +8,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import java.util.Date
@@ -16,9 +17,10 @@ import javax.inject.Inject
 
 class BuildSubjectUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
+    private val subjectFactory: SubjectFactory
 ) {
 
-    operator fun invoke(params: EnrolLastBiometricParams): Subject = Subject(
+    operator fun invoke(params: EnrolLastBiometricParams): Subject = subjectFactory.buildSubject(
         UUID.randomUUID().toString(),
         params.projectId,
         params.userId,
