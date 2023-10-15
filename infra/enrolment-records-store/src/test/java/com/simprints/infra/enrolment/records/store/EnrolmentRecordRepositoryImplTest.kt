@@ -2,8 +2,13 @@ package com.simprints.infra.enrolment.records.store
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import io.mockk.coEvery
@@ -15,6 +20,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
 
 class EnrolmentRecordRepositoryImplTest {
 
@@ -42,7 +48,7 @@ class EnrolmentRecordRepositoryImplTest {
         }
     }
 
-    private val subjectRepository = mockk<SubjectRepository>()
+    private val subjectRepository = mockk<SubjectRepository>(relaxed = true)
     private val tokenizationManager = mockk<TokenizationManager>()
     private val remoteDataSource = mockk<EnrolmentRecordRemoteDataSource>(relaxed = true)
     private val prefsEditor = mockk<SharedPreferences.Editor>(relaxed = true)
@@ -52,7 +58,7 @@ class EnrolmentRecordRepositoryImplTest {
     private val ctx = mockk<Context> {
         every { getSharedPreferences(any(), any()) } returns prefs
     }
-    private lateinit var repository : EnrolmentRecordRepositoryImpl
+    private lateinit var repository: EnrolmentRecordRepositoryImpl
 
     @Before
     fun setup() {
@@ -160,4 +166,73 @@ class EnrolmentRecordRepositoryImplTest {
         coVerify(exactly = 1) { prefsEditor.putString(any(), SUBJECT_ID_2) }
         coVerify(exactly = 1) { prefsEditor.remove(any()) }
     }
+
+    @Test
+    fun `given the tokenization keys, when tokenizing existing subjects, the untokenized existing subjects should be tokenized`() =
+        runTest {
+            val projectId = "projectId"
+            val attendantIdRaw = "attendantId".asTokenizableRaw()
+            val moduleIdRaw = "moduleId".asTokenizableRaw()
+            val attendantIdTokenized = "attendantId".asTokenizableEncrypted()
+            val moduleIdTokenized = "moduleId".asTokenizableEncrypted()
+            val project = mockk<Project>()
+            val subject = Subject(
+                subjectId = "subjectId",
+                projectId = projectId,
+                attendantId = attendantIdRaw,
+                moduleId = moduleIdRaw,
+                createdAt = Date(),
+                updatedAt = null,
+                fingerprintSamples = emptyList(),
+                faceSamples = emptyList()
+            )
+            every { project.id } returns projectId
+            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+            every {
+                tokenizationManager.encrypt(
+                    decrypted = attendantIdRaw,
+                    tokenKeyType = TokenKeyType.AttendantId,
+                    project = project
+                )
+            } returns attendantIdTokenized
+            every {
+                tokenizationManager.encrypt(
+                    decrypted = moduleIdRaw,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = project
+                )
+            } returns moduleIdTokenized
+
+            repository.tokenizeExistingRecords(project)
+            val expectedSubject = subject.copy(
+                attendantId = attendantIdTokenized,
+                moduleId = moduleIdTokenized
+            )
+            val expectedSubjectActions = listOf(SubjectAction.Creation(expectedSubject))
+            coVerify { subjectRepository.performActions(expectedSubjectActions) }
+        }
+
+    @Test
+    fun `given the different project, when tokenizing existing subjects, the untokenized existing subjects are not tokenized`() =
+        runTest {
+            val projectId = "projectId"
+            val attendantIdRaw = "attendantId".asTokenizableRaw()
+            val moduleIdRaw = "moduleId".asTokenizableRaw()
+            val project = mockk<Project>()
+            val subject = Subject(
+                subjectId = "subjectId",
+                projectId = "another project id",
+                attendantId = attendantIdRaw,
+                moduleId = moduleIdRaw,
+                createdAt = Date(),
+                updatedAt = null,
+                fingerprintSamples = emptyList(),
+                faceSamples = emptyList()
+            )
+            every { project.id } returns projectId
+            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+
+            repository.tokenizeExistingRecords(project)
+            coVerify { subjectRepository.performActions(emptyList()) }
+        }
 }
