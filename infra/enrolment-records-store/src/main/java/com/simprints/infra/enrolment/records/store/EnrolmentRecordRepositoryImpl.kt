@@ -77,19 +77,21 @@ internal class EnrolmentRecordRepositoryImpl(
 
     override suspend fun tokenizeExistingRecords(project: Project) {
         val query = SubjectQuery(projectId = project.id)
-        val tokenizedSubjectsCreateAction = subjectRepository.load(query).toList().map { subject ->
-            val moduleId = tokenizeIfNecessary(
-                value = subject.moduleId,
-                tokenKeyType = TokenKeyType.ModuleId,
-                project = project
-            )
-            val attendantId = tokenizeIfNecessary(
-                value = subject.attendantId,
-                tokenKeyType = TokenKeyType.AttendantId,
-                project = project
-            )
-            return@map subject.copy(moduleId = moduleId, attendantId = attendantId)
-        }.map(SubjectAction::Creation)
+        val tokenizedSubjectsCreateAction =
+            subjectRepository.load(query).toList().mapNotNull { subject ->
+                if (subject.projectId != project.id) return@mapNotNull null
+                val moduleId = tokenizeIfNecessary(
+                    value = subject.moduleId,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = project
+                )
+                val attendantId = tokenizeIfNecessary(
+                    value = subject.attendantId,
+                    tokenKeyType = TokenKeyType.AttendantId,
+                    project = project
+                )
+                return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
+            }.map(SubjectAction::Creation)
         subjectRepository.performActions(tokenizedSubjectsCreateAction)
     }
 
