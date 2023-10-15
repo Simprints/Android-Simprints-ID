@@ -103,8 +103,7 @@ class EnrolmentRecordRemoteDataSourceImplTest {
                     templates = listOf(ApiFaceTemplate(template = BASE64_FACE_TEMPLATE)),
                     format = "faceTemplateFormat",
                 )
-            ),
-            tokenizedFields = listOf(MODULE_ID.value, ATTENDANT_ID.value)
+            )
         )
         enrolmentRecordRemoteDataSourceImpl.uploadRecords(listOf(subject))
 
