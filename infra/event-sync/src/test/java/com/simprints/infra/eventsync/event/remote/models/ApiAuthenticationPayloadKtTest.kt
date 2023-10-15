@@ -1,7 +1,9 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent
+import io.mockk.mockk
 import org.junit.Test
 
 class ApiAuthenticationPayloadKtTest {
@@ -40,12 +42,14 @@ class ApiAuthenticationPayloadKtTest {
             AuthenticationEvent.AuthenticationPayload.Result.MISSING_OR_OUTDATED_PLAY_STORE_ERROR.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.MISSING_OR_OUTDATED_PLAY_STORE_ERROR::class.java)
     }
+
     @Test
     fun `should map integration service temp down error correctly`() {
         val result =
             AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR::class.java)
     }
+
     @Test
     fun `should map integrity service error correctly`() {
         val result =
@@ -58,5 +62,17 @@ class ApiAuthenticationPayloadKtTest {
         val result =
             AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiAuthenticationPayload.ApiResult.TECHNICAL_FAILURE::class.java)
+    }
+
+    @Test
+    fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
+        val payload = ApiAuthenticationPayload(domainPayload = mockk(relaxed = true))
+        TokenKeyType.values().forEach {
+            val result = payload.getTokenizedFieldJsonPath(it)
+            when(it) {
+                TokenKeyType.AttendantId -> assertThat(result).isEqualTo("userInfo.userId")
+                else -> assertThat(result).isNull()
+            }
+        }
     }
 }
