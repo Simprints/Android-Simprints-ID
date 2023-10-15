@@ -2,6 +2,7 @@ package com.simprints.infra.enrolment.records.store
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.simprints.infra.config.store.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
@@ -42,6 +43,7 @@ class EnrolmentRecordRepositoryImplTest {
     }
 
     private val subjectRepository = mockk<SubjectRepository>()
+    private val tokenizationManager = mockk<TokenizationManager>()
     private val remoteDataSource = mockk<EnrolmentRecordRemoteDataSource>(relaxed = true)
     private val prefsEditor = mockk<SharedPreferences.Editor>(relaxed = true)
     private val prefs = mockk<SharedPreferences> {
@@ -58,11 +60,12 @@ class EnrolmentRecordRepositoryImplTest {
         every { prefsEditor.remove(any()) } returns prefsEditor
 
         repository = EnrolmentRecordRepositoryImpl(
-            ctx,
-            remoteDataSource,
-            subjectRepository,
-            UnconfinedTestDispatcher(),
-            BATCH_SIZE,
+            context = ctx,
+            remoteDataSource = remoteDataSource,
+            subjectRepository = subjectRepository,
+            tokenizationManager = tokenizationManager,
+            dispatcher = UnconfinedTestDispatcher(),
+            batchSize = BATCH_SIZE,
         )
     }
 
