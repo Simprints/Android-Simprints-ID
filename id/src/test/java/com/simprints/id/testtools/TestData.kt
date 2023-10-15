@@ -2,7 +2,7 @@ package com.simprints.id.testtools
 
 import com.simprints.core.biometrics.FingerprintGeneratorUtils
 import com.simprints.core.domain.face.FaceSample
-import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
 import com.simprints.infra.events.sampledata.SampleDefaults
 import java.util.Date
