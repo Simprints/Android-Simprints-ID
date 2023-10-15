@@ -13,7 +13,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CO
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import javax.inject.Inject

@@ -15,6 +15,6 @@ dependencies {
 
     implementation(libs.workManager.work)
 
-    androidTestImplementation(project(":infra:enrolment-records"))
+    androidTestImplementation(project(":infra:enrolment-records-store"))
 }
 
