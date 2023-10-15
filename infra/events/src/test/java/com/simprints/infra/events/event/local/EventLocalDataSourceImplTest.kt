@@ -146,7 +146,9 @@ internal class EventLocalDataSourceImplTest {
             //Given
             coEvery { eventDao.observeCount(any()) } throws SQLiteException()
             // When
-            assertThrows<SQLiteException> { eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList() }
+            assertThrows<SQLiteException> {
+                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            }
             // Then
             verify(exactly = 0) {
                 eventDatabaseFactory.deleteDatabase()
@@ -178,7 +180,9 @@ internal class EventLocalDataSourceImplTest {
             //Given
             coEvery { eventDao.observeCount(any()) } throws Exception()
             // When
-            assertThrows<Exception> { eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList() }
+            assertThrows<Exception> {
+                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            }
             // Then
             verify(exactly = 0) {
                 eventDatabaseFactory.deleteDatabase()
@@ -330,6 +334,16 @@ internal class EventLocalDataSourceImplTest {
 
         coVerify { eventDao.deleteAll() }
     }
+
+    @Test
+    fun `when loadAllFromProject is called, then events are loaded from the local storage`() =
+        runTest {
+            val projectId = "projectId"
+            coEvery { eventDao.loadFromProject(projectId) } returns mockk()
+            eventLocalDataSource.loadAllFromProject(projectId)
+
+            coVerify { eventDao.loadFromProject(projectId) }
+        }
 
     private fun mockDaoLoadToMakeNothing() {
         db = mockk(relaxed = true)
