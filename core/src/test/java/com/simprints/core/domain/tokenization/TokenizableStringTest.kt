@@ -41,4 +41,31 @@ class TokenizableStringTest {
         val value = "value".asTokenizableRaw()
         assertThat(value.isTokenized()).isFalse()
     }
+
+    @Test
+    fun `when hashCode is invoked, the result is calculated from the value`() {
+        val value = "value"
+        assertThat(value.asTokenizableRaw().hashCode()).isEqualTo(value.hashCode())
+        assertThat(value.asTokenizableEncrypted().hashCode()).isEqualTo(value.hashCode())
+    }
+
+    @Test
+    fun `when toString is invoked, the result is calculated from the value`() {
+        val value = "value"
+        assertThat(value.asTokenizableRaw().toString()).isEqualTo(value)
+        assertThat(value.asTokenizableEncrypted().toString()).isEqualTo(value)
+    }
+
+    @Test
+    fun `when asTokenized is invoked, the correct tokenizable string is returned`() {
+        val value = "value"
+        assertThat(value.asTokenized(isTokenized = true)).isEqualTo(TokenizableString.Tokenized(value))
+        assertThat(value.asTokenized(isTokenized = false)).isEqualTo(TokenizableString.Raw(value))
+    }
+    @Test
+    fun `when takeIfTokenized is invoked, the value is not null only if it is tokenized`() {
+        val value = "value"
+        assertThat(value.asTokenizableRaw().takeIfTokenized(value)).isNull()
+        assertThat(value.asTokenizableEncrypted().takeIfTokenized(value)).isEqualTo(value)
+    }
 }
