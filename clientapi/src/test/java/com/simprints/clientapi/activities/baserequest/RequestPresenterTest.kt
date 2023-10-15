@@ -10,9 +10,12 @@ import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.errors.ClientApiAlert
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.events.sampledata.createIdentificationCalloutEvent
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -118,6 +121,45 @@ class RequestPresenterTest {
         presenter.start()
 
         verify { mockView.handleClientRequestError(ClientApiAlert.ROOTED_DEVICE) }
+    }
+
+    @Test
+    fun `when decryptTokenizedFields is called, tokenized fields of the event are decrypted`() {
+        val mockDeviceManager = mockk<SecurityManager>(relaxed = true)
+        every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
+        val mockView = mockk<RequestContract.RequestView>(relaxed = true)
+        val tokenizationManager = mockk<TokenizationManager>(relaxed = true)
+        val presenter = ImplRequestPresenter(
+            view = mockView,
+            clientApiSessionEventsManager = mockk(relaxed = true),
+            rootManager = mockDeviceManager,
+            configManager = mockk(relaxed = true),
+            sessionEventsManager = mockk(relaxed = true),
+            tokenizationManager = tokenizationManager
+        )
+        val userId = "userId".asTokenizableEncrypted()
+        val moduleId = "moduleId".asTokenizableRaw()
+        val event = createIdentificationCalloutEvent().let {
+            it.copy(payload = it.payload.copy(userId = userId, moduleId = moduleId))
+        }
+
+
+        presenter.decryptTokenizedFields(events = listOf(event), project = mockk()).first()
+
+        verify {
+            tokenizationManager.decrypt(
+                encrypted = userId,
+                tokenKeyType = TokenKeyType.AttendantId,
+                project = any()
+            )
+        }
+        verify(exactly = 0) {
+            tokenizationManager.decrypt(
+                encrypted = moduleId.value.asTokenizableEncrypted(),
+                tokenKeyType = TokenKeyType.ModuleId,
+                project = any()
+            )
+        }
     }
 
 }

@@ -40,15 +40,15 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.canCoSyncAllData
 import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.config.store.models.canCoSyncData
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
@@ -182,11 +182,11 @@ abstract class RequestPresenter(
         if (configManager.getProjectConfiguration().canCoSyncData()) {
             val events = sessionEventsManager
                 .getAllEventsForSession(sessionId).toList()
-                .decryptTokenizedFields(configManager.getProject(getProjectIdFromRequest()))
+            val decryptedEvents = decryptTokenizedFields(events, configManager.getProject(getProjectIdFromRequest()))
             val serializationModule = SimpleModule().apply {
                 addSerializer(TokenizableString::class.java, TokenizationAsStringSerializer())
             }
-            jsonHelper.toJson(CoSyncEvents(events), module = serializationModule)
+            jsonHelper.toJson(CoSyncEvents(decryptedEvents), module = serializationModule)
         } else {
             null
         }
@@ -251,7 +251,7 @@ abstract class RequestPresenter(
         )
     }
 
-    private fun List<Event>.decryptTokenizedFields(project: Project): List<Event> = map {
+    fun decryptTokenizedFields(events: List<Event>, project: Project): List<Event> = events.map {
         val decryptedFieldsMap = it.getTokenizedFields().mapValues { entry ->
             when (val value = entry.value) {
                 is TokenizableString.Raw -> value
