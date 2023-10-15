@@ -1,4 +1,4 @@
-package com.simprints.infra.config.sync.tokenization
+package com.simprints.infra.config.store.tokenization
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
@@ -6,7 +6,6 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.utils.StringTokenizer
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
