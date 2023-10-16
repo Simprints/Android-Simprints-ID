@@ -22,7 +22,7 @@ import com.simprints.infra.logging.Simber
  *    This migration changes the
  *      | "field": "some_id"
  *    to the
- *      | "field": { "className": "Raw", "value": "some_id" }
+ *      | "field": { "className": "TokenizableString.Raw", "value": "some_id" }
  *    within the json string stored in DbEvent::eventJson.
  *
  * This way the objects stored previously in the database can be safely casted from the old JSON to
