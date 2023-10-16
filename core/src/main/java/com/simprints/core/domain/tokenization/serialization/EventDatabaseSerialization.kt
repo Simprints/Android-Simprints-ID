@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.simprints.core.domain.tokenization.TokenizableString
 
-private const val TOKENIZED = "Tokenized"
-const val RAW = "Raw"
+private const val TOKENIZED = "TokenizableString.Tokenized"
+const val RAW = "TokenizableString.Raw"
 const val FIELD_CLASS_NAME = "className"
 const val FIELD_VALUE = "value"
 
@@ -22,10 +22,10 @@ const val FIELD_VALUE = "value"
  *
  * Examples:
  * TokenizableString.Raw(value = "person")
- *     -> { "className": "Raw", "value": "person" }
+ *     -> { "className": "TokenizableString.Raw", "value": "person" }
  *
  * TokenizableString.Tokenized(value = "eq2Efc98d")
- *     -> { "className": "Tokenized", "value": "eq2Efc98d" }
+ *     -> { "className": "TokenizableString.Tokenized", "value": "eq2Efc98d" }
  */
 class TokenizationClassNameSerializer :
     StdSerializer<TokenizableString>(TokenizableString::class.java) {
@@ -52,10 +52,10 @@ class TokenizationClassNameSerializer :
  * Use [TokenizationClassNameSerializer] to deserialize the object.
  *
  * Examples:
- * { "className": "Raw", "value": "person" }
+ * { "className": "TokenizableString.Raw", "value": "person" }
  *     -> TokenizableString.Raw(value = "person")
  *
- * { "className": "Tokenized", "value": "eq2Efc98d" }
+ * { "className": "TokenizableString.Tokenized", "value": "eq2Efc98d" }
  *     -> TokenizableString.Tokenized(value = "eq2Efc98d")
  *
  * { "className": "Something else", "value": "name" }
