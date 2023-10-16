@@ -8,7 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import io.mockk.every
 import io.mockk.mockk
 
@@ -33,11 +33,11 @@ object EnrolLastBiometricsFactory : RequestFactory() {
 
     override fun getBuilder(extractor: ClientRequestExtractor): EnrolLastBiometricsBuilder {
         val project = mockk<Project>()
-        val tokenizationManager = mockk<TokenizationManager>()
+        val tokenizationProcessor = mockk<TokenizationProcessor>()
         return EnrolLastBiometricsBuilder(
             extractor = extractor as EnrolLastBiometricsExtractor,
             project = project,
-            tokenizationManager = tokenizationManager,
+            tokenizationProcessor = tokenizationProcessor,
             validator = getValidator(extractor)
         )
     }

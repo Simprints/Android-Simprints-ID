@@ -23,7 +23,7 @@ import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -40,7 +40,7 @@ internal class SyncInfoViewModel @Inject constructor(
     private val authStore: AuthStore,
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
-    private val tokenizationManager: TokenizationManager
+    private val tokenizationProcessor: TokenizationProcessor
 ) : ViewModel() {
 
     val recordsInLocal: LiveData<Int?>
@@ -211,7 +211,7 @@ internal class SyncInfoViewModel @Inject constructor(
             )
             val decryptedName = when (moduleName) {
                 is TokenizableString.Raw -> moduleName
-                is TokenizableString.Tokenized -> tokenizationManager.decrypt(
+                is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                     encrypted = moduleName,
                     tokenKeyType = TokenKeyType.ModuleId,
                     project = configManager.getProject(projectId)
