@@ -17,7 +17,7 @@ internal class ConfigurationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val authStore: AuthStore,
-    private val configRepository: ConfigRepository,
+    private val configManager: ConfigManager
 ) : CoroutineWorker(context, params) {
 
     private val tag = ConfigurationWorker::class.java.name
@@ -29,8 +29,8 @@ internal class ConfigurationWorker @AssistedInject constructor(
         if (projectId.isEmpty()) {
             Result.failure()
         } else {
-            configRepository.refreshProject(projectId)
-            configRepository.refreshConfiguration(projectId)
+            configManager.refreshProject(projectId)
+            configManager.refreshProjectConfiguration(projectId)
             Simber.tag(tag).i("Successfully refresh the project configuration")
             Result.success()
         }
