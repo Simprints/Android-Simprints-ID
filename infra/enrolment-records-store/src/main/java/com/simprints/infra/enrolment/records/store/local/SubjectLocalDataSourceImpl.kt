@@ -28,6 +28,8 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(private val realmW
         const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
         const val MODULE_ID_FIELD = "moduleId"
+        const val IS_ATTENDANT_ID_TOKENIZED_FIELD = "isAttendantIdTokenized"
+        const val IS_MODULE_ID_TOKENIZED_FIELD = "isModuleIdTokenized"
     }
 
     override suspend fun load(query: SubjectQuery): Flow<Subject> =
@@ -132,7 +134,11 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(private val realmW
                         UUID.fromString(it)
                     )
                 }
-
+                query.hasUntokenizedFields?.let {
+                    this.equalTo(IS_ATTENDANT_ID_TOKENIZED_FIELD, false)
+                        .or()
+                        .equalTo(IS_MODULE_ID_TOKENIZED_FIELD, false)
+                }
                 if (query.sort)
                     this.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
             }

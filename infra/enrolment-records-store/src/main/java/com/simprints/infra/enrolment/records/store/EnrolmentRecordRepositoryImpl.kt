@@ -76,7 +76,7 @@ internal class EnrolmentRecordRepositoryImpl(
     }
 
     override suspend fun tokenizeExistingRecords(project: Project) {
-        val query = SubjectQuery(projectId = project.id)
+        val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
         val tokenizedSubjectsCreateAction =
             subjectRepository.load(query).toList().mapNotNull { subject ->
                 if (subject.projectId != project.id) return@mapNotNull null
