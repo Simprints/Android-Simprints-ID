@@ -31,10 +31,9 @@ import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
@@ -88,7 +87,7 @@ class CollectFingerprintsActivityTest {
         every { isLiveFeedbackAvailable() } returns false
         coEvery { disconnect() } just Runs
         every { versionInformation() } returns mockk {
-            every { generation } returns ScannerGeneration.VERO_2
+            every { generation } returns com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration.VERO_2
         }
     }
     private val scannerManager: ScannerManager =

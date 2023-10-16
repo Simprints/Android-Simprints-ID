@@ -65,7 +65,7 @@ data class ExtendedVersionInformation(
 
         fun nextData(): String {
             dataLength = bytes[endPosition + 1].toInt()
-            startPosition  = endPosition + 2
+            startPosition = endPosition + 2
             endPosition = startPosition + dataLength - 1
 
             return String(bytes.sliceArray(startPosition..endPosition))

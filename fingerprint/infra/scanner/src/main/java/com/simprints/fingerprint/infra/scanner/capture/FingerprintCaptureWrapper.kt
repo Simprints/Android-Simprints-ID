@@ -5,7 +5,7 @@ import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerp
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 
 interface FingerprintCaptureWrapper {
-    suspend fun acquireFingerprintImage():AcquireFingerprintImageResponse
+    suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse
 
     suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,

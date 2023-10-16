@@ -20,7 +20,7 @@ fun wrapErrorFromScanner(e: Throwable): Throwable = when (e) {
     is IllegalStateException, // We're calling scanner methods out of order somehow
     is IllegalArgumentException -> { // We've received unexpected/invalid bytes from the scanner
         Simber.e(e)
-        UnexpectedScannerException(e)
+        UnexpectedScannerException(throwable = e)
     }
 
     is OtaFailedException -> { // Wrap the OTA failed exception to fingerprint domain exception

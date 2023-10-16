@@ -20,7 +20,7 @@ class StmOtaMessageOutputStreamTest {
     fun messageOutputStream_sendMessage_serializesAndDispatchesMessageCorrectly() {
         val message = WriteMemoryStartCommand()
         val expectedBytes = message.getBytes()
-        every {mockStmOtaMessageSerializer.serialize(eq(message)) } returns listOf(expectedBytes)
+        every { mockStmOtaMessageSerializer.serialize(eq(message)) } returns listOf(expectedBytes)
 
         val messageOutputStream = StmOtaMessageOutputStream(mockStmOtaMessageSerializer, OutputStreamDispatcher())
 

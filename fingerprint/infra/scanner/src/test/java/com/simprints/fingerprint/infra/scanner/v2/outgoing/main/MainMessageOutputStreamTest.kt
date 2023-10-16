@@ -27,13 +27,13 @@ class MainMessageOutputStreamTest {
         justRun { outputStreamDispatcher.connect(any()) }
         messageOutputStream.connect(mockk())
 
-        verify {outputStreamDispatcher.connect(any()) }
+        verify { outputStreamDispatcher.connect(any()) }
     }
 
     @Test
     fun messageOutputStream_sendMessage_serializesAndDispatchesMessageByCallingCorrectMethods() {
-        every {messageSerializerMock.serialize(any()) } returns listOf(byteArrayOf(0x10, 0x20, 0x30), byteArrayOf(0x40, 0x50))
-        every {outputStreamDispatcher.dispatch(any()) } returns Completable.complete()
+        every { messageSerializerMock.serialize(any()) } returns listOf(byteArrayOf(0x10, 0x20, 0x30), byteArrayOf(0x40, 0x50))
+        every { outputStreamDispatcher.dispatch(any()) } returns Completable.complete()
 
         val messageOutputStream = MainMessageOutputStream(messageSerializerMock, outputStreamDispatcher)
 
@@ -47,7 +47,7 @@ class MainMessageOutputStreamTest {
     fun messageOutputStream_sendMessage_serializesAndDispatchesMessageCorrectly() {
         val message = GetUn20OnCommand()
         val expectedBytes = listOf(byteArrayOf(0x10, 0x20, 0x30), byteArrayOf(0x40, 0x50))
-        every {messageSerializerMock.serialize(eq(message)) } returns expectedBytes
+        every { messageSerializerMock.serialize(eq(message)) } returns expectedBytes
 
         val messageOutputStream = MainMessageOutputStream(messageSerializerMock, OutputStreamDispatcher())
 

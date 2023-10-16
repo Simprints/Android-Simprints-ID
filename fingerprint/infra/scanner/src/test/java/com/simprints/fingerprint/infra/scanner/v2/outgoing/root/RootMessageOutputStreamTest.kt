@@ -20,7 +20,7 @@ class RootMessageOutputStreamTest {
     fun messageOutputStream_sendMessage_serializesAndDispatchesMessageCorrectly() {
         val message = EnterMainModeCommand()
         val expectedBytes = listOf(byteArrayOf(0x10, 0x20, 0x30), byteArrayOf(0x40, 0x50))
-        every {rootMessageSerializerMock.serialize(eq(message)) } returns expectedBytes
+        every { rootMessageSerializerMock.serialize(eq(message)) } returns expectedBytes
 
         val messageOutputStream = RootMessageOutputStream(rootMessageSerializerMock, OutputStreamDispatcher())
 

@@ -27,7 +27,7 @@ class RootMessageInputStreamTest {
     private val rootMessageInputStream = RootMessageInputStream(rootMessageAccumulator)
 
     @Test
-    fun `test disconnect disposes the flowable stream`(){
+    fun `test disconnect disposes the flowable stream`() {
         //Given
         mockkStatic("com.simprints.fingerprint.infra.scanner.v2.incoming.root.RootMessageStreamKt")
         val flowableDisposable = mockk<Disposable>(relaxed = true)
@@ -39,7 +39,7 @@ class RootMessageInputStreamTest {
             }
         }
 
-        val flowable:Flowable<ByteArray> = mockk{
+        val flowable: Flowable<ByteArray> = mockk {
             every { toRootMessageStream(rootMessageAccumulator) } returns rootResponseFlowable
         }
 

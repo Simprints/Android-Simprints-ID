@@ -20,7 +20,7 @@ class CypressOtaMessageOutputStreamTest {
     fun messageOutputStream_sendMessage_serializesAndDispatchesMessageCorrectly() {
         val message = DownloadCommand(5000)
         val expectedBytes = message.getBytes()
-        every {mockCypressOtaMessageSerializer.serialize(message) } returns listOf(expectedBytes)
+        every { mockCypressOtaMessageSerializer.serialize(message) } returns listOf(expectedBytes)
 
         val messageOutputStream = CypressOtaMessageOutputStream(mockCypressOtaMessageSerializer, OutputStreamDispatcher())
 
