@@ -19,7 +19,7 @@ import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -38,7 +38,7 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     private val sessionDataCache: SessionDataCache,
-    private val configService: ConfigService
+    private val configRepository: ConfigRepository
 ) : EventRepository {
 
     companion object {
@@ -56,8 +56,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         closeAllSessions(NEW_SESSION)
 
         return reportException {
-            val projectConfiguration = configService.getConfiguration()
-            val deviceConfiguration = configService.getDeviceConfiguration()
+            val projectConfiguration = configRepository.getConfiguration()
+            val deviceConfiguration = configRepository.getDeviceConfiguration()
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
             val sessionCaptureEvent = SessionCaptureEvent(
                 id = UUID.randomUUID().toString(),

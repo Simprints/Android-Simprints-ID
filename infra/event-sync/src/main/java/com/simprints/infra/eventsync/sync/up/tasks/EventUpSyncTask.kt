@@ -22,7 +22,7 @@ import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -36,7 +36,7 @@ internal class EventUpSyncTask @Inject constructor(
     private val eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
-    private val configService: ConfigService
+    private val configRepository: ConfigRepository
 ) {
 
     fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
@@ -46,7 +46,7 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val config = configService.getConfiguration()
+        val config = configRepository.getConfiguration()
         var lastOperation = operation.copy()
         var count = 0
         try {
