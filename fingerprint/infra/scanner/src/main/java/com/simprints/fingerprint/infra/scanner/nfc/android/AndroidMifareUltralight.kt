@@ -4,7 +4,7 @@ import android.nfc.tech.MifareUltralight
 import com.simprints.fingerprint.infra.scanner.nfc.ComponentMifareUltralight
 import java.io.Closeable
 
-class AndroidMifareUltralight(
+internal class AndroidMifareUltralight(
     val mifare: MifareUltralight
 ) : ComponentMifareUltralight, Closeable by mifare {
 

@@ -13,7 +13,7 @@ import javax.inject.Inject
 /**
  * This class is responsible for downloading the firmware updates.
  */
-class FingerprintFileDownloader @Inject constructor(
+internal class FingerprintFileDownloader @Inject constructor(
     private val fingerprintApiClientFactory: FingerprintApiClientFactory,
     private val authStore: AuthStore,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,

@@ -25,7 +25,7 @@ private typealias StmStep = FlowCollector<StmOtaStep>
  * @param connectionHelper  for connection operations on the scanner
  * @param firmwareLocalDataSource  for retrieving firmware bytes to be transferred for update
  */
-class StmOtaHelper @Inject constructor(
+internal class StmOtaHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
     private val firmwareLocalDataSource: FirmwareLocalDataSource
 ) {

@@ -24,7 +24,7 @@ import javax.inject.Singleton
 abstract class ScannerModule {
 
     @Binds
-    abstract fun provideScannerManager(impl: ScannerManagerImpl): ScannerManager
+    internal abstract fun provideScannerManager(impl: ScannerManagerImpl): ScannerManager
 
 }
 

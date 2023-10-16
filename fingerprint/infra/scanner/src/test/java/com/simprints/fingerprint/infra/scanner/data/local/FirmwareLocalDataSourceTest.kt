@@ -16,7 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 
-class FirmwareLocalDataSourceTest {
+internal class FirmwareLocalDataSourceTest {
 
     @MockK
     lateinit var context: Context

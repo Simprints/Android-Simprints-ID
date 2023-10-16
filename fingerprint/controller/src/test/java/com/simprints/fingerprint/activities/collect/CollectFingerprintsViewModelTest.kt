@@ -25,6 +25,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
@@ -91,7 +92,7 @@ class CollectFingerprintsViewModelTest {
         every { isLiveFeedbackAvailable() } returns false
         every { isImageTransferSupported() } returns true
         every { versionInformation() } returns mockk {
-            every { generation } returns com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration.VERO_1
+            every { generation } returns ScannerGeneration.VERO_1
         }
     }
     private lateinit var scannerManager: ScannerManager
