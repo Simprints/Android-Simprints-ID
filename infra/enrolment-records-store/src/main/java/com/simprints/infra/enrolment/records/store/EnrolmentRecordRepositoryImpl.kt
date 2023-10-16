@@ -5,7 +5,7 @@ import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -20,7 +20,7 @@ internal class EnrolmentRecordRepositoryImpl(
     context: Context,
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
     private val subjectRepository: SubjectRepository,
-    private val tokenizationManager: TokenizationManager,
+    private val tokenizationProcessor: TokenizationProcessor,
     private val dispatcher: CoroutineDispatcher,
     private val batchSize: Int,
 ) : EnrolmentRecordRepository {
@@ -30,13 +30,13 @@ internal class EnrolmentRecordRepositoryImpl(
         @ApplicationContext context: Context,
         remoteDataSource: EnrolmentRecordRemoteDataSource,
         subjectRepository: SubjectRepository,
-        tokenizationManager: TokenizationManager,
+        tokenizationProcessor: TokenizationProcessor,
         @DispatcherIO dispatcher: CoroutineDispatcher,
     ) : this(
         context = context,
         remoteDataSource = remoteDataSource,
         subjectRepository = subjectRepository,
-        tokenizationManager = tokenizationManager,
+        tokenizationProcessor = tokenizationProcessor,
         dispatcher = dispatcher,
         batchSize = BATCH_SIZE
     )
@@ -101,7 +101,7 @@ internal class EnrolmentRecordRepositoryImpl(
         project: Project
     ) = when (value) {
         is TokenizableString.Tokenized -> value
-        is TokenizableString.Raw -> tokenizationManager.encrypt(
+        is TokenizableString.Raw -> tokenizationProcessor.encrypt(
             decrypted = value,
             tokenKeyType = tokenKeyType,
             project = project

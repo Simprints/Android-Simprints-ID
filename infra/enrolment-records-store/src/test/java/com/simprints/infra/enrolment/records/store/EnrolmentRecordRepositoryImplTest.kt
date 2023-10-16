@@ -6,7 +6,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -49,7 +49,7 @@ class EnrolmentRecordRepositoryImplTest {
     }
 
     private val subjectRepository = mockk<SubjectRepository>(relaxed = true)
-    private val tokenizationManager = mockk<TokenizationManager>()
+    private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val remoteDataSource = mockk<EnrolmentRecordRemoteDataSource>(relaxed = true)
     private val prefsEditor = mockk<SharedPreferences.Editor>(relaxed = true)
     private val prefs = mockk<SharedPreferences> {
@@ -69,7 +69,7 @@ class EnrolmentRecordRepositoryImplTest {
             context = ctx,
             remoteDataSource = remoteDataSource,
             subjectRepository = subjectRepository,
-            tokenizationManager = tokenizationManager,
+            tokenizationProcessor = tokenizationProcessor,
             dispatcher = UnconfinedTestDispatcher(),
             batchSize = BATCH_SIZE,
         )
@@ -189,14 +189,14 @@ class EnrolmentRecordRepositoryImplTest {
             every { project.id } returns projectId
             coEvery { subjectRepository.load(any()) } returns flowOf(subject)
             every {
-                tokenizationManager.encrypt(
+                tokenizationProcessor.encrypt(
                     decrypted = attendantIdRaw,
                     tokenKeyType = TokenKeyType.AttendantId,
                     project = project
                 )
             } returns attendantIdTokenized
             every {
-                tokenizationManager.encrypt(
+                tokenizationProcessor.encrypt(
                     decrypted = moduleIdRaw,
                     tokenKeyType = TokenKeyType.ModuleId,
                     project = project

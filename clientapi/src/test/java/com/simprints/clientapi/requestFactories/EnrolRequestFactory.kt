@@ -9,8 +9,8 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
 import io.mockk.every
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import io.mockk.mockk
 
 object EnrolRequestFactory : RequestFactory() {
@@ -26,14 +26,14 @@ object EnrolRequestFactory : RequestFactory() {
 
     override fun getBuilder(extractor: ClientRequestExtractor): EnrolBuilder {
         val project = mockk<Project>()
-        val tokenizationManager = mockk<TokenizationManager> {
+        val tokenizationProcessor = mockk<TokenizationProcessor> {
             every { encrypt(MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns MOCK_USER_ID
             every { encrypt(MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns MOCK_MODULE_ID
         }
         return EnrolBuilder(
             extractor = extractor as EnrolExtractor,
             project = project,
-            tokenizationManager = tokenizationManager,
+            tokenizationProcessor = tokenizationProcessor,
             validator = getValidator(extractor)
         )
     }

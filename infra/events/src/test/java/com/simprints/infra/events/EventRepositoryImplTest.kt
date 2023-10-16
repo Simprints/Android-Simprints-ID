@@ -2,10 +2,7 @@ package com.simprints.infra.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigService
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
-import com.simprints.infra.config.store.tokenization.TokenizationManager
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
@@ -21,14 +18,10 @@ import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventV
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.every
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.verify
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
@@ -38,7 +31,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.util.UUID
 
 internal class EventRepositoryImplTest {
 
@@ -63,10 +55,7 @@ internal class EventRepositoryImplTest {
     lateinit var sessionDataCache: SessionDataCache
 
     @MockK
-    lateinit var configManager: ConfigService
-
-    @MockK
-    lateinit var tokenizationManager: TokenizationManager
+    lateinit var configRepository: ConfigRepository
 
     @Before
     fun setup() {
@@ -76,12 +65,12 @@ internal class EventRepositoryImplTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
-        coEvery { configManager.getConfiguration() } returns mockk {
+        coEvery { configRepository.getConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
             }
         }
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { language } returns LANGUAGE
         }
 
@@ -94,8 +83,7 @@ internal class EventRepositoryImplTest {
             timeHelper = timeHelper,
             validatorsFactory = sessionEventValidatorsFactory,
             sessionDataCache = sessionDataCache,
-            configService = configManager,
-            tokenizationManager = tokenizationManager
+            configRepository = configRepository,
         )
     }
 
@@ -483,12 +471,6 @@ internal class EventRepositoryImplTest {
     private fun mockSignedId() =
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
-    private fun mockUUID(result: String) {
-        mockkStatic(UUID::class)
-        val guid = mockk<UUID>()
-        every { guid.toString() } returns result
-        every { UUID.randomUUID() } returns guid
-    }
     companion object {
         const val DEVICE_ID = "DEVICE_ID"
         const val APP_VERSION_NAME = "APP_VERSION_NAME"

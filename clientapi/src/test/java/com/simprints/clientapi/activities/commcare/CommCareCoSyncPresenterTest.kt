@@ -27,8 +27,8 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
-import com.simprints.infra.config.store.tokenization.TokenizationManager
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.event.domain.models.RefusalEvent
@@ -59,7 +59,7 @@ class CommCareCoSyncPresenterTest {
     }
 
     private val project: Project = mockk()
-    private val tokenizationManagerMock: TokenizationManager = mockk {
+    private val tokenizationProcessorMock: TokenizationProcessor = mockk {
         every { encrypt(MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns MOCK_USER_ID
         every { encrypt(MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns MOCK_MODULE_ID
     }
@@ -71,7 +71,7 @@ class CommCareCoSyncPresenterTest {
             )
         )
         coEvery { getProject() } returns project
-        every { tokenizationManager } returns tokenizationManagerMock
+        every { tokenizationProcessor } returns tokenizationProcessorMock
     }
     private val jsonHelper = JsonHelper
 

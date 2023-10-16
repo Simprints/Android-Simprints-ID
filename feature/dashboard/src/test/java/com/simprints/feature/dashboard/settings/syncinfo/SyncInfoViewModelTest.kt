@@ -13,7 +13,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
@@ -74,7 +74,7 @@ class SyncInfoViewModelTest {
     private lateinit var project: Project
 
     @MockK(relaxed = true)
-    private lateinit var tokenizationManager: TokenizationManager
+    private lateinit var tokenizationProcessor: TokenizationProcessor
 
     private lateinit var connectionLiveData: MutableLiveData<Boolean>
     private lateinit var stateLiveData: MutableLiveData<EventSyncState>
@@ -100,7 +100,7 @@ class SyncInfoViewModelTest {
             authStore = authStore,
             imageRepository = imageRepository,
             eventSyncManager = eventSyncManager,
-            tokenizationManager = tokenizationManager
+            tokenizationProcessor = tokenizationProcessor
         )
     }
 
@@ -173,7 +173,7 @@ class SyncInfoViewModelTest {
         } returns numberForModule2
         listOf(module1, module2).forEach { moduleName ->
             every {
-                tokenizationManager.decrypt(
+                tokenizationProcessor.decrypt(
                     encrypted = moduleName,
                     tokenKeyType = TokenKeyType.ModuleId,
                     project = project

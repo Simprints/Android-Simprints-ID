@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.events.EventRepository
 import dagger.assisted.Assisted
@@ -17,7 +17,7 @@ internal class ConfigurationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val authStore: AuthStore,
-    private val configManager: ConfigManager
+    private val configRepository: ConfigRepository,
 ) : CoroutineWorker(context, params) {
 
     private val tag = ConfigurationWorker::class.java.name
@@ -29,8 +29,8 @@ internal class ConfigurationWorker @AssistedInject constructor(
         if (projectId.isEmpty()) {
             Result.failure()
         } else {
-            configManager.refreshProject(projectId)
-            configManager.refreshProjectConfiguration(projectId)
+            configRepository.refreshProject(projectId)
+            configRepository.refreshConfiguration(projectId)
             Simber.tag(tag).i("Successfully refresh the project configuration")
             Result.success()
         }

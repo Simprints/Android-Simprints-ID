@@ -8,7 +8,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ internal class ProjectDetailsViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val authStore: AuthStore,
     private val recentUserActivityManager: RecentUserActivityManager,
-    private val tokenizationManager: TokenizationManager
+    private val tokenizationProcessor: TokenizationProcessor
 ) : ViewModel() {
 
     val projectCardStateLiveData: LiveData<DashboardProjectState>
@@ -37,7 +37,7 @@ internal class ProjectDetailsViewModel @Inject constructor(
             val recentUserActivity = recentUserActivityManager.getRecentUserActivity()
             val decryptedUserId = when(val userId = recentUserActivity.lastUserUsed) {
                 is TokenizableString.Raw -> userId
-                is TokenizableString.Tokenized -> tokenizationManager.decrypt(
+                is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                     encrypted = userId,
                     tokenKeyType = TokenKeyType.AttendantId,
                     project = cachedProject

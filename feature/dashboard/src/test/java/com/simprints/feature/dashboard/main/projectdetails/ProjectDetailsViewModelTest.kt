@@ -7,7 +7,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -57,7 +57,7 @@ class ProjectDetailsViewModelTest {
     private val configManager = mockk<ConfigManager> {
         coEvery { getProject(PROJECT_ID) } returns PROJECT
     }
-    private val tokenizationManager = mockk<TokenizationManager>()
+    private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val recentUserActivityManager = mockk<RecentUserActivityManager> {
         coEvery { getRecentUserActivity() } returns RECENT_USER_ACTIVITY
     }
@@ -65,7 +65,7 @@ class ProjectDetailsViewModelTest {
     @Test
     fun `should initialize the live data correctly`() = runTest {
         every {
-            tokenizationManager.decrypt(
+            tokenizationProcessor.decrypt(
                 RECENT_USER_ACTIVITY.lastUserUsed as TokenizableString.Tokenized,
                 TokenKeyType.AttendantId,
                 PROJECT
@@ -75,7 +75,7 @@ class ProjectDetailsViewModelTest {
             configManager = configManager,
             authStore = authStore,
             recentUserActivityManager = recentUserActivityManager,
-            tokenizationManager = tokenizationManager
+            tokenizationProcessor = tokenizationProcessor
         )
 
         val expectedState = DashboardProjectState(PROJECT_NAME, LAST_USER.value, LAST_SCANNER, true)
@@ -91,7 +91,7 @@ class ProjectDetailsViewModelTest {
             configManager = configManager,
             authStore = authStore,
             recentUserActivityManager = recentUserActivityManager,
-            tokenizationManager = tokenizationManager
+            tokenizationProcessor = tokenizationProcessor
         )
 
         val expectedState = DashboardProjectState(isLoaded = false)
