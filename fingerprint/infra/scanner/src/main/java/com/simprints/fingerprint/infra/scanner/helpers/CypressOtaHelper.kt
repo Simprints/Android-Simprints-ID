@@ -25,7 +25,7 @@ private typealias CypressStep = FlowCollector<CypressOtaStep>
  * @param connectionHelper  for connection operations on the scanner
  * @param firmwareLocalDataSource  for retrieving firmware bytes to be transferred for update
  */
-class CypressOtaHelper @Inject constructor(
+internal class CypressOtaHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
     private val firmwareLocalDataSource: FirmwareLocalDataSource
 ) {

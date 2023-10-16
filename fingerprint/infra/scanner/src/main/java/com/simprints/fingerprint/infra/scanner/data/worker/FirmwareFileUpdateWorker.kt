@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
  * if any update are available, ensuring that the latest versions are always on the phone.
  */
 @HiltWorker
-class FirmwareFileUpdateWorker @AssistedInject constructor(
+internal class FirmwareFileUpdateWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val firmwareRepository: FirmwareRepository

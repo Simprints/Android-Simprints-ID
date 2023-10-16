@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
-class ScannerOtaOperationsWrapper(
+class ScannerOtaOperationsWrapper internal constructor(
     private val macAddress: String,
     private val scannerV2: ScannerV2,
     private val cypressOtaHelper: CypressOtaHelper,

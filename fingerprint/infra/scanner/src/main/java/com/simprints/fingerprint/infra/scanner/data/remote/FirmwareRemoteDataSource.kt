@@ -12,7 +12,7 @@ import javax.inject.Inject
  *
  * @property fingerprintFileDownloader  the file downloader responsible for downloading the updated firmware
  */
-class FirmwareRemoteDataSource @Inject constructor(
+internal class FirmwareRemoteDataSource @Inject constructor(
     private val fingerprintFileDownloader: FingerprintFileDownloader,
     private val configManager: ConfigManager,
 ) {

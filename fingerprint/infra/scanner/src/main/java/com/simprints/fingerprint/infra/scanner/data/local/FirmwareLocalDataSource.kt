@@ -12,7 +12,7 @@ import javax.inject.Inject
  * Handles reading and writing to local firmware files on the phone.
  * Files are saved at the path /firmware/(chipName)/(chipVersion)
  */
-class FirmwareLocalDataSource(
+internal class FirmwareLocalDataSource(
     private val context: Context,
     private val fileUtil: FileUtil = FileUtil
 ) {

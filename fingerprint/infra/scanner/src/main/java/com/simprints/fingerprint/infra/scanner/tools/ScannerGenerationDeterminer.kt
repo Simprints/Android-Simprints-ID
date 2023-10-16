@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Helper class for determining which Vero generation a particular MAC address corresponds to.
  */
-class ScannerGenerationDeterminer @Inject constructor() {
+internal class ScannerGenerationDeterminer @Inject constructor() {
 
     /**
      * Vero 2 serial numbers are taken from the range 000000 - 099999. Some Vero 1 serial numbers

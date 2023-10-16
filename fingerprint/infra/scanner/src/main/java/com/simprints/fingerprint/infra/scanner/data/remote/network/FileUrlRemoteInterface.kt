@@ -4,7 +4,7 @@ import com.simprints.infra.network.SimRemoteInterface
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-interface FileUrlRemoteInterface : SimRemoteInterface {
+internal interface FileUrlRemoteInterface : SimRemoteInterface {
 
     @GET("projects/{projectId}/files/{fileId}")
     suspend fun getFileUrl(

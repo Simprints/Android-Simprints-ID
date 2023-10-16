@@ -36,7 +36,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 
-class ScannerWrapperV2Test {
+internal class ScannerWrapperV2Test {
 
     @MockK
     lateinit var scannerV2: Scanner

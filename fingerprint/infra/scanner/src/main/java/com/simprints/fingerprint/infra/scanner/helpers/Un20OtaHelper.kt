@@ -27,7 +27,7 @@ private typealias Un20Step = FlowCollector<Un20OtaStep>
  * @param connectionHelper  for connection operations on the scanner
  * @param firmwareLocalDataSource  for retrieving firmware bytes to be transferred for update
  */
-class Un20OtaHelper @Inject constructor(
+internal class Un20OtaHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
     private val firmwareLocalDataSource: FirmwareLocalDataSource
 ) {

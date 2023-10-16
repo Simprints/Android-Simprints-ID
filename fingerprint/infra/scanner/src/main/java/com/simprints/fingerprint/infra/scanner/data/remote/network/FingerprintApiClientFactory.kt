@@ -9,7 +9,7 @@ import kotlin.reflect.KClass
  * This class provides an implementation of FingerprintApiClient factory
  * @see FingerprintApiClientFactory
  */
-class FingerprintApiClientFactory @Inject constructor(
+internal class FingerprintApiClientFactory @Inject constructor(
     private val authStore: AuthStore,
 ) {
 

@@ -4,7 +4,7 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVe
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import com.simprints.infra.config.domain.models.Vero2Configuration
 
-fun Map<String, Vero2Configuration.Vero2FirmwareVersions>.getAvailableVersionsForDownload(
+internal fun Map<String, Vero2Configuration.Vero2FirmwareVersions>.getAvailableVersionsForDownload(
     hardwareVersion: String,
     localFirmwareVersions: Map<Chip, Set<String>>
 ): List<DownloadableFirmwareVersion> {

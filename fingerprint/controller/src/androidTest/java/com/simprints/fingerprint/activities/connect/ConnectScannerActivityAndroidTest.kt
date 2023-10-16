@@ -19,6 +19,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.infra.scanner.NfcManager
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
@@ -60,7 +61,7 @@ class ConnectScannerActivityAndroidTest {
     private val scanner: ScannerWrapper = mockk<ScannerWrapper>().apply {
         every { isLiveFeedbackAvailable() } returns false
         every { versionInformation() } returns mockk {
-            every { generation } returns com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration.VERO_2
+            every { generation } returns ScannerGeneration.VERO_2
         }
     }
     private val scannerManager: ScannerManager =

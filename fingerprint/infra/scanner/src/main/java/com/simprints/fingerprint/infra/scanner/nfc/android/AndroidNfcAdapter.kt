@@ -9,7 +9,7 @@ import com.simprints.fingerprint.infra.scanner.nfc.ComponentMifareUltralight
 import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcAdapter
 import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcTag
 
-class AndroidNfcAdapter(private val nfcAdapter: NfcAdapter?) : ComponentNfcAdapter {
+internal class AndroidNfcAdapter(private val nfcAdapter: NfcAdapter?) : ComponentNfcAdapter {
 
     override fun isNull(): Boolean = nfcAdapter == null
 

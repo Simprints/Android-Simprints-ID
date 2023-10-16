@@ -27,7 +27,7 @@ import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
-class ScannerWrapperV2(
+internal class ScannerWrapperV2(
     private val scannerV2: ScannerV2,
     private val scannerUiHelper: ScannerUiHelper,
     private val macAddress: String,

@@ -19,7 +19,7 @@ import javax.inject.Inject
  * For handling the initial setup to the scanner upon connection, such as retrieving and checking
  * the firmware version and battery level, and determining whether OTA is necessary.
  */
-class ScannerInitialSetupHelper @Inject constructor(
+internal class ScannerInitialSetupHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
     private val batteryLevelChecker: BatteryLevelChecker,
     private val configManager: ConfigManager,

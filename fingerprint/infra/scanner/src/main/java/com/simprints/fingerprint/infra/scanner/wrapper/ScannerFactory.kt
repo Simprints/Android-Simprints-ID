@@ -22,7 +22,7 @@ import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner as ScannerV2
 
 @Singleton
-class ScannerFactory @Inject constructor(
+class ScannerFactory @Inject internal constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val configManager: ConfigManager,
     private val scannerUiHelper: ScannerUiHelper,

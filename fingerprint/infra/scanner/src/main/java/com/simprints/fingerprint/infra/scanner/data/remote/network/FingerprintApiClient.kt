@@ -5,7 +5,7 @@ import com.simprints.infra.network.SimRemoteInterface
 /**
  * This interface represents an API network interface for fingerprint requests
  */
-interface FingerprintApiClient<T : SimRemoteInterface> {
+internal interface FingerprintApiClient<T : SimRemoteInterface> {
 
     // the remote interface that executes the network requests
     val api: T

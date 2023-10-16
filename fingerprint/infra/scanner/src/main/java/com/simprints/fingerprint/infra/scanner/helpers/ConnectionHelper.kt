@@ -31,7 +31,7 @@ import javax.inject.Inject
  *         disconnecting from the bluetooth socket.
  * @param dispatcher  a [CoroutineDispatcher] for running coroutines in background
  */
-class ConnectionHelper @Inject constructor(
+internal class ConnectionHelper @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     @DispatcherIO private val dispatcher: CoroutineDispatcher
 ) {

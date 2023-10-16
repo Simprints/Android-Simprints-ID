@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.wrapper
 
-import com.simprints.fingerprint.infra.scanner.capture.ScannerCallbackWrapper
+import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperV1.ScannerCallbackWrapper
 import com.simprints.fingerprint.infra.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.ScannerTriggerListener
@@ -37,7 +37,7 @@ import com.simprints.fingerprint.infra.scanner.v1.Scanner as ScannerV1
  * @param scannerV1  the vero 1 scanner object
  *
  */
-class ScannerWrapperV1(
+internal class ScannerWrapperV1(
     private val scannerV1: ScannerV1,
     private val ioDispatcher: CoroutineDispatcher,
 ) : ScannerWrapper {

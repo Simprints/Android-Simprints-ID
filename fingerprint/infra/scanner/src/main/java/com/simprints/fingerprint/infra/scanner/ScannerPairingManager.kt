@@ -16,7 +16,7 @@ import javax.inject.Inject
 /**
  * Helper class for handling MAC addresses and pairing programmatically.
  */
-class ScannerPairingManager @Inject constructor(
+class ScannerPairingManager @Inject internal constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val recentUserActivityManager: RecentUserActivityManager,
     private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
