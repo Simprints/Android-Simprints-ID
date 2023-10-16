@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
@@ -86,7 +86,7 @@ class EventDownSyncTaskTest {
     private lateinit var timeHelper: TimeHelper
 
     @MockK
-    private lateinit var configManager: ConfigService
+    private lateinit var configManager: ConfigRepository
 
     @MockK
     private lateinit var eventRemoteDataSource: EventRemoteDataSource

@@ -6,7 +6,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import kotlinx.coroutines.flow.Flow
 
-interface ConfigService {
+interface ConfigRepository {
 
     suspend fun refreshProject(projectId: String): Project
     suspend fun getProject(projectId: String): Project
