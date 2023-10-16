@@ -17,20 +17,19 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
-import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
@@ -92,7 +91,7 @@ class CollectFingerprintsViewModelTest {
         every { isLiveFeedbackAvailable() } returns false
         every { isImageTransferSupported() } returns true
         every { versionInformation() } returns mockk {
-            every { generation } returns ScannerGeneration.VERO_1
+            every { generation } returns com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration.VERO_1
         }
     }
     private lateinit var scannerManager: ScannerManager

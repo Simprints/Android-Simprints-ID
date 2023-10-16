@@ -15,7 +15,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentOtaRecoveryBinding
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

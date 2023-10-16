@@ -5,7 +5,7 @@ import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue.*
 import com.simprints.fingerprint.activities.connect.issues.ota.OtaFragmentRequest
 import com.simprints.fingerprint.activities.connect.issues.otarecovery.OtaRecoveryFragmentRequest
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
 import org.junit.Test
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType as CoreAlertScreenEventType
 

@@ -37,7 +37,7 @@ internal class FingerprintCaptureWrapperV2(
         timeOutMs: Int,
         qualityThreshold: Int
     ): AcquireFingerprintTemplateResponse = withContext(ioDispatcher) {
-        require (captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
+        require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
             "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
         }
         scannerV2
@@ -116,6 +116,7 @@ internal class FingerprintCaptureWrapperV2(
         private const val MIN_CAPTURE_DPI = 500
         private const val MAX_CAPTURE_DPI = 1700
     }
+
     private fun <T> Single<T>.wrapErrorsFromScanner() =
         onErrorResumeNext { Single.error(wrapErrorFromScanner(it)) }
 

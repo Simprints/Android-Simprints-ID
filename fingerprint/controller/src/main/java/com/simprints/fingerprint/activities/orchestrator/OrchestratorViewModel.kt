@@ -13,7 +13,7 @@ import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
-import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
+import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

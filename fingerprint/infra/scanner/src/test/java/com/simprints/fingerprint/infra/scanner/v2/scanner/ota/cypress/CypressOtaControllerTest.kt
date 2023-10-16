@@ -113,7 +113,7 @@ class CypressOtaControllerTest {
     }
 
     private fun configureCrcCalculatorMock() = mockk<Crc32Calculator> {
-        every { calculateCrc32(any()) } returns  42
+        every { calculateCrc32(any()) } returns 42
     }
 
     private fun configureMessageStreamMock(errorPositions: List<Int> = listOf()): CypressOtaMessageChannel {
@@ -122,11 +122,11 @@ class CypressOtaControllerTest {
 
         return CypressOtaMessageChannel(
             spyk(CypressOtaMessageInputStream(mockk())) {
-                justRun { connect(any()) } 
+                justRun { connect(any()) }
                 cypressOtaResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },
             mockk {
-                every { sendMessage(any()) } answers  {
+                every { sendMessage(any()) } answers {
                     val desirableResponse = when (args[0] as CypressOtaCommand) {
                         is SendImageChunk -> ContinueResponse()
                         else -> OkResponse()

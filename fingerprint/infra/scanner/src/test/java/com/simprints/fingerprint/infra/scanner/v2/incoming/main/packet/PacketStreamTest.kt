@@ -17,7 +17,7 @@ import org.junit.Test
 class PacketStreamTest {
 
     private val packetParserMock = mockk<PacketParser> {
-        every { parse(any()) } answers  {
+        every { parse(any()) } answers {
             hollowPacketWithRawBytes(args[0] as ByteArray)
         }
     }

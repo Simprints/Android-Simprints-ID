@@ -45,8 +45,7 @@ public class Message {
         return message;
     }
 
-    public static Message setSensorConfig(short powerOffTimeoutSecs, short un20IdleTimeoutSecs)
-    {
+    public static Message setSensorConfig(short powerOffTimeoutSecs, short un20IdleTimeoutSecs) {
         Message message = new Message(14, MESSAGE_TYPE.SET_SENSOR_CONFIG);
         message.bytes.putShort(CONTENT_OFFSET, powerOffTimeoutSecs);
         message.bytes.putShort(CONTENT_OFFSET + SHORT_SIZE, un20IdleTimeoutSecs);
@@ -55,8 +54,7 @@ public class Message {
 
     public static Message setUI(boolean enableTrigger, boolean setLeds, boolean triggerVibrate,
                                 LED_STATE[] leds, short vibrationDuration)
-            throws IllegalArgumentException
-    {
+        throws IllegalArgumentException {
         if (leds.length != LED.COUNT)
             throw new IllegalArgumentException("Invalid led states array size");
 
@@ -94,7 +92,7 @@ public class Message {
     public static Message sendOtaPacket(int packet_number, int number_of_data_bytes, String data) {
         int FIXED_PACKET_DATA_SIZE = 800;
         int number_of_extra_padding_bytes = FIXED_PACKET_DATA_SIZE - number_of_data_bytes;
-        assert(number_of_extra_padding_bytes >= 0);
+        assert (number_of_extra_padding_bytes >= 0);
         int message_size = FIXED_PACKET_DATA_SIZE + INT_SIZE + INT_SIZE;
         Message message = new Message(message_size, MESSAGE_TYPE.SEND_OTA_DATA_PACKET);
         message.bytes.putInt(CONTENT_OFFSET, packet_number);
@@ -242,17 +240,16 @@ public class Message {
 
     public short getFragmentNumber() throws IllegalStateException {
         if (!this.isReply() || (this.getMessageType() != MESSAGE_TYPE.GET_TEMPLATE_FRAGMENT &&
-                this.getMessageType() != MESSAGE_TYPE.GET_IMAGE_FRAGMENT)) {
+            this.getMessageType() != MESSAGE_TYPE.GET_IMAGE_FRAGMENT)) {
             throw new IllegalStateException("This message is not a fragment reply");
         }
         return bytes.getShort(CONTENT_OFFSET);
     }
 
     public void writeFragmentBytesIn(ByteArrayOutputStream dest)
-            throws IllegalStateException
-    {
+        throws IllegalStateException {
         if (!this.isReply() || (this.getMessageType() != MESSAGE_TYPE.GET_TEMPLATE_FRAGMENT &&
-                this.getMessageType() != MESSAGE_TYPE.GET_IMAGE_FRAGMENT)) {
+            this.getMessageType() != MESSAGE_TYPE.GET_IMAGE_FRAGMENT)) {
             throw new IllegalStateException("This message is not a fragment reply");
         }
         short fragmentLength = bytes.getShort(CONTENT_OFFSET + SHORT_SIZE);
@@ -261,7 +258,7 @@ public class Message {
 
     public boolean isLastFragment() throws IllegalStateException {
         if (!this.isReply() || (this.getMessageType() != MESSAGE_TYPE.GET_TEMPLATE_FRAGMENT &&
-                this.getMessageType() != MESSAGE_TYPE.GET_IMAGE_FRAGMENT)) {
+            this.getMessageType() != MESSAGE_TYPE.GET_IMAGE_FRAGMENT)) {
             throw new IllegalStateException("This message is not a fragment reply");
         }
         return bytes.get(CONTENT_OFFSET + 2 * SHORT_SIZE) != 0;
@@ -304,7 +301,7 @@ public class Message {
                 throw new IOException("End of stream reached");
         }
         if (doLog) log(String.format("blockingReceiveFrom(): received header %s.",
-                hexString(header, 0, headerLen)));
+            hexString(header, 0, headerLen)));
 
         if (header.getInt(0) != HEADER_BYTES)
             throw new IOException("End of stream reached");
@@ -321,9 +318,9 @@ public class Message {
                 throw new IOException("End of stream reached");
         }
         if (doLog) log(String.format("blockingReceiveFrom(): received body %s.",
-                hexString(msg.bytes, headerLen, bodyLen)));
+            hexString(msg.bytes, headerLen, bodyLen)));
         if (doLog) log(String.format("blockingReceiveFrom(): received %s, status %s.",
-                msg.getMessageType(), msg.getMessageStatus().name()));
+            msg.getMessageType(), msg.getMessageStatus().name()));
         return msg;
     }
 
@@ -341,10 +338,9 @@ public class Message {
     public void sendToWithLogging(OutputStream os) throws IOException {
         sendTo(os);
         log(String.format(Locale.UK,
-                "sendTo(): sent %d bytes : %s.", bytes.getShort(4),
-                hexString(bytes, 0, bytes.getShort(4))));
+            "sendTo(): sent %d bytes : %s.", bytes.getShort(4),
+            hexString(bytes, 0, bytes.getShort(4))));
     }
-
 
 
     public void copy(Message message) {
