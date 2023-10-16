@@ -10,6 +10,8 @@ import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
+import com.simprints.infra.logging.Simber
+import com.simprints.infra.realm.exceptions.RealmUninitialisedException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.toList
@@ -76,23 +78,30 @@ internal class EnrolmentRecordRepositoryImpl(
     }
 
     override suspend fun tokenizeExistingRecords(project: Project) {
-        val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
-        val tokenizedSubjectsCreateAction =
-            subjectRepository.load(query).toList().mapNotNull { subject ->
-                if (subject.projectId != project.id) return@mapNotNull null
-                val moduleId = tokenizeIfNecessary(
-                    value = subject.moduleId,
-                    tokenKeyType = TokenKeyType.ModuleId,
-                    project = project
-                )
-                val attendantId = tokenizeIfNecessary(
-                    value = subject.attendantId,
-                    tokenKeyType = TokenKeyType.AttendantId,
-                    project = project
-                )
-                return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
-            }.map(SubjectAction::Creation)
-        subjectRepository.performActions(tokenizedSubjectsCreateAction)
+        try {
+            val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
+            val tokenizedSubjectsCreateAction =
+                subjectRepository.load(query).toList().mapNotNull { subject ->
+                    if (subject.projectId != project.id) return@mapNotNull null
+                    val moduleId = tokenizeIfNecessary(
+                        value = subject.moduleId,
+                        tokenKeyType = TokenKeyType.ModuleId,
+                        project = project
+                    )
+                    val attendantId = tokenizeIfNecessary(
+                        value = subject.attendantId,
+                        tokenKeyType = TokenKeyType.AttendantId,
+                        project = project
+                    )
+                    return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
+                }.map(SubjectAction::Creation)
+            subjectRepository.performActions(tokenizedSubjectsCreateAction)
+        } catch (e: Exception) {
+            when (e) {
+                is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
+                else -> Simber.e(e)
+            }
+        }
     }
 
     private fun tokenizeIfNecessary(
