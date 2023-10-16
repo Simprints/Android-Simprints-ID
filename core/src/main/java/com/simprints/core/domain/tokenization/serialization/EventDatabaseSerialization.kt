@@ -68,8 +68,8 @@ class TokenizationClassNameDeserializer : StdDeserializer<TokenizableString>(Tok
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): TokenizableString {
         val node: JsonNode = p.codec.readTree(p)
 
-        val className = node.get(FIELD_CLASS_NAME).asText()
-        val value = node.get(FIELD_VALUE).asText()
+        val className = node[FIELD_CLASS_NAME].asText()
+        val value = node[FIELD_VALUE].asText()
 
         return when (className) {
             TOKENIZED -> TokenizableString.Tokenized(value)
