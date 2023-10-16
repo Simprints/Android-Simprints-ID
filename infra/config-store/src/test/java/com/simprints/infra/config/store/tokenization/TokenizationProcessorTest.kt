@@ -11,7 +11,7 @@ import io.mockk.mockk
 import org.junit.Test
 
 
-class TokenizationManagerTest {
+class TokenizationProcessorTest {
 
     private val raw = "raw"
     private val encrypted = "encrypted"
@@ -25,7 +25,7 @@ class TokenizationManagerTest {
         every { decrypt(encrypted, keySet) } returns raw
     }
 
-    private val manager = TokenizationManager(stringTokenizer)
+    private val manager = TokenizationProcessor(stringTokenizer)
 
     @Test
     fun `when tokenization key is presented, should encrypt value`() {

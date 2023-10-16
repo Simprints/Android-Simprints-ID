@@ -11,7 +11,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
 import com.simprints.core.domain.tokenization.values
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
@@ -55,7 +55,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val configService: ConfigService,
+    private val configRepository: ConfigRepository,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
 
@@ -133,8 +133,8 @@ internal class EventSyncManagerImpl @Inject constructor(
         eventRepository.observeEventCount(projectId, type)
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
-        val projectConfig = configService.getConfiguration()
-        val deviceConfig = configService.getDeviceConfiguration()
+        val projectConfig = configRepository.getConfiguration()
+        val deviceConfig = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = getProjectModes(projectConfig),
@@ -166,7 +166,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         val op = EventDownSyncOperation(RemoteEventQuery(
             projectId = projectId,
             subjectId = subjectId,
-            modes = getProjectModes(configService.getConfiguration()),
+            modes = getProjectModes(configRepository.getConfiguration()),
         ))
         downSyncTask.downSync(this, op).toList()
     }
@@ -177,7 +177,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(
             unselectedModules,
-            modes = getProjectModes(configService.getConfiguration()),
+            modes = getProjectModes(configRepository.getConfiguration()),
         )
     }
 

@@ -19,11 +19,11 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-internal class ConfigServiceImpl @Inject constructor(
+internal class ConfigRepositoryImpl @Inject constructor(
     private val localDataSource: ConfigLocalDataSource,
     private val remoteDataSource: ConfigRemoteDataSource,
     private val simNetwork: SimNetwork,
-) : ConfigService {
+) : ConfigRepository {
 
     companion object {
         @VisibleForTesting

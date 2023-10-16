@@ -19,7 +19,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotest.assertions.throwables.shouldThrow
@@ -41,13 +41,13 @@ class CommCarePresenterTest {
     }
 
     private val project: Project = mockk()
-    private val tokenizationManagerMock: TokenizationManager = mockk {
+    private val tokenizationProcessorMock: TokenizationProcessor = mockk {
         every { encrypt(RequestFactory.MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns RequestFactory.MOCK_USER_ID
         every { encrypt(RequestFactory.MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns RequestFactory.MOCK_MODULE_ID
     }
     private val view = mockk<CommCareActivity> {
         coEvery { getProject() } returns project
-        every { tokenizationManager } returns tokenizationManagerMock
+        every { tokenizationProcessor } returns tokenizationProcessorMock
     }
     private val jsonHelper = JsonHelper
     private val configManager = mockk<ConfigManager> {

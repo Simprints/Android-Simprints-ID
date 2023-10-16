@@ -1,6 +1,6 @@
 package com.simprints.infra.config.sync
 
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.Project
@@ -11,31 +11,31 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal class ConfigManagerImpl @Inject constructor(
-    private val configService: ConfigService,
+    private val configRepository: ConfigRepository,
     private val configurationScheduler: ConfigurationScheduler,
     private val enrolmentRecordRepository: EnrolmentRecordRepository
 ) :
     ConfigManager {
 
     override suspend fun refreshProject(projectId: String): Project =
-        configService.refreshProject(projectId).also { project ->
+        configRepository.refreshProject(projectId).also { project ->
             enrolmentRecordRepository.tokenizeExistingRecords(project)
         }
 
     override suspend fun getProject(projectId: String): Project =
-        configService.getProject(projectId)
+        configRepository.getProject(projectId)
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration =
-        configService.getConfiguration()
+        configRepository.getConfiguration()
 
     override suspend fun refreshProjectConfiguration(projectId: String): ProjectConfiguration =
-        configService.refreshConfiguration(projectId)
+        configRepository.refreshConfiguration(projectId)
 
     override suspend fun getDeviceConfiguration(): DeviceConfiguration =
-        configService.getDeviceConfiguration()
+        configRepository.getDeviceConfiguration()
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) =
-        configService.updateDeviceConfiguration(update)
+        configRepository.updateDeviceConfiguration(update)
 
     override fun scheduleSyncConfiguration() =
         configurationScheduler.scheduleSync()
@@ -44,11 +44,11 @@ internal class ConfigManagerImpl @Inject constructor(
         configurationScheduler.cancelScheduledSync()
 
     override suspend fun clearData() =
-        configService.clearData()
+        configRepository.clearData()
 
     override suspend fun getPrivacyNotice(
         projectId: String,
         language: String
     ): Flow<PrivacyNoticeResult> =
-        configService.getPrivacyNotice(projectId, language)
+        configRepository.getPrivacyNotice(projectId, language)
 }

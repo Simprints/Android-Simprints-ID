@@ -7,13 +7,12 @@ import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
-
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 
 class EnrolLastBiometricsBuilder(
     private val extractor: EnrolLastBiometricsExtractor,
     private val project: Project?,
-    private val tokenizationManager: TokenizationManager,
+    private val tokenizationProcessor: TokenizationProcessor,
     validator: EnrolLastBiometricsValidator
 ) : ClientRequestBuilder(validator) {
     override fun encryptIfNecessary(baseRequest: BaseRequest): BaseRequest {
@@ -22,13 +21,13 @@ class EnrolLastBiometricsBuilder(
             value = request.userId,
             project = project,
             tokenKeyType = TokenKeyType.AttendantId,
-            tokenizationManager = tokenizationManager
+            tokenizationProcessor = tokenizationProcessor
         )
         val encryptedModuleId = encryptField(
             value = request.moduleId,
             project = project,
             tokenKeyType = TokenKeyType.ModuleId,
-            tokenizationManager = tokenizationManager
+            tokenizationProcessor = tokenizationProcessor
         )
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }

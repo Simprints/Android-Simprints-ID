@@ -7,13 +7,13 @@ import com.simprints.clientapi.domain.requests.VerifyRequest
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 
 
 class VerifyBuilder(
     private val extractor: VerifyExtractor,
     private val project: Project?,
-    private val tokenizationManager: TokenizationManager,
+    private val tokenizationProcessor: TokenizationProcessor,
     validator: VerifyValidator
 ) : ClientRequestBuilder(validator) {
     override fun encryptIfNecessary(baseRequest: BaseRequest): BaseRequest {
@@ -22,13 +22,13 @@ class VerifyBuilder(
             value = request.userId,
             project = project,
             tokenKeyType = TokenKeyType.AttendantId,
-            tokenizationManager = tokenizationManager
+            tokenizationProcessor = tokenizationProcessor
         )
         val encryptedModuleId = encryptField(
             value = request.moduleId,
             project = project,
             tokenKeyType = TokenKeyType.ModuleId,
-            tokenizationManager = tokenizationManager
+            tokenizationProcessor = tokenizationProcessor
         )
         return request.copy(userId = encryptedUserId, moduleId = encryptedModuleId)
     }

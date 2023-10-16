@@ -10,7 +10,7 @@ import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.tokenization.TokenizationManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -29,7 +29,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     lateinit var libSimprintsPresenterFactory: ClientApiModule.LibSimprintsPresenterFactory
 
     @Inject
-    lateinit var tokenizationManagerParam: TokenizationManager
+    lateinit var tokenizationProcessorParam: TokenizationProcessor
 
     @Inject
     lateinit var configManager: ConfigManager
@@ -37,8 +37,8 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     @Inject
     lateinit var authStore: AuthStore
 
-    override val tokenizationManager: TokenizationManager by lazy {
-        tokenizationManagerParam
+    override val tokenizationProcessor: TokenizationProcessor by lazy {
+        tokenizationProcessorParam
     }
 
     override suspend fun getProject(): Project? =
