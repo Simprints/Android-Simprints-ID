@@ -15,7 +15,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -47,7 +47,7 @@ class ModuleSelectionViewModelTest {
     private lateinit var configManager: ConfigManager
 
     @MockK(relaxed = true)
-    private lateinit var tokenizationManager: TokenizationManager
+    private lateinit var tokenizationProcessor: TokenizationProcessor
 
     @MockK(relaxed = true)
     private lateinit var authStore: AuthStore
@@ -76,7 +76,7 @@ class ModuleSelectionViewModelTest {
         coEvery { configManager.getProject(PROJECT_ID) } returns project
         modulesDefault.forEach {
             coEvery {
-                tokenizationManager.decrypt(
+                tokenizationProcessor.decrypt(
                     encrypted = it.name as TokenizableString.Tokenized,
                     tokenKeyType = TokenKeyType.ModuleId,
                     project = project
@@ -89,7 +89,7 @@ class ModuleSelectionViewModelTest {
             repository = repository,
             eventSyncManager = eventSyncManager,
             configManager = configManager,
-            tokenizationManager = tokenizationManager,
+            tokenizationProcessor = tokenizationProcessor,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
@@ -162,7 +162,7 @@ class ModuleSelectionViewModelTest {
         )
         updatedModules.forEach { module ->
             every {
-                tokenizationManager.encrypt(
+                tokenizationProcessor.encrypt(
                     decrypted = module.name as TokenizableString.Raw,
                     tokenKeyType = TokenKeyType.ModuleId,
                     project = project
