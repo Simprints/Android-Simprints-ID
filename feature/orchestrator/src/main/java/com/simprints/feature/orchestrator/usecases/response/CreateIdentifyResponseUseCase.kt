@@ -53,6 +53,6 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
             .filter { it.confidence >= faceDecisionPolicy.high }
             .ifEmpty { goodResults }
             .take(projectConfiguration.identification.maxNbOfReturnedCandidates)
-            .map { AppMatchResult(it.guid, it.confidence, faceDecisionPolicy) }
+            .map { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
     } else emptyList()
 }

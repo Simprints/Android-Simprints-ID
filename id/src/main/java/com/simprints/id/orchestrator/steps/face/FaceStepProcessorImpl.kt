@@ -96,7 +96,7 @@ class FaceStepProcessorImpl @Inject constructor(
 
         if (data?.extras?.containsKey(MatchContract.RESULT) == true) {
             return when (val result = data.getParcelableExtra<Parcelable>(MatchContract.RESULT)) {
-                is FaceMatchResult -> FaceMatchResponse(result.results.map { FaceMatchResponseResult(it.guid, it.confidence) })
+                is FaceMatchResult -> FaceMatchResponse(result.results.map { FaceMatchResponseResult(it.subjectId, it.confidence) })
                 else -> null
             }
         }
