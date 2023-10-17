@@ -54,7 +54,7 @@ class NfcManager @Inject constructor(private val nfcAdapter: ComponentNfcAdapter
         val mifare = nfcAdapter.getMifareUltralight(tag)
             ?: throw IllegalArgumentException("Could not get mifare connection from tag")
 
-        val payload = mifare.use { it ->
+        val payload = mifare.use {
             it.connect()
             it.readPages(BT_EASY_PAIR_MAC_ADDRESS_PAGE_OFFSET_POSITION)
         }
