@@ -235,4 +235,14 @@ class EnrolmentRecordRepositoryImplTest {
             repository.tokenizeExistingRecords(project)
             coVerify { subjectRepository.performActions(emptyList()) }
         }
+    @Test
+    fun `when tokenizing existing subjects throws exception, then it is captured and not thrown up the calling chain`() =
+        runTest {
+            val projectId = "projectId"
+            val project = mockk<Project>()
+            every { project.id } returns projectId
+            coEvery { subjectRepository.load(any()) } throws Exception()
+
+            repository.tokenizeExistingRecords(project)
+        }
 }
