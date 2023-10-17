@@ -33,9 +33,9 @@ import com.simprints.fingerprint.databinding.ContentMainBinding
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.fingerprint.tools.extensions.showToast
+import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
