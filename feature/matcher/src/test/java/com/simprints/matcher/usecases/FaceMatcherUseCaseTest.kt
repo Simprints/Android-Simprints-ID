@@ -38,7 +38,7 @@ class FaceMatcherUseCaseTest {
     fun `Skips matching if there are no probes`() = runTest {
         coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns flowOf(
             FaceIdentity(
-                "personId",
+                "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))
             )
         )
@@ -58,7 +58,7 @@ class FaceMatcherUseCaseTest {
     fun `Correctly calls SDK matcher`() = runTest {
         coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns flowOf(
             FaceIdentity(
-                "personId",
+                "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))
             )
         )
@@ -84,7 +84,7 @@ class FaceMatcherUseCaseTest {
         assertThat(onLoadingCalled).isTrue()
         assertThat(onMatchingCalled).isTrue()
 
-        assertThat(results.first().guid).isEqualTo("personId")
+        assertThat(results.first().subjectId).isEqualTo("subjectId")
         assertThat(results.first().confidence).isEqualTo(42f)
     }
 }

@@ -32,13 +32,12 @@ class FingerprintStepProcessorImpl @Inject constructor(
 
     companion object {
         const val MATCHER_ACTIVITY_NAME = "com.simprints.matcher.screen.MatchWrapperActivity"
-        const val ACTIVITY_CLASS_NAME =
-            "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
+        const val CAPTURE_ACTIVITY_NAME = "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
     }
 
     override suspend fun buildStepToCapture(): Step = Step(
         requestCode = CAPTURE.value,
-        activityName = ACTIVITY_CLASS_NAME,
+        activityName = CAPTURE_ACTIVITY_NAME,
         bundleKey = IFingerprintRequest.BUNDLE_KEY,
         payloadType = Step.PayloadType.REQUEST,
         payload = FingerprintCaptureRequest(fingerprintsToCapture = configManager.getProjectConfiguration().fingerprint!!.fingersToCapture),
@@ -79,7 +78,7 @@ class FingerprintStepProcessorImpl @Inject constructor(
 
         if (data?.extras?.containsKey(MatchContract.RESULT) == true) {
             return when (val result = data.getParcelableExtra<Parcelable>(MatchContract.RESULT)) {
-                is FingerprintMatchResult -> FingerprintMatchResponse(result.results.map { FingerprintMatchResponseResult(it.guid, it.confidence) })
+                is FingerprintMatchResult -> FingerprintMatchResponse(result.results.map { FingerprintMatchResponseResult(it.subjectId, it.confidence) })
                 else -> null
             }
         }

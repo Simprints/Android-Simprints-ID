@@ -31,6 +31,6 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
             .lastOrNull()
             ?.results
             ?.maxByOrNull { it.confidence }
-            ?.let { AppMatchResult(it.guid, it.confidence, faceDecisionPolicy) }
+            ?.let { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
     } else null
 }

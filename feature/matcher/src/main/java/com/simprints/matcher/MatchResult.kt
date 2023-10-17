@@ -13,7 +13,7 @@ interface MatchResult : Parcelable {
  * This is required to bridge different interfaces from moduleApi module.
  */
 interface MatchResultItem : Parcelable {
-    val guid: String
+    val subjectId: String
     val confidence: Float
 }
 
@@ -26,7 +26,11 @@ data class FaceMatchResult(
     data class Item(
         override val guid: String,
         override val confidence: Float,
-    ) : IFaceMatchResult, MatchResultItem
+    ) : IFaceMatchResult, MatchResultItem {
+
+        override val subjectId: String
+            get() = guid
+    }
 }
 
 @Parcelize
@@ -40,7 +44,7 @@ data class FingerprintMatchResult(
         override val confidenceScore: Float,
     ) : IFingerprintMatchResult, MatchResultItem {
 
-        override val guid: String
+        override val subjectId: String
             get() = personId
 
         override val confidence: Float

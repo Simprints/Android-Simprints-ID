@@ -23,7 +23,7 @@ class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
             )
 
             is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(
-                result.results.map { MatchResult(it.guid, it.confidence) }
+                result.results.map { MatchResult(it.subjectId, it.confidence) }
             )
 
             // TODO Map fingerprint results

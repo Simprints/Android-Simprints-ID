@@ -404,7 +404,7 @@ class OrchestratorManagerImplTest {
         add(
             Step(
                 requestCode = FingerprintRequestCode.CAPTURE.value,
-                activityName = FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME,
+                activityName = FingerprintStepProcessorImpl.CAPTURE_ACTIVITY_NAME,
                 bundleKey = IFingerprintRequest.BUNDLE_KEY,
                 payloadType = Step.PayloadType.REQUEST,
                 payload = FingerprintCaptureRequest(fingerprintsToCapture = emptyList()),

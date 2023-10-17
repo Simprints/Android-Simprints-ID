@@ -27,7 +27,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         results: List<MatchResultItem>
     ) {
         externalScope.launch {
-            val matchEntries = results.map { MatchEntry(it.guid, it.confidence) }
+            val matchEntries = results.map { MatchEntry(it.subjectId, it.confidence) }
             val event = if (matchParams.flowType == FlowProvider.FlowType.VERIFY) {
                 getOneToOneEvent(startTime, endTime, matcherName, matchParams.queryForCandidates, matchEntries.firstOrNull())
             } else {
