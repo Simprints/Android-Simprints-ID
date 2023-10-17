@@ -6,28 +6,21 @@ import com.simprints.fingerprint.activities.alert.AlertError.BLUETOOTH_NOT_SUPPO
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.controllers.fingerprint.config.ConfigurationTaskResult
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
-import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintConfigurationRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.testtools.common.syntax.failTest
-import io.mockk.mockk
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import java.util.*
-import kotlin.random.Random as Rand
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [28])
@@ -46,22 +39,6 @@ class OrchestratorTest {
                 assertEquals(Activity.RESULT_OK, resultCode)
                 assertNotNull(resultData?.extras?.getParcelable<IFingerprintCaptureResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
                     assertEquals(IFingerprintResponseType.CAPTURE, type)
-                })
-            }
-        }
-    }
-
-    @Test
-    fun matchingTaskFlow_allResultsOk_shouldFinishSuccessfully() {
-        with(Orchestrator(FinalResultBuilder())) {
-            start(createFingerprintMatchRequest())
-            assertNextTaskIs<Matching>()
-            okMatchingResult()
-            assertTrue(isFinished())
-            with(getFinalResult()) {
-                assertEquals(Activity.RESULT_OK, resultCode)
-                assertNotNull(resultData?.extras?.getParcelable<IFingerprintMatchResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
-                    assertEquals(IFingerprintResponseType.MATCH, type)
                 })
             }
         }
@@ -157,17 +134,6 @@ class OrchestratorTest {
         }
     }
 
-    private fun Orchestrator.okMatchingResult() {
-        handleActivityTaskResult(ResultCode.OK) { key ->
-            assertEquals(MatchingTaskResult.BUNDLE_KEY, key)
-            val numberOfMatchReturns = 10
-            MatchingTaskResult(List(numberOfMatchReturns) {
-                val score = Rand.nextInt(100).toFloat()
-                MatchResult(UUID.randomUUID().toString(), score)
-            }.sortedByDescending { it.confidence })
-        }
-    }
-
     private fun Orchestrator.alertResult() {
         handleActivityTaskResult(ResultCode.ALERT) { key ->
             assertEquals(AlertTaskResult.BUNDLE_KEY, key)
@@ -196,11 +162,5 @@ class OrchestratorTest {
 
         private fun createFingerprintCaptureRequest() =
             FingerprintCaptureRequest(DEFAULT_FINGERS_TO_CAPTURE)
-
-        private fun createFingerprintMatchRequest() =
-            FingerprintMatchRequest(listOf(mockk()), mockk())
-
-        private fun createFingerprintConfigurationRequest() =
-            FingerprintConfigurationRequest()
     }
 }

@@ -36,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class NfcPairFragment : FingerprintFragment() {
@@ -99,10 +100,10 @@ class NfcPairFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        binding.couldNotPairTextView.text = getString(R.string.cannot_connect_devices)
-        binding.tryAgainButton.text = getString(R.string.try_again_label)
-        binding.nfcPairInstructionsTextView.text = getString(R.string.nfc_pair_instructions)
-        binding.nfcPairTitleTextView.text = getString(R.string.nfc_pair_title)
+        binding.couldNotPairTextView.text = getString(IDR.string.cannot_connect_devices)
+        binding.tryAgainButton.text = getString(IDR.string.try_again_label)
+        binding.nfcPairInstructionsTextView.text = getString(IDR.string.nfc_pair_instructions)
+        binding.nfcPairTitleTextView.text = getString(IDR.string.nfc_pair_title)
     }
 
     private fun setupScannerPhoneTappingAnimation() {
@@ -166,7 +167,7 @@ class NfcPairFragment : FingerprintFragment() {
             couldNotPairTextView.visibility = View.GONE
             nfcPairingProgressBar.visibility = View.VISIBLE
             nfcPairInstructionsTextView.text = String.format(
-                getString(R.string.nfc_pairing_in_progress),
+                getString(IDR.string.nfc_pairing_in_progress),
                 serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
             )
         }
@@ -200,10 +201,10 @@ class NfcPairFragment : FingerprintFragment() {
                 nfcPairingProgressBar.visibility = View.INVISIBLE
                 tryAgainButton.visibility = View.VISIBLE
                 nfcPairInstructionsTextView.text = if (pairingRejected) {
-                    getString(R.string.nfc_pairing_rejected_instruction)
+                    getString(IDR.string.nfc_pairing_rejected_instruction)
                 } else {
                     getString(
-                        R.string.nfc_pairing_try_again_instruction,
+                        IDR.string.nfc_pairing_try_again_instruction,
                         serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
                     )
                 }

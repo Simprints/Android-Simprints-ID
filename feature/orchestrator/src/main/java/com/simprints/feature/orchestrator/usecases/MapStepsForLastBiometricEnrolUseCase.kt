@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.usecases
 
 import android.os.Parcelable
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.matcher.FaceMatchResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
@@ -23,7 +23,7 @@ class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
             )
 
             is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(
-                result.results.map { MatchResult(it.guid, it.confidence) }
+                result.results.map { MatchResult(it.subjectId, it.confidence) }
             )
 
             // TODO Map fingerprint results

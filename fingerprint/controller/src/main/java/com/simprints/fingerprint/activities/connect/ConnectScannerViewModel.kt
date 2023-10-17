@@ -37,6 +37,7 @@ import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 @HiltViewModel
 class ConnectScannerViewModel @Inject constructor(
@@ -52,7 +53,7 @@ class ConnectScannerViewModel @Inject constructor(
     lateinit var connectMode: ConnectScannerTaskRequest.ConnectMode
 
     val progress: MutableLiveData<Int> = MutableLiveData(0)
-    val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
+    val message: MutableLiveData<Int> = MutableLiveData(IDR.string.connect_scanner_bt_connect)
     private val _isConnecting = MutableLiveData(false)
     val isConnecting: LiveData<Boolean> = _isConnecting
     val backButtonBehaviour: MutableLiveData<BackButtonBehaviour> =
@@ -112,26 +113,26 @@ class ConnectScannerViewModel @Inject constructor(
 
     fun stopConnectingAndResetState() {
         progress.postValue(0)
-        message.postValue(R.string.connect_scanner_bt_connect)
+        message.postValue(IDR.string.connect_scanner_bt_connect)
         backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_FORM)
     }
 
     private suspend fun disconnectVero() {
         if (scannerManager.isScannerAvailable) {
-            postProgressAndMessage(step = 1, messageRes = R.string.connect_scanner_bt_connect)
+            postProgressAndMessage(step = 1, messageRes = IDR.string.connect_scanner_bt_connect)
             scannerManager.scanner.disconnect()
             logMessageForCrashReport("ScannerManager: disconnect")
         }
     }
 
     private suspend fun checkIfBluetoothIsEnabled() {
-        postProgressAndMessage(step = 2, messageRes = R.string.connect_scanner_bt_connect)
+        postProgressAndMessage(step = 2, messageRes = IDR.string.connect_scanner_bt_connect)
         scannerManager.checkBluetoothStatus()
         logMessageForCrashReport("ScannerManager: bluetooth is enabled")
     }
 
     private suspend fun initVero() {
-        postProgressAndMessage(step = 3, messageRes = R.string.connect_scanner_bt_connect)
+        postProgressAndMessage(step = 3, messageRes = IDR.string.connect_scanner_bt_connect)
         scannerManager.initScanner()
         logMessageForCrashReport("ScannerManager: init vero")
     }
@@ -139,7 +140,7 @@ class ConnectScannerViewModel @Inject constructor(
     private suspend fun connectToVero() {
         postProgressAndMessage(
             step = 4,
-            messageRes = R.string.connect_scanner_bt_connect
+            messageRes = IDR.string.connect_scanner_bt_connect
         )
 
         scannerManager.scanner.connect()
@@ -147,20 +148,20 @@ class ConnectScannerViewModel @Inject constructor(
     }
 
     private suspend fun setupVero() {
-        postProgressAndMessage(step = 5, messageRes = R.string.connect_scanner_setup)
+        postProgressAndMessage(step = 5, messageRes = IDR.string.connect_scanner_setup)
         scannerManager.scanner.setScannerInfoAndCheckAvailableOta()
         setLastConnectedScannerInfo()
         logMessageForCrashReport("ScannerManager: setupVero")
     }
 
     private suspend fun resetVeroUI() {
-        postProgressAndMessage(step = 6, messageRes = R.string.connect_scanner_setup)
+        postProgressAndMessage(step = 6, messageRes = IDR.string.connect_scanner_setup)
         scannerManager.scanner.setUiIdle()
         logMessageForCrashReport("ScannerManager: resetVeroUI")
     }
 
     private suspend fun wakeUpVero() {
-        postProgressAndMessage(step = 7, messageRes = R.string.connect_scanner_wake_un20)
+        postProgressAndMessage(step = 7, messageRes = IDR.string.connect_scanner_wake_un20)
         scannerManager.scanner.sensorWakeUp()
         logMessageForCrashReport("ScannerManager: wakeUpVero")
     }
@@ -240,7 +241,7 @@ class ConnectScannerViewModel @Inject constructor(
         addInfoSnapshotEventIfNecessary()
 
         progress.postValue(computeProgress(7))
-        message.postValue(R.string.connect_scanner_finished)
+        message.postValue(IDR.string.connect_scanner_finished)
 
         Simber.tag(MAC_ADDRESS, true).i(scannerManager.currentMacAddress ?: "")
         Simber.tag(SCANNER_ID, true).i(scannerManager.currentScannerId ?: "")

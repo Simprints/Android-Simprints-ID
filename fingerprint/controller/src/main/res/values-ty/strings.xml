@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <!-- This is infact not Tahitian but is actually Chinyanja, the Zambian dialect of Chichewa.
-     There's a bug in pre-7.0 Android that meant that Android could not find locales for a specific
-      region, so an obscure 2-letter language was chosen instead. -->
-
-</resources>

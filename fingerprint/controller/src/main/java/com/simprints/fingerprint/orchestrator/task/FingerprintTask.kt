@@ -6,9 +6,6 @@ import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTa
 import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.activities.matching.MatchingActivity
-import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
-import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 
 /**
@@ -51,13 +48,4 @@ sealed class FingerprintTask(
             CollectFingerprintsTaskResult.BUNDLE_KEY
         )
 
-    class Matching(taskResultKey: String, createMatchingTaskRequest: () -> MatchingTaskRequest) :
-        FingerprintTask(
-            taskResultKey,
-            createMatchingTaskRequest,
-            MatchingActivity::class.java,
-            RequestCode.MATCHING,
-            MatchingTaskRequest.BUNDLE_KEY,
-            MatchingTaskResult.BUNDLE_KEY
-        )
 }

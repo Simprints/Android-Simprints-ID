@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.fingerprint.R
+import com.simprints.infra.resources.R
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 class ConfirmScannerErrorBuilder {
