@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import androidx.annotation.VisibleForTesting
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.store.ConfigService
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
@@ -34,7 +34,7 @@ internal class EventDownSyncTask @Inject constructor(
     private val subjectRepository: EnrolmentRecordManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
-    private val configService: ConfigService,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val eventRemoteDataSource: EventRemoteDataSource,
 ) {
@@ -217,7 +217,7 @@ internal class EventDownSyncTask @Inject constructor(
         op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
 
     private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
-        moduleId.value.partOf(configService.getDeviceConfiguration().selectedModules.values())
+        moduleId.value.partOf(configRepository.getDeviceConfiguration().selectedModules.values())
 
     private fun String.partOf(modules: List<String>) = modules.contains(this)
 

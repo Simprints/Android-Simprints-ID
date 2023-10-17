@@ -1,8 +1,8 @@
 package com.simprints.infra.config.store.domain
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.ConfigServiceImpl
-import com.simprints.infra.config.store.ConfigServiceImpl.Companion.PRIVACY_NOTICE_FILE
+import com.simprints.infra.config.store.ConfigRepositoryImpl
+import com.simprints.infra.config.store.ConfigRepositoryImpl.Companion.PRIVACY_NOTICE_FILE
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
@@ -28,7 +28,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class ConfigServiceImplTest {
+class ConfigRepositoryImplTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
@@ -40,11 +40,11 @@ class ConfigServiceImplTest {
     private val remoteDataSource = mockk<ConfigRemoteDataSource>()
     private val simNetwork = mockk<SimNetwork>(relaxed = true)
 
-    private lateinit var configServiceImpl: ConfigServiceImpl
+    private lateinit var configServiceImpl: ConfigRepositoryImpl
 
     @Before
     fun setup() {
-        configServiceImpl = ConfigServiceImpl(
+        configServiceImpl = ConfigRepositoryImpl(
             localDataSource,
             remoteDataSource,
             simNetwork,

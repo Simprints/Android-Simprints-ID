@@ -45,7 +45,7 @@ import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.config.store.models.canCoSyncData
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
@@ -66,14 +66,14 @@ abstract class RequestPresenter(
     private val encoder: EncodingUtils = EncodingUtilsImpl,
     private val configManager: ConfigManager,
     private val sessionEventsManager: ClientApiSessionEventsManager,
-    private val tokenizationManager: TokenizationManager
+    private val tokenizationProcessor: TokenizationProcessor
 ) : RequestContract.Presenter {
 
     override suspend fun processEnrolRequest() = validateAndSendRequest(
         EnrolBuilder(
             extractor = view.enrolExtractor,
             project = view.getProject(),
-            tokenizationManager = view.tokenizationManager,
+            tokenizationProcessor = view.tokenizationProcessor,
             validator = EnrolValidator(view.enrolExtractor)
         )
     )
@@ -82,7 +82,7 @@ abstract class RequestPresenter(
         IdentifyBuilder(
             extractor = view.identifyExtractor,
             project = view.getProject(),
-            tokenizationManager = view.tokenizationManager,
+            tokenizationProcessor = view.tokenizationProcessor,
             validator = IdentifyValidator(view.identifyExtractor)
         )
     )
@@ -91,7 +91,7 @@ abstract class RequestPresenter(
         VerifyBuilder(
             extractor = view.verifyExtractor,
             project = view.getProject(),
-            tokenizationManager = view.tokenizationManager,
+            tokenizationProcessor = view.tokenizationProcessor,
             validator = VerifyValidator(view.verifyExtractor)
         )
     )
@@ -100,7 +100,7 @@ abstract class RequestPresenter(
         ConfirmIdentifyBuilder(
             extractor = view.confirmIdentityExtractor,
             project = view.getProject(),
-            tokenizationManager = view.tokenizationManager,
+            tokenizationProcessor = view.tokenizationProcessor,
             validator = ConfirmIdentityValidator(
                 view.confirmIdentityExtractor,
                 eventsManager.getCurrentSessionId(),
@@ -113,7 +113,7 @@ abstract class RequestPresenter(
         EnrolLastBiometricsBuilder(
             extractor = view.enrolLastBiometricsExtractor,
             project = view.getProject(),
-            tokenizationManager = view.tokenizationManager,
+            tokenizationProcessor = view.tokenizationProcessor,
             validator = EnrolLastBiometricsValidator(
                 view.enrolLastBiometricsExtractor,
                 eventsManager.getCurrentSessionId(),
@@ -255,7 +255,7 @@ abstract class RequestPresenter(
         val decryptedFieldsMap = it.getTokenizedFields().mapValues { entry ->
             when (val value = entry.value) {
                 is TokenizableString.Raw -> value
-                is TokenizableString.Tokenized -> tokenizationManager.decrypt(
+                is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                     encrypted = value,
                     tokenKeyType = entry.key,
                     project = project
