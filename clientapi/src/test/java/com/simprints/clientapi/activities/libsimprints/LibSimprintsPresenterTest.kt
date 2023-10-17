@@ -21,7 +21,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -56,7 +56,7 @@ class LibSimprintsPresenterTest {
     }
 
     private val project: Project = mockk()
-    private val tokenizationManagerMock: TokenizationManager = mockk {
+    private val tokenizationProcessorMock: TokenizationProcessor = mockk {
         every { encrypt(RequestFactory.MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns RequestFactory.MOCK_USER_ID
         every { encrypt(RequestFactory.MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns RequestFactory.MOCK_MODULE_ID
     }
@@ -65,7 +65,7 @@ class LibSimprintsPresenterTest {
         BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
         MockKAnnotations.init(this, relaxed = true)
         coEvery { view.getProject() } returns project
-        every { view.tokenizationManager } returns tokenizationManagerMock
+        every { view.tokenizationProcessor } returns tokenizationProcessorMock
         coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
         coEvery { clientApiSessionEventsManager.createSession(any()) } returns "session_id"
@@ -84,7 +84,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = mockk(),
+            tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply {
             runBlocking { start() }
@@ -112,7 +112,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = mockk(),
+            tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply {
             runBlocking { start() }
@@ -140,7 +140,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = mockk(),
+            tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply { runBlocking { start() } }
 
@@ -168,7 +168,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = mockk(),
+            tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply { runBlocking { start() } }
 
@@ -194,7 +194,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = mockk(),
+            tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply { runBlocking { start() } }
 
@@ -217,7 +217,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = mockk(),
+            tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply {
             runBlocking {
@@ -242,7 +242,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = tokenizationManagerMock,
+            tokenizationProcessor = tokenizationProcessorMock,
             configManager = configManager
         ).handleEnrolResponse(EnrolResponse(registerId))
 
@@ -276,7 +276,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = tokenizationManagerMock,
+            tokenizationProcessor = tokenizationProcessorMock,
             configManager = configManager
         ).handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
@@ -324,7 +324,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = tokenizationManagerMock,
+            tokenizationProcessor = tokenizationProcessorMock,
             configManager = configManager
         ).apply {
             handleVerifyResponse(verification)
@@ -365,7 +365,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = tokenizationManagerMock,
+            tokenizationProcessor = tokenizationProcessorMock,
             configManager = configManager
         ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
 
@@ -402,7 +402,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = mockk(),
+            tokenizationProcessor = mockk(),
             configManager = configManager
         ).handleConfirmationResponse(mockk())
 
@@ -436,7 +436,7 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            tokenizationManager = mockk(),
+            tokenizationProcessor = mockk(),
             configManager = configManager
         ).handleEnrolResponse(mockk())
         runBlocking {

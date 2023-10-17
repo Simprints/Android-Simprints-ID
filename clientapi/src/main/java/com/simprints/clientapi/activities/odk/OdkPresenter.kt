@@ -25,8 +25,8 @@ import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.core.tools.extentions.safeSealedWhens
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -40,7 +40,7 @@ class OdkPresenter @AssistedInject constructor(
     @Assisted private val view: OdkContract.View,
     @Assisted private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
-    private val tokenizationManager: TokenizationManager,
+    tokenizationProcessor: TokenizationProcessor,
     rootManager: SecurityManager,
     configManager: ConfigManager
 ) : RequestPresenter(
@@ -49,7 +49,7 @@ class OdkPresenter @AssistedInject constructor(
     rootManager = rootManager,
     configManager = configManager,
     sessionEventsManager = sessionEventsManager,
-    tokenizationManager = tokenizationManager
+    tokenizationProcessor = tokenizationProcessor
 ), OdkContract.Presenter {
 
     override suspend fun start() {

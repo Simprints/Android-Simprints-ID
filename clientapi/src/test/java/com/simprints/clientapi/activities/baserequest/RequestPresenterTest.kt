@@ -14,7 +14,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.events.sampledata.createIdentificationCalloutEvent
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
@@ -65,7 +65,7 @@ class RequestPresenterTest {
                 rootManager = mockk(relaxed = true),
                 configManager = mockk(relaxed = true),
                 sessionEventsManager = mockk(relaxed = true),
-                tokenizationManager = mockk(relaxed = true)
+                tokenizationProcessor = mockk(relaxed = true)
             )
             presenter.validateAndSendRequest(requestBuilder)
 
@@ -94,7 +94,7 @@ class RequestPresenterTest {
                 rootManager = mockk(relaxed = true),
                 configManager = mockk(relaxed = true),
                 sessionEventsManager = mockk(relaxed = true),
-                tokenizationManager = mockk(relaxed = true)
+                tokenizationProcessor = mockk(relaxed = true)
             )
             presenter.validateAndSendRequest(requestBuilder)
 
@@ -115,7 +115,7 @@ class RequestPresenterTest {
             rootManager = mockDeviceManager,
             configManager = mockk(relaxed = true),
             sessionEventsManager = mockk(relaxed = true),
-            tokenizationManager = mockk(relaxed = true)
+            tokenizationProcessor = mockk(relaxed = true)
         )
 
         presenter.start()
@@ -128,14 +128,14 @@ class RequestPresenterTest {
         val mockDeviceManager = mockk<SecurityManager>(relaxed = true)
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
-        val tokenizationManager = mockk<TokenizationManager>(relaxed = true)
+        val tokenizationProcessor = mockk<TokenizationProcessor>(relaxed = true)
         val presenter = ImplRequestPresenter(
             view = mockView,
             clientApiSessionEventsManager = mockk(relaxed = true),
             rootManager = mockDeviceManager,
             configManager = mockk(relaxed = true),
             sessionEventsManager = mockk(relaxed = true),
-            tokenizationManager = tokenizationManager
+            tokenizationProcessor = tokenizationProcessor
         )
         val userId = "userId".asTokenizableEncrypted()
         val moduleId = "moduleId".asTokenizableRaw()
@@ -147,14 +147,14 @@ class RequestPresenterTest {
         presenter.decryptTokenizedFields(events = listOf(event), project = mockk()).first()
 
         verify {
-            tokenizationManager.decrypt(
+            tokenizationProcessor.decrypt(
                 encrypted = userId,
                 tokenKeyType = TokenKeyType.AttendantId,
                 project = any()
             )
         }
         verify(exactly = 0) {
-            tokenizationManager.decrypt(
+            tokenizationProcessor.decrypt(
                 encrypted = moduleId.value.asTokenizableEncrypted(),
                 tokenKeyType = TokenKeyType.ModuleId,
                 project = any()
@@ -170,14 +170,14 @@ class ImplRequestPresenter(
     rootManager: SecurityManager,
     configManager: ConfigManager,
     sessionEventsManager: ClientApiSessionEventsManager,
-    tokenizationManager: TokenizationManager
+    tokenizationProcessor: TokenizationProcessor
 ) : RequestPresenter(
     view = view,
     eventsManager = clientApiSessionEventsManager,
     rootManager = rootManager,
     configManager = configManager,
     sessionEventsManager = sessionEventsManager,
-    tokenizationManager = tokenizationManager
+    tokenizationProcessor = tokenizationProcessor
 ) {
 
     override suspend fun start() {

@@ -23,7 +23,7 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
@@ -46,7 +46,7 @@ class LibSimprintsPresenter @AssistedInject constructor(
     private val timeHelper: ClientApiTimeHelper,
     private val enrolmentRecordManager: EnrolmentRecordManager,
     private val jsonHelper: JsonHelper,
-    tokenizationManager: TokenizationManager,
+    tokenizationProcessor: TokenizationProcessor,
     configManager: ConfigManager
 ) : RequestPresenter(
     view = view,
@@ -54,7 +54,7 @@ class LibSimprintsPresenter @AssistedInject constructor(
     rootManager = rootManager,
     configManager = configManager,
     sessionEventsManager = sessionEventsManager,
-    tokenizationManager = tokenizationManager
+    tokenizationProcessor = tokenizationProcessor
 ), LibSimprintsContract.Presenter {
 
     override suspend fun start() {

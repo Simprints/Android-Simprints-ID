@@ -9,7 +9,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-class TokenizationManager @Inject constructor(
+class TokenizationProcessor @Inject constructor(
     private val stringTokenizer: StringTokenizer
 ) {
 

@@ -8,7 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import io.mockk.every
 import io.mockk.mockk
 
@@ -28,11 +28,11 @@ object ConfirmIdentityFactory : RequestFactory() {
 
     override fun getBuilder(extractor: ClientRequestExtractor): ConfirmIdentifyBuilder {
         val project = mockk<Project>()
-        val tokenizationManager = mockk<TokenizationManager>()
+        val tokenizationProcessor = mockk<TokenizationProcessor>()
         return ConfirmIdentifyBuilder(
             extractor = extractor as ConfirmIdentityExtractor,
             project = project,
-            tokenizationManager = tokenizationManager,
+            tokenizationProcessor = tokenizationProcessor,
             validator = getValidator(extractor)
         )
     }
