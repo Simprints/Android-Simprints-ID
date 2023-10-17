@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel

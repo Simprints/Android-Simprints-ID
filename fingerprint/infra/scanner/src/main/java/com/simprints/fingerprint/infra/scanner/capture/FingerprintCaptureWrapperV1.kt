@@ -104,18 +104,18 @@ internal class FingerprintCaptureWrapperV1(
             )
         }
     }
-}
 
-class ScannerCallbackWrapper(
-    val success: () -> Unit,
-    val failure: (scannerError: SCANNER_ERROR?) -> Unit
-) :
-    ScannerCallback {
-    override fun onSuccess() {
-        success()
-    }
+    class ScannerCallbackWrapper(
+        val success: () -> Unit,
+        val failure: (scannerError: SCANNER_ERROR?) -> Unit
+    ) :
+        ScannerCallback {
+        override fun onSuccess() {
+            success()
+        }
 
-    override fun onFailure(error: SCANNER_ERROR?) {
-        failure(error)
+        override fun onFailure(error: SCANNER_ERROR?) {
+            failure(error)
+        }
     }
 }

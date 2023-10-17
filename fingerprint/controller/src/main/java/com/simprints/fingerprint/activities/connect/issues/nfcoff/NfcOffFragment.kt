@@ -15,7 +15,7 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.controllers.fingerprint.NfcManager
+import com.simprints.fingerprint.infra.scanner.NfcManager
 import com.simprints.fingerprint.databinding.FragmentNfcOffBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

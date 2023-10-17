@@ -28,8 +28,10 @@ class PacketParser {
         when (e) {
             is InvalidPacketException ->
                 throw e
+
             is IndexOutOfBoundsException, is BufferUnderflowException ->
                 throw InvalidPacketException("Incorrect number of bytes received parsing response in ${this::class.java.simpleName}", e)
+
             else ->
                 throw InvalidPacketException("Unknown issue during parsing in ${this::class.java.simpleName}", e)
         }

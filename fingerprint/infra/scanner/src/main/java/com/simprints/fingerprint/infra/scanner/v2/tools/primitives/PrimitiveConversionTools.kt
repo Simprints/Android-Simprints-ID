@@ -15,6 +15,7 @@ fun Short.toByteArray(byteOrder: ByteOrder): ByteArray =
                 (it and 0xFFFF),
                 ((it ushr 8) and 0xFFFF)
             )
+
             else -> byteArrayOf(
                 ((it ushr 8) and 0xFFFF),
                 (it and 0xFFFF)
@@ -31,6 +32,7 @@ fun Int.toByteArray(byteOrder: ByteOrder): ByteArray =
                 ((it ushr 16) and 0xFFFF),
                 ((it ushr 24) and 0xFFFF)
             )
+
             else -> byteArrayOf(
                 ((it ushr 24) and 0xFFFF),
                 ((it ushr 16) and 0xFFFF),
@@ -53,6 +55,7 @@ fun Long.toByteArray(byteOrder: ByteOrder): ByteArray =
                 ((it ushr 48) and 0xFFFF).toByte(),
                 ((it ushr 56) and 0xFFFF).toByte()
             )
+
             else -> byteArrayOf(
                 ((it ushr 56) and 0xFFFF).toByte(),
                 ((it ushr 48) and 0xFFFF).toByte(),

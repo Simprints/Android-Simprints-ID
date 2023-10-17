@@ -3,10 +3,10 @@ package com.simprints.fingerprint.activities.connect.issues.nfcpair
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEventWithContent
-import com.simprints.fingerprint.controllers.fingerprint.NfcManager
-import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
+import com.simprints.fingerprint.infra.scanner.NfcManager
+import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.fingerprint.tools.nfc.ComponentNfcTag
+import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcTag
 import com.simprints.infra.resources.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.IOException
