@@ -72,14 +72,17 @@ class ReflectionToolsTest {
 
     private sealed class TestSealedClassMixedClassesAndObjects {
         object ObjectA : TestSealedClassMixedClassesAndObjects()
+
         @Suppress("unused")
         class ObjectB(val i: Int) : TestSealedClassMixedClassesAndObjects()
 
         object ObjectC : TestSealedClassMixedClassesAndObjects()
+
         @Suppress("unused")
         class ClassD(val i: Int) : TestSealedClassMixedClassesAndObjects()
 
         object ObjectE : TestSealedClassMixedClassesAndObjects()
+
         @Suppress("unused")
         class ClassF(val i: Int) : TestSealedClassMixedClassesAndObjects()
     }

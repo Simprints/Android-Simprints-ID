@@ -5,6 +5,6 @@ interface Message {
     fun getBytes(): ByteArray
 }
 
-interface OutgoingMessage: Message
+interface OutgoingMessage : Message
 
-interface IncomingMessage: Message
+interface IncomingMessage : Message

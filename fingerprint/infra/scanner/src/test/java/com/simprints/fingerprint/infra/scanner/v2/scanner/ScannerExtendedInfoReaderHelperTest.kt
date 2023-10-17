@@ -49,7 +49,7 @@ class ScannerExtendedInfoReaderHelperTest {
 
     private val mainMessageChannel: MainMessageChannel = mockk()
     private val rootMessageChannel: RootMessageChannel = getRootMessageChannel()
-    private val responseErrorHandler: ResponseErrorHandler =  ResponseErrorHandler(
+    private val responseErrorHandler: ResponseErrorHandler = ResponseErrorHandler(
         ResponseErrorHandlingStrategy.NONE)
 
     private lateinit var expectedVersionResponse: GetVersionResponse
@@ -127,7 +127,6 @@ class ScannerExtendedInfoReaderHelperTest {
         expectedExtendedVersionResponse = GetExtendedVersionResponse(expectedFirmwareVersions)
 
 
-
         val testObserver = scannerInfoReader.readScannerInfo().test()
         testObserver.awaitAndAssertSuccess()
 
@@ -192,10 +191,10 @@ class ScannerExtendedInfoReaderHelperTest {
         val spyRootMessageInputStream = spyk(RootMessageInputStream(mockk())).apply {
             justRun { connect(any()) }
             justRun { disconnect() }
-            every { rootResponseStream }returns  responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+            every { rootResponseStream } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
         val mockRootMessageOutputStream = mockk<RootMessageOutputStream> {
-            every { sendMessage(any()) } answers  {
+            every { sendMessage(any()) } answers {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(
                         when (args[0] as RootCommand) {

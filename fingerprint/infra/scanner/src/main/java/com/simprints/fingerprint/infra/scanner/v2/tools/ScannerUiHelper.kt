@@ -16,7 +16,7 @@ class ScannerUiHelper @Inject constructor() {
 
     fun idleLedState() = SmileLedState(X, X, X, X, X)
 
-    fun deduceLedStateFromQualityForLiveFeedback(quality : Int) =
+    fun deduceLedStateFromQualityForLiveFeedback(quality: Int) =
         when (quality) {
             in QUALITY[0] -> SmileLedState(G, X, X, X, X)
             in QUALITY[1] -> SmileLedState(G, G, X, X, X)
@@ -37,7 +37,7 @@ class ScannerUiHelper @Inject constructor() {
 
         val X = LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00) // off
         val G = LedState(DigitalValue.FALSE, 0x00, 0x08, 0x00) // green
-        val R = LedState(DigitalValue.FALSE, 0x08, 0x00 ,0x00) // red
+        val R = LedState(DigitalValue.FALSE, 0x08, 0x00, 0x00) // red
 
     }
 }

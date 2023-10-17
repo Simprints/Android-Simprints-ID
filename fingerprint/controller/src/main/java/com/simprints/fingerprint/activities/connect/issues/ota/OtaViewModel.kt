@@ -11,11 +11,11 @@ import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
-import com.simprints.fingerprint.scanner.domain.ota.OtaStep
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.*
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.logging.Simber

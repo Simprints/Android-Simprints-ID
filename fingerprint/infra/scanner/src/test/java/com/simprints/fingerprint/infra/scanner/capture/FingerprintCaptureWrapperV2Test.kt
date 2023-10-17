@@ -51,6 +51,7 @@ class FingerprintCaptureWrapperV2Test {
             )
         }
     }
+
     @Test
     fun `should throw illegal argument exception when capture DPI is less than 500`() = runTest {
         assertThrows<IllegalArgumentException> {
@@ -61,6 +62,7 @@ class FingerprintCaptureWrapperV2Test {
             )
         }
     }
+
     @Test
     fun `should throw illegal argument exception when capture DPI is greater than 1700`() = runTest {
         assertThrows<IllegalArgumentException> {

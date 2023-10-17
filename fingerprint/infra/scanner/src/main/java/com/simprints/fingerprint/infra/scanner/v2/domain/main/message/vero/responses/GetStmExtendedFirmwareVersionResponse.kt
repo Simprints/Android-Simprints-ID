@@ -9,7 +9,7 @@ data class GetStmExtendedFirmwareVersionResponse(val stmFirmwareVersion: StmExte
 
     override fun getDataBytes(): ByteArray = stmFirmwareVersion.getBytes()
 
-        companion object {
+    companion object {
         fun fromBytes(data: ByteArray) =
             GetStmExtendedFirmwareVersionResponse(StmExtendedFirmwareVersion.fromBytes(data))
     }

@@ -9,24 +9,25 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
-import com.simprints.fingerprint.controllers.fingerprint.NfcManager
+import com.simprints.fingerprint.infra.scanner.NfcManager
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerVersion
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.BluetoothNotSupportedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.MultiplePossibleScannersPairedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
-import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
-import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
-import com.simprints.fingerprint.scanner.factory.ScannerFactory
-import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
-import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
-import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerFactory
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice
 import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
@@ -350,7 +351,7 @@ class ConnectScannerViewModelTest {
     fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEvent() {
         val error = Error("Oops")
         setupBluetooth(numberOfPairedScanners = 1)
-        coEvery { scannerFactory.scannerWrapper} returns mockScannerWrapper(VERO_2, error)
+        coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(VERO_2, error)
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val launchAlertObserver = viewModel.launchAlert.testObserver()
@@ -467,7 +468,7 @@ class ConnectScannerViewModelTest {
         every { bluetoothAdapter.isEnabled() } returns isEnabled
         when (numberOfPairedScanners) {
             0 -> coEvery { pairingManager.getPairedScannerAddressToUse() } throws ScannerNotPairedException()
-            1 -> coEvery { pairingManager.getPairedScannerAddressToUse() } returns com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice.random().address
+            1 -> coEvery { pairingManager.getPairedScannerAddressToUse() } returns DummyBluetoothDevice.random().address
             else -> coEvery { pairingManager.getPairedScannerAddressToUse() } throws MultiplePossibleScannersPairedException()
         }
     }

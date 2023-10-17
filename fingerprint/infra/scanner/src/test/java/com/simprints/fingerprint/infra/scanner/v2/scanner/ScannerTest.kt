@@ -148,8 +148,8 @@ class ScannerTest {
 
     @Test
     fun scanner_connect_callsConnectOnRootMessageStreams() {
-        val rootMessageChannel:RootMessageChannel =mockk{
-            every { connect(any(),any()) } just runs
+        val rootMessageChannel: RootMessageChannel = mockk {
+            every { connect(any(), any()) } just runs
         }
         scanner = Scanner(
             MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
@@ -164,7 +164,7 @@ class ScannerTest {
         )
         scanner.connect(mockkInputStream, mockk()).blockingAwait()
 
-        verify { rootMessageChannel.connect(any(),any()) }
+        verify { rootMessageChannel.connect(any(), any()) }
     }
 
     @Test
@@ -197,6 +197,7 @@ class ScannerTest {
 
         assertThat(scanner.state.mode).isEqualTo(Mode.MAIN)
     }
+
     @Test
     fun `scanner disconnect does nothing when scanner already disconnected`() {
         val mockRootMessageChannel = mockk<RootMessageChannel>()

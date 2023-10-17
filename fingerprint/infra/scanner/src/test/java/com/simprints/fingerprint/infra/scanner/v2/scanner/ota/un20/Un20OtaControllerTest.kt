@@ -62,8 +62,8 @@ class Un20OtaControllerTest {
 
         testObserver.awaitAndAssertSuccess()
 
-        verify {crc32Calculator.calculateCrc32(any()) }
-        verify(exactly =  expectedNumberOfCalls){ messageStreamMock.outgoing.sendMessage(any()) }
+        verify { crc32Calculator.calculateCrc32(any()) }
+        verify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
     @Test
@@ -126,10 +126,10 @@ class Un20OtaControllerTest {
         return MainMessageChannel(
             spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
                 justRun { connect(any()) }
-                every { un20Responses } returns  responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+                every { un20Responses } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },
             mockk {
-                every { sendMessage(any()) } answers  {
+                every { sendMessage(any()) } answers {
                     val resultCode =
                         if (errorPositions.contains(messageIndex.getAndIncrement())) {
                             OperationResultCode.UNKNOWN_ERROR

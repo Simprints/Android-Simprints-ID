@@ -23,8 +23,8 @@ import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEve
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentSerialEntryPairBinding
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
-import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
-import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
+import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
+import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.uibase.viewbinding.viewBinding

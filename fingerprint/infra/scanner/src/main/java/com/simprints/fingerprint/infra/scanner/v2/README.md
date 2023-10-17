@@ -1,11 +1,13 @@
 # Fingerprint Scanner V2
 
 ### Summary
+
 This package contains the code to interface with a Vero 2 fingerprint
 scanner over Bluetooth. The main class is [Scanner](scanner/Scanner.kt)
 which allows access to all the functionality supported by Vero 2.
 
 ### Platform
+
 It is written in Kotlin with heavy reliance on RxJava. Although it is
 written for Android, there are no Android dependencies throughout this
 package in anticipation for porting to another platform. It relies on
@@ -13,6 +15,7 @@ being handed a `java.io.InputStream` and `java.io.OutputStream` after
 the Bluetooth socket is connected.
 
 ## Using This Package
+
 The [`Scanner`](scanner/Scanner.kt) class is the single point of use of
 this package. The only other classes that should appear as imports
 outside of this package are some of the model classes which are taken as
@@ -20,6 +23,7 @@ arguments and returned by the methods on Scanner.kt, as well as any
 custom exceptions.
 
 ### Scanner Setup and Teardown
+
 Use the [`createScanner()`](scanner/CreateScanner.kt) helper function to
 build and instance of the `Scanner` class. No work is done on class
 instantiation so this class can be created at any time.
@@ -74,6 +78,7 @@ can register an observer that listens for trigger button presses on the
 Vero.
 
 ### Exceptions
+
 Use of the methods in [Scanner](scanner/Scanner.kt) can throw certain
 subclasses of certain stock exceptions in the `onError`:
 
@@ -99,6 +104,7 @@ Due to the nature of exception handling in RxJava 2.0,
 `io.reactivex.exceptions.UndeliverableException` may be thrown and cause
 issues. For this reason it is highly recommended to have an application
 level error handler set in place:
+
 ```
 RxJavaPlugins.setErrorHandler {
     if (e is UndeliverableException) {
@@ -106,6 +112,7 @@ RxJavaPlugins.setErrorHandler {
     }
 }
 ```
+
 In most situations you simply want to ignore undeliverable exceptions as
 they most commonly occur when a stream is disposed and then an
 `IOException` is thrown upon the scanner disconnecting.
@@ -117,6 +124,7 @@ how communication with Vero 2 is achieved, along with giving definitions
 of terms used throughout this package.
 
 ### Chips
+
 Vero 2.0 has three chips each with its own firmware and function.
 
 - **Cypress Bluetooth Module** - This is the Bluetooth chip that acts as
@@ -137,6 +145,7 @@ Vero 2.0 has three chips each with its own firmware and function.
   the other chips.
 
 ### Modes
+
 Vero 2.0 has 4 discrete modes, two of which are used during everyday
 operation, and the other two are for performing Over The Air (OTA)
 updates to the firmware on two of the three chips. Each mode has its own
@@ -165,6 +174,7 @@ on.
 ![modes_diagram](../../../../../../../doc/modes_diagram.png)
 
 ### Messages
+
 High-level communication between a client device and a scanner is best
 understood with the concept of **messages**. A message can be one of
 three types:
@@ -190,12 +200,14 @@ the [domain](./domain) package. Note that sometimes STM-related domain
 classes and packages are simply prefixed `Vero` instead of `Stm`.
 
 #### Channels
+
 In this code base, commands are sent over a `MessageOutputStream` and
 the response is expected from the `MessageInputStream`. Pairs of
 corresponsing Message Output and Input streams are called **channels**.
 This acts as a convenient type-safe abstraction for message dialogue.
 
 ### Main Mode Communication
+
 Main mode is quite complex in that it involves communication over both
 the STM and UN20 chips, while the Cypress acts as a pipe to both these
 chips. To facilitate this, and to avoid unintentional interleaving of
@@ -203,6 +215,7 @@ messages, Main Mode messages are divided bundled divided into packets
 over distinct routes.
 
 #### Routes
+
 There are three remote [routes](domain/main/packet/Route.kt) with which
 packets are sent and received.
 
@@ -214,6 +227,7 @@ packets are sent and received.
   that the UN20 must be on for messages sent over this route.
 
 #### Packets
+
 The maximum size of a chunk of data that can be sent over bluetooth (a
 *bluetooth packet*) was found to be around 1000B. Some very long
 messages exist in Main Mode (such as the `AcquireImageResponse` which
@@ -250,6 +264,7 @@ interleaving or splitting is minimal
 ### Data Pipeline
 
 #### Input and Output Streams
+
 When a bluetooth socket is connected, an `InputStream` and
 `OutputStream` is provided by the OS for communication, which is passed
 into the [Scanner](scanner/Scanner.kt) class when connected. These are
@@ -259,6 +274,7 @@ into the domain layer `MessageInputStream`s and `MessageOutputStream`s
 for use by the [Scanner](scanner/Scanner.kt) class.
 
 #### Incoming
+
 The following is the pipeline for receiving data over Bluetooth to an
 observer subscribing to the Main Mode message stream as found in the
 [incoming](./incoming) package:
@@ -278,6 +294,7 @@ routing steps - the `Flowable<ByteArray>` from the `InputStream` is
 directly accumulated and parsed as messages.
 
 #### Outgoing
+
 The [outgoing](./outgoing) package contains the pipeline for
 transmitting data over Bluetooth, with the following steps for the Main
 Mode message stream:
@@ -302,6 +319,7 @@ into messages without the routing/packet intermediate step.
 ![data_pipeline_diagram](../../../../../../../doc/data_pipeline_diagram.png)
 
 ### API Specifications
+
 The list of commands available and their corresponding byte
 representation can be inferred from the [domain](./domain) package.
 Additionally, a complete tabulation can be found on Confluence:

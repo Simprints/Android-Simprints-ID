@@ -33,7 +33,7 @@ fun Single<*>.completeOnceReceived(): Completable =
 fun <T> Flowable<T>.subscribeOnIoAndPublish(): ConnectableFlowable<T> =
     this.subscribeOn(Schedulers.io()).publish()
 
-fun <T:Any> Completable.doSimultaneously(single: Single<T>): Single<T> =
+fun <T : Any> Completable.doSimultaneously(single: Single<T>): Single<T> =
     Singles.zip(single, this.toSingleDefault(Unit)) { value, _ -> value }
 
 fun <T, R> Single<T>.mapToMaybeEmptyIfNull(block: (T) -> R?): Maybe<R> =

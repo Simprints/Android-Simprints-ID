@@ -6,5 +6,5 @@ import com.simprints.fingerprint.infra.scanner.v2.incoming.main.message.accumula
 import com.simprints.fingerprint.infra.scanner.v2.tools.accumulator.accumulateAndTakeElements
 import io.reactivex.Flowable
 
-fun <R: MainMessage> Flowable<out Packet>.toMainMessageStream(accumulator: PacketToMainMessageAccumulator<R>): Flowable<R> =
+fun <R : MainMessage> Flowable<out Packet>.toMainMessageStream(accumulator: PacketToMainMessageAccumulator<R>): Flowable<R> =
     accumulateAndTakeElements(accumulator)
