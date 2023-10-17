@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
-import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.matcher.FaceMatchResult
 import com.simprints.infra.config.domain.models.ProjectConfiguration
 import javax.inject.Inject
 

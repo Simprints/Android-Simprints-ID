@@ -39,6 +39,7 @@ import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class CollectFingerprintsActivity : FingerprintActivity() {
@@ -97,9 +98,9 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private fun initToolbar() {
         // TODO setSupportActionBar(binding.toolbar)
         binding.toolbar.title = when (masterFlowManager.getCurrentAction()) {
-            Action.ENROL -> getString(R.string.register_title)
-            Action.IDENTIFY -> getString(R.string.identify_title)
-            Action.VERIFY -> getString(R.string.verify_title)
+            Action.ENROL -> getString(IDR.string.register_title)
+            Action.IDENTIFY -> getString(IDR.string.identify_title)
+            Action.VERIFY -> getString(IDR.string.verify_title)
         }
     }
 
@@ -115,7 +116,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun initMissingFingerButton() {
-        mainContentBinding.missingFingerText.text = getString(R.string.missing_finger)
+        mainContentBinding.missingFingerText.text = getString(IDR.string.missing_finger)
         mainContentBinding.missingFingerText.paintFlags =
             mainContentBinding.missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         mainContentBinding.missingFingerText.setOnClickListener {
@@ -140,7 +141,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         }
 
         vm.vibrate.activityObserveEventWith { Vibrate.vibrate(this) }
-        vm.noFingersScannedToast.activityObserveEventWith { showToast(getString(R.string.no_fingers_scanned)) }
+        vm.noFingersScannedToast.activityObserveEventWith { showToast(getString(IDR.string.no_fingers_scanned)) }
         vm.launchAlert.activityObserveEventWith { showAlert.launch(it.toAlertConfig().toArgs()) }
         vm.launchReconnect.activityObserveEventWith { launchConnectScannerActivityForReconnect() }
         vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }

@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
-import com.simprints.face.matcher.FaceMatchResult
+import com.simprints.matcher.FaceMatchResult
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
 import com.simprints.feature.orchestrator.model.responses.AppMatchResult
 import com.simprints.feature.orchestrator.model.responses.AppVerifyResponse
@@ -31,6 +31,6 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
             .lastOrNull()
             ?.results
             ?.maxByOrNull { it.confidence }
-            ?.let { AppMatchResult(it.guid, it.confidence, faceDecisionPolicy) }
+            ?.let { AppMatchResult(it.subjectId, it.confidence, faceDecisionPolicy) }
     } else null
 }

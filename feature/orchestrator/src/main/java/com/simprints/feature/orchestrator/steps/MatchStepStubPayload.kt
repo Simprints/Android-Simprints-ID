@@ -3,8 +3,8 @@ package com.simprints.feature.orchestrator.steps
 import android.os.Parcelable
 import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowProvider
-import com.simprints.face.matcher.FaceMatchContract
-import com.simprints.face.matcher.FaceMatchParams
+import com.simprints.matcher.MatchContract
+import com.simprints.matcher.MatchParams
 import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import kotlinx.parcelize.Parcelize
 
@@ -20,13 +20,17 @@ internal data class MatchStepStubPayload(
     val subjectQuery: SubjectQuery,
 ) : Parcelable {
 
-    fun toFaceStepArgs(samples: List<FaceMatchParams.Sample>) = FaceMatchContract.getArgs(
-        samples,
-        flowType,
-        subjectQuery,
+    fun toFaceStepArgs(samples: List<MatchParams.FaceSample>) = MatchContract.getArgs(
+        faceSamples = samples,
+        flowType = flowType,
+        subjectQuery = subjectQuery,
     )
 
-    // TODO toFingerprintStepArgs()
+    fun toFingerprintStepArgs(samples: List<MatchParams.FingerprintSample>) = MatchContract.getArgs(
+        fingerprintSamples = samples,
+        flowType = flowType,
+        subjectQuery =    subjectQuery,
+    )
 
     companion object {
         const val STUB_KEY = "match_step_stub_payload"

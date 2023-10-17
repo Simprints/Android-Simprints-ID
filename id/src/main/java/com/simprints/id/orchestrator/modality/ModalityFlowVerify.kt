@@ -106,7 +106,7 @@ class ModalityFlowVerify @Inject constructor(
     }
 
     private fun addMatchingStep(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery) {
-        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
+        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query, FlowProvider.FlowType.VERIFY))
     }
 
     private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectQuery) {

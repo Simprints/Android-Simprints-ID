@@ -2,10 +2,11 @@ package com.simprints.fingerprint.activities.collect.resources
 
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
-import com.simprints.fingerprint.R
-import com.simprints.infra.resources.R as CR
 import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.infra.resources.R
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
     when (this) {
@@ -25,21 +26,23 @@ fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @ColorRes
 fun CaptureState.buttonBackgroundColour(): Int =
     when (this) {
-        is CaptureState.NotCollected -> CR.color.simprints_grey
+        is CaptureState.NotCollected -> R.color.simprints_grey
         is CaptureState.Scanning,
-        is CaptureState.TransferringImage -> CR.color.simprints_blue
+        is CaptureState.TransferringImage -> R.color.simprints_blue
         is CaptureState.Skipped,
-        is CaptureState.NotDetected -> CR.color.simprints_red
+        is CaptureState.NotDetected -> R.color.simprints_red
         is CaptureState.Collected -> if (scanResult.isGoodScan()) {
-            CR.color.simprints_green
+            R.color.simprints_green
         } else {
-            CR.color.simprints_red
+            R.color.simprints_red
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 fun CaptureState.resultTextId(): Int =
     when (this) {
@@ -59,21 +62,22 @@ fun CaptureState.resultTextId(): Int =
         }
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @ColorRes
 fun CaptureState.resultTextColour(): Int =
     when (this) {
         is CaptureState.NotCollected,
         is CaptureState.Scanning -> android.R.color.white
         is CaptureState.TransferringImage -> if (scanResult.isGoodScan()) {
-            CR.color.simprints_green
+            R.color.simprints_green
         } else {
-            CR.color.simprints_red
+            R.color.simprints_red
         }
         is CaptureState.Skipped,
-        is CaptureState.NotDetected -> CR.color.simprints_red
+        is CaptureState.NotDetected -> R.color.simprints_red
         is CaptureState.Collected -> if (scanResult.isGoodScan()) {
-            CR.color.simprints_green
+            R.color.simprints_green
         } else {
-            CR.color.simprints_red
+            R.color.simprints_red
         }
     }

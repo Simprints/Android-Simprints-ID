@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.face.matcher.FaceMatchParams
+import com.simprints.matcher.MatchParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.model.OrchestratorResult
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
@@ -135,7 +135,7 @@ internal class OrchestratorViewModel @Inject constructor(
             val matchingStep = steps.firstOrNull { it.id == StepId.FACE_MATCHER }
 
             if (matchingStep != null) {
-                val faceSamples = result.results.mapNotNull { it.sample }.map { FaceMatchParams.Sample(it.faceId, it.template) }
+                val faceSamples = result.results.mapNotNull { it.sample }.map { MatchParams.FaceSample(it.faceId, it.template) }
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFaceStepArgs(faceSamples)

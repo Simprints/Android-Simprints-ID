@@ -24,7 +24,7 @@ import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
 import com.simprints.infra.authstore.AuthStore
 import javax.inject.Inject
 
-class ModalityFlowEnrol @Inject constructor (
+class ModalityFlowEnrol @Inject constructor(
     private val fingerprintStepProcessor: FingerprintStepProcessor,
     private val faceStepProcessor: FaceStepProcessor,
     private val coreStepProcessor: CoreStepProcessor,
@@ -64,11 +64,13 @@ class ModalityFlowEnrol @Inject constructor (
             isFingerprintResult(requestCode) -> {
                 fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             }
+
             isFaceResult(requestCode) -> faceStepProcessor.processResult(
                 requestCode,
                 resultCode,
                 data
             )
+
             else -> throw IllegalStateException("Invalid result from intent")
         }
         completeAllStepsIfExitFormOrErrorHappened(requestCode, resultCode, data)
@@ -121,11 +123,8 @@ class ModalityFlowEnrol @Inject constructor (
             PoolType.MODULE -> SubjectQuery(projectId, moduleId = moduleId)
         }
 
-    private fun addMatchingStepForFinger(
-        probeSamples: List<FingerprintCaptureSample>,
-        query: SubjectQuery
-    ) {
-        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
+    private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery) {
+        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query, FlowProvider.FlowType.ENROL))
     }
 
     private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectQuery) {
