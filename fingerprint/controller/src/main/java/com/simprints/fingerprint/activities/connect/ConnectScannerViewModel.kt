@@ -18,7 +18,6 @@ import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnect
 import com.simprints.fingerprint.controllers.core.eventData.model.Vero2InfoSnapshotEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.infra.scanner.NfcManager
-import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.BluetoothNotEnabledException
@@ -180,9 +179,7 @@ class ConnectScannerViewModel @Inject constructor(
         Simber.d(e)
         scannerConnected.postEvent(false)
         launchAlertOrScannerIssueOrShowDialog(e)
-        if (e !is FingerprintSafeException) {
-            Simber.e(e)
-        }
+        Simber.e(e)
         if (remainingConnectionAttempts > 0) {
             remainingConnectionAttempts--
             retryConnect()

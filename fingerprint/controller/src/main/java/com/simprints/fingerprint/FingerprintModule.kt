@@ -6,8 +6,6 @@ import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManagerImpl
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
 import dagger.Binds
@@ -30,8 +28,5 @@ abstract class FingerprintModule {
 
     @Binds
     abstract fun provideFingerprintSessionEventsManager(impl: FingerprintSessionEventsManagerImpl): FingerprintSessionEventsManager
-
-    @Binds
-    abstract fun provideFingerprintDbManager(impl: FingerprintDbManagerImpl): FingerprintDbManager
 
 }
