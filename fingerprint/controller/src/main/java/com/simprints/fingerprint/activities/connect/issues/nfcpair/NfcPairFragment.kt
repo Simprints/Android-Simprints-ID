@@ -27,10 +27,10 @@ import com.simprints.fingerprint.databinding.FragmentNfcPairBinding
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
-import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcTag
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
+import com.simprints.infra.uibase.system.Vibrate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.consumeEach

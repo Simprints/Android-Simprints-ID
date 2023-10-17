@@ -19,7 +19,7 @@ internal class AlertActivityHelper {
     fun handleResume(retry: () -> Unit) {
         listOf(settingsOpenedForPairing, appSettingsOpened)
             .any { it.getAndSet(false) }
-            .takeIf { it == true }
+            .takeIf { it }
             ?.run { retry() }
     }
 

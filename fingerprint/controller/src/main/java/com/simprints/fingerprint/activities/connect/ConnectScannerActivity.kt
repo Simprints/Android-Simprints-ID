@@ -27,8 +27,8 @@ import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskRes
 import com.simprints.fingerprint.activities.refusal.RefusalAlertHelper
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.uibase.system.Vibrate
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -130,7 +130,7 @@ class ConnectScannerActivity : FingerprintActivity() {
 
     private fun hasBluetoothPermissions(): Boolean {
         return if (Build.VERSION.SDK_INT < 31) true
-        else hasPermissions(bluetoothPermissions.toList())
+        else hasPermissions(bluetoothPermissions)
     }
 
     private fun vibrateAndContinueToNextActivity() {

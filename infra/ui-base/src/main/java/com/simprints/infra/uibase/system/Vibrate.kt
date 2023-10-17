@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.tools
+package com.simprints.infra.uibase.system
 
 import android.annotation.TargetApi
 import android.content.Context
