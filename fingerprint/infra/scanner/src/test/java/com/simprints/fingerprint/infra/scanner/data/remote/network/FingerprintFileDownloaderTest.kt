@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.infra.scanner.data.remote.network
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprint.infra.scanner.data.FirmwareTestData
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -45,11 +46,11 @@ internal class FingerprintFileDownloaderTest {
         val api: FileUrlRemoteInterface = mockk()
         coEvery { fingerprintApiClientFactory.buildClient<FileUrlRemoteInterface>(any()) } returns apiClient
         every { apiClient.api } returns api
-        coEvery { api.getFileUrl(any(), any()) } returns FileUrl(com.simprints.fingerprint.infra.scanner.data.FirmwareTestData.SOME_URL)
+        coEvery { api.getFileUrl(any(), any()) } returns FileUrl(FirmwareTestData.SOME_URL)
         every { authStore.signedInProjectId } returns "projectId"
         // When
         val result = fingerprintFileDownloader.getFileUrl("Any fileId")
         // Then
-        assertThat(result).isEqualTo(com.simprints.fingerprint.infra.scanner.data.FirmwareTestData.SOME_URL)
+        assertThat(result).isEqualTo(FirmwareTestData.SOME_URL)
     }
 }
