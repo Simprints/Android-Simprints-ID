@@ -3,7 +3,7 @@ package domain.requests
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.core.domain.tokenization.asTokenized
+import com.simprints.core.domain.tokenization.asTokenizable
 import org.junit.Test
 
 class ConfirmIdentityRequestTest {
@@ -21,7 +21,7 @@ class ConfirmIdentityRequestTest {
     }
 
     private fun buildRequest(isTokenized: Boolean) = ConfirmIdentityRequest(
-        userId = "userId".asTokenized(isTokenized),
+        userId = "userId".asTokenizable(isTokenized),
         projectId = RequestFactory.MOCK_PROJECT_ID,
         sessionId = RequestFactory.MOCK_SESSION_ID,
         selectedGuid = RequestFactory.MOCK_SELECTED_GUID,
