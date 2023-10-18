@@ -3,7 +3,7 @@ package domain.requests
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.core.domain.tokenization.asTokenized
+import com.simprints.core.domain.tokenization.asTokenizable
 import com.simprints.moduleapi.app.requests.IAppEnrolLastBiometricsRequest
 import org.junit.Test
 
@@ -27,8 +27,8 @@ class EnrollLastBiometricsRequestTest {
 
     private fun buildRequest(isTokenized: Boolean) = EnrolLastBiometricsRequest(
         projectId = RequestFactory.MOCK_PROJECT_ID,
-        moduleId = "moduleId".asTokenized(isTokenized),
-        userId = "userId".asTokenized(isTokenized),
+        moduleId = "moduleId".asTokenizable(isTokenized),
+        userId = "userId".asTokenizable(isTokenized),
         metadata = RequestFactory.MOCK_METADATA,
         sessionId = RequestFactory.MOCK_SESSION_ID,
         unknownExtras = emptyMap()

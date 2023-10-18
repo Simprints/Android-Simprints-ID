@@ -3,7 +3,7 @@ package domain.requests
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.domain.requests.VerifyRequest
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.core.domain.tokenization.asTokenized
+import com.simprints.core.domain.tokenization.asTokenizable
 import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 import org.junit.Test
 
@@ -25,8 +25,8 @@ class VerifyRequestTest {
 
     private fun buildRequest(isTokenized: Boolean) = VerifyRequest(
         projectId = RequestFactory.MOCK_PROJECT_ID,
-        moduleId = "moduleId".asTokenized(isTokenized),
-        userId = "userId".asTokenized(isTokenized),
+        moduleId = "moduleId".asTokenizable(isTokenized),
+        userId = "userId".asTokenizable(isTokenized),
         metadata = RequestFactory.MOCK_METADATA,
         verifyGuid = RequestFactory.MOCK_VERIFY_GUID,
         unknownExtras = emptyMap()
