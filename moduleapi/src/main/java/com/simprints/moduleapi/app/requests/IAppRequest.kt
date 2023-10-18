@@ -12,4 +12,5 @@ interface IAppRequest : Parcelable, IRequest {
 
     val projectId: String
     val userId: String
+    val isUserIdTokenized: Boolean
 }

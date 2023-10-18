@@ -19,7 +19,14 @@ class EnrolmentCalloutEventTest {
     @Test
     fun create_EnrolmentCalloutEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = EnrolmentCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, labels)
+        val event = EnrolmentCalloutEvent(
+            createdAt = CREATED_AT,
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID,
+            moduleId = DEFAULT_MODULE_ID,
+            metadata = DEFAULT_METADATA,
+            labels = labels
+        )
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLOUT_ENROLMENT)

@@ -25,5 +25,6 @@ dependencies {
     implementation(project(":feature:alert"))
     implementation(project(":infra:auth-store"))
 
+    implementation(libs.jackson.core)
     implementation(libs.libsimprints)
 }

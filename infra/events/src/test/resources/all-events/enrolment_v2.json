@@ -14,11 +14,11 @@
     "subjectId": "9aa64aff-46b5-4ab4-90b5-82c0e6d9725f",
     "projectId": "TEST6Oai41ps1pBNrzBL",
     "moduleId": {
-      "className": "Raw",
+      "className": "TokenizableString.Raw",
       "value": "module1"
     },
     "attendantId": {
-      "className": "Raw",
+      "className": "TokenizableString.Raw",
       "value": "user1"
     },
     "personCreationEventId": "94828488-47ce-4c76-8ace-33d69b2a6d75"

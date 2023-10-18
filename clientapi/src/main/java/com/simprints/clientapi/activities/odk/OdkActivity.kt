@@ -191,10 +191,12 @@ class OdkActivity : RequestActivity(), OdkContract.View {
                 ODK_CONFIRM_IDENTITY_BIOMETRICS_COMPLETE,
                 flowCompletedCheck
             )
+
             OdkActionFollowUpAction.EnrolLastBiometrics -> intent.putExtra(
                 ODK_REGISTER_BIOMETRICS_COMPLETE,
                 flowCompletedCheck
             )
+
             Enrol -> intent.putExtra(ODK_REGISTER_BIOMETRICS_COMPLETE, flowCompletedCheck)
             Verify -> intent.putExtra(ODK_VERIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
             Identify -> intent.putExtra(ODK_IDENTIFY_BIOMETRICS_COMPLETE, flowCompletedCheck)
