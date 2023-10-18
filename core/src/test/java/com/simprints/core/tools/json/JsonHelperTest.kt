@@ -35,16 +35,16 @@ class JsonHelperTest {
         val resultRaw = JsonHelper.toJson(tokenizableRaw, tokenizableStringModule)
         val resultEncrypted = JsonHelper.toJson(tokenizableEncrypted, tokenizableStringModule)
 
-        assertThat(resultRaw).isEqualTo("{\"className\":\"Raw\",\"value\":\"${tokenizableRaw}\"}")
-        assertThat(resultEncrypted).isEqualTo("{\"className\":\"Tokenized\",\"value\":\"${tokenizableEncrypted}\"}")
+        assertThat(resultRaw).isEqualTo("{\"className\":\"TokenizableString.Raw\",\"value\":\"${tokenizableRaw}\"}")
+        assertThat(resultEncrypted).isEqualTo("{\"className\":\"TokenizableString.Tokenized\",\"value\":\"${tokenizableEncrypted}\"}")
     }
 
     @Test
     fun `when module is passed, its serializer is used to read from JSON`() {
         val tokenizableRaw = "tokenizableRaw"
         val tokenizableEncrypted = "tokenizableEncrypted"
-        val jsonRaw = "{\"className\":\"Raw\",\"value\":\"${tokenizableRaw}\"}"
-        val jsonTokenized = "{\"className\":\"Tokenized\",\"value\":\"${tokenizableEncrypted}\"}"
+        val jsonRaw = "{\"className\":\"TokenizableString.Raw\",\"value\":\"${tokenizableRaw}\"}"
+        val jsonTokenized = "{\"className\":\"TokenizableString.Tokenized\",\"value\":\"${tokenizableEncrypted}\"}"
 
         val resultRaw = JsonHelper.fromJson(
             json = jsonRaw,
