@@ -18,10 +18,10 @@ data class EnrolRequest(
     override fun convertToAppRequest(): IAppRequest = AppEnrolRequest(
         projectId = this.projectId,
         userId = this.userId.value,
-        isUserIdTokenized = this.userId.isTokenized(),
         moduleId = this.moduleId.value,
-        isModuleIdTokenized = this.moduleId.isTokenized(),
-        metadata = this.metadata
+        metadata = this.metadata,
+        isUserIdTokenized = this.userId.isTokenized(),
+        isModuleIdTokenized = this.moduleId.isTokenized()
     )
 
     @Parcelize

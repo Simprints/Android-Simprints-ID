@@ -36,9 +36,9 @@ class StandardEnrolRequestTest : BaseStandardClientApiTest() {
         val expectedAppRequest = AppEnrolRequest(
             projectId = projectIdField.value(),
             userId = userIdField.value(),
+            isModuleIdTokenized = false,
             isUserIdTokenized = false,
             moduleId = moduleIdField.value(),
-            isModuleIdTokenized = false,
             metadata = metadataField.value()
         )
 

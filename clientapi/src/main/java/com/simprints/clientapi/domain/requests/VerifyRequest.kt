@@ -19,11 +19,11 @@ data class VerifyRequest(
     override fun convertToAppRequest(): IAppRequest = AppVerifyRequest(
         projectId = this.projectId,
         userId = this.userId.value,
-        isUserIdTokenized = this.userId.isTokenized(),
         moduleId = this.moduleId.value,
-        isModuleIdTokenized = this.moduleId.isTokenized(),
         metadata = this.metadata,
         verifyGuid = this.verifyGuid,
+        isUserIdTokenized = this.userId.isTokenized(),
+        isModuleIdTokenized = this.moduleId.isTokenized()
     )
 
     @Parcelize

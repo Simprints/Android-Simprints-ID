@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth
+import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.steps.Step
@@ -32,11 +33,11 @@ class ModalityFlowEnrolLastBiometricsTest {
     private val appRequest = AppEnrolLastBiometricsRequestApi(
         projectId = DEFAULT_PROJECT_ID,
         userId = DEFAULT_USER_ID.value,
-        isUserIdTokenized = false,
-        isModuleIdTokenized = false,
         moduleId = DEFAULT_MODULE_ID.value,
         metadata = DEFAULT_METADATA,
         sessionId = GUID1,
+        isModuleIdTokenized = DEFAULT_MODULE_ID.isTokenized(),
+        isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
     )
 
     @Before

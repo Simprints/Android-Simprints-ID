@@ -208,11 +208,11 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
         )
 
         editText?.let {
-            it.typeface = try {
-                ResourcesCompat.getFont(requireContext(), IDR.font.muli)
-            } catch (ex: Exception) {
-                Typeface.DEFAULT
-            }
+                it.typeface = try {
+                    ResourcesCompat.getFont(requireContext(), IDR.font.muli)
+                } catch (ex: Exception) {
+                    Typeface.DEFAULT
+                }
             it.observeSearchButton()
             it.observeFocus()
         }

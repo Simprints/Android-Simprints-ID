@@ -2,18 +2,31 @@ package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.activities.odk.OdkAction.*
+import com.simprints.clientapi.activities.odk.OdkAction.Enrol
+import com.simprints.clientapi.activities.odk.OdkAction.Identify
+import com.simprints.clientapi.activities.odk.OdkAction.Invalid
+import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.odk.OdkAction.OdkActionFollowUpAction.EnrolLastBiometrics
+import com.simprints.clientapi.activities.odk.OdkAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.domain.responses.entities.MatchConfidence.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.HIGH
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.LOW
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.MEDIUM
+import com.simprints.clientapi.domain.responses.entities.MatchConfidence.NONE
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.logging.LoggingConstants.CrashReportingCustomKeys.SESSION_ID
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -27,6 +40,7 @@ class OdkPresenter @AssistedInject constructor(
     @Assisted private val view: OdkContract.View,
     @Assisted private val action: OdkAction,
     private val sessionEventsManager: ClientApiSessionEventsManager,
+    tokenizationProcessor: TokenizationProcessor,
     rootManager: SecurityManager,
     configManager: ConfigManager
 ) : RequestPresenter(
@@ -34,7 +48,8 @@ class OdkPresenter @AssistedInject constructor(
     eventsManager = sessionEventsManager,
     rootManager = rootManager,
     configManager = configManager,
-    sessionEventsManager = sessionEventsManager
+    sessionEventsManager = sessionEventsManager,
+    tokenizationProcessor = tokenizationProcessor
 ), OdkContract.Presenter {
 
     override suspend fun start() {
