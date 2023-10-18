@@ -2,8 +2,10 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import io.mockk.mockk
 import org.junit.Test
 
 class ApiFingerprintCapturePayloadTest {
@@ -73,5 +75,13 @@ class ApiFingerprintCapturePayloadTest {
         val result =
             FingerprintCaptureEvent.FingerprintCapturePayload.Result.FAILURE_TO_ACQUIRE.fromDomainToApi()
         assertThat(result).isInstanceOf(ApiFingerprintCapturePayload.ApiResult.FAILURE_TO_ACQUIRE::class.java)
+    }
+
+    @Test
+    fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
+        val payload = ApiFingerprintCapturePayload(domainPayload = mockk(relaxed = true))
+        TokenKeyType.values().forEach {
+            assertThat(payload.getTokenizedFieldJsonPath(it)).isNull()
+        }
     }
 }

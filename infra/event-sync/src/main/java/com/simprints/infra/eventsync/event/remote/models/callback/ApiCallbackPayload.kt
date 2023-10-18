@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.callback
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
@@ -55,6 +56,9 @@ internal data class ApiCallbackPayload(
         domainPayload.createdAt,
         domainPayload.eventVersion,
         ApiRefusalCallback(domainPayload.reason, domainPayload.extra))
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }
 
 internal fun ApiCallbackPayload.fromApiToDomain(): EventPayload =

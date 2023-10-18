@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
@@ -33,5 +34,8 @@ internal data class ApiFingerprintCaptureBiometricsPayload(
         Fingerprint(domainPayload.fingerprint),
         domainPayload.id
     )
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }
 

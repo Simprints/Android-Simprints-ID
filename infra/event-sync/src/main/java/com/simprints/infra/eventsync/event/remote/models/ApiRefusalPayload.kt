@@ -1,8 +1,16 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload
-import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.*
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.APP_NOT_WORKING
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_DATA_CONCERNS
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_NOT_PRESENT
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_PERMISSION
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_RELIGION
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.REFUSED_YOUNG
+import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.SCANNER_NOT_WORKING
 import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload.ApiAnswer
 
 @Keep
@@ -32,6 +40,9 @@ internal data class ApiRefusalPayload(
         domainPayload.endedAt,
         domainPayload.reason.toApiRefusalEventAnswer(),
         domainPayload.otherText)
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }
 
 

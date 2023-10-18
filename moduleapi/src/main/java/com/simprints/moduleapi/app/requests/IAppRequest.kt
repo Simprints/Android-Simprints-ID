@@ -12,5 +12,7 @@ interface IAppRequest : Parcelable, IRequest {
 
     val projectId: String
     val userId: String
+    // Adding TokenizedString introduces circular dependency, and bringing TokenizedString
+    // to this module introduces a lot of dependencies. Keeping it as a simple flag for now
     val isUserIdTokenized: Boolean
 }
