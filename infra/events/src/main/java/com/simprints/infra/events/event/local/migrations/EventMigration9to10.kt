@@ -2,6 +2,9 @@ package com.simprints.infra.events.event.local.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.simprints.core.domain.tokenization.serialization.FIELD_CLASS_NAME
+import com.simprints.core.domain.tokenization.serialization.FIELD_VALUE
+import com.simprints.core.domain.tokenization.serialization.RAW
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.infra.logging.Simber
 
@@ -13,17 +16,17 @@ import com.simprints.infra.logging.Simber
  * Starting from the database version 10, ID fields above need to be stored in encrypted manner.
  * However, in order to properly encrypt the previously stored entities, it is necessary to
  * differentiate between the raw values and the values that were already encrypted. Since there is
- * no reliable way to do so, the TokenizedString sealed class was introduced that explicitly
+ * no reliable way to do so, the TokenizableString sealed class was introduced that explicitly
  * specifies the encryption status of the stored value.
  *
  *    This migration changes the
  *      | "field": "some_id"
  *    to the
- *      | "field": { "className": "Raw", "value": "some_id" }
+ *      | "field": { "className": "TokenizableString.Raw", "value": "some_id" }
  *    within the json string stored in DbEvent::eventJson.
  *
  * This way the objects stored previously in the database can be safely casted from the old JSON to
- * the new Event objects containing TokenizedString fields.
+ * the new Event objects containing TokenizableString fields.
  */
 internal class EventMigration9to10 : Migration(9, 10) {
 
@@ -44,7 +47,7 @@ internal class EventMigration9to10 : Migration(9, 10) {
 
                 // Updating JSON attendantId/moduleId fields with new values that represent TokenizedString
                 val migratedJson =
-                    jsonData.migrateJsonStringToTokenizedString(ATTENDANT_ID, MODULE_ID)
+                    jsonData.migrateJsonStringToTokenizableString(ATTENDANT_ID, MODULE_ID)
                 database.execSQL(
                     "UPDATE $DB_EVENT_ENTITY SET $DB_EVENT_JSON_FIELD = ? WHERE id = ?",
                     arrayOf(migratedJson, id)
@@ -62,11 +65,11 @@ internal class EventMigration9to10 : Migration(9, 10) {
     }
 }
 
-internal fun String.migrateJsonStringToTokenizedString(vararg fieldsToMigrate: String): String =
+internal fun String.migrateJsonStringToTokenizableString(vararg fieldsToMigrate: String): String =
     fieldsToMigrate.fold(this) { json, field ->
         val modifiedJson = StringBuilder(json)
         val searchField = "\"$field\":\""
-        val classNameValue = "Raw"
+        val classNameValue = RAW
 
         val startIndex = modifiedJson.indexOf(searchField)
 
@@ -76,7 +79,7 @@ internal fun String.migrateJsonStringToTokenizedString(vararg fieldsToMigrate: S
                 val userIdValue =
                     modifiedJson.substring(startIndex + searchField.length, endIndex)
                 val replacement =
-                    "\"$field\":{\"className\":\"$classNameValue\",\"value\":\"$userIdValue\"}"
+                    "\"$field\":{\"$FIELD_CLASS_NAME\":\"$classNameValue\",\"$FIELD_VALUE\":\"$userIdValue\"}"
                 modifiedJson.replace(startIndex, endIndex + 1, replacement)
             }
         }

@@ -7,6 +7,10 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
@@ -56,7 +60,11 @@ class EventMigrationTest {
 
         while (cursor.moveToNext()) {
             val eventJson = cursor.getStringWithColumnName("eventJson")!!
-            JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
+            JsonHelper.fromJson(
+                json = eventJson,
+                type = object : TypeReference<Event>() {},
+                module = tokenizeSerializationModule
+            )
         }
         cursor.close()
     }
@@ -105,6 +113,10 @@ class EventMigrationTest {
             EventMigration8to9(),
             EventMigration9to10(),
         )
+        val tokenizeSerializationModule = SimpleModule().apply {
+            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
+            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
+        }
     }
 }
 
