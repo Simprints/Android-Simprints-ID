@@ -19,11 +19,11 @@ data class EnrolLastBiometricsRequest(
     override fun convertToAppRequest(): IAppRequest = AppEnrolLastBiometricsRequest(
         projectId = this.projectId,
         userId = this.userId.value,
-        moduleId = this.moduleId.value,
-        metadata = this.metadata,
-        sessionId = this.sessionId,
         isUserIdTokenized = this.userId.isTokenized(),
-        isModuleIdTokenized = this.moduleId.isTokenized()
+        moduleId = this.moduleId.value,
+        isModuleIdTokenized = this.moduleId.isTokenized(),
+        metadata = this.metadata,
+        sessionId = this.sessionId
     )
 
     @Parcelize

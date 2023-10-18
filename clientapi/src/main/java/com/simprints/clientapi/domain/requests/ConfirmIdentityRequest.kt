@@ -17,9 +17,9 @@ data class ConfirmIdentityRequest(
     override fun convertToAppRequest(): IAppConfirmIdentityRequest = AppConfirmIdentityRequest(
         projectId = this.projectId,
         userId = this.userId.value,
+        isUserIdTokenized = this.userId.isTokenized(),
         sessionId = this.sessionId,
-        selectedGuid = this.selectedGuid,
-        isUserIdTokenized = this.userId.isTokenized()
+        selectedGuid = this.selectedGuid
     )
 
     @Parcelize

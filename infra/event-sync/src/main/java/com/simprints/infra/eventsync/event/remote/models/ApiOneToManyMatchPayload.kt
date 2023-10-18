@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 
@@ -34,4 +35,7 @@ internal data class ApiOneToManyMatchPayload(
             ApiMatchPool(domainPayload.pool),
             domainPayload.matcher,
             domainPayload.result?.map { ApiMatchEntry(it) })
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }

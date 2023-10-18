@@ -39,8 +39,8 @@ class ModalityFlowConfirmIdentityTest {
         val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
+            isUserIdTokenized = false,
             sessionId = GUID1,
-            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
             selectedGuid = GUID2
         )
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain())
@@ -54,8 +54,8 @@ class ModalityFlowConfirmIdentityTest {
         val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
+            isUserIdTokenized = false,
             sessionId = GUID1,
-            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
             selectedGuid = GUID2
         )
         val step = mockk<Step>()
@@ -74,8 +74,8 @@ class ModalityFlowConfirmIdentityTest {
         val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID.value,
+            isUserIdTokenized = false,
             sessionId = GUID1,
-            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
             selectedGuid = GUID2
         )
         val step = mockk<Step>()

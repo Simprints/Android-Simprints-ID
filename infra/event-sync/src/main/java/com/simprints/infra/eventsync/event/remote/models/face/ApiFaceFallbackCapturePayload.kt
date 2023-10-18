@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.face
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent.FaceFallbackCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceFallbackCapture
@@ -17,4 +18,7 @@ internal data class ApiFaceFallbackCapturePayload(
         domainPayload.createdAt,
         domainPayload.endedAt,
         domainPayload.eventVersion)
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }

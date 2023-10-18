@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED
@@ -36,6 +37,11 @@ internal data class ApiAuthorizationPayload(
             domainPayload.eventVersion,
             domainPayload.result.fromDomainToApi(),
             domainPayload.userInfo?.let { ApiUserInfo(it) })
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
+        TokenKeyType.AttendantId -> "userInfo.userId"
+        else -> null
+    }
 }
 
 

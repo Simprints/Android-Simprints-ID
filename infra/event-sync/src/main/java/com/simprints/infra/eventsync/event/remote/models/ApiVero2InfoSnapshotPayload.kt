@@ -3,8 +3,11 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
-import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.*
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2InfoSnapshotPayload
+import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -40,7 +43,10 @@ internal sealed class ApiVero2InfoSnapshotPayload(
         version,
         scannerVersion,
         battery
-    )
+    ) {
+        override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+            null // this payload doesn't have tokenizable fields
+    }
 
     @Deprecated(message = "used only for backwards compatibility")
     data class ApiVero2InfoSnapshotPayloadForOldApi(
@@ -53,7 +59,10 @@ internal sealed class ApiVero2InfoSnapshotPayload(
         version,
         scannerVersion,
         battery
-    )
+    ) {
+        override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+            null // this payload doesn't have tokenizable fields
+    }
 
     sealed class ApiVero2Version {
 

@@ -2,6 +2,7 @@ package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.core.tools.utils.SimNetworkUtils
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent.ConnectivitySnapshotPayload
 
 
@@ -21,4 +22,7 @@ internal data class ApiConnectivitySnapshotPayload(
         this(domainPayload.createdAt,
             domainPayload.eventVersion,
             domainPayload.connections.map { ApiConnection(it) })
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }

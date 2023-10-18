@@ -39,8 +39,8 @@ class CommCareEnrolRequestTest : BaseCommCareClientApiTest() {
             isModuleIdTokenized = false,
             isUserIdTokenized = false,
             moduleId = moduleIdField.value(),
-            metadata = metadataField.value(),
-            )
+            metadata = metadataField.value()
+        )
 
         intended(hasAction(APP_ENROL_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))

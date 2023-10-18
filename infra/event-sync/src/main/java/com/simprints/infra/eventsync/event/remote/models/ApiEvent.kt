@@ -1,14 +1,32 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 
 @Keep
 internal data class ApiEvent(
     val id: String,
     val labels: ApiEventLabels,
-    val payload: ApiEventPayload
+    val payload: ApiEventPayload,
+    val tokenizedFields: List<String>
 )
 
-internal fun Event.fromDomainToApi() =
-    ApiEvent(id, labels.fromDomainToApi(), payload.fromDomainToApi())
+internal fun Event.fromDomainToApi(): ApiEvent {
+    val tokenizedKeyTypes =
+        getTokenizedFields().filter { it.value is TokenizableString.Tokenized }.keys.toList()
+    val payload = payload.fromDomainToApi()
+    val tokenizedFields = tokenizedKeyTypes.mapNotNull(payload::getTokenizedFieldJsonPath)
+    return ApiEvent(
+        id = id,
+        labels = labels.fromDomainToApi(),
+        payload = payload,
+        tokenizedFields = tokenizedFields
+    )
+}
+
+private fun findTokenizedFieldJsonPath(
+    key: TokenKeyType,
+    jsonPaths: Map<TokenKeyType, String>
+): String? = jsonPaths[key]
