@@ -8,7 +8,7 @@ import org.junit.Test
 class ApiEnrolmentPayloadV2Test {
 
     @Test
-    fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
+    fun `when getTokenizedFieldJsonPath is invoked, correct fields are returned`() {
         val payload = ApiEnrolmentPayloadV2(domainPayload = mockk(relaxed = true))
         TokenKeyType.values().forEach {
             val result = payload.getTokenizedFieldJsonPath(it)

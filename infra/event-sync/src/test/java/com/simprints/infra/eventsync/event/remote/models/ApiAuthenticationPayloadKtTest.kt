@@ -65,7 +65,7 @@ class ApiAuthenticationPayloadKtTest {
     }
 
     @Test
-    fun `when getTokenizedFieldJsonPath is invoked, null is returned`() {
+    fun `when getTokenizedFieldJsonPath is invoked, correct fields are returned`() {
         val payload = ApiAuthenticationPayload(domainPayload = mockk(relaxed = true))
         TokenKeyType.values().forEach {
             val result = payload.getTokenizedFieldJsonPath(it)
