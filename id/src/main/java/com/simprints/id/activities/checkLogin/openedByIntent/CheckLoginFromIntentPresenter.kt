@@ -146,16 +146,23 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     ) =
         with(request) {
             IdentificationCalloutEvent(
-                relativeStartTime,
-                projectId, userId, moduleId, metadata
+                createdAt = relativeStartTime,
+                projectId = projectId,
+                userId = userId,
+                moduleId = moduleId,
+                metadata = metadata
             )
         }
 
     private fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStartTime: Long) =
         with(request) {
             VerificationCalloutEvent(
-                relativeStartTime,
-                projectId, userId, moduleId, verifyGuid, metadata
+                createdAt = relativeStartTime,
+                projectId = projectId,
+                userId = userId,
+                moduleId = moduleId,
+                verifyGuid = verifyGuid,
+                metadata = metadata
             )
         }
 
@@ -163,8 +170,11 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStartTime: Long) =
         with(request) {
             EnrolmentCalloutEvent(
-                relativeStartTime,
-                projectId, userId, moduleId, metadata
+                createdAt = relativeStartTime,
+                projectId = projectId,
+                userId = userId,
+                moduleId = moduleId,
+                metadata = metadata
             )
         }
 

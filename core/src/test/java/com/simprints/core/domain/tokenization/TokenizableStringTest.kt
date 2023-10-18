@@ -7,13 +7,13 @@ import org.junit.Test
 class TokenizableStringTest {
 
     @Test
-    fun `given two different TokenizedString objects with equal values, when compared, should be equal`() {
+    fun `given two different TokenizableString objects with equal values, when compared, should be equal`() {
         val value = "value"
         assertThat(TokenizableString.Raw(value).equals(TokenizableString.Tokenized(value))).isTrue()
     }
 
     @Test
-    fun `given two similar TokenizedString objects with different values, when compared, should be equal`() {
+    fun `given two similar TokenizableString objects with different values, when compared, should be equal`() {
         val value = "value"
         val value2 = "value2"
         assertThat(TokenizableString.Raw(value) == TokenizableString.Raw(value2)).isFalse()
@@ -31,11 +31,13 @@ class TokenizableStringTest {
         val value = "value"
         assertThat(value.asTokenizableEncrypted()).isEqualTo(TokenizableString.Tokenized(value))
     }
+
     @Test
     fun `isTokenized should return true when string is TokenizedString_Tokenized`() {
         val value = "value".asTokenizableEncrypted()
         assertThat(value.isTokenized()).isTrue()
     }
+
     @Test
     fun `isTokenized should return false when string is TokenizedString_Raw`() {
         val value = "value".asTokenizableRaw()
@@ -57,10 +59,10 @@ class TokenizableStringTest {
     }
 
     @Test
-    fun `when asTokenized is invoked, the correct tokenizable string is returned`() {
+    fun `when asTokenizable is invoked, the correct tokenizable string is returned`() {
         val value = "value"
-        assertThat(value.asTokenized(isTokenized = true)).isEqualTo(TokenizableString.Tokenized(value))
-        assertThat(value.asTokenized(isTokenized = false)).isEqualTo(TokenizableString.Raw(value))
+        assertThat(value.asTokenizable(isTokenized = true)).isEqualTo(TokenizableString.Tokenized(value))
+        assertThat(value.asTokenizable(isTokenized = false)).isEqualTo(TokenizableString.Raw(value))
     }
     @Test
     fun `when takeIfTokenized is invoked, the value is not null only if it is tokenized`() {

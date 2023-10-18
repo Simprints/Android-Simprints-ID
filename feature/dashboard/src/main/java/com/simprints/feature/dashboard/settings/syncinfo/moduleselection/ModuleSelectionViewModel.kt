@@ -14,7 +14,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.sync.tokenization.TokenizationManager
+import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.EventSyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +27,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
     private val repository: ModuleRepository,
     private val eventSyncManager: EventSyncManager,
     private val configManager: ConfigManager,
-    private val tokenizationManager: TokenizationManager,
+    private val tokenizationProcessor: TokenizationProcessor,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -52,7 +52,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
                 repository.getModules().map { module ->
                     val decryptedName = when (val name = module.name) {
                         is TokenizableString.Raw -> name
-                        is TokenizableString.Tokenized -> tokenizationManager.decrypt(
+                        is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                             encrypted = name,
                             tokenKeyType = TokenKeyType.ModuleId,
                             project = configManager.getProject(authStore.signedInProjectId)
@@ -96,7 +96,7 @@ internal class ModuleSelectionViewModel @Inject constructor(
         externalScope.launch {
             val modules = modules.map { module ->
                 val encryptedName = when (val name = module.name) {
-                    is TokenizableString.Raw -> tokenizationManager.encrypt(
+                    is TokenizableString.Raw -> tokenizationProcessor.encrypt(
                         decrypted = name,
                         tokenKeyType = TokenKeyType.ModuleId,
                         project = configManager.getProject(authStore.signedInProjectId)

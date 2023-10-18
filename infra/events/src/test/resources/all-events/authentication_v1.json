@@ -15,7 +15,7 @@
     "userInfo": {
       "projectId": "TEST6Oai41ps1pBNrzBL",
       "userId": {
-        "className": "Raw",
+        "className": "TokenizableString.Raw",
         "value": "user1"
       }
     }

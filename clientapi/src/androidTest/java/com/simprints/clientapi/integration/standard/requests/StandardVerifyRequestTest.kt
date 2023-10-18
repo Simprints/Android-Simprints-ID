@@ -40,9 +40,9 @@ class StandardVerifyRequestTest : BaseStandardClientApiTest() {
         val expectedAppRequest = AppVerifyRequest(
             projectId = projectIdField.value(),
             userId = userIdField.value(),
-            isUserIdTokenized = false,
             moduleId = moduleIdField.value(),
             isModuleIdTokenized = false,
+            isUserIdTokenized = false,
             metadata = metadataField.value(),
             verifyGuid = verifyGuidField.value()
         )
