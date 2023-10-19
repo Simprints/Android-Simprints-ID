@@ -11,13 +11,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.extentions.hasPermission
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.login.R
 import com.simprints.feature.login.databinding.FragmentQrScannerBinding
 import com.simprints.feature.login.tools.camera.CameraHelper
 import com.simprints.feature.login.tools.camera.QrCodeAnalyzer
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -76,7 +76,9 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
             viewLifecycleOwner,
             binding.qrScannerPreview,
             qrCodeAnalyzer
-        )
+        ){
+            finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
+        }
     }
 
     private fun finishWithContent(content: String) {
