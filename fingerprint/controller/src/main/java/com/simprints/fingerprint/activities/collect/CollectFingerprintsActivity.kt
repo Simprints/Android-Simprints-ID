@@ -34,7 +34,7 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
-import com.simprints.fingerprint.tools.extensions.showToast
+import com.simprints.infra.uibase.extensions.showToast
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -141,7 +141,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
         }
 
         vm.vibrate.activityObserveEventWith { Vibrate.vibrate(this) }
-        vm.noFingersScannedToast.activityObserveEventWith { showToast(getString(IDR.string.no_fingers_scanned)) }
+        vm.noFingersScannedToast.activityObserveEventWith { this.showToast(IDR.string.no_fingers_scanned) }
         vm.launchAlert.activityObserveEventWith { showAlert.launch(it.toAlertConfig().toArgs()) }
         vm.launchReconnect.activityObserveEventWith { launchConnectScannerActivityForReconnect() }
         vm.finishWithFingerprints.activityObserveEventWith { setResultAndFinishSuccess(it) }

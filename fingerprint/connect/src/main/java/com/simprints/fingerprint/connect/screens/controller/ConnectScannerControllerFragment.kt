@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.domain.permission.PermissionStatus
 import com.simprints.core.domain.permission.worstPermissionStatus
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
@@ -25,11 +26,13 @@ import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel.ConnectScannerIssueScreen
 import com.simprints.fingerprint.connect.screens.alert.AlertActivityHelper
 import com.simprints.fingerprint.connect.screens.alert.AlertError
+import com.simprints.fingerprint.connect.screens.issues.scanneroff.ScannerOffFragmentArgs
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.system.Vibrate
 import dagger.hilt.android.AndroidEntryPoint
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_connect_scanner) {
@@ -91,13 +94,31 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                 ConnectScannerIssueScreen.LowBattery -> showAlert(AlertError.LOW_BATTERY)
                 ConnectScannerIssueScreen.UnexpectedError -> showAlert(AlertError.UNEXPECTED_ERROR)
 
-                ConnectScannerIssueScreen.BluetoothOff -> {} // TODO
-                ConnectScannerIssueScreen.NfcOff -> {} // TODO
-                ConnectScannerIssueScreen.NfcPair -> {} // TODO
-                is ConnectScannerIssueScreen.Ota -> {} // TODO
-                is ConnectScannerIssueScreen.ScannerError -> {} // TODO
-                ConnectScannerIssueScreen.SerialEntryPair -> {} // TODO
+                ConnectScannerIssueScreen.BluetoothOff -> internalNavController()?.navigate(R.id.issueBluetoothOffFragment)
+                ConnectScannerIssueScreen.NfcOff -> internalNavController()?.navigate(R.id.issueNfcOffFragment)
+                ConnectScannerIssueScreen.NfcPair -> internalNavController()?.navigate(R.id.issueNfcPairFragment)
+                ConnectScannerIssueScreen.SerialEntryPair -> internalNavController()?.navigate(R.id.issueSerialEntryPairFragment)
 
+                is ConnectScannerIssueScreen.ScannerOff -> internalNavController()?.navigate(
+                    R.id.issueScannerOffFragment,
+                    ScannerOffFragmentArgs(screen.currentScannerId).toBundle()
+                )
+
+                is ConnectScannerIssueScreen.ScannerError -> screen.currentScannerId?.let {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getString(IDR.string.scanner_id_confirmation_message, it))
+                        .setPositiveButton(IDR.string.scanner_confirmation_yes) { _, _ ->
+                            viewModel.handleScannerDisconnectedYesClick()
+                        }
+                        .setNegativeButton(IDR.string.scanner_confirmation_no) { _, _ ->
+                            viewModel.handleScannerDisconnectedNoClick()
+                        }
+                        .setCancelable(false)
+                        .create()
+                        .show()
+                }
+
+                is ConnectScannerIssueScreen.Ota -> {} // TODO
                 ConnectScannerIssueScreen.Refusal -> {} // TODO
             }
         })
@@ -108,9 +129,15 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
             }
         })
 
-        viewModel.scannerConnected.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { isSuccess ->
+        viewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { isSuccess ->
             finishWithResult(isSuccess)
         })
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            viewModel.handleBackPress()
+        }
+
+        internalNavController()?.setGraph(R.navigation.graph_connect_internal)
 
         if (shouldRequestPermissions) {
             shouldRequestPermissions = false
@@ -119,12 +146,6 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
             alertHelper.handleResume { shouldRequestPermissions = true }
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
-            viewModel.handleBackPress()
-        }
-
-        internalNavController()?.setGraph(R.navigation.graph_connect_internal)
-        checkBluetoothPermissions()
     }
 
 

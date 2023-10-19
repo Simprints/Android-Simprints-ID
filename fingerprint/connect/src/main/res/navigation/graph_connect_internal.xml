@@ -6,5 +6,79 @@
 
     <fragment
         android:id="@+id/connectProgressFragment"
-        android:name="com.simprints.fingerprint.connect.screens.connect.ConnectFragment" />
+        android:name="com.simprints.fingerprint.connect.screens.connect.ConnectFragment">
+
+        <action
+            android:id="@+id/action_connectProgressFragment_to_issueBluetoothOff"
+            app:destination="@id/issueBluetoothOffFragment" />
+        <action
+            android:id="@+id/action_connectProgressFragment_to_nfcOffFragment"
+            app:destination="@id/issueNfcOffFragment" />
+        <action
+            android:id="@+id/action_connectProgressFragment_to_nfcPairFragment"
+            app:destination="@id/issueNfcPairFragment" />
+        <action
+            android:id="@+id/action_connectProgressFragment_to_serialEntryPairFragment"
+            app:destination="@id/issueSerialEntryPairFragment" />
+        <action
+            android:id="@+id/action_connectProgressFragment_to_scannerOffFragment"
+            app:destination="@id/issueScannerOffFragment" />
+        <action
+            android:id="@+id/action_connectProgressFragment_to_otaFragment"
+            app:destination="@id/otaFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/issueBluetoothOffFragment"
+        android:name="com.simprints.fingerprint.connect.screens.issues.bluetoothoff.BluetoothOffFragment"
+        app:popUpTo="@id/connectProgressFragment">
+        <action
+            android:id="@+id/action_issueBluetoothOffFragment_to_connectProgressFragment"
+            app:destination="@id/connectProgressFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/issueNfcOffFragment"
+        android:name="com.simprints.fingerprint.connect.screens.issues.nfcoff.NfcOffFragment"
+        android:label="NfcOffFragment">
+        <action
+            android:id="@+id/action_nfcOffFragment_to_nfcPairFragment"
+            app:destination="@id/issueNfcPairFragment" />
+        <action
+            android:id="@+id/action_nfcOffFragment_to_serialEntryPairFragment"
+            app:destination="@id/issueSerialEntryPairFragment" />
+        <action
+            android:id="@+id/action_nfcOffFragment_to_connectProgressFragment"
+            app:destination="@id/connectProgressFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/issueNfcPairFragment"
+        android:name="com.simprints.fingerprint.connect.screens.issues.nfcpair.NfcPairFragment"
+        app:popUpTo="@id/connectProgressFragment">
+        <action
+            android:id="@+id/action_nfcPairFragment_to_connectProgressFragment"
+            app:destination="@id/connectProgressFragment" />
+        <action
+            android:id="@+id/action_nfcPairFragment_to_serialEntryPairFragment"
+            app:destination="@id/issueSerialEntryPairFragment" />
+        <action
+            android:id="@+id/action_nfcPairFragment_to_connectProgressFragment2"
+            app:destination="@id/connectProgressFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/issueSerialEntryPairFragment"
+        android:name="com.simprints.fingerprint.connect.screens.issues.serialentrypair.SerialEntryPairFragment"
+        app:popUpTo="@id/connectProgressFragment">
+        <action
+            android:id="@+id/action_serialEntryPairFragment_to_connectProgressFragment"
+            app:destination="@id/connectProgressFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/issueScannerOffFragment"
+        android:name="com.simprints.fingerprint.connect.screens.issues.scanneroff.ScannerOffFragment"
+        app:popUpTo="@id/connectProgressFragment">
+        <argument
+            android:name="scannerId"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>
