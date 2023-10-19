@@ -20,6 +20,11 @@ import com.simprints.core.tools.extentions.permissionFromResult
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
+import com.simprints.feature.exitform.ExitFormContract
+import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.feature.exitform.exitFormConfiguration
+import com.simprints.feature.exitform.scannerOptions
+import com.simprints.feature.exitform.toArgs
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
@@ -76,16 +81,8 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         super.onViewCreated(view, savedInstanceState)
         viewModel.init(args.params)
 
-        // TODO findNavController().handleResult<ExitFormResult>
-        findNavController().handleResult<AlertResult>(this, R.id.connectScannerControllerFragment, AlertContract.DESTINATION) { result ->
-            alertHelper.handleAlertResult(
-                requireActivity(),
-                result,
-                showRefusal = {},
-                retry = {},
-                finishWithError = { finishWithResult(false) },
-            )
-        }
+        findNavController().handleResult(this, R.id.connectScannerControllerFragment, ExitFormContract.DESTINATION, ::handleExitForm)
+        findNavController().handleResult(this, R.id.connectScannerControllerFragment, AlertContract.DESTINATION, ::handleResult)
 
         viewModel.showScannerIssueScreen.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { screen ->
             when (screen) {
@@ -93,6 +90,8 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                 ConnectScannerIssueScreen.BluetoothNotSupported -> showAlert(AlertError.BLUETOOTH_NOT_SUPPORTED)
                 ConnectScannerIssueScreen.LowBattery -> showAlert(AlertError.LOW_BATTERY)
                 ConnectScannerIssueScreen.UnexpectedError -> showAlert(AlertError.UNEXPECTED_ERROR)
+
+                ConnectScannerIssueScreen.ExitForm -> showExitForm()
 
                 ConnectScannerIssueScreen.BluetoothOff -> internalNavController()?.navigate(R.id.issueBluetoothOffFragment)
                 ConnectScannerIssueScreen.NfcOff -> internalNavController()?.navigate(R.id.issueNfcOffFragment)
@@ -119,7 +118,6 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                 }
 
                 is ConnectScannerIssueScreen.Ota -> {} // TODO
-                ConnectScannerIssueScreen.Refusal -> {} // TODO
             }
         })
         viewModel.scannerConnected.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { isSuccess ->
@@ -172,6 +170,36 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
 
     private fun showAlert(error: AlertError) {
         findNavController().navigate(R.id.action_global_to_alertFragment, error.toAlertConfig().toArgs())
+    }
+
+    private fun handleResult(result: AlertResult) {
+        alertHelper.handleAlertResult(
+            requireActivity(),
+            result,
+            showRefusal = {},
+            retry = {},
+            finishWithError = { finishWithResult(false) },
+        )
+    }
+
+    private fun showExitForm() {
+        findNavController().navigate(
+            R.id.action_global_to_exitFormFragment,
+            exitFormConfiguration {
+                titleRes = IDR.string.why_did_you_skip_fingerprinting
+                backButtonRes = IDR.string.button_scan_prints
+                visibleOptions = scannerOptions()
+            }.toArgs()
+        )
+    }
+
+    private fun handleExitForm(result: ExitFormResult) {
+        val option = result.submittedOption()
+        if (option != null) {
+            findNavController().finishWithResult(this, result)
+        } else {
+            shouldRequestPermissions = true
+        }
     }
 
     private fun finishWithResult(isSuccess: Boolean) {
