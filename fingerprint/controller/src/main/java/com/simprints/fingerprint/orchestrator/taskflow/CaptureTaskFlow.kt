@@ -16,14 +16,11 @@ class CaptureTaskFlow(captureRequest: FingerprintCaptureRequest) : FingerprintTa
     init {
         with(captureRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.ConnectScanner(CONNECT_TASK_KEY) { createConnectScannerTaskRequest() },
-                FingerprintTask.CollectFingerprints(COLLECT_TASK_KEY) { createCollectFingerprintsTaskRequest() }
+                FingerprintTask.ConnectScanner(COLLECT_TASK_KEY),
+                FingerprintTask.CollectFingerprints(COLLECT_TASK_KEY, { createCollectFingerprintsTaskRequest() })
             )
         }
     }
-
-    private fun createConnectScannerTaskRequest() =
-        ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
 
     private fun FingerprintCaptureRequest.createCollectFingerprintsTaskRequest() =
         CollectFingerprintsTaskRequest(fingerprintsToCapture)
