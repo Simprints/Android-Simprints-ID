@@ -76,7 +76,7 @@ internal class QrScannerFragment : Fragment(R.layout.fragment_qr_scanner) {
             viewLifecycleOwner,
             binding.qrScannerPreview,
             qrCodeAnalyzer
-        ){
+        ) {
             finishWithError(QrScannerResult.QrScannerError.CameraNotAvailable)
         }
     }

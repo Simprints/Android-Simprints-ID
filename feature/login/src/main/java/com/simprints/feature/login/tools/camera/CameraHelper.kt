@@ -73,6 +73,7 @@ internal class CameraHelper @Inject constructor(
         .apply { setSurfaceProvider(previewView.surfaceProvider) }
 
 }
+
 fun interface CameraInitializationErrorListener {
     fun onCameraError()
 }
