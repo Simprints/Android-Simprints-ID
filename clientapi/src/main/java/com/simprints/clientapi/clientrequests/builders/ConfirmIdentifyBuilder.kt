@@ -7,7 +7,7 @@ import com.simprints.clientapi.domain.requests.ConfirmIdentityRequest
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 
 
 class ConfirmIdentifyBuilder(

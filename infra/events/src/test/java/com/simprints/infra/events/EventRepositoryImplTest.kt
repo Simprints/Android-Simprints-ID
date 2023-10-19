@@ -75,15 +75,15 @@ internal class EventRepositoryImplTest {
         }
 
         eventRepo = EventRepositoryImpl(
-            DEVICE_ID,
-            APP_VERSION_NAME,
-            LIB_VERSION_NAME,
-            authStore,
-            eventLocalDataSource,
-            timeHelper,
-            sessionEventValidatorsFactory,
-            sessionDataCache,
-            configRepository,
+            deviceId = DEVICE_ID,
+            appVersionName = APP_VERSION_NAME,
+            libSimprintsVersionName = LIB_VERSION_NAME,
+            authStore = authStore,
+            eventLocalDataSource = eventLocalDataSource,
+            timeHelper = timeHelper,
+            validatorsFactory = sessionEventValidatorsFactory,
+            sessionDataCache = sessionDataCache,
+            configRepository = configRepository,
         )
     }
 
@@ -402,8 +402,10 @@ internal class EventRepositoryImplTest {
     fun `when observeEventCount called with type return events of type`() = runTest {
         coEvery { eventLocalDataSource.observeCount(any(), any()) } returns flowOf(7)
 
-        assertThat(eventRepo.observeEventCount("test", CALLBACK_ENROLMENT)
-            .firstOrNull()).isEqualTo(7)
+        assertThat(
+            eventRepo.observeEventCount("test", CALLBACK_ENROLMENT)
+                .firstOrNull()
+        ).isEqualTo(7)
 
         coVerify(exactly = 0) { eventLocalDataSource.observeCount(any()) }
         coVerify(exactly = 1) { eventLocalDataSource.observeCount(any(), any()) }

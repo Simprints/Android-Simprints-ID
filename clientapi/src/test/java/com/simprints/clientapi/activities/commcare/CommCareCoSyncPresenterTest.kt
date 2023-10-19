@@ -38,9 +38,9 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Up
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
-import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore

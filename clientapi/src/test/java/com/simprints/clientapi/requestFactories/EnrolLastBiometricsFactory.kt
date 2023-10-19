@@ -8,7 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolLastBiometricsRequest
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import io.mockk.every
 import io.mockk.mockk
 

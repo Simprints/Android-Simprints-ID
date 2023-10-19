@@ -9,6 +9,7 @@ data class SubjectQuery(
     val subjectId: String? = null,
     val subjectIds: List<String>? = null,
     val attendantId: String? = null,
+    val hasUntokenizedFields: Boolean? = null,
     val moduleId: String? = null,
     val sort: Boolean = false,
     val afterSubjectId: String? = null

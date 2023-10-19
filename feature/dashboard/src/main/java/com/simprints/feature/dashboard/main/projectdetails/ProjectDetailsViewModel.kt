@@ -8,7 +8,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

@@ -8,7 +8,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -16,7 +15,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import io.mockk.MockKAnnotations
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -51,31 +49,30 @@ internal class EventRoomDaoTest {
         eventDao = db.eventDao
     }
 
-    @Test
-    fun loadByProjectId() {
-        runBlocking {
-            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(projectId = GUID1))
-            addIntoDb(event, wrongEvent)
-            verifyEvents(listOf(event), eventDao.loadFromProject(projectId = DEFAULT_PROJECT_ID))
-        }
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     @Test
-    fun loadBySessionId() {
-        runBlocking {
-            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
-            addIntoDb(event, wrongEvent)
-            verifyEvents(listOf(event), eventDao.loadFromSession(sessionId = GUID1))
-        }
+    fun loadByProjectId() = runTest {
+        val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(projectId = GUID1))
+        addIntoDb(event, wrongEvent)
+        verifyEvents(listOf(event), eventDao.loadFromProject(projectId = DEFAULT_PROJECT_ID))
     }
 
     @Test
-    fun loadEventJsonFormSession() {
-        runBlocking {
-            addIntoDb(event)
-            val results = eventDao.loadEventJsonFromSession(GUID1)
-            assertThat(results).containsExactlyElementsIn(listOf(eventJson))
-        }
+    fun loadBySessionId() = runTest {
+        val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
+        addIntoDb(event, wrongEvent)
+        verifyEvents(listOf(event), eventDao.loadFromSession(sessionId = GUID1))
+    }
+
+    @Test
+    fun loadEventJsonFormSession() = runTest {
+        addIntoDb(event)
+        val results = eventDao.loadEventJsonFromSession(GUID1)
+        assertThat(results).containsExactlyElementsIn(listOf(eventJson))
     }
 
     @Test
@@ -95,61 +92,53 @@ internal class EventRoomDaoTest {
 
 
     @Test
-    fun loadAllClosedSessionIds() {
-        runBlocking {
-            val otherId = randomUUID()
-            val closedEvent = event.copy(
-                id = otherId,
-                sessionIsClosed = true,
-                labels = event.labels.copy(sessionId = otherId)
+    fun loadAllClosedSessionIds() = runTest {
+        val otherId = randomUUID()
+        val closedEvent = event.copy(
+            id = otherId,
+            sessionIsClosed = true,
+            labels = event.labels.copy(sessionId = otherId)
+        )
+
+        addIntoDb(event, closedEvent)
+        assertThat(listOf(closedEvent.id)).isEqualTo(
+            eventDao.loadAllClosedSessionIds(
+                DEFAULT_PROJECT_ID
             )
+        )
 
-            addIntoDb(event, closedEvent)
-            assertThat(listOf(closedEvent.id)).isEqualTo(
-                eventDao.loadAllClosedSessionIds(
-                    DEFAULT_PROJECT_ID
-                )
-            )
-        }
     }
 
     @Test
-    fun loadAll() {
-        runBlocking {
-            val secondEvent = event.copy(id = randomUUID(), labels = EventLabels(deviceId = GUID2))
-            addIntoDb(event, secondEvent)
-            verifyEvents(listOf(event, secondEvent), eventDao.loadAll())
-        }
+    fun loadAll() = runTest {
+        val secondEvent = event.copy(id = randomUUID(), labels = EventLabels(deviceId = GUID2))
+        addIntoDb(event, secondEvent)
+        verifyEvents(listOf(event, secondEvent), eventDao.loadAll())
     }
 
     @Test
-    fun count() {
-        runBlocking {
-            addIntoDb(event, event.copy(id = randomUUID()), event.copy(id = randomUUID()))
-            assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(3)
-        }
+    fun count() = runTest {
+        addIntoDb(event, event.copy(id = randomUUID()), event.copy(id = randomUUID()))
+        assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(3)
     }
 
     @Test
-    fun deletion() {
-        runBlocking {
-            addIntoDb(event)
-            db.eventDao.delete(listOf(event.id))
-            assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(0)
-        }
+    fun deletion() = runTest {
+        addIntoDb(event)
+        db.eventDao.delete(listOf(event.id))
+        assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(0)
     }
 
     @Test
-    fun deletionBySessionId() {
-        runBlocking {
-            val eventSameSession =
-                event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID1))
-            val eventDifferentSession =
-                event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
-            addIntoDb(event, eventSameSession, eventDifferentSession)
-            db.eventDao.deleteAllFromSession(sessionId = GUID1)
-            verifyEvents(listOf(eventDifferentSession), eventDao.loadAll())
-        }
+    fun deletionBySessionId() = runTest {
+        val eventSameSession =
+            event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID1))
+        val eventDifferentSession =
+            event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
+        addIntoDb(event, eventSameSession, eventDifferentSession)
+        db.eventDao.deleteAllFromSession(sessionId = GUID1)
+        verifyEvents(listOf(eventDifferentSession), eventDao.loadAll())
+
     }
 
     private suspend fun addIntoDb(vararg events: DbEvent) {

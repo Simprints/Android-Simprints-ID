@@ -83,16 +83,16 @@ internal class EventSyncManagerTest {
         }
 
         eventSyncManagerImpl = EventSyncManagerImpl(
-            ctx,
-            eventSyncStateProcessor,
-            eventDownSyncScopeRepository,
-            eventRepository,
-            eventUpSyncScopeRepository,
-            eventSyncCache,
-            downSyncTask,
-            eventRemoteDataSource,
-            configRepository,
-            testCoroutineRule.testCoroutineDispatcher,
+            ctx = ctx,
+            eventSyncStateProcessor = eventSyncStateProcessor,
+            downSyncScopeRepository = eventDownSyncScopeRepository,
+            eventRepository = eventRepository,
+            upSyncScopeRepo = eventUpSyncScopeRepository,
+            eventSyncCache = eventSyncCache,
+            downSyncTask = downSyncTask,
+            eventRemoteDataSource = eventRemoteDataSource,
+            configRepository = configRepository,
+            dispatcher = testCoroutineRule.testCoroutineDispatcher
         )
     }
 
