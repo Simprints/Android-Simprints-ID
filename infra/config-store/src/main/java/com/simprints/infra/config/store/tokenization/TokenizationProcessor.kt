@@ -1,4 +1,4 @@
-package com.simprints.infra.config.sync.tokenization
+package com.simprints.infra.config.store.tokenization
 
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted

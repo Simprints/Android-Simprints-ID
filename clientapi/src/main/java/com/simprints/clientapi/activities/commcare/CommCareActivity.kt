@@ -11,7 +11,7 @@ import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier

@@ -9,8 +9,8 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrolRequest
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
 import io.mockk.every
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import io.mockk.mockk
 
 object EnrolRequestFactory : RequestFactory() {

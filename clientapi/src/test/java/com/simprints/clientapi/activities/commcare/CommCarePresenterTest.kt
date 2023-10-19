@@ -19,7 +19,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.kotest.assertions.throwables.shouldThrow

@@ -18,6 +18,8 @@ import com.simprints.infra.events.local.*
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.flow.flowOf
@@ -29,9 +31,11 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 internal class EventLocalDataSourceImplTest {
 
     private lateinit var db: EventRoomDatabase
@@ -142,7 +146,9 @@ internal class EventLocalDataSourceImplTest {
             //Given
             coEvery { eventDao.observeCount(any()) } throws SQLiteException()
             // When
-            assertThrows<SQLiteException> { eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList() }
+            assertThrows<SQLiteException> {
+                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            }
             // Then
             verify(exactly = 0) {
                 eventDatabaseFactory.deleteDatabase()
@@ -174,7 +180,9 @@ internal class EventLocalDataSourceImplTest {
             //Given
             coEvery { eventDao.observeCount(any()) } throws Exception()
             // When
-            assertThrows<Exception> { eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList() }
+            assertThrows<Exception> {
+                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            }
             // Then
             verify(exactly = 0) {
                 eventDatabaseFactory.deleteDatabase()
@@ -326,6 +334,16 @@ internal class EventLocalDataSourceImplTest {
 
         coVerify { eventDao.deleteAll() }
     }
+
+    @Test
+    fun `when loadAllFromProject is called, then events are loaded from the local storage`() =
+        runTest {
+            val projectId = "projectId"
+            coEvery { eventDao.loadFromProject(projectId) } returns mockk()
+            eventLocalDataSource.loadAllFromProject(projectId)
+
+            coVerify { eventDao.loadFromProject(projectId) }
+        }
 
     private fun mockDaoLoadToMakeNothing() {
         db = mockk(relaxed = true)

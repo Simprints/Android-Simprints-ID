@@ -13,7 +13,7 @@ import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType

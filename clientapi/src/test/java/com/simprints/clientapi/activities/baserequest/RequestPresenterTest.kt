@@ -14,7 +14,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.config.sync.tokenization.TokenizationProcessor
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.sampledata.createIdentificationCalloutEvent
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
