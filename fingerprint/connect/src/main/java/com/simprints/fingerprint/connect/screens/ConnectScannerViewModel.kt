@@ -115,7 +115,6 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     fun stopConnectingAndResetState() {
         _currentStep.postValue(Step.Preparation)
-        // TODO message.postValue(R.string.connect_scanner_bt_connect)
         backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_FORM)
     }
 
@@ -124,7 +123,7 @@ internal class ConnectScannerViewModel @Inject constructor(
             BackButtonBehaviour.DISABLED, null -> { /* Do nothing */
             }
 
-            BackButtonBehaviour.EXIT_WITH_ERROR -> _scannerConnected.send(false)
+            BackButtonBehaviour.EXIT_WITH_ERROR -> _finish.send(false)
             BackButtonBehaviour.EXIT_FORM -> _showScannerIssueScreen.send(ConnectScannerIssueScreen.Refusal)
         }
     }
@@ -198,7 +197,7 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     private suspend fun manageVeroErrors(e: Throwable) {
         Simber.e(e)
-       // _finish.send(false)
+        _scannerConnected.send(false)
 
         launchAlertOrScannerIssueOrShowDialog(e)
 
@@ -239,6 +238,17 @@ internal class ConnectScannerViewModel @Inject constructor(
         Simber.tag(LoggingConstants.CrashReportTag.SCANNER_SETUP.name).i(message)
     }
 
+    fun handleScannerDisconnectedYesClick() {
+        _showScannerIssueScreen.send(ConnectScannerIssueScreen.ScannerOff(scannerManager.currentScannerId))
+    }
+
+    fun handleScannerDisconnectedNoClick() {
+        _showScannerIssueScreen.send(determineAppropriateScannerIssueForPairing())
+    }
+
+    fun handleIncorrectScanner() {
+        _showScannerIssueScreen.send(determineAppropriateScannerIssueForPairing())
+    }
 
     private enum class BackButtonBehaviour {
         DISABLED,
@@ -283,7 +293,9 @@ internal class ConnectScannerViewModel @Inject constructor(
         data object NfcOff : ConnectScannerIssueScreen()
         data object SerialEntryPair : ConnectScannerIssueScreen()
         data object LowBattery : ConnectScannerIssueScreen()
-        data class ScannerError(val currentId: String?) : ConnectScannerIssueScreen()
+
+        data class ScannerOff(val currentScannerId: String?) : ConnectScannerIssueScreen()
+        data class ScannerError(val currentScannerId: String?) : ConnectScannerIssueScreen()
         data class Ota(val availableOtas: List<AvailableOta>) : ConnectScannerIssueScreen()
 
         data object UnexpectedError : ConnectScannerIssueScreen()

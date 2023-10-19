@@ -1,42 +1,40 @@
-package com.simprints.fingerprint.activities.connect.issues.serialentrypair
+package com.simprints.fingerprint.connect.screens.issues.serialentrypair
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Bundle
-import android.os.Handler
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.base.FingerprintFragment
-import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
-import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.connect.screens.issues.serialentrypair.SerialEntryPairViewModel
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.databinding.FragmentSerialEntryPairBinding
-import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
+import androidx.navigation.navOptions
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.fingerprint.connect.R
+import com.simprints.fingerprint.connect.databinding.FragmentSerialEntryPairBinding
+import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
+import com.simprints.fingerprint.connect.screens.issues.bluetoothoff.BluetoothOffFragmentDirections
+import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.uibase.extensions.showToast
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class SerialEntryPairFragment : FingerprintFragment() {
+class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry_pair) {
 
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val viewModel: SerialEntryPairViewModel by viewModels()
@@ -49,10 +47,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
     lateinit var serialNumberConverter: SerialNumberConverter
 
     @Inject
-    lateinit var timeHelper: FingerprintTimeHelper
-
-    @Inject
-    lateinit var sessionManager: FingerprintSessionEventsManager
+    lateinit var screenReporter: ReportAlertScreenEventUseCase
 
     @Inject
     lateinit var recentUserActivityManager: RecentUserActivityManager
@@ -60,47 +55,25 @@ class SerialEntryPairFragment : FingerprintFragment() {
     private lateinit var bluetoothPairStateChangeReceiver: BroadcastReceiver
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
-    private val handler = Handler()
-    private val determineWhetherPairingWasSuccessful = Runnable {
-        checkIfNowBondedToChosenScannerThenProceed()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_serial_entry_pair, container, false)
+    private var determineWhetherPairingWasSuccessfulJob: Job? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setTextInLayout()
 
-        sessionManager.addEventInBackground(
-            AlertScreenEventWithScannerIssue(
-                timeHelper.now(),
-                ConnectScannerIssue.SerialEntryPair
-            )
-        )
+        screenReporter.reportSerialEntry()
 
         binding.serialEntryOkButton.setOnClickListener { parseTextAndCommencePair() }
         setupDoneButtonForEditText()
 
-        viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith {
+        viewModel.awaitingToPairToMacAddress.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
             binding.serialEntryOkButton.visibility = View.INVISIBLE
             binding.serialEntryPairProgressBar.visibility = View.VISIBLE
-            handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
-        }
-    }
 
-    private fun setTextInLayout() {
-        binding.apply {
-            serialEntryOkButton.text = getString(IDR.string.serial_entry_ok)
-            serialEntryPairInstructionsTextView.text = getString(IDR.string.enter_scanner_number)
-            serialEntryPairTitleTextView.text = getString(IDR.string.serial_entry_pair_title)
-            serialEntryPairInstructionsDetailTextView.text =
-                getString(IDR.string.enter_scanner_number_detail)
-        }
+            determineWhetherPairingWasSuccessfulJob = lifecycleScope.launch {
+                delay(PAIRING_WAIT_TIMEOUT)
+                checkIfNowBondedToChosenScannerThenProceed()
+            }
+        })
     }
 
     private fun setupDoneButtonForEditText() {
@@ -144,8 +117,8 @@ class SerialEntryPairFragment : FingerprintFragment() {
     }
 
     override fun onDestroy() {
+        determineWhetherPairingWasSuccessfulJob?.cancel()
         super.onDestroy()
-        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
     }
 
     private fun parseTextAndCommencePair() {
@@ -164,10 +137,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
             val macAddress = viewModel.awaitingToPairToMacAddress.value?.peekContent()
             if (macAddress != null && scannerPairingManager.isAddressPaired(macAddress)) {
                 recentUserActivityManager.updateRecentUserActivity {
-                    it.apply {
-                        it.lastScannerUsed =
-                            serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
-                    }
+                    it.copy(lastScannerUsed = serialNumberConverter.convertMacAddressToSerialNumber(macAddress))
                 }
                 retryConnectAndFinishFragment()
             } else {
@@ -177,7 +147,7 @@ class SerialEntryPairFragment : FingerprintFragment() {
     }
 
     private fun handlePairingAttemptFailed(pairingRejected: Boolean) {
-        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
+        determineWhetherPairingWasSuccessfulJob?.cancel()
         viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
             binding.serialEntryPairProgressBar.visibility = View.INVISIBLE
             binding.serialEntryOkButton.visibility = View.VISIBLE
@@ -194,9 +164,12 @@ class SerialEntryPairFragment : FingerprintFragment() {
     }
 
     private fun retryConnectAndFinishFragment() {
-        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
-        connectScannerViewModel.retryConnect()
-        findNavController().navigate(R.id.action_serialEntryPairFragment_to_connectScannerMainFragment)
+        determineWhetherPairingWasSuccessfulJob?.cancel()
+        connectScannerViewModel.connect()
+        findNavController().navigate(
+            SerialEntryPairFragmentDirections.actionSerialEntryPairFragmentToConnectProgressFragment(),
+            navOptions { popUpTo(R.id.connectProgressFragment) }
+        )
     }
 
     companion object {

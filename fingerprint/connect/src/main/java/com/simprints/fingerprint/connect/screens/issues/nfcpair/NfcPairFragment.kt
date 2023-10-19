@@ -1,50 +1,47 @@
-package com.simprints.fingerprint.activities.connect.issues.nfcpair
+package com.simprints.fingerprint.connect.screens.issues.nfcpair
 
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
 import android.graphics.Paint
 import android.os.Bundle
-import android.os.Handler
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.base.FingerprintFragment
-import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
-import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
-import com.simprints.fingerprint.connect.screens.issues.nfcpair.NfcPairViewModel
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import androidx.navigation.navOptions
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
+import com.simprints.fingerprint.connect.R
+import com.simprints.fingerprint.connect.databinding.FragmentNfcPairBinding
+import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
+import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.NfcManager
-import com.simprints.fingerprint.databinding.FragmentNfcPairBinding
-import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
-import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
+import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
 import com.simprints.fingerprint.infra.scanner.nfc.ComponentNfcTag
+import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.uibase.extensions.showToast
 import com.simprints.infra.uibase.system.Vibrate
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class NfcPairFragment : FingerprintFragment() {
+class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
 
-    private val viewModel: NfcPairViewModel by viewModels()
-    private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentNfcPairBinding::bind)
+    private val viewModel: NfcPairViewModel by viewModels()
+    private val connectViewModel: ConnectScannerViewModel by activityViewModels()
 
     @Inject
     lateinit var nfcManager: NfcManager
@@ -56,70 +53,45 @@ class NfcPairFragment : FingerprintFragment() {
     lateinit var serialNumberConverter: SerialNumberConverter
 
     @Inject
-    lateinit var sessionManager: FingerprintSessionEventsManager
+    lateinit var screenReporter: ReportAlertScreenEventUseCase
 
     @Inject
     lateinit var recentUserActivityManager: RecentUserActivityManager
 
-    @Inject
-    lateinit var timeHelper: FingerprintTimeHelper
 
     private lateinit var bluetoothPairStateChangeReceiver: BroadcastReceiver
 
     // Sometimes the BOND_BONDED state is never sent, so we need to check after a timeout whether the devices are paired
-    private val handler = Handler()
-    private val determineWhetherPairingWasSuccessful = Runnable {
-        checkIfNowBondedToChosenScannerThenProceed()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(R.layout.fragment_nfc_pair, container, false)
+    private var determineWhetherPairingWasSuccessfulJob: Job? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setTextInLayout()
-
-        sessionManager.addEventInBackground(
-            AlertScreenEventWithScannerIssue(
-                timeHelper.now(),
-                ConnectScannerIssue.NfcPair
-            )
-        )
+        screenReporter.reportNfcPairing()
 
         setupScannerPhoneTappingAnimation()
 
-        binding.couldNotPairTextView.paintFlags =
-            binding.couldNotPairTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        binding.couldNotPairTextView.paintFlags = binding.couldNotPairTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         binding.couldNotPairTextView.setOnClickListener { goToSerialEntryPair() }
 
-        viewModel.showToastWithStringRes.fragmentObserveEventWith { context?.showToast(it) }
-        viewModel.awaitingToPairToMacAddress.fragmentObserveEventWith { handleAwaitingPair(it) }
-    }
-
-    private fun setTextInLayout() {
-        binding.couldNotPairTextView.text = getString(IDR.string.cannot_connect_devices)
-        binding.tryAgainButton.text = getString(IDR.string.try_again_label)
-        binding.nfcPairInstructionsTextView.text = getString(IDR.string.nfc_pair_instructions)
-        binding.nfcPairTitleTextView.text = getString(IDR.string.nfc_pair_title)
+        viewModel.showToastWithStringRes.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
+            requireContext().showToast(it)
+        })
+        viewModel.awaitingToPairToMacAddress.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
+            handleAwaitingPair(it)
+        })
     }
 
     private fun setupScannerPhoneTappingAnimation() {
-        AnimationUtils.loadAnimation(requireContext(), R.anim.animation_nfc_pair_scanner)
-            .also { scannerAnimation ->
-                scannerAnimation.repeatMode = Animation.REVERSE
-                scannerAnimation.repeatCount = Animation.INFINITE
-                binding.nfcPairScannerImageView.startAnimation(scannerAnimation)
-            }
-        AnimationUtils.loadAnimation(requireContext(), R.anim.animation_nfc_pair_phone)
-            .also { phoneAnimation ->
-                phoneAnimation.repeatMode = Animation.REVERSE
-                phoneAnimation.repeatCount = Animation.INFINITE
-                binding.nfcPairPhoneImageView.startAnimation(phoneAnimation)
-            }
+        AnimationUtils.loadAnimation(requireContext(), R.anim.animation_nfc_pair_scanner).also { scannerAnimation ->
+            scannerAnimation.repeatMode = Animation.REVERSE
+            scannerAnimation.repeatCount = Animation.INFINITE
+            binding.nfcPairScannerImageView.startAnimation(scannerAnimation)
+        }
+        AnimationUtils.loadAnimation(requireContext(), R.anim.animation_nfc_pair_phone).also { phoneAnimation ->
+            phoneAnimation.repeatMode = Animation.REVERSE
+            phoneAnimation.repeatCount = Animation.INFINITE
+            binding.nfcPairPhoneImageView.startAnimation(phoneAnimation)
+        }
     }
 
     override fun onStart() {
@@ -128,7 +100,7 @@ class NfcPairFragment : FingerprintFragment() {
             onPairSuccess = ::checkIfNowBondedToChosenScannerThenProceed,
             onPairFailed = ::handlePairingAttemptFailed
         )
-        activity?.registerReceiver(
+        requireActivity().registerReceiver(
             bluetoothPairStateChangeReceiver,
             IntentFilter(ComponentBluetoothDevice.ACTION_BOND_STATE_CHANGED)
         )
@@ -153,8 +125,8 @@ class NfcPairFragment : FingerprintFragment() {
     }
 
     override fun onDestroy() {
+        determineWhetherPairingWasSuccessfulJob?.cancel()
         super.onDestroy()
-        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
     }
 
     private fun handleNfcTagDetected(tag: ComponentNfcTag) {
@@ -173,7 +145,10 @@ class NfcPairFragment : FingerprintFragment() {
             )
         }
 
-        handler.postDelayed(determineWhetherPairingWasSuccessful, PAIRING_WAIT_TIMEOUT)
+        determineWhetherPairingWasSuccessfulJob = lifecycleScope.launch {
+            delay(PAIRING_WAIT_TIMEOUT)
+            checkIfNowBondedToChosenScannerThenProceed()
+        }
     }
 
     private fun checkIfNowBondedToChosenScannerThenProceed() {
@@ -194,7 +169,7 @@ class NfcPairFragment : FingerprintFragment() {
     }
 
     private fun handlePairingAttemptFailed(pairingRejected: Boolean) {
-        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
+        determineWhetherPairingWasSuccessfulJob?.cancel()
         viewModel.awaitingToPairToMacAddress.value?.let { macAddressEvent ->
 
             binding.apply {
@@ -215,13 +190,16 @@ class NfcPairFragment : FingerprintFragment() {
     }
 
     private fun retryConnectAndFinishFragment() {
-        handler.removeCallbacks(determineWhetherPairingWasSuccessful)
-        connectScannerViewModel.retryConnect()
-        findNavController().navigate(R.id.action_nfcPairFragment_to_connectScannerMainFragment)
+        determineWhetherPairingWasSuccessfulJob?.cancel()
+        connectViewModel.connect()
+        findNavController().navigate(
+            NfcPairFragmentDirections.actionNfcPairFragmentToSerialEntryPairFragment(),
+            navOptions { popUpTo(R.id.connectProgressFragment) }
+        )
     }
 
     private fun goToSerialEntryPair() {
-        findNavController().navigate(R.id.action_nfcPairFragment_to_serialEntryPairFragment)
+        findNavController().navigate(NfcPairFragmentDirections.actionNfcPairFragmentToSerialEntryPairFragment())
     }
 
     companion object {

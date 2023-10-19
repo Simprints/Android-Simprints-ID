@@ -9,10 +9,6 @@ import android.widget.Toast
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.infra.logging.Simber
 
-fun Context.showToast(string: String) =
-    runOnUiThread {
-        Toast.makeText(this, string, Toast.LENGTH_LONG).show()
-    }
 fun Context.runOnUiThread(f: Context.() -> Unit) {
     if (Looper.getMainLooper() === Looper.myLooper()) f() else
         Handler(Looper.getMainLooper()).post {
