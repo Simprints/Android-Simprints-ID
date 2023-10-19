@@ -10,6 +10,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.infra.logging.Simber
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -26,20 +27,34 @@ internal class CameraHelper @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         cameraPreview: PreviewView,
         qrAnalyser: QrCodeAnalyzer,
+        initializationErrorListener: CameraInitializationErrorListener,
     ) {
         val providerFuture = ProcessCameraProvider.getInstance(context)
         providerFuture.addListener(
             {
                 val cameraProvider = providerFuture.get()
+                // Check if the back camera is available
+                if (cameraProvider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA).not()) {
+                    initializationErrorListener.onCameraError()
+                    return@addListener
+                }
                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
                 val analyzer = buildAnalyser(qrAnalyser)
                 val preview = buildPreview(cameraPreview)
 
-                cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, analyzer, preview).let {
-                    with(cameraFocusManager) {
-                        setUpFocusOnTap(cameraPreview, it)
-                        setUpAutoFocus(cameraPreview, it)
+                try {
+                    cameraProvider.bindToLifecycle(
+                        lifecycleOwner, cameraSelector, analyzer, preview
+                    ).let {
+                        with(cameraFocusManager) {
+                            setUpFocusOnTap(cameraPreview, it)
+                            setUpAutoFocus(cameraPreview, it)
+                        }
                     }
+                } catch (e: Exception) {
+                    // Can be thrown if the camera is already in use by another process
+                    Simber.i(e)
+                    initializationErrorListener.onCameraError()
                 }
             },
             ContextCompat.getMainExecutor(context)
@@ -57,4 +72,7 @@ internal class CameraHelper @Inject constructor(
         .build()
         .apply { setSurfaceProvider(previewView.surfaceProvider) }
 
+}
+fun interface CameraInitializationErrorListener {
+    fun onCameraError()
 }
