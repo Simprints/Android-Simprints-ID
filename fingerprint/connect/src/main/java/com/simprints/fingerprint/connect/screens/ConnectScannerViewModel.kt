@@ -124,7 +124,10 @@ internal class ConnectScannerViewModel @Inject constructor(
             }
 
             BackButtonBehaviour.EXIT_WITH_ERROR -> _finish.send(false)
-            BackButtonBehaviour.EXIT_FORM -> _showScannerIssueScreen.send(ConnectScannerIssueScreen.Refusal)
+            BackButtonBehaviour.EXIT_FORM -> {
+                _scannerConnected.send(false)
+                _showScannerIssueScreen.send(ConnectScannerIssueScreen.ExitForm)
+            }
         }
     }
 
@@ -299,6 +302,6 @@ internal class ConnectScannerViewModel @Inject constructor(
         data class Ota(val availableOtas: List<AvailableOta>) : ConnectScannerIssueScreen()
 
         data object UnexpectedError : ConnectScannerIssueScreen()
-        data object Refusal : ConnectScannerIssueScreen()
+        data object ExitForm : ConnectScannerIssueScreen()
     }
 }

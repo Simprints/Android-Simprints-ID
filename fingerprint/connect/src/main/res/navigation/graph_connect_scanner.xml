@@ -21,4 +21,9 @@
         android:id="@+id/action_global_to_alertFragment"
         app:destination="@+id/graph_alert" />
 
+    <include app:graph="@navigation/graph_exit_form" />
+    <action
+        android:id="@+id/action_global_to_exitFormFragment"
+        app:destination="@+id/graph_exit_form" />
+
 </navigation>
