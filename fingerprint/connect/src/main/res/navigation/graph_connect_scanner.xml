@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/graph_connect_scanner.xml"
+    app:startDestination="@id/connectScannerControllerFragment">
+
+    <fragment
+        android:id="@+id/connectScannerControllerFragment"
+        android:name="com.simprints.fingerprint.connect.screens.controller.ConnectScannerControllerFragment"
+        android:label="ConnectScanner">
+
+        <argument
+            android:name="params"
+            app:argType="com.simprints.fingerprint.connect.FingerprintConnectParams" />
+
+
+    </fragment>
+
+    <include app:graph="@navigation/graph_alert" />
+    <action
+        android:id="@+id/action_global_to_alertFragment"
+        app:destination="@+id/graph_alert" />
+
+</navigation>

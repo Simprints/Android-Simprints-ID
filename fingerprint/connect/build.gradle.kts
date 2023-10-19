@@ -9,4 +9,12 @@ android {
 
 dependencies {
 
+    implementation(project(":infra:config"))
+    implementation(project(":infra:events"))
+    implementation(project(":infra:recent-user-activity"))
+
+    implementation(project(":feature:alert"))
+
+    implementation(project(":fingerprint:infra:scanner"))
+
 }

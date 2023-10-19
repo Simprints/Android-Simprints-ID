@@ -4,10 +4,20 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import com.simprints.fingerprint.activities.alert.AlertError
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
+import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
+import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
+import com.simprints.fingerprint.connect.screens.ShowConnectWrapper
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
+import com.simprints.fingerprint.orchestrator.task.FingerprintTask
+import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -16,8 +26,30 @@ class OrchestratorActivity : FingerprintActivity() {
 
     private val viewModel: OrchestratorViewModel by viewModels()
 
-    private val nextActivityCallObserver = Observer<OrchestratorViewModel.ActivityCall> {
-        startActivityForResult(it.createIntent(this), it.requestCode)
+    private val showConnect = registerForActivityResult(ShowConnectWrapper()) { result ->
+        if (result.isSuccess) {
+            viewModel.handleActivityResult(OrchestratorViewModel.ActivityResult(
+                ResultCode.OK.value,
+                Intent().putExtra(ConnectScannerTaskResult.BUNDLE_KEY, ConnectScannerTaskResult())
+            ))
+        } else {
+            viewModel.handleActivityResult(OrchestratorViewModel.ActivityResult(
+                ResultCode.CANCELLED.value,
+                Intent().putExtra(ConnectScannerTaskResult.BUNDLE_KEY, AlertTaskResult(AlertError.UNEXPECTED_ERROR))
+            ))
+        }
+    }
+
+    private val nextActivityCallObserver = Observer<FingerprintTask> { task ->
+        when (task) {
+            is FingerprintTask.ConnectScanner -> showConnect.launch(Unit)
+            is FingerprintTask.CollectFingerprints -> {
+                startActivityForResult(
+                    Intent(this, task.targetActivity).putExtra(task.requestBundleKey, task.createTaskRequest()),
+                    task.requestCode.value
+                )
+            }
+        }
     }
 
     private val finishedResultObserver = Observer<OrchestratorViewModel.ActivityResult> {
@@ -49,7 +81,9 @@ class OrchestratorActivity : FingerprintActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.handleActivityResult(OrchestratorViewModel.ActivityResult(resultCode, data))
+        if (requestCode == RequestCode.COLLECT.value) {
+            viewModel.handleActivityResult(OrchestratorViewModel.ActivityResult(resultCode, data))
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
