@@ -1,6 +1,7 @@
 package com.simprints.clientapi.activities.baserequest
 
 import androidx.annotation.Keep
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
 import com.simprints.clientapi.clientrequests.builders.EnrolBuilder
@@ -33,13 +34,17 @@ import com.simprints.clientapi.exceptions.InvalidStateForIntentAction
 import com.simprints.clientapi.exceptions.InvalidUserIdException
 import com.simprints.clientapi.exceptions.InvalidVerifyIdException
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.serialization.TokenizationAsStringSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.canCoSyncAllData
 import com.simprints.infra.config.store.models.canCoSyncBiometricData
 import com.simprints.infra.config.store.models.canCoSyncData
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -60,7 +65,8 @@ abstract class RequestPresenter(
     private val rootManager: SecurityManager,
     private val encoder: EncodingUtils = EncodingUtilsImpl,
     private val configManager: ConfigManager,
-    private val sessionEventsManager: ClientApiSessionEventsManager
+    private val sessionEventsManager: ClientApiSessionEventsManager,
+    private val tokenizationProcessor: TokenizationProcessor
 ) : RequestContract.Presenter {
 
     override suspend fun processEnrolRequest() = validateAndSendRequest(
@@ -174,8 +180,13 @@ abstract class RequestPresenter(
         jsonHelper: JsonHelper
     ): String? =
         if (configManager.getProjectConfiguration().canCoSyncData()) {
-            val events = sessionEventsManager.getAllEventsForSession(sessionId).toList()
-            jsonHelper.toJson(CoSyncEvents(events))
+            val events = sessionEventsManager
+                .getAllEventsForSession(sessionId).toList()
+            val decryptedEvents = decryptTokenizedFields(events, configManager.getProject(getProjectIdFromRequest()))
+            val serializationModule = SimpleModule().apply {
+                addSerializer(TokenizableString::class.java, TokenizationAsStringSerializer())
+            }
+            jsonHelper.toJson(CoSyncEvents(decryptedEvents), module = serializationModule)
         } else {
             null
         }
@@ -238,5 +249,19 @@ abstract class RequestPresenter(
                 encoder
             )
         )
+    }
+
+    fun decryptTokenizedFields(events: List<Event>, project: Project): List<Event> = events.map {
+        val decryptedFieldsMap = it.getTokenizedFields().mapValues { entry ->
+            when (val value = entry.value) {
+                is TokenizableString.Raw -> value
+                is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
+                    encrypted = value,
+                    tokenKeyType = entry.key,
+                    project = project
+                )
+            }
+        }
+        return@map it.setTokenizedFields(decryptedFieldsMap)
     }
 }

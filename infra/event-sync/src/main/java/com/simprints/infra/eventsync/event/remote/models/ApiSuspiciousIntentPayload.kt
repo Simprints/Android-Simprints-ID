@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent.SuspiciousIntentPayload
 
 @Keep
@@ -17,5 +18,8 @@ internal data class ApiSuspiciousIntentPayload(
         this(domainPayload.createdAt,
             domainPayload.eventVersion,
             domainPayload.unexpectedExtras)
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }
 
