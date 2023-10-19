@@ -346,15 +346,16 @@ class CommCarePresenterTest {
         clientApiSessionEventsManager: ClientApiSessionEventsManager,
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
     ): CommCarePresenter = CommCarePresenter(
-        view,
-        action,
-        clientApiSessionEventsManager,
-        mockSharedPrefs(),
-        jsonHelper,
-        mockk(),
-        mockk(),
-        mockk(),
-        configManager,
-        coroutineScope
+        view = view,
+        action = action,
+        sessionEventsManager = clientApiSessionEventsManager,
+        sharedPreferencesManager = mockSharedPrefs(),
+        jsonHelper = jsonHelper,
+        enrolmentRecordManager = mockk(),
+        timeHelper = mockk(),
+        tokenizationProcessor = mockk(),
+        rootManager = mockk(),
+        configManager = configManager,
+        coroutineScope = coroutineScope
     )
 }

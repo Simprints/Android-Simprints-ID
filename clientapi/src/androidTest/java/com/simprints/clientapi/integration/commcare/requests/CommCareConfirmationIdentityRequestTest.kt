@@ -63,10 +63,11 @@ class CommCareConfirmationIdentityRequestTest : BaseCommCareClientApiTest() {
 //        }
 
         val expectedAppRequest = AppConfirmIdentityRequest(
-            projectIdField.value(),
-            userIdField.value(),
-            sessionIdField.value(),
-            selectedGuidField.value()
+            projectId = projectIdField.value(),
+            userId = userIdField.value(),
+            isUserIdTokenized = false,
+            sessionId = sessionIdField.value(),
+            selectedGuid = selectedGuidField.value()
         )
 
         Intents.intended(IntentMatchers.hasAction(APP_CONFIRM_ACTION))

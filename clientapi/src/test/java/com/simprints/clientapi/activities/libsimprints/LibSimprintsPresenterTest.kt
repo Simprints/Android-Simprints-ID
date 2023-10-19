@@ -77,14 +77,15 @@ class LibSimprintsPresenterTest {
         every { view.enrolExtractor } returns enrolmentExtractor
 
         LibSimprintsPresenter(
-            view,
-            Enrol,
-            clientApiSessionEventsManager,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
+            view = view,
+            action = Enrol,
+            sessionEventsManager = clientApiSessionEventsManager,
+            rootManager = mockk(),
+            timeHelper = mockk(),
+            enrolmentRecordManager = mockk(),
+            jsonHelper = mockk(),
+            tokenizationProcessor = mockk(),
+            configManager = mockk()
         ).apply {
             runBlocking { start() }
         }
@@ -104,14 +105,15 @@ class LibSimprintsPresenterTest {
         every { view.identifyExtractor } returns identifyExtractor
 
         LibSimprintsPresenter(
-            view,
-            Identify,
-            clientApiSessionEventsManager,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
+            view = view,
+            action = Identify,
+            sessionEventsManager = clientApiSessionEventsManager,
+            rootManager = mockk(),
+            timeHelper = mockk(),
+            enrolmentRecordManager = mockk(),
+            jsonHelper = mockk(),
+            tokenizationProcessor = mockk(),
+            configManager = mockk()
         ).apply {
             runBlocking { start() }
         }
@@ -131,14 +133,15 @@ class LibSimprintsPresenterTest {
         every { view.verifyExtractor } returns verificationExtractor
 
         LibSimprintsPresenter(
-            view,
-            Verify,
-            clientApiSessionEventsManager,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
+            view = view,
+            action = Verify,
+            sessionEventsManager = clientApiSessionEventsManager,
+            rootManager = mockk(),
+            timeHelper = mockk(),
+            enrolmentRecordManager = mockk(),
+            jsonHelper = mockk(),
+            tokenizationProcessor = mockk(),
+            configManager = mockk()
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) {
@@ -158,14 +161,15 @@ class LibSimprintsPresenterTest {
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
 
         LibSimprintsPresenter(
-            view,
-            ConfirmIdentity,
-            clientApiSessionEventsManager,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
+            view = view,
+            action = ConfirmIdentity,
+            sessionEventsManager = clientApiSessionEventsManager,
+            rootManager = mockk(),
+            timeHelper = mockk(),
+            enrolmentRecordManager = mockk(),
+            jsonHelper = mockk(),
+            tokenizationProcessor = mockk(),
+            configManager = mockk()
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) {
@@ -183,14 +187,15 @@ class LibSimprintsPresenterTest {
         every { view.enrolLastBiometricsExtractor } returns enrolLastBiometricsExtractor
 
         LibSimprintsPresenter(
-            view,
-            EnrolLastBiometrics,
-            clientApiSessionEventsManager,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
+            view = view,
+            action = EnrolLastBiometrics,
+            sessionEventsManager = clientApiSessionEventsManager,
+            rootManager = mockk(),
+            timeHelper = mockk(),
+            enrolmentRecordManager = mockk(),
+            jsonHelper = mockk(),
+            tokenizationProcessor = mockk(),
+            configManager = mockk()
         ).apply { runBlocking { start() } }
 
         verify(exactly = 1) {
@@ -205,14 +210,15 @@ class LibSimprintsPresenterTest {
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         LibSimprintsPresenter(
-            view,
-            Invalid,
-            clientApiSessionEventsManager,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
+            view = view,
+            action = Invalid,
+            sessionEventsManager = clientApiSessionEventsManager,
+            rootManager = mockk(),
+            timeHelper = mockk(),
+            enrolmentRecordManager = mockk(),
+            jsonHelper = mockk(),
+            tokenizationProcessor = mockk(),
+            configManager = mockk()
         ).apply {
             runBlocking {
                 shouldThrow<InvalidIntentActionException> {
@@ -236,7 +242,8 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            configManager
+            tokenizationProcessor = tokenizationProcessorMock,
+            configManager = configManager
         ).handleEnrolResponse(EnrolResponse(registerId))
 
         verify(exactly = 1) {
@@ -269,7 +276,8 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            configManager
+            tokenizationProcessor = tokenizationProcessorMock,
+            configManager = configManager
         ).handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
         verify(exactly = 1) {
@@ -316,7 +324,8 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            configManager
+            tokenizationProcessor = tokenizationProcessorMock,
+            configManager = configManager
         ).apply {
             handleVerifyResponse(verification)
         }
@@ -356,7 +365,8 @@ class LibSimprintsPresenterTest {
             timeHelper = mockk(),
             enrolmentRecordManager = mockk(),
             jsonHelper = mockk(),
-            configManager
+            tokenizationProcessor = tokenizationProcessorMock,
+            configManager = configManager
         ).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
 
         verify(exactly = 1) {
@@ -385,14 +395,15 @@ class LibSimprintsPresenterTest {
 
 
         LibSimprintsPresenter(
-            view,
-            ConfirmIdentity,
-            clientApiSessionEventsManager,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
+            view = view,
+            action = ConfirmIdentity,
+            sessionEventsManager = clientApiSessionEventsManager,
+            rootManager = mockk(),
+            timeHelper = mockk(),
+            enrolmentRecordManager = mockk(),
+            jsonHelper = mockk(),
+            tokenizationProcessor = mockk(),
+            configManager = configManager
         ).handleConfirmationResponse(mockk())
 
 
@@ -418,14 +429,15 @@ class LibSimprintsPresenterTest {
 
 
         LibSimprintsPresenter(
-            view,
-            EnrolLastBiometrics,
-            clientApiSessionEventsManager,
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk(),
-            mockk()
+            view = view,
+            action = EnrolLastBiometrics,
+            sessionEventsManager = clientApiSessionEventsManager,
+            rootManager = mockk(),
+            timeHelper = mockk(),
+            enrolmentRecordManager = mockk(),
+            jsonHelper = mockk(),
+            tokenizationProcessor = mockk(),
+            configManager = configManager
         ).handleEnrolResponse(mockk())
         runBlocking {
             val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
