@@ -21,4 +21,7 @@ dependencies {
     implementation(libs.androidX.cameraX.view)
     implementation(libs.jackson.core)
     implementation(libs.playServices.barcode)
+    // For concurrent.ListenableFuture needed by camera Apis
+    implementation(libs.google.guava)
+
 }
