@@ -35,6 +35,8 @@ dependencies {
     implementation(libs.circleImageView)
 
     runtimeOnly(libs.androidX.cameraX.core)
+    // For concurrent.ListenableFuture needed by camera Apis
+    implementation(libs.google.guava)
 
     // ######################################################
     //                      Android test
