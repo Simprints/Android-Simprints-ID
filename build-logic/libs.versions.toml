@@ -77,7 +77,7 @@ espresso_version = "3.5.1"
 espresso_accessibility_version = "4.0.0"
 barista_version = "4.3.0"
 uiAutomator_version = "2.2.0"
-jacoco_version = "0.8.10"
+jacoco_version = "0.8.11"
 
 sonar_plugin_version = "4.2.1.3168"
 deps_analysis_version = "1.20.0"
