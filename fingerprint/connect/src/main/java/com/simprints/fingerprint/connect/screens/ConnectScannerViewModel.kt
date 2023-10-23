@@ -253,6 +253,14 @@ internal class ConnectScannerViewModel @Inject constructor(
         _showScannerIssueScreen.send(determineAppropriateScannerIssueForPairing())
     }
 
+    fun disableBackButton() {
+        backButtonBehaviour.postValue(BackButtonBehaviour.DISABLED)
+    }
+
+    fun setBackButtonToExitWithError() {
+        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_WITH_ERROR)
+    }
+
     private enum class BackButtonBehaviour {
         DISABLED,
         EXIT_FORM,

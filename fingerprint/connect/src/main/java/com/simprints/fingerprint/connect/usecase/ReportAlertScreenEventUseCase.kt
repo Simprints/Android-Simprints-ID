@@ -27,4 +27,8 @@ class ReportAlertScreenEventUseCase @Inject constructor(
     fun reportSerialEntry() = this(AlertScreenEventType.SERIAL_ENTRY_PAIR)
     fun reportScannerOff() = this(AlertScreenEventType.DISCONNECTED)
 
+    fun reportOta() = this(AlertScreenEventType.OTA)
+    fun reportOtaFailed() = this(AlertScreenEventType.OTA_FAILED)
+    fun reportOtaRecovery() = this(AlertScreenEventType.OTA_RECOVERY)
+
 }
