@@ -81,4 +81,44 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/otaFragment"
+        android:name="com.simprints.fingerprint.connect.screens.ota.OtaFragment"
+        android:label="OtaFragment">
+        <argument
+            android:name="params"
+            app:argType="com.simprints.fingerprint.connect.screens.ota.OtaFragmentParams" />
+        <action
+            android:id="@+id/action_otaFragment_to_connectProgressFragment"
+            app:destination="@id/connectProgressFragment" />
+        <action
+            android:id="@+id/action_otaFragment_to_otaFailedFragment"
+            app:destination="@id/otaFailedFragment" />
+        <action
+            android:id="@+id/action_otaFragment_to_otaRecoveryFragment"
+            app:destination="@id/otaRecoveryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/otaFailedFragment"
+        android:name="com.simprints.fingerprint.connect.screens.ota.failed.OtaFailedFragment"
+        android:label="OtaFailedFragment">
+        <argument
+            android:name="fetchResult"
+            app:argType="com.simprints.fingerprint.connect.screens.ota.FetchOtaResult"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/otaRecoveryFragment"
+        android:name="com.simprints.fingerprint.connect.screens.ota.recovery.OtaRecoveryFragment"
+        android:label="OtaRecoveryFragment">
+        <argument
+            android:name="params"
+            app:argType="com.simprints.fingerprint.connect.screens.ota.recovery.OtaRecoveryParams" />
+        <action
+            android:id="@+id/action_otaRecoveryFragment_to_otaFragment"
+            app:destination="@id/otaFragment" />
+        <action
+            android:id="@+id/action_otaRecoveryFragment_to_otaFailedFragment"
+            app:destination="@id/otaFailedFragment" />
+    </fragment>
 </navigation>

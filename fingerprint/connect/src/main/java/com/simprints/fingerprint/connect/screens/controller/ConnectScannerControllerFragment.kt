@@ -32,6 +32,8 @@ import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel.Connect
 import com.simprints.fingerprint.connect.screens.alert.AlertActivityHelper
 import com.simprints.fingerprint.connect.screens.alert.AlertError
 import com.simprints.fingerprint.connect.screens.issues.scanneroff.ScannerOffFragmentArgs
+import com.simprints.fingerprint.connect.screens.ota.OtaFragmentArgs
+import com.simprints.fingerprint.connect.screens.ota.OtaFragmentParams
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -117,7 +119,10 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                         .show()
                 }
 
-                is ConnectScannerIssueScreen.Ota -> {} // TODO
+                is ConnectScannerIssueScreen.Ota -> internalNavController()?.navigate(
+                    R.id.otaFragment,
+                    OtaFragmentArgs(OtaFragmentParams(screen.availableOtas)).toBundle()
+                )
             }
         })
         viewModel.scannerConnected.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { isSuccess ->
