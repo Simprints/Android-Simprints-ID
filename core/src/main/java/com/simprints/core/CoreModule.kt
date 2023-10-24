@@ -3,7 +3,7 @@ package com.simprints.core
 import android.content.Context
 import com.lyft.kronos.AndroidClockFactory
 import com.simprints.core.tools.exceptions.AppCoroutineExceptionHandler
-import com.simprints.core.tools.extentions.deviceId
+import com.simprints.core.tools.extentions.deviceHardwareId
 import com.simprints.core.tools.extentions.packageVersionName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.KronosTimeHelperImpl
@@ -53,6 +53,7 @@ object CoreModule {
     @Singleton
     fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImpl
 
+
     @Provides
     @Singleton
     fun provideStringTokenizer(encodingUtils: EncodingUtils): StringTokenizer =
@@ -62,7 +63,7 @@ object CoreModule {
     @Provides
     fun provideDeviceId(
         @ApplicationContext context: Context
-    ): String = context.deviceId
+    ): String = context.deviceHardwareId
 
     @PackageVersionName
     @Provides

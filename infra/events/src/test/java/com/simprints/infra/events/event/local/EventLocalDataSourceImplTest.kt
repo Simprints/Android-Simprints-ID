@@ -24,7 +24,6 @@ import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -302,7 +301,7 @@ internal class EventLocalDataSourceImplTest {
 
     @Test
     fun insertOrUpdate() {
-        runBlocking {
+        runTest {
             mockkStatic("com.simprints.infra.events.event.local.models.DbEventKt")
             val dbEvent = mockk<DbEvent>()
             val event = mockk<Event> {

@@ -40,13 +40,13 @@ internal class LoginFormViewModel @Inject constructor(
         projectId: String,
         projectSecret: String,
     ) {
-        if (!areMandatoryCredentialsPresent(projectId, projectSecret, loginParams.userId)) {
+        if (!areMandatoryCredentialsPresent(projectId, projectSecret, loginParams.userId.value)) {
             _signInState.send(SignInState.MissingCredential)
         } else if (projectId != loginParams.projectId) {
             _signInState.send(SignInState.ProjectIdMismatch)
         } else {
             viewModelScope.launch {
-                val result = authManager.authenticateSafely(loginParams.userId, projectId, projectSecret, deviceId)
+                val result = authManager.authenticateSafely(loginParams.userId.value, projectId, projectSecret, deviceId)
                 _signInState.send(mapAuthDataResult(result))
             }
         }

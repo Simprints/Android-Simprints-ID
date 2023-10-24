@@ -40,7 +40,7 @@ class ImageRemoteDataSourceImplTest {
             every { signedInProjectId } returns "projectId"
         }
 
-        val storageMock = setupStorageMock()
+        val storageMock = setupStoragemockk()
 
         every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
 
@@ -88,7 +88,7 @@ class ImageRemoteDataSourceImplTest {
         assert(!rtn.isUploadSuccessful())
     }
 
-    private fun setupStorageMock() = mockk<FirebaseStorage>(relaxed = true) {
+    private fun setupStoragemockk() = mockk<FirebaseStorage>(relaxed = true) {
         every { reference } returns mockk {
             every { child(any()) } returns mockk {
                 every { path } returns "testPath"

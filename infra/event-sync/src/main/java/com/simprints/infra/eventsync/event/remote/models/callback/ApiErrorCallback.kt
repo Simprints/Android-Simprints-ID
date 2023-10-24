@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.*
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason
-import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason.GUID_NOT_FOUND_OFFLINE
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
 
 @Keep
@@ -16,7 +15,6 @@ internal data class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCal
         DIFFERENT_USER_ID_SIGNED_IN,
         GUID_NOT_FOUND_ONLINE,
 
-        @Deprecated("User can't leave the app anymore in case of GUID_NOT_FOUND_OFFLINE. He exits through the ExitForm.")
         GUID_NOT_FOUND_OFFLINE,
         UNEXPECTED_ERROR,
         BACKEND_MAINTENANCE_ERROR,
@@ -40,6 +38,7 @@ internal fun Reason.fromDomainToApi() =
         DIFFERENT_PROJECT_ID_SIGNED_IN -> ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN
         DIFFERENT_USER_ID_SIGNED_IN -> ApiReason.DIFFERENT_USER_ID_SIGNED_IN
         GUID_NOT_FOUND_ONLINE -> ApiReason.GUID_NOT_FOUND_ONLINE
+        GUID_NOT_FOUND_OFFLINE -> ApiReason.GUID_NOT_FOUND_OFFLINE
         UNEXPECTED_ERROR -> ApiReason.UNEXPECTED_ERROR
         BLUETOOTH_NOT_SUPPORTED -> ApiReason.BLUETOOTH_NOT_SUPPORTED
         LOGIN_NOT_COMPLETE -> ApiReason.LOGIN_NOT_COMPLETE
@@ -60,7 +59,7 @@ internal fun ApiReason.fromApiToDomain(): Reason =
         ApiReason.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
         ApiReason.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
         ApiReason.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
-        GUID_NOT_FOUND_OFFLINE -> UNEXPECTED_ERROR
+        ApiReason.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
         ApiReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
         ApiReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
         SCANNER_LOW_BATTERY -> UNEXPECTED_ERROR

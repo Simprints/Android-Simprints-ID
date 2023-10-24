@@ -2,18 +2,21 @@ package com.simprints.id.orchestrator.steps
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.enrolAppRequest
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CAPTURE
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.testtools.TestApplication
+import com.simprints.infra.config.store.models.Finger
+import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchContract
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
@@ -36,8 +39,6 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
         }
     }
 
-    private val fingerprintRequestFactory: FingerprintRequestFactory =
-        FingerprintRequestFactoryImpl()
     private lateinit var fingerprintStepProcess: FingerprintStepProcessor
 
     private val fingerprintResponseMock: IFingerprintResponse = mockk()
@@ -47,10 +48,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Before
     fun setUp() {
-        fingerprintStepProcess = FingerprintStepProcessorImpl(
-            fingerprintRequestFactory,
-            configManager
-        )
+        fingerprintStepProcess = FingerprintStepProcessorImpl(configManager)
         mockFromModuleApiToDomainExt()
     }
 
@@ -62,30 +60,43 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForMatching() {
-        val step = fingerprintStepProcess.buildStepToMatch(mockk(), mockk())
-        verifyFingerprintIntent<FingerprintMatchRequest>(step, MATCH.value)
+        val step = fingerprintStepProcess.buildStepToMatch(
+            listOf(FingerprintCaptureSample(Finger.LEFT_3RD_FINGER, ByteArray(0), 0, "", null)),
+            mockk(),
+            mockk()
+        )
+        verifyFingerprintMatcherIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForCapturing() = runTest {
         with(enrolAppRequest) {
             val step = fingerprintStepProcess.buildStepToCapture()
-            verifyFingerprintIntent<FingerprintCaptureRequest>(step, CAPTURE.value)
+            verifyFingerprintIntent<FingerprintCaptureRequest>(step, FingerprintRequestCode.CAPTURE.value)
         }
     }
 
     @Test
     fun stepProcessorShouldProcessFingerprintEnrolResult() {
-        fingerprintStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, result)
+        fingerprintStepProcess.processResult(FingerprintRequestCode.CAPTURE.value, Activity.RESULT_OK, result)
 
         verify { fingerprintResponseMock.fromModuleApiToDomain() }
     }
 
     @Test
     fun stepProcessorShouldProcessFingerprintMatchResult() {
-        fingerprintStepProcess.processResult(MATCH.value, Activity.RESULT_OK, result)
+        val matchResult = Intent().putExtra(MatchContract.RESULT, FingerprintMatchResult(emptyList()))
+        val result = fingerprintStepProcess.processResult(FingerprintRequestCode.MATCH.value, Activity.RESULT_OK, matchResult)
 
-        verify { fingerprintResponseMock.fromModuleApiToDomain() }
+        assertThat(result).isInstanceOf(FingerprintMatchResponse::class.java)
+    }
+
+    @Test
+    fun stepProcessorShouldNotProcessMissingMatchResult() {
+        val matchResult = Intent().putExtra(MatchContract.RESULT, Bundle())
+        val result = fingerprintStepProcess.processResult(FingerprintRequestCode.MATCH.value, Activity.RESULT_OK, matchResult)
+
+        assertThat(result).isNull()
     }
 
     @Test
@@ -93,5 +104,13 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
         fingerprintStepProcess.processResult(0, Activity.RESULT_OK, result)
 
         verify(exactly = 0) { fingerprintResponseMock.fromModuleApiToDomain() }
+    }
+
+    @Test
+    fun stepProcessorShouldNotProcessNullResult() {
+        val matchResult = Intent()
+        val result = fingerprintStepProcess.processResult(FingerprintRequestCode.MATCH.value, Activity.RESULT_OK, matchResult)
+
+        assertThat(result).isNull()
     }
 }

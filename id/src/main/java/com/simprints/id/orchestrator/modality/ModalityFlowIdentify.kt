@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.core.DeviceID
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.feature.consent.ConsentType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppIdentifyRequest
@@ -65,11 +66,13 @@ class ModalityFlowIdentify @Inject constructor(
                 resultCode,
                 data
             )
+
             isFaceResult(requestCode) -> faceStepProcessor.processResult(
                 requestCode,
                 resultCode,
                 data
             )
+
             else -> throw IllegalStateException("Invalid result from intent")
         }
 
@@ -129,14 +132,11 @@ class ModalityFlowIdentify @Inject constructor(
         }
 
 
-    private fun addMatchingStepForFinger(
-        probeSamples: List<FingerprintCaptureSample>,
-        query: SubjectQuery
-    ) {
-        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
+    private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery) {
+        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query, FlowProvider.FlowType.IDENTIFY))
     }
 
     private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectQuery) {
-        steps.add(faceStepProcessor.buildStepMatch(probeSamples, query))
+        steps.add(faceStepProcessor.buildStepMatch(probeSamples, query, FlowProvider.FlowType.IDENTIFY))
     }
 }

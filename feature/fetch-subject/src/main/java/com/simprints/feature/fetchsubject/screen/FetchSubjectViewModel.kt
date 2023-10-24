@@ -25,9 +25,17 @@ internal class FetchSubjectViewModel @Inject constructor(
     val subjectState: LiveData<LiveDataEventWithContent<FetchSubjectState>>
         get() = _subjectState
     private var _subjectState = MutableLiveData<LiveDataEventWithContent<FetchSubjectState>>()
+    private var fetchWasAttempted = false
+
+    fun onViewCreated(projectId: String, subjectId: String) {
+        if (!fetchWasAttempted) {
+            fetchSubject(projectId, subjectId)
+        }
+    }
 
     fun fetchSubject(projectId: String, subjectId: String) {
         viewModelScope.launch {
+            fetchWasAttempted = true
             val subjectFetchStartTime = timeHelper.now()
             val subjectState = fetchSubjectUseCase(projectId, subjectId)
 

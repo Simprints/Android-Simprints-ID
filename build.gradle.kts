@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 // Lists all plugins used throughout the project without applying them.
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -52,17 +49,4 @@ https://docs.gradle.org/nightly/userguide/performance.html#suggestions_for_java_
 tasks.withType(Test::class).configureEach {
     maxParallelForks = Runtime.getRuntime().availableProcessors().div(2)
     retry.maxRetries.set(5)
-}
-/*
-Workaround to set jvmTarget = 11 because R8 doesn't yet support java 17
-Should be removed before migrating to jdk 17
-https://issuetracker.google.com/issues/212279104
- */
-subprojects {
-    tasks.withType(KaptGenerateStubsTask::class).configureEach {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
-    }
-    tasks.withType(KotlinCompile::class).configureEach {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
-    }
 }

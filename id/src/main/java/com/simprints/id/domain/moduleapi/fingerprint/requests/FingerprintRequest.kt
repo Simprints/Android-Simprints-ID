@@ -9,11 +9,9 @@ interface FingerprintRequest : Request {
 enum class FingerprintRequestType {
     CAPTURE,
     MATCH,
-    CONFIGURATION
 }
 
 fun FingerprintRequest.fromDomainToModuleApi() = when (this.type) {
     FingerprintRequestType.CAPTURE -> (this as FingerprintCaptureRequest).fromDomainToModuleApi()
     FingerprintRequestType.MATCH -> (this as FingerprintMatchRequest).fromDomainToModuleApi()
-    FingerprintRequestType.CONFIGURATION -> (this as FingerprintConfigurationRequest).fromDomainToModuleApi()
 }

@@ -97,6 +97,7 @@ definitions:
                     - ./gradlew infra:project-security-store:jacocoTestReport
                     - ./gradlew infra:realm:jacocoTestReport
                     - ./gradlew infra:recent-user-activity:jacocoTestReport
+                    - ./gradlew infra:orchestrator-data:jacocoTestReport
                 artifacts:
                     - infra/config-store/build/reports/**
                     - infra/config-sync/build/reports/**
@@ -108,6 +109,7 @@ definitions:
                     - infra/project-security-store/build/reports/**
                     - infra/realm/build/reports/**
                     - infra/recent-user-activity/build/reports/**
+                    - infra/orchestrator-data/build/reports/**
 
         ######################################################################
         # Run the feature unit tests with coverage and upload report to
@@ -122,6 +124,9 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
+                    - ./gradlew feature:orchestrator:jacocoTestReport
+                    - ./gradlew feature:client-api:jacocoTestReport
+                    - ./gradlew feature:login-check:jacocoTestReport
                     - ./gradlew feature:alert:jacocoTestReport
                     - ./gradlew feature:exit-form:jacocoTestReport
                     - ./gradlew feature:consent:jacocoTestReport
@@ -130,7 +135,11 @@ definitions:
                     - ./gradlew feature:select-subject:jacocoTestReport
                     - ./gradlew feature:setup:jacocoTestReport
                     - ./gradlew feature:enrol-last-biometric:jacocoTestReport
+                    - ./gradlew feature:matcher:jacocoTestReport
                 artifacts:
+                    - feature/orchestrator/build/reports/**
+                    - feature/client-api/build/reports/**
+                    - feature/login-check/build/reports/**
                     - feature/alert/build/reports/**
                     - feature/exit-form/build/reports/**
                     - feature/consent/build/reports/**
@@ -139,6 +148,7 @@ definitions:
                     - feature/select-subject/build/reports/**
                     - feature/setup/build/reports/**
                     - feature/enrol-last-biometric/build/reports/**
+                    - feature/matcher/build/reports/**
 
         # Dashboard feature module is much larger than others
         # and unit tests take significantly more time.
@@ -167,13 +177,15 @@ definitions:
                     - gradlewrapper
                 script:
                     - source ci/pipeline/setup
-                    - ./gradlew face:jacocoTestReport
-                    - ./gradlew infrafacebiosdk:jacocoTestReport
-                    - ./gradlew infrarocwrapper:jacocoTestReport
+                    - ./gradlew face:configuration:jacocoTestReport
+                    - ./gradlew face:capture:jacocoTestReport
+                    - ./gradlew face:infra:face-bio-sdk:jacocoTestReport
+                    - ./gradlew face:infra:roc-wrapper:jacocoTestReport
                 artifacts:
-                    - face/build/reports/**
-                    - infrafacebiosdk/build/reports/**
-                    - infrarocwrapper/build/reports/**
+                    - face/configuration/build/reports/**
+                    - face/capture/build/reports/**
+                    - face/infra/face-bio-sdk/build/reports/**
+                    - face/infra/roc-wrapper/build/reports/**
 
         ######################################################################
         # Run the Fingerprint unit tests with coverage and upload report to
@@ -189,13 +201,13 @@ definitions:
                 script:
                     - source ci/pipeline/setup
                     - ./gradlew fingerprint:controller:jacocoTestReport
+                    - ./gradlew fingerprint:infra:bio-sdk:jacocoTestReport
                     - ./gradlew fingerprint:infra:simprints-bio-sdk:jacocoTestReport
                     - ./gradlew fingerprint:infra:scanner:jacocoTestReport
                     - ./gradlew fingerprint:infra:simafis-wrapper:jacocoTestReport
-
-
                 artifacts:
                     - fingerprint/controller/build/reports/**
+                    - fingerprint/infra/bio-sdk/build/reports/**
                     - fingerprint/infra/simprints-bio-sdk/build/reports/**
                     - fingerprint/infra/scanner/build/reports/**
                     - fingerprint/infra/simafis-wrapper/build/reports/**

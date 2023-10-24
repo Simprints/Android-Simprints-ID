@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     id("simprints.android.application")
     id("kotlin-parcelize")
@@ -38,14 +40,22 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":core"))
 
+    // Since the new orchestrator is not yet ready for production it must be explicitly enabled
+    // by setting the USE_NEW_ORCHESTRATOR=true in the local.properties file.
+    // TODO: Remove once orchestrator is done - https://simprints.atlassian.net/browse/CORE-2845
+    if (gradleLocalProperties(rootDir)["USE_NEW_ORCHESTRATOR"] == "true") {
+        implementation(project(":feature:orchestrator"))
+    } else {
+        implementation(project(":clientapi"))
+    }
+
     implementation(project(":infra:ui-base"))
     implementation(project(":infra:events"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:project-security-store"))
-    implementation(project(":clientapi"))
-    implementation(project(":face"))
+
     implementation(project(":feature:login"))
     implementation(project(":feature:fetch-subject"))
     implementation(project(":feature:select-subject"))
@@ -55,7 +65,12 @@ dependencies {
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:consent"))
+    implementation(project(":feature:matcher"))
+
     implementation(project(":fingerprint:controller"))
+    implementation(project(":face:capture"))
+    implementation(project(":face:configuration"))
+
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))
     implementation(project(":infra:enrolment-records-sync"))
@@ -68,7 +83,6 @@ dependencies {
 
     implementation(libs.androidX.core)
     implementation(libs.androidX.appcompat)
-    implementation(libs.androidX.ui.activity)
     implementation(libs.androidX.ui.fragment)
     implementation(libs.androidX.ui.constraintlayout)
     implementation(libs.androidX.ui.cardview)

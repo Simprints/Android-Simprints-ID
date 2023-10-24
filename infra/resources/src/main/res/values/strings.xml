@@ -121,7 +121,7 @@
     <string name="fingerprint_face_feature_alert">fingerprint and face features</string>
 
     <!-- Button Labels For Error Messages -->
-    <string name="close">CLOSE</string>
+    <string name="close">Close</string>
     <string name="try_again_label">Try Again</string>
     <string name="settings_label">Phone settings</string>
     <!-- Content Descriptions -->
@@ -361,4 +361,286 @@
     <string name="id_config_error_enrol_last_biometrics">A configuration error has occurred (invalid Simprints intent), please contact your system administrator.</string>
     <string name="configuration_error_message">A configuration error has occurred (%1$s), please contact your system administrator</string>
     <string name="refusal_scanner_not_working">Scanner not working</string>
+
+    <!-- region Error Screen Layout -->
+    <string name="main_error_graphic" translatable="false">Main Error Graphic</string>
+    <string name="failed_to_retrieve_message" translatable="false">Failed to retrieve message</string>
+    <!-- endregion -->
+
+    <!-- region Error Screen Text -->
+    <string name="invalid_projectId_message">A configuration error has occurred (invalid Project Id), please contact your system administrator</string>
+    <string name="invalid_selectedId_message">A configuration error has occurred (invalid Selected Id), please contact your system administrator</string>
+    <string name="invalid_sessionId_message">A configuration error has occurred (invalid Session Id), please contact your system administrator</string>
+    <string name="invalid_intentAction_message">A configuration error has occurred (invalid intent action), please contact your system administrator</string>
+    <string name="invalid_metadata_message">A configuration error has occurred (invalid metadata), please contact your system administrator</string>
+    <string name="invalid_userId_message">A configuration error has occurred (invalid user ID), please contact your system administrator</string>
+    <string name="invalid_moduleId_message">A configuration error has occurred (invalid module ID), please contact your system administrator</string>
+    <string name="invalid_verifyId_message">A configuration error has occurred (invalid verify GUID), please contact your system administrator</string>
+    <string name="rooted_device_title">Rooted device detected</string>
+    <string name="rooted_device_message">1. Contact your supervisor - rooted device detected\n2. Tap Close</string>
+    <!-- endregion -->
+
+    <!-- region GUID selection -->
+    <string name="guid_selection_data_sent">Data sent</string>
+    <string name="guid_selection_result_sent">Result sent</string>
+    <!-- endregion -->
+
+    <!--  Face modality  -->
+    <string name="capture_title_howto">How to scan a face</string>
+    <string name="capture_title_previewing">Preparing to scan</string>
+    <string name="capture_title_looks_good">Scan is ready!</string>
+    <string name="capture_error_no_face">Make sure the face fills the circle</string>
+    <string name="capture_error_face_too_far">Move closer</string>
+    <string name="capture_error_face_too_close">Move back</string>
+    <string name="capture_error_look_straight">Make sure the person is looking straight at the camera</string>
+    <string name="capture_ready">Ready to capture</string>
+    <string name="capture_prep_begin_btn">Tap to capture</string>
+    <string name="capture_prep_begin_btn_capturing">Capturing…</string>
+    <string name="capture_title_scan_progress">Scan in progress</string>
+    <string name="capture_hold">Hold the position…</string>
+    <string name="capture_debug_features" translatable="false">Yaw: %s\nRoll: %s\n</string>
+
+    <string name="captured_successfully">Face has been successfully captured.</string>
+    <string name="title_confirmation">Confirmation</string>
+    <string name="title_capturing">Live Capture</string>
+    <string name="title_preparation">Preparation</string>
+
+    <string name="btn_recapture">Recapture</string>
+    <string name="btn_finish">Tap to continue</string>
+    <string name="btn_capture_again">Capture again</string>
+    <string name="captured_unsuccessful">Couldn\'t capture the face due to technical issue.</string>
+    <string name="retry_tips">Here’s how you can fix the issue: \n\n1. Make sure you are in a well lighted space.\n2. Make sure the person is looking straight.\n3. Stay still and hold the position.</string>
+    <string name="onboarding_light">Find a well-lighted place.</string>
+    <string name="onboarding_fill">Fill the face in the circle frame.</string>
+    <string name="onboarding_straight">Make sure the person is looking straight.</string>
+    <string name="onboarding_continue">Tap anywhere to continue</string>
+    <string name="capture_title_look_straight">Not looking straight</string>
+    <string name="capture_title_no_face">No face detected</string>
+    <string name="capture_title_too_close">Too close</string>
+    <string name="capture_title_face_too_far">Too far</string>
+    <string name="matching_x_records">Matching against %s records</string>
+    <string name="exit_form_return_to_face_capture">Capture face</string>
+
+    <!--  Matching activity  -->
+    <string name="face_match_please_wait">Please wait while we proceed to identification</string>
+    <string name="face_match_loading_candidates">Loading candidates…</string>
+    <string name="face_match_matching_candidates">Matching candidates</string>
+
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">Compared to %d candidate.</item>
+        <item quantity="other">Compared to %d candidates.</item>
+    </plurals>
+
+
+    <plurals name="face_match_returned_results">
+        <item quantity="one">Returned %d result.</item>
+        <item quantity="other">Returned %d results.</item>
+    </plurals>
+
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">No very good matches</item>
+        <item quantity="one">%d very good match</item>
+        <item quantity="other">%d very good matches</item>
+    </plurals>
+
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">No good matches</item>
+        <item quantity="one">%d good match</item>
+        <item quantity="other">%d good matches</item>
+    </plurals>
+
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">No matches</item>
+        <item quantity="one">%d match</item>
+        <item quantity="other">%d matches</item>
+    </plurals>
+
+    <string name="face_configuration_started">Configuring face modality</string>
+    <string name="face_configuration_downloading">Downloading necessary files</string>
+    <string name="error_backend_maintenance_title">Maintenance mode</string>
+    <!--  Error screens  -->
+    <string name="error_licence_invalid_title">License invalid</string>
+    <string name="error_licence_invalid_message">Face license is invalid, please contact your system administrator</string>
+    <string name="error_close_button">Close</string>
+    <string name="error_licence_missing_title">License missing</string>
+    <string name="error_licence_missing_message">Face license is missing, please contact your system administrator</string>
+    <string name="error_configuration_error_title">Configuration error</string>
+    <string name="error_configuration_error_message">There was an error while configuring face modality, please contact your system administrator</string>
+    <string name="error_unexpected_error_title">Error occurred</string>
+    <string name="error_unexpected_error_message">Please try again and if Simprints does not work contact your system administrator</string>
+
+
+
+    <!-- AndroidManifest : activity titles throughout the app -->
+    <!-- Activity Titles -->
+    <string name="register_title">Enrolment</string>
+    <string name="identify_title">Identification</string>
+    <string name="verify_title">Verification</string>
+    <string name="refusal_label">Refusal Form</string>
+
+    <!-- ConnectScannerActivity : the activity for connecting to the scanner -->
+    <!-- Dialog messages -->
+    <string name="scanner_id_confirmation_message">Is %1$s your scanner?</string>
+    <string name="scanner_confirmation_yes">Yes</string>
+    <string name="scanner_confirmation_no">No</string>
+    <!-- Loading Messages-->
+    <string name="connect_scanner_bt_connect">Connecting to Vero…</string>
+    <string name="connect_scanner_wake_un20">Waking up UN20…</string>
+    <string name="connect_scanner_setup">Setting up Vero…</string>
+    <string name="connect_scanner_finished">Connected</string>
+    <!-- Scanner issue text -->
+    <!-- BluetoothOffFragment -->
+    <string name="bluetooth_off_title">Bluetooth off</string>
+    <string name="turn_on_bluetooth">Turn on Bluetooth</string>
+    <string name="bluetooth_on">✓ Bluetooth on</string>
+    <string name="bluetooth_off_toast_error">Could not turn on bluetooth. Please turn on bluetooth in device settings.</string>
+    <!-- NfcOffFragment -->
+    <string name="nfc_off_title">NFC off</string>
+    <string name="turn_on_nfc">Turn on NFC</string>
+    <string name="nfc_on">✓ NFC on</string>
+    <!-- ScannerOffFragment -->
+    <string name="scanner_off_title">Scanner off</string>
+    <string name="scanner_off_instructions">Press scanner power button.</string>
+    <string name="scanner_on">✓ Scanner on</string>
+    <string name="not_my_scanner">%1$s is not my scanner</string>
+    <!-- NfcPairFragment -->
+    <string name="nfc_pair_title">Scanner not connected</string>
+    <string name="nfc_pair_instructions">Tap back of scanner to back of phone</string>
+    <string name="cannot_connect_devices">Cannot connect devices</string>
+    <string name="nfc_pairing_in_progress">Found scanner %1$s</string>
+    <string name="nfc_pairing_try_again_instruction">Please ensure scanner %1$s is turned on and try again.</string>
+    <string name="nfc_pairing_rejected_instruction">Pairing cancelled, please try again and accept the pairing request when prompted.</string>
+    <string name="nfc_pair_toast_try_again">Could not read NFC chip, please try again</string>
+    <string name="nfc_pair_toast_invalid">Invalid NFC chip detected</string>
+    <!-- SerialEntryPairFragment -->
+    <string name="serial_entry_ok">OK</string>
+    <string name="serial_entry_pair_title">Scanner not connected</string>
+    <string name="enter_scanner_number">Enter scanner number</string>
+    <string name="enter_scanner_number_detail">This is found on the bottom of the scanner</string>
+    <string name="serial_entry_pair_failed">Please ensure scanner %1$s is turned on and try again.</string>
+    <string name="serial_entry_pair_rejected">Pairing cancelled, please try again and accept the pairing request when prompted.</string>
+    <string name="serial_entry_pair_toast_invalid">Please enter the 6 digits of the serial number</string>
+    <string name="sp" translatable="false">SP</string>
+    <!-- OtaFragment -->
+    <string name="ota_title">Scanner needs updating</string>
+    <string name="ota_instructions">Keep scanner turned on as it is updating</string>
+    <string name="updating">Updating…</string>
+    <string name="updating_attempt">Updating attempt %1$s of %2$s…</string>
+    <string name="update_complete">✓ Update complete</string>
+    <string name="start_update">Start update</string>
+    <!-- OtaRecoveryFragment -->
+    <string name="ota_recovery_title">Scanner update failed</string>
+    <string name="ota_recovery_soft_reset">Turn scanner off and on again</string>
+    <string name="ota_recovery_hard_reset">Press and hold power button for 5 seconds</string>
+    <!-- OtaFailedFragment -->
+    <string name="ota_failed_title">Scanner update failed</string>
+    <string name="ota_failed_instructions">Please contact your supervisor for help</string>
+    <string name="continue_button">Continue</string>
+
+
+    <!-- CollectFingerprintsActivity : screen where the scanning happens -->
+    <!-- Screen Text -->
+    <string name="good_scan_direction">Swipe left to next finger</string>
+    <string name="please_scan">Please scan</string>
+    <string name="poor_scan_direction">Please re-scan</string>
+    <string name="scanning">Scanning…</string>
+    <string name="transfering_data">Transferring data…</string>
+    <string name="good_scan_message">Good Scan</string>
+    <string name="poor_scan_message">Poor Scan</string>
+    <string name="no_finger_detected_message">No finger detected</string>
+    <string name="finger_skipped_message">Finger skipped</string>
+    <string name="no_fingers_scanned">Please scan at least 1 required finger</string>
+    <string name="reconnecting_message">Reconnecting…</string>
+    <string name="confirm_fingers_dialog_title">Fingers Scanned</string>
+    <string name="capture_number_text">Scan %1$s of %2$s</string>
+    <string name="please_scan_again">Please scan again</string>
+    <!-- Button Labels -->
+    <string name="rescan_label">Re-scan</string>
+    <string name="rescan_label_question">Re-scan?</string>
+    <string name="scan_label">Scan</string>
+    <string name="please_wait_button">Please Wait</string>
+    <string name="scan">Scan</string>
+    <string name="confirm">Confirm</string>
+    <string name="restart">Restart</string>
+    <!-- Content Descriptions -->
+
+    <!-- MatchingActivity : the waiting screen after an identification -->
+    <!-- Screen Text -->
+    <string name="please_wait">Please wait while we proceed to identification</string>
+    <!-- Loading text -->
+    <string name="loading_candidates">Loading candidates…</string>
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">Loaded %d candidate.</item>
+        <item quantity="other">Loaded %d candidates.</item>
+    </plurals>
+
+
+    <string name="matching_fingerprints">Matching fingerprints…</string>
+    <string name="returning_results">Returning results…</string>
+
+
+
+    <plurals name="returned_results">
+        <item quantity="one">Returned %d result.</item>
+        <item quantity="other">Returned %d results.</item>
+    </plurals>
+
+
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">No very good matches</item>
+        <item quantity="one">%d very good match</item>
+        <item quantity="other">%d very good matches</item>
+    </plurals>
+
+
+    <plurals name="tier3_matches">
+        <item quantity="zero">No good matches</item>
+        <item quantity="one">%d good match</item>
+        <item quantity="other">%d good matches</item>
+    </plurals>
+
+
+    <plurals name="tier4_matches">
+        <item quantity="zero">No matches</item>
+        <item quantity="one">%d match</item>
+        <item quantity="other">%d matches</item>
+    </plurals>
+
+
+    <!-- AlertActivity : the Simprints ID reason message screen -->
+    <!-- Error Message Titles -->
+    <string name="low_battery_title">Low battery</string>
+    <string name="bluetooth_error_pair_scanner_and_device_title">Pair scanner and device</string>
+    <string name="scanner_error_turn_scanner_on_title">Turn scanner on</string>
+    <!-- Error Message Text -->
+    <string name="no_permission_title">No permission</string>
+    <string name="bluetooth_no_permission_message">Please enable the Bluetooth permission in the phone settings</string>
+    <string name="bluetooth_not_supported_message">Bluetooth not supported on this device, please contact your system administrator</string>
+    <string name="bluetooth_not_enabled_message">Bluetooth not enabled, please make sure it is enabled in settings and try again</string>
+    <string name="multiple_scanners_found_message">More than one scanner is paired to the phone, please unpair un-needed scanners</string>
+    <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
+    <string name="bluetooth_error_pair_scanner_and_device_message">1. Check scanner is turned on \n 2. Tap Settings \n 3. Unpair any paired scanner \n 4. Pair your scanner to device \n 5. Tap back to return to Simprints</string>
+    <string name="scanner_error_turn_scanner_on_message">1. Turn scanner on \n 2. Tap Try Again</string>
+    <!-- Button Labels For Error Messages -->
+    <string name="pair_scanner_label">Settings</string>
+    <!-- Content Descriptions -->
+
+
+    <!-- Dashboard Activity -->
+
+    <string name="get_ready">Get Ready</string>
+    <string name="try_another_finger">Let\'s Try Another Finger!</string>
+    <string name="missing_finger"><u>Missing Finger</u></string>
+
+    <!--Settings Activity-->
+
+    <!--Settings Preferences titles and summaries-->
+
+    <string name="preference_select_fingers_title">Select default fingers</string>
+    <string name="finger_selection_confirm_dialog_text">Save settings?</string>
+    <string name="finger_selection_confirm_dialog_yes">Save</string>
+    <string name="finger_selection_confirm_dialog_no">Cancel</string>
+    <string name="finger_selection_add_finger">Add Finger</string>
+    <string name="finger_selection_invalid">Invalid Selection - there is more than 5 of one finger</string>
+    <string name="finger_selection_activity_title">Select Fingers</string>
 </resources>

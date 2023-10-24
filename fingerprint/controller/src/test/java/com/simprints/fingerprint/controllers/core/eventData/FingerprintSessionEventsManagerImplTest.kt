@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
 import com.google.common.truth.Truth
-import com.simprints.fingerprint.activities.matching.MatchTask.Companion.MATCHER_NAME
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerComparisonStrategy
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
@@ -15,7 +14,7 @@ import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy as CoreFingerComparisonStrategy
@@ -28,7 +27,7 @@ class FingerprintSessionEventsManagerImplTest {
 
 
     @Test
-    fun addEventInBackground() = runBlocking {
+    fun addEventInBackground() = runTest {
         //Given
         val scope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         val eventRepository: EventRepository = mockk()
@@ -42,7 +41,7 @@ class FingerprintSessionEventsManagerImplTest {
             1L,
             1L,
             mockk<SubjectQuery>(relaxed = true),
-            MATCHER_NAME,
+            "matcherName",
             MatchEntry("candidateId", 1F),
             FingerComparisonStrategy.SAME_FINGER
         )
@@ -55,7 +54,7 @@ class FingerprintSessionEventsManagerImplTest {
             Truth.assertThat(fingerComparisonStrategy)
                 .isEqualTo(CoreFingerComparisonStrategy.SAME_FINGER)
             Truth.assertThat(this.matcher)
-                .isEqualTo(MATCHER_NAME)
+                .isEqualTo("matcherName")
         }
     }
 }

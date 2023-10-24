@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 import com.simprints.core.DeviceID
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.feature.consent.ConsentType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
@@ -23,7 +24,7 @@ import com.simprints.infra.config.store.models.IdentificationConfiguration.PoolT
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import javax.inject.Inject
 
-class ModalityFlowEnrol @Inject constructor (
+class ModalityFlowEnrol @Inject constructor(
     private val fingerprintStepProcessor: FingerprintStepProcessor,
     private val faceStepProcessor: FaceStepProcessor,
     private val coreStepProcessor: CoreStepProcessor,
@@ -63,11 +64,13 @@ class ModalityFlowEnrol @Inject constructor (
             isFingerprintResult(requestCode) -> {
                 fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             }
+
             isFaceResult(requestCode) -> faceStepProcessor.processResult(
                 requestCode,
                 resultCode,
                 data
             )
+
             else -> throw IllegalStateException("Invalid result from intent")
         }
         completeAllStepsIfExitFormOrErrorHappened(requestCode, resultCode, data)
@@ -125,14 +128,11 @@ class ModalityFlowEnrol @Inject constructor (
             PoolType.MODULE -> SubjectQuery(projectId, moduleId = moduleId)
         }
 
-    private fun addMatchingStepForFinger(
-        probeSamples: List<FingerprintCaptureSample>,
-        query: SubjectQuery
-    ) {
-        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
+    private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: SubjectQuery) {
+        steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query, FlowProvider.FlowType.ENROL))
     }
 
     private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: SubjectQuery) {
-        steps.add(faceStepProcessor.buildStepMatch(probeSamples, query))
+        steps.add(faceStepProcessor.buildStepMatch(probeSamples, query, FlowProvider.FlowType.ENROL))
     }
 }

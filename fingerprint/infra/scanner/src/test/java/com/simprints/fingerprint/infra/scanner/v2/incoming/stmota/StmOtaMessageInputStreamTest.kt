@@ -25,7 +25,7 @@ class StmOtaMessageInputStreamTest {
     private val stmOtaMessageInputStream = StmOtaMessageInputStream(stmOtaResponseParser)
 
     @Test
-    fun `test disconnect disposes the flowable stream`(){
+    fun `test disconnect disposes the flowable stream`() {
         //Given
         val flowableDisposable = mockk<Disposable>(relaxed = true)
 
@@ -36,7 +36,7 @@ class StmOtaMessageInputStreamTest {
             }
         }
 
-        val flowable: Flowable<ByteArray> = mockk{
+        val flowable: Flowable<ByteArray> = mockk {
             every { map(any<Function<ByteArray, StmOtaResponse>>()) } returns stmResponseFlowable
         }
 

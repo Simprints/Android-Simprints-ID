@@ -37,20 +37,20 @@ enum class ClientApiAlert {
         }
 
         private fun getTitle(clientApiAlert: ClientApiAlert) = when (clientApiAlert) {
-            ROOTED_DEVICE -> com.simprints.clientapi.R.string.rooted_device_title
-            else -> com.simprints.clientapi.R.string.configuration_error_title
+            ROOTED_DEVICE -> R.string.rooted_device_title
+            else -> R.string.configuration_error_title
         }
 
         private fun getMessage(clientApiAlert: ClientApiAlert) = when (clientApiAlert) {
-            INVALID_STATE_FOR_INTENT_ACTION -> com.simprints.clientapi.R.string.invalid_intentAction_message
-            INVALID_METADATA -> com.simprints.clientapi.R.string.invalid_metadata_message
-            INVALID_MODULE_ID -> com.simprints.clientapi.R.string.invalid_moduleId_message
-            INVALID_PROJECT_ID -> com.simprints.clientapi.R.string.invalid_projectId_message
-            INVALID_SELECTED_ID -> com.simprints.clientapi.R.string.invalid_selectedId_message
-            INVALID_SESSION_ID -> com.simprints.clientapi.R.string.invalid_sessionId_message
-            INVALID_USER_ID -> com.simprints.clientapi.R.string.invalid_userId_message
-            INVALID_VERIFY_ID -> com.simprints.clientapi.R.string.invalid_verifyId_message
-            ROOTED_DEVICE -> com.simprints.clientapi.R.string.rooted_device_message
+            INVALID_STATE_FOR_INTENT_ACTION -> R.string.invalid_intentAction_message
+            INVALID_METADATA -> R.string.invalid_metadata_message
+            INVALID_MODULE_ID -> R.string.invalid_moduleId_message
+            INVALID_PROJECT_ID -> R.string.invalid_projectId_message
+            INVALID_SELECTED_ID -> R.string.invalid_selectedId_message
+            INVALID_SESSION_ID -> R.string.invalid_sessionId_message
+            INVALID_USER_ID -> R.string.invalid_userId_message
+            INVALID_VERIFY_ID -> R.string.invalid_verifyId_message
+            ROOTED_DEVICE -> R.string.rooted_device_message
         }
 
         private fun getMessageIcon(clientApiAlert: ClientApiAlert) = when (clientApiAlert) {

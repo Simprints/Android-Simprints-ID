@@ -118,7 +118,7 @@ open class CheckLoginFromIntentActivity : BaseActivity(), CheckLoginFromIntentCo
     }
 
     override fun openLoginActivity(appRequest: AppRequest) {
-        showLoginFlow.launch(LoginContract.toArgs(appRequest.projectId, appRequest.userId.value))
+        showLoginFlow.launch(LoginContract.toArgs(appRequest.projectId, appRequest.userId))
     }
 
     override fun openOrchestratorActivity(appRequest: AppRequest) {

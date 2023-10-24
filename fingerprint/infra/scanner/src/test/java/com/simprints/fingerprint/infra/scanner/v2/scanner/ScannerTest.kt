@@ -77,7 +77,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
 import io.reactivex.rxkotlin.toObservable
 import io.reactivex.subjects.PublishSubject
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.io.InputStream
@@ -121,7 +121,7 @@ class ScannerTest {
         }
         scanner = Scanner(
             MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -148,8 +148,8 @@ class ScannerTest {
 
     @Test
     fun scanner_connect_callsConnectOnRootMessageStreams() {
-        val rootMessageChannel:RootMessageChannel =mockk{
-            every { connect(any(),any()) } just runs
+        val rootMessageChannel: RootMessageChannel = mockk {
+            every { connect(any(), any()) } just runs
         }
         scanner = Scanner(
             MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
@@ -164,7 +164,7 @@ class ScannerTest {
         )
         scanner.connect(mockkInputStream, mockk()).blockingAwait()
 
-        verify { rootMessageChannel.connect(any(),any()) }
+        verify { rootMessageChannel.connect(any(), any()) }
     }
 
     @Test
@@ -197,6 +197,7 @@ class ScannerTest {
 
         assertThat(scanner.state.mode).isEqualTo(Mode.MAIN)
     }
+
     @Test
     fun `scanner disconnect does nothing when scanner already disconnected`() {
         val mockRootMessageChannel = mockk<RootMessageChannel>()
@@ -232,7 +233,7 @@ class ScannerTest {
 
         scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockCypressOtaMessageChannel,
             mockk(),
@@ -258,7 +259,7 @@ class ScannerTest {
         }
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockkCypressOtaMessageChannel,
             mockk(),
@@ -294,7 +295,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             CypressOtaMessageChannel(mockkMessageInputStream, mockk(relaxed = true)),
             mockk(),
@@ -331,7 +332,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             StmOtaMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
@@ -360,7 +361,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             StmOtaMessageChannel(mockkMessageInputStream, mockk(relaxed = true)),
@@ -392,7 +393,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             StmOtaMessageChannel(mockk(relaxed = true), mockk(relaxed = true)),
@@ -421,7 +422,7 @@ class ScannerTest {
         }
         val scanner = Scanner(
             mockkMainMessageChannel,
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -474,7 +475,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             MainMessageChannel(messageInputStreamMock, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -514,7 +515,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             MainMessageChannel(messageInputStreamspyk, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -559,7 +560,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             MainMessageChannel(messageInputStreamspyk, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -595,7 +596,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             MainMessageChannel(messageInputStreamspyk, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -641,7 +642,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             MainMessageChannel(messageInputStreamspyk, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -692,7 +693,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             MainMessageChannel(messageInputStreamspyk, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -733,7 +734,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             MainMessageChannel(messageInputStreamspyk, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             mockk(),
             mockk(),
             mockk(),
@@ -793,7 +794,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             MainMessageChannel(mockkMessageInputStream, mockkMessageOutputStream),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             scannerInfoReadermockk,
             mockk(), mockk(), mockk(), mockk(), mockk(),
             responseErrorHandler
@@ -817,7 +818,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             scannerInfoReadermockk,
             mockk(), mockk(), mockk(), mockk(), mockk(),
             responseErrorHandler
@@ -831,7 +832,7 @@ class ScannerTest {
     }
 
     @Test
-    fun scanner_getExtendedVersion_shouldReturn_ExtendedVersionInformation() = runBlocking {
+    fun scanner_getExtendedVersion_shouldReturn_ExtendedVersionInformation() = runTest {
         val expectedVersion = mockk<ExtendedVersionInformation>()
         val scannerInfoReadermockk = mockk<ScannerExtendedInfoReaderHelper> {
             coEvery { getExtendedVersionInfo() } returns GetExtendedVersionResponse(expectedVersion)
@@ -839,7 +840,7 @@ class ScannerTest {
 
         val scanner = Scanner(
             mockk(),
-            setupRootMessageChannelMock(),
+            setupRootMessageChannelmockk(),
             scannerInfoReadermockk,
             mockk(), mockk(), mockk(), mockk(), mockk(),
             responseErrorHandler
@@ -852,7 +853,7 @@ class ScannerTest {
         assertThat(testObserver.values().first()).isEqualTo(expectedVersion)
     }
 
-    private fun setupRootMessageChannelMock(): RootMessageChannel {
+    private fun setupRootMessageChannelmockk(): RootMessageChannel {
 
         val responseSubject = PublishSubject.create<RootResponse>()
         val mockRootMessageInputStream = mockk<RootMessageInputStream> {

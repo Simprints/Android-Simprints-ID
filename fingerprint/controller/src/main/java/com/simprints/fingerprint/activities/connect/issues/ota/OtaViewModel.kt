@@ -11,11 +11,11 @@ import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy.*
-import com.simprints.fingerprint.scanner.domain.ota.OtaStep
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.*
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaStep
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
@@ -97,11 +97,11 @@ class OtaViewModel @Inject constructor(
         val otaStartedTime = timeHelper.now()
         return when (this) {
             AvailableOta.CYPRESS ->
-                scannerManager.scanner.performCypressOta(targetVersions(AvailableOta.CYPRESS))
+                scannerManager.otaOperationsWrapper.performCypressOta(targetVersions(AvailableOta.CYPRESS))
             AvailableOta.STM ->
-                scannerManager.scanner.performStmOta(targetVersions(AvailableOta.STM))
+                scannerManager.otaOperationsWrapper.performStmOta(targetVersions(AvailableOta.STM))
             AvailableOta.UN20 ->
-                scannerManager.scanner.performUn20Ota(targetVersions(AvailableOta.UN20))
+                scannerManager.otaOperationsWrapper.performUn20Ota(targetVersions(AvailableOta.UN20))
         }.onCompletion { error ->
             if (error == null) {
                 saveOtaEventInSession(this@toFlowOfSteps, otaStartedTime)

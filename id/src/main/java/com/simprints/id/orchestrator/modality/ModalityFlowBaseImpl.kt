@@ -63,9 +63,9 @@ abstract class ModalityFlowBaseImpl(
         )
     }
 
-    private fun buildModalityConfigurationSteps(modalities: List<Modality>) = modalities.map {
+    private fun buildModalityConfigurationSteps(modalities: List<Modality>) = modalities.mapNotNull {
         when (it) {
-            Modality.FINGERPRINT -> fingerprintStepProcessor.buildConfigurationStep()
+            Modality.FINGERPRINT -> null
             Modality.FACE -> faceStepProcessor.buildConfigurationStep(
                 authStore.signedInProjectId,
                 deviceId

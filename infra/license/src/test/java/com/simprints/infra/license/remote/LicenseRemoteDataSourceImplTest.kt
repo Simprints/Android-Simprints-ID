@@ -2,17 +2,15 @@ package com.simprints.infra.license.remote
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
-import com.simprints.infra.license.LicenseVendor
 import com.simprints.testtools.common.alias.InterfaceInvocation
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaType
@@ -45,13 +43,17 @@ class LicenseRemoteDataSourceImplTest {
 
         coEvery { authStore.buildClient(LicenseRemoteInterface::class) } returns simApiClient
 
-        coEvery { remoteInterface.getLicense("validProject", any(), any()) } returns ApiLicense(
-            RankOneLicense(
-                "RANK_ONE_FACE",
-                "today",
-                license
-            )
-        )
+        coEvery {
+            remoteInterface.getLicense("validProject", any(), any())
+        } returns """{
+                "RANK_ONE_FACE": {
+                    "vendor": "RANK_ONE_FACE",
+                    "expiration": "2023.12.31",
+                    "data": "$license"
+                }
+            }
+        """
+
         coEvery {
             remoteInterface.getLicense(
                 "invalidProject",
@@ -134,7 +136,7 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "validProject",
                 "deviceId",
-                LicenseVendor.RANK_ONE_FACE
+                RANK_ONE_FACE
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Success(license))
@@ -146,7 +148,7 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "invalidProject",
                 "deviceId",
-                LicenseVendor.RANK_ONE_FACE
+                RANK_ONE_FACE
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("001"))
@@ -158,19 +160,19 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "invalidProjectUnknownErrorCode",
                 "deviceId",
-                LicenseVendor.RANK_ONE_FACE
+                RANK_ONE_FACE
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
     }
 
     @Test
-    fun `Get no license if is a backend maintenance exception`() = runBlocking {
+    fun `Get no license if is a backend maintenance exception`() = runTest {
         val newLicense =
             licenseRemoteDataSourceImpl.getLicense(
                 "backendMaintenanceErrorProject",
                 "deviceId",
-                LicenseVendor.RANK_ONE_FACE
+                RANK_ONE_FACE
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.BackendMaintenanceError())
@@ -182,7 +184,7 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "noQuotaProject",
                 "deviceId",
-                LicenseVendor.RANK_ONE_FACE
+                RANK_ONE_FACE
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("002"))
@@ -194,33 +196,39 @@ class LicenseRemoteDataSourceImplTest {
             licenseRemoteDataSourceImpl.getLicense(
                 "serviceUnavailable",
                 "deviceId",
-                LicenseVendor.RANK_ONE_FACE
+                RANK_ONE_FACE
             )
 
         assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
     }
 
     @Test
-    fun `Get no license if there is a connection exception - generic error`() = runTest(StandardTestDispatcher()) {
-        val newLicense =
-            licenseRemoteDataSourceImpl.getLicense(
-                "networkConnectionException",
-                "deviceId",
-                LicenseVendor.RANK_ONE_FACE
-            )
+    fun `Get no license if there is a connection exception - generic error`() =
+        runTest(StandardTestDispatcher()) {
+            val newLicense =
+                licenseRemoteDataSourceImpl.getLicense(
+                    "networkConnectionException",
+                    "deviceId",
+                    RANK_ONE_FACE
+                )
 
-        assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
-    }
+            assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
+        }
 
     @Test
-    fun `Get no license if there is a generic exception - generic error`() = runTest(StandardTestDispatcher()) {
-        val newLicense =
-            licenseRemoteDataSourceImpl.getLicense(
-                "genericException",
-                "deviceId",
-                LicenseVendor.RANK_ONE_FACE
-            )
+    fun `Get no license if there is a generic exception - generic error`() =
+        runTest(StandardTestDispatcher()) {
+            val newLicense =
+                licenseRemoteDataSourceImpl.getLicense(
+                    "genericException",
+                    "deviceId",
+                    RANK_ONE_FACE
+                )
 
-        assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
+            assertThat(newLicense).isEqualTo(ApiLicenseResult.Error("000"))
+        }
+
+    companion object {
+        private val RANK_ONE_FACE = Vendor("RANK_ONE_FACE")
     }
 }

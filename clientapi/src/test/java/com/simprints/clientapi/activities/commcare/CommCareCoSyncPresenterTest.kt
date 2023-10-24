@@ -50,8 +50,9 @@ import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.libsimprints.Constants
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence.MEDIUM
 import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
-import io.kotest.assertions.throwables.shouldThrow
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -60,7 +61,6 @@ import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -98,7 +98,7 @@ class CommCareCoSyncPresenterTest {
         every { view.enrolExtractor } returns enrolmentExtractor
 
         getNewPresenter(Enrol, mockSessionManagerToCreateSession()).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -116,7 +116,7 @@ class CommCareCoSyncPresenterTest {
         every { view.identifyExtractor } returns identifyExtractor
 
         getNewPresenter(Identify, mockSessionManagerToCreateSession()).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -136,7 +136,7 @@ class CommCareCoSyncPresenterTest {
         getNewPresenter(
             Verify,
             mockSessionManagerToCreateSession()
-        ).apply { runBlocking { start() } }
+        ).apply { runTest { start() } }
 
         verify(exactly = 1) {
             view.sendSimprintsRequest(
@@ -157,7 +157,7 @@ class CommCareCoSyncPresenterTest {
             coEvery { it.getCurrentSessionId() } returns MOCK_SESSION_ID
         }
 
-        getNewPresenter(ConfirmIdentity, sessionEventsManager).apply { runBlocking { start() } }
+        getNewPresenter(ConfirmIdentity, sessionEventsManager).apply { runTest { start() } }
 
         verify(exactly = 1) {
             view.sendSimprintsRequest(
@@ -171,8 +171,8 @@ class CommCareCoSyncPresenterTest {
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         getNewPresenter(Invalid, mockSessionManagerToCreateSession()).apply {
-            runBlocking {
-                shouldThrow<InvalidIntentActionException> {
+            runTest {
+                assertThrows<InvalidIntentActionException> {
                     start()
                 }
             }
@@ -187,14 +187,14 @@ class CommCareCoSyncPresenterTest {
 
             val subject =
                 Subject(
-                    registerId,
-                    "projectId",
-                    "thales".asTokenizableRaw(),
-                    "mod1".asTokenizableRaw(),
-                    Date(),
-                    null,
-                    emptyList(),
-                    emptyList()
+                    subjectId = registerId,
+                    projectId = "projectId",
+                    attendantId = "thales".asTokenizableRaw(),
+                    moduleId = "mod1".asTokenizableRaw(),
+                    createdAt = Date(),
+                    updatedAt = null,
+                    fingerprintSamples = emptyList(),
+                    faceSamples = emptyList()
                 )
             val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
             coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
@@ -263,14 +263,14 @@ class CommCareCoSyncPresenterTest {
 
             val subject =
                 Subject(
-                    registerId,
-                    projectId,
-                    "thales".asTokenizableRaw(),
-                    "mod1".asTokenizableRaw(),
-                    Date(),
-                    null,
-                    emptyList(),
-                    emptyList()
+                    subjectId = registerId,
+                    projectId = projectId,
+                    attendantId = "thales".asTokenizableRaw(),
+                    moduleId = "mod1".asTokenizableRaw(),
+                    createdAt = Date(),
+                    updatedAt = null,
+                    fingerprintSamples = emptyList(),
+                    faceSamples = emptyList()
                 )
             val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
             coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
@@ -337,14 +337,14 @@ class CommCareCoSyncPresenterTest {
 
             val subject =
                 Subject(
-                    registerId,
-                    projectId,
-                    "thales".asTokenizableRaw(),
-                    "mod1".asTokenizableRaw(),
-                    Date(),
-                    null,
-                    emptyList(),
-                    emptyList()
+                    subjectId = registerId,
+                    projectId = projectId,
+                    attendantId = "thales".asTokenizableRaw(),
+                    moduleId = "mod1".asTokenizableRaw(),
+                    createdAt = Date(),
+                    updatedAt = null,
+                    fingerprintSamples = emptyList(),
+                    faceSamples = emptyList()
                 )
             val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
             coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
@@ -785,7 +785,7 @@ class CommCareCoSyncPresenterTest {
         createdAt = 2,
         sessionId = UUID.randomUUID().toString(),
         scores = listOf(
-            CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1)
+            CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1, MEDIUM)
         )
     )
 
@@ -796,6 +796,6 @@ class CommCareCoSyncPresenterTest {
 
     private val verificationCallbackEvent = VerificationCallbackEvent(
         2,
-        CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1)
+        CallbackComparisonScore(UUID.randomUUID().toString(), 1, TIER_1, MEDIUM)
     )
 }

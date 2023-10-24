@@ -4,7 +4,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.MessagePro
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 import java.nio.ByteOrder
 
-object Un20MessageProtocol: MessageProtocol {
+object Un20MessageProtocol : MessageProtocol {
 
     override val byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN
     override val HEADER_SIZE: Int = 6

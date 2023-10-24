@@ -43,9 +43,12 @@ class ResponseErrorHandler(val strategy: ResponseErrorHandlingStrategy,
         onErrorResumeNext {
             when (it) {
                 is TimeoutException -> Single.error(
-                    IOException("Scanner did not respond after $timeOut milliseconds (with ${retryTimes
-                        ?: "no"} retries)")
+                    IOException("Scanner did not respond after $timeOut milliseconds (with ${
+                        retryTimes
+                            ?: "no"
+                    } retries)")
                 )
+
                 else -> Single.error(it)
             }
         }

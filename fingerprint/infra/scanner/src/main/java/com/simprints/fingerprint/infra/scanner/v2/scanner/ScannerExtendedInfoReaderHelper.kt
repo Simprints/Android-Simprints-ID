@@ -40,12 +40,12 @@ class ScannerExtendedInfoReaderHelper(
     private val responseErrorHandler: ResponseErrorHandler
 ) {
 
-    fun readScannerInfo(): Single<ScannerInformation>  {
+    fun readScannerInfo(): Single<ScannerInformation> {
         return getCypressVersion().flatMap { cypressVersion ->
             val isLegacyApi = cypressVersion.apiMajorVersion <= CYPRESS_HIGHEST_LEGACY_API_MAJOR_VERSION
-                    && cypressVersion.apiMinorVersion <= CYPRESS_HIGHEST_LEGACY_API_MINOR_VERSION
+                && cypressVersion.apiMinorVersion <= CYPRESS_HIGHEST_LEGACY_API_MINOR_VERSION
 
-           rxSingle { readScannerInfoBasedOnApiVersion(isLegacyApi) }
+            rxSingle { readScannerInfoBasedOnApiVersion(isLegacyApi) }
         }
     }
 
@@ -66,7 +66,7 @@ class ScannerExtendedInfoReaderHelper(
         ).map { it.version }
     }
 
-    fun getStmExtendedFirmwareVersion(): Single<StmExtendedFirmwareVersion>  {
+    fun getStmExtendedFirmwareVersion(): Single<StmExtendedFirmwareVersion> {
         return sendMainModeCommandAndReceiveResponse<GetStmExtendedFirmwareVersionResponse>(
             GetStmExtendedFirmwareVersionCommand()
         ).map { it.stmFirmwareVersion }
@@ -85,7 +85,7 @@ class ScannerExtendedInfoReaderHelper(
     }
 
     private suspend fun getScannerInformationWithLegacyApi(): ScannerInformation {
-        val legacyUnifiedVersion =  sendRootModeCommandAndReceiveResponse<GetVersionResponse>(
+        val legacyUnifiedVersion = sendRootModeCommandAndReceiveResponse<GetVersionResponse>(
             GetVersionCommand()
         ).await()
 
@@ -170,7 +170,6 @@ class ScannerExtendedInfoReaderHelper(
     private inline fun <reified R : IncomingMainMessage> sendMainModeCommandAndReceiveResponse(command: OutgoingMainMessage): Single<R> =
         mainMessageChannel.sendMainModeCommandAndReceiveResponse<R>(command)
             .handleErrorsWith(responseErrorHandler)
-
 
 
     companion object {

@@ -25,7 +25,7 @@ class CypressOtaMessageInputStreamTest {
     private val cypressOtaMessageInputStream = CypressOtaMessageInputStream(cypressOtaResponseParser)
 
     @Test
-    fun `test disconnect disposes the flowable stream`(){
+    fun `test disconnect disposes the flowable stream`() {
         //Given
         val flowableDisposable = mockk<Disposable>(relaxed = true)
 
@@ -36,8 +36,8 @@ class CypressOtaMessageInputStreamTest {
             }
         }
 
-        val flowable: Flowable<ByteArray> = mockk{
-            every { map(any<Function<ByteArray,CypressOtaResponse>>()) } returns cypressResponseFlowable
+        val flowable: Flowable<ByteArray> = mockk {
+            every { map(any<Function<ByteArray, CypressOtaResponse>>()) } returns cypressResponseFlowable
         }
 
         //When

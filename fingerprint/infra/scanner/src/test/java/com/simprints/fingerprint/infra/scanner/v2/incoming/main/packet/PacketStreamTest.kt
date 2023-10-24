@@ -7,19 +7,18 @@ import com.simprints.fingerprint.infra.scanner.testtools.stripWhiteSpaceToLowerc
 import com.simprints.fingerprint.infra.scanner.testtools.toHexStrings
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.chunked
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.hexToByteArray
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
-import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.whenThis
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.every
+import io.mockk.mockk
 import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test
 
 class PacketStreamTest {
 
-    private val packetParserMock = setupMock<PacketParser> {
-        whenThis { parse(anyNotNull()) } then {
-            hollowPacketWithRawBytes(it.arguments[0] as ByteArray)
+    private val packetParserMock = mockk<PacketParser> {
+        every { parse(any()) } answers {
+            hollowPacketWithRawBytes(args[0] as ByteArray)
         }
     }
 

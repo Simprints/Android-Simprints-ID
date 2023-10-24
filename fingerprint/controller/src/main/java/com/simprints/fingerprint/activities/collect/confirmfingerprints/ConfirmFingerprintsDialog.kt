@@ -8,6 +8,7 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.resources.nameTextId
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 class ConfirmFingerprintsDialog(private val context: Context,
@@ -16,10 +17,10 @@ class ConfirmFingerprintsDialog(private val context: Context,
                                 private val callbackRestart: () -> Unit) {
 
     fun create(): AlertDialog = MaterialAlertDialogBuilder(context)
-        .setTitle(context.getString(R.string.confirm_fingers_dialog_title))
+        .setTitle(context.getString(IDR.string.confirm_fingers_dialog_title))
         .setMessage(getMapOfFingersAndQualityAsText())
-        .setPositiveButton(context.getString(R.string.confirm)) { _, _ -> callbackConfirm() }
-        .setNegativeButton(context.getString(R.string.restart)) { _, _ -> callbackRestart() }
+        .setPositiveButton(context.getString(IDR.string.confirm)) { _, _ -> callbackConfirm() }
+        .setNegativeButton(context.getString(IDR.string.restart)) { _, _ -> callbackRestart() }
         .setCancelable(false)
         .create()
 

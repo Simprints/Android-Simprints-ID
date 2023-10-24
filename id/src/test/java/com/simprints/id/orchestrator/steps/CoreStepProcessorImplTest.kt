@@ -38,7 +38,7 @@ import org.robolectric.annotation.Config
 class CoreStepProcessorImplTest : BaseStepProcessorTest() {
 
     @MockK
-    private lateinit var mapStepsForLastBiometricEnrol: MapStepsForLastBiometricEnrolUseCase
+    private lateinit var mapStepsForLastBiometricEnrol: MapStepResultsForLastBiometricEnrolUseCase
 
     private lateinit var coreStepProcessor: CoreStepProcessorImpl
 
@@ -167,8 +167,32 @@ class CoreStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
-    fun stepProcessor_shouldProcessFetchGUIDResponseWhenTried() {
-        val fetchActivityReturn: Intent = Intent().putExtra(FetchSubjectContract.FETCH_SUBJECT_RESULT, FetchSubjectResult(false))
+    fun stepProcessor_shouldProcessFetchGUIDResponseNotFoundOnlineWhenTried() {
+        val fetchActivityReturn: Intent = Intent().putExtra(FetchSubjectContract.FETCH_SUBJECT_RESULT, FetchSubjectResult(
+            found = false,
+            wasOnline = true
+        ))
+        val result = coreStepProcessor.processResult(fetchActivityReturn)
+
+        assertThat(result).isInstanceOf(FetchGUIDResponse::class.java)
+    }
+
+    @Test
+    fun stepProcessor_shouldProcessFetchGUIDResponseNotFoundOfflineWhenTried() {
+        val fetchActivityReturn: Intent = Intent().putExtra(FetchSubjectContract.FETCH_SUBJECT_RESULT, FetchSubjectResult(
+            found = false,
+            wasOnline = false
+        ))
+        val result = coreStepProcessor.processResult(fetchActivityReturn)
+
+        assertThat(result).isInstanceOf(FetchGUIDResponse::class.java)
+    }
+
+    @Test
+    fun stepProcessor_shouldProcessFetchGUIDResponseFoundWhenTried() {
+        val fetchActivityReturn: Intent = Intent().putExtra(FetchSubjectContract.FETCH_SUBJECT_RESULT, FetchSubjectResult(
+            found = true
+        ))
         val result = coreStepProcessor.processResult(fetchActivityReturn)
 
         assertThat(result).isInstanceOf(FetchGUIDResponse::class.java)

@@ -16,7 +16,7 @@ object RefusalAlertHelper {
 
     fun refusalArgs() = exitFormConfiguration {
         titleRes = R.string.why_did_you_skip_fingerprinting
-        backButtonRes = com.simprints.fingerprint.R.string.button_scan_prints
+        backButtonRes = R.string.button_scan_prints
         visibleOptions = scannerOptions()
     }.toArgs()
 

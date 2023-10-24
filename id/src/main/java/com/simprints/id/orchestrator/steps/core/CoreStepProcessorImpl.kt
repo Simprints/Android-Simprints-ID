@@ -21,7 +21,7 @@ import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
 import com.simprints.feature.setup.SetupContract
 import com.simprints.feature.setup.SetupWrapperActivity
 import com.simprints.id.exitformhandler.ExitFormReason.Companion.fromExitFormOption
-import com.simprints.id.orchestrator.steps.MapStepsForLastBiometricEnrolUseCase
+import com.simprints.id.orchestrator.steps.MapStepResultsForLastBiometricEnrolUseCase
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.FETCH_GUID_CHECK
@@ -40,7 +40,7 @@ import com.simprints.id.orchestrator.steps.core.response.SetupResponse
 import javax.inject.Inject
 
 class CoreStepProcessorImpl @Inject constructor(
-    private val mapStepsForLastBiometricEnrol: MapStepsForLastBiometricEnrolUseCase
+    private val mapStepsForLastBiometricEnrol: MapStepResultsForLastBiometricEnrolUseCase
 ) : CoreStepProcessor {
 
     companion object {
@@ -133,7 +133,7 @@ class CoreStepProcessorImpl @Inject constructor(
         data.containsKey(FetchSubjectContract.FETCH_SUBJECT_RESULT) -> {
             when (val result = data.getParcelable<Parcelable>(FetchSubjectContract.FETCH_SUBJECT_RESULT)) {
                 is ExitFormResult -> mapExitFormResponse(result)
-                is FetchSubjectResult -> FetchGUIDResponse(result.found)
+                is FetchSubjectResult -> FetchGUIDResponse(result.found, result.wasOnline)
                 else -> null
             }
         }

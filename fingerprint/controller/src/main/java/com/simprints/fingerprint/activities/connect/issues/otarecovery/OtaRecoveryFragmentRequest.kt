@@ -2,8 +2,8 @@ package com.simprints.fingerprint.activities.connect.issues.otarecovery
 
 import android.os.Parcelable
 import androidx.annotation.Keep
-import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

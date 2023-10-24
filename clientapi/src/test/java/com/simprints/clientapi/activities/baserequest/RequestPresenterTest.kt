@@ -40,8 +40,7 @@ class RequestPresenterTest {
 
     @Before
     fun setUp() {
-        BaseUnitTestConfig()
-            .coroutinesMainThread()
+        BaseUnitTestConfig().coroutinesMainThread()
 
         clientApiSessionEventsManagerMock = mockk(relaxed = true)
     }

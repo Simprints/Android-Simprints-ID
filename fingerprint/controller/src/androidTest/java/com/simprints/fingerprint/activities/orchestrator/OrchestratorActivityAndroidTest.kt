@@ -18,7 +18,7 @@ import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.state.FingerprintTaskFlowState
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
-import com.simprints.fingerprint.scanner.data.worker.FirmwareFileUpdateScheduler
+import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -50,7 +50,6 @@ class OrchestratorActivityAndroidTest {
     val orchestratorViewModel = spyk(
         OrchestratorViewModel(
             orchestratorMock,
-            mockk(relaxed = true),
             firmwareFileUpdateSchedulerMock,
         )
     )

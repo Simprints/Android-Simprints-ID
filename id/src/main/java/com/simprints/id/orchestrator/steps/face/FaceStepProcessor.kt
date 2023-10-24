@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -13,7 +14,7 @@ interface FaceStepProcessor {
 
     suspend fun buildCaptureStep(): Step
 
-    fun buildStepMatch(probeFaceSample: List<FaceCaptureSample>, query: SubjectQuery): Step
+    fun buildStepMatch(probeFaceSample: List<FaceCaptureSample>, query: SubjectQuery, flowType: FlowProvider.FlowType): Step
 
     fun processResult(requestCode: Int,
                       resultCode: Int,

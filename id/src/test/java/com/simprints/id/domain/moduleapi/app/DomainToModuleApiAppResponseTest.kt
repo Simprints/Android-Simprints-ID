@@ -1,13 +1,9 @@
 package com.simprints.id.domain.moduleapi.app
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
-import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintExitReason
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Test
@@ -15,7 +11,7 @@ import org.junit.Test
 class DomainToModuleApiAppResponseTest {
 
     @Test
-    fun fromDomainToModuleApiAppErrorReason_backendMaintenanceError_shoulMapCorrectly() {
+    fun fromDomainToModuleApiAppErrorReason_backendMaintenanceError_shouldMapCorrectly() {
         val appErrorResponse = AppErrorResponse(AppErrorResponse.Reason.BACKEND_MAINTENANCE_ERROR)
 
         val response = fromDomainToModuleApiAppErrorResponse(appErrorResponse)
@@ -24,7 +20,7 @@ class DomainToModuleApiAppResponseTest {
     }
 
     @Test
-    fun fromDomainToModuleApiAppErrorReason_differentProjectSignedInError_shoulMapCorrectly() {
+    fun fromDomainToModuleApiAppErrorReason_differentProjectSignedInError_shouldMapCorrectly() {
         val appErrorResponse =
             AppErrorResponse(AppErrorResponse.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN)
 
@@ -42,12 +38,14 @@ class DomainToModuleApiAppResponseTest {
             AppErrorResponse.Reason.LOGIN_NOT_COMPLETE to IAppErrorReason.LOGIN_NOT_COMPLETE,
             AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED to IAppErrorReason.BLUETOOTH_NOT_SUPPORTED,
             AppErrorResponse.Reason.GUID_NOT_FOUND_ONLINE to IAppErrorReason.GUID_NOT_FOUND_ONLINE,
+            AppErrorResponse.Reason.GUID_NOT_FOUND_OFFLINE to IAppErrorReason.GUID_NOT_FOUND_OFFLINE,
             AppErrorResponse.Reason.ENROLMENT_LAST_BIOMETRICS_FAILED to IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED,
             AppErrorResponse.Reason.FACE_LICENSE_MISSING to IAppErrorReason.FACE_LICENSE_MISSING,
             AppErrorResponse.Reason.FACE_LICENSE_INVALID to IAppErrorReason.FACE_LICENSE_INVALID,
             AppErrorResponse.Reason.FINGERPRINT_CONFIGURATION_ERROR to IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR,
             AppErrorResponse.Reason.BLUETOOTH_NO_PERMISSION to IAppErrorReason.BLUETOOTH_NO_PERMISSION,
             AppErrorResponse.Reason.BACKEND_MAINTENANCE_ERROR to IAppErrorReason.BACKEND_MAINTENANCE_ERROR,
+            AppErrorResponse.Reason.PROJECT_ENDING to IAppErrorReason.PROJECT_ENDING,
             AppErrorResponse.Reason.PROJECT_PAUSED to IAppErrorReason.PROJECT_PAUSED,
             AppErrorResponse.Reason.FACE_CONFIGURATION_ERROR to IAppErrorReason.FACE_CONFIGURATION_ERROR
         ).forEach { (formReason, exitReason) ->

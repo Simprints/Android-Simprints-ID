@@ -20,8 +20,10 @@ interface MessageParser<out R : Message> {
         when (e) {
             is InvalidMessageException ->
                 throw e
+
             is IndexOutOfBoundsException, is BufferUnderflowException ->
                 throw InvalidMessageException("Incorrect number of bytes received parsing response in ${this::class.java.simpleName}", e)
+
             else ->
                 throw InvalidMessageException("Unknown issue during parsing in ${this::class.java.simpleName}", e)
         }

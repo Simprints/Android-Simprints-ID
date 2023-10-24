@@ -9,7 +9,7 @@ class CypressFirmwareVersion(
     apiMinorVersion: Short,
     firmwareMajorVersion: Short,
     firmwareMinorVersion: Short
-): FirmwareVersion(
+) : FirmwareVersion(
     apiMajorVersion,
     apiMinorVersion,
     firmwareMajorVersion,

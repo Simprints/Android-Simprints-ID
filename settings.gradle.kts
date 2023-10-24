@@ -56,19 +56,30 @@ include(
     ":fingerprint:infra:scanner",
     ":fingerprint:infra:scannermock",
     ":fingerprint:infra:base-bio-sdk",
+    ":fingerprint:infra:bio-sdk",
     ":fingerprint:infra:simprints-bio-sdk",
     ":fingerprint:infra:simafis-wrapper",
 )
 
+// Face modality modules
+include(
+    ":face:configuration",
+    ":face:capture",
+    ":face:infra:face-bio-sdk",
+    ":face:infra:roc-wrapper",
+)
+
 // Modules to be refactored
 include(
-    ":face",
     ":clientapi",
     ":moduleapi",
 )
 
 // Feature modules
 include(
+    ":feature:orchestrator",
+    ":feature:client-api",
+    ":feature:login-check",
     ":feature:login",
     ":feature:fetch-subject",
     ":feature:select-subject",
@@ -78,6 +89,7 @@ include(
     ":feature:exit-form",
     ":feature:consent",
     ":feature:setup",
+    ":feature:matcher",
 )
 
 // Infra modules
@@ -99,9 +111,8 @@ include(
     ":infra:recent-user-activity",
     ":infra:resources",
     ":infra:security",
+    ":infra:orchestrator-data",
     ":infra:ui-base",
-    ":infrafacebiosdk",
-    ":infrarocwrapper",
 )
 
 // Tooling modules
