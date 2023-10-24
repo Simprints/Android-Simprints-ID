@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery

@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -28,8 +29,8 @@ class ParcelableConverterTest {
         val request = ActionRequest.EnrolActionRequest(
             actionIdentifier = ActionRequestIdentifier("action", "package"),
             projectId = "projectId",
-            userId = "userId",
-            moduleId = "moduleId",
+            userId = "userId".asTokenizableRaw(),
+            moduleId = "moduleId".asTokenizableRaw(),
             metadata = "metadata",
             unknownExtras = listOf("key" to "value", "key2" to 42),
         )
