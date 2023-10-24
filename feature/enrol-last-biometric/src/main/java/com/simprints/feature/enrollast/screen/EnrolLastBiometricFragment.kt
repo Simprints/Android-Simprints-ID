@@ -1,6 +1,5 @@
 package com.simprints.feature.enrollast.screen
 
-
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -8,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.alertConfiguration
@@ -41,9 +41,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
             AlertContract.DESTINATION
         ) { finishWithSubjectId(null) }
 
-        viewModel.finish.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let(::finishWithResult)
-        }
+        viewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { finishWithResult(it) })
         viewModel.enrolBiometric(args.params)
     }
 
