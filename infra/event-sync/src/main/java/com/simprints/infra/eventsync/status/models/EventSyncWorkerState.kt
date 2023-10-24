@@ -5,9 +5,9 @@ import androidx.work.WorkInfo
 // val state: String is used for logs purpose only - otherwise any state.toString() would print the same output.
 sealed class EventSyncWorkerState(val state: String) {
 
-    object Enqueued : EventSyncWorkerState("Enqueued")
-    object Running : EventSyncWorkerState("Running")
-    object Succeeded : EventSyncWorkerState("Succeeded")
+    data object Enqueued : EventSyncWorkerState("Enqueued")
+    data object Running : EventSyncWorkerState("Running")
+    data object Succeeded : EventSyncWorkerState("Succeeded")
     class Failed(
         val failedBecauseReloginRequired: Boolean = false,
         val failedBecauseCloudIntegration: Boolean = false,
@@ -17,8 +17,8 @@ sealed class EventSyncWorkerState(val state: String) {
     ) :
         EventSyncWorkerState("Failed")
 
-    object Blocked : EventSyncWorkerState("Blocked")
-    object Cancelled : EventSyncWorkerState("Cancelled")
+    data object Blocked : EventSyncWorkerState("Blocked")
+    data object Cancelled : EventSyncWorkerState("Cancelled")
 
     companion object {
         fun fromWorkInfo(

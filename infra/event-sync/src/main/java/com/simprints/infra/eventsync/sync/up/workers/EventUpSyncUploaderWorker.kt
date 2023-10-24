@@ -84,11 +84,11 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
         } catch (t: Throwable) {
             Simber.d(t)
             Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
-            retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t)
+            handleSyncException(t)
         }
     }
 
-    private fun retryOrFailIfCloudIntegrationOrBackendMaintenanceError(t: Throwable): Result {
+    private fun handleSyncException(t: Throwable): Result {
         return when (t) {
             is BackendMaintenanceException -> {
                 fail(

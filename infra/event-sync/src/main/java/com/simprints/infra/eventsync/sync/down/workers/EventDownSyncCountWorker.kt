@@ -52,6 +52,7 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
 
     override val tag: String = EventDownSyncCountWorker::class.java.simpleName
 
+
     private val downSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)
             ?: throw IllegalArgumentException("input required")
@@ -62,13 +63,13 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher) {
         Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
         try {
-            crashlyticsLog("Start")
+            crashlyticsLog("Start - Params: $downSyncScope")
 
             val downCount = eventDownSyncCountTask.getCount(downSyncScope)
             val output = jsonHelper.toJson(downCount)
 
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Done $downCount")
-            success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output))
+            success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
 
         } catch (t: Throwable) {
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Failed. ${t.message}")
@@ -78,8 +79,7 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
                     fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
                 }
                 t is BackendMaintenanceException -> fail(
-                    t,
-                    t.message,
+                    t, t.message,
                     workDataOf(
                         OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
                         OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
@@ -91,7 +91,6 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
                 isSyncStillRunning() -> retry(t)
                 else -> {
                     Simber.d(t)
-                    t.printStackTrace()
                     success(message = "Succeed because count is not required any more.")
                 }
             }

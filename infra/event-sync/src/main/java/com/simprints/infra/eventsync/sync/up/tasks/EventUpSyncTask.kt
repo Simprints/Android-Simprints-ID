@@ -116,11 +116,12 @@ internal class EventUpSyncTask @Inject constructor(
                     this.emit(it.size)
                 }
             } catch (ex: Exception) {
-                if (ex is JsonParseException || ex is JsonMappingException) {
-                    attemptInvalidEventUpload(projectId, sessionId)?.let { this.emit(it) }
-                } else {
-                    Simber.i("Failed to un-marshal events for $sessionId")
-                    Simber.e(ex)
+                Simber.i("Failed to upload events for $sessionId")
+                when (ex) {
+                    is JsonParseException, is JsonMappingException ->
+                        attemptInvalidEventUpload(projectId, sessionId)?.let { this.emit(it) }
+                    is RemoteDbNotSignedInException -> throw ex
+                    else -> Simber.e(ex)
                 }
             }
         }
@@ -176,6 +177,7 @@ internal class EventUpSyncTask @Inject constructor(
             is NetworkConnectionException -> Simber.i(t)
             // We don't need to report http exceptions as cloud logs all of them.
             is HttpException -> Simber.i(t)
+            is RemoteDbNotSignedInException -> throw t
             else -> Simber.e(t)
         }
     }
