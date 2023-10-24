@@ -9,8 +9,8 @@ internal sealed class EnrolLastState {
         val modalities: List<GeneralConfiguration.Modality>
     ) : EnrolLastState()
 
-enum class ErrorType {
-    DUPLICATE_ENROLMENTS,
-    GENERAL_ERROR
-}
+    enum class ErrorType {
+        DUPLICATE_ENROLMENTS,
+        GENERAL_ERROR
+    }
 }
