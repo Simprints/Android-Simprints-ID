@@ -9,8 +9,10 @@ import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.fingerprint.connect.screens.controller.ConnectScannerControllerFragmentArgs
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
 // TODO remove and use only as include into the capture flow
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 class ShowConnectWrapper : ActivityResultContract<Unit, Parcelable>() {
     override fun createIntent(context: Context, input: Unit): Intent =
         Intent(context, ConnectScannerWrapperActivity::class.java).putExtra(

@@ -13,10 +13,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal class SaveScannerConnectionEventsUseCase @Inject constructor(
-        private val scannerManager: ScannerManager,
-        private val timeHelper: TimeHelper,
-        private val eventRepository: EventRepository,
-        @ExternalScope private val externalScope: CoroutineScope,
+    private val scannerManager: ScannerManager,
+    private val timeHelper: TimeHelper,
+    private val eventRepository: EventRepository,
+    @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
     operator fun invoke() {
@@ -24,28 +24,28 @@ internal class SaveScannerConnectionEventsUseCase @Inject constructor(
             val scanner = scannerManager.scanner
 
             eventRepository.addOrUpdateEvent(ScannerConnectionEvent(
-                    timeHelper.now(),
-                    ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo(
-                            scannerManager.currentScannerId ?: "",
-                            scannerManager.currentMacAddress ?: "",
-                            scannerGeneration(scanner),
-                            scanner.hardwareVersion(),
-                    )
+                timeHelper.now(),
+                ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo(
+                    scannerManager.currentScannerId ?: "",
+                    scannerManager.currentMacAddress ?: "",
+                    scannerGeneration(scanner),
+                    scanner.hardwareVersion(),
+                )
             ))
             if (scanner.versionInformation().generation == ScannerGeneration.VERO_2) {
                 eventRepository.addOrUpdateEvent(Vero2InfoSnapshotEvent(
-                        timeHelper.now(),
-                        scanner.versionInformation().let {
-                            Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
-                                    cypressApp = it.firmware.cypress,
-                                    stmApp = it.firmware.stm,
-                                    un20App = it.firmware.un20,
-                                    hardwareRevision = it.hardwareVersion
-                            )
-                        },
-                        scanner.batteryInformation().let {
-                            Vero2InfoSnapshotEvent.BatteryInfo(it.charge, it.voltage, it.current, it.temperature)
-                        }
+                    timeHelper.now(),
+                    scanner.versionInformation().let {
+                        Vero2InfoSnapshotEvent.Vero2Version.Vero2NewApiVersion(
+                            cypressApp = it.firmware.cypress,
+                            stmApp = it.firmware.stm,
+                            un20App = it.firmware.un20,
+                            hardwareRevision = it.hardwareVersion
+                        )
+                    },
+                    scanner.batteryInformation().let {
+                        Vero2InfoSnapshotEvent.BatteryInfo(it.charge, it.voltage, it.current, it.temperature)
+                    }
                 ))
             }
         }

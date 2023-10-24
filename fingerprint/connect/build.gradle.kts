@@ -9,7 +9,8 @@ android {
 
 dependencies {
 
-    implementation(project(":infra:config"))
+    implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
     implementation(project(":infra:events"))
     implementation(project(":infra:recent-user-activity"))
 
@@ -18,4 +19,5 @@ dependencies {
 
     implementation(project(":fingerprint:infra:scanner"))
 
+    testImplementation(project(":fingerprint:infra:scannermock"))
 }

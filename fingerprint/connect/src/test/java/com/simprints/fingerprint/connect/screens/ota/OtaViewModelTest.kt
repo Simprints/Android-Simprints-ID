@@ -1,12 +1,10 @@
-package com.simprints.fingerprint.activities.connect.issues.ota
+package com.simprints.fingerprint.connect.screens.ota
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
-import com.simprints.fingerprint.activities.connect.result.FetchOtaResult
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.eventData.model.ScannerFirmwareUpdateEvent
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.core.tools.time.TimeHelper
+import com.simprints.fingerprint.connect.usecase.ReportFirmwareUpdateEventUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.infra.scanner.domain.ota.CypressOtaStep
@@ -24,19 +22,20 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventReceived
 import com.simprints.testtools.common.livedata.assertEventReceivedWithContent
 import com.simprints.testtools.common.livedata.assertEventReceivedWithContentAssertions
-import com.simprints.testtools.common.livedata.assertEventWithContentNeverReceived
 import com.simprints.testtools.common.livedata.testObserver
-import com.simprints.testtools.common.mock.MockTimer
-import io.mockk.CapturingSlot
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.MockK
+import io.mockk.justRun
 import io.mockk.verify
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.time.Duration.Companion.seconds
 
 class OtaViewModelTest {
 
@@ -46,54 +45,47 @@ class OtaViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val sessionEventsManagerMock: FingerprintSessionEventsManager = mockk(relaxed = true)
-    private val mockTimer = MockTimer()
-    private val timeHelperMock: FingerprintTimeHelper = mockk(relaxed = true) {
-        every { newTimer() } returns mockTimer
-    }
-    private val scannerOtaWrapper: ScannerOtaOperationsWrapper = mockk()
-    private val scannerManager: ScannerManager = mockk {
-        every { otaOperationsWrapper } returns scannerOtaWrapper
-    }
 
-    private val recentUserActivityManager = mockk<RecentUserActivityManager> {
-        coEvery { getRecentUserActivity() } returns RecentUserActivity(
-            HARDWARE_VERSION,
-            "",
-            "".asTokenizableRaw(),
-            0,
-            0,
-            0,
-            0
-        )
-    }
-    private val configManager = mockk<ConfigManager> {
-        coEvery { getProjectConfiguration() } returns mockk {
-            every { fingerprint } returns mockk {
-                every { vero2 } returns mockk {
-                    every { firmwareVersions } returns mapOf(
-                        HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
-                            NEW_CYPRESS_VERSION,
-                            NEW_STM_VERSION,
-                            NEW_UN20_VERSION
-                        )
-                    )
-                }
-            }
-        }
-    }
+    @MockK
+    private lateinit var reportFirmwareUpdate: ReportFirmwareUpdateEventUseCase
+
+    @MockK
+    private lateinit var timeHelperMock: TimeHelper
+
+    @MockK
+    private lateinit var scannerOtaWrapper: ScannerOtaOperationsWrapper
+
+    @MockK
+    private lateinit var scannerManager: ScannerManager
+
+    @MockK
+    private lateinit var recentUserActivityManager: RecentUserActivityManager
+
+    @MockK
+    private lateinit var configManager: ConfigManager
 
     private lateinit var otaViewModel: OtaViewModel
 
     @Before
-    fun setup() {
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { timeHelperMock.now() } returns 1L
+        coEvery {
+            recentUserActivityManager.getRecentUserActivity()
+        } returns RecentUserActivity(HARDWARE_VERSION, "", "".asTokenizableRaw(), 0, 0, 0, 0)
+        coEvery { configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions } returns mapOf(
+            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(NEW_CYPRESS_VERSION, NEW_STM_VERSION, NEW_UN20_VERSION)
+        )
+
         every { scannerOtaWrapper.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()
         every { scannerOtaWrapper.performStmOta(any()) } returns STM_OTA_STEPS.asFlow()
         every { scannerOtaWrapper.performUn20Ota(any()) } returns UN20_OTA_STEPS.asFlow()
+        every { scannerManager.otaOperationsWrapper } returns scannerOtaWrapper
 
         otaViewModel = OtaViewModel(
             scannerManager,
-            sessionEventsManagerMock,
+            reportFirmwareUpdate,
             timeHelperMock,
             recentUserActivityManager,
             configManager
@@ -101,53 +93,47 @@ class OtaViewModelTest {
     }
 
     @Test
-    fun oneOta_updatesStateCorrectlyAndSavesEvent() {
+    fun oneOta_updatesStateCorrectlyAndSavesEvent() = runTest {
         val progressObserver = otaViewModel.progress.testObserver()
 
         otaViewModel.startOta(listOf(AvailableOta.CYPRESS), 0)
 
         progressObserver.observedValues.assertAlmostContainsExactlyElementsIn(
-            listOf(0f) + CYPRESS_OTA_STEPS.map { it.totalProgress } + listOf(1f))
+            listOf(0f) + CYPRESS_OTA_STEPS.map { it.totalProgress } + listOf(1f)
+        )
         otaViewModel.otaComplete.assertEventReceived()
 
-        val savedEvent = CapturingSlot<ScannerFirmwareUpdateEvent>()
-        verify { sessionEventsManagerMock.addEventInBackground(capture(savedEvent)) }
-        assertThat(savedEvent.captured.chip).isEqualTo("cypress")
-        assertThat(savedEvent.captured.targetAppVersion).isEqualTo(NEW_CYPRESS_STRING)
-        assertThat(savedEvent.captured.failureReason).isNull()
+        verify { reportFirmwareUpdate.invoke(any(), any(), any()) }
     }
 
     @Test
-    fun multipleOtas_updatesStateCorrectlyAndSavesEvents() {
-        val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
-        every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
+    fun multipleOtas_updatesStateCorrectlyAndSavesEvents() = runTest {
+        val capturedOtas = mutableListOf<AvailableOta>()
+        justRun { reportFirmwareUpdate.invoke(any(), capture(capturedOtas), any()) }
+
         val progressObserver = otaViewModel.progress.testObserver()
+        val completeObserver = otaViewModel.otaComplete.testObserver()
 
         otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
 
-        progressObserver.observedValues.assertAlmostContainsExactlyElementsIn(listOf(0f) +
-            CYPRESS_OTA_STEPS.map { it.totalProgress / 3f } +
-            STM_OTA_STEPS.map { (it.totalProgress + 1f) / 3f } +
-            UN20_OTA_STEPS.map { (it.totalProgress + 2f) / 3f } +
-            listOf(1f))
-        otaViewModel.otaComplete.assertEventReceived()
+        progressObserver.observedValues.assertAlmostContainsExactlyElementsIn(
+            listOf(0f) +
+                CYPRESS_OTA_STEPS.map { it.totalProgress / 3f } +
+                STM_OTA_STEPS.map { (it.totalProgress + 1f) / 3f } +
+                UN20_OTA_STEPS.map { (it.totalProgress + 2f) / 3f } +
+                listOf(1f)
+        )
+        completeObserver.assertEventReceived()
 
-        assertThat(capturedEvents.size).isEqualTo(3)
-        assertThat(capturedEvents[0].chip).isEqualTo("cypress")
-        assertThat(capturedEvents[0].targetAppVersion).isEqualTo(NEW_CYPRESS_STRING)
-        assertThat(capturedEvents[0].failureReason).isNull()
-        assertThat(capturedEvents[1].chip).isEqualTo("stm")
-        assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
-        assertThat(capturedEvents[1].failureReason).isNull()
-        assertThat(capturedEvents[2].chip).isEqualTo("un20")
-        assertThat(capturedEvents[2].targetAppVersion).isEqualTo(NEW_UN20_STRING)
-        assertThat(capturedEvents[2].failureReason).isNull()
+        assertThat(capturedOtas.size).isEqualTo(3)
+        assertThat(capturedOtas[0]).isEqualTo(AvailableOta.CYPRESS)
+        assertThat(capturedOtas[1]).isEqualTo(AvailableOta.STM)
+        assertThat(capturedOtas[2]).isEqualTo(AvailableOta.UN20)
     }
 
     @Test
-    fun otaFailsFirstAttempt_otaException_correctlyUpdatesStateAndSavesEvent() {
-        val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
-        every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
+    fun otaFailsFirstAttempt_otaException_correctlyUpdatesStateAndSavesEvent() = runTest {
+        justRun { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
         coEvery { scannerOtaWrapper.performStmOta(any()) } returns flow {
             emit(STM_OTA_STEPS[0])
             throw OtaFailedException("oops")
@@ -155,10 +141,8 @@ class OtaViewModelTest {
 
         otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
 
-        verify(exactly = 2) { sessionEventsManagerMock.addEventInBackground(any()) }
-        assertThat(capturedEvents[1].chip).isEqualTo("stm")
-        assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
-        assertThat(capturedEvents[1].failureReason).isNotEmpty()
+        verify { reportFirmwareUpdate.invoke(any(), any(), any(), null) }
+        verify { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
 
         otaViewModel.otaRecovery.assertEventReceivedWithContentAssertions {
             assertThat(it?.recoveryStrategy).isEqualTo(OtaRecoveryStrategy.HARD_RESET)
@@ -167,9 +151,8 @@ class OtaViewModelTest {
     }
 
     @Test
-    fun otaFailsLastAttempt_otaException_correctlyUpdatesStateAndSavesEvent() {
-        val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
-        every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
+    fun otaFailsLastAttempt_otaException_correctlyUpdatesStateAndSavesEvent() = runTest {
+        justRun { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
         coEvery { scannerOtaWrapper.performStmOta(any()) } returns flow {
             emit(STM_OTA_STEPS[0])
             throw OtaFailedException("oops")
@@ -180,18 +163,15 @@ class OtaViewModelTest {
             OtaViewModel.MAX_RETRY_ATTEMPTS
         )
 
-        verify(exactly = 2) { sessionEventsManagerMock.addEventInBackground(any()) }
-        assertThat(capturedEvents[1].chip).isEqualTo("stm")
-        assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
-        assertThat(capturedEvents[1].failureReason).isNotEmpty()
+        verify(exactly = 2) { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
 
         otaViewModel.otaFailed.assertEventReceivedWithContent(FetchOtaResult())
     }
 
     @Test
-    fun otaFailsLastAttempt_backendMaintenanceException_correctlyUpdatesStateAndSavesEvent() {
-        val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
-        every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
+    fun otaFailsLastAttempt_backendMaintenanceException_correctlyUpdatesStateAndSavesEvent() = runTest {
+        val capturedOtas = mutableListOf<AvailableOta>()
+        justRun { reportFirmwareUpdate.invoke(any(), capture(capturedOtas), any(), any()) }
         coEvery { scannerOtaWrapper.performStmOta(any()) } returns flow {
             emit(STM_OTA_STEPS[0])
             throw BackendMaintenanceException(estimatedOutage = null)
@@ -202,33 +182,28 @@ class OtaViewModelTest {
             OtaViewModel.MAX_RETRY_ATTEMPTS
         )
 
-        verify(exactly = 2) { sessionEventsManagerMock.addEventInBackground(any()) }
-        assertThat(capturedEvents[1].chip).isEqualTo("stm")
-        assertThat(capturedEvents[1].targetAppVersion).isEqualTo(NEW_STM_STRING)
-        assertThat(capturedEvents[1].failureReason).isNotEmpty()
+        verify { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
+        assertThat(capturedOtas[1]).isEqualTo(AvailableOta.STM)
 
         otaViewModel.otaFailed.assertEventReceivedWithContent(FetchOtaResult(isMaintenanceMode = true))
     }
 
     @Test
-    fun otaFailsFirstAttempt_otaExceptionRequiringDelay_correctlyDelaysThenUpdatesStateAndSavesEvent() {
-        val capturedEvents = mutableListOf<ScannerFirmwareUpdateEvent>()
-        every { sessionEventsManagerMock.addEventInBackground(capture(capturedEvents)) } returns Unit
+    fun otaFailsFirstAttempt_otaExceptionRequiringDelay_correctlyDelaysThenUpdatesStateAndSavesEvent() = runTest {
+        justRun { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
         coEvery { scannerOtaWrapper.performUn20Ota(any()) } returns flow {
             emit(Un20OtaStep.AwaitingCacheCommit)
             throw OtaFailedException("oops")
         }
 
-        otaViewModel.startOta(listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20), 0)
+        otaViewModel.startOta(
+            listOf(AvailableOta.CYPRESS, AvailableOta.STM, AvailableOta.UN20),
+            0
+        )
 
-        verify(exactly = 3) { sessionEventsManagerMock.addEventInBackground(any()) }
-        assertThat(capturedEvents[2].chip).isEqualTo("un20")
-        assertThat(capturedEvents[2].targetAppVersion).isEqualTo(NEW_UN20_STRING)
-        assertThat(capturedEvents[2].failureReason).isNotEmpty()
+        testCoroutineRule.testCoroutineDispatcher.scheduler.advanceTimeBy(11.seconds)
 
-        otaViewModel.otaRecovery.assertEventWithContentNeverReceived()
-
-        mockTimer.executeNextTask()
+        verify(exactly = 3) { reportFirmwareUpdate.invoke(any(), any(), any(), any()) }
 
         otaViewModel.otaRecovery.assertEventReceivedWithContentAssertions {
             assertThat(it?.recoveryStrategy).isEqualTo(OtaRecoveryStrategy.SOFT_RESET)
@@ -245,9 +220,6 @@ class OtaViewModelTest {
 
     companion object {
         private const val HARDWARE_VERSION = "E-1"
-        private const val NEW_CYPRESS_STRING = "5.E-1.1"
-        private const val NEW_STM_STRING = "4.E-1.7"
-        private const val NEW_UN20_STRING = "8.E-1.0"
 
         private const val NEW_CYPRESS_VERSION = "5.E-1.1"
         private const val NEW_STM_VERSION = "4.E-1.7"
@@ -294,3 +266,4 @@ class OtaViewModelTest {
                 )
     }
 }
+

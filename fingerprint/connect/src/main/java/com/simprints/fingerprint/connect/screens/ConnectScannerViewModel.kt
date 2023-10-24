@@ -21,8 +21,8 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnect
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerLowBatteryException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.LoggingConstants.AnalyticsUserProperties
 import com.simprints.infra.logging.Simber
@@ -129,6 +129,14 @@ internal class ConnectScannerViewModel @Inject constructor(
                 _showScannerIssueScreen.send(ConnectScannerIssueScreen.ExitForm)
             }
         }
+    }
+
+    fun disableBackButton() {
+        backButtonBehaviour.postValue(BackButtonBehaviour.DISABLED)
+    }
+
+    fun setBackButtonToExitWithError() {
+        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_WITH_ERROR)
     }
 
     private suspend fun disconnectVero() {
@@ -251,14 +259,6 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     fun handleIncorrectScanner() {
         _showScannerIssueScreen.send(determineAppropriateScannerIssueForPairing())
-    }
-
-    fun disableBackButton() {
-        backButtonBehaviour.postValue(BackButtonBehaviour.DISABLED)
-    }
-
-    fun setBackButtonToExitWithError() {
-        backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_WITH_ERROR)
     }
 
     private enum class BackButtonBehaviour {

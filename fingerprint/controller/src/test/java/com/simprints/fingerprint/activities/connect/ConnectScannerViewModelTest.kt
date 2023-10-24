@@ -29,13 +29,13 @@ import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerFactory
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice
-import com.simprints.fingerprint.testtools.assertEventReceived
-import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
-import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.FingerprintConfiguration.VeroGeneration.VERO_1
 import com.simprints.infra.config.store.models.FingerprintConfiguration.VeroGeneration.VERO_2
+import com.simprints.testtools.common.livedata.assertEventReceived
+import com.simprints.testtools.common.livedata.assertEventReceivedWithContent
+import com.simprints.testtools.common.livedata.assertEventReceivedWithContentAssertions
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
