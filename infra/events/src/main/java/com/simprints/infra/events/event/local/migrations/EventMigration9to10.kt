@@ -47,7 +47,7 @@ internal class EventMigration9to10 : Migration(9, 10) {
 
                 // Updating JSON attendantId/moduleId fields with new values that represent TokenizedString
                 val migratedJson =
-                    jsonData.migrateJsonStringToTokenizableString(ATTENDANT_ID, MODULE_ID)
+                    jsonData.migrateJsonStringToTokenizableString(USER_ID, ATTENDANT_ID, MODULE_ID)
                 database.execSQL(
                     "UPDATE $DB_EVENT_ENTITY SET $DB_EVENT_JSON_FIELD = ? WHERE id = ?",
                     arrayOf(migratedJson, id)
@@ -61,6 +61,7 @@ internal class EventMigration9to10 : Migration(9, 10) {
         private const val DB_EVENT_ENTITY = "DbEvent"
         private const val DB_EVENT_JSON_FIELD = "eventJson"
         private const val ATTENDANT_ID = "attendantId"
+        private const val USER_ID = "userId"
         private const val MODULE_ID = "moduleId"
     }
 }
