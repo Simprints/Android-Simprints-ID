@@ -19,20 +19,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.matching.MatchingActivity"
-            android:label="Matching"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activities.collect.CollectFingerprintsActivity"
             android:label="Collect Fingerprints"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.connect.ConnectScannerActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:theme="@style/Theme.Simprints.Transparent" />
         <activity
             android:name=".activities.collect.tryagainsplash.SplashScreenActivity"
             android:theme="@style/Theme.Simprints.Transparent" />

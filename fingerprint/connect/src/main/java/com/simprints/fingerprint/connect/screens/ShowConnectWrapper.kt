@@ -13,11 +13,11 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
 
 // TODO remove and use only as include into the capture flow
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-class ShowConnectWrapper : ActivityResultContract<Unit, Parcelable>() {
-    override fun createIntent(context: Context, input: Unit): Intent =
+class ShowConnectWrapper : ActivityResultContract<Boolean, Parcelable>() {
+    override fun createIntent(context: Context, input: Boolean): Intent =
         Intent(context, ConnectScannerWrapperActivity::class.java).putExtra(
             ConnectScannerWrapperActivity.SCANNER_CONNECT_ARGS_EXTRA,
-            ConnectScannerControllerFragmentArgs(FingerprintConnectParams(false)).toBundle()
+            ConnectScannerControllerFragmentArgs(FingerprintConnectParams(isReconnect = input)).toBundle()
         )
 
     override fun parseResult(resultCode: Int, intent: Intent?): Parcelable = intent

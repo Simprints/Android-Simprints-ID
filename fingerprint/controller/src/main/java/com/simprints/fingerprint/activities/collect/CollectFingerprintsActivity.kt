@@ -22,16 +22,14 @@ import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTa
 import com.simprints.fingerprint.activities.collect.state.CaptureState.Collected
 import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
 import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
-import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
-import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.refusal.RefusalAlertHelper
+import com.simprints.fingerprint.connect.screens.ShowConnectWrapper
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.databinding.ActivityCollectFingerprintsBinding
 import com.simprints.fingerprint.databinding.ContentMainBinding
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
-import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.infra.uibase.extensions.showToast
@@ -67,8 +65,11 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     private val showAlert = registerForActivityResult(ShowAlertWrapper()) { data ->
         alertHelper.handleAlertResult(this, data,
             showRefusal = { showRefusal.launch(RefusalAlertHelper.refusalArgs()) },
-            retry = {}
         )
+    }
+
+    private val showConnect = registerForActivityResult(ShowConnectWrapper()) {
+        // No-op
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -208,13 +209,7 @@ class CollectFingerprintsActivity : FingerprintActivity() {
     }
 
     private fun launchConnectScannerActivityForReconnect() {
-        val intent = Intent(this, ConnectScannerActivity::class.java).apply {
-            putExtra(
-                ConnectScannerTaskRequest.BUNDLE_KEY,
-                ConnectScannerTaskRequest(ConnectScannerTaskRequest.ConnectMode.RECONNECT)
-            )
-        }
-        startActivityForResult(intent, RequestCode.CONNECT.value)
+        showConnect.launch(true)
     }
 
     private fun setResultAndFinishSuccess(fingerprints: List<Fingerprint>) {
