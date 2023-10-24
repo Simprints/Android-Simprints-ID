@@ -32,10 +32,10 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedE
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
-import com.simprints.fingerprint.testtools.assertEventReceived
-import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
-import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
-import com.simprints.fingerprint.testtools.assertEventWithContentNeverReceived
+import com.simprints.testtools.common.livedata.assertEventReceived
+import com.simprints.testtools.common.livedata.assertEventReceivedWithContent
+import com.simprints.testtools.common.livedata.assertEventReceivedWithContentAssertions
+import com.simprints.testtools.common.livedata.assertEventWithContentNeverReceived
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration
@@ -434,10 +434,10 @@ class CollectFingerprintsViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints).hasSize(FOUR_FINGERS_IDS.size)
-            assertThat(actualFingerprints.map { it.fingerId }).containsExactlyElementsIn(
+            assertThat(actualFingerprints?.map { it.fingerId }).containsExactlyElementsIn(
                 FOUR_FINGERS_IDS
             )
-            actualFingerprints.forEach {
+            actualFingerprints?.forEach {
                 assertThat(it.templateBytes).isEqualTo(TEMPLATE)
                 assertThat(it.imageRef).isNotNull()
             }
@@ -484,10 +484,10 @@ class CollectFingerprintsViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints).hasSize(TWO_FINGERS_IDS.size)
-            assertThat(actualFingerprints.map { it.fingerId }).containsExactlyElementsIn(
+            assertThat(actualFingerprints?.map { it.fingerId }).containsExactlyElementsIn(
                 TWO_FINGERS_IDS
             )
-            actualFingerprints.forEach {
+            actualFingerprints?.forEach {
                 assertThat(it.templateBytes).isEqualTo(TEMPLATE)
                 assertThat(it.imageRef).isNotNull()
             }
@@ -533,10 +533,10 @@ class CollectFingerprintsViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints).hasSize(TWO_FINGERS_IDS.size)
-            assertThat(actualFingerprints.map { it.fingerId }).containsExactlyElementsIn(
+            assertThat(actualFingerprints?.map { it.fingerId }).containsExactlyElementsIn(
                 TWO_FINGERS_IDS
             )
-            actualFingerprints.forEach {
+            actualFingerprints?.forEach {
                 assertThat(it.templateBytes).isEqualTo(TEMPLATE)
                 assertThat(it.imageRef).isNull()
             }
@@ -722,12 +722,12 @@ class CollectFingerprintsViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints).hasSize(3)
-            assertThat(actualFingerprints.map { it.fingerId }).containsExactly(
+            assertThat(actualFingerprints?.map { it.fingerId }).containsExactly(
                 FingerIdentifier.LEFT_THUMB,
                 FingerIdentifier.RIGHT_THUMB,
                 FingerIdentifier.RIGHT_INDEX_FINGER
             )
-            actualFingerprints.forEach {
+            actualFingerprints?.forEach {
                 assertThat(it.templateBytes).isEqualTo(TEMPLATE)
                 assertThat(it.imageRef).isNotNull()
             }
@@ -824,12 +824,12 @@ class CollectFingerprintsViewModelTest {
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints).hasSize(3)
-            assertThat(actualFingerprints.map { it.fingerId }).containsExactly(
+            assertThat(actualFingerprints?.map { it.fingerId }).containsExactly(
                 FingerIdentifier.LEFT_THUMB,
                 FingerIdentifier.RIGHT_THUMB,
                 FingerIdentifier.RIGHT_INDEX_FINGER
             )
-            actualFingerprints.forEach {
+            actualFingerprints?.forEach {
                 assertThat(it.templateBytes).isEqualTo(TEMPLATE)
                 assertThat(it.imageRef).isNotNull()
             }

@@ -13,8 +13,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OtaRecoveryViewModel @Inject constructor(private val scannerManager: ScannerManager) :
-    ViewModel() {
+class OtaRecoveryViewModel @Inject constructor(
+    private val scannerManager: ScannerManager
+) : ViewModel() {
 
     val isConnectionSuccess: LiveData<LiveDataEventWithContent<Boolean>>
         get() = _isConnectionSuccess

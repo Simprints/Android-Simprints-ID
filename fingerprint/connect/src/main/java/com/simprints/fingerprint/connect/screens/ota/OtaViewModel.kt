@@ -16,7 +16,7 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy.*
 import com.simprints.fingerprint.infra.scanner.domain.ota.OtaStep
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
