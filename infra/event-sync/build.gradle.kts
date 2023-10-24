@@ -42,8 +42,6 @@ dependencies {
     implementation(project(":infra:recent-user-activity"))
 
     implementation(libs.workManager.work)
-    // For concurrent.ListenableFuture needed by workmanger Apis
-    implementation(libs.google.guava)
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
 }

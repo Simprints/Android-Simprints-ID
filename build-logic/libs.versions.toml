@@ -85,7 +85,6 @@ retry_version = "1.5.6"
 realm_version = "10.17.0"
 protobuf_plugin_version = "0.9.4"
 deps_graph_version = "0.8.0"
-guava_version = "31.0.2-android"
 
 [libraries]
 
@@ -149,7 +148,6 @@ firebase-storage = { module = "com.google.firebase:firebase-storage", version.re
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics", version.ref = "firebase_crashlytics_version" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebase_analytics_version" }
 firebase-perf = { module = "com.google.firebase:firebase-perf", version.ref = "firebase_perf_version" }
-google-guava = { module= "com.google.guava:guava", version.ref = "guava_version" }
 
 #SqlCipher
 sqlCipher-core = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sqlCipher_version" }
