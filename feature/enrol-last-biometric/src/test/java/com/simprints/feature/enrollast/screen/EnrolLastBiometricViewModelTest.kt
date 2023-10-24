@@ -88,9 +88,13 @@ class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `returns success when has previous enrolment`() = runTest {
-        viewModel.enrolBiometric(createParams(listOf(
-            EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
-        )))
+        viewModel.enrolBiometric(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
+                )
+            )
+        )
 
         val result = viewModel.finish.test().value().getContentIfNotHandled()
         assertThat(result).isEqualTo(EnrolLastState.Success("previousSubjectId"))
@@ -98,9 +102,13 @@ class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `does not log event when has previous enrolment`() = runTest {
-        viewModel.enrolBiometric(createParams(listOf(
-            EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
-        )))
+        viewModel.enrolBiometric(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
+                )
+            )
+        )
 
         coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
         coVerify(exactly = 0) { enrolmentRecordManager.performActions(any()) }
@@ -108,12 +116,17 @@ class EnrolLastBiometricViewModelTest {
 
     @Test
     fun `returns failure when has previous enrolment without subject`() = runTest {
-        viewModel.enrolBiometric(createParams(listOf(
-            EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null)
-        )))
+        viewModel.enrolBiometric(
+            createParams(
+                listOf(
+                    EnrolLastBiometricStepResult.EnrolLastBiometricsResult(null)
+                )
+            )
+        )
 
-        val result = viewModel.finish.test().value().getContentIfNotHandled()
-        assertThat(result).isInstanceOf(EnrolLastState.Failed::class.java)
+        val result =
+            viewModel.finish.test().value().getContentIfNotHandled() as EnrolLastState.Failed
+        assertThat(result.errorType).isEqualTo(EnrolLastState.ErrorType.GENERAL_ERROR)
     }
 
     @Test
@@ -122,8 +135,10 @@ class EnrolLastBiometricViewModelTest {
 
         viewModel.enrolBiometric(createParams(listOf()))
 
-        val result = viewModel.finish.test().value().getContentIfNotHandled()
-        assertThat(result).isInstanceOf(EnrolLastState.Failed::class.java)
+        val result =
+            viewModel.finish.test().value().getContentIfNotHandled() as EnrolLastState.Failed
+
+        assertThat(result.errorType).isEqualTo(EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS)
     }
 
     @Test
@@ -156,8 +171,9 @@ class EnrolLastBiometricViewModelTest {
 
         viewModel.enrolBiometric(createParams(listOf()))
 
-        val result = viewModel.finish.test().value().getContentIfNotHandled()
-        assertThat(result).isInstanceOf(EnrolLastState.Failed::class.java)
+        val result =
+            viewModel.finish.test().value().getContentIfNotHandled() as EnrolLastState.Failed
+        assertThat(result.errorType).isEqualTo(EnrolLastState.ErrorType.GENERAL_ERROR)
     }
 
     private fun createParams(steps: List<EnrolLastBiometricStepResult>) = EnrolLastBiometricParams(
