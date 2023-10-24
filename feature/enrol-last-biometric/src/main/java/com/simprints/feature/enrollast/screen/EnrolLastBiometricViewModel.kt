@@ -40,7 +40,17 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
         get() = _finish
     private var _finish = MutableLiveData<LiveDataEventWithContent<EnrolLastState>>()
 
+    private var enrolWasAttempted = false
+
+    fun onViewCreated(params: EnrolLastBiometricParams) {
+        if (!enrolWasAttempted) {
+            enrolBiometric(params)
+        }
+    }
+
     fun enrolBiometric(params: EnrolLastBiometricParams) = viewModelScope.launch {
+        enrolWasAttempted = true
+
         val projectConfig = configManager.getProjectConfiguration()
         val modalities = projectConfig.general.modalities
 
