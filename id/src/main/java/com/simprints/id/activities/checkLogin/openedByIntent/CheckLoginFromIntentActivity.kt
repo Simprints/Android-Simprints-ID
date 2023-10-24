@@ -114,7 +114,12 @@ open class CheckLoginFromIntentActivity : BaseActivity(), CheckLoginFromIntentCo
     }
 
     override fun openAlertActivityForError(alertType: AlertType) {
-        showAlert.launch(alertType.toAlertConfig().toArgs())
+        try {
+            showAlert.launch(alertType.toAlertConfig().toArgs())
+        } catch (_: Throwable) {
+            // If launching the alert fails, activity is most likely finished
+            // In such case just do nothing but also don't crash, please!
+        }
     }
 
     override fun openLoginActivity(appRequest: AppRequest) {
