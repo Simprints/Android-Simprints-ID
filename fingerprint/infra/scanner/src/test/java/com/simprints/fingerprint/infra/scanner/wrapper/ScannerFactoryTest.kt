@@ -6,7 +6,7 @@ import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBlue
 import com.simprints.fingerprint.infra.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
 import com.simprints.fingerprint.infra.scanner.v2.tools.ScannerUiHelper
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import io.mockk.MockKAnnotations
 import io.mockk.every

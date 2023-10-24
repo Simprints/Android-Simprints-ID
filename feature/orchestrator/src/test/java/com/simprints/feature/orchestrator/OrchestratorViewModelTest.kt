@@ -23,7 +23,7 @@ import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUs
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.testtools.common.coroutines.TestCoroutineRule

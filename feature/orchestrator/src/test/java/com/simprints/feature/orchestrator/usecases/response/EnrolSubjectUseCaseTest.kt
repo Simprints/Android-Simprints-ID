@@ -1,10 +1,11 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
@@ -53,7 +54,14 @@ class EnrolSubjectUseCaseTest {
             mockk<PersonCreationEvent> { every { id } returns "personCreationId" }
         )
 
-        useCase.invoke(Subject("subjectId", "projectId", "moduleId", "attendantId"))
+        useCase.invoke(
+            Subject(
+                subjectId = "subjectId",
+                projectId = "projectId",
+                attendantId = "moduleId".asTokenizableRaw(),
+                moduleId = "attendantId".asTokenizableRaw()
+            )
+        )
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg {
@@ -68,7 +76,14 @@ class EnrolSubjectUseCaseTest {
             mockk<PersonCreationEvent> { every { id } returns "personCreationId" }
         )
 
-        useCase.invoke(Subject("subjectId", "projectId", "moduleId", "attendantId"))
+        useCase.invoke(
+            Subject(
+                subjectId = "subjectId",
+                projectId = "projectId",
+                attendantId = "moduleId".asTokenizableRaw(),
+                moduleId = "attendantId".asTokenizableRaw()
+            )
+        )
 
         coVerify {
             enrolmentRecordManager.performActions(withArg {

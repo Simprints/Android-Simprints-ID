@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.data
 
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.fingerprint.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.infra.config.store.models.Vero2Configuration
 
 object FirmwareTestData {

@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
 import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
@@ -26,8 +27,8 @@ class CreateEnrolResponseUseCaseTest {
 
     private val action = mockk<ActionRequest.EnrolActionRequest> {
         every { projectId } returns "projectId"
-        every { userId } returns "userId"
-        every { moduleId } returns "moduleId"
+        every { userId } returns "userId".asTokenizableRaw()
+        every { moduleId } returns "moduleId".asTokenizableRaw()
     }
 
     private lateinit var useCase: CreateEnrolResponseUseCase

@@ -1,7 +1,7 @@
 package com.simprints.feature.logincheck.usecases
 
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.logging.Simber
 import io.mockk.MockKAnnotations

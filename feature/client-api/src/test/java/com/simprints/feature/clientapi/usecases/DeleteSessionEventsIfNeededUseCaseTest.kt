@@ -1,6 +1,6 @@
 package com.simprints.feature.clientapi.usecases
 
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
