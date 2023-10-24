@@ -45,7 +45,6 @@ dependencies {
     implementation(project(":infra:recent-user-activity"))
 
     implementation(libs.workManager.work)
-
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)
 }
