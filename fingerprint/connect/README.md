@@ -1,5 +1,7 @@
 # ConnectScannerActivity
 
+> This document is describing deprecated implementation. While it is still mostly correct, there are parts that need to be updated. 
+
 This is the activity that handles the setup with the scanner, and any associated issues that might occur.
 The desired side-effect of this activity is creating a connected instance of `Scanner` in the `ScannerManager` singleton, which can then be used by proceeding activities.
 

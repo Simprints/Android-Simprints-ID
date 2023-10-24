@@ -28,16 +28,7 @@ enum class FingerprintErrorReason {
     companion object {
         fun fromFingerprintAlertToErrorResponse(fingerprintAlert: AlertError): FingerprintErrorResponse =
             when (fingerprintAlert) {
-                AlertError.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                 AlertError.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                AlertError.BLUETOOTH_NO_PERMISSION -> BLUETOOTH_NO_PERMISSION
-
-                //User can not leave these alerts, so Fingerprint module should not produce any error response for them.
-                AlertError.BLUETOOTH_NOT_ENABLED,
-                AlertError.NOT_PAIRED,
-                AlertError.MULTIPLE_PAIRED_SCANNERS,
-                AlertError.DISCONNECTED,
-                AlertError.LOW_BATTERY -> UNEXPECTED_ERROR
             }.run {
                 FingerprintErrorResponse(this)
             }

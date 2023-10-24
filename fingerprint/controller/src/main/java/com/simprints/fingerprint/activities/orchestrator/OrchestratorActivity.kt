@@ -8,21 +8,17 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
-import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.activities.refusal.RefusalAlertHelper
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.fingerprint.connect.screens.ShowConnectWrapper
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
-import com.simprints.fingerprint.tools.extensions.setResultAndFinish
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -62,7 +58,7 @@ class OrchestratorActivity : FingerprintActivity() {
 
     private val nextActivityCallObserver = Observer<FingerprintTask> { task ->
         when (task) {
-            is FingerprintTask.ConnectScanner -> showConnect.launch(Unit)
+            is FingerprintTask.ConnectScanner -> showConnect.launch(false)
             is FingerprintTask.CollectFingerprints -> {
                 startActivityForResult(
                     Intent(this, task.targetActivity).putExtra(task.requestBundleKey, task.createTaskRequest()),
