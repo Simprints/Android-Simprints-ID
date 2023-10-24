@@ -3,6 +3,7 @@ package com.simprints.face.capture.screens
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.annotation.Keep
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.face.capture.R
@@ -12,6 +13,7 @@ import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.face.capture.FaceCaptureContract
 import dagger.hilt.android.AndroidEntryPoint
 
+@Keep
 @AndroidEntryPoint
 class FaceCaptureWrapperActivity : BaseActivity() {
 
