@@ -7,6 +7,7 @@ import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.*
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
+import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppResponseTier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -47,7 +48,8 @@ class OrchestratorEventsHelperImpl @Inject constructor(
                     CallbackComparisonScore(
                         it.guidFound,
                         it.confidence,
-                        IAppResponseTier.valueOf(it.tier.name)
+                        IAppResponseTier.valueOf(it.tier.name),
+                        IAppMatchConfidence.valueOf(it.matchConfidence.name),
                     )
                 })
         }
@@ -56,7 +58,12 @@ class OrchestratorEventsHelperImpl @Inject constructor(
         with(appVerifyResponse.matchingResult) {
             VerificationCallbackEvent(
                 timeHelper.now(),
-                CallbackComparisonScore(guidFound, confidence, IAppResponseTier.valueOf(tier.name))
+                CallbackComparisonScore(
+                    guidFound,
+                    confidence,
+                    IAppResponseTier.valueOf(tier.name),
+                    IAppMatchConfidence.valueOf(matchConfidence.name),
+                )
             )
         }
 

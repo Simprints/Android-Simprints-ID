@@ -9,7 +9,7 @@ class HexRecord(val string: String) {
     private var recordLength = 0
     private var hex = IntArray(21)
     private var hexLength = 0
-    private var crc : Byte = 0
+    private var crc: Byte = 0
 
     init {
         if (string.isNotBlank()) {

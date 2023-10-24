@@ -6,7 +6,7 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class FingerprintMatcherImplTest {
@@ -14,7 +14,7 @@ class FingerprintMatcherImplTest {
     private var simAfisMatcher: SimAfisMatcher = mockk()
 
     @Test
-    fun match() = runBlocking {
+    fun match() = runTest {
         // Given
         val matcher = FingerprintMatcherImpl(simAfisMatcher)
         val probe: FingerprintIdentity = mockk()

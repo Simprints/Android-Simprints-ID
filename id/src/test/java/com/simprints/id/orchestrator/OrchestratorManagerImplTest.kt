@@ -10,11 +10,13 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.face.capture.FaceCaptureContract
+import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.face.capture.screens.FaceCaptureWrapperActivity
 import com.simprints.feature.setup.LocationStore
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.cache.HotCache
@@ -22,13 +24,12 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.*
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import com.simprints.moduleapi.face.requests.IFaceRequest
-import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import io.mockk.*
@@ -40,6 +41,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult as DomainFaceCaptureResult
+
 
 @RunWith(AndroidJUnit4::class)
 class OrchestratorManagerImplTest {
@@ -95,7 +98,7 @@ class OrchestratorManagerImplTest {
         orchestrator = buildOrchestratorManager()
         prepareModalFlowForFaceEnrol()
 
-        intending(toPackage(FaceStepProcessorImpl.ACTIVITY_CLASS_NAME))
+        intending(toPackage(FaceStepProcessorImpl.CAPTURE_ACTIVITY_NAME))
             .respondWith(ActivityResult(Activity.RESULT_OK, null))
     }
 
@@ -331,15 +334,14 @@ class OrchestratorManagerImplTest {
             mockSteps.firstOrNull { it.getStatus() == NOT_STARTED }
         }
 
-        val nFaceSamplesToCapture = 3
-        val request = FaceCaptureRequest(nFaceSamplesToCapture = nFaceSamplesToCapture)
+        val request = FaceCaptureContract.getArgs(3)
 
         mockSteps.add(
             Step(
-                requestCode = CAPTURE.value,
-                activityName = FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
-                bundleKey = IFaceRequest.BUNDLE_KEY,
-                payloadType = Step.PayloadType.REQUEST,
+                requestCode = FaceRequestCode.CAPTURE.value,
+                activityName = FaceStepProcessorImpl.CAPTURE_ACTIVITY_NAME,
+                bundleKey = FaceCaptureWrapperActivity.FACE_CAPTURE_ARGS_EXTRA,
+                payloadType = Step.PayloadType.BUNDLE,
                 payload = request,
                 status = NOT_STARTED
             )
@@ -378,13 +380,17 @@ class OrchestratorManagerImplTest {
     }
 
     private suspend fun OrchestratorManager.progressWitFaceCapture(
-        requestCode: Int = CAPTURE.value,
-        response: IFaceCaptureResponse? = IFaceCaptureResponseImpl(emptyList())
+        requestCode: Int = FaceRequestCode.CAPTURE.value,
+        response: FaceCaptureResult? = FaceCaptureResult(emptyList())
     ) {
-        response?.let {
-            mockSteps.firstOrNull { step ->
-                step.getStatus() == ONGOING
-            }?.setResult(it.fromModuleApiToDomain())
+        response?.let { r ->
+            mockSteps.firstOrNull { step -> step.getStatus() == ONGOING }
+                ?.setResult(FaceCaptureResponse(r.results.map { capture ->
+                    DomainFaceCaptureResult(
+                        capture.index,
+                        capture.sample?.let { FaceCaptureSample(it.faceId, it.template, null, it.format) }
+                    )
+                }))
         }
 
         handleIntentResult(
@@ -398,8 +404,8 @@ class OrchestratorManagerImplTest {
     private fun MutableList<Step>.addFingerprintCaptureStep(result: Step.Result? = null) {
         add(
             Step(
-                requestCode = CAPTURE.value,
-                activityName = FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME,
+                requestCode = FingerprintRequestCode.CAPTURE.value,
+                activityName = FingerprintStepProcessorImpl.CAPTURE_ACTIVITY_NAME,
                 bundleKey = IFingerprintRequest.BUNDLE_KEY,
                 payloadType = Step.PayloadType.REQUEST,
                 payload = FingerprintCaptureRequest(fingerprintsToCapture = emptyList()),
@@ -412,11 +418,11 @@ class OrchestratorManagerImplTest {
     private fun MutableList<Step>.addFaceCaptureStep(result: Step.Result? = null) {
         add(
             Step(
-                requestCode = CAPTURE.value,
-                activityName = FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
-                bundleKey = IFaceRequest.BUNDLE_KEY,
-                payloadType = Step.PayloadType.REQUEST,
-                payload = FaceCaptureRequest(nFaceSamplesToCapture = 3),
+                requestCode = FaceRequestCode.CAPTURE.value,
+                activityName = FaceStepProcessorImpl.CAPTURE_ACTIVITY_NAME,
+                bundleKey = FaceCaptureWrapperActivity.FACE_CAPTURE_ARGS_EXTRA,
+                payloadType = Step.PayloadType.BUNDLE,
+                payload = FaceCaptureContract.getArgs(3),
                 status = COMPLETED,
                 result = result
             )

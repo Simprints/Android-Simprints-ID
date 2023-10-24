@@ -16,15 +16,13 @@ import com.simprints.fingerprint.infra.scanner.v2.incoming.main.MainMessageInput
 import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.fingerprint.infra.scanner.v2.tools.crc.Crc32Calculator
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.spy
-import com.simprints.testtools.common.syntax.verifyExactly
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenThis
 import com.simprints.testtools.unit.reactive.testSubscribe
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
@@ -40,7 +38,7 @@ class Un20OtaControllerTest {
 
     @Test
     fun program_correctlyEmitsProgressValuesAndCompletes() {
-        val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
+        val un20OtaController = Un20OtaController(configureCrcCalculatorMockk())
 
         val binFile = generateRandomBinFile()
         val testObserver = un20OtaController.program(configureMessageStreamMock(), responseErrorHandler, binFile).testSubscribe()
@@ -56,7 +54,7 @@ class Un20OtaControllerTest {
         val binFile = generateRandomBinFile()
         val expectedNumberOfCalls = expectedNumberOfChunks(binFile) + 2
 
-        val crc32Calculator = configureCrcCalculatorMock()
+        val crc32Calculator = configureCrcCalculatorMockk()
         val messageStreamMock = configureMessageStreamMock()
         val un20OtaController = Un20OtaController(crc32Calculator)
 
@@ -64,13 +62,13 @@ class Un20OtaControllerTest {
 
         testObserver.awaitAndAssertSuccess()
 
-        verifyOnce(crc32Calculator) { calculateCrc32(anyNotNull()) }
-        verifyExactly(expectedNumberOfCalls, messageStreamMock.outgoing) { sendMessage(anyNotNull()) }
+        verify { crc32Calculator.calculateCrc32(any()) }
+        verify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
     @Test
     fun program_receivesErrorAtPrepareDownload_throwsException() {
-        val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
+        val un20OtaController = Un20OtaController(configureCrcCalculatorMockk())
 
         val testObserver = un20OtaController.program(
             configureMessageStreamMock(errorPositions = listOf(0)), responseErrorHandler, generateRandomBinFile()).testSubscribe()
@@ -81,7 +79,7 @@ class Un20OtaControllerTest {
 
     @Test
     fun program_receivesErrorAtDownload_throwsException() {
-        val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
+        val un20OtaController = Un20OtaController(configureCrcCalculatorMockk())
 
         val testObserver = un20OtaController.program(
             configureMessageStreamMock(errorPositions = listOf(1)), responseErrorHandler, generateRandomBinFile()).testSubscribe()
@@ -92,7 +90,7 @@ class Un20OtaControllerTest {
 
     @Test
     fun program_receivesErrorDuringSendImageProcess_emitsValueUntilErrorThenThrowsException() {
-        val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
+        val un20OtaController = Un20OtaController(configureCrcCalculatorMockk())
 
         val binFile = generateRandomBinFile()
         val progressValues = generateExpectedProgressValues(binFile)
@@ -106,7 +104,7 @@ class Un20OtaControllerTest {
 
     @Test
     fun program_receivesErrorAtVerify_throwsException() {
-        val un20OtaController = Un20OtaController(configureCrcCalculatorMock())
+        val un20OtaController = Un20OtaController(configureCrcCalculatorMockk())
 
         val binFile = generateRandomBinFile()
         val indexOfVerifyResponse = expectedNumberOfChunks(binFile) + 1
@@ -117,8 +115,8 @@ class Un20OtaControllerTest {
         testObserver.assertError(OtaFailedException::class.java)
     }
 
-    private fun configureCrcCalculatorMock() = setupMock<Crc32Calculator> {
-        whenThis { calculateCrc32(anyNotNull()) } thenReturn 42
+    private fun configureCrcCalculatorMockk() = mockk<Crc32Calculator> {
+        every { calculateCrc32(any()) } returns 42
     }
 
     private fun configureMessageStreamMock(errorPositions: List<Int> = listOf()): MainMessageChannel {
@@ -126,19 +124,19 @@ class Un20OtaControllerTest {
         val messageIndex = AtomicInteger(0)
 
         return MainMessageChannel(
-            spy(MainMessageInputStream(mock(), mock(), mock(), mock())).apply {
-                whenThis { connect(anyNotNull()) } thenDoNothing {}
-                un20Responses = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+            spyk(MainMessageInputStream(mockk(), mockk(), mockk(), mockk())).apply {
+                justRun { connect(any()) }
+                every { un20Responses } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },
-            setupMock {
-                whenThis { sendMessage(anyNotNull()) } then {
+            mockk {
+                every { sendMessage(any()) } answers {
                     val resultCode =
                         if (errorPositions.contains(messageIndex.getAndIncrement())) {
                             OperationResultCode.UNKNOWN_ERROR
                         } else {
                             OperationResultCode.OK
                         }
-                    val response = when (it.arguments[0] as Un20Command) {
+                    val response = when (args[0] as Un20Command) {
                         is StartOtaCommand -> StartOtaResponse(resultCode)
                         is WriteOtaChunkCommand -> WriteOtaChunkResponse(resultCode)
                         is VerifyOtaCommand -> VerifyOtaResponse(resultCode)

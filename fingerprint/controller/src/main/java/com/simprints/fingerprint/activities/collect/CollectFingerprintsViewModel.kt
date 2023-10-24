@@ -9,7 +9,6 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
@@ -27,22 +26,22 @@ import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.fingerprint.toDomain
+import com.simprints.fingerprint.data.domain.fingerprint.toInt
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
 import com.simprints.fingerprint.data.domain.images.deduceFileExtension
 import com.simprints.fingerprint.data.domain.images.isEager
 import com.simprints.fingerprint.data.domain.images.isImageTransferRequired
-import com.simprints.fingerprint.data.domain.images.toDomain
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.exceptions.safe.NoFingerDetectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerOperationInterruptedException
-import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.infra.scanner.domain.ScannerTriggerListener
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.FingerprintConfiguration
@@ -59,7 +58,7 @@ import kotlin.concurrent.schedule
 import kotlin.math.min
 
 @HiltViewModel
-class CollectFingerprintsViewModel(
+class CollectFingerprintsViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
     private val configManager: ConfigManager,
     private val imageManager: FingerprintImageManager,
@@ -68,31 +67,9 @@ class CollectFingerprintsViewModel(
     private val fingerPriorityDeterminer: FingerPriorityDeterminer,
     private val startingStateDeterminer: StartingStateDeterminer,
     private val encoder: EncodingUtils,
+    private val bioSdk: BioSdkWrapper,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
-
-    @Inject
-    constructor(
-        scannerManager: ScannerManager,
-        configManager: ConfigManager,
-        imageManager: FingerprintImageManager,
-        timeHelper: FingerprintTimeHelper,
-        sessionEventsManager: FingerprintSessionEventsManager,
-        fingerPriorityDeterminer: FingerPriorityDeterminer,
-        startingStateDeterminer: StartingStateDeterminer,
-        @ExternalScope externalScope: CoroutineScope,
-    ) : this(
-        scannerManager,
-        configManager,
-        imageManager,
-        timeHelper,
-        sessionEventsManager,
-        fingerPriorityDeterminer,
-        startingStateDeterminer,
-        EncodingUtilsImpl,
-        externalScope,
-    )
-
     lateinit var configuration: FingerprintConfiguration
     var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
         private set(value) {
@@ -156,6 +133,7 @@ class CollectFingerprintsViewModel(
 
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         runBlocking {
+            bioSdk.initialize()
             // Configuration must be initialised when start returns for UI to be initialised correctly,
             // and since fetching happens on IO thread execution must be suspended until it is available
             configuration = configManager.getProjectConfiguration().fingerprint!!
@@ -229,7 +207,7 @@ class CollectFingerprintsViewModel(
     }
 
     fun isImageTransferRequired(): Boolean =
-        configuration.vero2?.imageSavingStrategy?.toDomain()?.isImageTransferRequired() ?: false &&
+        configuration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
             scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
@@ -300,8 +278,8 @@ class CollectFingerprintsViewModel(
         scanningTask = viewModelScope.launch {
             try {
                 scannerManager.scanner.setUiIdle()
-                val capturedFingerprint = scannerManager.scanner.captureFingerprint(
-                    configuration.vero2?.captureStrategy?.toDomain(),
+                val capturedFingerprint = bioSdk.acquireFingerprintTemplate(
+                    configuration.vero2?.captureStrategy?.toInt(),
                     scanningTimeoutMs.toInt(),
                     qualityThreshold()
                 )
@@ -316,11 +294,11 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    private fun handleCaptureSuccess(captureFingerprintResponse: CaptureFingerprintResponse) {
+    private fun handleCaptureSuccess(acquireFingerprintTemplateResponse: AcquireFingerprintTemplateResponse) {
         val scanResult = ScanResult(
-            captureFingerprintResponse.imageQualityScore,
-            captureFingerprintResponse.template,
-            captureFingerprintResponse.templateFormat,
+            acquireFingerprintTemplateResponse.imageQualityScore,
+            acquireFingerprintTemplateResponse.template,
+            acquireFingerprintTemplateResponse.templateFormat,
             null,
             qualityThreshold()
         )
@@ -338,17 +316,14 @@ class CollectFingerprintsViewModel(
         isImageTransferRequired() && (quality >= qualityThreshold() || tooManyBadScans(
             state.currentCaptureState(),
             plusBadScan = true
-        ) || configuration.vero2?.imageSavingStrategy?.toDomain()?.isEager() ?: false)
+        ) || configuration.vero2?.imageSavingStrategy?.isEager() ?: false)
 
     private fun proceedToImageTransfer() {
         imageTransferTask?.cancel()
 
         imageTransferTask = viewModelScope.launch {
             try {
-                val acquiredImage = scannerManager.scanner.acquireImage(
-                    configuration.vero2?.imageSavingStrategy?.toDomain()
-
-                )
+                val acquiredImage = bioSdk.acquireFingerprintImage()
                 handleImageTransferSuccess(acquiredImage)
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
@@ -356,9 +331,9 @@ class CollectFingerprintsViewModel(
         }
     }
 
-    private fun handleImageTransferSuccess(acquireImageResponse: AcquireImageResponse) {
+    private fun handleImageTransferSuccess(acquireFingerprintImageResponse: AcquireFingerprintImageResponse) {
         vibrate.postEvent()
-        updateCaptureState { it.toCollected(acquireImageResponse.imageBytes) }
+        updateCaptureState { it.toCollected(acquireFingerprintImageResponse.imageBytes) }
         handleCaptureFinished()
     }
 
@@ -412,7 +387,7 @@ class CollectFingerprintsViewModel(
                     )
                 else null
 
-            captureEventIds[CaptureId(id, currentCaptureIndex)] = captureEvent.id
+            captureEventIds[CaptureId(id, currentCaptureIndex)] = payloadId
 
             //It can not be done in background because then SID won't find the last capture event id
             runBlocking {
@@ -424,9 +399,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun saveCurrentImageIfEager() {
-        if (configuration.vero2?.imageSavingStrategy?.toDomain()
-                ?.isEager() == true
-        ) {
+        if (configuration.vero2?.imageSavingStrategy?.isEager() == true) {
             with(state.currentFingerState()) {
                 (currentCapture() as? CaptureState.Collected)?.let { capture ->
                     runBlocking {
@@ -536,12 +509,7 @@ class CollectFingerprintsViewModel(
     }
 
     private fun isScanningEndStateAchieved(): Boolean = with(state) {
-        if (everyActiveFingerHasSatisfiedTerminalCondition()) {
-            if (weHaveTheMinimumNumberOfAnyQualityScans() || weHaveTheMinimumNumberOfGoodScans()) {
-                return true
-            }
-        }
-        return false
+        return everyActiveFingerHasSatisfiedTerminalCondition() && (weHaveTheMinimumNumberOfAnyQualityScans() || weHaveTheMinimumNumberOfGoodScans())
     }
 
     private fun CollectFingerprintsState.everyActiveFingerHasSatisfiedTerminalCondition(): Boolean =
@@ -593,9 +561,7 @@ class CollectFingerprintsViewModel(
             noFingersScannedToast.postEvent()
             handleRestart()
         } else {
-            if (configuration.vero2?.imageSavingStrategy?.toDomain()
-                    ?.isEager() != true
-            ) {
+            if (configuration.vero2?.imageSavingStrategy?.isEager() != true) {
                 saveImages(collectedFingers)
             }
             proceedToFinish(collectedFingers)
@@ -630,8 +596,7 @@ class CollectFingerprintsViewModel(
             imageManager.save(
                 collectedFinger.scanResult.image,
                 captureEventId,
-                configuration.vero2!!.imageSavingStrategy.toDomain()
-                    .deduceFileExtension()
+                configuration.vero2!!.imageSavingStrategy.deduceFileExtension()
             )
         } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
             Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))

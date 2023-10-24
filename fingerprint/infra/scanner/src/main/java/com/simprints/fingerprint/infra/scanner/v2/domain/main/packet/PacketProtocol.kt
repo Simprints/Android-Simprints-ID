@@ -4,7 +4,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.Protocol
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.unsignedToInt
 import java.nio.ByteOrder
 
-object PacketProtocol: Protocol {
+object PacketProtocol : Protocol {
 
     override val byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN
 

@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
 import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent as ScannerFirmwareUpdateEventCore
 
 /**

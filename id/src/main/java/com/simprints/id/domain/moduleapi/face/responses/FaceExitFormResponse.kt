@@ -1,5 +1,6 @@
 package com.simprints.id.domain.moduleapi.face.responses
 
+import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormReason
 import com.simprints.moduleapi.face.responses.IFaceExitFormResponse
 import com.simprints.moduleapi.face.responses.IFaceExitReason
@@ -34,6 +35,18 @@ enum class FaceExitReason {
             OTHER -> RefusalFormReason.OTHER
         }
 
+    companion object {
+        fun fromExitFormOption(option: ExitFormOption) = when (option) {
+            ExitFormOption.ReligiousConcerns -> REFUSED_RELIGION
+            ExitFormOption.DataConcerns -> REFUSED_DATA_CONCERNS
+            ExitFormOption.NoPermission -> REFUSED_PERMISSION
+            ExitFormOption.ScannerNotWorking -> SCANNER_NOT_WORKING
+            ExitFormOption.AppNotWorking -> APP_NOT_WORKING
+            ExitFormOption.PersonNotPresent -> REFUSED_NOT_PRESENT
+            ExitFormOption.TooYoung -> REFUSED_YOUNG
+            ExitFormOption.Other -> OTHER
+        }
+    }
 }
 
 fun IFaceExitFormResponse.fromModuleApiToDomain(): FaceExitFormResponse {

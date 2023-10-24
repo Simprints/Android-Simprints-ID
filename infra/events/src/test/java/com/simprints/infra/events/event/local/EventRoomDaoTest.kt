@@ -55,24 +55,30 @@ internal class EventRoomDaoTest {
     }
 
     @Test
-    fun loadByProjectId() = runTest {
-        val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(projectId = GUID1))
-        addIntoDb(event, wrongEvent)
-        verifyEvents(listOf(event), eventDao.loadFromProject(projectId = DEFAULT_PROJECT_ID))
+    fun loadByProjectId() {
+        runTest {
+            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(projectId = GUID1))
+            addIntoDb(event, wrongEvent)
+            verifyEvents(listOf(event), eventDao.loadFromProject(projectId = DEFAULT_PROJECT_ID))
+        }
     }
 
     @Test
-    fun loadBySessionId() = runTest {
-        val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
-        addIntoDb(event, wrongEvent)
-        verifyEvents(listOf(event), eventDao.loadFromSession(sessionId = GUID1))
+    fun loadBySessionId() {
+        runTest {
+            val wrongEvent = event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
+            addIntoDb(event, wrongEvent)
+            verifyEvents(listOf(event), eventDao.loadFromSession(sessionId = GUID1))
+        }
     }
 
     @Test
-    fun loadEventJsonFormSession() = runTest {
-        addIntoDb(event)
-        val results = eventDao.loadEventJsonFromSession(GUID1)
-        assertThat(results).containsExactlyElementsIn(listOf(eventJson))
+    fun loadEventJsonFormSession() {
+        runTest {
+            addIntoDb(event)
+            val results = eventDao.loadEventJsonFromSession(GUID1)
+            assertThat(results).containsExactlyElementsIn(listOf(eventJson))
+        }
     }
 
     @Test
@@ -92,53 +98,61 @@ internal class EventRoomDaoTest {
 
 
     @Test
-    fun loadAllClosedSessionIds() = runTest {
-        val otherId = randomUUID()
-        val closedEvent = event.copy(
-            id = otherId,
-            sessionIsClosed = true,
-            labels = event.labels.copy(sessionId = otherId)
-        )
-
-        addIntoDb(event, closedEvent)
-        assertThat(listOf(closedEvent.id)).isEqualTo(
-            eventDao.loadAllClosedSessionIds(
-                DEFAULT_PROJECT_ID
+    fun loadAllClosedSessionIds() {
+        runTest {
+            val otherId = randomUUID()
+            val closedEvent = event.copy(
+                id = otherId,
+                sessionIsClosed = true,
+                labels = event.labels.copy(sessionId = otherId)
             )
-        )
 
+            addIntoDb(event, closedEvent)
+            assertThat(listOf(closedEvent.id)).isEqualTo(
+                eventDao.loadAllClosedSessionIds(
+                    DEFAULT_PROJECT_ID
+                )
+            )
+        }
     }
 
     @Test
-    fun loadAll() = runTest {
-        val secondEvent = event.copy(id = randomUUID(), labels = EventLabels(deviceId = GUID2))
-        addIntoDb(event, secondEvent)
-        verifyEvents(listOf(event, secondEvent), eventDao.loadAll())
+    fun loadAll() {
+        runTest {
+            val secondEvent = event.copy(id = randomUUID(), labels = EventLabels(deviceId = GUID2))
+            addIntoDb(event, secondEvent)
+            verifyEvents(listOf(event, secondEvent), eventDao.loadAll())
+        }
     }
 
     @Test
-    fun count() = runTest {
-        addIntoDb(event, event.copy(id = randomUUID()), event.copy(id = randomUUID()))
-        assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(3)
+    fun count() {
+        runTest {
+            addIntoDb(event, event.copy(id = randomUUID()), event.copy(id = randomUUID()))
+            assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(3)
+        }
     }
 
     @Test
-    fun deletion() = runTest {
-        addIntoDb(event)
-        db.eventDao.delete(listOf(event.id))
-        assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(0)
+    fun deletion() {
+        runTest {
+            addIntoDb(event)
+            db.eventDao.delete(listOf(event.id))
+            assertThat(eventDao.countFromType(SESSION_CAPTURE)).isEqualTo(0)
+        }
     }
 
     @Test
-    fun deletionBySessionId() = runTest {
-        val eventSameSession =
-            event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID1))
-        val eventDifferentSession =
-            event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
-        addIntoDb(event, eventSameSession, eventDifferentSession)
-        db.eventDao.deleteAllFromSession(sessionId = GUID1)
-        verifyEvents(listOf(eventDifferentSession), eventDao.loadAll())
-
+    fun deletionBySessionId() {
+        runTest {
+            val eventSameSession =
+                event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID1))
+            val eventDifferentSession =
+                event.copy(id = randomUUID(), labels = EventLabels(sessionId = GUID2))
+            addIntoDb(event, eventSameSession, eventDifferentSession)
+            db.eventDao.deleteAllFromSession(sessionId = GUID1)
+            verifyEvents(listOf(eventDifferentSession), eventDao.loadAll())
+        }
     }
 
     private suspend fun addIntoDb(vararg events: DbEvent) {

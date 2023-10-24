@@ -20,6 +20,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         LOGIN_NOT_COMPLETE,
         BLUETOOTH_NOT_SUPPORTED,
         GUID_NOT_FOUND_ONLINE,
+        GUID_NOT_FOUND_OFFLINE,
         ENROLMENT_LAST_BIOMETRICS_FAILED,
         FACE_LICENSE_MISSING,
         FACE_LICENSE_INVALID,

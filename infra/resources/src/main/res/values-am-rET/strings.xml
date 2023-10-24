@@ -151,7 +151,6 @@
     <string name="fetch_guid_checking_person_in_database">ተገልጋዩ ዳታቤዝ ውስጥ መኖሩን ማረጋገጥ</string>
     <string name="progress_sync_overlay">መረጃ በመላላክ ላይ...</string>
     <string name="enrol_last_biometrics_alert_message">1. %1$s ሪኮርድን ማስቀመጥ አልተሳካም \n 2. ዝጋን መታ ያድርጉ</string>
-    <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
     <string name="enrol_last_biometrics_alert_message_all_param">ፊት /የጣት አሻራ</string>
     <string name="enrol_last_biometrics_success">የተሳካ ምዝገባ</string>
@@ -341,4 +340,87 @@
         <item quantity="one">%d እጩ ተጭኗል።</item>
         <item quantity="other">የተጫኑ %d እጩዎች</item>
     </plurals>
+
+    <string name="invalid_projectId_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_selectedId_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_sessionId_message">የተሳሳተ የቆይታ መለያ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_intentAction_message">በሲስተሙ ያልተፈቀደ ፍላጎት ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_metadata_message">ልተፈቀደ ሜታዳታ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_userId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ስላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_moduleId_message">የተሳሳተ የምዕራፍ መለያ ቁጥር ስላላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_verifyId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ማጣሪያ ስላደረጉ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="rooted_device_title">ዋናው መሳሪያ ተገኝቷል</string>
+    <string name="rooted_device_message">1. ተቆጣጣሪዎን ያግኙ-ዋናው መሳሪያ ተገኝቷል\n2. መዝጊያውን ይጫኑ</string>
+    <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
+    <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
+
+    <string name="capture_title_howto">እንዴት ፊትን ማንሳት ይቻላል</string>
+    <string name="capture_title_previewing">ለማንሳት እየተዘጋጀ</string>
+    <string name="capture_title_looks_good">ለማንሳት ዝግጁ ነዉ!</string>
+    <string name="capture_error_no_face">ፊቱ ክቡን መሙላቱን ያረጋግጡ</string>
+    <string name="capture_error_face_too_far">ቀረብ አድርግ(ፊት ርቋል)</string>
+    <string name="capture_error_face_too_close">ወደኋላ ተመለስ</string>
+    <string name="capture_error_look_straight">ሰዉየዉ ቀጥታ ካሜራዉን  እንዲያይ አድርግ</string>
+    <string name="capture_ready">ለማንሳት ዝግጁ</string>
+    <string name="capture_prep_begin_btn">ለማንሳት ተጫን</string>
+    <string name="capture_prep_begin_btn_capturing">በማንሳት ላይ....</string>
+    <string name="capture_title_scan_progress">ማንሳት በሂደት ላይ</string>
+    <string name="capture_hold">ባለበት ፖዚሽኑ ላይ አቆይ....</string>
+    <string name="captured_successfully">የፊት ምስል በስኬት ተመዝግቧል</string>
+    <string name="title_confirmation">ማረጋገጥ</string>
+    <string name="title_capturing">አሁን ላይ(ላይቭ) ማንሳት</string>
+    <string name="title_preparation">ለማንሳት በዝግጅት ላይ</string>
+    <string name="btn_recapture">እንደገና ማንሳት</string>
+    <string name="btn_finish">ለመቀጠል ተጫን</string>
+    <string name="btn_capture_again">እንደገና ማንሳት</string>
+    <string name="captured_unsuccessful">የፊቱን ምስል ማንሳት አልቻኩም፣በቴክኒክ ምክንያት</string>
+    <string name="retry_tips">ይሄን ቸግር ማስተካከል የምትችሉት እንዲህ ነው። 1/ በቂ ብርህን ያለው ቦታ ምረጡ 2/ሰዉየው ወደ ካሜራው አተኩሮ ይመልከት 3/ካሜራዉን እንደያዝክክ ሳታንቀሳቅሰ ማቆየት</string>
+    <string name="onboarding_light">በቂ ብርሀን ያለበት ቦታ መምረጥ</string>
+    <string name="onboarding_fill">በካሜራው ክብ ዉስጥ ፊቱ እንዲገባ ማድረግ</string>
+    <string name="onboarding_straight">ሰዉየው ወደ ስልኩ ቀጥ ብሎ ይመልከት</string>
+    <string name="onboarding_continue">ለመቀጠል ስልኩ ሰሌዳ(የትኛውም ቦታ)  ተጫን</string>
+    <string name="capture_title_look_straight">ቀጥ ብሎ እየተመለከተ አይደለም</string>
+    <string name="capture_title_no_face">ምንም ፊት ማግኘት አልቻለም</string>
+    <string name="capture_title_too_close">ፊቱ በጣም ቀርቧል</string>
+    <string name="capture_title_face_too_far">ፊቱ በጣም ርቋል</string>
+    <string name="matching_x_records">ካሉት %s ማህደር ዉስጥ እየለየ</string>
+    <string name="face_match_please_wait">የመለየት ሰራውን እስኪጠናቀቅ እባክዎት ትንሽ ይጠብቁ</string>
+    <string name="face_match_loading_candidates">ዕጩዎችን በመጫን ላይ ነው</string>
+    <string name="face_match_matching_candidates">ካሉት %s ማህደር ዉስጥ እየለየ</string>
+    <string name="error_licence_invalid_title">ፍቃድ አይሰራም/ትክክል አይደለም</string>
+    <string name="error_licence_invalid_message">የፊት ላይሰንሱ/ ፍቃድ የማይሰራ ነው፤እባክዎ የሲስተም አስተዳዳሪውን ያሳውቁ</string>
+    <string name="error_close_button">ይዝጉ</string>
+    <string name="error_licence_missing_title">ላይሰንሱ/ ፍቃድ ጠፍቷል</string>
+    <string name="error_licence_missing_message">የፊት ላይሰንሱ/ ፍቃድ ጠፍቷል፤እባክዎ የሲስተም አስተዳዳሪውን ያሳውቁ</string>
+    <string name="face_configuration_started">የፊት ሞዳሊቲ አልተገኘም</string>
+    <string name="face_configuration_downloading">አስፈላጊ ፋይሎችን በማውረድ ላይ</string>
+    <string name="error_configuration_error_title">የማዋቀር ስህተት</string>
+    <string name="error_configuration_error_message">የፊት ሁነታን በማዋቀር ላይ ስህተት ነበር፣እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">ፊት</string>
+    <string name="error_unexpected_error_title">ስህተት አጋጥሟል</string>
+    <string name="error_unexpected_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">እያወዳደረ %d ተመራጭ</item>
+        <item quantity="other">እያወዳደረ %d ተመራጮችን</item>
+    </plurals>
+    <plurals name="face_match_returned_results">
+        <item quantity="one">%d ዉጤቶችን ይዟል</item>
+        <item quantity="other">%d ዉጤቶችን ይዟል</item>
+    </plurals>
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">በጣም ጥሩ ግጥሚያዎች የሉም</item>
+        <item quantity="one">%d በጣም ጥሩ ተመራጭ</item>
+        <item quantity="other">%d በጣም ጥሩ ተመራጮች</item>
+    </plurals>
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">ጥሩ ተመራጮች የሉም</item>
+        <item quantity="one">%d ጥሩ ተመራጭ</item>
+        <item quantity="other">%d ጥሩ ተመራጮች</item>
+    </plurals>
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">ተመራጮች የሉም</item>
+        <item quantity="one">%d  ተመራጭ</item>
+        <item quantity="other">%d  ተመራጮች</item>
+    </plurals>
+    <string name="returning_results">ውጤቱን መመለስ</string>
 </resources>

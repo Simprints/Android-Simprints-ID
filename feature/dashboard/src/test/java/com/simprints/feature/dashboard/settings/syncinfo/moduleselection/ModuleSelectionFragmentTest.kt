@@ -15,9 +15,10 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.tools.clickCloseChipIcon
-import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.feature.dashboard.tools.typeSearchViewText
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.testtools.hilt.launchFragmentInHiltContainer
+import com.simprints.testtools.hilt.resetThemeResources
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -28,6 +29,7 @@ import io.mockk.verify
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.IsNot.not
 import org.junit.Ignore
+import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -291,5 +293,9 @@ class ModuleSelectionFragmentTest {
         launchFragmentInHiltContainer<ModuleSelectionFragment>()
 
         onView(withId(R.id.modulesLockOverlayClickableArea)).perform(click())
+    }
+    @After
+    fun tearDown() {
+        resetThemeResources()
     }
 }

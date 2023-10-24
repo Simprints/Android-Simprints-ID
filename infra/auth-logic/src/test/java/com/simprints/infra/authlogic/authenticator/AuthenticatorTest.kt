@@ -17,7 +17,7 @@ import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import java.io.IOException
@@ -52,21 +52,21 @@ internal class AuthenticatorTest {
     }
 
     @Test
-    fun shouldSetBackendErrorIfBackendMaintenanceExceptionWithoutTime() = runBlocking {
+    fun shouldSetBackendErrorIfBackendMaintenanceExceptionWithoutTime() = runTest {
         val result = mockException(BackendMaintenanceException(estimatedOutage = null))
 
         assertThat(result).isInstanceOf(AuthenticateDataResult.BackendMaintenanceError::class.java)
     }
 
     @Test
-    fun shouldSetOfflineIfIOException() = runBlocking {
+    fun shouldSetOfflineIfIOException() = runTest {
         val result = mockException(IOException())
 
         assertThat(result).isInstanceOf(AuthenticateDataResult.Offline::class.java)
     }
 
     @Test
-    fun shouldSetOfflineIfNetworkConnectionException() = runBlocking {
+    fun shouldSetOfflineIfNetworkConnectionException() = runTest {
         val result = mockException(
             NetworkConnectionException(
                 cause = Throwable()
@@ -77,44 +77,43 @@ internal class AuthenticatorTest {
     }
 
     @Test
-    fun shouldSetMissingOrOutdatedGooglePlayStoreAppIfMissingOrOutdatedGooglePlayStoreAppException() =
-        runBlocking {
-            val result =
-                mockException(MissingOrOutdatedGooglePlayStoreApp(IntegrityErrorCode.PLAY_STORE_VERSION_OUTDATED))
-            assertThat(result).isInstanceOf(AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp::class.java)
-        }
+    fun shouldSetMissingOrOutdatedGooglePlayStoreAppIfMissingOrOutdatedGooglePlayStoreAppException() = runTest {
+        val result =
+            mockException(MissingOrOutdatedGooglePlayStoreApp(IntegrityErrorCode.PLAY_STORE_VERSION_OUTDATED))
+        assertThat(result).isInstanceOf(AuthenticateDataResult.MissingOrOutdatedGooglePlayStoreApp::class.java)
+    }
 
 
     @Test
-    fun shouldSetIntegrityServiceTemporaryDownIfIntegrityServiceTemporaryDown() = runBlocking {
+    fun shouldSetIntegrityServiceTemporaryDownIfIntegrityServiceTemporaryDown() = runTest {
         val result =
             mockException(IntegrityServiceTemporaryDown(IntegrityErrorCode.GOOGLE_SERVER_UNAVAILABLE))
         assertThat(result).isInstanceOf(AuthenticateDataResult.IntegrityServiceTemporaryDown::class.java)
     }
 
     @Test
-    fun shouldSetIntegrityErrorIfServiceUnavailableException() = runBlocking {
+    fun shouldSetIntegrityErrorIfServiceUnavailableException() = runTest {
         val result =
             mockException(RequestingIntegrityTokenException(IntegrityErrorCode.API_NOT_AVAILABLE))
         assertThat(result).isInstanceOf(AuthenticateDataResult.IntegrityException::class.java)
     }
 
     @Test
-    fun shouldSetUnknownIfGenericException() = runBlocking {
+    fun shouldSetUnknownIfGenericException() = runTest {
         val result = mockException(Exception())
 
         assertThat(result).isInstanceOf(AuthenticateDataResult.Unknown::class.java)
     }
 
     @Test
-    fun shouldTechnicalFailureIfSyncCloudIntegrationException() = runBlocking {
+    fun shouldTechnicalFailureIfSyncCloudIntegrationException() = runTest {
         val result = mockException(SyncCloudIntegrationException(cause = Exception()))
 
         assertThat(result).isInstanceOf(AuthenticateDataResult.TechnicalFailure::class.java)
     }
 
     @Test
-    fun shouldBadCredentialsIfAuthRequestInvalidCredentialsException() = runBlocking {
+    fun shouldBadCredentialsIfAuthRequestInvalidCredentialsException() = runTest {
         val result = mockException(AuthRequestInvalidCredentialsException())
 
         assertThat(result).isInstanceOf(AuthenticateDataResult.BadCredentials::class.java)
@@ -132,7 +131,7 @@ internal class AuthenticatorTest {
     }
 
     @Test
-    fun `should return AUTHENTICATED if no exception`() = runBlocking {
+    fun `should return AUTHENTICATED if no exception`() = runTest {
         val result = authenticator.authenticate(
             userId = "".asTokenizableRaw(),
             projectId = "",

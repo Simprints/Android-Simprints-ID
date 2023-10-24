@@ -239,4 +239,213 @@
     <string name="project_paused_body">Impossible de lancer la session car le projet est actuellement en pause. Veuillez contacter votre superviseur pour plus d\'informations</string>
     <string name="project_ending_title">Le projet se termine actuellement</string>
     <string name="project_ending_body">Impossible de lancer la session car le projet se termine actuellement. Veuillez contacter votre superviseur pour plus d\'informations</string>
+
+    <string name="invalid_projectId_message">Une erreur de configuration s\'est produite (le champ project ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_selectedId_message">Une erreur de configuration s\'est produite (le champ selected Id est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_sessionId_message">Une erreur de configuration s\'est produite (le champ session ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_intentAction_message">Une erreur de configuration s\'est produite (action intentionnelle invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_metadata_message">Une erreur de configuration s\'est produite (le champ metadata est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_moduleId_message">Une erreur de configuration s\'est produite (le champ module ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_userId_message">Une erreur de configuration s\'est produite (le champ user ID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="invalid_verifyId_message">Une erreur de configuration s\'est produite (le champ verify GUID est invalide), veuillez contacter votre administrateur système.</string>
+    <string name="rooted_device_title">Appareil rooter détecté</string>
+    <string name="rooted_device_message">\"1. Contactez votre superviseur - appareil rooté détecté  2. Tapez sur Fermer\"</string>
+    <string name="guid_selection_data_sent">Données envoyées</string>
+    <string name="guid_selection_result_sent">Résultat envoyé</string>
+
+    <string name="capture_title_howto">Comment scanner un visage</string>
+    <string name="btn_capture_again">Capturer à nouveau</string>
+    <string name="btn_finish">Touchez pour continuer</string>
+    <string name="btn_recapture">Recapturer</string>
+    <string name="capture_error_face_too_close">Reculez</string>
+    <string name="capture_error_face_too_far">Rapprochez-vous</string>
+    <string name="capture_error_look_straight">Assurez-vous que la personne regarde droit vers la caméra.</string>
+    <string name="capture_error_no_face">Assurez-vous que le visage soit dans le cercle</string>
+    <string name="capture_hold">Maintenez la position...</string>
+    <string name="capture_prep_begin_btn" translatable="false">Touchez pour capturer</string>
+    <string name="capture_prep_begin_btn_capturing">Capture en cours...</string>
+    <string name="capture_ready" translatable="false">Prêt à capturer</string>
+    <string name="capture_title_face_too_far">Trop loin</string>
+    <string name="capture_title_look_straight">La personne ne regarde pas droit devant elle</string>
+    <string name="capture_title_looks_good">Le scan est prêt !</string>
+    <string name="capture_title_no_face">Aucun visage détecté</string>
+    <string name="capture_title_previewing">Préparation du scan</string>
+    <string name="capture_title_scan_progress">Scan en cours</string>
+    <string name="capture_title_too_close">Trop près</string>
+    <string name="captured_successfully">Le visage a été capturé avec succès.</string>
+    <string name="captured_unsuccessful">Impossible de capturer le visage en raison d\'un problème technique.</string>
+    <string name="error_close_button">Fermez</string>
+    <string name="error_configuration_error_message">Une erreur s\'est produite lors de la configuration de la modalité de visage, veuillez contacter votre administrateur système.</string>
+    <string name="error_configuration_error_title">Erreur de configuration</string>
+    <string name="error_licence_invalid_message">La licence pour la reconnaissance faciale n\'est pas valide, veuillez contacter votre administrateur système</string>
+    <string name="error_licence_invalid_title">Licence invalide</string>
+    <string name="error_licence_missing_message">La licence pour la reconnaissance faciale est manquante, veuillez contacter votre administrateur système</string>
+    <string name="error_licence_missing_title">Licence manquante</string>
+    <string name="exit_form_return_to_face_capture">Capturer le visage</string>
+    <string name="face_configuration_downloading">Téléchargement des fichiers nécessaires</string>
+    <string name="face_configuration_started">Configuration de la modalité de reconnaissance faciale</string>
+    <string name="face_match_loading_candidates">Chargement des candidats...</string>
+    <string name="face_match_matching_candidates">Comparaison des candidats</string>
+    <string name="face_match_please_wait">Veuillez attendre pendant que nous procédons à l\'identification</string>
+    <string name="matching_x_records">Comparaison avec %s enregistrements</string>
+    <string name="onboarding_continue">Touchez n\'importe où pour continuer</string>
+    <string name="onboarding_fill">Placez le visage dans le cadre circulaire.</string>
+    <string name="onboarding_light">Trouvez un endroit bien éclairé.</string>
+    <string name="onboarding_straight">Assurez-vous que la personne regarde droit devant elle.</string>
+    <string name="retry_tips">Voici comment vous pouvez résoudre ce problème : \\1. Assurez-vous d\'être dans un endroit bien éclairé. 2. Assurez-vous que la personne regarde droit devant elle.\\n3. Restez immobile et maintenez la position.</string>
+    <string name="title_capturing">Capture en direct</string>
+    <string name="title_confirmation">Confirmation</string>
+    <string name="title_preparation">Préparation</string>
+    <string name="error_unexpected_error_message">Veuillez réessayer et si Simprints ne fonctionne pas, contactez votre administrateur système.</string>
+    <string name="error_unexpected_error_title">Erreur survenue</string>
+
+    <plurals name="face_match_matched_candidates">
+        <item quantity="one">Comparé à %d candidats.</item>
+        <item quantity="other">Comparé à %d candidats.</item>
+    </plurals>
+
+    <plurals name="face_match_returned_results">
+        <item quantity="one">A retourné %d résultats.</item>
+        <item quantity="other">A retourné %d résultats.</item>
+    </plurals>
+
+    <plurals name="face_match_tier1or2_matches">
+        <item quantity="zero">Pas de très bonnes correspondances</item>
+        <item quantity="one">%d très bonne correspondance</item>
+        <item quantity="other">%d très bonnes correspondances</item>
+    </plurals>
+
+    <plurals name="face_match_tier3_matches">
+        <item quantity="zero">Pas de bonnes correspondances</item>
+        <item quantity="one">%d bonne correspondance</item>
+        <item quantity="other">%d bonnes correspondances</item>
+    </plurals>
+
+    <plurals name="face_match_tier4_matches">
+        <item quantity="zero">Aucune correspondance</item>
+        <item quantity="one">%d correspondance</item>
+        <item quantity="other">%d correspondances</item>
+    </plurals>
+
+    <string name="bluetooth_error_pair_scanner_and_device_message">1. Vérifiez que le scanner est allumé \\n 2. Cliquez sur réglages \\n 3. Déjumelez tous les scanners jumelés \\n 4. Jumelez votre scanner au téléphone \\n 5. Cliquez sur retour pour repartir à Simprints.</string>
+    <string name="bluetooth_error_pair_scanner_and_device_title">Jumelez le scanner au téléphone</string>
+    <string name="bluetooth_not_enabled_message">Le bluetooth n\'est pas activé, assurez-vous qu\'il soit activé dans les réglages puis réessayez</string>
+    <string name="bluetooth_not_supported_message">Le bluetooth n\'est pas supporté sur ce téléphone, veuillez contacter votre administrateur système.</string>
+    <string name="bluetooth_off_title">Bluetooth éteint</string>
+    <string name="bluetooth_off_toast_error">Impossible d\'allumer le bluetooth. Veuillez allumer le bluetooth dans les réglages du téléphone.</string>
+    <string name="bluetooth_on">✓ Bluetooth allumé</string>
+    <string name="cannot_connect_devices">Impossible de connecter les appareils</string>
+    <string name="capture_number_text">Scan %1$s sur %2$s</string>
+    <string name="confirm">Validez</string>
+    <string name="confirm_fingers_dialog_title">Doigts scannés</string>
+    <string name="connect_scanner_bt_connect">Connexion au Vero</string>
+    <string name="connect_scanner_finished">Connecté</string>
+    <string name="connect_scanner_setup">Configuration du Vero</string>
+    <string name="connect_scanner_wake_un20">Réveil en cours de UN20</string>
+    <string name="continue_button">Continuer</string>
+    <string name="enter_scanner_number">Entrez le numéro du scanner dans la boite ci-dessous</string>
+    <string name="enter_scanner_number_detail">Ceci se trouve sous le bas du scanner</string>
+    <string name="finger_skipped_message">Doigt ignoré</string>
+    <string name="get_ready">Soyez prêt</string>
+    <string name="good_scan_direction">Glissez à gauche pour passer au doigt suivant</string>
+    <string name="good_scan_message">Scan correct</string>
+    <string name="identify_title">Identification</string>
+    <string name="low_battery_message">Batterie du scanner faible, veuillez charger votre scanner</string>
+    <string name="low_battery_title">Batterie faible</string>
+    <string name="matching_fingerprints">Comparaison des empreintes digitales</string>
+    <string name="missing_finger"><u>Doigt manquant</u></string>
+    <string name="multiple_scanners_found_message">Plus d\'un scanner est jumelé au téléphone, veuillez déjumeler les scanners non nécessaire</string>
+    <string name="nfc_off_title">NFC éteint</string>
+    <string name="nfc_on">✓ NFC allumé</string>
+    <string name="nfc_pair_instructions">Placer le dos du scanner contre le dos du téléphone.</string>
+    <string name="nfc_pair_title">Scanner déconnecté</string>
+    <string name="nfc_pair_toast_invalid">La puce NFC détectée est invalid</string>
+    <string name="nfc_pair_toast_try_again">Impossible de lire la puce NFC, veuillez réessayer</string>
+    <string name="nfc_pairing_in_progress">Scanner %1$s trouvé</string>
+    <string name="nfc_pairing_try_again_instruction">Veuillez vous assurer que le scanner %1$s est allumé et réessayez.</string>
+    <string name="no_finger_detected_message">Pas de doigt détecté</string>
+    <string name="no_fingers_scanned">Veuillez scanner au moins 1 doigt requis</string>
+    <string name="not_my_scanner">%1$s n\'est pas mon scanner</string>
+    <string name="ota_failed_instructions">Veuillez contact votre superviseur pour avoir de l\'aide</string>
+    <string name="ota_failed_title">La mise à jour du scanner a échoué</string>
+    <string name="ota_instructions">Laissez le scanner allumé pendant la mise à jour</string>
+    <string name="ota_recovery_hard_reset">Appuyez et maintenez le bouton d\'alimentation pendant 5 secondes</string>
+    <string name="ota_recovery_soft_reset">Eteignez le scanner puis rallumez le.</string>
+    <string name="ota_recovery_title">La mise à jour du scanner a échoué</string>
+    <string name="ota_title">Le scanner doit être mis à jour</string>
+    <string name="pair_scanner_label">Réglages</string>
+    <string name="please_scan">Veuillez scanner</string>
+    <string name="please_scan_again">Veuillez scanner à nouveau</string>
+    <string name="please_wait">Veuillez attendre pendant que nous procédons à l\'identification</string>
+    <string name="please_wait_button">Veuillez attendre</string>
+    <string name="poor_scan_direction">Veuillez rescanner</string>
+    <string name="poor_scan_message">Mauvais scan</string>
+    <string name="reconnecting_message">Reconnexion</string>
+    <string name="refusal_label">Formulaire de refus</string>
+    <string name="register_title">Inscription</string>
+    <string name="rescan_label">Rescanner</string>
+    <string name="rescan_label_question">Rescanner?</string>
+    <string name="restart">Recommencer</string>
+    <string name="scan">Scanner</string>
+    <string name="scan_label">Scanner</string>
+    <string name="scanner_confirmation_no">Non</string>
+    <string name="scanner_confirmation_yes">Oui</string>
+    <string name="scanner_error_turn_scanner_on_message">1. Allumez le scanner \\n 2. Cliquez Réessayez</string>
+    <string name="scanner_error_turn_scanner_on_title">Allumez le scanner</string>
+    <string name="scanner_id_confirmation_message">Est ce que %1$s est votre scanner?</string>
+    <string name="scanner_off_instructions">Appuyez sur le bouton d\'alimentation du scanner</string>
+    <string name="scanner_off_title">Scanner éteint</string>
+    <string name="scanner_on">✓ Scanner allumé</string>
+    <string name="scanning">En cours de scan</string>
+    <string name="serial_entry_ok">OK</string>
+    <string name="serial_entry_pair_failed">Veuillez vous assurer que le scanner %1$s est allumé et réessayez.</string>
+    <string name="serial_entry_pair_title">Scanner déconnecté</string>
+    <string name="serial_entry_pair_toast_invalid">Veuillez entrer les 6 chiffres du numéro de série</string>
+    <string name="start_update">Commencer la mise à jour</string>
+    <string name="transfering_data">En cours de transfert de données</string>
+    <string name="try_another_finger">Veuillez essayer un autre doigt</string>
+    <string name="turn_on_bluetooth">Allumez le bluetooth</string>
+    <string name="update_complete">✓ Mise à jour finie</string>
+    <string name="updating">Mise à jour...</string>
+    <string name="updating_attempt">Tentative de mise à jour %1$s sur %2$s…</string>
+    <string name="verify_title">Vérification</string>
+    <string name="turn_on_nfc">Allumez le NFC</string>
+
+    <plurals name="loaded_candidates_result">
+        <item quantity="one">%d candidat chargé</item>
+        <item quantity="other">%d candidats chargés</item>
+    </plurals>
+
+    <plurals name="returned_results">
+        <item quantity="one">%d resultat retourné.</item>
+        <item quantity="other">A retourné %d résultats.</item>
+    </plurals>
+
+
+    <plurals name="tier1or2_matches">
+        <item quantity="zero">Pas de très bonnes correspondances</item>
+        <item quantity="one">%d très bonne correspondance</item>
+        <item quantity="other">%d très bonnes correspondances</item>
+    </plurals>
+
+
+    <plurals name="tier3_matches">
+        <item quantity="zero">Pas de bonnes correspondances</item>
+        <item quantity="one">%d bonne correspondance</item>
+        <item quantity="other">%d bonnes correspondances</item>
+    </plurals>
+
+
+    <plurals name="tier4_matches">
+        <item quantity="zero">Aucune correspondance</item>
+        <item quantity="one">%d correspondance</item>
+        <item quantity="other">%d correspondances</item>
+    </plurals>
+     <string name="preference_select_fingers_title">Selectionnez les doigts par défault</string>
+    <string name="finger_selection_confirm_dialog_text">Sauvegarder les réglages?</string>
+    <string name="finger_selection_confirm_dialog_yes">Sauvegarder</string>
+    <string name="finger_selection_confirm_dialog_no">Annuler</string>
+    <string name="finger_selection_add_finger">Ajouter un doigt</string>
+    <string name="finger_selection_invalid">Sélection invalide - il y a plus de 5 instances d\'un doigt</string>
+    <string name="finger_selection_activity_title">Choississez les doigts</string>
 </resources>

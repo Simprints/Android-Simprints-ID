@@ -34,13 +34,13 @@ internal data class ApiCallbackPayload(
     constructor(domainPayload: IdentificationCallbackPayload) : this(
         domainPayload.createdAt,
         domainPayload.eventVersion,
-        ApiIdentificationCallback(domainPayload.sessionId, domainPayload.scores.map { it.fromDomainToApi() })
+        ApiIdentificationCallback(domainPayload.sessionId, domainPayload.scores.map { it.fromDomainToApi(domainPayload.eventVersion) })
     )
 
     constructor(domainPayload: VerificationCallbackPayload) : this(
         domainPayload.createdAt,
         domainPayload.eventVersion,
-        ApiVerificationCallback(domainPayload.score.fromDomainToApi()))
+        ApiVerificationCallback(domainPayload.score.fromDomainToApi(domainPayload.eventVersion)))
 
     constructor(domainPayload: ConfirmationCallbackPayload) : this(
         domainPayload.createdAt,
@@ -60,13 +60,3 @@ internal data class ApiCallbackPayload(
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields
 }
-
-internal fun ApiCallbackPayload.fromApiToDomain(): EventPayload =
-    when (this.callback.type) {
-        Enrolment -> (callback as ApiEnrolmentCallback).let { EnrolmentCallbackPayload(startTime, version, it.guid, type.fromApiToDomain(), 0) }
-        Identification -> (callback as ApiIdentificationCallback).let { IdentificationCallbackPayload(startTime, version, it.sessionId, it.scores.map { it.fromApiToDomain() }) }
-        Refusal -> (callback as ApiRefusalCallback).let { RefusalCallbackPayload(startTime, version, it.reason, it.extra) }
-        Verification -> (callback as ApiVerificationCallback).let { VerificationCallbackPayload(startTime, version, it.score.fromApiToDomain()) }
-        Error -> (callback as ApiErrorCallback).let { ErrorCallbackPayload(startTime, version, it.reason.fromApiToDomain()) }
-        Confirmation -> (callback as ApiConfirmationCallback).let { ConfirmationCallbackPayload(startTime, version, it.received) }
-    }

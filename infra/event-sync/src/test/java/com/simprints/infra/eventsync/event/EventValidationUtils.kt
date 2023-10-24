@@ -27,22 +27,36 @@ fun validateCommonParams(json: JSONObject, type: String) {
     assertThat(json.length()).isEqualTo(4)
 }
 
-fun validateCallbackEventApiModel(json: JSONObject) {
+fun validateCallbackV1EventApiModel(json: JSONObject) {
     validateCommonParams(json, "Callback")
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(1)
         assertThat(getInt("startTime"))
-        with(getJSONObject("callback")) {
-            when (ApiCallbackType.valueOf(getString("type"))) {
-                ApiCallbackType.Enrolment -> verifyCallbackEnrolmentApiModel(this)
-                ApiCallbackType.Identification -> verifyCallbackIdentificationApiModel(this)
-                ApiCallbackType.Verification -> verifyCallbackVerificationApiModel(this)
-                ApiCallbackType.Refusal -> verifyCallbackRefusalApiModel(this)
-                ApiCallbackType.Confirmation -> verifyCallbackConfirmationApiModel(this)
-                ApiCallbackType.Error -> verifyCallbackErrorApiModel(this)
-            }
-        }
+        verifyCallbackPayloadContent(1)
         assertThat(length()).isEqualTo(4)
+    }
+}
+
+fun validateCallbackV2EventApiModel(json: JSONObject) {
+    validateCommonParams(json, "Callback")
+    with(json.getJSONObject("payload")) {
+        assertThat(getInt("version")).isEqualTo(2)
+        assertThat(getInt("startTime"))
+        verifyCallbackPayloadContent(2)
+        assertThat(getInt("startTime"))
+    }
+}
+
+private fun JSONObject.verifyCallbackPayloadContent(version: Int) {
+    with(getJSONObject("callback")) {
+        when (ApiCallbackType.valueOf(getString("type"))) {
+            ApiCallbackType.Enrolment -> verifyCallbackEnrolmentApiModel(this)
+            ApiCallbackType.Identification -> verifyCallbackIdentificationApiModel(this, version)
+            ApiCallbackType.Verification -> verifyCallbackVerificationApiModel(this, version)
+            ApiCallbackType.Refusal -> verifyCallbackRefusalApiModel(this)
+            ApiCallbackType.Confirmation -> verifyCallbackConfirmationApiModel(this)
+            ApiCallbackType.Error -> verifyCallbackErrorApiModel(this)
+        }
     }
 }
 
@@ -52,28 +66,38 @@ fun verifyCallbackEnrolmentApiModel(json: JSONObject) {
     assertThat(json.length()).isEqualTo(2)
 }
 
-fun verifyCallbackIdentificationApiModel(json: JSONObject) {
+fun verifyCallbackIdentificationApiModel(json: JSONObject, version: Int) {
     assertThat(json.getString("type")).isEqualTo("Identification")
     assertThat(json.getString("sessionId"))
-    verifyCallbackIdentificationScoresApiModel(json.getJSONArray("scores"))
+    json.getJSONArray("scores").let { jsonArray ->
+        assertThat(jsonArray.length()).isEqualTo(1)
+        val score = jsonArray.getJSONObject(0)
+
+        assertThat(score.getString("guid"))
+        assertThat(score.getString("tier"))
+        assertThat(score.getString("confidence"))
+
+        when (version) {
+            1 -> assertThat(score.has("confidenceMatch")).isFalse()
+            2 -> assertThat(score.getString("confidenceMatch"))
+            else -> {}
+        }
+    }
     assertThat(json.length()).isEqualTo(3)
 }
 
-fun verifyCallbackIdentificationScoresApiModel(jsonArray: JSONArray) {
-    val score = jsonArray.getJSONObject(0)
-    assertThat(score.getString("guid"))
-    assertThat(score.getString("tier"))
-    assertThat(score.getString("confidence"))
-    assertThat(jsonArray.length()).isEqualTo(1)
-}
-
-fun verifyCallbackVerificationApiModel(json: JSONObject) {
+fun verifyCallbackVerificationApiModel(json: JSONObject, version: Int) {
     assertThat(json.getString("type")).isEqualTo("Verification")
-    with(json.getJSONObject("score")) {
-        assertThat(getString("guid"))
-        assertThat(getString("confidence"))
-        assertThat(getString("tier"))
-        assertThat(length()).isEqualTo(3)
+    json.getJSONObject("score").let { score ->
+        assertThat(score.getString("guid"))
+        assertThat(score.getString("confidence"))
+        assertThat(score.getString("tier"))
+
+        when (version) {
+            1 -> assertThat(score.has("confidenceMatch")).isFalse()
+            2 -> assertThat(score.getString("confidenceMatch"))
+            else -> {}
+        }
     }
     assertThat(json.length()).isEqualTo(2)
 }
@@ -493,7 +517,7 @@ fun validateOneToOneMatchEventApiModel(json: JSONObject) {
         assertThat(getString("candidateId").isGuid()).isTrue()
         assertThat(getString("matcher")).isAnyOf("SIM_AFIS", "RANK_ONE")
         assertThat(getString("fingerComparisonStrategy")).isAnyOf(
-            "null", "SAME_FINGER","CROSS_FINGER_USING_MEAN_OF_MAX")
+            "null", "SAME_FINGER", "CROSS_FINGER_USING_MEAN_OF_MAX")
         with(getJSONObject("result")) {
             validateMatchEntryApiModel(this)
         }
@@ -729,4 +753,5 @@ fun validateFingerprintCaptureBiometricsEventApiModel(json: JSONObject) {
         assertThat(length()).isEqualTo(5)
     }
 }
+
 private fun <T> Array<T>.valuesAsStrings(): List<String> = this.map { it.toString() }

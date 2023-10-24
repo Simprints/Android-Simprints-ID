@@ -79,7 +79,7 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     }
 
     private fun initUi() {
-        binding.loginUserId.setText(args.loginParams.userId)
+        binding.loginUserId.setText(args.loginParams.userId.value)
         binding.loginButtonScanQr.setOnClickListener {
             Simber.tag(LoggingConstants.CrashReportTag.LOGIN.name).i("Scan QR button clicked")
             findNavController().navigate(R.id.action_loginFormFragment_to_loginQrScanner)

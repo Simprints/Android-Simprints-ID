@@ -6,7 +6,7 @@
 //import com.simprints.infra.events.domain.events.callback.IdentificationCallbackEvent
 //import com.simprints.id.exceptions.safe.session.validator.GuidSelectEventValidatorException
 //import com.simprints.id.tools.time.TimeHelperImpl
-//import io.kotest.assertions.throwables.shouldThrow
+//import com.simprints.testtools.common.syntax.assertThrows
 //import org.junit.Test
 //import java.util.*
 // TOFIX
@@ -20,7 +20,7 @@
 //        session.addEvent(GuidSelectionEvent(0, UUID.randomUUID().toString()))
 //        session.addEvent(GuidSelectionEvent(0, UUID.randomUUID().toString()))
 //
-//        shouldThrow<GuidSelectEventValidatorException> {
+//        assertThrows<GuidSelectEventValidatorException> {
 //            GuidSelectionEventValidator().validate(session)
 //        }
 //    }
@@ -30,7 +30,7 @@
 //        val session = createFakeOpenSession(timeHelper)
 //        session.addEvent(GuidSelectionEvent(0, UUID.randomUUID().toString()))
 //
-//        shouldThrow<GuidSelectEventValidatorException> {
+//        assertThrows<GuidSelectEventValidatorException> {
 //            GuidSelectionEventValidator().validate(session)
 //        }
 //    }

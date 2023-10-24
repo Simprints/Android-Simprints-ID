@@ -3,10 +3,12 @@ package com.simprints.fingerprint.activities.collect.resources
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.simprints.infra.resources.R as CR
+import com.simprints.infra.resources.R as IDR
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
 fun FingerIdentifier.fingerDrawable(): Int =
     when (this) {
@@ -22,22 +24,24 @@ fun FingerIdentifier.fingerDrawable(): Int =
         FingerIdentifier.LEFT_5TH_FINGER -> R.drawable.hand_bb_l5_c4
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 fun FingerIdentifier.nameTextId(): Int =
     when (this) {
-        FingerIdentifier.RIGHT_5TH_FINGER -> R.string.r_5_finger_name
-        FingerIdentifier.RIGHT_4TH_FINGER -> R.string.r_4_finger_name
-        FingerIdentifier.RIGHT_3RD_FINGER -> R.string.r_3_finger_name
-        FingerIdentifier.RIGHT_INDEX_FINGER -> R.string.r_2_finger_name
-        FingerIdentifier.RIGHT_THUMB -> R.string.r_1_finger_name
-        FingerIdentifier.LEFT_THUMB -> R.string.l_1_finger_name
-        FingerIdentifier.LEFT_INDEX_FINGER -> R.string.l_2_finger_name
-        FingerIdentifier.LEFT_3RD_FINGER -> R.string.l_3_finger_name
-        FingerIdentifier.LEFT_4TH_FINGER -> R.string.l_4_finger_name
-        FingerIdentifier.LEFT_5TH_FINGER -> R.string.l_5_finger_name
+        FingerIdentifier.RIGHT_5TH_FINGER -> IDR.string.r_5_finger_name
+        FingerIdentifier.RIGHT_4TH_FINGER -> IDR.string.r_4_finger_name
+        FingerIdentifier.RIGHT_3RD_FINGER -> IDR.string.r_3_finger_name
+        FingerIdentifier.RIGHT_INDEX_FINGER -> IDR.string.r_2_finger_name
+        FingerIdentifier.RIGHT_THUMB -> IDR.string.r_1_finger_name
+        FingerIdentifier.LEFT_THUMB -> IDR.string.l_1_finger_name
+        FingerIdentifier.LEFT_INDEX_FINGER -> IDR.string.l_2_finger_name
+        FingerIdentifier.LEFT_3RD_FINGER -> IDR.string.l_3_finger_name
+        FingerIdentifier.LEFT_4TH_FINGER -> IDR.string.l_4_finger_name
+        FingerIdentifier.LEFT_5TH_FINGER -> IDR.string.l_5_finger_name
     }
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @ColorRes
 fun FingerIdentifier.nameTextColour(): Int =
-    CR.color.simprints_blue
+    IDR.color.simprints_blue

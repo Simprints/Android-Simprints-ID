@@ -2,7 +2,7 @@ package com.simprints.fingerprint.infra.scanner.v2.domain.main.message
 
 import com.simprints.fingerprint.infra.scanner.v2.domain.Protocol
 
-interface MessageProtocol: Protocol {
+interface MessageProtocol : Protocol {
 
     val HEADER_SIZE: Int
     val HEADER_INDICES: IntRange

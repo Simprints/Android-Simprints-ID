@@ -91,6 +91,7 @@ class Scanner(
                     mainMessageChannel.disconnect()
                     scannerTriggerListenerDisposable?.dispose()
                 }
+
                 CYPRESS_OTA -> cypressOtaMessageChannel.disconnect()
                 STM_OTA -> stmOtaMessageChannel.disconnect()
                 null -> {/* Do nothing */
@@ -340,7 +341,7 @@ class Scanner(
             .map { it.captureFingerprintResult }
 
     /** Requires UN20 API 1.1 */
-    fun setScannerLedStateOn() : Completable =
+    fun setScannerLedStateOn(): Completable =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<SetScanLedStateResponse>(
                 SetScanLedStateCommand(Un20DigitalValue.TRUE)
@@ -349,7 +350,7 @@ class Scanner(
             .doOnComplete { state.scanLedState = true }
 
     /** Requires UN20 API 1.1 */
-    fun setScannerLedStateDefault() : Completable =
+    fun setScannerLedStateDefault(): Completable =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<SetScanLedStateResponse>(
                 SetScanLedStateCommand(Un20DigitalValue.FALSE)
@@ -359,7 +360,7 @@ class Scanner(
 
     /** Requires UN20 API 1.1
      * No value emitted if an image could not be captured */
-    fun getImageQualityPreview() : Maybe<Int> =
+    fun getImageQualityPreview(): Maybe<Int> =
         assertConnected().andThen(assertMode(MAIN)).andThen(assertUn20On()).andThen(
             sendMainModeCommandAndReceiveResponse<GetImageQualityPreviewResponse>(
                 GetImageQualityPreviewCommand()

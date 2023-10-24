@@ -8,7 +8,7 @@ import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class PacketParserTest {
-    
+
     @Test
     fun parsePacket_buildsPacketCorrectlyFromProtocol() {
         val packetParser = PacketParser()

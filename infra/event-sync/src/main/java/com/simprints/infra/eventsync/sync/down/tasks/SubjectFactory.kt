@@ -3,7 +3,9 @@ package com.simprints.infra.eventsync.sync.down.tasks
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
@@ -13,6 +15,7 @@ import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 
 class SubjectFactory @Inject constructor(
@@ -43,6 +46,24 @@ class SubjectFactory @Inject constructor(
             )
         }
 
+    fun buildSubjectFromFace(
+        projectId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
+        faceResponse: FaceCaptureResult,
+        timeHelper: TimeHelper
+    ): Subject {
+        val subjectId = UUID.randomUUID().toString()
+        return Subject(
+            subjectId,
+            projectId,
+            userId,
+            moduleId,
+            createdAt = Date(timeHelper.now()),
+            faceSamples = extractFaceSamples(faceResponse)
+        )
+    }
+
     fun buildSubject(
         subjectId: String,
         projectId: String,
@@ -62,6 +83,10 @@ class SubjectFactory @Inject constructor(
         fingerprintSamples = fingerprintSamples,
         faceSamples = faceSamples
     )
+
+    private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results
+        .mapNotNull { it.sample }
+        .map { FaceSample(it.template, it.format) }
 
     private fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
         biometricReferences?.filterIsInstance<FingerprintReference>()

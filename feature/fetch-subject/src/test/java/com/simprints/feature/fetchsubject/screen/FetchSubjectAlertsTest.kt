@@ -10,16 +10,16 @@ import org.junit.runner.RunWith
 class FetchSubjectAlertsTest {
 
     @Test
-    fun `should not show exit form when returning from NotFoundOnline alert`() {
+    fun `when returning from NotFoundOnline alert should set wasOnline flag to true`() {
         val config = FetchSubjectAlerts.subjectNotFoundOnline()
-        val showExitForm = FetchSubjectAlerts.shouldShowExitForm(config.payload)
-        assertThat(showExitForm).isFalse()
+        val wasOnline = FetchSubjectAlerts.wasOnline(config.payload)
+        assertThat(wasOnline).isTrue()
     }
 
     @Test
-    fun `should show exit form when returning from NotFoundOffline alert`() {
+    fun `when returning from NotFoundOffline alert should set wasOnline flag to false`() {
         val config = FetchSubjectAlerts.subjectNotFoundOffline()
-        val showExitForm = FetchSubjectAlerts.shouldShowExitForm(config.payload)
-        assertThat(showExitForm).isTrue()
+        val wasOnline = FetchSubjectAlerts.wasOnline(config.payload)
+        assertThat(wasOnline).isFalse()
     }
 }

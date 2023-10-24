@@ -1,9 +1,12 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.*
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Enrol
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Identify
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Invalid
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.ConfirmIdentity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.LibSimprintsActionFollowUpAction.EnrolLastBiometrics
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsAction.Verify
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.STANDARD
 import com.simprints.clientapi.domain.responses.EnrolResponse
@@ -15,7 +18,12 @@ import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.exceptions.InvalidIntentActionException
-import com.simprints.clientapi.requestFactories.*
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
+import com.simprints.clientapi.requestFactories.EnrolLastBiometricsFactory
+import com.simprints.clientapi.requestFactories.EnrolRequestFactory
+import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory
+import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -24,14 +32,19 @@ import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.Up
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.unit.BaseUnitTestConfig
-import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.runBlocking
+import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class LibSimprintsPresenterTest {
 
@@ -62,7 +75,7 @@ class LibSimprintsPresenterTest {
     }
     @Before
     fun setup() {
-        BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
+        BaseUnitTestConfig().coroutinesMainThread()
         MockKAnnotations.init(this, relaxed = true)
         coEvery { view.getProject() } returns project
         every { view.tokenizationProcessor } returns tokenizationProcessorMock
@@ -87,7 +100,7 @@ class LibSimprintsPresenterTest {
             tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -115,7 +128,7 @@ class LibSimprintsPresenterTest {
             tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply {
-            runBlocking { start() }
+            runTest { start() }
         }
 
         verify(exactly = 1) {
@@ -142,7 +155,7 @@ class LibSimprintsPresenterTest {
             jsonHelper = mockk(),
             tokenizationProcessor = mockk(),
             configManager = mockk()
-        ).apply { runBlocking { start() } }
+        ).apply { runTest { start() } }
 
         verify(exactly = 1) {
             view.sendSimprintsRequest(
@@ -170,7 +183,7 @@ class LibSimprintsPresenterTest {
             jsonHelper = mockk(),
             tokenizationProcessor = mockk(),
             configManager = mockk()
-        ).apply { runBlocking { start() } }
+        ).apply { runTest { start() } }
 
         verify(exactly = 1) {
             view.sendSimprintsRequest(
@@ -196,7 +209,7 @@ class LibSimprintsPresenterTest {
             jsonHelper = mockk(),
             tokenizationProcessor = mockk(),
             configManager = mockk()
-        ).apply { runBlocking { start() } }
+        ).apply { runTest { start() } }
 
         verify(exactly = 1) {
             view.sendSimprintsRequest(
@@ -220,8 +233,8 @@ class LibSimprintsPresenterTest {
             tokenizationProcessor = mockk(),
             configManager = mockk()
         ).apply {
-            runBlocking {
-                shouldThrow<InvalidIntentActionException> {
+            runTest {
+                assertThrows<InvalidIntentActionException> {
                     start()
                 }
             }
@@ -408,7 +421,7 @@ class LibSimprintsPresenterTest {
 
 
 
-        runBlocking {
+        runTest {
             val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
             assertThat(sessionId).isNotEqualTo(newSessionId)
             coVerify(exactly = 0) { clientApiSessionEventsManager.closeCurrentSessionNormally() }
@@ -439,7 +452,7 @@ class LibSimprintsPresenterTest {
             tokenizationProcessor = mockk(),
             configManager = configManager
         ).handleEnrolResponse(mockk())
-        runBlocking {
+        runTest {
             val sessionId = clientApiSessionEventsManager.getCurrentSessionId()
             assertThat(sessionId).isEqualTo(newSessionId)
             coVerify(exactly = 1) { clientApiSessionEventsManager.closeCurrentSessionNormally() }

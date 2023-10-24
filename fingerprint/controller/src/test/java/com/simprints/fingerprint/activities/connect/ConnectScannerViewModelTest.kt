@@ -10,24 +10,25 @@ import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
-import com.simprints.fingerprint.controllers.fingerprint.NfcManager
+import com.simprints.fingerprint.infra.scanner.NfcManager
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.ota.AvailableOta
-import com.simprints.fingerprint.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.fingerprint.scanner.domain.versions.ScannerVersion
-import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotSupportedException
-import com.simprints.fingerprint.scanner.exceptions.safe.MultiplePossibleScannersPairedException
-import com.simprints.fingerprint.scanner.exceptions.safe.OtaAvailableException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerDisconnectedException
-import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
-import com.simprints.fingerprint.scanner.factory.ScannerFactory
-import com.simprints.fingerprint.scanner.pairing.ScannerPairingManager
-import com.simprints.fingerprint.scanner.tools.SerialNumberConverter
-import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
+import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerFirmwareVersions
+import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerVersion
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.BluetoothNotSupportedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.MultiplePossibleScannersPairedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaAvailableException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerNotPairedException
+import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
+import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerFactory
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice
 import com.simprints.fingerprint.testtools.assertEventReceived
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContent
 import com.simprints.fingerprint.testtools.assertEventReceivedWithContentAssertions
@@ -43,6 +44,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coJustRun
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -97,6 +99,7 @@ class ConnectScannerViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
         every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(VERO_1, VERO_2)
         coEvery { configManager.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
+        coJustRun { scannerFactory.initScannerOperationWrappers(any()) }
 
         scannerManager = ScannerManagerImpl(
             bluetoothAdapter,
@@ -139,7 +142,7 @@ class ConnectScannerViewModelTest {
     @Test
     fun start_bluetoothOff_sendsBluetoothOffIssueEvent() {
         setupBluetooth(isEnabled = false)
-        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
+        coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(VERO_2)
 
         val connectScannerIssueObserver = viewModel.connectScannerIssue.testObserver()
 
@@ -152,7 +155,7 @@ class ConnectScannerViewModelTest {
     @Test
     fun start_bluetoothNotSupported_sendsBluetoothNotSupportedAlert() {
         setupBluetooth(numberOfPairedScanners = 1)
-        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(
+        coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(
             VERO_2,
             connectFailException = BluetoothNotSupportedException()
         )
@@ -169,7 +172,7 @@ class ConnectScannerViewModelTest {
     fun startVero1_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() =
         runTest {
             setupBluetooth(numberOfPairedScanners = 1)
-            coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_1)
+            coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(VERO_1)
             val updateActivityFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
             coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateActivityFn)) } returns mockk()
             var scannerConnectionEvent: ScannerConnectionEvent? = null
@@ -201,7 +204,7 @@ class ConnectScannerViewModelTest {
     fun startVero2_scannerConnectSucceeds_sendsScannerConnectedEventAndProgressValuesAndLogsPropertiesAndSessionEvent() =
         runTest {
             setupBluetooth(numberOfPairedScanners = 1)
-            coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2)
+            coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(VERO_2)
             val updateActivityFn = slot<suspend (RecentUserActivity) -> RecentUserActivity>()
             coEvery { recentUserActivityManager.updateRecentUserActivity(capture(updateActivityFn)) } returns mockk()
             var scannerConnectionEvent: ScannerConnectionEvent? = null
@@ -332,7 +335,7 @@ class ConnectScannerViewModelTest {
     @Test
     fun start_scannerConnectFailsWithDisconnectedException_sendsScannerConnectedFailedEvent() {
         setupBluetooth(numberOfPairedScanners = 1)
-        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(
+        coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(
             VERO_2,
             ScannerDisconnectedException()
         )
@@ -349,7 +352,7 @@ class ConnectScannerViewModelTest {
     fun start_scannerConnectFailsWithUnexpectedException_sendsAlertEvent() {
         val error = Error("Oops")
         setupBluetooth(numberOfPairedScanners = 1)
-        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, error)
+        coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(VERO_2, error)
 
         val scannerConnectedObserver = viewModel.scannerConnected.testObserver()
         val launchAlertObserver = viewModel.launchAlert.testObserver()
@@ -365,7 +368,7 @@ class ConnectScannerViewModelTest {
     fun start_scannerConnectThrowsOtaAvailableException_sendsOtaAvailableScannerIssue() {
         val e = OtaAvailableException(listOf(AvailableOta.CYPRESS, AvailableOta.UN20))
         setupBluetooth(numberOfPairedScanners = 1)
-        coEvery { scannerFactory.create(any()) } returns mockScannerWrapper(VERO_2, e)
+        coEvery { scannerFactory.scannerWrapper } returns mockScannerWrapper(VERO_2, e)
 
         viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
         viewModel.start()
@@ -429,8 +432,7 @@ class ConnectScannerViewModelTest {
     fun startRetryingToConnect_scannerConnectFails_makesNoMoreThanMaxRetryAttempts() {
         setupBluetooth(numberOfPairedScanners = 1)
         val scannerWrapper = mockScannerWrapper(VERO_1, UnknownScannerIssueException())
-        coEvery { scannerFactory.create(any()) } returns scannerWrapper
-
+        every { scannerFactory.scannerWrapper } returns scannerWrapper
         viewModel.init(ConnectScannerTaskRequest.ConnectMode.INITIAL_CONNECT)
         viewModel.startRetryingToConnect()
 
@@ -467,7 +469,7 @@ class ConnectScannerViewModelTest {
         every { bluetoothAdapter.isEnabled() } returns isEnabled
         when (numberOfPairedScanners) {
             0 -> coEvery { pairingManager.getPairedScannerAddressToUse() } throws ScannerNotPairedException()
-            1 -> coEvery { pairingManager.getPairedScannerAddressToUse() } returns com.simprints.fingerprint.scannermock.dummy.DummyBluetoothDevice.random().address
+            1 -> coEvery { pairingManager.getPairedScannerAddressToUse() } returns DummyBluetoothDevice.random().address
             else -> coEvery { pairingManager.getPairedScannerAddressToUse() } throws MultiplePossibleScannersPairedException()
         }
     }

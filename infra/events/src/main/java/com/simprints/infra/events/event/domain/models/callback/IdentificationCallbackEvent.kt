@@ -44,6 +44,6 @@ data class IdentificationCallbackEvent(
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

@@ -7,9 +7,6 @@ android {
     namespace = "com.simprints.testtools"
 }
 
-//Required to make the mock-android library to work in a no android module.
-System.setProperty("org.mockito.mock.android", "true")
-
 dependencies {
     api(project(":core"))
 
@@ -27,16 +24,10 @@ dependencies {
     api(libs.testing.work)
 
     api(libs.testing.junit)
-    api(libs.testing.mockito.core)
-    api(libs.testing.mockito.inline)
-    api(libs.testing.mockito.kotlin)
     api(libs.testing.mockk.core)
     api(libs.testing.truth)
     api(libs.testing.robolectric.core)
     api(libs.testing.coroutines)
-    api(libs.testing.koTest.kotlin.assert) {
-        exclude("org.jetbrains:annotations")
-    }
 
     api(libs.testing.espresso.core)
     api(libs.testing.espresso.intents)

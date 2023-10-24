@@ -30,12 +30,11 @@ import com.simprints.fingerprint.infra.scanner.v2.outgoing.root.RootMessageOutpu
 import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandler
 import com.simprints.fingerprint.infra.scanner.v2.scanner.errorhandler.ResponseErrorHandlingStrategy
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.spy
-import com.simprints.testtools.common.syntax.whenThis
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.spyk
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.subjects.PublishSubject
@@ -48,9 +47,9 @@ class ScannerExtendedInfoReaderHelperTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val mainMessageChannel: MainMessageChannel = mock()
+    private val mainMessageChannel: MainMessageChannel = mockk()
     private val rootMessageChannel: RootMessageChannel = getRootMessageChannel()
-    private val responseErrorHandler: ResponseErrorHandler =  ResponseErrorHandler(
+    private val responseErrorHandler: ResponseErrorHandler = ResponseErrorHandler(
         ResponseErrorHandlingStrategy.NONE)
 
     private lateinit var expectedVersionResponse: GetVersionResponse
@@ -128,7 +127,6 @@ class ScannerExtendedInfoReaderHelperTest {
         expectedExtendedVersionResponse = GetExtendedVersionResponse(expectedFirmwareVersions)
 
 
-
         val testObserver = scannerInfoReader.readScannerInfo().test()
         testObserver.awaitAndAssertSuccess()
 
@@ -190,16 +188,16 @@ class ScannerExtendedInfoReaderHelperTest {
     private fun getRootMessageChannel(): RootMessageChannel {
         val responseSubject = PublishSubject.create<RootResponse>()
 
-        val spyRootMessageInputStream = spy(RootMessageInputStream(mock())).apply {
-            whenThis { connect(anyNotNull()) } thenDoNothing {}
-            whenThis { disconnect() } thenDoNothing {}
-            rootResponseStream = responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+        val spyRootMessageInputStream = spyk(RootMessageInputStream(mockk())).apply {
+            justRun { connect(any()) }
+            justRun { disconnect() }
+            every { rootResponseStream } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
-        val mockRootMessageOutputStream = setupMock<RootMessageOutputStream> {
-            whenThis { sendMessage(anyNotNull()) } then {
+        val mockRootMessageOutputStream = mockk<RootMessageOutputStream> {
+            every { sendMessage(any()) } answers {
                 Completable.complete().doAfterTerminate {
                     responseSubject.onNext(
-                        when (it.arguments[0] as RootCommand) {
+                        when (args[0] as RootCommand) {
                             is GetVersionCommand -> expectedVersionResponse
                             is GetExtendedVersionCommand -> expectedExtendedVersionResponse
                             is GetCypressVersionCommand -> expectedCypressVersionResponse

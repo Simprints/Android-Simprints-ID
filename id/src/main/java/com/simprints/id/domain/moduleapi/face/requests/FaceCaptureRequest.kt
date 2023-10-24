@@ -5,11 +5,10 @@ import kotlinx.parcelize.Parcelize
 
 //Do not change the order of the parameters. Parcelize is not able to marshall correctly if type is the 2nd param
 @Parcelize
-data class FaceCaptureRequest(override val type: FaceRequestType = FaceRequestType.CAPTURE,
-                              val nFaceSamplesToCapture: Int) : FaceRequest
-
-fun FaceCaptureRequest.fromDomainToModuleApi(): IFaceCaptureRequest =
-    IFaceCaptureRequestImpl(nFaceSamplesToCapture)
+data class FaceCaptureRequest(
+    override val type: FaceRequestType = FaceRequestType.CAPTURE,
+    val nFaceSamplesToCapture: Int,
+) : FaceRequest
 
 @Parcelize
 private data class IFaceCaptureRequestImpl(override val nFaceSamplesToCapture: Int) : IFaceCaptureRequest
