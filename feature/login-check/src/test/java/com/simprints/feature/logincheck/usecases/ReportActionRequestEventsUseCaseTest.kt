@@ -1,5 +1,6 @@
 package com.simprints.feature.logincheck.usecases
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.infra.events.EventRepository
@@ -102,7 +103,7 @@ internal class ReportActionRequestEventsUseCaseTest {
     }
 
     private fun createBlankUserActivity() = RecentUserActivity(
-        lastUserUsed = "",
+        lastUserUsed = "".asTokenizableRaw(),
         lastScannerUsed = "",
         lastScannerVersion = "",
         enrolmentsToday = 0,

@@ -3,9 +3,9 @@ package com.simprints.matcher.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.face.FaceSample
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.enrolment.records.domain.models.FaceIdentity
+import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.matcher.MatchParams
 import io.mockk.MockKAnnotations

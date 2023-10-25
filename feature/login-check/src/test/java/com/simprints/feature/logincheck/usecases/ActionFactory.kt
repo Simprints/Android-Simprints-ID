@@ -1,5 +1,6 @@
 package com.simprints.feature.logincheck.usecases
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
@@ -32,7 +33,7 @@ internal object ActionFactory {
         unknownExtras = emptyList()
     )
 
-    const val MOCK_USER_ID = "userId"
-    const val MOCK_MODULE_ID = "moduleId"
+    val MOCK_USER_ID = "userId".asTokenizableRaw()
+    val MOCK_MODULE_ID = "moduleId".asTokenizableRaw()
     const val MOCK_PROJECT_ID = "projectId"
 }

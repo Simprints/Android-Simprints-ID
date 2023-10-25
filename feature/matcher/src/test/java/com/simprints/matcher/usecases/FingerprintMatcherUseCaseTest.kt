@@ -5,9 +5,9 @@ import com.simprints.core.domain.common.FlowProvider
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.enrolment.records.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.matcher.MatchParams
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import io.mockk.MockKAnnotations
