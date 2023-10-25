@@ -120,6 +120,9 @@
     <action
         android:id="@+id/action_mainFragment_to_login"
         app:destination="@id/graph_login" />
+    <action
+        android:id="@+id/action_logOutSyncFragment_to_login"
+        app:destination="@id/graph_login" />
 
     <navigation
         android:id="@+id/logout_navigation"
