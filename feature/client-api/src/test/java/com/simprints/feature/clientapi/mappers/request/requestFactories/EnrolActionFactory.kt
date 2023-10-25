@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.mappers.request.requestFactories
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.clientapi.mappers.request.builders.EnrolRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolRequestExtractor
@@ -19,14 +20,20 @@ internal object EnrolActionFactory : RequestActionFactory() {
     override fun getValidSimprintsRequest() = ActionRequest.EnrolActionRequest(
         actionIdentifier = getIdentifier(),
         projectId = MOCK_PROJECT_ID,
-        userId = MOCK_USER_ID,
+        userId = MOCK_USER_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
-        moduleId = MOCK_MODULE_ID,
+        moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
         unknownExtras = emptyList()
     )
 
     override fun getBuilder(extractor: ActionRequestExtractor): EnrolRequestBuilder =
-        EnrolRequestBuilder(getIdentifier(), extractor as EnrolRequestExtractor, getValidator(extractor))
+        EnrolRequestBuilder(
+            actionIdentifier = getIdentifier(),
+            extractor = extractor as EnrolRequestExtractor,
+            project = mockk(),
+            tokenizationProcessor = mockk(),
+            validator = getValidator(extractor)
+        )
 
     override fun getValidator(extractor: ActionRequestExtractor): EnrolValidator =
         EnrolValidator(extractor as EnrolRequestExtractor)
