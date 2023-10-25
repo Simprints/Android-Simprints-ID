@@ -1,5 +1,6 @@
 package com.simprints.feature.dashboard.main.sync
 
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -7,12 +8,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.LiveDataEventWithContent
+import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
 import com.simprints.feature.dashboard.views.SyncCardState.SyncFailed
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedSignInRequired
 import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedBackendMaintenance
 import com.simprints.feature.dashboard.views.SyncCardState.SyncHasNoModules
 import com.simprints.feature.dashboard.views.SyncCardState.SyncOffline
@@ -20,6 +24,8 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
 import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
+import com.simprints.feature.login.LoginContract
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
@@ -34,6 +40,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -49,8 +56,9 @@ internal class SyncViewModel @Inject constructor(
     private val configManager: ConfigManager,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
-    private val securityStateRepository: SecurityStateRepository,
     private val authManager: AuthManager,
+    private val securityStateRepository: SecurityStateRepository,
+    private val recentUserActivityManager: RecentUserActivityManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -69,6 +77,9 @@ internal class SyncViewModel @Inject constructor(
     val signOutEventLiveData: LiveData<LiveDataEvent>
         get() = _signOutEventLiveData
     private val _signOutEventLiveData = MediatorLiveData<LiveDataEvent>()
+    val loginRequestedEventLiveData: LiveData<LiveDataEventWithContent<Bundle>>
+        get() = _loginRequestedEventLiveData
+    private val _loginRequestedEventLiveData = MutableLiveData<LiveDataEventWithContent<Bundle>>()
 
     private val upSyncCountLiveData = MutableLiveData(0)
     private val syncStateLiveData = eventSyncManager.getLastSyncState()
@@ -107,6 +118,23 @@ internal class SyncViewModel @Inject constructor(
     fun sync() {
         _syncCardLiveData.postValue(SyncConnecting(null, 0, null))
         eventSyncManager.sync()
+    }
+
+    fun login() {
+        viewModelScope.launch {
+            val userId = recentUserActivityManager.getRecentUserActivity().lastUserUsed
+            val loginArgs = LoginContract.toArgs(
+                authStore.signedInProjectId,
+                userId
+            )
+            _loginRequestedEventLiveData.send(loginArgs)
+        }
+    }
+
+    fun handleLoginResult(result: LoginResult) {
+        if (result.isSuccess) {
+            sync()
+        }
     }
 
     private fun startInitialSyncIfRequired() {
@@ -209,6 +237,9 @@ internal class SyncViewModel @Inject constructor(
                 syncState.progress,
                 syncState.total
             )
+            isSyncFailedBecauseSignInRequired(allSyncStates) -> SyncFailedSignInRequired(
+                lastTimeSyncSucceed()
+            )
             isSyncFailedBecauseTooManyRequests(allSyncStates) -> SyncTooManyRequests(
                 lastTimeSyncSucceed()
             )
@@ -233,6 +264,9 @@ internal class SyncViewModel @Inject constructor(
 
     private fun isSyncConnecting(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         allSyncStates.any { it.state is EventSyncWorkerState.Enqueued }
+
+    private fun isSyncFailedBecauseSignInRequired(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
+        allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseSignInRequired }
 
     private fun isSyncFailedBecauseTooManyRequests(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
         allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseTooManyRequest }

@@ -26,6 +26,7 @@ internal class SyncCardView : MaterialCardView {
     var onSyncButtonClick: () -> Unit = {}
     var onSelectNoModulesButtonClick: () -> Unit = {}
     var onOfflineButtonClick: () -> Unit = {}
+    var onLoginButtonClick: () -> Unit = {}
     private val binding = LayoutCardSyncBinding.inflate(LayoutInflater.from(context), this)
 
     init {
@@ -38,10 +39,8 @@ internal class SyncCardView : MaterialCardView {
             is SyncCardState.SyncDefault -> prepareSyncDefaultStateView()
             is SyncCardState.SyncPendingUpload -> prepareSyncDefaultStateView(state.itemsToUpSync)
             is SyncCardState.SyncFailed -> prepareSyncFailedStateView()
-            is SyncCardState.SyncFailedBackendMaintenance -> prepareSyncFailedBecauseBackendMaintenanceView(
-                state
-            )
-
+            is SyncCardState.SyncFailedSignInRequired -> prepareSyncFailedBecauseSignInRequired()
+            is SyncCardState.SyncFailedBackendMaintenance -> prepareSyncFailedBecauseBackendMaintenanceView(state)
             is SyncCardState.SyncTooManyRequests -> prepareSyncTooManyRequestsView()
             is SyncCardState.SyncTryAgain -> prepareTryAgainStateView()
             is SyncCardState.SyncHasNoModules -> prepareNoModulesStateView()
@@ -60,6 +59,7 @@ internal class SyncCardView : MaterialCardView {
         binding.syncCardOffline.visibility = View.GONE
         binding.syncCardProgress.visibility = View.GONE
         binding.syncCardTryAgain.visibility = View.GONE
+        binding.syncCardReloginRequired.visibility = View.GONE
     }
 
     private fun prepareSyncDefaultStateView(itemsToSync: Int = 0) {
@@ -82,6 +82,11 @@ internal class SyncCardView : MaterialCardView {
             resources.getString(R.string.dashboard_sync_card_failed_message)
     }
 
+    private fun prepareSyncFailedBecauseSignInRequired() {
+        binding.syncCardReloginRequired.visibility = View.VISIBLE
+        binding.syncCardReloginRequiredLoginButton.setOnClickListener { onLoginButtonClick() }
+    }
+
     private fun prepareSyncFailedBecauseBackendMaintenanceView(state: SyncCardState.SyncFailedBackendMaintenance) {
         binding.syncCardFailedMessage.visibility = View.VISIBLE
         binding.syncCardFailedMessage.text =
@@ -102,9 +107,7 @@ internal class SyncCardView : MaterialCardView {
 
     private fun prepareTryAgainStateView() {
         binding.syncCardTryAgain.visibility = View.VISIBLE
-        binding.syncCardTryAgainSyncButton.setOnClickListener {
-            onSyncButtonClick()
-        }
+        binding.syncCardTryAgainSyncButton.setOnClickListener { onSyncButtonClick() }
     }
 
     private fun prepareNoModulesStateView() {
@@ -116,9 +119,7 @@ internal class SyncCardView : MaterialCardView {
 
     private fun prepareSyncOfflineView() {
         binding.syncCardOffline.visibility = View.VISIBLE
-        binding.syncCardOfflineButton.setOnClickListener {
-            onOfflineButtonClick()
-        }
+        binding.syncCardOfflineButton.setOnClickListener { onOfflineButtonClick() }
     }
 
     private fun prepareProgressView(state: SyncCardState.SyncProgress) {

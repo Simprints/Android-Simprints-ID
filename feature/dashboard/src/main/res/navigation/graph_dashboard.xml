@@ -116,6 +116,11 @@
         android:id="@+id/action_mainFragment_to_privacyNoticesFragment"
         app:destination="@id/graph_privacy" />
 
+    <include app:graph="@navigation/graph_login" />
+    <action
+        android:id="@+id/action_mainFragment_to_login"
+        app:destination="@id/graph_login" />
+
     <navigation
         android:id="@+id/logout_navigation"
         android:label="logoutNavigation"
