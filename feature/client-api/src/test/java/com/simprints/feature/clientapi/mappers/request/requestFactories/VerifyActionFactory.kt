@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.mappers.request.requestFactories
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.clientapi.mappers.request.builders.VerifyRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
@@ -20,15 +21,21 @@ internal object VerifyActionFactory : RequestActionFactory() {
     override fun getValidSimprintsRequest() = ActionRequest.VerifyActionRequest(
         actionIdentifier = getIdentifier(),
         projectId = MOCK_PROJECT_ID,
-        moduleId = MOCK_MODULE_ID,
-        userId = MOCK_USER_ID,
+        moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
+        userId = MOCK_USER_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         verifyGuid = MOCK_VERIFY_GUID,
         unknownExtras = emptyList()
     )
 
     override fun getBuilder(extractor: ActionRequestExtractor): VerifyRequestBuilder =
-        VerifyRequestBuilder(getIdentifier(), extractor as VerifyRequestExtractor, getValidator(extractor))
+        VerifyRequestBuilder(
+            actionIdentifier = getIdentifier(),
+            extractor = extractor as VerifyRequestExtractor,
+            project = mockk(),
+            tokenizationProcessor = mockk(),
+            validator = getValidator(extractor)
+        )
 
     override fun getValidator(extractor: ActionRequestExtractor): VerifyValidator =
         VerifyValidator(extractor as VerifyRequestExtractor)

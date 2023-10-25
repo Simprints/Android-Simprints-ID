@@ -14,6 +14,8 @@ import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubj
 import com.simprints.feature.clientapi.usecases.GetEventJsonForSessionUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
@@ -67,6 +69,12 @@ internal class ClientApiViewModelTest {
     @MockK
     lateinit var isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase
 
+    @MockK
+    lateinit var authStore: AuthStore
+
+    @MockK
+    lateinit var configManager: ConfigManager
+
     private lateinit var viewModel: ClientApiViewModel
 
 
@@ -82,22 +90,30 @@ internal class ClientApiViewModelTest {
         coEvery { deleteSessionEventsIfNeeded.invoke(any()) } returns mockk()
 
         viewModel = ClientApiViewModel(
-            intentMapper,
-            resultMapper,
-            simpleEventReporter,
-            getCurrentSessionId,
-            createSessionIfRequiredUseCase,
-            getEventJsonForSession,
-            getEnrolmentCreationEventForSubject,
-            deleteSessionEventsIfNeeded,
-            isFlowCompletedWithError
+            intentMapper = intentMapper,
+            resultMapper = resultMapper,
+            simpleEventReporter = simpleEventReporter,
+            getCurrentSessionId = getCurrentSessionId,
+            createSessionIfRequiredUseCase = createSessionIfRequiredUseCase,
+            getEventJsonForSession = getEventJsonForSession,
+            getEnrolmentCreationEventForSubject = getEnrolmentCreationEventForSubject,
+            deleteSessionEventsIfNeeded = deleteSessionEventsIfNeeded,
+            isFlowCompletedWithError = isFlowCompletedWithError,
+            authStore = authStore,
+            configManager = configManager
         )
     }
 
     @Test
     fun `handleIntent tries creating session when called`() = runTest {
         coEvery { createSessionIfRequiredUseCase.invoke(any()) } returns true
-        coEvery { intentMapper.invoke(any(), any()) } returns mockk()
+        coEvery {
+            intentMapper.invoke(
+                action = any(),
+                extras = any(),
+                project = any()
+            )
+        } returns mockk()
 
         viewModel.handleIntent("action", Bundle())
 
@@ -108,7 +124,13 @@ internal class ClientApiViewModelTest {
     @Test
     fun `handleIntent handles invalid intent`() = runTest {
         coEvery { createSessionIfRequiredUseCase.invoke(any()) } returns false
-        coEvery { intentMapper.invoke(any(), any()) } throws InvalidRequestException("Invalid intent")
+        coEvery {
+            intentMapper.invoke(
+                action = any(),
+                extras = any(),
+                project = any()
+            )
+        } throws InvalidRequestException("Invalid intent")
 
         viewModel.handleIntent("action", Bundle())
 
