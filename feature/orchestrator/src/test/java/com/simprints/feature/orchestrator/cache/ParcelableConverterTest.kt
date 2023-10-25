@@ -26,11 +26,13 @@ class ParcelableConverterTest {
 
     @Test
     fun `Correctly marshals and unmarshalls the action request`() {
+        val userId = "userId".asTokenizableRaw()
+        val moduleId = "moduleId".asTokenizableRaw()
         val request = ActionRequest.EnrolActionRequest(
             actionIdentifier = ActionRequestIdentifier("action", "package"),
             projectId = "projectId",
-            userId = "userId".asTokenizableRaw(),
-            moduleId = "moduleId".asTokenizableRaw(),
+            userId = userId,
+            moduleId = moduleId,
             metadata = "metadata",
             unknownExtras = listOf("key" to "value", "key2" to 42),
         )
@@ -41,8 +43,8 @@ class ParcelableConverterTest {
         with(resultRequest as ActionRequest.EnrolActionRequest) {
             assertThat(actionIdentifier).isEqualTo(ActionRequestIdentifier("action", "package"))
             assertThat(projectId).isEqualTo("projectId")
-            assertThat(userId).isEqualTo("userId")
-            assertThat(moduleId).isEqualTo("moduleId")
+            assertThat(this.userId).isEqualTo(userId)
+            assertThat(this.moduleId).isEqualTo(moduleId)
             assertThat(metadata).isEqualTo("metadata")
             assertThat(unknownExtras).containsExactly("key" to "value", "key2" to 42)
         }
