@@ -1,20 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.VIBRATE" />
 
-    <application
-        android:theme="@style/Theme.Simprints"
-        tools:ignore="GoogleAppIndexingWarning">
-
-        <!-- TODO replace with dialog fragment -->
-        <activity
-            android:name=".capture.views.tryagainsplash.SplashScreenActivity"
-            android:theme="@style/Theme.Simprints.Transparent" />
-
+    <application>
         <activity android:name="com.simprints.fingerprint.capture.screen.FingerprintCaptureWrapperActivity" />
-
     </application>
 
 </manifest>
