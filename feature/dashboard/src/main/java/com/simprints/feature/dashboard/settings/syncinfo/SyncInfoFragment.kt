@@ -2,20 +2,26 @@ package com.simprints.feature.dashboard.settings.syncinfo
 
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSyncInfoBinding
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCountAdapter
+import com.simprints.feature.login.LoginContract
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.uibase.navigation.handleResult
 import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
@@ -37,6 +43,12 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         setupClickListeners()
         observeUI()
         viewModel.refreshInformation()
+
+        findNavController().handleResult<LoginResult>(
+            viewLifecycleOwner,
+            R.id.syncInfoFragment,
+            LoginContract.LOGIN_DESTINATION_ID,
+        ) { result -> viewModel.handleLoginResult(result) }
     }
 
     private fun setupClickListeners() {
@@ -53,6 +65,9 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         binding.syncButton.setOnClickListener {
             viewModel.forceSync()
             updateSyncButton(isSyncInProgress = true)
+        }
+        binding.reloginRequiredLoginButton.setOnClickListener {
+            viewModel.login()
         }
     }
 
@@ -97,6 +112,21 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         viewModel.isSyncAvailable.observe(viewLifecycleOwner) {
             binding.syncButton.isEnabled = it
         }
+        viewModel.isReloginRequired.observe(viewLifecycleOwner) { reloginRequired ->
+            if (reloginRequired) {
+                binding.reloginRequiredSection.visibility = VISIBLE
+                binding.syncButton.visibility = GONE
+            } else {
+                binding.reloginRequiredSection.visibility = GONE
+                binding.syncButton.visibility = VISIBLE
+            }
+        }
+        viewModel.loginRequestedEventLiveData.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { loginArgs ->
+            findNavController().navigate(
+                R.id.action_syncInfoFragment_to_login,
+                loginArgs
+            )
+        })
     }
 
     private fun updateSyncButton(isSyncInProgress: Boolean) {
@@ -108,33 +138,33 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun enableModuleSelectionButtonAndTabsIfNecessary(synchronizationConfiguration: SynchronizationConfiguration) {
         if (viewModel.isModuleSyncAndModuleIdOptionsNotEmpty(synchronizationConfiguration)) {
-            binding.moduleSelectionButton.visibility = View.VISIBLE
-            binding.modulesTabHost.visibility = View.VISIBLE
+            binding.moduleSelectionButton.visibility = VISIBLE
+            binding.modulesTabHost.visibility = VISIBLE
         } else {
-            binding.moduleSelectionButton.visibility = View.GONE
-            binding.modulesTabHost.visibility = View.GONE
+            binding.moduleSelectionButton.visibility = GONE
+            binding.modulesTabHost.visibility = GONE
         }
     }
 
     private fun setupRecordsCountCards(configuration: ProjectConfiguration) {
         if (!configuration.isEventDownSyncAllowed()) {
-            binding.recordsToDownloadCardView.visibility = View.GONE
-            binding.recordsToDeleteCardView.visibility = View.GONE
+            binding.recordsToDownloadCardView.visibility = GONE
+            binding.recordsToDeleteCardView.visibility = GONE
         }
 
         if (!configuration.canSyncDataToSimprints()) {
-            binding.recordsToUploadCardView.visibility = View.GONE
-            binding.imagesToUploadCardView.visibility = View.GONE
+            binding.recordsToUploadCardView.visibility = GONE
+            binding.imagesToUploadCardView.visibility = GONE
         }
     }
 
     private fun setProgressBar(value: Int?, tv: TextView, pb: ProgressBar) {
         if (value == null) {
-            pb.visibility = View.VISIBLE
-            tv.visibility = View.GONE
+            pb.visibility = VISIBLE
+            tv.visibility = GONE
         } else {
-            pb.visibility = View.GONE
-            tv.visibility = View.VISIBLE
+            pb.visibility = GONE
+            tv.visibility = VISIBLE
         }
     }
 

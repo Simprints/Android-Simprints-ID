@@ -36,7 +36,6 @@ import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
@@ -90,7 +89,6 @@ internal class SyncViewModel @Inject constructor(
     }
 
     private var lastTimeSyncRun: Date? = null
-    private var estimatedOutage: Long? = null
 
     init {
         viewModelScope.launch {
@@ -217,77 +215,38 @@ internal class SyncViewModel @Inject constructor(
 
     private suspend fun processRecentSyncState(syncState: EventSyncState, itemsToUpSync: Int): SyncCardState {
 
-        val downSyncStates = syncState.downSyncWorkersInfo
-        val upSyncStates = syncState.upSyncWorkersInfo
-        val allSyncStates = downSyncStates + upSyncStates
-
         return when {
-            isThereNotSyncHistory(allSyncStates) -> SyncDefault(lastTimeSyncSucceed())
-            isSyncCompleted(allSyncStates) -> {
+            syncState.isThereNotSyncHistory() -> SyncDefault(lastTimeSyncSucceed())
+            syncState.isSyncCompleted() -> {
                 if (itemsToUpSync == 0) SyncComplete(lastTimeSyncSucceed())
                 else SyncPendingUpload(lastTimeSyncSucceed(), itemsToUpSync)
             }
-            isSyncProcess(allSyncStates) -> SyncProgress(
+            syncState.isSyncInProgress() -> SyncProgress(
                 lastTimeSyncSucceed(),
                 syncState.progress,
                 syncState.total
             )
-            isSyncConnecting(allSyncStates) -> SyncConnecting(
+            syncState.isSyncConnecting() -> SyncConnecting(
                 lastTimeSyncSucceed(),
                 syncState.progress,
                 syncState.total
             )
-            isSyncFailedBecauseSignInRequired(allSyncStates) -> SyncFailedSignInRequired(
+            syncState.isSyncFailedBecauseSignInRequired() -> SyncFailedSignInRequired(
                 lastTimeSyncSucceed()
             )
-            isSyncFailedBecauseTooManyRequests(allSyncStates) -> SyncTooManyRequests(
+            syncState.isSyncFailedBecauseTooManyRequests() -> SyncTooManyRequests(
                 lastTimeSyncSucceed()
             )
-            isSyncFailedBecauseCloudIntegration(allSyncStates) -> SyncFailed(lastTimeSyncSucceed())
-            isSyncFailedBecauseBackendMaintenance(allSyncStates) -> SyncFailedBackendMaintenance(
+            syncState.isSyncFailedBecauseCloudIntegration() -> SyncFailed(lastTimeSyncSucceed())
+            syncState.isSyncFailedBecauseBackendMaintenance() -> SyncFailedBackendMaintenance(
                 lastTimeSyncSucceed(),
-                estimatedOutage
+                syncState.getEstimatedBackendMaintenanceOutage()
             )
-            isSyncFailed(allSyncStates) -> SyncTryAgain(lastTimeSyncSucceed())
+            syncState.isSyncFailed() -> SyncTryAgain(lastTimeSyncSucceed())
             else -> SyncProgress(lastTimeSyncSucceed(), syncState.progress, syncState.total)
         }
     }
 
-    private fun isThereNotSyncHistory(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.isEmpty()
-
-    private fun isSyncCompleted(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.all { it.state is EventSyncWorkerState.Succeeded }
-
-    private fun isSyncProcess(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is EventSyncWorkerState.Running }
-
-    private fun isSyncConnecting(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is EventSyncWorkerState.Enqueued }
-
-    private fun isSyncFailedBecauseSignInRequired(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseSignInRequired }
-
-    private fun isSyncFailedBecauseTooManyRequests(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseTooManyRequest }
-
-    private fun isSyncFailedBecauseCloudIntegration(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseCloudIntegration }
-
-    private fun isSyncFailedBecauseBackendMaintenance(allSyncStates: List<EventSyncState.SyncWorkerInfo>): Boolean {
-        val isBackendMaintenance =
-            allSyncStates.any { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).failedBecauseBackendMaintenance }
-        if (isBackendMaintenance) {
-            val syncWorkerInfo =
-                allSyncStates.find { it.state is EventSyncWorkerState.Failed && (it.state as EventSyncWorkerState.Failed).estimatedOutage != 0L }
-            val failedWorkerState = syncWorkerInfo?.state as EventSyncWorkerState.Failed?
-            estimatedOutage = failedWorkerState?.estimatedOutage
-        }
-        return isBackendMaintenance
-    }
-
-    private fun isSyncFailed(allSyncStates: List<EventSyncState.SyncWorkerInfo>) =
-        allSyncStates.any { it.state is EventSyncWorkerState.Failed || it.state is EventSyncWorkerState.Blocked || it.state is EventSyncWorkerState.Cancelled }
 
     private suspend fun isModuleSelectionRequired() =
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
