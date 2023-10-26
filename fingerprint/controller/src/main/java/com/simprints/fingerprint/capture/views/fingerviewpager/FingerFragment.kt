@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel
 import com.simprints.fingerprint.capture.resources.captureNumberTextId
 import com.simprints.fingerprint.capture.resources.directionTextColour
 import com.simprints.fingerprint.capture.resources.directionTextId
@@ -17,6 +16,7 @@ import com.simprints.fingerprint.capture.resources.nameTextColour
 import com.simprints.fingerprint.capture.resources.nameTextId
 import com.simprints.fingerprint.capture.resources.resultTextColour
 import com.simprints.fingerprint.capture.resources.resultTextId
+import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.state.FingerState
@@ -26,6 +26,7 @@ import com.simprints.fingerprint.capture.views.timeoutbar.ScanningWithImageTrans
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.databinding.FragmentFingerBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,14 +35,14 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
     private val binding by viewBinding(FragmentFingerBinding::bind)
     private val vm: FingerprintCaptureViewModel by activityViewModels()
 
-    private lateinit var fingerId: FingerIdentifier
+    private lateinit var fingerId: IFingerIdentifier
 
     private lateinit var timeoutBars: List<ScanningTimeoutBar>
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        fingerId = FingerIdentifier.values()[arguments?.getInt(FINGER_ID_BUNDLE_KEY)
+        fingerId = IFingerIdentifier.values()[arguments?.getInt(FINGER_ID_BUNDLE_KEY)
             ?: throw IllegalArgumentException()]
 
         initTimeoutBars()
@@ -188,7 +189,7 @@ internal class FingerFragment : Fragment(R.layout.fragment_finger) {
 
         private const val PROGRESS_BAR_MARGIN = 4
 
-        fun newInstance(fingerId: FingerIdentifier) = FingerFragment().also {
+        fun newInstance(fingerId: IFingerIdentifier) = FingerFragment().also {
             it.arguments = Bundle().apply { putInt(FINGER_ID_BUNDLE_KEY, fingerId.ordinal) }
         }
     }

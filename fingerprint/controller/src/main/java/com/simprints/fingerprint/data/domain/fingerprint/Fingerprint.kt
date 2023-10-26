@@ -3,6 +3,7 @@ package com.simprints.fingerprint.data.domain.fingerprint
 import android.os.Parcel
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -16,7 +17,7 @@ import java.nio.ByteOrder
  * @property format  the format for the template (i.e. the format used to generate the template which will determine the format used to match fingerprints)
  */
 class Fingerprint(
-    val fingerId: FingerIdentifier,
+    val fingerId: IFingerIdentifier,
     val template: ByteBuffer,
     var imageRef: FingerprintImageRef? = null,
     val format: String
@@ -50,7 +51,7 @@ class Fingerprint(
      * (2011 not supported yet) template containing only 1 fingerprint.
      */
     @Throws(IllegalArgumentException::class)
-    constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray, format: String) : this(
+    constructor(fingerId: IFingerIdentifier, isoTemplateBytes: ByteArray, format: String) : this(
         fingerId,
         ByteBuffer.allocateDirect(isoTemplateBytes.size),
         format = format
@@ -87,7 +88,7 @@ class Fingerprint(
         private const val FIRST_QUALITY = 26         // BYTE
 
         override fun createFromParcel(source: Parcel): Fingerprint {
-            val fingerId = FingerIdentifier.values()[source.readInt()]
+            val fingerId = IFingerIdentifier.values()[source.readInt()]
             val temp = ByteArray(source.readInt())
             source.readByteArray(temp)
             val template = ByteBuffer.allocateDirect(temp.size)

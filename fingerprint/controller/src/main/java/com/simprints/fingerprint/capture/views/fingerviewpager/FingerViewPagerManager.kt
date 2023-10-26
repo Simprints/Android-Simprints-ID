@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.capture.views.fingerviewpager
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -10,10 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.simprints.fingerprint.capture.resources.indicatorDrawableId
 import com.simprints.fingerprint.capture.state.FingerState
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 internal class FingerViewPagerManager(
-    private val activeFingers: MutableList<FingerIdentifier>,
+    private val activeFingers: MutableList<IFingerIdentifier>,
     private val parentFragment: Fragment,
     private val viewPager: ViewPager2,
     private val indicatorLayout: LinearLayout,

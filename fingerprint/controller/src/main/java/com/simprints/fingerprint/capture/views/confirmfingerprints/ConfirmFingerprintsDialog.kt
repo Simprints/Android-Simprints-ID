@@ -6,7 +6,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.fingerprint.capture.resources.nameTextId
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
@@ -38,5 +38,5 @@ internal class ConfirmFingerprintsDialog(
             }
         }.toString()
 
-    data class Item(val finger: FingerIdentifier, val numberOfSuccessfulScans: Int, val numberOfScans: Int)
+    data class Item(val finger: IFingerIdentifier, val numberOfSuccessfulScans: Int, val numberOfScans: Int)
 }

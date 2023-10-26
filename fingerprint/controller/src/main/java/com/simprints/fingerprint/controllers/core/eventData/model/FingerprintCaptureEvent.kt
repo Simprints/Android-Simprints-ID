@@ -64,19 +64,6 @@ class FingerprintCaptureEvent(
         FAILURE_TO_ACQUIRE;
     }
 
-    companion object {
-        // this function transforms a fingerprint capture status into a Result
-        fun buildResult(status: CaptureState): Result = when (status) {
-            is CaptureState.Skipped -> Result.SKIPPED
-            is CaptureState.NotDetected -> Result.NO_FINGER_DETECTED
-            is CaptureState.Collected -> if (status.scanResult.isGoodScan()) {
-                Result.GOOD_SCAN
-            } else {
-                Result.BAD_QUALITY
-            }
-            else -> Result.FAILURE_TO_ACQUIRE
-        }
-    }
 }
 
 fun FingerprintCaptureEvent.fromDomainToCore() = FingerprintCaptureEventCore(
