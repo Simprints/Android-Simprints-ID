@@ -100,6 +100,9 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
                 OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true
             )
         )
+        is RemoteDbNotSignedInException -> {
+            fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
+        }
         else -> retry(t)
     }
 

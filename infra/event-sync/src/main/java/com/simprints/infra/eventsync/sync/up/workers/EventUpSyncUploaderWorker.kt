@@ -96,6 +96,9 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
             is SyncCloudIntegrationException -> {
                 fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
             }
+            is RemoteDbNotSignedInException -> {
+                fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
+            }
             else -> {
                 retry(t)
             }

@@ -9,6 +9,7 @@ sealed class EventSyncWorkerState(val state: String) {
     object Running : EventSyncWorkerState("Running")
     object Succeeded : EventSyncWorkerState("Succeeded")
     class Failed(
+        val failedBecauseReloginRequired: Boolean = false,
         val failedBecauseCloudIntegration: Boolean = false,
         val failedBecauseBackendMaintenance: Boolean = false,
         val failedBecauseTooManyRequest: Boolean = false,
@@ -22,6 +23,7 @@ sealed class EventSyncWorkerState(val state: String) {
     companion object {
         fun fromWorkInfo(
             state: WorkInfo.State,
+            failedBecauseReloginRequired: Boolean = false,
             failedBecauseCloudIntegration: Boolean = false,
             failedBecauseBackendMaintenance: Boolean = false,
             failedBecauseTooManyRequest: Boolean = false,
@@ -32,6 +34,7 @@ sealed class EventSyncWorkerState(val state: String) {
                 WorkInfo.State.RUNNING -> Running
                 WorkInfo.State.SUCCEEDED -> Succeeded
                 WorkInfo.State.FAILED -> Failed(
+                    failedBecauseReloginRequired,
                     failedBecauseCloudIntegration,
                     failedBecauseBackendMaintenance,
                     failedBecauseTooManyRequest,

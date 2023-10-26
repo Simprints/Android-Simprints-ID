@@ -39,7 +39,7 @@ internal class SyncCardView : MaterialCardView {
             is SyncCardState.SyncDefault -> prepareSyncDefaultStateView()
             is SyncCardState.SyncPendingUpload -> prepareSyncDefaultStateView(state.itemsToUpSync)
             is SyncCardState.SyncFailed -> prepareSyncFailedStateView()
-            is SyncCardState.SyncFailedSignInRequired -> prepareSyncFailedBecauseSignInRequired()
+            is SyncCardState.SyncFailedReloginRequired -> prepareSyncFailedBecauseReloginRequired()
             is SyncCardState.SyncFailedBackendMaintenance -> prepareSyncFailedBecauseBackendMaintenanceView(state)
             is SyncCardState.SyncTooManyRequests -> prepareSyncTooManyRequestsView()
             is SyncCardState.SyncTryAgain -> prepareTryAgainStateView()
@@ -82,7 +82,7 @@ internal class SyncCardView : MaterialCardView {
             resources.getString(R.string.dashboard_sync_card_failed_message)
     }
 
-    private fun prepareSyncFailedBecauseSignInRequired() {
+    private fun prepareSyncFailedBecauseReloginRequired() {
         binding.syncCardReloginRequired.visibility = View.VISIBLE
         binding.syncCardReloginRequiredLoginButton.setOnClickListener { onLoginButtonClick() }
     }

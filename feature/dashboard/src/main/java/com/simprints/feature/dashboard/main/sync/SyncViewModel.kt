@@ -16,7 +16,7 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
 import com.simprints.feature.dashboard.views.SyncCardState.SyncFailed
-import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedSignInRequired
+import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedReloginRequired
 import com.simprints.feature.dashboard.views.SyncCardState.SyncFailedBackendMaintenance
 import com.simprints.feature.dashboard.views.SyncCardState.SyncHasNoModules
 import com.simprints.feature.dashboard.views.SyncCardState.SyncOffline
@@ -231,7 +231,7 @@ internal class SyncViewModel @Inject constructor(
                 syncState.progress,
                 syncState.total
             )
-            syncState.isSyncFailedBecauseSignInRequired() -> SyncFailedSignInRequired(
+            syncState.isSyncFailedBecauseReloginRequired() -> SyncFailedReloginRequired(
                 lastTimeSyncSucceed()
             )
             syncState.isSyncFailedBecauseTooManyRequests() -> SyncTooManyRequests(

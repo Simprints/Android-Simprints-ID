@@ -122,7 +122,7 @@ internal class SyncInfoViewModel @Inject constructor(
             )
         }
         _isReloginRequired.addSource(lastSyncState) { lastSyncStateValue ->
-            _isReloginRequired.postValue(lastSyncStateValue.isSyncFailedBecauseSignInRequired())
+            _isReloginRequired.postValue(lastSyncStateValue.isSyncFailedBecauseReloginRequired())
         }
     }
 

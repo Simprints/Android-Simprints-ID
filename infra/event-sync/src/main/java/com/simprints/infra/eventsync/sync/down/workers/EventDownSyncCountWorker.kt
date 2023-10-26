@@ -83,6 +83,9 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
                         OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage
                     )
                 )
+                t is RemoteDbNotSignedInException -> {
+                    fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true))
+                }
                 isSyncStillRunning() -> retry(t)
                 else -> {
                     Simber.d(t)

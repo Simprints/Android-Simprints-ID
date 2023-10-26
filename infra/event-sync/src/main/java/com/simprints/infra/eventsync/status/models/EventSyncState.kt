@@ -31,8 +31,8 @@ data class EventSyncState(
     fun isSyncConnecting() = (upSyncWorkersInfo + downSyncWorkersInfo)
         .any { it.state is EventSyncWorkerState.Enqueued }
 
-    fun isSyncFailedBecauseSignInRequired() = (upSyncWorkersInfo + downSyncWorkersInfo)
-        .any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseSignInRequired }
+    fun isSyncFailedBecauseReloginRequired() = (upSyncWorkersInfo + downSyncWorkersInfo)
+        .any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseReloginRequired }
 
     fun isSyncFailedBecauseTooManyRequests() = (upSyncWorkersInfo + downSyncWorkersInfo)
         .any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseTooManyRequest }

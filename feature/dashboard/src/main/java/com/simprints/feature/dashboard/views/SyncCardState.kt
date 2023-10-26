@@ -27,7 +27,7 @@ internal sealed class SyncCardState(open val lastTimeSyncSucceed: String?) {
         override val lastTimeSyncSucceed: String?,
     ) : SyncCardState(lastTimeSyncSucceed)
 
-    data class SyncFailedSignInRequired(
+    data class SyncFailedReloginRequired(
         override val lastTimeSyncSucceed: String?,
     ) : SyncCardState(lastTimeSyncSucceed)
 
