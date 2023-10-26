@@ -1,13 +1,10 @@
 package com.simprints.fingerprint.testtools
 
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
-import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
+import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Random
-import java.util.UUID
 
 object FingerprintGenerator {
 
@@ -40,7 +37,7 @@ object FingerprintGenerator {
     private const val QUALITY_SHIFT = 5          // SHORT
 
     private val RANDOM_GENERATOR = Random()
-    private val FINGER_IDENTIFIERS = IFingerIdentifier.values()
+    private val FINGER_IDENTIFIERS = FingerIdentifier.values()
 
 
     /**
@@ -53,20 +50,11 @@ object FingerprintGenerator {
     }
 
 
-    fun generateRandomFingerprintRecord() =
-        generateRandomFingerprintRecord(generateRandomFingerIds(RANDOM_GENERATOR.nextInt(9) + 1))
-
-    fun generateRandomFingerprintRecords(n: Int) =
-        List(n) { generateRandomFingerprintRecord() }
-
-    fun generateRandomFingerprints(n: Int) =
-        generateRandomFingerprints(generateRandomFingerIds(n))
-
     /**
      * @param fingerId Finger identifier of the fingerprint
      * @return A random valid [Fingerprint] with specified [FingerIdentifier]
      */
-    private fun generateRandomFingerprint(fingerId: IFingerIdentifier): Fingerprint {
+    private fun generateRandomFingerprint(fingerId: FingerIdentifier): Fingerprint {
         val qualityScore = RANDOM_GENERATOR.nextInt(101).toByte()
         return generateRandomFingerprint(fingerId, qualityScore)
     }
@@ -77,7 +65,7 @@ object FingerprintGenerator {
      * @param qualityScore Quality score of the fingerprint
      * @return A random valid [Fingerprint] with specified [FingerIdentifier]
      */
-    private fun generateRandomFingerprint(fingerId: IFingerIdentifier,
+    private fun generateRandomFingerprint(fingerId: FingerIdentifier,
                                           qualityScore: Byte): Fingerprint {
         val nbMinutiae = RANDOM_GENERATOR.nextInt(128).toByte()
         val length = HEADER_SIZE + nbMinutiae * MINUTIAE_SIZE
@@ -112,15 +100,7 @@ object FingerprintGenerator {
         bb.position(0)
         val templateBytes = ByteArray(bb.remaining())
         bb.get(templateBytes)
-        return Fingerprint(fingerId, templateBytes, format ="ISO_19794_2")
+        return Fingerprint(fingerId, templateBytes, format = "ISO_19794_2")
     }
 
-    private fun generateRandomFingerprints(fingerIds: List<IFingerIdentifier>) =
-        fingerIds.map { generateRandomFingerprint(it) }
-
-    private fun generateRandomFingerprintRecord(fingerIds: List<IFingerIdentifier>) =
-        FingerprintIdentity(UUID.randomUUID().toString(), generateRandomFingerprints(fingerIds))
-
-    private fun generateRandomFingerIds(n: Int) =
-        List(n) { IFingerIdentifier.values()[RANDOM_GENERATOR.nextInt(IFingerIdentifier.values().size)] }
 }

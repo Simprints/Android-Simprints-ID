@@ -23,7 +23,6 @@ import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.views.timeoutbar.ScanningOnlyTimeoutBar
 import com.simprints.fingerprint.capture.views.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.capture.views.timeoutbar.ScanningWithImageTransferTimeoutBar
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.databinding.FragmentFingerBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier

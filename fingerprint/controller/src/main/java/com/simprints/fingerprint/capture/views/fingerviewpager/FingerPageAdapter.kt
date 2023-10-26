@@ -2,8 +2,10 @@ package com.simprints.fingerprint.capture.views.fingerviewpager
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class FingerPageAdapter(
     parent: Fragment,
     private val activeFingers: MutableList<IFingerIdentifier>

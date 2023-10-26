@@ -9,8 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.simprints.fingerprint.capture.resources.indicatorDrawableId
 import com.simprints.fingerprint.capture.state.FingerState
+import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
+@ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class FingerViewPagerManager(
     private val activeFingers: MutableList<IFingerIdentifier>,
     private val parentFragment: Fragment,
