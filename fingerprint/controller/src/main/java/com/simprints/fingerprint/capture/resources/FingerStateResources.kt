@@ -1,28 +1,30 @@
-package com.simprints.fingerprint.activities.collect.resources
+package com.simprints.fingerprint.capture.resources
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.FingerState
+import com.simprints.fingerprint.capture.state.CaptureState
+import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
-fun FingerState.indicatorDrawableId(selected: Boolean): Int =
+internal fun FingerState.indicatorDrawableId(selected: Boolean): Int =
     if (selected) indicatorSelectedDrawableId() else indicatorDeselectedDrawableId()
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
-fun FingerState.indicatorSelectedDrawableId(): Int =
+internal fun FingerState.indicatorSelectedDrawableId(): Int =
     when (this.currentCapture()) {
         is CaptureState.NotCollected,
         is CaptureState.Scanning,
         is CaptureState.TransferringImage -> R.drawable.blank_selected
+
         is CaptureState.Skipped,
         is CaptureState.NotDetected -> R.drawable.alert_selected
+
         is CaptureState.Collected -> when {
             captures.all { it is CaptureState.Collected && it.scanResult.isGoodScan() } -> R.drawable.ok_selected
             captures.any { it is CaptureState.NotCollected } -> R.drawable.blank_selected
@@ -32,13 +34,15 @@ fun FingerState.indicatorSelectedDrawableId(): Int =
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
-fun FingerState.indicatorDeselectedDrawableId(): Int =
+internal fun FingerState.indicatorDeselectedDrawableId(): Int =
     when (this.currentCapture()) {
         is CaptureState.NotCollected,
         is CaptureState.Scanning,
         is CaptureState.TransferringImage -> R.drawable.blank_deselected
+
         is CaptureState.Skipped,
         is CaptureState.NotDetected -> R.drawable.alert_deselected
+
         is CaptureState.Collected -> when {
             captures.all { it is CaptureState.Collected && it.scanResult.isGoodScan() } -> R.drawable.ok_deselected
             captures.any { it is CaptureState.NotCollected } -> R.drawable.blank_deselected
@@ -49,18 +53,17 @@ fun FingerState.indicatorDeselectedDrawableId(): Int =
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @ColorRes
-fun FingerState.nameTextColour(): Int =
-    IDR.color.simprints_blue
+internal fun FingerState.nameTextColour(): Int = IDR.color.simprints_blue
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @StringRes
-fun FingerState.captureNumberTextId(): Int =
+internal fun FingerState.captureNumberTextId(): Int =
     IDR.string.capture_number_text
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
-fun FingerState.directionTextId(isLastFinger: Boolean): Int =
+internal fun FingerState.directionTextId(isLastFinger: Boolean): Int =
     when (val currentCapture = this.currentCapture()) {
         is CaptureState.NotCollected -> if (currentCaptureIndex == 0) IDR.string.please_scan else IDR.string.please_scan_again
         is CaptureState.Scanning -> IDR.string.scanning
@@ -77,5 +80,4 @@ fun FingerState.directionTextId(isLastFinger: Boolean): Int =
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @ColorRes
-fun FingerState.directionTextColour(): Int =
-    IDR.color.simprints_grey
+internal fun FingerState.directionTextColour(): Int = IDR.color.simprints_grey

@@ -1,14 +1,14 @@
-package com.simprints.fingerprint.activities.collect.resources
+package com.simprints.fingerprint.capture.resources
 
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
-import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.infra.resources.R
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
-fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
+internal fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
     when (this) {
         is CaptureState.NotCollected -> R.string.scan_label
         is CaptureState.Scanning -> R.string.cancel_button
@@ -28,7 +28,7 @@ fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int =
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @ColorRes
-fun CaptureState.buttonBackgroundColour(): Int =
+internal fun CaptureState.buttonBackgroundColour(): Int =
     when (this) {
         is CaptureState.NotCollected -> R.color.simprints_grey
         is CaptureState.Scanning,
@@ -44,7 +44,7 @@ fun CaptureState.buttonBackgroundColour(): Int =
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
-fun CaptureState.resultTextId(): Int =
+internal fun CaptureState.resultTextId(): Int =
     when (this) {
         is CaptureState.NotCollected -> R.string.empty
         is CaptureState.Scanning -> R.string.empty
@@ -64,7 +64,7 @@ fun CaptureState.resultTextId(): Int =
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @ColorRes
-fun CaptureState.resultTextColour(): Int =
+internal fun CaptureState.resultTextColour(): Int =
     when (this) {
         is CaptureState.NotCollected,
         is CaptureState.Scanning -> android.R.color.white

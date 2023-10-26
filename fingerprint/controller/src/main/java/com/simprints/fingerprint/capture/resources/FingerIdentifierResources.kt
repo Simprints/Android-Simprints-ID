@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect.resources
+package com.simprints.fingerprint.capture.resources
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -10,7 +10,7 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @DrawableRes
-fun FingerIdentifier.fingerDrawable(): Int =
+internal fun FingerIdentifier.fingerDrawable(): Int =
     when (this) {
         FingerIdentifier.RIGHT_5TH_FINGER -> R.drawable.hand_bb_r5_c4
         FingerIdentifier.RIGHT_4TH_FINGER -> R.drawable.hand_bb_r4_c4
@@ -26,7 +26,7 @@ fun FingerIdentifier.fingerDrawable(): Int =
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
-fun FingerIdentifier.nameTextId(): Int =
+internal fun FingerIdentifier.nameTextId(): Int =
     when (this) {
         FingerIdentifier.RIGHT_5TH_FINGER -> IDR.string.r_5_finger_name
         FingerIdentifier.RIGHT_4TH_FINGER -> IDR.string.r_4_finger_name
@@ -43,5 +43,4 @@ fun FingerIdentifier.nameTextId(): Int =
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @ColorRes
-fun FingerIdentifier.nameTextColour(): Int =
-    IDR.color.simprints_blue
+internal fun FingerIdentifier.nameTextColour(): Int = IDR.color.simprints_blue

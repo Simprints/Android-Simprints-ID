@@ -1,26 +1,27 @@
-package com.simprints.fingerprint.activities.collect.confirmfingerprints
+package com.simprints.fingerprint.capture.views.confirmfingerprints
 
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.resources.nameTextId
+import com.simprints.fingerprint.capture.resources.nameTextId
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-class ConfirmFingerprintsDialog(private val context: Context,
-                                private val scannedFingers: List<Item>,
-                                private val callbackConfirm: () -> Unit,
-                                private val callbackRestart: () -> Unit) {
+internal class ConfirmFingerprintsDialog(
+    private val context: Context,
+    private val scannedFingers: List<Item>,
+    private val onConfirm: () -> Unit,
+    private val onRestart: () -> Unit,
+) {
 
     fun create(): AlertDialog = MaterialAlertDialogBuilder(context)
         .setTitle(context.getString(IDR.string.confirm_fingers_dialog_title))
         .setMessage(getMapOfFingersAndQualityAsText())
-        .setPositiveButton(context.getString(IDR.string.confirm)) { _, _ -> callbackConfirm() }
-        .setNegativeButton(context.getString(IDR.string.restart)) { _, _ -> callbackRestart() }
+        .setPositiveButton(context.getString(IDR.string.confirm)) { _, _ -> onConfirm() }
+        .setNegativeButton(context.getString(IDR.string.restart)) { _, _ -> onRestart() }
         .setCancelable(false)
         .create()
 

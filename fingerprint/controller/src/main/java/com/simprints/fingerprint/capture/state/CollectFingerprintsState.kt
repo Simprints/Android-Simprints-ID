@@ -1,6 +1,6 @@
-package com.simprints.fingerprint.activities.collect.state
+package com.simprints.fingerprint.capture.state
 
-data class CollectFingerprintsState(
+internal data class CollectFingerprintsState(
     val fingerStates: List<FingerState>,
     val currentFingerIndex: Int,
     val isAskingRescan: Boolean,

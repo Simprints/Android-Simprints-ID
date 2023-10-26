@@ -1,19 +1,20 @@
-package com.simprints.fingerprint.activities.collect.fingerviewpager
+package com.simprints.fingerprint.capture.views.fingerviewpager
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.view.children
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import com.simprints.fingerprint.activities.collect.resources.indicatorDrawableId
-import com.simprints.fingerprint.activities.collect.state.FingerState
+import com.simprints.fingerprint.capture.resources.indicatorDrawableId
+import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 
-class FingerViewPagerManager(
+internal class FingerViewPagerManager(
     private val activeFingers: MutableList<FingerIdentifier>,
-    private val activity: FragmentActivity,
+    private val parentFragment: Fragment,
     private val viewPager: ViewPager2,
     private val indicatorLayout: LinearLayout,
     private val onFingerSelected: (Int) -> Unit,
@@ -29,7 +30,7 @@ class FingerViewPagerManager(
     private fun initIndicators() {
         indicatorLayout.removeAllViewsInLayout()
         activeFingers.forEachIndexed { index, _ ->
-            val indicator = ImageView(activity)
+            val indicator = ImageView(parentFragment.requireContext())
             indicator.adjustViewBounds = true
             indicator.setOnClickListener { if (isAbleToSelectNewFinger()) onFingerSelected(index) }
             indicatorLayout.addView(indicator, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
@@ -38,7 +39,7 @@ class FingerViewPagerManager(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun initViewPager() {
-        pageAdapter = FingerPageAdapter(activity, activeFingers)
+        pageAdapter = FingerPageAdapter(parentFragment, activeFingers)
         viewPager.adapter = pageAdapter
         viewPager.offscreenPageLimit = 1
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {

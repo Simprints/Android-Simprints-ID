@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.activities.collect.state.CaptureState
+import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result.*
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier

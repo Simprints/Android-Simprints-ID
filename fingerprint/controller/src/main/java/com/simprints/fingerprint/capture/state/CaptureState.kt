@@ -1,9 +1,9 @@
-package com.simprints.fingerprint.activities.collect.state
+package com.simprints.fingerprint.capture.state
 
-sealed class CaptureState {
+internal sealed class CaptureState {
 
-    object NotCollected : CaptureState()
-    object Skipped : CaptureState()
+    data object NotCollected : CaptureState()
+    data object Skipped : CaptureState()
     data class Scanning(val numberOfBadScans: Int = 0) : CaptureState()
     data class TransferringImage(val scanResult: ScanResult, val numberOfBadScans: Int = 0) : CaptureState()
     data class NotDetected(val numberOfBadScans: Int = 0) : CaptureState()

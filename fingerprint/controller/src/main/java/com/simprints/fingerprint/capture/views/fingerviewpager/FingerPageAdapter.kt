@@ -1,13 +1,13 @@
-package com.simprints.fingerprint.activities.collect.fingerviewpager
+package com.simprints.fingerprint.capture.views.fingerviewpager
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 
-class FingerPageAdapter(fragmentActivity: FragmentActivity,
-                        private val activeFingers: MutableList<FingerIdentifier>) :
-    FragmentStateAdapter(fragmentActivity) {
+internal class FingerPageAdapter(
+    parent: Fragment,
+    private val activeFingers: MutableList<FingerIdentifier>
+) : FragmentStateAdapter(parent) {
 
     override fun createFragment(position: Int): Fragment = FingerFragment.newInstance(activeFingers[position])
     override fun containsItem(itemId: Long): Boolean = activeFingers.contains(itemId.itemIdToFingerIdentifier())
