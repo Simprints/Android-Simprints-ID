@@ -31,6 +31,7 @@ import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerManager
+import com.simprints.fingerprint.capture.views.tryagainsplash.FullScreenSplashDialog
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.fingerprint.databinding.FragmentFingerprintCaptureBinding
@@ -92,7 +93,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     private fun startCollection() {
-        // TODO simplify methods params
         vm.start(args.params.fingerprintsToCapture)
 
         initToolbar(args.params.flowType)
@@ -238,14 +238,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     private fun listenForSplashScreen(state: CollectFingerprintsState) {
         if (state.isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             if (!hasSplashScreenBeenTriggered) {
-                // TODO show splash screen
-                // startActivity(
-                //     Intent(
-                //         this@CollectFingerprintsActivity,
-                //         SplashScreenActivity::class.java
-                //     )
-                // )
-                // overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+                FullScreenSplashDialog().show(childFragmentManager, "splash")
                 hasSplashScreenBeenTriggered = true
             }
         } else {
