@@ -5,7 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.infra.resources.R as IDR
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 

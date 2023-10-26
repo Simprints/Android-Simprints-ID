@@ -7,6 +7,7 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.common.FlowProvider
@@ -14,6 +15,9 @@ import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
+import com.simprints.feature.alert.alertConfiguration
+import com.simprints.feature.alert.config.AlertButtonConfig
+import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.exitform.ExitFormContract
 import com.simprints.feature.exitform.ExitFormResult
@@ -21,7 +25,6 @@ import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
 import com.simprints.fingerprint.capture.state.CaptureState
@@ -31,6 +34,7 @@ import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerMa
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.fingerprint.databinding.FragmentFingerprintCaptureBinding
+import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.extensions.showToast
@@ -50,7 +54,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private lateinit var fingerViewPagerManager: FingerViewPagerManager
     private var confirmDialog: AlertDialog? = null
-    // TODO private var hasSplashScreenBeenTriggered: Boolean = false
+    private var hasSplashScreenBeenTriggered: Boolean = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -59,21 +63,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             viewLifecycleOwner,
             R.id.fingerprintCaptureFragment,
             AlertContract.DESTINATION
-        ) {
-            val alertError = it.payload.getString(AlertError.PAYLOAD_KEY)?.let { AlertError.valueOf(it) }
-                ?: AlertError.UNEXPECTED_ERROR
-
-            when (it.buttonKey) {
-                AlertError.ACTION_CLOSE -> findNavController().finishWithResult(this, it)
-                AlertContract.ALERT_BUTTON_PRESSED_BACK -> {
-                    if (alertError == AlertError.UNEXPECTED_ERROR) {
-                        findNavController().finishWithResult(this, it)
-                    } else {
-                        openRefusal()
-                    }
-                }
-            }
-        }
+        ) { findNavController().finishWithResult(this, it) }
 
         findNavController().handleResult<ExitFormResult>(
             viewLifecycleOwner,
@@ -172,7 +162,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 }
 
                 listenForConfirmDialog(state)
-                // TODO it.listenForSplashScreen()
+                listenForSplashScreen(state)
             }
         }
 
@@ -182,8 +172,18 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             requireContext().showToast(IDR.string.no_fingers_scanned)
         })
 
-        vm.launchAlert.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            findNavController().navigate(R.id.action_fingerprintCaptureFragment_to_graphAlert, it.toAlertConfig().toArgs())
+        vm.launchAlert.observe(viewLifecycleOwner, LiveDataEventObserver {
+            findNavController().navigate(
+                R.id.action_fingerprintCaptureFragment_to_graphAlert,
+                alertConfiguration {
+                    titleRes = IDR.string.error_occurred_title
+                    messageRes = IDR.string.unforeseen_error_message
+                    color = AlertColor.Red
+                    image = IDR.drawable.ic_alert_default
+                    eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
+                    leftButton = AlertButtonConfig.Close
+                }.toArgs()
+            )
         })
         vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
         vm.finishWithFingerprints.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { fingerprints ->
@@ -232,6 +232,24 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             null
         } else {
             confirmDialog
+        }
+    }
+
+    private fun listenForSplashScreen(state: CollectFingerprintsState) {
+        if (state.isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            if (!hasSplashScreenBeenTriggered) {
+                // TODO show splash screen
+                // startActivity(
+                //     Intent(
+                //         this@CollectFingerprintsActivity,
+                //         SplashScreenActivity::class.java
+                //     )
+                // )
+                // overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+                hasSplashScreenBeenTriggered = true
+            }
+        } else {
+            hasSplashScreenBeenTriggered = false
         }
     }
 

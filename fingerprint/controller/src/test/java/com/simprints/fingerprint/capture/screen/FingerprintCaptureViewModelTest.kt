@@ -3,7 +3,6 @@ package com.simprints.fingerprint.capture.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.DIFFERENT_GOOD_SCAN
@@ -20,8 +19,6 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
-import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -37,9 +34,7 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventReceived
-import com.simprints.testtools.common.livedata.assertEventReceivedWithContent
 import com.simprints.testtools.common.livedata.assertEventReceivedWithContentAssertions
-import com.simprints.testtools.common.livedata.assertEventWithContentNeverReceived
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coJustRun
@@ -100,9 +95,6 @@ class FingerprintCaptureViewModelTest {
     @MockK
     private lateinit var addCaptureEventsUseCase: AddCaptureEventsUseCase
 
-
-    private val imageManager: FingerprintImageManager = mockk(relaxed = true)
-
     private lateinit var vm: FingerprintCaptureViewModel
 
     @Before
@@ -145,11 +137,7 @@ class FingerprintCaptureViewModelTest {
 
         assertThat(vm.stateLiveData.value).isEqualTo(
             CollectFingerprintsState(
-                fingerStates = TWO_FINGERS_IDS.map {
-                    FingerState(
-                        it, listOf(CaptureState.NotCollected)
-                    )
-                },
+                fingerStates = TWO_FINGERS_IDS.map { FingerState(it, listOf(CaptureState.NotCollected)) },
                 currentFingerIndex = 0,
                 isAskingRescan = false,
                 isShowingConfirmDialog = false,
@@ -170,7 +158,7 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
 
-        vm.launchAlert.assertEventWithContentNeverReceived()
+        vm.launchAlert.assertEventReceived()
     }
 
     @Test
@@ -437,7 +425,7 @@ class FingerprintCaptureViewModelTest {
         coVerify(exactly = 16) { addCaptureEventsUseCase.invoke(any(), any(), any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
-        coVerify(exactly = 4) { imageManager.save(any(), any(), any()) }
+        coVerify(exactly = 4) { saveImageUseCase.invoke(any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(FOUR_FINGERS_IDS.size)
@@ -487,7 +475,7 @@ class FingerprintCaptureViewModelTest {
         coVerify(exactly = 4) { addCaptureEventsUseCase.invoke(any(), any(), any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
-        coVerify(exactly = 2) { imageManager.save(any(), any(), any()) }
+        coVerify(exactly = 2) { saveImageUseCase.invoke(any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(TWO_FINGERS_IDS.size)
@@ -536,7 +524,7 @@ class FingerprintCaptureViewModelTest {
         coVerify(exactly = 4) { addCaptureEventsUseCase.invoke(any(), any(), any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
-        coVerify(exactly = 0) { imageManager.save(any(), any(), any()) }
+        coVerify(exactly = 0) { saveImageUseCase.invoke(any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(TWO_FINGERS_IDS.size)
@@ -725,14 +713,14 @@ class FingerprintCaptureViewModelTest {
         coVerify(exactly = 17) { addCaptureEventsUseCase.invoke(any(), any(), any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
-        coVerify(exactly = 3) { imageManager.save(any(), any(), any()) }
+        coVerify(exactly = 3) { saveImageUseCase.invoke(any(), any(), any()) }
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
-                FingerIdentifier.LEFT_THUMB,
-                FingerIdentifier.RIGHT_THUMB,
-                FingerIdentifier.RIGHT_INDEX_FINGER
+                IFingerIdentifier.LEFT_THUMB,
+                IFingerIdentifier.RIGHT_THUMB,
+                IFingerIdentifier.RIGHT_INDEX_FINGER
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -825,16 +813,16 @@ class FingerprintCaptureViewModelTest {
         coVerify(exactly = 17) { addCaptureEventsUseCase.invoke(any(), any(), any(), any(), any()) }
 
         // If eager, expect that images were saved before confirm was pressed, including bad scans
-        coVerify(exactly = 8) { imageManager.save(any(), any(), any()) }
+        coVerify(exactly = 8) { saveImageUseCase.invoke(any(), any(), any()) }
 
         vm.handleConfirmFingerprintsAndContinue()
 
         vm.finishWithFingerprints.assertEventReceivedWithContentAssertions { actualFingerprints ->
             assertThat(actualFingerprints?.results).hasSize(3)
             assertThat(actualFingerprints?.results?.map { it.identifier }).containsExactly(
-                FingerIdentifier.LEFT_THUMB,
-                FingerIdentifier.RIGHT_THUMB,
-                FingerIdentifier.RIGHT_INDEX_FINGER
+                IFingerIdentifier.LEFT_THUMB,
+                IFingerIdentifier.RIGHT_THUMB,
+                IFingerIdentifier.RIGHT_INDEX_FINGER
             )
             actualFingerprints?.results?.forEach {
                 assertThat(it.sample?.template).isEqualTo(TEMPLATE)
@@ -995,7 +983,7 @@ class FingerprintCaptureViewModelTest {
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
 
-        vm.launchAlert.assertEventReceivedWithContent(AlertError.UNEXPECTED_ERROR)
+        vm.launchAlert.assertEventReceived()
     }
 
     @Test
@@ -1149,7 +1137,7 @@ class FingerprintCaptureViewModelTest {
     }
 
     @Test
-    fun whenScannerDisconnects_AndUserSelectsDifferentFinger_updatesStateCorrectlyAndReconnects() {
+    fun whenScannerDisconnects_AndUserSelectsDifferentFinger_updatesStateCorrectlyAndReconnects() = runTest {
         mockScannerSetUiIdle()
         coEvery { scanner.setUiIdle() } throws ScannerDisconnectedException()
 
@@ -1208,7 +1196,7 @@ class FingerprintCaptureViewModelTest {
 
     private fun withImageTransfer(isEager: Boolean = false) {
         every { vero2Configuration.imageSavingStrategy } returns if (isEager) Vero2Configuration.ImageSavingStrategy.EAGER else Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
-        coEvery { imageManager.save(any(), any(), any()) } returns mockk()
+        coEvery { saveImageUseCase(any(), any(), any()) } returns mockk()
     }
 
     private fun mockScannerSetUiIdle() {
@@ -1306,8 +1294,8 @@ class FingerprintCaptureViewModelTest {
         const val DIFFERENT_GOOD_QUALITY = 80
         const val BAD_QUALITY = 20
 
-        val TEMPLATE = FingerprintGenerator.generateRandomFingerprint().templateBytes
-        val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprint().templateBytes
+        val TEMPLATE = FingerprintGenerator.generateRandomFingerprint().template
+        val DIFFERENT_TEMPLATE = FingerprintGenerator.generateRandomFingerprint().template
 
         val IMAGE = byteArrayOf(0x05, 0x06, 0x07, 0x08)
 

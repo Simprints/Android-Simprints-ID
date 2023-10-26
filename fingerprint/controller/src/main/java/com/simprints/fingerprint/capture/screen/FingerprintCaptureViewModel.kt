@@ -11,7 +11,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.fingerprint.activities.alert.AlertError
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.capture.models.CaptureId
 import com.simprints.fingerprint.capture.models.Path
@@ -26,10 +25,9 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
-import com.simprints.fingerprint.data.domain.fingerprint.toInt
-import com.simprints.fingerprint.data.domain.images.FingerprintImageRef
-import com.simprints.fingerprint.data.domain.images.isEager
-import com.simprints.fingerprint.data.domain.images.isImageTransferRequired
+import com.simprints.fingerprint.capture.extensions.toInt
+import com.simprints.fingerprint.capture.extensions.isEager
+import com.simprints.fingerprint.capture.extensions.isImageTransferRequired
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -104,9 +102,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         get() = _noFingersScannedToast
     private val _noFingersScannedToast = MutableLiveData<LiveDataEvent>()
 
-    val launchAlert: LiveData<LiveDataEventWithContent<AlertError>>
+    val launchAlert: LiveData<LiveDataEvent>
         get() = _launchAlert
-    private val _launchAlert = MutableLiveData<LiveDataEventWithContent<AlertError>>()
+    private val _launchAlert = MutableLiveData<LiveDataEvent>()
 
     val launchReconnect: LiveData<LiveDataEvent>
         get() = _launchReconnect
@@ -118,7 +116,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private lateinit var originalFingerprintsToCapture: List<IFingerIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
-    private val imageRefs: MutableMap<CaptureId, FingerprintImageRef?> = mutableMapOf()
+    private val imageRefs: MutableMap<CaptureId, SecuredImageRef?> = mutableMapOf()
     private var lastCaptureStartedAt: Long = 0
     private var hasStarted: Boolean = false
 
@@ -459,7 +457,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)
-                _launchAlert.send(AlertError.UNEXPECTED_ERROR)
+                _launchAlert.send()
             }
         }
     }
