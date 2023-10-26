@@ -1,8 +1,8 @@
-package com.simprints.fingerprint.activities.collect.timeoutbar
+package com.simprints.fingerprint.capture.views.timeoutbar
 
 import android.widget.ProgressBar
 
-interface ScanningTimeoutBar {
+internal interface ScanningTimeoutBar {
 
     val progressBar: ProgressBar
 

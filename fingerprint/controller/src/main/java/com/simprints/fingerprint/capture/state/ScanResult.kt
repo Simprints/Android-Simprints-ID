@@ -1,6 +1,6 @@
-package com.simprints.fingerprint.activities.collect.state
+package com.simprints.fingerprint.capture.state
 
-data class ScanResult(
+internal data class ScanResult(
     val qualityScore: Int,
     val template: ByteArray,
     val templateFormat: String,

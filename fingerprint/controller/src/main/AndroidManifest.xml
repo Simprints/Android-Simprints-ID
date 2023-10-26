@@ -27,6 +27,8 @@
             android:name=".activities.collect.tryagainsplash.SplashScreenActivity"
             android:theme="@style/Theme.Simprints.Transparent" />
 
+        <activity android:name="com.simprints.fingerprint.capture.screen.FingerprintCaptureWrapperActivity" />
+
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity" />

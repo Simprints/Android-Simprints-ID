@@ -46,7 +46,7 @@ class ModalityFlowIdentify @Inject constructor(
         addSetupStep()
         addModalityConfigurationSteps()
         addCoreConsentStepIfRequired(ConsentType.IDENTIFY)
-        addModalitiesStepsList()
+        addModalitiesStepsList(FlowProvider.FlowType.IDENTIFY)
     }
 
     override fun getNextStepToLaunch(): Step? =

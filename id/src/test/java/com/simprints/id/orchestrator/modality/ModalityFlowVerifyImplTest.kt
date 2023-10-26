@@ -86,7 +86,7 @@ class ModalityFlowVerifyImplTest {
         every { verifyCoreStepMock.activityName } returns FETCH_GUID_ACTIVITY_NAME
         every { consentCoreStepMock.activityName } returns CONSENT_ACTIVITY_NAME
 
-        coEvery { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
+        coEvery { fingerprintStepProcessor.buildStepToCapture(any()) } returns fingerprintStepMock
         coEvery { faceStepProcessor.buildCaptureStep() } returns faceStepMock
         every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildFetchGuidStep(any(), any()) } returns verifyCoreStepMock

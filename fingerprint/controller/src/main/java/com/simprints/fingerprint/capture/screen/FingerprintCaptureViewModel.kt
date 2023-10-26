@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect
+package com.simprints.fingerprint.capture.screen
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,14 +11,14 @@ import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.fingerprint.activities.alert.AlertError
-import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
-import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.CaptureState.NotCollected.toNotCollected
-import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsState
-import com.simprints.fingerprint.activities.collect.state.FingerState
-import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
+import com.simprints.fingerprint.capture.state.CaptureState
+import com.simprints.fingerprint.capture.state.CaptureState.NotCollected.toNotCollected
+import com.simprints.fingerprint.capture.state.CollectFingerprintsState
+import com.simprints.fingerprint.capture.state.FingerState
+import com.simprints.fingerprint.capture.state.LiveFeedbackState
+import com.simprints.fingerprint.capture.state.ScanResult
+import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
@@ -58,24 +58,26 @@ import kotlin.concurrent.schedule
 import kotlin.math.min
 
 @HiltViewModel
-class CollectFingerprintsViewModel @Inject constructor(
+internal class FingerprintCaptureViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
     private val configManager: ConfigManager,
     private val imageManager: FingerprintImageManager,
     private val timeHelper: FingerprintTimeHelper,
     private val sessionEventsManager: FingerprintSessionEventsManager,
-    private val fingerPriorityDeterminer: FingerPriorityDeterminer,
-    private val startingStateDeterminer: StartingStateDeterminer,
+    private val getNextFingerToAdd: GetNextFingerToAddUseCase,
+    private val getStartStateUseCase: GetStartStateUseCase,
     private val encoder: EncodingUtils,
     private val bioSdk: BioSdkWrapper,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
     lateinit var configuration: FingerprintConfiguration
+
     var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
         private set(value) {
             field = value
             field.run(_stateLiveData::postValue)
         }
+
     private val _stateLiveData = MutableLiveData<CollectFingerprintsState>()
     val stateLiveData: LiveData<CollectFingerprintsState> = _stateLiveData
 
@@ -117,6 +119,8 @@ class CollectFingerprintsViewModel @Inject constructor(
     private var stopLiveFeedbackTask: Job? = null
     var liveFeedbackState: LiveFeedbackState? = null
 
+    private var hasStarted: Boolean = false
+
     private data class CaptureId(val finger: FingerIdentifier, val captureIndex: Int)
 
     private val scannerTriggerListener = ScannerTriggerListener {
@@ -131,16 +135,22 @@ class CollectFingerprintsViewModel @Inject constructor(
         }
     }
 
+    fun hasScanner() = scannerManager.isScannerAvailable
+
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
-        runBlocking {
-            bioSdk.initialize()
-            // Configuration must be initialised when start returns for UI to be initialised correctly,
-            // and since fetching happens on IO thread execution must be suspended until it is available
-            configuration = configManager.getProjectConfiguration().fingerprint!!
+        if (!hasStarted) {
+            hasStarted = true
+
+            runBlocking {
+                bioSdk.initialize()
+                // Configuration must be initialised when start returns for UI to be initialised correctly,
+                // and since fetching happens on IO thread execution must be suspended until it is available
+                configuration = configManager.getProjectConfiguration().fingerprint!!
+            }
+            originalFingerprintsToCapture = fingerprintsToCapture
+            setStartingState()
+            startObserverForLiveFeedback()
         }
-        originalFingerprintsToCapture = fingerprintsToCapture
-        setStartingState()
-        startObserverForLiveFeedback()
     }
 
     private fun startObserverForLiveFeedback() {
@@ -199,9 +209,7 @@ class CollectFingerprintsViewModel @Inject constructor(
     private fun setStartingState() {
         updateState {
             CollectFingerprintsState.EMPTY.copy(
-                fingerStates = startingStateDeterminer.determineStartingFingerStates(
-                    originalFingerprintsToCapture
-                )
+                fingerStates = getStartStateUseCase(originalFingerprintsToCapture)
             )
         }
     }
@@ -458,8 +466,7 @@ class CollectFingerprintsViewModel @Inject constructor(
 
     private fun handleAutoAddFinger() {
         updateState { state ->
-            val nextPriorityFingerId =
-                fingerPriorityDeterminer.determineNextPriorityFinger(state.fingerStates.map { it.id })
+            val nextPriorityFingerId = getNextFingerToAdd(state.fingerStates.map { it.id })
             when (nextPriorityFingerId) {
                 null -> state
                 else -> {

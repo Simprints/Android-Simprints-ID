@@ -82,7 +82,7 @@ class ModalityFlowIdentifyImplTest {
         every { faceStepMock.activityName } returns FACE_ACTIVITY_NAME
         every { consentStepMock.activityName } returns CONSENT_ACTIVITY_NAME
 
-        coEvery { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
+        coEvery { fingerprintStepProcessor.buildStepToCapture(any()) } returns fingerprintStepMock
         coEvery { faceStepProcessor.buildCaptureStep() } returns faceStepMock
         every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildStepSetup() } returns setupStepMock

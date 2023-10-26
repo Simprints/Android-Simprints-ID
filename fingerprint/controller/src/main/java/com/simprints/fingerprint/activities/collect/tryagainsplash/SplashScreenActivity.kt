@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModel.Companion.TRY_DIFFERENT_FINGER_SPLASH_DELAY
+import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel.Companion.TRY_DIFFERENT_FINGER_SPLASH_DELAY
 import com.simprints.fingerprint.databinding.ActivitySplashScreenBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.infra.resources.R as IDR

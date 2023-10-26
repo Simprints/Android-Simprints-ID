@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprint.activities.collect.state.CaptureState
-import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.capture.state.CaptureState
+import com.simprints.fingerprint.capture.state.ScanResult
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Companion.buildResult
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.infra.config.store.models.Finger

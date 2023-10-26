@@ -3,13 +3,13 @@ package com.simprints.fingerprint.activities.collect
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.activities.alert.AlertError
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockAcquireImageResult.OK
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.DIFFERENT_GOOD_SCAN
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.GOOD_SCAN
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.NEVER_RETURNS
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.NO_FINGER_DETECTED
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsViewModelTest.MockCaptureFingerprintResponse.UNKNOWN_ERROR
+import com.simprints.fingerprint.activities.collect.FingerprintCaptureViewModelTest.MockAcquireImageResult.OK
+import com.simprints.fingerprint.activities.collect.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
+import com.simprints.fingerprint.activities.collect.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.DIFFERENT_GOOD_SCAN
+import com.simprints.fingerprint.activities.collect.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.GOOD_SCAN
+import com.simprints.fingerprint.activities.collect.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.NEVER_RETURNS
+import com.simprints.fingerprint.activities.collect.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.NO_FINGER_DETECTED
+import com.simprints.fingerprint.activities.collect.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.UNKNOWN_ERROR
 import com.simprints.fingerprint.activities.collect.domain.FingerPriorityDeterminer
 import com.simprints.fingerprint.activities.collect.domain.StartingStateDeterminer
 import com.simprints.fingerprint.activities.collect.state.CaptureState
@@ -17,6 +17,7 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
+import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
@@ -61,7 +62,7 @@ import org.junit.Test
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
-class CollectFingerprintsViewModelTest {
+class FingerprintCaptureViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -100,20 +101,20 @@ class CollectFingerprintsViewModelTest {
 
     private val imageManager: FingerprintImageManager = mockk(relaxed = true)
 
-    private lateinit var vm: CollectFingerprintsViewModel
+    private lateinit var vm: FingerprintCaptureViewModel
 
     @Before
     fun setUp() {
         mockBase64EncodingForSavingTemplateInSession()
 
         scannerManager = mockk(relaxed = true) {
-            every { scanner } returns this@CollectFingerprintsViewModelTest.scanner
+            every { scanner } returns this@FingerprintCaptureViewModelTest.scanner
             every { isScannerAvailable } returns true
         }
         bioSdkWrapper = mockk {
             coJustRun { initialize() }
         }
-        vm = CollectFingerprintsViewModel(
+        vm = FingerprintCaptureViewModel(
             scannerManager,
             configManager,
             imageManager,
