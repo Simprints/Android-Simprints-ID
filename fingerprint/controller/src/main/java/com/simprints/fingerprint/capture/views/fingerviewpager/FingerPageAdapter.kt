@@ -2,11 +2,11 @@ package com.simprints.fingerprint.capture.views.fingerviewpager
 
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 internal class FingerPageAdapter(
     parent: Fragment,
-    private val activeFingers: MutableList<FingerIdentifier>
+    private val activeFingers: MutableList<IFingerIdentifier>
 ) : FragmentStateAdapter(parent) {
 
     override fun createFragment(position: Int): Fragment = FingerFragment.newInstance(activeFingers[position])
@@ -14,6 +14,6 @@ internal class FingerPageAdapter(
     override fun getItemCount(): Int = activeFingers.size
     override fun getItemId(position: Int): Long = activeFingers[position].toItemId()
 
-    private fun FingerIdentifier.toItemId(): Long = this.ordinal.toLong()
-    private fun Long.itemIdToFingerIdentifier(): FingerIdentifier = FingerIdentifier.values()[this.toInt()]
+    private fun IFingerIdentifier.toItemId(): Long = this.ordinal.toLong()
+    private fun Long.itemIdToFingerIdentifier(): IFingerIdentifier = IFingerIdentifier.values()[this.toInt()]
 }

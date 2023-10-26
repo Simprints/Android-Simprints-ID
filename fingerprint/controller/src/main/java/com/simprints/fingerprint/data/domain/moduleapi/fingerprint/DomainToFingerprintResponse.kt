@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
-import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
@@ -35,9 +34,9 @@ object DomainToFingerprintResponse {
     fun fromDomainToFingerprintCaptureResponse(capture: FingerprintCaptureResponse): IFingerprintCaptureResponse =
         IFingerprintCaptureResponseImpl(capture.fingerprints.map { fingerprint ->
             IFingerprintCaptureResultImpl(
-                fingerprint.fingerId.fromDomainToModuleApi(),
+                fingerprint.fingerId,
                 IFingerprintSampleImpl(
-                    fingerprint.fingerId.fromDomainToModuleApi(),
+                    fingerprint.fingerId,
                     fingerprint.templateBytes,
                     fingerprint.qualityScore,
                     fingerprint.imageRef?.path?.let {

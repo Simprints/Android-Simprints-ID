@@ -26,13 +26,10 @@ import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
-import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerManager
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
-import com.simprints.fingerprint.data.domain.fingerprint.fromModuleApiToDomain
 import com.simprints.fingerprint.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
@@ -106,7 +103,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private fun startCollection() {
         // TODO simplify methods params
-        vm.start(args.params.fingerprintsToCapture.map { it.fromModuleApiToDomain() })
+        vm.start(args.params.fingerprintsToCapture)
 
         initToolbar(args.params.flowType)
         initMissingFingerButton()
@@ -141,7 +138,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             binding.fingerprintViewPager,
             binding.fingerprintIndicator,
             onFingerSelected = { position -> vm.updateSelectedFinger(position) },
-            isAbleToSelectNewFinger = { !vm.state.currentCaptureState().isCommunicating() }
+            isAbleToSelectNewFinger = { vm.stateLiveData.value?.currentCaptureState()?.isCommunicating() != true }
         )
     }
 
@@ -190,23 +187,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         })
         vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
         vm.finishWithFingerprints.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { fingerprints ->
-            findNavController().finishWithResult(this, FingerprintCaptureResult(
-                // TODO move the mapping to the vm
-                fingerprints.map { fingerprint ->
-                    FingerprintCaptureResult.Item(
-                        identifier = fingerprint.fingerId.fromDomainToModuleApi(),
-                        sample = FingerprintCaptureResult.Sample(
-                            fingerIdentifier = fingerprint.fingerId.fromDomainToModuleApi(),
-                            template = fingerprint.templateBytes,
-                            templateQualityScore = fingerprint.qualityScore,
-                            imageRef = fingerprint.imageRef
-                                ?.let { FingerprintCaptureResult.Path(it.path.parts) }
-                                ?.let { FingerprintCaptureResult.SecuredImageRef(it) },
-                            format = fingerprint.format,
-                        )
-                    )
-                }
-            ))
+            findNavController().finishWithResult(this, fingerprints)
         })
     }
 
@@ -238,11 +219,11 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
             ConfirmFingerprintsDialog(requireContext(), dialogItems,
                 onConfirm = {
-                    vm.logUiMessageForCrashReport("Confirm fingerprints clicked")
+                    Simber.tag(FINGER_CAPTURE.name).i("Confirm fingerprints clicked")
                     vm.handleConfirmFingerprintsAndContinue()
                 },
                 onRestart = {
-                    vm.logUiMessageForCrashReport("Restart clicked")
+                    Simber.tag(FINGER_CAPTURE.name).i("Restart clicked")
                     vm.handleRestart()
                 })
                 .create().also { it.show() }
