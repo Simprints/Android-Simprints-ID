@@ -22,11 +22,11 @@ internal class AddCaptureEventsUseCase @Inject constructor(
     suspend operator fun invoke(
         lastCaptureStartedAt: Long,
         fingerState: FingerState,
-        captureState: CaptureState,
         qualityThreshold: Int,
         tooManyBadScans: Boolean,
     ): String {
         val payloadId = randomUUID()
+        val captureState = fingerState.currentCapture()
 
         val captureEvent = FingerprintCaptureEvent(
             createdAt = lastCaptureStartedAt,
