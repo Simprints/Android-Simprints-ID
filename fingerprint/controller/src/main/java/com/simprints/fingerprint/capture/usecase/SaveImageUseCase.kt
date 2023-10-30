@@ -1,11 +1,11 @@
 package com.simprints.fingerprint.capture.usecase
 
+import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedException
+import com.simprints.fingerprint.capture.extensions.deduceFileExtension
 import com.simprints.fingerprint.capture.models.Path
 import com.simprints.fingerprint.capture.models.SecuredImageRef
 import com.simprints.fingerprint.capture.state.CaptureState
-import com.simprints.fingerprint.capture.extensions.deduceFileExtension
-import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedException
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
@@ -32,8 +32,7 @@ internal class SaveImageUseCase @Inject constructor(
         null
     } else null
 
-    // TODO this should be private once tests are fixed
-    suspend fun saveImage(
+    private suspend fun saveImage(
         imageBytes: ByteArray,
         captureEventId: String,
         fileExtension: String

@@ -12,6 +12,9 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.fingerprint.capture.extensions.isEager
+import com.simprints.fingerprint.capture.extensions.isImageTransferRequired
+import com.simprints.fingerprint.capture.extensions.toInt
 import com.simprints.fingerprint.capture.models.CaptureId
 import com.simprints.fingerprint.capture.models.Path
 import com.simprints.fingerprint.capture.models.SecuredImageRef
@@ -25,9 +28,6 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
-import com.simprints.fingerprint.capture.extensions.toInt
-import com.simprints.fingerprint.capture.extensions.isEager
-import com.simprints.fingerprint.capture.extensions.isImageTransferRequired
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -71,7 +71,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
         private set(value) {
             field = value
-            _stateLiveData.postValue(value)
+            _stateLiveData.value = value
         }
     private val _stateLiveData = MutableLiveData<CollectFingerprintsState>()
     val stateLiveData: LiveData<CollectFingerprintsState> = _stateLiveData
@@ -152,8 +152,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 // and since fetching happens on IO thread execution must be suspended until it is available
                 configuration = configManager.getProjectConfiguration().fingerprint!!
             }
+
             originalFingerprintsToCapture = fingerprintsToCapture
-            setStartingState()
+            setStartingState(fingerprintsToCapture)
             startObserverForLiveFeedback()
         }
     }
@@ -212,12 +213,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun setStartingState() {
-        updateState {
-            CollectFingerprintsState.EMPTY.copy(
-                fingerStates = getStartState(originalFingerprintsToCapture)
-            )
-        }
+    private fun setStartingState(fingerprintsToCapture: List<IFingerIdentifier>) = updateState {
+        CollectFingerprintsState.EMPTY.copy(
+            fingerStates = getStartState(fingerprintsToCapture)
+        )
     }
 
     fun isImageTransferRequired(): Boolean =
@@ -364,14 +363,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun addCaptureAndBiometricEventsInSession() {
         val fingerState = state.currentFingerState()
-        val captureState = state.currentCaptureState()
+        val captureState = fingerState.currentCapture()
 
         //It can not be done in background because then SID won't find the last capture event id
         val payloadId = runBlocking {
             addCaptureEvents(
                 lastCaptureStartedAt,
                 fingerState,
-                captureState,
                 qualityThreshold(),
                 tooManyBadScans(captureState, plusBadScan = false)
             )
@@ -528,7 +526,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             _noFingersScannedToast.send()
             handleRestart()
         } else {
-            if (configuration.vero2?.imageSavingStrategy?.isEager() != true) {
+            if (configuration.vero2?.imageSavingStrategy?.let { !it.isEager() && it.isImageTransferRequired() } == true) {
                 saveImages(collectedFingers)
             }
             proceedToFinish(collectedFingers)
@@ -566,7 +564,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     fun handleRestart() {
-        setStartingState()
+        setStartingState(originalFingerprintsToCapture)
     }
 
     fun handleOnResume() {

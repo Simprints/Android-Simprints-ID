@@ -21,6 +21,10 @@ fun LiveData<LiveDataEvent>.assertEventReceived() {
     assertThat(this.value).isNotNull()
 }
 
+fun LiveData<LiveDataEvent>.assertEventNotReceived() {
+    assertThat(this.value).isNull()
+}
+
 fun <T> LiveData<LiveDataEventWithContent<T>>.assertEventReceivedWithContent(expected: T) {
     assertThat(this.value?.peekContent()).isEqualTo(expected)
 }
