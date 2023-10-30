@@ -24,7 +24,7 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
-import com.simprints.fingerprint.R
+import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
 import com.simprints.fingerprint.capture.state.CaptureState
@@ -34,7 +34,7 @@ import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerMa
 import com.simprints.fingerprint.capture.views.tryagainsplash.FullScreenSplashDialog
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.fingerprint.databinding.FragmentFingerprintCaptureBinding
+import com.simprints.fingerprint.capture.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.simprints.fingerprint"
+    namespace = "com.simprints.fingerprint.capture"
 
     defaultConfig {
         testInstrumentationRunner = "com.simprints.fingerprint.CustomTestRunner"

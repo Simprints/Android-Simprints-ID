@@ -66,8 +66,8 @@ dependencies {
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:consent"))
     implementation(project(":feature:matcher"))
+    implementation(project(":fingerprint:capture"))
 
-    implementation(project(":fingerprint:controller"))
     implementation(project(":face:capture"))
     implementation(project(":face:configuration"))
 
