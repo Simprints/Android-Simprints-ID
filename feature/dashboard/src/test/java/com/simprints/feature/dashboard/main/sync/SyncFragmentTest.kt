@@ -43,12 +43,13 @@ class SyncFragmentTest {
     internal val viewModel = mockk<SyncViewModel>(relaxed = true)
 
     private val context = InstrumentationRegistry.getInstrumentation().context
+    private val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
     @Test
     fun `should hide the sync card view if it can't sync to BFSID`() {
         mockSyncToBFSIDAllowed(false)
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         onView(withId(R.id.dashboardSyncCard)).check(matches(not(isDisplayed())))
     }
@@ -57,7 +58,7 @@ class SyncFragmentTest {
     fun `should display the sync card view if it can sync to BFSID`() {
         mockSyncToBFSIDAllowed(true)
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         onView(withId(R.id.dashboardSyncCard)).check(matches(isDisplayed()))
     }
@@ -67,7 +68,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncDefault(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -94,7 +95,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncPendingUpload(LAST_SYNC_TIME, 2))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -122,7 +123,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncFailed(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -144,7 +145,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncFailedBackendMaintenance(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -170,7 +171,7 @@ class SyncFragmentTest {
             )
         )
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -194,7 +195,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncTooManyRequests(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -216,7 +217,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncTryAgain(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -240,8 +241,6 @@ class SyncFragmentTest {
     fun `should display the correct sync card view for the SyncHasNoModules state`() {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncHasNoModules(LAST_SYNC_TIME))
-
-        val navController = testNavController(R.navigation.graph_dashboard, R.id.mainFragment)
 
         launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
@@ -269,7 +268,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncOffline(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -293,7 +292,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -323,7 +322,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncConnecting(LAST_SYNC_TIME, 20, 40))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -350,7 +349,7 @@ class SyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncComplete(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<SyncFragment>()
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(

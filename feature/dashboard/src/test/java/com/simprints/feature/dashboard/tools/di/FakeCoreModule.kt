@@ -1,10 +1,7 @@
 package com.simprints.feature.dashboard.tools.di
 
-import com.simprints.core.CoreModule
-import com.simprints.core.DeviceID
-import com.simprints.core.DispatcherIO
-import com.simprints.core.ExternalScope
-import com.simprints.core.PackageVersionName
+import com.simprints.core.*
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.StringTokenizer
@@ -36,6 +33,10 @@ object FakeCoreModule {
     @Singleton
     fun provideTimeHelper(): TimeHelper = mockk()
 
+    @Provides
+    @Singleton
+    fun provideJsonHelper(): JsonHelper = mockk()
+
     @DeviceID
     @Provides
     fun provideDeviceId(): String = DEVICE_ID
@@ -47,6 +48,10 @@ object FakeCoreModule {
     @DispatcherIO
     @Provides
     fun provideCoroutineDispatcher(): CoroutineDispatcher = StandardTestDispatcher()
+
+    @DispatcherBG
+    @Provides
+    fun provideCoroutineDispatcher2(): CoroutineDispatcher = StandardTestDispatcher()
 
     @ExternalScope
     @Provides

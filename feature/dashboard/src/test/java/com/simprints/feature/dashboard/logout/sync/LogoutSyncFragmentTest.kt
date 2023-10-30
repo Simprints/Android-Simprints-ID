@@ -52,11 +52,12 @@ internal class LogoutSyncFragmentTest {
     internal val logoutSyncViewModel = mockk<LogoutSyncViewModel>(relaxed = true)
 
     private val context = InstrumentationRegistry.getInstrumentation().context
+    private val navController = testNavController(R.navigation.graph_dashboard)
 
     @Test
     fun `should not hide the sync card view if it can't sync to BFSID`() {
         mockSyncToBFSIDAllowed(false)
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         onView(withId(R.id.logoutSyncCard)).check(matches(isDisplayed()))
     }
@@ -66,7 +67,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncDefault(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -98,7 +99,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncPendingUpload(LAST_SYNC_TIME, 2))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -138,7 +139,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncFailed(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -166,7 +167,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncFailedBackendMaintenance(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -198,7 +199,7 @@ internal class LogoutSyncFragmentTest {
             )
         )
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -231,7 +232,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncTooManyRequests(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -259,7 +260,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncTryAgain(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -322,7 +323,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -358,7 +359,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncConnecting(LAST_SYNC_TIME, 20, 40))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -391,7 +392,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncComplete(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
 
         checkHiddenViews(
             listOf(
@@ -439,7 +440,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncProgress(LAST_SYNC_TIME, 20, 40))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
         onView(withId(R.id.logoutButton)).check(matches(not(isDisplayed())))
         onView(withId(R.id.logout_sync_info)).check(matches(isDisplayed()))
         onView(withId(R.id.logoutWithoutSyncButton)).check(matches(isDisplayed()))
@@ -450,7 +451,7 @@ internal class LogoutSyncFragmentTest {
         mockSyncToBFSIDAllowed(true)
         mockSyncCardLiveData(SyncCardState.SyncComplete(LAST_SYNC_TIME))
 
-        launchFragmentInHiltContainer<LogoutSyncFragment>()
+        launchFragmentInHiltContainer<LogoutSyncFragment>(navController = navController)
         onView(withId(R.id.logoutButton)).check(matches(isDisplayed()))
         onView(withId(R.id.logout_sync_info)).check(matches(not(isDisplayed())))
         onView(withId(R.id.logoutWithoutSyncButton)).check(matches(not(isDisplayed())))

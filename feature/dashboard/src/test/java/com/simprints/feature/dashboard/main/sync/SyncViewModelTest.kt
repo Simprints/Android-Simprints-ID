@@ -31,6 +31,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.ConnectivityTracker
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
+import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
@@ -86,6 +87,9 @@ class SyncViewModelTest {
 
     @MockK
     lateinit var authManager: AuthManager
+
+    @MockK
+    lateinit var recentUserActivityManager: RecentUserActivityManager
 
     @Before
     fun setUp() {
@@ -386,8 +390,9 @@ class SyncViewModelTest {
         configManager = configManager,
         timeHelper = timeHelper,
         authStore = authStore,
-        securityStateRepository = securityStateRepository,
         authManager = authManager,
+        securityStateRepository = securityStateRepository,
+        recentUserActivityManager = recentUserActivityManager,
         externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
     )
 }
