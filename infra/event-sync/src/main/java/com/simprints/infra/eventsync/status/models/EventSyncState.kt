@@ -16,41 +16,42 @@ data class EventSyncState(
         val state: EventSyncWorkerState,
     )
 
-    fun isThereNotSyncHistory() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    private val syncWorkersInfo: List<SyncWorkerInfo>
+        get() = upSyncWorkersInfo + downSyncWorkersInfo
+
+    fun isThereNotSyncHistory() = syncWorkersInfo
         .isEmpty()
 
-    fun isSyncRunning() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncRunning() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Running || it.state is EventSyncWorkerState.Enqueued }
 
-    fun isSyncCompleted() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncCompleted() = syncWorkersInfo
         .all { it.state is EventSyncWorkerState.Succeeded }
 
-    fun isSyncInProgress() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncInProgress() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Running }
 
-    fun isSyncConnecting() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncConnecting() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Enqueued }
 
-    fun isSyncFailedBecauseReloginRequired() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncFailedBecauseReloginRequired() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseReloginRequired }
 
-    fun isSyncFailedBecauseTooManyRequests() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncFailedBecauseTooManyRequests() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseTooManyRequest }
 
-    fun isSyncFailedBecauseCloudIntegration() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncFailedBecauseCloudIntegration() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseCloudIntegration }
 
-    fun isSyncFailedBecauseBackendMaintenance() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncFailedBecauseBackendMaintenance() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Failed && it.state.failedBecauseBackendMaintenance }
 
-    fun getEstimatedBackendMaintenanceOutage(): Long? {
-        val syncWorkerInfo = (upSyncWorkersInfo + downSyncWorkersInfo)
-                .find { it.state is EventSyncWorkerState.Failed && it.state.estimatedOutage != 0L }
-        val failedWorkerState = syncWorkerInfo?.state as EventSyncWorkerState.Failed?
-        return failedWorkerState?.estimatedOutage
-    }
+    fun getEstimatedBackendMaintenanceOutage() = syncWorkersInfo
+        .find { it.state is EventSyncWorkerState.Failed && it.state.estimatedOutage != 0L }
+        ?.let { it.state as? EventSyncWorkerState.Failed }
+        ?.estimatedOutage
 
-    fun isSyncFailed() = (upSyncWorkersInfo + downSyncWorkersInfo)
+    fun isSyncFailed() = syncWorkersInfo
         .any { it.state is EventSyncWorkerState.Failed || it.state is EventSyncWorkerState.Blocked || it.state is EventSyncWorkerState.Cancelled }
 
 }
