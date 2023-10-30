@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import com.simprints.fingerprint.R
+import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel.Companion.TRY_DIFFERENT_FINGER_SPLASH_DELAY
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

@@ -7,7 +7,7 @@ import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.simprints.fingerprint.R
+import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.resources.captureNumberTextId
 import com.simprints.fingerprint.capture.resources.directionTextColour
 import com.simprints.fingerprint.capture.resources.directionTextId
@@ -23,7 +23,7 @@ import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.fingerprint.capture.views.timeoutbar.ScanningOnlyTimeoutBar
 import com.simprints.fingerprint.capture.views.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.capture.views.timeoutbar.ScanningWithImageTransferTimeoutBar
-import com.simprints.fingerprint.databinding.FragmentFingerBinding
+import com.simprints.fingerprint.capture.databinding.FragmentFingerBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import dagger.hilt.android.AndroidEntryPoint

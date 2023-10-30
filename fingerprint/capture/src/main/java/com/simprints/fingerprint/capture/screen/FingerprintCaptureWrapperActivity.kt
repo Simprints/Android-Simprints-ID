@@ -6,9 +6,9 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
-import com.simprints.fingerprint.R
+import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
-import com.simprints.fingerprint.databinding.ActivityFingerprintCaptureWrapperBinding
+import com.simprints.fingerprint.capture.databinding.ActivityFingerprintCaptureWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint

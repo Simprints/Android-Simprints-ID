@@ -3,7 +3,7 @@ package com.simprints.fingerprint.capture.resources
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.simprints.fingerprint.R
+import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
