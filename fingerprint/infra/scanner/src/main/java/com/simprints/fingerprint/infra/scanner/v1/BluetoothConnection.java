@@ -25,10 +25,11 @@ class BluetoothConnection extends Thread {
     private volatile ComponentBluetoothSocket socket;
     private volatile boolean open;
 
-    BluetoothConnection(@NonNull String macAddress,
-                        @NonNull ScannerCallback callback,
-                        @NonNull ComponentBluetoothAdapter bluetoothAdapter)
-    {
+    BluetoothConnection(
+        @NonNull String macAddress,
+        @NonNull ScannerCallback callback,
+        @NonNull ComponentBluetoothAdapter bluetoothAdapter
+    ) {
         this.bluetoothAdapter = bluetoothAdapter;
         this.macAddress = macAddress;
         this.callback = callback;
@@ -37,8 +38,8 @@ class BluetoothConnection extends Thread {
         this.open = false;
     }
 
-    public void run()
-    {
+    @Override
+    public void run() {
         // Make sure bluetooth is supported
         if (bluetoothAdapter.isNull()) {
             callback.onFailure(SCANNER_ERROR.BLUETOOTH_NOT_SUPPORTED);
@@ -109,8 +110,7 @@ class BluetoothConnection extends Thread {
         return scannerId;
     }
 
-    MessageDispatcher getMessageDispatcher()
-    {
+    MessageDispatcher getMessageDispatcher() {
         return msgDispatcher;
     }
 }

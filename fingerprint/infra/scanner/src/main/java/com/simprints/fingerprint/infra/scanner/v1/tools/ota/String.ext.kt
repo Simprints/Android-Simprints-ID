@@ -2,8 +2,8 @@ package com.simprints.fingerprint.infra.scanner.v1.tools.ota
 
 private const val HEX_CHARS = "0123456789ABCDEF"
 
-fun String.hexStringToIntArray() : IntArray {
-    assert(this.length %2 == 0)
+fun String.hexStringToIntArray(): IntArray {
+    assert(this.length % 2 == 0)
     assert(this.matches("[$HEX_CHARS]*".toRegex()))
 
     val result = IntArray(length / 2)

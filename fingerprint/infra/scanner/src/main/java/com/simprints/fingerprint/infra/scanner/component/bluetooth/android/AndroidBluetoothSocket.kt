@@ -6,7 +6,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 
-class AndroidBluetoothSocket(private val socket: BluetoothSocket): ComponentBluetoothSocket {
+internal class AndroidBluetoothSocket(private val socket: BluetoothSocket) : ComponentBluetoothSocket {
 
     override fun connect() = socket.connect()
 

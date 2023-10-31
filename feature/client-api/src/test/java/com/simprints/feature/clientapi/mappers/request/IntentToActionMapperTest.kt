@@ -56,7 +56,7 @@ class IntentToActionMapperTest {
             "com.simprints.simodkadapter.REGISTER" to ActionRequest.EnrolActionRequest::class,
             "com.simprints.simodkadapter.IDENTIFY" to ActionRequest.IdentifyActionRequest::class,
             "com.simprints.simodkadapter.VERIFY" to ActionRequest.VerifyActionRequest::class,
-            "com.simprints.simodkadapter.CONFIRM_IDENTITY" to ActionRequest.ConfirmActionRequest::class,
+            "com.simprints.simodkadapter.CONFIRM_IDENTITY" to ActionRequest.ConfirmIdentityActionRequest::class,
             "com.simprints.simodkadapter.REGISTER_LAST_BIOMETRICS" to ActionRequest.EnrolLastBiometricActionRequest::class,
         ).forEach { (action, expectedClass) ->
             assertThat(mapper(action, defaultExtras)).isInstanceOf(expectedClass.java)
@@ -76,7 +76,7 @@ class IntentToActionMapperTest {
             "com.simprints.commcare.REGISTER" to ActionRequest.EnrolActionRequest::class,
             "com.simprints.commcare.IDENTIFY" to ActionRequest.IdentifyActionRequest::class,
             "com.simprints.commcare.VERIFY" to ActionRequest.VerifyActionRequest::class,
-            "com.simprints.commcare.CONFIRM_IDENTITY" to ActionRequest.ConfirmActionRequest::class,
+            "com.simprints.commcare.CONFIRM_IDENTITY" to ActionRequest.ConfirmIdentityActionRequest::class,
             "com.simprints.commcare.REGISTER_LAST_BIOMETRICS" to ActionRequest.EnrolLastBiometricActionRequest::class,
         ).forEach { (action, expectedClass) ->
             assertThat(mapper(action, defaultExtras)).isInstanceOf(expectedClass.java)
@@ -96,7 +96,7 @@ class IntentToActionMapperTest {
             "com.simprints.id.REGISTER" to ActionRequest.EnrolActionRequest::class,
             "com.simprints.id.IDENTIFY" to ActionRequest.IdentifyActionRequest::class,
             "com.simprints.id.VERIFY" to ActionRequest.VerifyActionRequest::class,
-            "com.simprints.id.CONFIRM_IDENTITY" to ActionRequest.ConfirmActionRequest::class,
+            "com.simprints.id.CONFIRM_IDENTITY" to ActionRequest.ConfirmIdentityActionRequest::class,
             "com.simprints.id.REGISTER_LAST_BIOMETRICS" to ActionRequest.EnrolLastBiometricActionRequest::class,
         ).forEach { (action, expectedClass) ->
             assertThat(mapper(action, defaultExtras)).isInstanceOf(expectedClass.java)

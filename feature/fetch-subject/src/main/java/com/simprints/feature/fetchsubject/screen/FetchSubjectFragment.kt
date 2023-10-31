@@ -32,8 +32,8 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
         super.onViewCreated(view, savedInstanceState)
 
         with(findNavController()) {
-            handleResult(viewLifecycleOwner, R.id.fetchSubjectFragment, AlertContract.ALERT_DESTINATION_ID, ::handleAlertResult)
-            handleResult(viewLifecycleOwner, R.id.fetchSubjectFragment, ExitFormContract.DESTINATION_ID, ::handleExitFormResult)
+            handleResult(viewLifecycleOwner, R.id.fetchSubjectFragment, AlertContract.DESTINATION, ::handleAlertResult)
+            handleResult(viewLifecycleOwner, R.id.fetchSubjectFragment, ExitFormContract.DESTINATION, ::handleExitFormResult)
         }
 
         viewModel.subjectState.observe(viewLifecycleOwner) { state ->

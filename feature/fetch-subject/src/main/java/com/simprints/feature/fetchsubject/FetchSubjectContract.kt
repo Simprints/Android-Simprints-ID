@@ -4,6 +4,8 @@ import com.simprints.feature.fetchsubject.screen.FetchSubjectFragmentArgs
 
 object FetchSubjectContract {
 
+    val DESTINATION = R.id.fetchSubjectFragment
+
     const val FETCH_SUBJECT_RESULT = "fetch_subject_result"
 
     fun getArgs(projectId: String, subjectId: String) =

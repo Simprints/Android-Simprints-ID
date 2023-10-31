@@ -9,6 +9,8 @@ import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
+import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
+import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
 import com.simprints.infra.config.ConfigManager
@@ -59,12 +61,12 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             _finish.send(
                 previousLastEnrolmentResult.subjectId
                     ?.let { EnrolLastState.Success(it) }
-                    ?: EnrolLastState.Failed(modalities)
+                    ?: EnrolLastState.Failed(GENERAL_ERROR,modalities)
             )
             return@launch
         }
         if (hasDuplicateEnrolments(projectConfig, params.steps)) {
-            _finish.send(EnrolLastState.Failed(modalities))
+            _finish.send(EnrolLastState.Failed(DUPLICATE_ENROLMENTS, modalities))
             return@launch
         }
 
@@ -80,7 +82,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             _finish.send(EnrolLastState.Success(subject.subjectId))
         } catch (t: Throwable) {
             Simber.tag(ENROLMENT.name).e(t)
-            _finish.send(EnrolLastState.Failed(modalities))
+            _finish.send(EnrolLastState.Failed(GENERAL_ERROR, modalities))
         }
     }
 

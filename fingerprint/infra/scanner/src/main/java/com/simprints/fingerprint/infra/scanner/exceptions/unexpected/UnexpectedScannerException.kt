@@ -4,9 +4,10 @@ import com.simprints.fingerprint.infra.scanner.exceptions.ScannerException
 import com.simprints.fingerprint.infra.scanner.v1.SCANNER_ERROR
 
 
-open class UnexpectedScannerException() : ScannerException() {
-    constructor(message: String) : this()
-    constructor(throwable: Throwable) : this()
+open class UnexpectedScannerException(
+    message: String = "UnexpectedScannerException",
+    throwable: Throwable? = null
+) : ScannerException(message, throwable) {
 
     companion object {
 

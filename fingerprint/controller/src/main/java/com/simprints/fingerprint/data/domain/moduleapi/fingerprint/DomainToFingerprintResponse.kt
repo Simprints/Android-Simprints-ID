@@ -1,19 +1,25 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
-import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.BLUETOOTH_NO_PERMISSION
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.UNEXPECTED_ERROR
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.moduleapi.common.IPath
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
-import com.simprints.moduleapi.fingerprint.responses.*
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintCaptureResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintErrorReason
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintErrorResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintExitFormResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintExitReason
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponseType
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult
-import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintMatchResult
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
@@ -42,14 +48,6 @@ object DomainToFingerprintResponse {
             )
         })
 
-    fun fromDomainToFingerprintMatchResponse(matchResponse: FingerprintMatchResponse): IFingerprintMatchResponse =
-        IFingerprintMatchResponseImpl(matchResponse.result.map {
-            IFingerprintMatchResultImpl(
-                personId = it.guid,
-                confidenceScore = it.confidence
-            )
-        })
-
     fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintExitFormResponse {
 
         val reason = when (refusalResponse.reason) {
@@ -72,10 +70,6 @@ object DomainToFingerprintResponse {
             BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
             BLUETOOTH_NO_PERMISSION -> IFingerprintErrorReason.BLUETOOTH_NO_PERMISSION
         }
-
-    fun fromDomainToFingerprintConfigurationResponse(@Suppress("UNUSED_PARAMETER") configurationResponse: FingerprintConfigurationResponse): IFingerprintConfigurationResponse =
-        IFingerprintConfigurationResponseImpl()
-
 }
 
 // The following classes represent the corresponding implementation of ModuleApi response interfaces.
@@ -103,20 +97,6 @@ private class IFingerprintExitFormResponseImpl(
 }
 
 @Parcelize
-private data class IFingerprintMatchResponseImpl(
-    override val result: List<IFingerprintMatchResult>
-) : Parcelable, IFingerprintMatchResponse {
-    @IgnoredOnParcel
-    override val type: IFingerprintResponseType = IFingerprintResponseType.MATCH
-}
-
-@Parcelize
-private data class IFingerprintMatchResultImpl(
-    override val personId: String,
-    override val confidenceScore: Float
-) : Parcelable, IFingerprintMatchResult
-
-@Parcelize
 private class IFingerprintCaptureResultImpl(
     override val identifier: IFingerIdentifier,
     override val sample: IFingerprintSample?
@@ -140,9 +120,3 @@ private class ISecuredImageRefImpl(
 private class IPathImpl(
     override val parts: Array<String>
 ) : IPath
-
-@Parcelize
-private class IFingerprintConfigurationResponseImpl : Parcelable, IFingerprintConfigurationResponse {
-    @IgnoredOnParcel
-    override val type: IFingerprintResponseType = IFingerprintResponseType.CONFIGURATION
-}

@@ -5,7 +5,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.model
 import com.simprints.fingerprint.infra.scanner.v2.tools.primitives.unsignedToInt
 import java.nio.ByteOrder
 
-object VeroMessageProtocol: MessageProtocol {
+object VeroMessageProtocol : MessageProtocol {
 
     override val byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN
     override val HEADER_SIZE: Int = 4

@@ -96,15 +96,18 @@ internal class ClientApiViewModelTest {
 
     @Test
     fun `handleIntent tries creating session when called`() = runTest {
+        coEvery { createSessionIfRequiredUseCase.invoke(any()) } returns true
         coEvery { intentMapper.invoke(any(), any()) } returns mockk()
 
         viewModel.handleIntent("action", Bundle())
 
         coVerify { createSessionIfRequiredUseCase("action") }
+        viewModel.newSessionCreated.test().assertHasValue()
     }
 
     @Test
     fun `handleIntent handles invalid intent`() = runTest {
+        coEvery { createSessionIfRequiredUseCase.invoke(any()) } returns false
         coEvery { intentMapper.invoke(any(), any()) } throws InvalidRequestException("Invalid intent")
 
         viewModel.handleIntent("action", Bundle())
@@ -198,7 +201,7 @@ internal class ClientApiViewModelTest {
     @Test
     fun `handleErrorResponse saves correct events`() = runTest {
         viewModel.handleErrorResponse(
-            ActionRequestIdentifier("action", "package"),
+            "action.package",
             mockk { every { reason } returns mockk() }
         )
 

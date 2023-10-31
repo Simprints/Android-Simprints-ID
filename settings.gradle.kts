@@ -56,6 +56,7 @@ include(
     ":fingerprint:infra:scanner",
     ":fingerprint:infra:scannermock",
     ":fingerprint:infra:base-bio-sdk",
+    ":fingerprint:infra:bio-sdk",
     ":fingerprint:infra:simprints-bio-sdk",
     ":fingerprint:infra:simafis-wrapper",
 )
@@ -64,7 +65,6 @@ include(
 include(
     ":face:configuration",
     ":face:capture",
-    ":face:matcher",
     ":face:infra:face-bio-sdk",
     ":face:infra:roc-wrapper",
 )
@@ -89,6 +89,7 @@ include(
     ":feature:exit-form",
     ":feature:consent",
     ":feature:setup",
+    ":feature:matcher",
 )
 
 // Infra modules

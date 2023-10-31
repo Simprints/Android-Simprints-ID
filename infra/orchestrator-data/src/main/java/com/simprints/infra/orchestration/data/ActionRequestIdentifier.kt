@@ -1,9 +1,13 @@
 package com.simprints.infra.orchestration.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class ActionRequestIdentifier(
     val actionName: String,
     val packageName: String,
-) {
+): Parcelable {
 
     companion object {
 

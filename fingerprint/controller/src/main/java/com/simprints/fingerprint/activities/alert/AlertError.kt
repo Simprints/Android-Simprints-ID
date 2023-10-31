@@ -44,16 +44,16 @@ enum class AlertError(
 
     // Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(
-        title = R.string.error_occurred_title,
-        message = R.string.bluetooth_not_supported_message,
+        title = IDR.string.error_occurred_title,
+        message = IDR.string.bluetooth_not_supported_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         leftButton = Buttons.closeButton(),
     ),
 
     BLUETOOTH_NOT_ENABLED(
-        title = R.string.scanner_error_turn_scanner_on_title,
-        message = R.string.bluetooth_not_enabled_message,
+        title = IDR.string.scanner_error_turn_scanner_on_title,
+        message = IDR.string.bluetooth_not_enabled_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         leftButton = Buttons.tryAgainButton(),
@@ -61,24 +61,24 @@ enum class AlertError(
     ),
 
     BLUETOOTH_NO_PERMISSION(
-        title = R.string.no_permission_title,
-        message = R.string.bluetooth_no_permission_message,
+        title = IDR.string.no_permission_title,
+        message = IDR.string.bluetooth_no_permission_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         leftButton = Buttons.appSettingsButton()
     ),
 
     NOT_PAIRED(
-        title = R.string.bluetooth_error_pair_scanner_and_device_title,
-        message = R.string.bluetooth_error_pair_scanner_and_device_message,
+        title = IDR.string.bluetooth_error_pair_scanner_and_device_title,
+        message = IDR.string.bluetooth_error_pair_scanner_and_device_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         leftButton = Buttons.pairScannerButton(),
     ),
 
     MULTIPLE_PAIRED_SCANNERS(
-        title = R.string.scanner_error_turn_scanner_on_title,
-        message = R.string.multiple_scanners_found_message,
+        title = IDR.string.scanner_error_turn_scanner_on_title,
+        message = IDR.string.multiple_scanners_found_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = R.drawable.multiple_scanners_found,
         leftButton = Buttons.tryAgainButton(),
@@ -87,16 +87,16 @@ enum class AlertError(
 
     // Scanner errors
     DISCONNECTED(
-        title = R.string.scanner_error_turn_scanner_on_title,
-        message = R.string.scanner_error_turn_scanner_on_message,
+        title = IDR.string.scanner_error_turn_scanner_on_title,
+        message = IDR.string.scanner_error_turn_scanner_on_message,
         backgroundColor = AlertColor.Default,
         mainDrawable = R.drawable.scanner_error_icon,
         leftButton = Buttons.tryAgainButton(),
     ),
 
     LOW_BATTERY(
-        title = R.string.low_battery_title,
-        message = R.string.low_battery_message,
+        title = IDR.string.low_battery_title,
+        message = IDR.string.low_battery_message,
         backgroundColor = AlertColor.Default,
         mainDrawable = R.drawable.scanner_error_icon,
         hintDrawable = IDR.drawable.ic_alert_hint_battery,
@@ -105,8 +105,8 @@ enum class AlertError(
 
     //Unexpected errors
     UNEXPECTED_ERROR(
-        title = R.string.error_occurred_title,
-        message = R.string.unforeseen_error_message,
+        title = IDR.string.error_occurred_title,
+        message = IDR.string.unforeseen_error_message,
         backgroundColor = AlertColor.Red,
         mainDrawable = IDR.drawable.ic_alert_default,
         leftButton = Buttons.closeButton(),
@@ -115,37 +115,37 @@ enum class AlertError(
     private object Buttons {
 
         fun closeButton() = alertButton {
-            textRes = R.string.close
+            textRes = IDR.string.close
             closeOnClick = true
             resultKey = ACTION_CLOSE
         }
 
         fun closeWithRefusalButton() = alertButton {
-            textRes = R.string.close
+            textRes = IDR.string.close
             closeOnClick = true
             resultKey = ACTION_REFUSAL
         }
 
         fun bluetoothSettingsButton() = alertButton {
-            textRes = R.string.settings_label
+            textRes = IDR.string.settings_label
             closeOnClick = true
             resultKey = ACTION_BT_SETTINGS
         }
 
         fun appSettingsButton() = alertButton {
-            textRes = R.string.settings_label
+            textRes = IDR.string.settings_label
             closeOnClick = true
             resultKey = ACTION_APP_SETTINGS
         }
 
         fun tryAgainButton() = alertButton {
-            textRes = R.string.try_again_label
+            textRes = IDR.string.try_again_label
             closeOnClick = true
             resultKey = ACTION_RETRY
         }
 
         fun pairScannerButton() = alertButton {
-            textRes = R.string.pair_scanner_label
+            textRes = IDR.string.pair_scanner_label
             closeOnClick = true
             resultKey = ACTION_PAIR
         }

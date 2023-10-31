@@ -36,9 +36,10 @@ android {
 
 dependencies {
     implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.analytics){
+        exclude("com.google.guava")
+    }
     implementation(libs.firebase.perf)
-
     implementation(libs.timber) {
         exclude("org.jetbrains", "annotations")
     }

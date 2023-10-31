@@ -33,7 +33,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.CAPTURE_ACTIVITY_NAME as FACE_ACTIVITY_NAME
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.ACTIVITY_CLASS_NAME as FINGERPRINT_ACTIVITY_NAME
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.CAPTURE_ACTIVITY_NAME as FINGERPRINT_ACTIVITY_NAME
 
 class ModalityFlowEnrolImplTest {
 
@@ -96,7 +96,6 @@ class ModalityFlowEnrolImplTest {
 
         coEvery { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
         coEvery { faceStepProcessor.buildCaptureStep() } returns faceStepMock
-        every { fingerprintStepProcessor.buildConfigurationStep() } returns fingerprintStepMock
         every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildStepSetup() } returns setupStepMock
         every { coreStepProcessor.buildStepConsent(any()) } returns consentStepMock
@@ -154,7 +153,6 @@ class ModalityFlowEnrolImplTest {
         assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             CONSENT_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
             FINGERPRINT_ACTIVITY_NAME,
@@ -171,7 +169,6 @@ class ModalityFlowEnrolImplTest {
 
         assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
             CONSENT_ACTIVITY_NAME,
             FINGERPRINT_ACTIVITY_NAME,
@@ -191,7 +188,6 @@ class ModalityFlowEnrolImplTest {
         assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
             FINGERPRINT_ACTIVITY_NAME,
         ))
@@ -207,7 +203,6 @@ class ModalityFlowEnrolImplTest {
 
         assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(listOf(
             SETUP_ACTIVITY_NAME,
-            FINGERPRINT_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
             FINGERPRINT_ACTIVITY_NAME,
             FACE_ACTIVITY_NAME,
@@ -238,7 +233,7 @@ class ModalityFlowEnrolImplTest {
             mockk()
         )
 
-        verify(exactly = 1) { fingerprintStepProcessor.buildStepToMatch(any(), any()) }
+        verify(exactly = 1) { fingerprintStepProcessor.buildStepToMatch(any(), any(), any()) }
     }
 
     @Test

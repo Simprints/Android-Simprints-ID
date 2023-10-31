@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
@@ -25,9 +24,10 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.databinding.FragmentBluetoothOffBinding
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
 import com.simprints.fingerprint.tools.extensions.showToast
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import com.simprints.infra.resources.R as CR
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class BluetoothOffFragment : FingerprintFragment() {
@@ -85,8 +85,8 @@ class BluetoothOffFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        binding.turnOnBluetoothButton.text = getString(R.string.turn_on_bluetooth)
-        binding.bluetoothOffTitleTextView.text = getString(R.string.bluetooth_off_title)
+        binding.turnOnBluetoothButton.text = getString(IDR.string.turn_on_bluetooth)
+        binding.bluetoothOffTitleTextView.text = getString(IDR.string.bluetooth_off_title)
     }
 
     override fun onStart() {
@@ -102,17 +102,18 @@ class BluetoothOffFragment : FingerprintFragment() {
         activity?.unregisterReceiver(bluetoothOnReceiver)
     }
 
-    private val enableBluetoothLauncher =registerForActivityResult(StartActivityForResult()) { result ->
+    private val enableBluetoothLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode != RESULT_OK) {
             handleCouldNotEnable()
         }
     }
+
     private fun tryEnableBluetooth() {
         enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
     }
 
     private fun handleCouldNotEnable() {
-        context?.showToast(getString(R.string.bluetooth_off_toast_error))
+        context?.showToast(getString(IDR.string.bluetooth_off_toast_error))
     }
 
     private fun handleBluetoothEnabled() {
@@ -120,10 +121,10 @@ class BluetoothOffFragment : FingerprintFragment() {
             turnOnBluetoothProgressBar.visibility = View.INVISIBLE
             turnOnBluetoothButton.visibility = View.VISIBLE
             turnOnBluetoothButton.isEnabled = false
-            turnOnBluetoothButton.text = getString(R.string.bluetooth_on)
+            turnOnBluetoothButton.text = getString(IDR.string.bluetooth_on)
             turnOnBluetoothButton.setBackgroundColor(
                 resources.getColor(
-                    CR.color.simprints_green,
+                    IDR.color.simprints_green,
                     null
                 )
             )

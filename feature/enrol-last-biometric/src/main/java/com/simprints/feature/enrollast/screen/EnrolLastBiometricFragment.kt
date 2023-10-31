@@ -16,6 +16,9 @@ import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.alert.toArgs
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.R
+import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType
+import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
+import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.uibase.navigation.finishWithResult
@@ -35,7 +38,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         findNavController().handleResult<AlertResult>(
             viewLifecycleOwner,
             R.id.enrolLastBiometricFragment,
-            AlertContract.ALERT_DESTINATION_ID
+            AlertContract.DESTINATION
         ) { finishWithSubjectId(null) }
 
         viewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { finishWithResult(it) })
@@ -43,36 +46,45 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
     }
 
     private fun finishWithResult(result: EnrolLastState) = when (result) {
-        is EnrolLastState.Failed -> showError(result.modalities)
+        is EnrolLastState.Failed -> showError(result.errorType, result.modalities)
         is EnrolLastState.Success -> {
             Toast.makeText(requireContext(), getString(IDR.string.enrol_last_biometrics_success), Toast.LENGTH_LONG).show()
             finishWithSubjectId(result.newGuid)
         }
     }
 
-    private fun showError(modalities: List<Modality>) {
+    private fun showError(errorType: ErrorType, modalities: List<Modality>) {
         findNavController().navigate(
             R.id.action_enrolLastBiometricFragment_to_errorFragment,
-            createAlertConfiguration(modalities).toArgs()
+            createAlertConfiguration(errorType, modalities).toArgs()
         )
     }
 
-    private fun createAlertConfiguration(modalities: List<Modality>) = alertConfiguration {
+    private fun createAlertConfiguration(
+        errorType: ErrorType,
+        modalities: List<Modality>
+    ) = alertConfiguration {
         color = AlertColor.Gray
         titleRes = IDR.string.enrol_last_biometrics_alert_title
-
-        message = modalities.let {
-            when {
-                it.size >= 2 -> IDR.string.enrol_last_biometrics_alert_message_all_param
-                it.contains(Modality.FACE) -> IDR.string.enrol_last_biometrics_alert_message_face_param
-                it.contains(Modality.FINGERPRINT) -> IDR.string.enrol_last_biometrics_alert_message_fingerprint_param
-                else -> IDR.string.enrol_last_biometrics_alert_message_all_param
-            }
-        }.let { getString(it) }.let { getString(IDR.string.enrol_last_biometrics_alert_message, it) }
-
+        message = getString(getAlertMessage(errorType), getModalityName(modalities))
         leftButton = AlertButtonConfig.Close
-        eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
+        eventType =
+            AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.ENROLMENT_LAST_BIOMETRICS_FAILED
     }
+
+    private fun getAlertMessage(errorType: ErrorType) = when (errorType) {
+        DUPLICATE_ENROLMENTS -> IDR.string.enrol_last_biometrics_duplicate_records_alert_message
+        GENERAL_ERROR -> IDR.string.enrol_last_biometrics_alert_message
+    }
+
+    private fun getModalityName(modalities: List<Modality>) = modalities.let {
+        when {
+            it.size >= 2 -> IDR.string.enrol_last_biometrics_alert_message_all_param
+            it.contains(Modality.FACE) -> IDR.string.enrol_last_biometrics_alert_message_face_param
+            it.contains(Modality.FINGERPRINT) -> IDR.string.enrol_last_biometrics_alert_message_fingerprint_param
+            else -> IDR.string.enrol_last_biometrics_alert_message_all_param
+        }
+    }.let { getString(it) }
 
     private fun finishWithSubjectId(newSubjectId: String?) {
         findNavController().finishWithResult(this, EnrolLastBiometricResult(newSubjectId))
