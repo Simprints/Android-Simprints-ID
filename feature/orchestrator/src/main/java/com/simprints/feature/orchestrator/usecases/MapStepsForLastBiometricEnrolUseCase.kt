@@ -2,11 +2,15 @@ package com.simprints.feature.orchestrator.usecases
 
 import android.os.Parcelable
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
+import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.feature.enrollast.MatchResult
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.models.fromModuleApiToDomain
+import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.FingerprintMatchResult
 import javax.inject.Inject
 
 // Last biometric enrolment heavily depends on the previous execution step results
@@ -18,6 +22,21 @@ class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
                 result.newSubjectId
             )
 
+            is FingerprintCaptureResult -> EnrolLastBiometricStepResult.FingerprintCaptureResult(
+                result.results.mapNotNull { it.sample }.map {
+                    FingerTemplateCaptureResult(
+                        it.fingerIdentifier.fromModuleApiToDomain(),
+                        it.template,
+                        it.templateQualityScore,
+                        it.format,
+                    )
+                }
+            )
+
+            is FingerprintMatchResult -> EnrolLastBiometricStepResult.FingerprintMatchResult(
+                result.results.map { MatchResult(it.subjectId, it.confidence) }
+            )
+
             is FaceCaptureResult -> EnrolLastBiometricStepResult.FaceCaptureResult(
                 result.results.mapNotNull { it.sample }.map { FaceTemplateCaptureResult(it.template, it.format) }
             )
@@ -25,8 +44,6 @@ class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
             is FaceMatchResult -> EnrolLastBiometricStepResult.FaceMatchResult(
                 result.results.map { MatchResult(it.subjectId, it.confidence) }
             )
-
-            // TODO Map fingerprint results
 
             else -> null
         }

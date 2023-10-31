@@ -1,8 +1,9 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.FingerprintMatchResult
 import javax.inject.Inject
 
 internal class IsNewEnrolmentUseCase @Inject constructor() {
@@ -21,14 +22,23 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
         }
 
         val faceResult = results.lastOrNull { it is FaceMatchResult } as? FaceMatchResult
-        // TODO val fingerprintResult = results.lastOrNull { it is FingerprintMatchResult } as? FingerprintMatchResult
+        val fingerprintResult = results.lastOrNull { it is FingerprintMatchResult } as? FingerprintMatchResult
 
         val isNewFaceEnrolment = isNewEnrolmentFaceResult(projectConfiguration, faceResult)
-        val isNewFingerprintEnrolment = true
-        // TODO val isNewFingerprintEnrolment = isValidEnrolmentFaceResult(projectConfiguration, fingerprintResult)
+        val isNewFingerprintEnrolment = isValidEnrolmentFaceResult(projectConfiguration, fingerprintResult)
 
         return isNewFaceEnrolment && isNewFingerprintEnrolment
     }
+
+    // Missing results and configuration are ignored as "valid" to allow creating new records.
+    private fun isValidEnrolmentFaceResult(
+        projectConfiguration: ProjectConfiguration,
+        fingerprintResult: FingerprintMatchResult?
+    ): Boolean = projectConfiguration.face
+        ?.decisionPolicy
+        ?.medium?.toFloat()
+        ?.let { threshold -> fingerprintResult?.results?.all { it.confidence < threshold } }
+        ?: true
 
     // Missing results and configuration are ignored as "valid" to allow creating new records.
     private fun isNewEnrolmentFaceResult(
@@ -40,14 +50,4 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
         ?.toFloat()
         ?.let { threshold -> faceResult?.results?.all { it.confidence < threshold } }
         ?: true
-
-    // TODO
-    //    // Missing results and configuration are ignored as "valid" to allow creating new records.
-    //    private fun isValidEnrolmentFaceResult(
-    //        projectConfiguration: ProjectConfiguration,
-    //        fingerpringResult: FingerprintMatchResult?
-    //    ): Boolean? = projectConfiguration.face
-    //        ?.decisionPolicy
-    //        ?.medium?.toFloat()
-    //        ?.let { threshold -> fingerpringResult?.results?.all { it.confidence < threshold } }
 }

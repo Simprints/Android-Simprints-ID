@@ -4,7 +4,10 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
@@ -16,8 +19,14 @@ import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
+import io.mockk.unmockkStatic
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.util.Date
+import java.util.UUID
 
 
 class SubjectFactoryTest {
@@ -25,14 +34,25 @@ class SubjectFactoryTest {
     @MockK
     lateinit var encodingUtils: EncodingUtils
 
+    @MockK
+    lateinit var timeHelper: TimeHelper
+
+
     @Before
     fun setup() {
-        MockKAnnotations.init(this)
+        MockKAnnotations.init(this, relaxed = true)
+        mockkStatic(UUID::class)
 
         every { encodingUtils.base64ToBytes(any()) } returns BASE_64_BYTES
         factory = SubjectFactory(
-            encodingUtils = encodingUtils
+            encodingUtils = encodingUtils,
+            timeHelper = timeHelper,
         )
+    }
+
+    @After
+    fun tearDown() {
+        unmockkStatic(UUID::class)
     }
 
     @Test
@@ -103,7 +123,64 @@ class SubjectFactoryTest {
     }
 
     @Test
-    fun `when buildsubject is called, correct subject is built`() {
+    fun `when buildSubjectFromCaptureResults is called, correct subject is built`() {
+        every { UUID.randomUUID().toString() } returns SUBJECT_ID
+
+        val expected = Subject(
+            subjectId = SUBJECT_ID,
+            projectId = PROJECT_ID,
+            attendantId = ATTENDANT_ID,
+            moduleId = MODULE_ID,
+            createdAt = Date(0L),
+            fingerprintSamples = listOf(
+                FingerprintSample(
+                    fingerIdentifier = IDENTIFIER,
+                    template = BASE_64_BYTES,
+                    templateQualityScore = QUALITY,
+                    format = REFERENCE_FORMAT
+                )
+            ),
+            faceSamples = listOf(
+                FaceSample(
+                    template = BASE_64_BYTES,
+                    format = REFERENCE_FORMAT
+                )
+            ),
+        )
+
+        val result = factory.buildSubjectFromCaptureResults(
+            projectId = expected.projectId,
+            attendantId = expected.attendantId,
+            moduleId = expected.moduleId,
+            fingerprintResponse = FingerprintCaptureResult(listOf(
+                FingerprintCaptureResult.Item(
+                    identifier = IDENTIFIER,
+                    sample = FingerprintCaptureResult.Sample(
+                        template = BASE_64_BYTES,
+                        templateQualityScore = QUALITY,
+                        format = REFERENCE_FORMAT,
+                        imageRef = null,
+                        fingerIdentifier = IDENTIFIER,
+                    )
+                ),
+            )),
+            faceResponse = FaceCaptureResult(listOf(
+                FaceCaptureResult.Item(
+                    index = 0,
+                    sample = FaceCaptureResult.Sample(
+                        template = BASE_64_BYTES,
+                        format = REFERENCE_FORMAT,
+                        faceId = REFERENCE_ID,
+                        imageRef = null,
+                    )
+                ),
+            )),
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `when buildSubject is called, correct subject is built`() {
         val expected = Subject(
             subjectId = SUBJECT_ID,
             projectId = PROJECT_ID,
@@ -135,6 +212,7 @@ class SubjectFactoryTest {
         )
         assertThat(result).isEqualTo(expected)
     }
+
     companion object {
         private lateinit var factory: SubjectFactory
         private const val PROJECT_ID = "projectId"

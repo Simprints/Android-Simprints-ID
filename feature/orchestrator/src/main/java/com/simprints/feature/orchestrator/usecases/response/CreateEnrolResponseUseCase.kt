@@ -4,24 +4,28 @@ import android.os.Parcelable
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 internal class CreateEnrolResponseUseCase @Inject constructor(
-    private val buildSubject: BuildEnrolledSubjectUseCase,
+    private val subjectFactory: SubjectFactory,
     private val enrolSubject: EnrolSubjectUseCase,
 ) {
 
     suspend operator fun invoke(request: ActionRequest.EnrolActionRequest, results: List<Parcelable>): IAppResponse {
+        val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
-        // TODO fingerprint capture
+
         return try {
-            val subject = buildSubject(
+            val subject = subjectFactory.buildSubjectFromCaptureResults(
                 projectId = request.projectId,
-                userId = request.userId,
+                attendantId = request.userId,
                 moduleId = request.moduleId,
+                fingerprintResponse = fingerprintCapture,
                 faceResponse = faceCapture
             )
             enrolSubject(subject)
