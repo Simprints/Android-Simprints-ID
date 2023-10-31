@@ -31,7 +31,7 @@ interface RequestContract {
         val identifyExtractor: IdentifyExtractor
         val confirmIdentityExtractor: ConfirmIdentityExtractor
         val enrolLastBiometricsExtractor: EnrolLastBiometricsExtractor
-        val tokenizationProcessor: TokenizationProcessor
+        fun getTokenizationProcessor(): TokenizationProcessor
         suspend fun getProject(): Project?
         fun sendSimprintsRequest(request: BaseRequest)
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
