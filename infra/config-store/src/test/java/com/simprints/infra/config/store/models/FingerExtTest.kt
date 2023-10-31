@@ -1,7 +1,6 @@
-package com.simprints.id.domain.moduleapi.fingerprint.models
+package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.models.Finger
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Test
 
