@@ -67,7 +67,7 @@ class OdkPresenterTest {
 
         MockKAnnotations.init(this, relaxed = true)
         coEvery { view.getProject() } returns project
-        every { view.tokenizationProcessor } returns tokenizationProcessorMock
+        every { view.getTokenizationProcessor() } returns tokenizationProcessorMock
         coEvery { clientApiSessionEventsManager.isCurrentSessionAnIdentificationOrEnrolment() } returns true
         coEvery { clientApiSessionEventsManager.getCurrentSessionId() } returns RequestFactory.MOCK_SESSION_ID
         coEvery { clientApiSessionEventsManager.createSession(any()) } returns "session_id"

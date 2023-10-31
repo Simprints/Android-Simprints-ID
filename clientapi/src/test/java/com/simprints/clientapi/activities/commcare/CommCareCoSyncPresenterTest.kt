@@ -87,7 +87,7 @@ class CommCareCoSyncPresenterTest {
             )
         )
         coEvery { getProject() } returns project
-        every { tokenizationProcessor } returns tokenizationProcessorMock
+        every { getTokenizationProcessor() } returns tokenizationProcessorMock
     }
     private val jsonHelper = JsonHelper
 
