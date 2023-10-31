@@ -5,6 +5,9 @@
     android:id="@+id/dashboard_navigation"
     app:startDestination="@id/baseFragment">
 
+    <include app:graph="@navigation/graph_privacy" />
+    <include app:graph="@navigation/graph_login" />
+
     <fragment
         android:id="@+id/requestLoginFragment"
         android:name="com.simprints.feature.dashboard.requestlogin.RequestLoginFragment"
@@ -56,6 +59,12 @@
             app:destination="@id/requestLoginFragment"
             app:popUpTo="@id/dashboard_navigation"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_mainFragment_to_privacyNoticesFragment"
+            app:destination="@id/graph_privacy" />
+        <action
+            android:id="@+id/action_mainFragment_to_login"
+            app:destination="@id/graph_login" />
     </fragment>
     <fragment
         android:id="@+id/debugFragment"
@@ -99,6 +108,9 @@
         <action
             android:id="@+id/action_syncInfoFragment_to_moduleSelectionFragment"
             app:destination="@id/moduleSelectionFragment" />
+        <action
+            android:id="@+id/action_syncInfoFragment_to_login"
+            app:destination="@id/graph_login" />
     </fragment>
     <fragment
         android:id="@+id/moduleSelectionFragment"
@@ -110,22 +122,6 @@
         android:name="com.simprints.feature.dashboard.settings.fingerselection.FingerSelectionFragment"
         android:label="FingerSelectionFragment"
         tools:layout="@layout/fragment_finger_selection" />
-
-    <include app:graph="@navigation/graph_privacy" />
-    <action
-        android:id="@+id/action_mainFragment_to_privacyNoticesFragment"
-        app:destination="@id/graph_privacy" />
-
-    <include app:graph="@navigation/graph_login" />
-    <action
-        android:id="@+id/action_mainFragment_to_login"
-        app:destination="@id/graph_login" />
-    <action
-        android:id="@+id/action_logOutSyncFragment_to_login"
-        app:destination="@id/graph_login" />
-    <action
-        android:id="@+id/action_syncInfoFragment_to_login"
-        app:destination="@id/graph_login" />
 
     <navigation
         android:id="@+id/logout_navigation"
@@ -147,6 +143,9 @@
             <action
                 android:id="@+id/action_logoutSyncFragment_to_moduleSelectionFragment"
                 app:destination="@id/moduleSelectionFragment" />
+            <action
+                android:id="@+id/action_logOutSyncFragment_to_login"
+                app:destination="@id/graph_login" />
         </fragment>
         <fragment
             android:id="@+id/logOutSyncDeclineFragment"
