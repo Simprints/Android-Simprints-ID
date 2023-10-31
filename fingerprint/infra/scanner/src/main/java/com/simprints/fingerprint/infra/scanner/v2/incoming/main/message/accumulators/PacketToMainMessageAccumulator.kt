@@ -6,7 +6,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.packet.Packet
 import com.simprints.fingerprint.infra.scanner.v2.incoming.common.MessageParser
 import com.simprints.fingerprint.infra.scanner.v2.tools.accumulator.ByteArrayAccumulator
 
-abstract class PacketToMainMessageAccumulator<R: MainMessage>(
+abstract class PacketToMainMessageAccumulator<R : MainMessage>(
     private val protocol: MessageProtocol,
     private val messageParser: MessageParser<R>
 ) : ByteArrayAccumulator<Packet, R>(

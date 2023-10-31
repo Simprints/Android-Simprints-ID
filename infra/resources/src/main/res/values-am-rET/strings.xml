@@ -422,4 +422,5 @@
         <item quantity="one">%d  ተመራጭ</item>
         <item quantity="other">%d  ተመራጮች</item>
     </plurals>
+    <string name="returning_results">ውጤቱን መመለስ</string>
 </resources>

@@ -1,21 +1,38 @@
 package com.simprints.infra.license.local
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.security.crypto.EncryptedFile
 import com.simprints.infra.license.Vendor
 import com.simprints.infra.security.SecurityManager
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.io.File
 
 class LicenseLocalDataSourceImplTest {
 
+    @get:Rule
+    val instantExecutorRule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
+    private lateinit var dispatcher: CoroutineDispatcher
     private val licenseVendor = Vendor("vendor1")
     private val filesDirPath = "testpath"
+
+    @Before
+    fun setUp() {
+        dispatcher = testCoroutineRule.testCoroutineDispatcher
+    }
 
     @Test
     fun `check saving the file opens a file output`() = runTest {
@@ -29,7 +46,7 @@ class LicenseLocalDataSourceImplTest {
 
         val localSource = LicenseLocalDataSourceImpl(context = mockk {
             every { filesDir } returns file
-        }, encryptedFileMock, UnconfinedTestDispatcher())
+        }, encryptedFileMock, dispatcher)
 
 
         val fileName = "testfile"
@@ -46,13 +63,13 @@ class LicenseLocalDataSourceImplTest {
         val file = File(filesDirPath)
         val mockFile = mockk<EncryptedFile>()
 
-        val encryptedFileMock = mockk<SecurityManager>() {
+        val encryptedFileMock = mockk<SecurityManager> {
             every { getEncryptedFileBuilder(any(), any()) } returns mockFile
         }
 
-        val localSource = LicenseLocalDataSourceImpl(context = mockk() {
+        val localSource = LicenseLocalDataSourceImpl(context = mockk {
             every { filesDir } returns file
-        }, encryptedFileMock, UnconfinedTestDispatcher())
+        }, encryptedFileMock, dispatcher)
 
         localSource.getLicense(licenseVendor)
 
@@ -87,7 +104,7 @@ class LicenseLocalDataSourceImplTest {
 
         val localSource = LicenseLocalDataSourceImpl(context = mockk() {
             every { filesDir } returns File(filesDirPath)
-        }, mockk(), UnconfinedTestDispatcher())
+        }, mockk(), dispatcher)
 
         localSource.getLicense(licenseVendor)
 
@@ -103,7 +120,7 @@ class LicenseLocalDataSourceImplTest {
 
         val localSource = LicenseLocalDataSourceImpl(context = mockk {
             every { filesDir } returns File(filesDirPath)
-        }, mockk(), UnconfinedTestDispatcher())
+        }, mockk(), dispatcher)
 
         val license = localSource.getLicense(licenseVendor)
 

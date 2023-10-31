@@ -31,10 +31,10 @@ import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
@@ -51,6 +51,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.simprints.infra.resources.R as IDR
 
 @RunWith(AndroidJUnit4::class)
 class CollectFingerprintsActivityTest {
@@ -105,7 +106,7 @@ class CollectFingerprintsActivityTest {
     private val vm: CollectFingerprintsViewModel = spyk(
         CollectFingerprintsViewModel(
             scannerManager, configManager, imageManager, timeHelper,
-            sessionEventsManager, mockk(), mockk(), EncodingUtilsImplForTests,mockk(),
+            sessionEventsManager, mockk(), mockk(), EncodingUtilsImplForTests, mockk(),
             mockCoroutineScope,
         )
     ) {
@@ -153,7 +154,7 @@ class CollectFingerprintsActivityTest {
 
         scenario.onActivity {
             it.assertViewPager(count = 2, currentIndex = 0)
-            it.assertScanButtonText(R.string.scan_label)
+            it.assertScanButtonText(IDR.string.scan_label)
         }
     }
 
@@ -164,7 +165,7 @@ class CollectFingerprintsActivityTest {
         scenario.onActivity {
             state.value = startingState(TWO_FINGERS_IDS).updateCurrentFingerState { toScanning() }
             it.assertViewPager(count = 2, currentIndex = 0)
-            it.assertScanButtonText(R.string.cancel_button)
+            it.assertScanButtonText(IDR.string.cancel_button)
         }
     }
 
@@ -178,7 +179,7 @@ class CollectFingerprintsActivityTest {
                 toTransferringImage(ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60))
             }
             it.assertViewPager(count = 2, currentIndex = 0)
-            it.assertScanButtonText(R.string.please_wait_button)
+            it.assertScanButtonText(IDR.string.please_wait_button)
         }
     }
 
@@ -199,7 +200,7 @@ class CollectFingerprintsActivityTest {
                 )
             }
             it.assertViewPager(count = 2, currentIndex = 0)
-            it.assertScanButtonText(R.string.good_scan_message)
+            it.assertScanButtonText(IDR.string.good_scan_message)
         }
     }
 
@@ -220,7 +221,7 @@ class CollectFingerprintsActivityTest {
                 )
             }
             it.assertViewPager(count = 2, currentIndex = 0)
-            it.assertScanButtonText(R.string.rescan_label)
+            it.assertScanButtonText(IDR.string.rescan_label)
         }
     }
 
@@ -241,7 +242,7 @@ class CollectFingerprintsActivityTest {
                 )
             }.copy(isAskingRescan = true)
             it.assertViewPager(count = 2, currentIndex = 0)
-            it.assertScanButtonText(R.string.rescan_label_question)
+            it.assertScanButtonText(IDR.string.rescan_label_question)
         }
     }
 
@@ -254,11 +255,11 @@ class CollectFingerprintsActivityTest {
             fingerStates = listOf(
                 FingerState(
                     FOUR_FINGERS_IDS[0],
-                    listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT,null, 60)))
+                    listOf(CaptureState.Collected(ScanResult(GOOD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60)))
                 ),
                 FingerState(
                     FOUR_FINGERS_IDS[1],
-                    listOf(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE,TEMPLATE_FORMAT, null, 60)))
+                    listOf(CaptureState.Collected(ScanResult(BAD_QUALITY, TEMPLATE, TEMPLATE_FORMAT, null, 60)))
                 )
             )
         )
@@ -266,13 +267,13 @@ class CollectFingerprintsActivityTest {
         scenario.onActivity {
             state.value = initialState
             it.assertViewPager(count = 4, currentIndex = 0)
-            it.assertScanButtonText(R.string.good_scan_message)
+            it.assertScanButtonText(IDR.string.good_scan_message)
             state.value = initialState.copy(currentFingerIndex = 1)
             it.assertViewPager(count = 4, currentIndex = 1)
-            it.assertScanButtonText(R.string.rescan_label)
+            it.assertScanButtonText(IDR.string.rescan_label)
             state.value = initialState.copy(currentFingerIndex = 3)
             it.assertViewPager(count = 4, currentIndex = 3)
-            it.assertScanButtonText(R.string.scan_label)
+            it.assertScanButtonText(IDR.string.scan_label)
         }
     }
 

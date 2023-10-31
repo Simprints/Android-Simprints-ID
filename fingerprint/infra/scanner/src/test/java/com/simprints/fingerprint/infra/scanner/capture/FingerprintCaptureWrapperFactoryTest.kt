@@ -20,19 +20,21 @@ class FingerprintCaptureWrapperFactoryTest {
     }
 
     @Test(expected = NullScannerException::class)
-    fun testThrowsNullScannerErrorWhenNotInitialized(){
+    fun testThrowsNullScannerErrorWhenNotInitialized() {
         fingerprintCaptureWrapperFactory.captureWrapper
     }
+
     @Test
-    fun testCreateV1(){
+    fun testCreateV1() {
         fingerprintCaptureWrapperFactory.createV1(mockk())
-        val wrapper =  fingerprintCaptureWrapperFactory.captureWrapper
+        val wrapper = fingerprintCaptureWrapperFactory.captureWrapper
         Truth.assertThat(wrapper).isInstanceOf(FingerprintCaptureWrapperV1::class.java)
     }
+
     @Test
-    fun testCreateV2(){
+    fun testCreateV2() {
         fingerprintCaptureWrapperFactory.createV2(mockk())
-        val wrapper =  fingerprintCaptureWrapperFactory.captureWrapper
+        val wrapper = fingerprintCaptureWrapperFactory.captureWrapper
         Truth.assertThat(wrapper).isInstanceOf(FingerprintCaptureWrapperV2::class.java)
     }
 }

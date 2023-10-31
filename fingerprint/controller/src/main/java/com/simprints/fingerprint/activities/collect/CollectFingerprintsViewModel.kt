@@ -19,7 +19,6 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.LiveFeedbackState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
-import com.simprints.fingerprint.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureBiometricsEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
@@ -33,15 +32,16 @@ import com.simprints.fingerprint.data.domain.images.deduceFileExtension
 import com.simprints.fingerprint.data.domain.images.isEager
 import com.simprints.fingerprint.data.domain.images.isImageTransferRequired
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
+import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.scanner.ScannerManager
+import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
+import com.simprints.fingerprint.infra.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.domain.ScannerGeneration
-import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.tools.livedata.postEvent
 import com.simprints.infra.config.ConfigManager
 import com.simprints.infra.config.domain.models.FingerprintConfiguration
@@ -133,6 +133,7 @@ class CollectFingerprintsViewModel @Inject constructor(
 
     fun start(fingerprintsToCapture: List<FingerIdentifier>) {
         runBlocking {
+            bioSdk.initialize()
             // Configuration must be initialised when start returns for UI to be initialised correctly,
             // and since fetching happens on IO thread execution must be suspended until it is available
             configuration = configManager.getProjectConfiguration().fingerprint!!

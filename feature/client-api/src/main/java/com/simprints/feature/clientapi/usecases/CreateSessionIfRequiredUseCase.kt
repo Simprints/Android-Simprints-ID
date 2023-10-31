@@ -15,10 +15,10 @@ internal class CreateSessionIfRequiredUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
 ) {
 
-    suspend operator fun invoke(action: String) {
+    suspend operator fun invoke(action: String): Boolean {
         val actionName = action.substringAfterLast('.')
         if (actionName == ActionConstants.ACTION_CONFIRM_IDENTITY || actionName == ActionConstants.ACTION_ENROL_LAST_BIOMETRICS) {
-            return
+            return false
         }
         val integrationInfo = when (action.substringBeforeLast('.')) {
             OdkConstants.PACKAGE_NAME -> IntentParsingEvent.IntentParsingPayload.IntegrationInfo.ODK
@@ -29,5 +29,6 @@ internal class CreateSessionIfRequiredUseCase @Inject constructor(
         coreEventRepository.createSession()
             .also { Simber.tag(LoggingConstants.CrashReportingCustomKeys.SESSION_ID, true).i(it.id) }
         coreEventRepository.addOrUpdateEvent(IntentParsingEvent(timeHelper.now(), integrationInfo))
+        return true
     }
 }

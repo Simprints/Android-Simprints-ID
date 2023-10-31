@@ -15,7 +15,7 @@ import com.simprints.face.capture.screens.FaceCaptureWrapperActivity
 import com.simprints.feature.setup.LocationStore
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.id.domain.moduleapi.face.responses.entities.fromModuleApiToDomain
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.cache.HotCache
@@ -40,6 +40,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult as DomainFaceCaptureResult
+
 
 @RunWith(AndroidJUnit4::class)
 class OrchestratorManagerImplTest {
@@ -382,7 +384,12 @@ class OrchestratorManagerImplTest {
     ) {
         response?.let { r ->
             mockSteps.firstOrNull { step -> step.getStatus() == ONGOING }
-                ?.setResult(FaceCaptureResponse(r.results.map { it.fromModuleApiToDomain() }))
+                ?.setResult(FaceCaptureResponse(r.results.map { capture ->
+                    DomainFaceCaptureResult(
+                        capture.index,
+                        capture.sample?.let { FaceCaptureSample(it.faceId, it.template, null, it.format) }
+                    )
+                }))
         }
 
         handleIntentResult(
@@ -397,7 +404,7 @@ class OrchestratorManagerImplTest {
         add(
             Step(
                 requestCode = FingerprintRequestCode.CAPTURE.value,
-                activityName = FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME,
+                activityName = FingerprintStepProcessorImpl.CAPTURE_ACTIVITY_NAME,
                 bundleKey = IFingerprintRequest.BUNDLE_KEY,
                 payloadType = Step.PayloadType.REQUEST,
                 payload = FingerprintCaptureRequest(fingerprintsToCapture = emptyList()),

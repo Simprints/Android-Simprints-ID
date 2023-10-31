@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.base.FingerprintFragment
 import com.simprints.fingerprint.activities.connect.issues.ConnectScannerIssue
@@ -16,9 +15,11 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEventWithScannerIssue
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.databinding.FragmentOtaRecoveryBinding
-import com.simprints.fingerprint.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.fingerprint.infra.scanner.domain.ota.OtaRecoveryStrategy
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.simprints.infra.resources.R as IDR
 
 /**
  * This fragment is show when an Over The Air update fails, and a reset is required
@@ -29,6 +30,7 @@ class OtaRecoveryFragment : FingerprintFragment() {
 
     @Inject
     lateinit var timeHelper: FingerprintTimeHelper
+
     @Inject
     lateinit var sessionManager: FingerprintSessionEventsManager
 
@@ -62,12 +64,12 @@ class OtaRecoveryFragment : FingerprintFragment() {
     }
 
     private fun setTextInLayout() {
-        binding.otaRecoveryTitleTextView.text = getString(R.string.ota_recovery_title)
-        binding.tryAgainButton.text = getString(R.string.try_again_label)
+        binding.otaRecoveryTitleTextView.text = getString(IDR.string.ota_recovery_title)
+        binding.tryAgainButton.text = getString(IDR.string.try_again_label)
         val instructionResourceId = when (args.otaRecoveryFragmentRequest.recoveryStrategy) {
-            OtaRecoveryStrategy.HARD_RESET -> R.string.ota_recovery_hard_reset
+            OtaRecoveryStrategy.HARD_RESET -> IDR.string.ota_recovery_hard_reset
             OtaRecoveryStrategy.SOFT_RESET,
-            OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY -> R.string.ota_recovery_soft_reset
+            OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY -> IDR.string.ota_recovery_soft_reset
         }
         binding.otaRecoveryInstructionsTextView.text = getString(instructionResourceId)
     }
@@ -94,9 +96,7 @@ class OtaRecoveryFragment : FingerprintFragment() {
 
     private fun goToOtaFailed() {
         findNavController().navigate(
-            OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFailedFragment(
-                null
-            )
+            OtaRecoveryFragmentDirections.actionOtaRecoveryFragmentToOtaFailedFragment(null)
         )
     }
 }

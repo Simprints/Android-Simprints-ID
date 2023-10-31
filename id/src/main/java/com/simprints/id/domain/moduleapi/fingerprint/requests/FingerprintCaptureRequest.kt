@@ -14,9 +14,7 @@ data class FingerprintCaptureRequest(
 ) : FingerprintRequest
 
 fun FingerprintCaptureRequest.fromDomainToModuleApi(): IFingerprintCaptureRequest =
-    FingerprintCaptureRequestImpl(
-        fingerprintsToCapture.map { it.fromDomainToModuleApi() }
-    )
+    FingerprintCaptureRequestImpl(fingerprintsToCapture.map { it.fromDomainToModuleApi() })
 
 @Parcelize
 private data class FingerprintCaptureRequestImpl(

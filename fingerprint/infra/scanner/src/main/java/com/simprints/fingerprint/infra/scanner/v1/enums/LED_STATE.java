@@ -13,6 +13,7 @@ public enum LED_STATE {
     public final static LED_STATE[] GREEN_LEDS = new LED_STATE[LED.COUNT];
     public final static LED_STATE[] RED_LEDS = new LED_STATE[LED.COUNT];
     public final static LED_STATE[] ONE_ORANGE_LED = new LED_STATE[LED.COUNT];
+
     static {
         Arrays.fill(OFF_LEDS, LED_STATE.OFF);
         Arrays.fill(GREEN_LEDS, LED_STATE.GREEN);

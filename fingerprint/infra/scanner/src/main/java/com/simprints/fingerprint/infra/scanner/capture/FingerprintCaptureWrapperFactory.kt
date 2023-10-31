@@ -15,9 +15,9 @@ class FingerprintCaptureWrapperFactory @Inject constructor(
     private val scannerUiHelper: ScannerUiHelper,
 ) {
     private var _captureWrapper: FingerprintCaptureWrapper? = null
+
     val captureWrapper: FingerprintCaptureWrapper
         get() = _captureWrapper ?: throw NullScannerException()
-
 
     fun createV1(scannerV1: ScannerV1) {
         _captureWrapper = FingerprintCaptureWrapperV1(scannerV1, ioDispatcher)

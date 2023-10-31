@@ -40,7 +40,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
     private fun reportUnknownExtras(actionRequest: ActionRequest) {
         if (actionRequest.unknownExtras.isNotEmpty()) {
             externalScope.launch {
-                coreEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras))
+                coreEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras.toMap()))
             }
         }
     }
@@ -56,7 +56,7 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
                 is ActionRequest.EnrolActionRequest -> EnrolmentCalloutEvent(startTime, projectId, userId, moduleId, metadata)
                 is ActionRequest.IdentifyActionRequest -> IdentificationCalloutEvent(startTime, projectId, userId, moduleId, metadata)
                 is ActionRequest.VerifyActionRequest -> VerificationCalloutEvent(startTime, projectId, userId, moduleId, verifyGuid, metadata)
-                is ActionRequest.ConfirmActionRequest -> ConfirmationCalloutEvent(startTime, projectId, selectedGuid, sessionId)
+                is ActionRequest.ConfirmIdentityActionRequest -> ConfirmationCalloutEvent(startTime, projectId, selectedGuid, sessionId)
                 is ActionRequest.EnrolLastBiometricActionRequest -> EnrolmentLastBiometricsCalloutEvent(startTime, projectId, userId, moduleId, metadata, sessionId)
             }
         }

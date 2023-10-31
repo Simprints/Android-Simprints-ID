@@ -21,7 +21,7 @@ internal class ExitFormWrapperActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        binding.exitFormHost.handleResult<ExitFormResult>(this, ExitFormContract.DESTINATION_ID) { result ->
+        binding.exitFormHost.handleResult<ExitFormResult>(this, ExitFormContract.DESTINATION) { result ->
             // Pass the fragment results directly into activity results
             setResult(RESULT_OK, Intent().also { it.putExtra(EXIT_FORM_RESULT, result) })
             finish()

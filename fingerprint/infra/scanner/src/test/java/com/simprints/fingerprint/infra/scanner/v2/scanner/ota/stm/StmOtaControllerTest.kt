@@ -55,7 +55,7 @@ class StmOtaControllerTest {
 
         testObserver.awaitAndAssertSuccess()
 
-        verify (exactly =  expectedNumberOfCalls){ messageStreamMock.outgoing.sendMessage(any()) }
+        verify(exactly = expectedNumberOfCalls) { messageStreamMock.outgoing.sendMessage(any()) }
     }
 
     @Test
@@ -91,10 +91,10 @@ class StmOtaControllerTest {
         return StmOtaMessageChannel(
             spyk(StmOtaMessageInputStream(mockk())).apply {
                 justRun { connect(any()) }
-                every { stmOtaResponseStream } returns  responseSubject.toFlowable(BackpressureStrategy.BUFFER)
+                every { stmOtaResponseStream } returns responseSubject.toFlowable(BackpressureStrategy.BUFFER)
             },
             mockk {
-                every { sendMessage(any()) } answers  {
+                every { sendMessage(any()) } answers {
                     Completable.complete().doAfterTerminate {
                         responseSubject.onNext(CommandAcknowledgement(
                             if (nackPositions.contains(messageIndex.getAndIncrement())) {

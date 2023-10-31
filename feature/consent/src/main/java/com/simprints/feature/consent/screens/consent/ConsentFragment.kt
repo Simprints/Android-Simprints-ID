@@ -42,7 +42,7 @@ internal class ConsentFragment : Fragment(R.layout.fragment_consent) {
         findNavController().handleResult<ExitFormResult>(
             viewLifecycleOwner,
             R.id.consentFragment,
-            ExitFormContract.DESTINATION_ID,
+            ExitFormContract.DESTINATION,
         ) { viewModel.handleExitFormResponse(it) }
 
         viewModel.loadConfiguration(args.consentType)

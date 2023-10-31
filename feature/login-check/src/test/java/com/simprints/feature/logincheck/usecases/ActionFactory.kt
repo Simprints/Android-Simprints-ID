@@ -16,11 +16,11 @@ internal object ActionFactory {
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
-        unknownExtras = extras,
+        unknownExtras = extras.toList(),
         metadata = "",
     )
 
-    fun getFolowUpRequest() = ActionRequest.ConfirmActionRequest(
+    fun getFolowUpRequest() = ActionRequest.ConfirmIdentityActionRequest(
         actionIdentifier = ActionRequestIdentifier(
             packageName = "com.simprints.id",
             actionName = ActionConstants.ACTION_CONFIRM_IDENTITY,
@@ -29,7 +29,7 @@ internal object ActionFactory {
         userId = MOCK_USER_ID,
         sessionId = "sessionId",
         selectedGuid = "selectedGuid",
-        unknownExtras = emptyMap()
+        unknownExtras = emptyList()
     )
 
     const val MOCK_USER_ID = "userId"
