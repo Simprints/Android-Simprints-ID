@@ -21,6 +21,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -84,6 +85,18 @@ class EnrolLastBiometricViewModelTest {
             hasDuplicateEnrolments,
             buildSubject
         )
+    }
+
+    @Test
+    fun `only calls enrol once`() = runTest {
+        viewModel.onViewCreated(createParams(listOf(
+            EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
+        )))
+        viewModel.onViewCreated(createParams(listOf(
+            EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
+        )))
+
+        coVerify(exactly = 1) { configManager.getProjectConfiguration() }
     }
 
     @Test
