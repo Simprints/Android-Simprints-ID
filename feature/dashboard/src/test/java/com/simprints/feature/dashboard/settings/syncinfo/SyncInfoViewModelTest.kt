@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -417,6 +418,52 @@ class SyncInfoViewModelTest {
         stateLiveData.value = EventSyncState("", 0, 0, emptyList(), emptyList())
 
         assertThat(viewModel.isSyncAvailable.getOrAwaitValue()).isFalse()
+    }
+
+    @Test
+    fun `emit ReloginRequired = false when lastSyncState updates with different status`() = runTest {
+        stateLiveData.value = EventSyncState("", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Failed(failedBecauseBackendMaintenance = true)
+            )
+        ))
+
+        assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isFalse()
+    }
+
+    @Test
+    fun `emit ReloginRequired = true when lastSyncState updates with such status`() = runTest {
+        stateLiveData.value = EventSyncState("", 0, 0, listOf(), listOf(
+            EventSyncState.SyncWorkerInfo(
+                EventSyncWorkerType.DOWNLOADER,
+                EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
+            )
+        ))
+
+        assertThat(viewModel.isReloginRequired.getOrAwaitValue()).isTrue()
+    }
+
+    @Test
+    fun `calling login() sends respective event to the view`() {
+        viewModel.login()
+
+        val loginRequestedEvent = viewModel.loginRequestedEventLiveData.getOrAwaitValue()
+        assertThat(loginRequestedEvent).isNotNull()
+    }
+
+    @Test
+    fun `calling handleLoginResult() triggers sync if result is success`() {
+        viewModel.handleLoginResult(LoginResult(true))
+
+        verify(exactly = 1) { eventSyncManager.sync() }
+    }
+
+    @Test
+    fun `calling handleLoginResult() does not trigger sync if result is not success`() {
+        viewModel.handleLoginResult(LoginResult(false))
+
+        verify(exactly = 0) { eventSyncManager.sync() }
     }
 
     private fun createMockDownSyncConfig(

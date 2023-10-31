@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
@@ -16,6 +17,7 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
 import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
+import com.simprints.feature.login.LoginResult
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.DeviceConfiguration
@@ -304,6 +306,55 @@ class SyncViewModelTest {
         val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
 
         assertThat(syncCardLiveData).isEqualTo(SyncFailed(DATE))
+    }
+
+    @Test
+    fun `should post a ReloginRequired card state if the sync fails with such problem`() {
+        coEvery { configManager.getDeviceConfiguration() } returns DeviceConfiguration(
+            "",
+            listOf("module 1"),
+            ""
+        )
+        isConnected.value = true
+        syncState.value = EventSyncState(
+            "", 10, 40, listOf(), listOf(
+                EventSyncState.SyncWorkerInfo(
+                    EventSyncWorkerType.DOWNLOADER,
+                    EventSyncWorkerState.Failed(failedBecauseReloginRequired = true)
+                )
+            )
+        )
+        val syncCardLiveData = initViewModel().syncCardLiveData.getOrAwaitValue()
+
+        assertThat(syncCardLiveData).isEqualTo(SyncCardState.SyncFailedReloginRequired(DATE))
+    }
+
+    @Test
+    fun `calling login() sends respective event to the view`() {
+        val viewModel = initViewModel()
+
+        viewModel.login()
+
+        val loginRequestedEvent = viewModel.loginRequestedEventLiveData.getOrAwaitValue()
+        assertThat(loginRequestedEvent).isNotNull()
+    }
+
+    @Test
+    fun `calling handleLoginResult() triggers sync if result is success`() {
+        val viewModel = initViewModel()
+
+        viewModel.handleLoginResult(LoginResult(true))
+
+        verify(exactly = 1) { eventSyncManager.sync() }
+    }
+
+    @Test
+    fun `calling handleLoginResult() does not trigger sync if result is not success`() {
+        val viewModel = initViewModel()
+
+        viewModel.handleLoginResult(LoginResult(false))
+
+        verify(exactly = 0) { eventSyncManager.sync() }
     }
 
     @Test

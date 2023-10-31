@@ -8,15 +8,22 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.google.common.util.concurrent.ListenableFuture
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.authstore.exceptions.RemoteDbNotSignedInException
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.eventsync.SampleSyncScopes.projectDownSyncScope
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED
 import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncCountTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -87,6 +94,48 @@ internal class EventDownSyncCountWorkerTest {
         val output = JsonHelper.toJson(listOf(counts))
         val expectedSuccessfulOutput = workDataOf(OUTPUT_COUNT_WORKER_DOWN to output)
         assertThat(result).isEqualTo(ListenableWorker.Result.success(expectedSuccessfulOutput))
+    }
+
+    @Test
+    fun `when worker encounters SyncCloudIntegrationException then it should fail with CLOUD_INTEGRATION`() {
+        runTest {
+            coEvery { eventDownSyncCountTask.getCount(any()) } throws
+                SyncCloudIntegrationException(cause = Throwable())
+
+            val result = countWorker.doWork()
+
+            val expectedFailureOutput = workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true)
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure(expectedFailureOutput))
+        }
+    }
+
+    @Test
+    fun `when worker encounters BackendMaintenanceException then it should fail with BACKEND_MAINTENANCE`() {
+        runTest {
+            val outage: Long = 666
+            coEvery { eventDownSyncCountTask.getCount(any()) } throws
+                BackendMaintenanceException(estimatedOutage = outage)
+
+            val result = countWorker.doWork()
+
+            val expectedFailureOutput = workDataOf(
+                OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+                OUTPUT_ESTIMATED_MAINTENANCE_TIME to outage
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure(expectedFailureOutput))
+        }
+    }
+
+    @Test
+    fun `when worker encounters RemoteDbNotSignedInException then it should fail with RELOGIN_REQUIRED`() {
+        runTest {
+            coEvery { eventDownSyncCountTask.getCount(any()) } throws RemoteDbNotSignedInException()
+
+            val result = countWorker.doWork()
+
+            val expectedFailureOutput = workDataOf(OUTPUT_FAILED_BECAUSE_RELOGIN_REQUIRED to true)
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure(expectedFailureOutput))
+        }
     }
 
     @Test

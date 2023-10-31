@@ -77,6 +77,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
@@ -104,6 +105,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
@@ -116,7 +118,6 @@ class SyncFragmentTest {
             .perform(click())
         verify(exactly = 1) { viewModel.sync() }
     }
-
 
     @Test
     fun `should display the correct sync card view for the SyncFailed state`() {
@@ -132,12 +133,38 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
 
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_failed_message)))
+    }
+
+    @Test
+    fun `should display the correct sync card view for the SyncFailedReloginRequired state`() {
+        mockSyncToBFSIDAllowed(true)
+        mockSyncCardLiveData(SyncCardState.SyncFailedReloginRequired(LAST_SYNC_TIME))
+
+        launchFragmentInHiltContainer<SyncFragment>(navController = navController)
+
+        checkHiddenViews(
+            listOf(
+                R.id.sync_card_default_state_sync_button,
+                R.id.sync_card_select_no_modules,
+                R.id.sync_card_offline,
+                R.id.sync_card_progress,
+                R.id.sync_card_try_again,
+            )
+        )
+
+        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
+        onView(withId(R.id.sync_card_relogin_required)).check(matches(isDisplayed()))
+        onView(withId(R.id.sync_card_relogin_required_login_button)).check(matches(isDisplayed()))
+            .perform(click())
+        verify(exactly = 1) { viewModel.login() }
     }
 
     @Test
@@ -154,6 +181,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
         val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
@@ -180,6 +208,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -204,6 +233,7 @@ class SyncFragmentTest {
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
                 R.id.sync_card_try_again,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -226,6 +256,7 @@ class SyncFragmentTest {
                 R.id.sync_card_select_no_modules,
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -251,6 +282,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_offline,
                 R.id.sync_card_progress,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -277,6 +309,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_progress,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -301,6 +334,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -331,6 +365,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
+                R.id.sync_card_relogin_required,
             )
         )
 
@@ -358,6 +393,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
                 R.id.sync_card_select_no_modules_button,
                 R.id.sync_card_offline,
+                R.id.sync_card_relogin_required,
             )
         )
 
