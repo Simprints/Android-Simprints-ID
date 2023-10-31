@@ -9,7 +9,6 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureWrapperActivity
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitReason
-import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
@@ -19,6 +18,7 @@ import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
+import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.matcher.FingerprintMatchResult
