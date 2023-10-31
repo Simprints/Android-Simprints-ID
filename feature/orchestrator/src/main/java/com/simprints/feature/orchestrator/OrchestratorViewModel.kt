@@ -108,7 +108,6 @@ internal class OrchestratorViewModel @Inject constructor(
                 nextStep.status = StepStatus.IN_PROGRESS
                 _currentStep.send(nextStep)
             } else {
-                // TODO move this to more appropriate spot??
                 // Acquiring location info could take long time, so we should stop location tracker
                 // before returning to the caller app to avoid creating empty sessions.
                 locationStore.cancelLocationCollection()

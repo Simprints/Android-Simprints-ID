@@ -103,6 +103,7 @@ class EventDownSyncTaskTest {
 
         subjectFactory = SubjectFactory(
             encodingUtils = EncodingUtilsImplForTests,
+            timeHelper = timeHelper,
         )
         eventDownSyncTask = EventDownSyncTask(
             enrolmentRecordManager,

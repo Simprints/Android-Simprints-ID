@@ -25,6 +25,8 @@ class MapRefusalOrErrorResultUseCase @Inject constructor() {
         is SetupResult -> result.takeUnless { it.permissionGranted }
             ?.let { AppErrorResponse(IAppErrorReason.LOGIN_NOT_COMPLETE) }
 
+        // TODO handle vero connection error?
+
         is FaceConfigurationResult -> result.takeUnless { it.isSuccess }
             ?.let { AppErrorResponse(it.error ?: IAppErrorReason.UNEXPECTED_ERROR) }
 

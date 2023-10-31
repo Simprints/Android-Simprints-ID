@@ -4,12 +4,14 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -20,7 +22,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -98,7 +99,6 @@ class CreatePersonEventUseCaseTest {
         }
     }
 
-    @Ignore("Enable when fingerprint modality is refactored")
     @Test
     fun `Create event if there is fingerprint biometric data`() = runTest {
         coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(
@@ -108,14 +108,19 @@ class CreatePersonEventUseCaseTest {
             },
         )
 
-        // TODO useCase(listOf(FingerprintCaptureResult(...)))
+        useCase(listOf(FingerprintCaptureResult(listOf(createFingerprintCaptureResultItem()))))
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<PersonCreationEvent> {
-                assertThat(it.payload.faceCaptureIds).isEqualTo(listOf("eventFaceId1"))
+                assertThat(it.payload.fingerprintCaptureIds).isEqualTo(listOf("eventFinger1"))
             })
         }
     }
+
+    private fun createFingerprintCaptureResultItem() = FingerprintCaptureResult.Item(
+        IFingerIdentifier.RIGHT_THUMB,
+        FingerprintCaptureResult.Sample(IFingerIdentifier.RIGHT_THUMB, byteArrayOf(), 0, null, "format")
+    )
 
     private fun createFaceCaptureResultItem() =
         FaceCaptureResult.Item(0, FaceCaptureResult.Sample("faceId", byteArrayOf(), null, "format"))
