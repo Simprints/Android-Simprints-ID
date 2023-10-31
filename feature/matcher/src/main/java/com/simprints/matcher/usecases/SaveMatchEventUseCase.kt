@@ -2,20 +2,24 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.FlowProvider
-import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
 import com.simprints.infra.events.event.domain.models.MatchEntry
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
+import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResultItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy as ConfigFingerComparisonStrategy
 
 internal class SaveMatchEventUseCase @Inject constructor(
     private val eventRepository: EventRepository,
-    @ExternalScope private val externalScope: CoroutineScope
+    private val configManager: ConfigManager,
+    @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
     operator fun invoke(
@@ -29,33 +33,56 @@ internal class SaveMatchEventUseCase @Inject constructor(
         externalScope.launch {
             val matchEntries = results.map { MatchEntry(it.subjectId, it.confidence) }
             val event = if (matchParams.flowType == FlowProvider.FlowType.VERIFY) {
-                getOneToOneEvent(startTime, endTime, matcherName, matchParams.queryForCandidates, matchEntries.firstOrNull())
+                getOneToOneEvent(
+                    startTime, endTime,
+                    matcherName,
+                    matchParams.queryForCandidates,
+                    matchEntries.firstOrNull(),
+                    if (matchParams.isFaceMatch()) null else getFingerprintComparisonStrategy(),
+                )
             } else {
-                getOneToManyEvent(startTime, endTime, matcherName, matchParams.queryForCandidates, candidatesCount, matchEntries)
+                getOneToManyEvent(
+                    startTime, endTime,
+                    matcherName,
+                    matchParams.queryForCandidates,
+                    candidatesCount,
+                    matchEntries
+                )
             }
             eventRepository.addOrUpdateEvent(event)
         }
     }
 
+    private suspend fun getFingerprintComparisonStrategy() = configManager.getProjectConfiguration()
+        .fingerprint
+        ?.comparisonStrategyForVerification
+        ?.let {
+            when (it) {
+                ConfigFingerComparisonStrategy.SAME_FINGER -> FingerComparisonStrategy.SAME_FINGER
+                ConfigFingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX -> FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
+            }
+        }
+
     private fun getOneToOneEvent(
         startTime: Long,
         endTime: Long,
-        faceMatcherName: String,
+        matcherName: String,
         queryForCandidates: SubjectQuery,
-        matchEntry: MatchEntry?
+        matchEntry: MatchEntry?,
+        fingerComparisonStrategy: FingerComparisonStrategy?,
     ) = OneToOneMatchEvent(
         startTime,
         endTime,
         queryForCandidates.subjectId!!,
-        faceMatcherName,
+        matcherName,
         matchEntry,
-        null
+        fingerComparisonStrategy,
     )
 
     private fun getOneToManyEvent(
         startTime: Long,
         endTime: Long,
-        faceMatcherName: String,
+        matcherName: String,
         queryForCandidates: SubjectQuery,
         candidatesCount: Int,
         matchEntries: List<MatchEntry>
@@ -66,7 +93,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
             queryForCandidates.parseQueryAsCoreMatchPoolType(),
             candidatesCount
         ),
-        faceMatcherName,
+        matcherName,
         matchEntries,
     )
 
