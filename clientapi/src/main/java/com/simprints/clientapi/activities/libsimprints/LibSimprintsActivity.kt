@@ -37,9 +37,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     @Inject
     lateinit var authStore: AuthStore
 
-    override val tokenizationProcessor: TokenizationProcessor by lazy {
-        tokenizationProcessorParam
-    }
+    override fun getTokenizationProcessor() = tokenizationProcessorParam
 
     override suspend fun getProject(): Project? =
         runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()

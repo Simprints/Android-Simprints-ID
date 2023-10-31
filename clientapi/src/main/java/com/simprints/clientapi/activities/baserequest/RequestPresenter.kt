@@ -73,7 +73,7 @@ abstract class RequestPresenter(
         EnrolBuilder(
             extractor = view.enrolExtractor,
             project = view.getProject(),
-            tokenizationProcessor = view.tokenizationProcessor,
+            tokenizationProcessor = view.getTokenizationProcessor(),
             validator = EnrolValidator(view.enrolExtractor)
         )
     )
@@ -82,7 +82,7 @@ abstract class RequestPresenter(
         IdentifyBuilder(
             extractor = view.identifyExtractor,
             project = view.getProject(),
-            tokenizationProcessor = view.tokenizationProcessor,
+            tokenizationProcessor = view.getTokenizationProcessor(),
             validator = IdentifyValidator(view.identifyExtractor)
         )
     )
@@ -91,7 +91,7 @@ abstract class RequestPresenter(
         VerifyBuilder(
             extractor = view.verifyExtractor,
             project = view.getProject(),
-            tokenizationProcessor = view.tokenizationProcessor,
+            tokenizationProcessor = view.getTokenizationProcessor(),
             validator = VerifyValidator(view.verifyExtractor)
         )
     )
@@ -100,7 +100,7 @@ abstract class RequestPresenter(
         ConfirmIdentifyBuilder(
             extractor = view.confirmIdentityExtractor,
             project = view.getProject(),
-            tokenizationProcessor = view.tokenizationProcessor,
+            tokenizationProcessor = view.getTokenizationProcessor(),
             validator = ConfirmIdentityValidator(
                 view.confirmIdentityExtractor,
                 eventsManager.getCurrentSessionId(),
@@ -113,7 +113,7 @@ abstract class RequestPresenter(
         EnrolLastBiometricsBuilder(
             extractor = view.enrolLastBiometricsExtractor,
             project = view.getProject(),
-            tokenizationProcessor = view.tokenizationProcessor,
+            tokenizationProcessor = view.getTokenizationProcessor(),
             validator = EnrolLastBiometricsValidator(
                 view.enrolLastBiometricsExtractor,
                 eventsManager.getCurrentSessionId(),
