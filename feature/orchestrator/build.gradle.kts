@@ -24,6 +24,8 @@ dependencies {
     implementation(project(":face:configuration"))
     implementation(project(":face:capture"))
 
+    implementation(project(":fingerprint:capture"))
+
     implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:enrolment-records-sync"))

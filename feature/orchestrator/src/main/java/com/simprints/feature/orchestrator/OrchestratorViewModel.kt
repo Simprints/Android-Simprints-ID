@@ -23,6 +23,7 @@ import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCas
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.setup.LocationStore
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
@@ -135,7 +136,8 @@ internal class OrchestratorViewModel @Inject constructor(
             val matchingStep = steps.firstOrNull { it.id == StepId.FACE_MATCHER }
 
             if (matchingStep != null) {
-                val faceSamples = result.results.mapNotNull { it.sample }.map { MatchParams.FaceSample(it.faceId, it.template) }
+                val faceSamples = result.results.mapNotNull { it.sample }
+                    .map { MatchParams.FaceSample(it.faceId, it.template) }
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFaceStepArgs(faceSamples)
@@ -145,6 +147,20 @@ internal class OrchestratorViewModel @Inject constructor(
                 }
             }
         }
-        // TODO fingerprint matching step payload handling
+        if (currentStep.id == StepId.FINGERPRINT_CAPTURE && result is FingerprintCaptureResult) {
+            val matchingStep = steps.firstOrNull { it.id == StepId.FINGERPRINT_MATCHER }
+
+            if (matchingStep != null) {
+                val fingerprintSamples = result.results.mapNotNull { it.sample }
+                    .map { MatchParams.FingerprintSample(it.fingerIdentifier, it.format, it.template) }
+                val newPayload = matchingStep.payload
+                    .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
+                    ?.toFingerprintStepArgs(fingerprintSamples)
+
+                if (newPayload != null) {
+                    matchingStep.payload = newPayload
+                }
+            }
+        }
     }
 }
