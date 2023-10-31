@@ -42,7 +42,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
         ) { finishWithSubjectId(null) }
 
         viewModel.finish.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { finishWithResult(it) })
-        viewModel.enrolBiometric(args.params)
+        viewModel.onViewCreated(args.params)
     }
 
     private fun finishWithResult(result: EnrolLastState) = when (result) {
