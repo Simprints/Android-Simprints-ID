@@ -17,7 +17,7 @@ import com.simprints.feature.clientapi.usecases.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.usecases.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubjectUseCase
-import com.simprints.feature.clientapi.usecases.GetEventJsonForSessionUseCase
+import com.simprints.feature.clientapi.usecases.GetEventsForCoSyncUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
 import com.simprints.infra.authstore.AuthStore
@@ -43,7 +43,7 @@ class ClientApiViewModel @Inject internal constructor(
     private val simpleEventReporter: SimpleEventReporter,
     private val getCurrentSessionId: GetCurrentSessionIdUseCase,
     private val createSessionIfRequiredUseCase: CreateSessionIfRequiredUseCase,
-    private val getEventJsonForSession: GetEventJsonForSessionUseCase,
+    private val getEventJsonForSession: GetEventsForCoSyncUseCase,
     private val getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase,
     private val deleteSessionEventsIfNeeded: DeleteSessionEventsIfNeededUseCase,
     private val isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase,
@@ -63,6 +63,8 @@ class ClientApiViewModel @Inject internal constructor(
         get() = _showAlert
     private val _showAlert = MutableLiveData<LiveDataEventWithContent<ClientApiError>>()
 
+    private suspend fun getProject() =
+        runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
 
     suspend fun handleIntent(action: String, extras: Bundle): ActionRequest? {
         val extrasMap = extras.toMap()
@@ -97,7 +99,10 @@ class ClientApiViewModel @Inject internal constructor(
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
         simpleEventReporter.closeCurrentSessionNormally()
 
-        val coSyncEventsJson = getEventJsonForSession(currentSessionId)
+        val coSyncEventsJson = getEventJsonForSession(
+            sessionId = currentSessionId,
+            project = getProject()
+        )
         val coSyncEnrolmentRecords =
             getEnrolmentCreationEventForSubject(action.projectId, enrolResponse.guid)
 
@@ -124,7 +129,10 @@ class ClientApiViewModel @Inject internal constructor(
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
 
-        val coSyncEventsJson = getEventJsonForSession(currentSessionId)
+        val coSyncEventsJson = getEventJsonForSession(
+            sessionId = currentSessionId,
+            project = getProject()
+        )
 
         _returnResponse.send(
             resultMapper(
@@ -146,7 +154,10 @@ class ClientApiViewModel @Inject internal constructor(
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
 
-        val coSyncEventsJson = getEventJsonForSession(currentSessionId)
+        val coSyncEventsJson = getEventJsonForSession(
+            sessionId = currentSessionId,
+            project = getProject()
+        )
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(
@@ -170,7 +181,10 @@ class ClientApiViewModel @Inject internal constructor(
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
         simpleEventReporter.closeCurrentSessionNormally()
 
-        val coSyncEventsJson = getEventJsonForSession(currentSessionId)
+        val coSyncEventsJson = getEventJsonForSession(
+            sessionId = currentSessionId,
+            project = getProject()
+        )
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(
@@ -194,7 +208,10 @@ class ClientApiViewModel @Inject internal constructor(
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
         simpleEventReporter.closeCurrentSessionNormally()
 
-        val coSyncEventsJson = getEventJsonForSession(currentSessionId)
+        val coSyncEventsJson = getEventJsonForSession(
+            sessionId = currentSessionId,
+            project = getProject()
+        )
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(
@@ -223,7 +240,10 @@ class ClientApiViewModel @Inject internal constructor(
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = flowCompleted)
         simpleEventReporter.closeCurrentSessionNormally()
 
-        val coSyncEventsJson = getEventJsonForSession(currentSessionId)
+        val coSyncEventsJson = getEventJsonForSession(
+            sessionId = currentSessionId,
+            project = getProject()
+        )
         deleteSessionEventsIfNeeded(currentSessionId)
 
         _returnResponse.send(
