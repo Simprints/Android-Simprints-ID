@@ -6,7 +6,6 @@ import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.configuration.FaceConfigurationContract
-import com.simprints.matcher.MatchContract
 import com.simprints.feature.consent.ConsentContract
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.enrollast.EnrolLastBiometricContract
@@ -23,6 +22,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.matcher.MatchContract
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Mapping code for steps")
@@ -142,16 +142,15 @@ internal class BuildStepsUseCase @Inject constructor(
         flowType: FlowProvider.FlowType,
         subjectQuery: SubjectQuery,
     ) = projectConfiguration.general.modalities.map {
-        when (it) {
-            Modality.FINGERPRINT -> TODO("Fingerprint modality is not supported yet")
-
-            Modality.FACE -> Step(
-                id = StepId.FACE_MATCHER,
-                navigationActionId = R.id.action_orchestratorFragment_to_faceMatcher,
-                destinationId = MatchContract.DESTINATION,
-                payload = MatchStepStubPayload.asBundle(flowType, subjectQuery),
-            )
-        }
+        Step(
+            id = when (it) {
+                Modality.FINGERPRINT -> StepId.FINGERPRINT_MATCHER
+                Modality.FACE -> StepId.FACE_MATCHER
+            },
+            navigationActionId = R.id.action_orchestratorFragment_to_matcher,
+            destinationId = MatchContract.DESTINATION,
+            payload = MatchStepStubPayload.asBundle(flowType, subjectQuery),
+        )
     }
 
     private fun buildEnrolLastBiometricStep(action: ActionRequest.EnrolLastBiometricActionRequest) = listOf(Step(
