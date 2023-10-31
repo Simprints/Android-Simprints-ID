@@ -29,6 +29,7 @@ import com.simprints.feature.orchestrator.databinding.FragmentOrchestratorBindin
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
+import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.orchestration.data.results.AppResult
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -108,6 +109,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(FaceConfigurationContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(MatchContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(FaceCaptureContract.DESTINATION, orchestratorVm::handleResult)
+        handleResult(FingerprintCaptureContract.DESTINATION, orchestratorVm::handleResult)
     }
 
     private fun <T : Parcelable> handleResult(destination: Int, block: (T) -> Unit) {

@@ -18,8 +18,10 @@ import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
+import com.simprints.fingerprint.capture.FingerprintCaptureContract
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.matcher.MatchContract
@@ -38,7 +40,10 @@ internal class BuildStepsUseCase @Inject constructor(
             buildSetupStep(),
             buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
             buildConsentStep(ConsentType.ENROL),
-            buildModalityCaptureSteps(projectConfiguration),
+            buildModalityCaptureSteps(
+                projectConfiguration,
+                FlowProvider.FlowType.ENROL,
+            ),
             if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
                 buildModalityMatcherSteps(
                     projectConfiguration,
@@ -52,7 +57,10 @@ internal class BuildStepsUseCase @Inject constructor(
             buildSetupStep(),
             buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
             buildConsentStep(ConsentType.IDENTIFY),
-            buildModalityCaptureSteps(projectConfiguration),
+            buildModalityCaptureSteps(
+                projectConfiguration,
+                FlowProvider.FlowType.IDENTIFY,
+            ),
             buildModalityMatcherSteps(
                 projectConfiguration,
                 FlowProvider.FlowType.IDENTIFY,
@@ -65,7 +73,10 @@ internal class BuildStepsUseCase @Inject constructor(
             buildModalityConfigurationSteps(projectConfiguration, action.projectId, deviceId),
             buildFetchGuidStep(action.projectId, action.verifyGuid),
             buildConsentStep(ConsentType.VERIFY),
-            buildModalityCaptureSteps(projectConfiguration),
+            buildModalityCaptureSteps(
+                projectConfiguration,
+                FlowProvider.FlowType.VERIFY,
+            ),
             buildModalityMatcherSteps(
                 projectConfiguration,
                 FlowProvider.FlowType.VERIFY,
@@ -121,9 +132,22 @@ internal class BuildStepsUseCase @Inject constructor(
     ))
 
 
-    private fun buildModalityCaptureSteps(projectConfiguration: ProjectConfiguration) = projectConfiguration.general.modalities.map {
+    private fun buildModalityCaptureSteps(
+        projectConfiguration: ProjectConfiguration,
+        flowType: FlowProvider.FlowType,
+    ) = projectConfiguration.general.modalities.map {
         when (it) {
-            Modality.FINGERPRINT -> TODO("Fingerprint modality is not supported yet")
+            Modality.FINGERPRINT -> {
+                val fingersToCollect = projectConfiguration.fingerprint?.fingersToCapture.orEmpty()
+                    .map { finger -> finger.fromDomainToModuleApi() }
+
+                Step(
+                    id = StepId.FINGERPRINT_CAPTURE,
+                    navigationActionId = R.id.action_orchestratorFragment_to_fingerprintCapture,
+                    destinationId = FingerprintCaptureContract.DESTINATION,
+                    payload = FingerprintCaptureContract.getArgs(flowType, fingersToCollect),
+                )
+            }
 
             Modality.FACE -> {
                 val samplesToCapture = projectConfiguration.face?.nbOfImagesToCapture ?: 0
