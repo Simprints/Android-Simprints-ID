@@ -207,7 +207,7 @@ internal class ConnectScannerViewModel @Inject constructor(
     }
 
     private suspend fun manageVeroErrors(e: Throwable) {
-        Simber.e(e)
+        Simber.i(e)
         _scannerConnected.send(false)
 
         launchAlertOrScannerIssueOrShowDialog(e)
