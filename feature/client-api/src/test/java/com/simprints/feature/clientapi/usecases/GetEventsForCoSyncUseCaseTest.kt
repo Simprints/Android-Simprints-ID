@@ -5,6 +5,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.clientapi.models.CoSyncEvents
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
@@ -22,7 +23,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class GetEventJsonForSessionUseCaseTest {
+class GetEventsForCoSyncUseCaseTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -33,9 +34,12 @@ class GetEventJsonForSessionUseCaseTest {
     private lateinit var eventRepository: EventRepository
 
     @MockK
+    private lateinit var tokenizationProcessor: TokenizationProcessor
+
+    @MockK
     private lateinit var jsonHelper: JsonHelper
 
-    private lateinit var useCase: GetEventJsonForSessionUseCase
+    private lateinit var useCase: GetEventsForCoSyncUseCase
 
     @Before
     fun setUp() {
@@ -49,7 +53,7 @@ class GetEventJsonForSessionUseCaseTest {
             mockk<EnrolmentEventV2>(relaxed = true),
         )
 
-        useCase = GetEventJsonForSessionUseCase(configManager, eventRepository, jsonHelper)
+        useCase = GetEventsForCoSyncUseCase(configManager, eventRepository, jsonHelper, tokenizationProcessor)
     }
 
     @Test
@@ -58,7 +62,7 @@ class GetEventJsonForSessionUseCaseTest {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         }
 
-        val result = useCase("sessionId")
+        val result = useCase(sessionId = "sessionId", project = mockk())
 
         assertThat(result).isNull()
     }
@@ -70,7 +74,7 @@ class GetEventJsonForSessionUseCaseTest {
         }
         every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"
 
-        val result = useCase("sessionId")
+        val result = useCase(sessionId = "sessionId", project = mockk())
 
         assertThat(result).isNotNull()
     }
@@ -82,7 +86,7 @@ class GetEventJsonForSessionUseCaseTest {
         }
         every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"
 
-        val result = useCase("sessionId")
+        val result = useCase(sessionId = "sessionId", project = mockk())
 
         assertThat(result).isNotNull()
     }
@@ -94,7 +98,7 @@ class GetEventJsonForSessionUseCaseTest {
         }
         every { jsonHelper.toJson(any<CoSyncEvents> ()) } returns "json"
 
-        val result = useCase("sessionId")
+        val result = useCase(sessionId = "sessionId", project = mockk())
 
         assertThat(result).isNotNull()
     }
