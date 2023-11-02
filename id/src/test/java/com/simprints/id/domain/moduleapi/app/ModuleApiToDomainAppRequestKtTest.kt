@@ -1,6 +1,7 @@
 package com.simprints.id.domain.moduleapi.app
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppConfirmIdentityRequest
 import com.simprints.id.testtools.moduleApi.AppConfirmationConfirmIdentityRequestModuleApi
@@ -18,7 +19,14 @@ class ModuleApiToDomainAppRequestKtTest {
 
     @Test
     fun fromIAppEnrolRequestToAppEnrolRequest() {
-        val iAppRequest = AppEnrolRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA)
+        val iAppRequest = AppEnrolRequestModuleApi(
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.value,
+            moduleId = DEFAULT_MODULE_ID.value,
+            isModuleIdTokenized = DEFAULT_MODULE_ID.isTokenized(),
+            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
+            metadata = DEFAULT_METADATA
+        )
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppEnrolRequest
         with(domainRequest) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -31,7 +39,15 @@ class ModuleApiToDomainAppRequestKtTest {
     @Test
     fun fromIAppVerifyRequestToAppVerifyRequest() {
         val toVerify = UUID.randomUUID().toString()
-        val iAppRequest = AppVerifyRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, toVerify)
+        val iAppRequest = AppVerifyRequestModuleApi(
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.value,
+            moduleId = DEFAULT_MODULE_ID.value,
+            metadata = DEFAULT_METADATA,
+            isModuleIdTokenized = DEFAULT_MODULE_ID.isTokenized(),
+            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
+            verifyGuid = toVerify
+        )
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppVerifyRequest
         with(domainRequest) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -44,7 +60,14 @@ class ModuleApiToDomainAppRequestKtTest {
 
     @Test
     fun fromIAppIdentityRequestToAppIdentifyRequest() {
-        val iAppRequest = AppIdentifyRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA)
+        val iAppRequest = AppIdentifyRequestModuleApi(
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.value,
+            moduleId = DEFAULT_MODULE_ID.value,
+            isModuleIdTokenized = DEFAULT_MODULE_ID.isTokenized(),
+            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
+            metadata = DEFAULT_METADATA
+        )
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppIdentifyRequest
         with(domainRequest) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
@@ -58,7 +81,13 @@ class ModuleApiToDomainAppRequestKtTest {
     fun fromIAppConfirmIdentityRequestToAppConfirmIdentityRequest() {
         val selectedGuid = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
-        val iAppRequest = AppConfirmationConfirmIdentityRequestModuleApi(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, sessionId, selectedGuid)
+        val iAppRequest = AppConfirmationConfirmIdentityRequestModuleApi(
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.value,
+            sessionId = sessionId,
+            isUserIdTokenized = DEFAULT_USER_ID.isTokenized(),
+            selectedGuid = selectedGuid
+        )
         val domainRequest = iAppRequest.fromModuleApiToDomain() as AppConfirmIdentityRequest
         with(domainRequest) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)

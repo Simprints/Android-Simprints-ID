@@ -8,7 +8,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
-import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -48,6 +47,11 @@ internal class EventRoomDaoTest {
         db = Room.inMemoryDatabaseBuilder(context, EventRoomDatabase::class.java)
             .allowMainThreadQueries().build()
         eventDao = db.eventDao
+    }
+
+    @After
+    fun tearDown() {
+        db.close()
     }
 
     @Test

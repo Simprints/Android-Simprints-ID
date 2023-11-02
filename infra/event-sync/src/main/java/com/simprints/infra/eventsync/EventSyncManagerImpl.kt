@@ -2,10 +2,17 @@ package com.simprints.infra.eventsync
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.core.domain.tokenization.values
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
@@ -17,7 +24,16 @@ import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessor
-import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULERS
+import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_ONE_TIME
+import com.simprints.infra.eventsync.sync.common.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
+import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.eventsync.sync.common.addTagForBackgroundSyncMasterWorker
+import com.simprints.infra.eventsync.sync.common.addTagForOneTimeSyncMasterWorker
+import com.simprints.infra.eventsync.sync.common.addTagForScheduledAtNow
+import com.simprints.infra.eventsync.sync.common.addTagForSyncMasterWorkers
+import com.simprints.infra.eventsync.sync.common.cancelAllSubjectsSyncWorkers
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask
 import com.simprints.infra.eventsync.sync.master.EventSyncMasterWorker
 import com.simprints.infra.logging.Simber
@@ -26,7 +42,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -39,7 +55,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     private val eventSyncCache: EventSyncCache,
     private val downSyncTask: EventDownSyncTask,
     private val eventRemoteDataSource: EventRemoteDataSource,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : EventSyncManager {
 
@@ -117,13 +133,13 @@ internal class EventSyncManagerImpl @Inject constructor(
         eventRepository.observeEventCount(projectId, type)
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
-        val projectConfig = configManager.getProjectConfiguration()
-        val deviceConfig = configManager.getDeviceConfiguration()
+        val projectConfig = configRepository.getConfiguration()
+        val deviceConfig = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
-            getProjectModes(projectConfig),
-            deviceConfig.selectedModules,
-            projectConfig.synchronization.down.partitionType.toGroup()
+            modes = getProjectModes(projectConfig),
+            selectedModuleIDs = deviceConfig.selectedModules.values(),
+            syncGroup = projectConfig.synchronization.down.partitionType.toGroup()
         )
 
         var creationsToDownload = 0
@@ -150,7 +166,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         val op = EventDownSyncOperation(RemoteEventQuery(
             projectId = projectId,
             subjectId = subjectId,
-            modes = getProjectModes(configManager.getProjectConfiguration()),
+            modes = getProjectModes(configRepository.getConfiguration()),
         ))
         downSyncTask.downSync(this, op).toList()
     }
@@ -161,7 +177,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(
             unselectedModules,
-            modes = getProjectModes(configManager.getProjectConfiguration()),
+            modes = getProjectModes(configRepository.getConfiguration()),
         )
     }
 
@@ -176,5 +192,4 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun resetDownSyncInfo() {
         downSyncScopeRepository.deleteAll()
     }
-
 }

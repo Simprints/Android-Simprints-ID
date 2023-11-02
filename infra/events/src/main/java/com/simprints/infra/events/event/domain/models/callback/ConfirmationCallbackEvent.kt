@@ -1,6 +1,8 @@
 package com.simprints.infra.events.event.domain.models.callback
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
@@ -24,7 +26,12 @@ data class ConfirmationCallbackEvent(
         UUID.randomUUID().toString(),
         labels,
         ConfirmationCallbackPayload(createdAt, EVENT_VERSION, identificationOutcome),
-        CALLBACK_CONFIRMATION)
+        CALLBACK_CONFIRMATION
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class ConfirmationCallbackPayload(

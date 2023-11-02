@@ -14,8 +14,8 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirm
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
 import io.mockk.coVerify

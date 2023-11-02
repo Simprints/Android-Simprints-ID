@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.infra.scanner.tools
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import org.junit.Test
 
 class ScannerGenerationDeterminerTest {

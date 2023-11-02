@@ -1,7 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
@@ -42,9 +45,22 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNE
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SESSION_CAPTURE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
-import com.simprints.infra.events.event.domain.models.callback.*
-import com.simprints.infra.events.event.domain.models.callout.*
-import com.simprints.infra.events.event.domain.models.face.*
+import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
+import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
+import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent
+import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
+import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEvent
+import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
@@ -118,6 +134,10 @@ abstract class Event {
     abstract val id: String
     abstract var labels: EventLabels
     abstract val payload: EventPayload
+
+    @JsonIgnore
+    abstract fun getTokenizedFields(): Map<TokenKeyType, TokenizableString>
+    abstract fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>): Event
 
     override fun equals(other: Any?): Boolean {
         return other is Event && other.id == id

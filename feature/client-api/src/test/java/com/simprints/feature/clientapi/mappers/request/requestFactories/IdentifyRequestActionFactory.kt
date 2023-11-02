@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.mappers.request.requestFactories
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.clientapi.mappers.request.builders.IdentifyRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.IdentifyRequestExtractor
@@ -19,8 +20,8 @@ internal object IdentifyRequestActionFactory : RequestActionFactory() {
     override fun getValidSimprintsRequest() = ActionRequest.IdentifyActionRequest(
         actionIdentifier = getIdentifier(),
         projectId = MOCK_PROJECT_ID,
-        moduleId = MOCK_MODULE_ID,
-        userId = MOCK_USER_ID,
+        moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
+        userId = MOCK_USER_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         unknownExtras = emptyList()
     )
@@ -29,7 +30,13 @@ internal object IdentifyRequestActionFactory : RequestActionFactory() {
         IdentifyValidator(extractor as IdentifyRequestExtractor)
 
     override fun getBuilder(extractor: ActionRequestExtractor): IdentifyRequestBuilder =
-        IdentifyRequestBuilder(getIdentifier(), extractor as IdentifyRequestExtractor, getValidator(extractor))
+        IdentifyRequestBuilder(
+            actionIdentifier = getIdentifier(),
+            extractor = extractor as IdentifyRequestExtractor,
+            project = mockk(),
+            tokenizationProcessor = mockk(),
+            validator = getValidator(extractor)
+        )
 
     override fun getMockExtractor(): IdentifyRequestExtractor {
         val mockIdentifyExtractor = mockk<IdentifyRequestExtractor>()

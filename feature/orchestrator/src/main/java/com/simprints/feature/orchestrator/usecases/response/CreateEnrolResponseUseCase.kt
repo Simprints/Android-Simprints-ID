@@ -18,7 +18,12 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
         // TODO fingerprint capture
         return try {
-            val subject = buildSubject(request.projectId, request.userId, request.moduleId, faceCapture)
+            val subject = buildSubject(
+                projectId = request.projectId,
+                userId = request.userId,
+                moduleId = request.moduleId,
+                faceResponse = faceCapture
+            )
             enrolSubject(subject)
 
             AppEnrolResponse(subject.subjectId)

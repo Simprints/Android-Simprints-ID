@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.mappers.request.requestFactories
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.clientapi.mappers.request.builders.EnrolLastBiometricsRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolLastBiometricsRequestExtractor
@@ -20,18 +21,28 @@ internal object EnrolLastBiometricsActionFactory : RequestActionFactory() {
     override fun getValidSimprintsRequest() = ActionRequest.EnrolLastBiometricActionRequest(
         actionIdentifier = getIdentifier(),
         projectId = MOCK_PROJECT_ID,
-        userId = MOCK_USER_ID,
-        moduleId = MOCK_MODULE_ID,
+        userId = MOCK_USER_ID.asTokenizableRaw(),
+        moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         sessionId = MOCK_SESSION_ID,
         unknownExtras = emptyList()
     )
 
     override fun getValidator(extractor: ActionRequestExtractor): EnrolLastBiometricsValidator =
-        EnrolLastBiometricsValidator(extractor as EnrolLastBiometricsRequestExtractor, MOCK_SESSION_ID, true)
+        EnrolLastBiometricsValidator(
+            extractor as EnrolLastBiometricsRequestExtractor,
+            MOCK_SESSION_ID,
+            true
+        )
 
     override fun getBuilder(extractor: ActionRequestExtractor): EnrolLastBiometricsRequestBuilder =
-        EnrolLastBiometricsRequestBuilder(getIdentifier(), extractor as EnrolLastBiometricsRequestExtractor, getValidator(extractor))
+        EnrolLastBiometricsRequestBuilder(
+            actionIdentifier = getIdentifier(),
+            extractor = extractor as EnrolLastBiometricsRequestExtractor,
+            project = mockk(),
+            tokenizationProcessor = mockk(),
+            validator = getValidator(extractor)
+        )
 
     override fun getMockExtractor(): EnrolLastBiometricsRequestExtractor {
         val mockEnrolLastBiometricsExtractor = mockk<EnrolLastBiometricsRequestExtractor>()

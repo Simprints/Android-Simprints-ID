@@ -3,9 +3,17 @@ package com.simprints.feature.clientapi.mappers.request.builders
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory
+import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory.Companion.MOCK_MODULE_ID
+import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory.Companion.MOCK_PROJECT_ID
+import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory.Companion.MOCK_SESSION_ID
+import com.simprints.feature.clientapi.mappers.request.requestFactories.RequestActionFactory.Companion.MOCK_USER_ID
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Test
 
 internal class EnrolLastBiometricRequestBuilderTest {
@@ -14,19 +22,25 @@ internal class EnrolLastBiometricRequestBuilderTest {
     fun `EnrolLastBiometricActionRequest should contain mandatory fields`() {
         val extractor = EnrolLastBiometricsActionFactory.getMockExtractor()
         val validator = EnrolLastBiometricsActionFactory.getValidator(extractor)
+        val tokenizationProcessor = mockk<TokenizationProcessor>()
+        val project = mockk<Project> {
+            every { id } returns "projectId"
+        }
 
         val action = EnrolLastBiometricsRequestBuilder(
-            ActionRequestIdentifier(
-                RequestActionFactory.MOCK_PACKAGE,
-                ActionConstants.ACTION_ENROL_LAST_BIOMETRICS,
+            actionIdentifier = ActionRequestIdentifier(
+                actionName = RequestActionFactory.MOCK_PACKAGE,
+                packageName = ActionConstants.ACTION_ENROL_LAST_BIOMETRICS,
             ),
-            extractor,
-            validator
+            extractor = extractor,
+            project = project,
+            tokenizationProcessor = tokenizationProcessor,
+            validator = validator
         ).build() as ActionRequest.EnrolLastBiometricActionRequest
 
-        assertThat(action.projectId).isEqualTo(RequestActionFactory.MOCK_PROJECT_ID)
-        assertThat(action.userId).isEqualTo(RequestActionFactory.MOCK_USER_ID)
-        assertThat(action.moduleId).isEqualTo(RequestActionFactory.MOCK_MODULE_ID)
-        assertThat(action.sessionId).isEqualTo(RequestActionFactory.MOCK_SESSION_ID)
+        assertThat(action.projectId).isEqualTo(MOCK_PROJECT_ID)
+        assertThat(action.userId.toString()).isEqualTo(MOCK_USER_ID)
+        assertThat(action.moduleId.toString()).isEqualTo(MOCK_MODULE_ID)
+        assertThat(action.sessionId).isEqualTo(MOCK_SESSION_ID)
     }
 }

@@ -3,9 +3,9 @@ package com.simprints.feature.clientapi.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -45,7 +45,12 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
 
         every { jsonHelper.toJson(any()) } returns "json"
 
-        useCase = GetEnrolmentCreationEventForSubjectUseCase(configManager, enrolmentRecordManager, encoder, jsonHelper)
+        useCase = GetEnrolmentCreationEventForSubjectUseCase(
+            configManager,
+            enrolmentRecordManager,
+            encoder,
+            jsonHelper
+        )
     }
 
     @Test

@@ -19,7 +19,15 @@ class EnrolmentLastBiometricsCalloutEventTest {
     @Test
     fun create_EnrolmentLastBiometricsCalloutEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val event = EnrolmentLastBiometricsCalloutEvent(CREATED_AT, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, DEFAULT_METADATA, GUID1, labels)
+        val event = EnrolmentLastBiometricsCalloutEvent(
+            createdAt = CREATED_AT,
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID,
+            moduleId = DEFAULT_MODULE_ID,
+            metadata = DEFAULT_METADATA,
+            sessionId = GUID1,
+            labels = labels
+        )
         assertThat(event.id).isNotNull()
         assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLOUT_LAST_BIOMETRICS)

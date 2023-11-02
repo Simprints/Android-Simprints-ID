@@ -13,7 +13,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
-import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.testtools.hilt.launchFragmentInHiltContainer
 import com.simprints.testtools.hilt.testNavController
 import dagger.hilt.android.testing.BindValue

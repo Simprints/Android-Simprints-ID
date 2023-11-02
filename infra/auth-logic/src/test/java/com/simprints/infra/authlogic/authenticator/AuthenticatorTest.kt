@@ -2,6 +2,7 @@ package com.simprints.infra.authlogic.authenticator
 
 import com.google.android.play.core.integrity.model.IntegrityErrorCode
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authlogic.integrity.exceptions.IntegrityServiceTemporaryDown
 import com.simprints.infra.authlogic.integrity.exceptions.MissingOrOutdatedGooglePlayStoreApp
@@ -121,12 +122,22 @@ internal class AuthenticatorTest {
     private suspend fun mockException(exception: Exception): AuthenticateDataResult {
         coEvery { projectAuthenticator.authenticate(any(), "") } throws exception
 
-        return authenticator.authenticate("", "", "", "")
+        return authenticator.authenticate(
+            userId = "".asTokenizableRaw(),
+            projectId = "",
+            projectSecret = "",
+            deviceId = ""
+        )
     }
 
     @Test
     fun `should return AUTHENTICATED if no exception`() = runTest {
-        val result = authenticator.authenticate("", "", "", "")
+        val result = authenticator.authenticate(
+            userId = "".asTokenizableRaw(),
+            projectId = "",
+            projectSecret = "",
+            deviceId = ""
+        )
 
         assertThat(result).isInstanceOf(AuthenticateDataResult.Authenticated::class.java)
     }

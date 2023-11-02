@@ -1,5 +1,6 @@
 package com.simprints.feature.clientapi.mappers.request.requestFactories
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.clientapi.mappers.request.builders.ConfirmIdentifyRequestBuilder
 import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestExtractor
 import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentityRequestExtractor
@@ -20,17 +21,27 @@ internal object ConfirmIdentityActionFactory : RequestActionFactory() {
     override fun getValidSimprintsRequest() = ActionRequest.ConfirmIdentityActionRequest(
         actionIdentifier = getIdentifier(),
         projectId = MOCK_PROJECT_ID,
-        userId = MOCK_USER_ID,
+        userId = MOCK_USER_ID.asTokenizableRaw(),
         sessionId = MOCK_SESSION_ID,
         selectedGuid = MOCK_SELECTED_GUID,
         unknownExtras = emptyList()
     )
 
     override fun getValidator(extractor: ActionRequestExtractor): ConfirmIdentityValidator =
-        ConfirmIdentityValidator(extractor as ConfirmIdentityRequestExtractor, MOCK_SESSION_ID, true)
+        ConfirmIdentityValidator(
+            extractor as ConfirmIdentityRequestExtractor,
+            MOCK_SESSION_ID,
+            true
+        )
 
     override fun getBuilder(extractor: ActionRequestExtractor): ConfirmIdentifyRequestBuilder =
-        ConfirmIdentifyRequestBuilder(getIdentifier(), extractor as ConfirmIdentityRequestExtractor, getValidator(extractor))
+        ConfirmIdentifyRequestBuilder(
+            actionIdentifier = getIdentifier(),
+            extractor = extractor as ConfirmIdentityRequestExtractor,
+            project = mockk(),
+            tokenizationProcessor = mockk(),
+            validator = getValidator(extractor),
+        )
 
     override fun getMockExtractor(): ConfirmIdentityRequestExtractor {
         val mockConfirmIdentifyExtractor = mockk<ConfirmIdentityRequestExtractor>()

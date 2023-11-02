@@ -1,13 +1,16 @@
 package com.simprints.feature.enrollast.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
 import com.simprints.feature.enrollast.FingerTemplateCaptureResult
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -21,12 +24,16 @@ class BuildSubjectUseCaseTest {
 
     private lateinit var useCase: BuildSubjectUseCase
 
+    private lateinit var subjectFactory: SubjectFactory
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
         every { timeHelper.now() }.returns(1L)
-
-        useCase = BuildSubjectUseCase(timeHelper)
+        subjectFactory = SubjectFactory(
+            encodingUtils = EncodingUtilsImplForTests,
+        )
+        useCase = BuildSubjectUseCase(timeHelper = timeHelper, subjectFactory = subjectFactory)
     }
 
     @Test
@@ -107,7 +114,7 @@ class BuildSubjectUseCaseTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
-        private const val USER_ID = "userId"
-        private const val MODULE_ID = "moduleId"
+        private val USER_ID = "userId".asTokenizableRaw()
+        private val MODULE_ID = "moduleId".asTokenizableRaw()
     }
 }

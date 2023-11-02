@@ -1,5 +1,6 @@
 package com.simprints.feature.orchestrator.usecases
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
 import com.simprints.feature.orchestrator.model.responses.AppIdentifyResponse
@@ -72,7 +73,7 @@ class UpdateDailyActivityUseCaseTest {
     }
 
     private fun createBlankUserActivity() = RecentUserActivity(
-        lastUserUsed = "",
+        lastUserUsed = "".asTokenizableRaw(),
         lastScannerUsed = "",
         lastScannerVersion = "",
         enrolmentsToday = 0,

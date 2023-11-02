@@ -16,11 +16,15 @@ android {
 
 dependencies {
     implementation(project(":infra:ui-base"))
-    implementation(project(":infra:config"))
-    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
+    implementation(project(":infra:enrolment-records-sync"))
+    implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:events"))
     implementation(project(":feature:alert"))
+    implementation(project(":infra:auth-store"))
 
+    implementation(libs.jackson.core)
     implementation(libs.libsimprints)
 }

@@ -6,8 +6,8 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.FaceConfiguration.ImageSavingStrategy
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations

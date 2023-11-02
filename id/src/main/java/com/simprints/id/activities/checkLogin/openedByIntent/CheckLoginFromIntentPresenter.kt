@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherBG
 import com.simprints.core.ExternalScope
+import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.exceptions.ignoreException
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
@@ -16,7 +17,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollo
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollowUp.AppEnrolLastBiometricsRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
@@ -145,16 +146,23 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     ) =
         with(request) {
             IdentificationCalloutEvent(
-                relativeStartTime,
-                projectId, userId, moduleId, metadata
+                createdAt = relativeStartTime,
+                projectId = projectId,
+                userId = userId,
+                moduleId = moduleId,
+                metadata = metadata
             )
         }
 
     private fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStartTime: Long) =
         with(request) {
             VerificationCalloutEvent(
-                relativeStartTime,
-                projectId, userId, moduleId, verifyGuid, metadata
+                createdAt = relativeStartTime,
+                projectId = projectId,
+                userId = userId,
+                moduleId = moduleId,
+                verifyGuid = verifyGuid,
+                metadata = metadata
             )
         }
 
@@ -162,8 +170,11 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStartTime: Long) =
         with(request) {
             EnrolmentCalloutEvent(
-                relativeStartTime,
-                projectId, userId, moduleId, metadata
+                createdAt = relativeStartTime,
+                projectId = projectId,
+                userId = userId,
+                moduleId = moduleId,
+                metadata = metadata
             )
         }
 
@@ -192,9 +203,9 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
     private fun extractSessionParametersForAnalyticsManager() =
         with(appRequest) {
             if (this is AppRequestFlow) {
-                Simber.tag(AnalyticsUserProperties.USER_ID, true).i(userId)
+                Simber.tag(AnalyticsUserProperties.USER_ID, true).i(userId.value)
                 Simber.tag(AnalyticsUserProperties.PROJECT_ID).i(projectId)
-                Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId)
+                Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId.value)
                 Simber.tag(AnalyticsUserProperties.DEVICE_ID).i(deviceId)
             }
         }
@@ -299,8 +310,8 @@ class CheckLoginFromIntentPresenter @AssistedInject constructor(
         val projectConfiguration = configManager.getProjectConfiguration()
         val deviceConfiguration = configManager.getDeviceConfiguration()
         Simber.tag(PROJECT_ID, true).i(authStore.signedInProjectId)
-        Simber.tag(USER_ID, true).i(appRequest.userId)
-        Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.toString())
+        Simber.tag(USER_ID, true).i(appRequest.userId.value)
+        Simber.tag(MODULE_IDS, true).i(deviceConfiguration.selectedModules.values().joinToString())
         Simber.tag(SUBJECTS_DOWN_SYNC_TRIGGERS, true)
             .i(projectConfiguration.synchronization.frequency.toString())
         Simber.d("[CHECK_LOGIN] Added keys in CrashManager")

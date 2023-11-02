@@ -42,6 +42,8 @@ internal data class AppErrorResponse(
 internal data class AppEnrolRequestModuleApi(
     override val projectId: String,
     override val userId: String,
+    override val isModuleIdTokenized: Boolean,
+    override val isUserIdTokenized: Boolean,
     override val moduleId: String,
     override val metadata: String
 ) : IAppEnrolRequest
@@ -50,6 +52,8 @@ internal data class AppEnrolRequestModuleApi(
 internal data class AppIdentifyRequestModuleApi(
     override val projectId: String,
     override val userId: String,
+    override val isModuleIdTokenized: Boolean,
+    override val isUserIdTokenized: Boolean,
     override val moduleId: String,
     override val metadata: String
 ) : IAppIdentifyRequest
@@ -59,6 +63,8 @@ internal data class AppVerifyRequestModuleApi(
     override val projectId: String,
     override val userId: String,
     override val moduleId: String,
+    override val isModuleIdTokenized: Boolean,
+    override val isUserIdTokenized: Boolean,
     override val metadata: String,
     override val verifyGuid: String
 ) : IAppVerifyRequest
@@ -68,6 +74,7 @@ internal data class AppConfirmationConfirmIdentityRequestModuleApi(
     override val projectId: String,
     override val userId: String,
     override val sessionId: String,
+    override val isUserIdTokenized: Boolean,
     override val selectedGuid: String
 ) : IAppConfirmIdentityRequest
 
@@ -76,6 +83,8 @@ internal data class AppEnrolLastBiometricsRequestApi(
     override val projectId: String,
     override val userId: String,
     override val moduleId: String,
+    override val isModuleIdTokenized: Boolean,
+    override val isUserIdTokenized: Boolean,
     override val metadata: String,
     override val sessionId: String
 ) : IAppEnrolLastBiometricsRequest

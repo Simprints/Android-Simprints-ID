@@ -5,6 +5,7 @@ import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.IsCurrentSessionAnIdentificationOrEnrolmentUseCase
 import com.simprints.feature.clientapi.usecases.SessionHasIdentificationCallbackUseCase
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.libsimprints.Constants.SIMPRINTS_MODULE_ID
 import com.simprints.libsimprints.Constants.SIMPRINTS_PROJECT_ID
@@ -21,6 +22,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentMatchers.any
 
 
 class IntentToActionMapperTest {
@@ -37,6 +39,9 @@ class IntentToActionMapperTest {
     @MockK
     private lateinit var sessionHasIdentificationCallback: SessionHasIdentificationCallbackUseCase
 
+    @MockK
+    private lateinit var tokenizationProcessor: TokenizationProcessor
+
     private lateinit var mapper: IntentToActionMapper
 
     @Before
@@ -47,7 +52,12 @@ class IntentToActionMapperTest {
         coEvery { sessionHasIdentificationCallback.invoke(any()) } returns true
         coEvery { isCurrentSessionAnIdentificationOrEnrolment.invoke() } returns true
 
-        mapper = IntentToActionMapper(getCurrentSessionIdUseCase, isCurrentSessionAnIdentificationOrEnrolment, sessionHasIdentificationCallback)
+        mapper = IntentToActionMapper(
+            getCurrentSessionIdUseCase,
+            isCurrentSessionAnIdentificationOrEnrolment,
+            sessionHasIdentificationCallback,
+            tokenizationProcessor
+        )
     }
 
     @Test
@@ -59,14 +69,14 @@ class IntentToActionMapperTest {
             "com.simprints.simodkadapter.CONFIRM_IDENTITY" to ActionRequest.ConfirmIdentityActionRequest::class,
             "com.simprints.simodkadapter.REGISTER_LAST_BIOMETRICS" to ActionRequest.EnrolLastBiometricActionRequest::class,
         ).forEach { (action, expectedClass) ->
-            assertThat(mapper(action, defaultExtras)).isInstanceOf(expectedClass.java)
+            assertThat(mapper(action, defaultExtras, any())).isInstanceOf(expectedClass.java)
         }
     }
 
     @Test
     fun `throws exception for invalid ODK intent actions`() = runTest {
         assertThrows<InvalidRequestException> {
-            mapper("com.simprints.simodkadapter.INVALID", defaultExtras)
+            mapper("com.simprints.simodkadapter.INVALID", defaultExtras, any())
         }
     }
 
@@ -79,14 +89,14 @@ class IntentToActionMapperTest {
             "com.simprints.commcare.CONFIRM_IDENTITY" to ActionRequest.ConfirmIdentityActionRequest::class,
             "com.simprints.commcare.REGISTER_LAST_BIOMETRICS" to ActionRequest.EnrolLastBiometricActionRequest::class,
         ).forEach { (action, expectedClass) ->
-            assertThat(mapper(action, defaultExtras)).isInstanceOf(expectedClass.java)
+            assertThat(mapper(action, defaultExtras, any())).isInstanceOf(expectedClass.java)
         }
     }
 
     @Test
     fun `throws exception for invalid CommCare intent actions`() = runTest {
         assertThrows<InvalidRequestException> {
-            mapper("com.simprints.commcare.INVALID", defaultExtras)
+            mapper("com.simprints.commcare.INVALID", defaultExtras, any())
         }
     }
 
@@ -99,28 +109,28 @@ class IntentToActionMapperTest {
             "com.simprints.id.CONFIRM_IDENTITY" to ActionRequest.ConfirmIdentityActionRequest::class,
             "com.simprints.id.REGISTER_LAST_BIOMETRICS" to ActionRequest.EnrolLastBiometricActionRequest::class,
         ).forEach { (action, expectedClass) ->
-            assertThat(mapper(action, defaultExtras)).isInstanceOf(expectedClass.java)
+            assertThat(mapper(action, defaultExtras, any())).isInstanceOf(expectedClass.java)
         }
     }
 
     @Test
     fun `throws exception for invalid LibSimprints intent actions`() = runTest {
         assertThrows<InvalidRequestException> {
-            mapper("com.simprints.id.INVALID", defaultExtras)
+            mapper("com.simprints.id.INVALID", defaultExtras, any())
         }
     }
 
     @Test
     fun `throws exception for invalid package intent actions`() = runTest {
         assertThrows<InvalidRequestException> {
-            mapper("com.unknown.package.INVALID", defaultExtras)
+            mapper("com.unknown.package.INVALID", defaultExtras, any())
         }
     }
 
     @Test
     fun `throws exception for empty package intent actions`() = runTest {
         assertThrows<InvalidRequestException> {
-            mapper("", defaultExtras)
+            mapper("", defaultExtras, any())
         }
     }
 

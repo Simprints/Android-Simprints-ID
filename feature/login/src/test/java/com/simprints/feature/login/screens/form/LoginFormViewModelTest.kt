@@ -2,6 +2,7 @@ package com.simprints.feature.login.screens.form
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.login.LoginParams
 import com.simprints.feature.login.screens.qrscanner.QrCodeContent
@@ -58,7 +59,7 @@ internal class LoginFormViewModelTest {
 
     @Test
     fun `returns MissingCredentials when empty user id`() {
-        viewModel.signInClicked(LoginParams(PROJECT_ID, ""), PROJECT_ID, PROJECT_SECRET)
+        viewModel.signInClicked(LoginParams(PROJECT_ID, "".asTokenizableRaw()), PROJECT_ID, PROJECT_SECRET)
 
         val result = viewModel.signInState.getOrAwaitValue()
 
@@ -186,7 +187,7 @@ internal class LoginFormViewModelTest {
 
         private const val DEVICE_ID = "deviceId"
         private const val PROJECT_ID = "projectId"
-        private const val USER_ID = "userId"
+        private val USER_ID = "userId".asTokenizableRaw()
 
         private const val QR_CONTENT = "qrCodeContents"
         private const val PROJECT_SECRET = "projectSecret"

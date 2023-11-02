@@ -19,9 +19,9 @@ import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.usecases.MapStepsForLastBiometricEnrolUseCase
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 

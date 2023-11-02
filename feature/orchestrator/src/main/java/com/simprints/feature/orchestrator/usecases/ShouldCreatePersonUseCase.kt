@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import javax.inject.Inject
 

@@ -21,20 +21,26 @@ import com.simprints.clientapi.exceptions.InvalidIntentActionException
 import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrolRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_MODULE_ID
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_USER_ID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
-import com.simprints.infra.config.domain.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.NONE
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_ANALYTICS
+import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
 import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
@@ -68,6 +74,11 @@ class CommCareCoSyncPresenterTest {
         const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
+    private val project: Project = mockk()
+    private val tokenizationProcessorMock: TokenizationProcessor = mockk {
+        every { encrypt(MOCK_USER_ID, TokenKeyType.AttendantId, project) } returns MOCK_USER_ID
+        every { encrypt(MOCK_MODULE_ID, TokenKeyType.ModuleId, project) } returns MOCK_MODULE_ID
+    }
     private val view = mockk<CommCareActivity> {
         every { extras } returns mapOf(
             Pair(
@@ -75,8 +86,11 @@ class CommCareCoSyncPresenterTest {
                 UUID.randomUUID().toString()
             )
         )
+        coEvery { getProject() } returns project
+        every { getTokenizationProcessor() } returns tokenizationProcessorMock
     }
     private val jsonHelper = JsonHelper
+
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
@@ -173,14 +187,14 @@ class CommCareCoSyncPresenterTest {
 
             val subject =
                 Subject(
-                    registerId,
-                    "projectId",
-                    "thales",
-                    "mod1",
-                    Date(),
-                    null,
-                    emptyList(),
-                    emptyList()
+                    subjectId = registerId,
+                    projectId = "projectId",
+                    attendantId = "thales".asTokenizableRaw(),
+                    moduleId = "mod1".asTokenizableRaw(),
+                    createdAt = Date(),
+                    updatedAt = null,
+                    fingerprintSamples = emptyList(),
+                    faceSamples = emptyList()
                 )
             val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
             coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
@@ -249,14 +263,14 @@ class CommCareCoSyncPresenterTest {
 
             val subject =
                 Subject(
-                    registerId,
-                    projectId,
-                    "thales",
-                    "mod1",
-                    Date(),
-                    null,
-                    emptyList(),
-                    emptyList()
+                    subjectId = registerId,
+                    projectId = projectId,
+                    attendantId = "thales".asTokenizableRaw(),
+                    moduleId = "mod1".asTokenizableRaw(),
+                    createdAt = Date(),
+                    updatedAt = null,
+                    fingerprintSamples = emptyList(),
+                    faceSamples = emptyList()
                 )
             val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
             coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
@@ -323,14 +337,14 @@ class CommCareCoSyncPresenterTest {
 
             val subject =
                 Subject(
-                    registerId,
-                    projectId,
-                    "thales",
-                    "mod1",
-                    Date(),
-                    null,
-                    emptyList(),
-                    emptyList()
+                    subjectId = registerId,
+                    projectId = projectId,
+                    attendantId = "thales".asTokenizableRaw(),
+                    moduleId = "mod1".asTokenizableRaw(),
+                    createdAt = Date(),
+                    updatedAt = null,
+                    fingerprintSamples = emptyList(),
+                    faceSamples = emptyList()
                 )
             val enrolmentRecordManager = mockk<EnrolmentRecordManager>()
             coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
@@ -731,16 +745,17 @@ class CommCareCoSyncPresenterTest {
         coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
         configManager: ConfigManager = mockk(),
     ): CommCarePresenter = CommCarePresenter(
-        view,
-        action,
-        clientApiSessionEventsManager,
-        sharedPreferencesManager,
-        jsonHelper,
-        enrolmentRecordManager,
-        mockTimeHelper(),
-        mockk(),
-        configManager,
-        coroutineScope
+        view = view,
+        action = action,
+        sessionEventsManager = clientApiSessionEventsManager,
+        sharedPreferencesManager = sharedPreferencesManager,
+        jsonHelper = jsonHelper,
+        enrolmentRecordManager = enrolmentRecordManager,
+        timeHelper = mockTimeHelper(),
+        tokenizationProcessor = tokenizationProcessorMock,
+        rootManager = mockk(),
+        configManager = configManager,
+        coroutineScope = coroutineScope,
     )
 
     private val sessionCaptureEvent = SessionCaptureEvent(

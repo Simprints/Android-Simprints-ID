@@ -1,5 +1,6 @@
 package com.simprints.infra.authlogic
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authlogic.authenticator.Authenticator
 import com.simprints.infra.authlogic.authenticator.SignerManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
@@ -50,7 +51,7 @@ internal class AuthManagerImplTest {
             )
             coVerify(exactly = 1) {
                 authenticator.authenticate(
-                    userId = userId,
+                    userId = userId.asTokenizableRaw(),
                     projectId = projectId,
                     projectSecret = projectSecret,
                     deviceId = deviceId

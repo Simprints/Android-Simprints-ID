@@ -48,4 +48,5 @@ interface EventRepository {
     suspend fun delete(eventIds: List<String>)
 
     suspend fun deleteAll()
+
 }

@@ -2,8 +2,11 @@ package com.simprints.infra.eventsync.sync.down.tasks
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
@@ -11,13 +14,17 @@ import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
+import java.util.Date
+import java.util.UUID
 import javax.inject.Inject
 
-internal class SubjectFactory @Inject constructor(private val encodingUtils: EncodingUtils) {
+class SubjectFactory @Inject constructor(
+    private val encodingUtils: EncodingUtils
+) {
 
     fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
         with(payload) {
-            Subject(
+            buildSubject(
                 subjectId = subjectId,
                 projectId = projectId,
                 attendantId = attendantId,
@@ -29,7 +36,7 @@ internal class SubjectFactory @Inject constructor(private val encodingUtils: Enc
 
     fun buildSubjectFromMovePayload(payload: EnrolmentRecordCreationInMove) =
         with(payload) {
-            Subject(
+            buildSubject(
                 subjectId = subjectId,
                 projectId = projectId,
                 attendantId = attendantId,
@@ -38,6 +45,48 @@ internal class SubjectFactory @Inject constructor(private val encodingUtils: Enc
                 faceSamples = extractFaceSamplesFromBiometricReferences(this.biometricReferences)
             )
         }
+
+    fun buildSubjectFromFace(
+        projectId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
+        faceResponse: FaceCaptureResult,
+        timeHelper: TimeHelper
+    ): Subject {
+        val subjectId = UUID.randomUUID().toString()
+        return Subject(
+            subjectId,
+            projectId,
+            userId,
+            moduleId,
+            createdAt = Date(timeHelper.now()),
+            faceSamples = extractFaceSamples(faceResponse)
+        )
+    }
+
+    fun buildSubject(
+        subjectId: String,
+        projectId: String,
+        attendantId: TokenizableString,
+        moduleId: TokenizableString,
+        createdAt: Date? = null,
+        updatedAt: Date? = null,
+        fingerprintSamples: List<FingerprintSample> = emptyList(),
+        faceSamples: List<FaceSample> = emptyList()
+    ) = Subject(
+        subjectId = subjectId,
+        projectId = projectId,
+        attendantId = attendantId,
+        moduleId = moduleId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        fingerprintSamples = fingerprintSamples,
+        faceSamples = faceSamples
+    )
+
+    private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results
+        .mapNotNull { it.sample }
+        .map { FaceSample(it.template, it.format) }
 
     private fun extractFingerprintSamplesFromBiometricReferences(biometricReferences: List<BiometricReference>?) =
         biometricReferences?.filterIsInstance<FingerprintReference>()
@@ -57,10 +106,10 @@ internal class SubjectFactory @Inject constructor(private val encodingUtils: Enc
         format: String
     ): FingerprintSample {
         return FingerprintSample(
-            template.finger,
-            encodingUtils.base64ToBytes(template.template),
-            template.quality,
-            format
+            fingerIdentifier = template.finger,
+            template = encodingUtils.base64ToBytes(template.template),
+            templateQualityScore = template.quality,
+            format = format
         )
     }
 

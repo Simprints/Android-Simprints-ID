@@ -1,7 +1,7 @@
 package com.simprints.feature.enrollast
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 
 import org.junit.Test
 

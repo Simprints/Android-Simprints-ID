@@ -2,7 +2,7 @@ package com.simprints.infra.images.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.model.SecuredImageRef
 import io.mockk.coEvery
 import io.mockk.every

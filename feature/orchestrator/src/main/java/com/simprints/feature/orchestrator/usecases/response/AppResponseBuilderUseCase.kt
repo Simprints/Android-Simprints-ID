@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppResponse

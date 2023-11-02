@@ -85,6 +85,7 @@ retry_version = "1.5.6"
 realm_version = "10.17.0"
 protobuf_plugin_version = "0.9.4"
 deps_graph_version = "0.8.0"
+tink_version = "1.10.0"
 
 [libraries]
 
@@ -207,6 +208,9 @@ datastore = { module = "androidx.datastore:datastore", version.ref = "androidx_d
 
 #Protobuf
 protobuf = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf_version" }
+
+#Google TINK cryptography
+tink-core = { module = "com.google.crypto.tink:tink-android", version.ref = "tink_version" }
 
 #Testing
 testing-junit = { module = "junit:junit", version.ref = "junit_version" }

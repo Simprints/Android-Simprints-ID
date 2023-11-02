@@ -3,15 +3,16 @@ package com.simprints.feature.enrollast.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.ProjectConfiguration
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.enrolment.records.domain.models.Subject
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -157,7 +158,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns success when no duplicate enrolments`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery {  buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
 
@@ -168,7 +169,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `saves event and record when no duplicate enrolments`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any()) } returns subject
 
         viewModel.enrolBiometric(createParams(listOf()))
 
@@ -179,7 +180,7 @@ class EnrolLastBiometricViewModelTest {
     @Test
     fun `returns failure record saving fails`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
-        every { buildSubject.invoke(any()) } returns subject
+        coEvery { buildSubject.invoke(any()) } returns subject
         coEvery { enrolmentRecordManager.performActions(any()) } throws Exception()
 
         viewModel.enrolBiometric(createParams(listOf()))
@@ -198,8 +199,8 @@ class EnrolLastBiometricViewModelTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
-        private const val USER_ID = "userId"
-        private const val MODULE_ID = "moduleId"
+        private val USER_ID = "userId".asTokenizableRaw()
+        private val MODULE_ID = "moduleId".asTokenizableRaw()
         private const val SESSION_ID = "sessionId"
     }
 }

@@ -1,6 +1,10 @@
 package com.simprints.infra.eventsync.event.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.extentions.safeSealedWhens
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.*
@@ -395,6 +399,55 @@ class ApiEventTest {
         val json = JSONObject(jackson.writeValueAsString(apiEvent))
 
         validateFingerprintCaptureBiometricsEventApiModel(json)
+    }
+
+    @Test
+    fun `when event contains tokenized attendant id, then ApiEvent should contain tokenizedField`() {
+        validateUserIdTokenization(attendantId = "attendantId".asTokenizableEncrypted())
+    }
+
+    @Test
+    fun `when event contains raw attendant id, then tokenizedField in ApiEvent should be empty`() {
+        validateUserIdTokenization(attendantId = "attendantId".asTokenizableRaw())
+    }
+
+    @Test
+    fun `when event contains tokenized module id, then ApiEvent should contain tokenizedField`() {
+        validateModuleIdTokenization(moduleId = "moduleId".asTokenizableEncrypted())
+    }
+
+    @Test
+    fun `when event contains raw module id, then tokenizedField in ApiEvent should be empty`() {
+        validateModuleIdTokenization(moduleId = "moduleId".asTokenizableRaw())
+    }
+
+    private fun validateModuleIdTokenization(moduleId: TokenizableString) {
+        val event = createEnrolmentEventV2().let {
+            it.copy(payload = it.payload.copy(moduleId = moduleId))
+        }
+        with(event.fromDomainToApi().tokenizedFields) {
+            when (moduleId) {
+                is TokenizableString.Raw -> assertThat(size).isEqualTo(0)
+                is TokenizableString.Tokenized -> {
+                    assertThat(first()).isEqualTo("moduleId")
+                    assertThat(size).isEqualTo(1)
+                }
+            }
+        }
+    }
+    private fun validateUserIdTokenization(attendantId: TokenizableString) {
+        val event = createEnrolmentEventV2().let {
+            it.copy(payload = it.payload.copy(attendantId = attendantId))
+        }
+        with(event.fromDomainToApi().tokenizedFields) {
+            when (attendantId) {
+                is TokenizableString.Raw -> assertThat(size).isEqualTo(0)
+                is TokenizableString.Tokenized -> {
+                    assertThat(first()).isEqualTo("attendantId")
+                    assertThat(size).isEqualTo(1)
+                }
+            }
+        }
     }
 
     // Never invoked, but used to enforce the implementation of a test for every event event class

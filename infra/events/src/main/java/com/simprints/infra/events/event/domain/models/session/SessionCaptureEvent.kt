@@ -1,13 +1,15 @@
 package com.simprints.infra.events.event.domain.models.session
 
 import androidx.annotation.Keep
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class SessionCaptureEvent(
@@ -29,27 +31,31 @@ data class SessionCaptureEvent(
         databaseInfo: DatabaseInfo,
         extraLabels: EventLabels = EventLabels()
     ) :
-        this(
-            id,
-            SESSION_CAPTURE,
-            extraLabels.copy(sessionId = id, deviceId = device.deviceId, projectId = projectId),
-            SessionCapturePayload(
-                EVENT_VERSION,
+            this(
                 id,
-                projectId,
-                createdAt,
-                modalities,
-                appVersionName,
-                libVersionName,
-                language,
-                device,
-                databaseInfo
-            )
-        ) {
+                SESSION_CAPTURE,
+                extraLabels.copy(sessionId = id, deviceId = device.deviceId, projectId = projectId),
+                SessionCapturePayload(
+                    eventVersion = EVENT_VERSION,
+                    id = id,
+                    projectId = projectId,
+                    createdAt = createdAt,
+                    modalities = modalities,
+                    appVersionName = appVersionName,
+                    libVersionName = libVersionName,
+                    language = language,
+                    device = device,
+                    databaseInfo = databaseInfo
+                )
+            ) {
 
         // Ensure that sessionId is equal to the id
         this.labels = labels.copy(sessionId = id)
     }
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class SessionCapturePayload(

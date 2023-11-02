@@ -5,8 +5,8 @@ import com.simprints.matcher.FaceMatchResult
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
 import com.simprints.feature.orchestrator.model.responses.AppMatchResult
 import com.simprints.feature.orchestrator.model.responses.AppVerifyResponse
-import com.simprints.infra.config.domain.models.DecisionPolicy
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject

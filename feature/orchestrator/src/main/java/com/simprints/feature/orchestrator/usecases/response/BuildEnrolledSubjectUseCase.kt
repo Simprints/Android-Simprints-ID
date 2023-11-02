@@ -1,22 +1,22 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import com.simprints.core.domain.face.FaceSample
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
-import com.simprints.infra.enrolment.records.domain.models.Subject
-import java.util.Date
-import java.util.UUID
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import javax.inject.Inject
 
 class BuildEnrolledSubjectUseCase @Inject constructor(
-    private val timeHelper: TimeHelper
+    private val timeHelper: TimeHelper,
+    private val subjectFactory: SubjectFactory
 ) {
 
     operator fun invoke(
         projectId: String,
-        userId: String,
-        moduleId: String,
+        userId: TokenizableString,
+        moduleId: TokenizableString,
         // TODO add fingerprint results as well
         faceResponse: FaceCaptureResult?,
     ): Subject =
@@ -40,33 +40,10 @@ class BuildEnrolledSubjectUseCase @Inject constructor(
             //       )
             //   }
 
-            faceResponse != null -> buildSubjectFromFace(projectId, userId, moduleId, faceResponse, timeHelper)
+            faceResponse != null -> subjectFactory.buildSubjectFromFace(projectId, userId, moduleId, faceResponse, timeHelper)
 
             else -> throw MissingCaptureException()
         }
-
-
-    private fun buildSubjectFromFace(
-        projectId: String,
-        userId: String,
-        moduleId: String,
-        faceResponse: FaceCaptureResult,
-        timeHelper: TimeHelper
-    ): Subject {
-        val subjectId = UUID.randomUUID().toString()
-        return Subject(
-            subjectId,
-            projectId,
-            userId,
-            moduleId,
-            createdAt = Date(timeHelper.now()),
-            faceSamples = extractFaceSamples(faceResponse)
-        )
-    }
-
-    private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results
-        .mapNotNull { it.sample }
-        .map { FaceSample(it.template, it.format) }
 
 
     // TODO

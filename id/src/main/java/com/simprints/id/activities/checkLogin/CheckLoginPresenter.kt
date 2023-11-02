@@ -11,7 +11,7 @@ import com.simprints.id.exceptions.safe.secure.ProjectEndingException
 import com.simprints.id.exceptions.safe.secure.ProjectPausedException
 import com.simprints.id.services.sync.SyncManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState

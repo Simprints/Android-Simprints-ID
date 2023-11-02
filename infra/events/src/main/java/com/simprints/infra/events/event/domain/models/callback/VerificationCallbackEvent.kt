@@ -1,12 +1,14 @@
 package com.simprints.infra.events.event.domain.models.callback
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_VERIFICATION
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class VerificationCallbackEvent(
@@ -24,7 +26,12 @@ data class VerificationCallbackEvent(
         UUID.randomUUID().toString(),
         labels,
         VerificationCallbackPayload(createdAt, EVENT_VERSION, score),
-        CALLBACK_VERIFICATION)
+        CALLBACK_VERIFICATION
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class VerificationCallbackPayload(

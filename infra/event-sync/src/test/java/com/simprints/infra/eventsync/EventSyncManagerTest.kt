@@ -8,12 +8,12 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.GROUP
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -66,7 +66,7 @@ internal class EventSyncManagerTest {
     lateinit var eventRemoteDataSource: EventRemoteDataSource
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     private lateinit var eventSyncManagerImpl: EventSyncManagerImpl
 
@@ -77,22 +77,22 @@ internal class EventSyncManagerTest {
         mockkStatic(WorkManager::class)
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every { synchronization.down.partitionType.toGroup() } returns GROUP.MODULE
         }
 
         eventSyncManagerImpl = EventSyncManagerImpl(
-            ctx,
-            eventSyncStateProcessor,
-            eventDownSyncScopeRepository,
-            eventRepository,
-            eventUpSyncScopeRepository,
-            eventSyncCache,
-            downSyncTask,
-            eventRemoteDataSource,
-            configManager,
-            testCoroutineRule.testCoroutineDispatcher,
+            ctx = ctx,
+            eventSyncStateProcessor = eventSyncStateProcessor,
+            downSyncScopeRepository = eventDownSyncScopeRepository,
+            eventRepository = eventRepository,
+            upSyncScopeRepo = eventUpSyncScopeRepository,
+            eventSyncCache = eventSyncCache,
+            downSyncTask = downSyncTask,
+            eventRemoteDataSource = eventRemoteDataSource,
+            configRepository = configRepository,
+            dispatcher = testCoroutineRule.testCoroutineDispatcher
         )
     }
 
@@ -182,8 +182,8 @@ internal class EventSyncManagerTest {
                 EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 11),
             )
         )
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, SampleDefaults.DEFAULT_MODULE_ID_2)
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
         }
 
         val result = eventSyncManagerImpl.countEventsToDownload()
@@ -207,8 +207,8 @@ internal class EventSyncManagerTest {
                 EventCount(EnrolmentRecordEventType.EnrolmentRecordDeletion, 5),
             )
         )
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, SampleDefaults.DEFAULT_MODULE_ID_2)
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
+            every { selectedModules } returns listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2)
         }
 
         val result = eventSyncManagerImpl.countEventsToDownload()

@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import android.app.Activity
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.id.domain.moduleapi.app.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
@@ -36,10 +37,11 @@ class ModalityFlowConfirmIdentityTest {
     @Test
     fun startFlow_shouldBuildTheRightListOfSteps() = runTest {
         val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
-            DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID,
-            GUID1,
-            GUID2
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.value,
+            isUserIdTokenized = false,
+            sessionId = GUID1,
+            selectedGuid = GUID2
         )
         modalityFlowConfirmIdentity.startFlow(appRequest.fromModuleApiToDomain())
 
@@ -50,10 +52,11 @@ class ModalityFlowConfirmIdentityTest {
     @Test
     fun notStartedStep_getNextStepToLaunch_returnTheRightStep() = runTest {
         val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
-            DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID,
-            GUID1,
-            GUID2
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.value,
+            isUserIdTokenized = false,
+            sessionId = GUID1,
+            selectedGuid = GUID2
         )
         val step = mockk<Step>()
         every { step.getStatus() } returns Step.Status.NOT_STARTED
@@ -69,10 +72,11 @@ class ModalityFlowConfirmIdentityTest {
     @Test
     fun givenAGuidSelectActivityResult_handleIt_shouldReturnTheRightResult() = runTest {
         val appRequest = AppConfirmationConfirmIdentityRequestModuleApi(
-            DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID,
-            GUID1,
-            GUID2
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID.value,
+            isUserIdTokenized = false,
+            sessionId = GUID1,
+            selectedGuid = GUID2
         )
         val step = mockk<Step>()
         every { step.requestCode } returns CoreRequestCode.GUID_SELECTION_CODE.value

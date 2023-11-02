@@ -1,19 +1,20 @@
 package com.simprints.infra.events.event.local
 
 import android.content.Context
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.keyprovider.LocalDbKey
-import io.mockk.*
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 
 
-@RunWith(AndroidJUnit4::class)
 internal class DbEventDatabaseFactoryImplTest {
 
     private val dbName = "dbevents"

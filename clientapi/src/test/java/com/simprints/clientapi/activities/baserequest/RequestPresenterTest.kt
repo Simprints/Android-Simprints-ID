@@ -10,7 +10,12 @@ import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.errors.ClientApiAlert
-import com.simprints.infra.config.ConfigManager
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.events.sampledata.createIdentificationCalloutEvent
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.unit.BaseUnitTestConfig
@@ -25,8 +30,8 @@ import org.junit.Test
 class RequestPresenterTest {
 
     private val projectIdField = "some_project_id"
-    private val moduleIdField = "some_module_id"
-    private val userIdField = "some_user_id"
+    private val moduleIdField = "some_module_id".asTokenizableRaw()
+    private val userIdField = "some_user_id".asTokenizableRaw()
     private val metadataField = "{\"key\": \"some_metadata\"}"
     private val extraField = mapOf("extraField" to "someExtraField")
 
@@ -54,11 +59,12 @@ class RequestPresenterTest {
             }
 
             val presenter = ImplRequestPresenter(
-                mockk(relaxed = true),
-                clientApiSessionEventsManagerMock,
-                mockk(relaxed = true),
-                mockk(relaxed = true),
-                mockk(relaxed = true)
+                view = mockk(relaxed = true),
+                clientApiSessionEventsManager = clientApiSessionEventsManagerMock,
+                rootManager = mockk(relaxed = true),
+                configManager = mockk(relaxed = true),
+                sessionEventsManager = mockk(relaxed = true),
+                tokenizationProcessor = mockk(relaxed = true)
             )
             presenter.validateAndSendRequest(requestBuilder)
 
@@ -82,11 +88,12 @@ class RequestPresenterTest {
             }
 
             val presenter = ImplRequestPresenter(
-                mockk(relaxed = true),
-                clientApiSessionEventsManagerMock,
-                mockk(relaxed = true),
-                mockk(relaxed = true),
-                mockk(relaxed = true)
+                view = mockk(relaxed = true),
+                clientApiSessionEventsManager = clientApiSessionEventsManagerMock,
+                rootManager = mockk(relaxed = true),
+                configManager = mockk(relaxed = true),
+                sessionEventsManager = mockk(relaxed = true),
+                tokenizationProcessor = mockk(relaxed = true)
             )
             presenter.validateAndSendRequest(requestBuilder)
 
@@ -102,16 +109,56 @@ class RequestPresenterTest {
         every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
         val mockView = mockk<RequestContract.RequestView>(relaxed = true)
         val presenter = ImplRequestPresenter(
-            mockView,
-            mockk(relaxed = true),
-            mockDeviceManager,
-            mockk(relaxed = true),
-            mockk(relaxed = true)
+            view = mockView,
+            clientApiSessionEventsManager = mockk(relaxed = true),
+            rootManager = mockDeviceManager,
+            configManager = mockk(relaxed = true),
+            sessionEventsManager = mockk(relaxed = true),
+            tokenizationProcessor = mockk(relaxed = true)
         )
 
         presenter.start()
 
         verify { mockView.handleClientRequestError(ClientApiAlert.ROOTED_DEVICE) }
+    }
+
+    @Test
+    fun `when decryptTokenizedFields is called, tokenized fields of the event are decrypted`() {
+        val mockDeviceManager = mockk<SecurityManager>(relaxed = true)
+        every { mockDeviceManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
+        val mockView = mockk<RequestContract.RequestView>(relaxed = true)
+        val tokenizationProcessor = mockk<TokenizationProcessor>(relaxed = true)
+        val presenter = ImplRequestPresenter(
+            view = mockView,
+            clientApiSessionEventsManager = mockk(relaxed = true),
+            rootManager = mockDeviceManager,
+            configManager = mockk(relaxed = true),
+            sessionEventsManager = mockk(relaxed = true),
+            tokenizationProcessor = tokenizationProcessor
+        )
+        val userId = "userId".asTokenizableEncrypted()
+        val moduleId = "moduleId".asTokenizableRaw()
+        val event = createIdentificationCalloutEvent().let {
+            it.copy(payload = it.payload.copy(userId = userId, moduleId = moduleId))
+        }
+
+
+        presenter.decryptTokenizedFields(events = listOf(event), project = mockk()).first()
+
+        verify {
+            tokenizationProcessor.decrypt(
+                encrypted = userId,
+                tokenKeyType = TokenKeyType.AttendantId,
+                project = any()
+            )
+        }
+        verify(exactly = 0) {
+            tokenizationProcessor.decrypt(
+                encrypted = moduleId.value.asTokenizableEncrypted(),
+                tokenKeyType = TokenKeyType.ModuleId,
+                project = any()
+            )
+        }
     }
 
 }
@@ -121,13 +168,15 @@ class ImplRequestPresenter(
     clientApiSessionEventsManager: ClientApiSessionEventsManager,
     rootManager: SecurityManager,
     configManager: ConfigManager,
-    sessionEventsManager: ClientApiSessionEventsManager
+    sessionEventsManager: ClientApiSessionEventsManager,
+    tokenizationProcessor: TokenizationProcessor
 ) : RequestPresenter(
     view = view,
     eventsManager = clientApiSessionEventsManager,
     rootManager = rootManager,
     configManager = configManager,
-    sessionEventsManager = sessionEventsManager
+    sessionEventsManager = sessionEventsManager,
+    tokenizationProcessor = tokenizationProcessor
 ) {
 
     override suspend fun start() {
