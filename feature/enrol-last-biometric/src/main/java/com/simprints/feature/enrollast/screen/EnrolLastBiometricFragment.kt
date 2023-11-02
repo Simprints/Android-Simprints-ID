@@ -19,7 +19,7 @@ import com.simprints.feature.enrollast.R
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE_ENROLMENTS
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult

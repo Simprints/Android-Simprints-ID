@@ -10,7 +10,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import com.simprints.testtools.common.coroutines.TestCoroutineRule

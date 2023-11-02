@@ -3,7 +3,7 @@ package com.simprints.infra.projectsecuritystore.securitystate.repo.remote
 import com.simprints.core.DeviceID
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.network.SimNetwork
 import javax.inject.Inject
 

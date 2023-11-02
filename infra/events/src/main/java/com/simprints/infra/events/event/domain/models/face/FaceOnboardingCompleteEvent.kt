@@ -1,12 +1,14 @@
 package com.simprints.infra.events.event.domain.models.face
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.FACE_ONBOARDING_COMPLETE
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class FaceOnboardingCompleteEvent(
@@ -24,7 +26,12 @@ data class FaceOnboardingCompleteEvent(
         UUID.randomUUID().toString(),
         labels,
         FaceOnboardingCompletePayload(startTime, endTime, EVENT_VERSION),
-        FACE_ONBOARDING_COMPLETE)
+        FACE_ONBOARDING_COMPLETE
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class FaceOnboardingCompletePayload(

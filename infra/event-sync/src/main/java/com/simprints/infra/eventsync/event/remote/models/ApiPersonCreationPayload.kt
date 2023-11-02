@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent.PersonCreationPayload
 
 
@@ -21,4 +22,7 @@ internal data class ApiPersonCreationPayload(
             domainPayload.fingerprintReferenceId,
             domainPayload.faceCaptureIds,
             domainPayload.faceReferenceId)
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }

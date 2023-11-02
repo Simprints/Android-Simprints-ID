@@ -96,8 +96,10 @@ include(
 include(
     ":infra:events",
     ":infra:event-sync",
-    ":infra:config",
-    ":infra:enrolment-records",
+    ":infra:config-store",
+    ":infra:config-sync",
+    ":infra:enrolment-records-sync",
+    ":infra:enrolment-records-store",
     ":infra:images",
     ":infra:license",
     ":infra:logging",

@@ -6,7 +6,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCap
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Result.*
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint as FingerprintCore
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent.FingerprintCapturePayload.Result as ResultCore

@@ -24,7 +24,7 @@ fun validateCommonParams(json: JSONObject, type: String) {
     with(json.getJSONObject("payload")) {
         assertThat(getString("type")).isEqualTo(type)
     }
-    assertThat(json.length()).isEqualTo(3)
+    assertThat(json.length()).isEqualTo(4)
 }
 
 fun validateCallbackV1EventApiModel(json: JSONObject) {

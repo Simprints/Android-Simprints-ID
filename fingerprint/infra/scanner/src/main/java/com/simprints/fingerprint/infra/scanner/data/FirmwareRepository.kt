@@ -4,7 +4,7 @@ import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSourc
 import com.simprints.fingerprint.infra.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion.Chip
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 

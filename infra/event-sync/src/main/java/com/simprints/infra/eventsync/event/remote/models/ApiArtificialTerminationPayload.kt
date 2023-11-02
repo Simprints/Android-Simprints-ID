@@ -1,6 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.TIMED_OUT
@@ -19,6 +20,9 @@ internal data class ApiArtificialTerminationPayload(
     enum class ApiReason {
         TIMED_OUT, NEW_SESSION
     }
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }
 
 internal fun ArtificialTerminationPayload.Reason.fromDomainToApi() =

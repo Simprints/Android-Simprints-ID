@@ -1,9 +1,9 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
 import com.simprints.infra.facebiosdk.matching.FaceIdentity
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.infra.facebiosdk.matching.FaceSample

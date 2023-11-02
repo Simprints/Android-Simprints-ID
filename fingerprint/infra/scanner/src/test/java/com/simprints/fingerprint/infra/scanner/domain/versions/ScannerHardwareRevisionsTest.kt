@@ -4,7 +4,7 @@ import com.google.common.truth.Truth
 import com.simprints.fingerprint.infra.scanner.data.FirmwareTestData
 import com.simprints.fingerprint.infra.scanner.data.FirmwareTestData.SCANNER_VERSIONS_HIGH
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration
 import org.junit.Test
 
 class ScannerHardwareRevisionsTest {

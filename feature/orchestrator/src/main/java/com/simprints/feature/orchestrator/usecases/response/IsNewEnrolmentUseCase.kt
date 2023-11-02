@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
 import com.simprints.matcher.FaceMatchResult
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import javax.inject.Inject
 
 internal class IsNewEnrolmentUseCase @Inject constructor() {

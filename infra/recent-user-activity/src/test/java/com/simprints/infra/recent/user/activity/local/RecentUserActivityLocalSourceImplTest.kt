@@ -5,6 +5,7 @@ import androidx.datastore.dataStoreFile
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
 import io.mockk.every
 import io.mockk.mockk
@@ -31,10 +32,11 @@ class RecentUserActivityLocalSourceImplTest {
 
     @Test
     fun `should clear the old activity before returning the recent user activity`() = runTest {
+        val user = "user".asTokenizableEncrypted()
         every { timeHelper.now() } returns 20000
         recentUserActivityLocalSourceImpl.updateRecentUserActivity {
             it.apply {
-                it.lastUserUsed = "user"
+                it.lastUserUsed = user
                 it.enrolmentsToday = 10
                 it.lastActivityTime = 10000
             }
@@ -42,16 +44,17 @@ class RecentUserActivityLocalSourceImplTest {
         val recentActivity = recentUserActivityLocalSourceImpl.getRecentUserActivity()
         assertThat(recentActivity.enrolmentsToday).isEqualTo(0)
         assertThat(recentActivity.lastActivityTime).isEqualTo(10000)
-        assertThat(recentActivity.lastUserUsed).isEqualTo("user")
+        assertThat(recentActivity.lastUserUsed).isEqualTo(user)
     }
 
     @Test
     fun `should clear the old activity before updating the recent user activity`() = runTest {
+        val user = "user".asTokenizableEncrypted()
         every { timeHelper.now() } returnsMany listOf(0, 11000)
         every { timeHelper.tomorrowInMillis() } returns 20000
         recentUserActivityLocalSourceImpl.updateRecentUserActivity {
             it.apply {
-                it.lastUserUsed = "user"
+                it.lastUserUsed = user
                 it.enrolmentsToday = 10
                 it.lastActivityTime = 10000
             }
@@ -66,7 +69,7 @@ class RecentUserActivityLocalSourceImplTest {
         val recentActivity = recentUserActivityLocalSourceImpl.getRecentUserActivity()
         assertThat(recentActivity.enrolmentsToday).isEqualTo(1)
         assertThat(recentActivity.lastActivityTime).isEqualTo(12000)
-        assertThat(recentActivity.lastUserUsed).isEqualTo("user")
+        assertThat(recentActivity.lastUserUsed).isEqualTo(user)
     }
 
     @Test

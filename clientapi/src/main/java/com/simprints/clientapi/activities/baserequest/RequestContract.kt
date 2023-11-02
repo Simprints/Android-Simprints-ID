@@ -1,13 +1,24 @@
 package com.simprints.clientapi.activities.baserequest
 
-import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.clientrequests.extractors.*
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrolExtractor
+import com.simprints.clientapi.clientrequests.extractors.EnrolLastBiometricsExtractor
+import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ConfirmationResponse
+import com.simprints.clientapi.domain.responses.EnrolResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.errors.ClientApiAlert
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 
 interface RequestContract {
 
@@ -20,7 +31,8 @@ interface RequestContract {
         val identifyExtractor: IdentifyExtractor
         val confirmIdentityExtractor: ConfirmIdentityExtractor
         val enrolLastBiometricsExtractor: EnrolLastBiometricsExtractor
-
+        fun getTokenizationProcessor(): TokenizationProcessor
+        suspend fun getProject(): Project?
         fun sendSimprintsRequest(request: BaseRequest)
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 

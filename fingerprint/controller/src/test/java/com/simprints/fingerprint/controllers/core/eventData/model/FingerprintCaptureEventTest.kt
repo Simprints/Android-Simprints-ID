@@ -5,7 +5,7 @@ import com.simprints.fingerprint.activities.collect.state.CaptureState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent.Companion.buildResult
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 import org.junit.Test
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent as FingerprintCaptureEventCore
 

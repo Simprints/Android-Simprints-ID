@@ -1,8 +1,11 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload
-import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.*
+import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
+import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.DECLINED
+import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.NO_RESPONSE
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.PARENTAL
 import com.simprints.infra.eventsync.event.remote.models.ApiConsentPayload.ApiResult
@@ -32,6 +35,9 @@ internal data class ApiConsentPayload(
             domainPayload.endedAt,
             domainPayload.consentType.fromDomainToApi(),
             domainPayload.result.fromDomainToApi())
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
+        null // this payload doesn't have tokenizable fields
 }
 
 internal fun ConsentPayload.Type.fromDomainToApi() =

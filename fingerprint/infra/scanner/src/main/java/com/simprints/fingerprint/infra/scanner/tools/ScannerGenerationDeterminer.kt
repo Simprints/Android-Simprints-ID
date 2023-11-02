@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.infra.scanner.tools
 
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.FingerprintConfiguration
 import javax.inject.Inject
 
 /**

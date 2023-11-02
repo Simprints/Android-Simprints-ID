@@ -30,7 +30,7 @@ class EventDownSyncOperationTest {
         val op = userDownSyncScope.operations.first()
         assertThat(op.getUniqueKey()).isEqualTo(
             uuidFrom(
-                "$DEFAULT_PROJECT_ID$DEFAULT_USER_ID${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
+                "$DEFAULT_PROJECT_ID${DEFAULT_USER_ID.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
             )
         )
     }
@@ -42,13 +42,13 @@ class EventDownSyncOperationTest {
 
         assertThat(op.getUniqueKey()).isEqualTo(
             uuidFrom(
-                "$DEFAULT_PROJECT_ID$DEFAULT_MODULE_ID${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
+                "$DEFAULT_PROJECT_ID${DEFAULT_MODULE_ID.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
             )
         )
 
         assertThat(op1.getUniqueKey()).isEqualTo(
             uuidFrom(
-                "$DEFAULT_PROJECT_ID$DEFAULT_MODULE_ID_2${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
+                "$DEFAULT_PROJECT_ID${DEFAULT_MODULE_ID_2.value}${DEFAULT_MODES.joinToString { it.name }}$oldTypes"
             )
         )
 

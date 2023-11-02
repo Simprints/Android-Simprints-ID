@@ -6,8 +6,8 @@ import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.fetchsubject.screen.usecase.FetchSubjectUseCase
 import com.simprints.feature.fetchsubject.screen.usecase.SaveSubjectFetchEventUseCase
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

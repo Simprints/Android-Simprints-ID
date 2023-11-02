@@ -11,9 +11,11 @@ import com.simprints.feature.clientapi.usecases.CreateSessionIfRequiredUseCase
 import com.simprints.feature.clientapi.usecases.DeleteSessionEventsIfNeededUseCase
 import com.simprints.feature.clientapi.usecases.GetCurrentSessionIdUseCase
 import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubjectUseCase
-import com.simprints.feature.clientapi.usecases.GetEventJsonForSessionUseCase
+import com.simprints.feature.clientapi.usecases.GetEventsForCoSyncUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
@@ -56,7 +58,7 @@ internal class ClientApiViewModelTest {
     lateinit var createSessionIfRequiredUseCase: CreateSessionIfRequiredUseCase
 
     @MockK
-    lateinit var getEventJsonForSession: GetEventJsonForSessionUseCase
+    lateinit var getEventJsonForSession: GetEventsForCoSyncUseCase
 
     @MockK
     lateinit var getEnrolmentCreationEventForSubject: GetEnrolmentCreationEventForSubjectUseCase
@@ -67,6 +69,12 @@ internal class ClientApiViewModelTest {
     @MockK
     lateinit var isFlowCompletedWithError: IsFlowCompletedWithErrorUseCase
 
+    @MockK
+    lateinit var authStore: AuthStore
+
+    @MockK
+    lateinit var configManager: ConfigManager
+
     private lateinit var viewModel: ClientApiViewModel
 
 
@@ -75,29 +83,37 @@ internal class ClientApiViewModelTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
         coEvery { getCurrentSessionId.invoke() } returns "sessionId"
-        coEvery { getEventJsonForSession.invoke(any()) } returns "eventsJson"
+        coEvery { getEventJsonForSession.invoke(any(), any()) } returns "eventsJson"
         coEvery { getEnrolmentCreationEventForSubject.invoke(any(), any()) } returns "recordsJson"
         every { resultMapper.invoke(any()) } returns mockk()
         every { isFlowCompletedWithError.invoke(any()) } returns false
         coEvery { deleteSessionEventsIfNeeded.invoke(any()) } returns mockk()
 
         viewModel = ClientApiViewModel(
-            intentMapper,
-            resultMapper,
-            simpleEventReporter,
-            getCurrentSessionId,
-            createSessionIfRequiredUseCase,
-            getEventJsonForSession,
-            getEnrolmentCreationEventForSubject,
-            deleteSessionEventsIfNeeded,
-            isFlowCompletedWithError
+            intentMapper = intentMapper,
+            resultMapper = resultMapper,
+            simpleEventReporter = simpleEventReporter,
+            getCurrentSessionId = getCurrentSessionId,
+            createSessionIfRequiredUseCase = createSessionIfRequiredUseCase,
+            getEventJsonForSession = getEventJsonForSession,
+            getEnrolmentCreationEventForSubject = getEnrolmentCreationEventForSubject,
+            deleteSessionEventsIfNeeded = deleteSessionEventsIfNeeded,
+            isFlowCompletedWithError = isFlowCompletedWithError,
+            authStore = authStore,
+            configManager = configManager
         )
     }
 
     @Test
     fun `handleIntent tries creating session when called`() = runTest {
         coEvery { createSessionIfRequiredUseCase.invoke(any()) } returns true
-        coEvery { intentMapper.invoke(any(), any()) } returns mockk()
+        coEvery {
+            intentMapper.invoke(
+                action = any(),
+                extras = any(),
+                project = any()
+            )
+        } returns mockk()
 
         viewModel.handleIntent("action", Bundle())
 
@@ -108,7 +124,13 @@ internal class ClientApiViewModelTest {
     @Test
     fun `handleIntent handles invalid intent`() = runTest {
         coEvery { createSessionIfRequiredUseCase.invoke(any()) } returns false
-        coEvery { intentMapper.invoke(any(), any()) } throws InvalidRequestException("Invalid intent")
+        coEvery {
+            intentMapper.invoke(
+                action = any(),
+                extras = any(),
+                project = any()
+            )
+        } throws InvalidRequestException("Invalid intent")
 
         viewModel.handleIntent("action", Bundle())
 
@@ -126,7 +148,7 @@ internal class ClientApiViewModelTest {
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
             simpleEventReporter.closeCurrentSessionNormally()
-            getEventJsonForSession(any())
+            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.EnrolActionResponse }) }
@@ -154,7 +176,7 @@ internal class ClientApiViewModelTest {
 
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
-            getEventJsonForSession(any())
+            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.ConfirmActionResponse }) }
@@ -171,7 +193,7 @@ internal class ClientApiViewModelTest {
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
             simpleEventReporter.closeCurrentSessionNormally()
-            getEventJsonForSession(any())
+            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.VerifyActionResponse }) }
@@ -191,7 +213,7 @@ internal class ClientApiViewModelTest {
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(true))
             simpleEventReporter.closeCurrentSessionNormally()
-            getEventJsonForSession(any())
+            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.ExitFormActionResponse }) }
@@ -208,7 +230,7 @@ internal class ClientApiViewModelTest {
         coVerify {
             simpleEventReporter.addCompletionCheckEvent(eq(false))
             simpleEventReporter.closeCurrentSessionNormally()
-            getEventJsonForSession(any())
+            getEventJsonForSession(sessionId = any(), project = any())
             deleteSessionEventsIfNeeded(any())
         }
         verify { resultMapper.invoke(withArg { it is ActionResponse.ErrorActionResponse }) }

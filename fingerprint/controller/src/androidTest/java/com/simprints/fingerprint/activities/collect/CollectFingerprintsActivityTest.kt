@@ -37,8 +37,8 @@ import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
 import com.simprints.fingerprint.tools.livedata.postEvent
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.mock.MockTimer
 import com.simprints.testtools.unit.EncodingUtilsImplForTests

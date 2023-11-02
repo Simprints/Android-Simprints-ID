@@ -4,8 +4,8 @@ import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSourc
 import com.simprints.fingerprint.infra.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.domain.versions.getAvailableVersionsForDownload
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Vero2Configuration
 import io.mockk.Ordering
 import io.mockk.coEvery
 import io.mockk.coVerify

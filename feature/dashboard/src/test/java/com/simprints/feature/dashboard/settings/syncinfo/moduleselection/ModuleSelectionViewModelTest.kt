@@ -3,12 +3,19 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.NoModuleSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.exceptions.TooManyModulesSelectedException
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.SettingsPasswordConfig
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.SettingsPasswordConfig
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -39,28 +46,51 @@ class ModuleSelectionViewModelTest {
     @MockK(relaxed = true)
     private lateinit var configManager: ConfigManager
 
+    @MockK(relaxed = true)
+    private lateinit var tokenizationProcessor: TokenizationProcessor
+
+    @MockK(relaxed = true)
+    private lateinit var authStore: AuthStore
+
+    @MockK
+    private lateinit var project: Project
+
     private lateinit var viewModel: ModuleSelectionViewModel
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
-        coEvery { repository.getModules() } returns listOf(
-            Module("a", false),
-            Module("b", false),
-            Module("c", true),
-            Module("d", false)
+        val modulesDefault = listOf(
+            Module("a".asTokenizableEncrypted(), false),
+            Module("b".asTokenizableEncrypted(), false),
+            Module("c".asTokenizableEncrypted(), true),
+            Module("d".asTokenizableEncrypted(), false)
         )
+        coEvery { repository.getModules() } returns modulesDefault
         coEvery { repository.getMaxNumberOfModules() } returns 2
         coEvery { configManager.getProjectConfiguration() } returns mockk {
             every { general.settingsPassword } returns SettingsPasswordConfig.Locked("1234")
         }
+        every { authStore.signedInProjectId } returns PROJECT_ID
+        coEvery { configManager.getProject(PROJECT_ID) } returns project
+        modulesDefault.forEach {
+            coEvery {
+                tokenizationProcessor.decrypt(
+                    encrypted = it.name as TokenizableString.Tokenized,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = project
+                )
+            } returns it.name.value.asTokenizableRaw()
+        }
 
         viewModel = ModuleSelectionViewModel(
-            repository,
-            eventSyncManager,
-            configManager,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
+            authStore = authStore,
+            repository = repository,
+            eventSyncManager = eventSyncManager,
+            configManager = configManager,
+            tokenizationProcessor = tokenizationProcessor,
+            externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
@@ -68,10 +98,10 @@ class ModuleSelectionViewModelTest {
     fun `should initialize the live data with the correct values`() {
         assertThat(viewModel.modulesList.getOrAwaitValue()).isEqualTo(
             listOf(
-                Module("a", false),
-                Module("b", false),
-                Module("c", true),
-                Module("d", false)
+                Module("a".asTokenizableRaw(), false),
+                Module("b".asTokenizableRaw(), false),
+                Module("c".asTokenizableRaw(), true),
+                Module("d".asTokenizableRaw(), false)
             )
         )
     }
@@ -79,16 +109,16 @@ class ModuleSelectionViewModelTest {
     @Test
     fun `updateModuleSelection should throw a NoModuleSelectedException if trying to unselect the last selected module`() {
         assertThrows<NoModuleSelectedException> {
-            viewModel.updateModuleSelection(Module("c", true))
+            viewModel.updateModuleSelection(Module("c".asTokenizableRaw(), true))
         }
     }
 
     @Test
     fun `updateModuleSelection should throw a TooManyModulesSelectedException if trying to select more than the maximum number of modules`() {
-        viewModel.updateModuleSelection(Module("b", false))
+        viewModel.updateModuleSelection(Module("b".asTokenizableRaw(), false))
 
         val exception = assertThrows<TooManyModulesSelectedException> {
-            viewModel.updateModuleSelection(Module("a", false))
+            viewModel.updateModuleSelection(Module("a".asTokenizableRaw(), false))
         }
 
         assertThat(exception.maxNumberOfModules).isEqualTo(2)
@@ -97,27 +127,27 @@ class ModuleSelectionViewModelTest {
     @Test
     fun `updateModuleSelection should update the module selection correctly otherwise`() {
         val expectedModules = listOf(
-            Module("a", false),
-            Module("b", true),
-            Module("c", true),
-            Module("d", false)
+            Module("a".asTokenizableRaw(), false),
+            Module("b".asTokenizableRaw(), true),
+            Module("c".asTokenizableRaw(), true),
+            Module("d".asTokenizableRaw(), false)
         )
-        viewModel.updateModuleSelection(Module("b", false))
+        viewModel.updateModuleSelection(Module("b".asTokenizableRaw(), false))
 
         assertThat(viewModel.modulesList.getOrAwaitValue()).isEqualTo(expectedModules)
     }
 
     @Test
     fun `hasSelectionChanged should return true if the selection has changed`() {
-        viewModel.updateModuleSelection(Module("a", false))
+        viewModel.updateModuleSelection(Module("a".asTokenizableRaw(), false))
 
         assertThat(viewModel.hasSelectionChanged()).isEqualTo(true)
     }
 
     @Test
     fun `hasSelectionChanged should return false if the selection hasn't changed`() {
-        viewModel.updateModuleSelection(Module("a", false))
-        viewModel.updateModuleSelection(Module("a", true))
+        viewModel.updateModuleSelection(Module("a".asTokenizableRaw(), false))
+        viewModel.updateModuleSelection(Module("a".asTokenizableRaw(), true))
 
         assertThat(viewModel.hasSelectionChanged()).isEqualTo(false)
     }
@@ -125,12 +155,21 @@ class ModuleSelectionViewModelTest {
     @Test
     fun `saveModules should save the modules and trigger the sync`() {
         val updatedModules = listOf(
-            Module("a", true),
-            Module("b", false),
-            Module("c", true),
-            Module("d", false)
+            Module("a".asTokenizableRaw(), true),
+            Module("b".asTokenizableRaw(), false),
+            Module("c".asTokenizableRaw(), true),
+            Module("d".asTokenizableRaw(), false)
         )
-        viewModel.updateModuleSelection(Module("a", false))
+        updatedModules.forEach { module ->
+            every {
+                tokenizationProcessor.encrypt(
+                    decrypted = module.name as TokenizableString.Raw,
+                    tokenKeyType = TokenKeyType.ModuleId,
+                    project = project
+                )
+            } returns module.name.value.asTokenizableEncrypted()
+        }
+        viewModel.updateModuleSelection(Module("a".asTokenizableRaw(), false))
         viewModel.saveModules()
 
         coVerify(exactly = 1) { repository.saveModules(updatedModules) }
@@ -154,5 +193,9 @@ class ModuleSelectionViewModelTest {
         assertThat(viewModel.screenLocked.getOrAwaitValue()).isEqualTo(
             SettingsPasswordConfig.Unlocked
         )
+    }
+
+    companion object {
+        private const val PROJECT_ID = "projectId"
     }
 }

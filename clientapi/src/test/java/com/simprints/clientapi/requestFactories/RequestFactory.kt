@@ -5,14 +5,15 @@ import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.BaseRequest
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import io.mockk.every
 
 abstract class RequestFactory {
 
     companion object {
         const val MOCK_PROJECT_ID = "xppPLwmR2eUmyN6LS3SN"
-        const val MOCK_USER_ID = "userId"
-        const val MOCK_MODULE_ID = "moduleId"
+        val MOCK_USER_ID = "userId".asTokenizableRaw()
+        val MOCK_MODULE_ID = "moduleId".asTokenizableRaw()
         const val MOCK_METADATA = ""
         const val MOCK_VERIFY_GUID = "1d3a92c1-3410-40fb-9e88-4570c9abd150"
         const val MOCK_SESSION_ID = "ddf01a3c-3081-4d3e-b872-538731517cb9"
@@ -29,8 +30,8 @@ abstract class RequestFactory {
 
     open fun setMockDefaultExtractor(mockExtractor: ClientRequestExtractor) {
         every { mockExtractor.getProjectId() } returns MOCK_PROJECT_ID
-        every { mockExtractor.getUserId() } returns MOCK_USER_ID
-        every { mockExtractor.getModuleId() } returns MOCK_MODULE_ID
+        every { mockExtractor.getUserId() } returns MOCK_USER_ID.value
+        every { mockExtractor.getModuleId() } returns MOCK_MODULE_ID.value
         every { mockExtractor.getMetadata() } returns MOCK_METADATA
         every { mockExtractor.getUnknownExtras() } returns emptyMap()
     }

@@ -1,8 +1,10 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class ConsentEvent(
@@ -22,16 +24,23 @@ data class ConsentEvent(
         UUID.randomUUID().toString(),
         labels,
         ConsentPayload(createdAt, EVENT_VERSION, endTime, consentType, result),
-        CONSENT)
+        CONSENT
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
 
     @Keep
-    data class ConsentPayload(override val createdAt: Long,
-                              override val eventVersion: Int,
-                              override var endedAt: Long,
-                              val consentType: Type,
-                              var result: Result,
-                              override val type: EventType = CONSENT) : EventPayload() {
+    data class ConsentPayload(
+        override val createdAt: Long,
+        override val eventVersion: Int,
+        override var endedAt: Long,
+        val consentType: Type,
+        var result: Result,
+        override val type: EventType = CONSENT
+    ) : EventPayload() {
 
         @Keep
         enum class Type {

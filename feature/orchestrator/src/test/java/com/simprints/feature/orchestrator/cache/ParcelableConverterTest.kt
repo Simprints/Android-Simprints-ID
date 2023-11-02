@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepStatus
 import com.simprints.infra.orchestration.data.ActionRequest
@@ -25,11 +26,13 @@ class ParcelableConverterTest {
 
     @Test
     fun `Correctly marshals and unmarshalls the action request`() {
+        val userId = "userId".asTokenizableRaw()
+        val moduleId = "moduleId".asTokenizableRaw()
         val request = ActionRequest.EnrolActionRequest(
             actionIdentifier = ActionRequestIdentifier("action", "package"),
             projectId = "projectId",
-            userId = "userId",
-            moduleId = "moduleId",
+            userId = userId,
+            moduleId = moduleId,
             metadata = "metadata",
             unknownExtras = listOf("key" to "value", "key2" to 42),
         )
@@ -40,8 +43,8 @@ class ParcelableConverterTest {
         with(resultRequest as ActionRequest.EnrolActionRequest) {
             assertThat(actionIdentifier).isEqualTo(ActionRequestIdentifier("action", "package"))
             assertThat(projectId).isEqualTo("projectId")
-            assertThat(userId).isEqualTo("userId")
-            assertThat(moduleId).isEqualTo("moduleId")
+            assertThat(this.userId).isEqualTo(userId)
+            assertThat(this.moduleId).isEqualTo(moduleId)
             assertThat(metadata).isEqualTo("metadata")
             assertThat(unknownExtras).containsExactly("key" to "value", "key2" to 42)
         }

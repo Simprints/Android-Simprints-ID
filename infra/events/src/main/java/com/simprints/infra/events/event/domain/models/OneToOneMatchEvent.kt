@@ -1,6 +1,8 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ONE_TO_ONE_MATCH
 import java.util.UUID
 
@@ -23,8 +25,21 @@ data class OneToOneMatchEvent(
     ) : this(
         UUID.randomUUID().toString(),
         labels,
-        OneToOneMatchPayload(createdAt, EVENT_VERSION, endTime, candidateId, matcher, result, fingerComparisonStrategy),
-        ONE_TO_ONE_MATCH)
+        OneToOneMatchPayload(
+            createdAt = createdAt,
+            eventVersion = EVENT_VERSION,
+            endedAt = endTime,
+            candidateId = candidateId,
+            matcher = matcher,
+            result = result,
+            fingerComparisonStrategy = fingerComparisonStrategy
+        ),
+        ONE_TO_ONE_MATCH
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
     @Keep
     data class OneToOneMatchPayload(

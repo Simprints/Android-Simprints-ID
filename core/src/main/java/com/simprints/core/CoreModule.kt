@@ -12,6 +12,7 @@ import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.EncodingUtilsImpl
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtilsImpl
+import com.simprints.core.tools.utils.StringTokenizer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,6 +53,11 @@ object CoreModule {
     @Singleton
     fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImpl
 
+
+    @Provides
+    @Singleton
+    fun provideStringTokenizer(encodingUtils: EncodingUtils): StringTokenizer =
+        StringTokenizer(encodingUtils = encodingUtils)
 
     @DeviceID
     @Provides

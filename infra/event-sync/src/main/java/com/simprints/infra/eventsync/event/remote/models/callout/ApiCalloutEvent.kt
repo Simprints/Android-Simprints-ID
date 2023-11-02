@@ -3,6 +3,7 @@ package com.simprints.infra.eventsync.event.remote.models.callout
 import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.callout.ConfirmationCalloutEvent.ConfirmationCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentCalloutEvent.EnrolmentCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.EnrolmentLastBiometricsCalloutPayload
@@ -24,8 +25,8 @@ internal data class ApiCalloutPayload(
         domainPayload.eventVersion,
         ApiEnrolmentCallout(
             domainPayload.projectId,
-            domainPayload.userId,
-            domainPayload.moduleId,
+            domainPayload.userId.value,
+            domainPayload.moduleId.value,
             domainPayload.metadata))
 
     constructor(domainPayload: IdentificationCalloutPayload) : this(
@@ -33,8 +34,8 @@ internal data class ApiCalloutPayload(
         domainPayload.eventVersion,
         ApiIdentificationCallout(
             domainPayload.projectId,
-            domainPayload.userId,
-            domainPayload.moduleId,
+            domainPayload.userId.value,
+            domainPayload.moduleId.value,
             domainPayload.metadata))
 
     constructor(domainPayload: VerificationCalloutPayload) : this(
@@ -42,8 +43,8 @@ internal data class ApiCalloutPayload(
         domainPayload.eventVersion,
         ApiVerificationCallout(
             domainPayload.projectId,
-            domainPayload.userId,
-            domainPayload.moduleId,
+            domainPayload.userId.value,
+            domainPayload.moduleId.value,
             domainPayload.metadata,
             domainPayload.verifyGuid))
 
@@ -59,8 +60,14 @@ internal data class ApiCalloutPayload(
         domainPayload.eventVersion,
         ApiEnrolmentLastBiometricsCallout(
             domainPayload.projectId,
-            domainPayload.userId,
-            domainPayload.moduleId,
+            domainPayload.userId.value,
+            domainPayload.moduleId.value,
             domainPayload.metadata,
             domainPayload.sessionId))
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
+        TokenKeyType.AttendantId -> "callout.userId"
+        TokenKeyType.ModuleId -> "callout.moduleId"
+        TokenKeyType.Unknown -> null
+    }
 }

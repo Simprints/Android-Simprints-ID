@@ -1,24 +1,25 @@
 package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.tools
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import org.junit.Test
 
 class ModuleQueryFilterTest {
 
     private val items = listOf(
-        Module("Abama", false),
-        Module("Abama Dawet", false),
-        Module("Achura Mazegaja", false),
-        Module("Bangladesh rocks", false),
-        Module("Dache Gofara", false),
-        Module("Gara Goda", false),
-        Module("Gurumo Koysha", false),
-        Module("Hajo Salata", false),
-        Module("Legama", false),
-        Module("Madagascar", false),
-        Module("Tadisa", false),
-        Module("Wakanda", false)
+        Module("Abama".asTokenizableRaw(), false),
+        Module("Abama Dawet".asTokenizableRaw(), false),
+        Module("Achura Mazegaja".asTokenizableRaw(), false),
+        Module("Bangladesh rocks".asTokenizableRaw(), false),
+        Module("Dache Gofara".asTokenizableRaw(), false),
+        Module("Gara Goda".asTokenizableRaw(), false),
+        Module("Gurumo Koysha".asTokenizableRaw(), false),
+        Module("Hajo Salata".asTokenizableRaw(), false),
+        Module("Legama".asTokenizableRaw(), false),
+        Module("Madagascar".asTokenizableRaw(), false),
+        Module("Tadisa".asTokenizableRaw(), false),
+        Module("Wakanda".asTokenizableRaw(), false)
     )
     private val filter = ModuleQueryFilter()
 
@@ -60,9 +61,9 @@ class ModuleQueryFilterTest {
     fun withExactQuery_shouldReturnCorrectResult() {
         val query = "Legama"
         val expected = listOf(
-            Module(name = "Legama", isSelected = false),
-            Module(name = "Achura Mazegaja", isSelected = false),
-            Module(name = "Abama", isSelected = false)
+            Module(name = "Legama".asTokenizableRaw(), isSelected = false),
+            Module(name = "Achura Mazegaja".asTokenizableRaw(), isSelected = false),
+            Module(name = "Abama".asTokenizableRaw(), isSelected = false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -73,9 +74,9 @@ class ModuleQueryFilterTest {
     fun withLowercaseQuery_shouldReturnCorrectResult() {
         val query = "legama"
         val expected = listOf(
-            Module(name = "Legama", isSelected = false),
-            Module(name = "Achura Mazegaja", isSelected = false),
-            Module(name = "Abama", isSelected = false)
+            Module(name = "Legama".asTokenizableRaw(), isSelected = false),
+            Module(name = "Achura Mazegaja".asTokenizableRaw(), isSelected = false),
+            Module(name = "Abama".asTokenizableRaw(), isSelected = false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -86,12 +87,12 @@ class ModuleQueryFilterTest {
     fun withInexactQuery_shouldReturnAllPossibleResults() {
         val query = "abama"
         val expected = listOf(
-            Module("Abama", false),
-            Module("Abama Dawet", false),
-            Module("Legama", false),
-            Module("Achura Mazegaja", false),
-            Module("Hajo Salata", false),
-            Module("Wakanda", false)
+            Module("Abama".asTokenizableRaw(), false),
+            Module("Abama Dawet".asTokenizableRaw(), false),
+            Module("Legama".asTokenizableRaw(), false),
+            Module("Achura Mazegaja".asTokenizableRaw(), false),
+            Module("Hajo Salata".asTokenizableRaw(), false),
+            Module("Wakanda".asTokenizableRaw(), false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -102,7 +103,7 @@ class ModuleQueryFilterTest {
     fun withFuzzyQuery_shouldReturnAllPossibleResults() {
         val query = "binglodosh"
         val expected = listOf(
-            Module("Bangladesh rocks", false)
+            Module("Bangladesh rocks".asTokenizableRaw(), false)
         )
 
         val actual = filter.getFilteredList(items, query)

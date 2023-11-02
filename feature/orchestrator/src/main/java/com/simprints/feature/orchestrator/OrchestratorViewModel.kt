@@ -23,8 +23,8 @@ import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCas
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
 import com.simprints.feature.setup.LocationStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import dagger.hilt.android.lifecycle.HiltViewModel

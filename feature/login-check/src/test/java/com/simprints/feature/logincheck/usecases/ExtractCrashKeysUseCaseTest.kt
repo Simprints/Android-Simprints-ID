@@ -1,8 +1,9 @@
 package com.simprints.feature.logincheck.usecases
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.SynchronizationConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.logging.Simber
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -46,7 +47,10 @@ class ExtractCrashKeysUseCaseTest {
             every { synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
         }
         coEvery { configManager.getDeviceConfiguration() } returns mockk {
-            every { selectedModules } returns listOf("module1", "module2")
+            every { selectedModules } returns listOf(
+                "module1".asTokenizableRaw(),
+                "module2".asTokenizableRaw()
+            )
         }
         every { authStore.signedInProjectId } returns "projectId"
 

@@ -5,8 +5,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.*
 import com.simprints.feature.consent.ConsentType
-import com.simprints.infra.config.domain.models.ConsentConfiguration
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.ConsentConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.resources.R
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -134,7 +134,8 @@ class GeneralConsentTextHelperTest {
     @Test
     fun `should return the correct consent for an identification with one modality`() {
         val generalConsentText = GeneralConsentTextHelper(context).assembleText(
-            configWithPrompt(ConsentConfiguration.ConsentPromptConfiguration(
+            configWithPrompt(
+                ConsentConfiguration.ConsentPromptConfiguration(
                 enrolmentVariant = ConsentConfiguration.ConsentEnrolmentVariant.STANDARD,
                 dataSharedWithPartner = false,
                 dataUsedForRAndD = false,

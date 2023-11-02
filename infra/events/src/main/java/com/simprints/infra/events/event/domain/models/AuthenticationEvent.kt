@@ -1,6 +1,8 @@
 package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
@@ -27,6 +29,17 @@ data class AuthenticationEvent(
         AUTHENTICATION
     )
 
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> =
+        mapOf(TokenKeyType.AttendantId to payload.userInfo.userId)
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this.copy(
+        payload = payload.copy(
+            userInfo = payload.userInfo.copy(
+                userId = map[TokenKeyType.AttendantId] ?: payload.userInfo.userId
+            )
+        )
+    )
+
 
     @Keep
     data class AuthenticationPayload(
@@ -39,7 +52,7 @@ data class AuthenticationEvent(
     ) : EventPayload() {
 
         @Keep
-        data class UserInfo(val projectId: String, val userId: String)
+        data class UserInfo(val projectId: String, val userId: TokenizableString)
 
         @Keep
         enum class Result {

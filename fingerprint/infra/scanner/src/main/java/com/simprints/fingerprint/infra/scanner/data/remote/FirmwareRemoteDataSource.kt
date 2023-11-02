@@ -3,7 +3,7 @@ package com.simprints.fingerprint.infra.scanner.data.remote
 import com.simprints.fingerprint.infra.scanner.data.remote.network.FingerprintFileDownloader
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.domain.versions.getAvailableVersionsForDownload
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 

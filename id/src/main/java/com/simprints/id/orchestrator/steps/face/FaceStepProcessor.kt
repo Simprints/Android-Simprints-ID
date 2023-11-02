@@ -4,7 +4,7 @@ import android.content.Intent
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 
 /**
  * It creates a Step to launch (used to launch a specific Activity) to execute

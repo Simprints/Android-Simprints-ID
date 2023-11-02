@@ -29,6 +29,10 @@ open class DbSubject(
 
     var fingerprintSamples: RealmList<DbFingerprintSample> = RealmList(),
 
-    var faceSamples: RealmList<DbFaceSample> = RealmList()
+    var faceSamples: RealmList<DbFaceSample> = RealmList(),
+
+    var isAttendantIdTokenized: Boolean = false,
+
+    var isModuleIdTokenized: Boolean = false
 
 ) : RealmObject()

@@ -3,10 +3,9 @@ package com.simprints.infra.eventsync.sync.up.tasks
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.canSyncAllDataToSimprints
-import com.simprints.infra.config.domain.models.canSyncAnalyticsDataToSimprints
-import com.simprints.infra.config.domain.models.canSyncBiometricDataToSimprints
+import com.simprints.infra.config.store.models.canSyncAllDataToSimprints
+import com.simprints.infra.config.store.models.canSyncAnalyticsDataToSimprints
+import com.simprints.infra.config.store.models.canSyncBiometricDataToSimprints
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.Event
@@ -23,6 +22,7 @@ import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -36,7 +36,7 @@ internal class EventUpSyncTask @Inject constructor(
     private val eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository
 ) {
 
     fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
@@ -46,7 +46,7 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val config = configManager.getProjectConfiguration()
+        val config = configRepository.getConfiguration()
         var lastOperation = operation.copy()
         var count = 0
         try {

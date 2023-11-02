@@ -2,7 +2,7 @@ package com.simprints.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowProvider
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent

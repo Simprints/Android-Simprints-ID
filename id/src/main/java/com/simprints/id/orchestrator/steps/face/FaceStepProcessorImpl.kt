@@ -26,8 +26,8 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CONFIGURATION
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import javax.inject.Inject
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult as FaceMatchResponseResult
 

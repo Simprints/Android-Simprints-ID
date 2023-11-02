@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses.entities
 
 import com.google.common.truth.Truth
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.store.models.Finger
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import org.junit.Test
 

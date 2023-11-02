@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Finger
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Finger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

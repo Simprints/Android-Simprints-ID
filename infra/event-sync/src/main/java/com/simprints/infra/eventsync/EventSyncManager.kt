@@ -5,7 +5,7 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.status.models.DownSyncCounts
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import kotlinx.coroutines.flow.Flow
-import java.util.*
+import java.util.Date
 
 interface EventSyncManager {
 

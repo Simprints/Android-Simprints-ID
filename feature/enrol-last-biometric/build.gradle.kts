@@ -10,9 +10,11 @@ android {
 dependencies {
 
     implementation(project(":feature:alert"))
-
-    implementation(project(":infra:config"))
+    implementation(project(":infra:event-sync"))
+    implementation(project(":infra:config-sync"))
+    implementation(project(":infra:config-store"))
     implementation(project(":infra:events"))
-    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:enrolment-records-sync"))
+    implementation(project(":infra:enrolment-records-store"))
 
 }

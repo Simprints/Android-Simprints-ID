@@ -8,7 +8,7 @@ import com.simprints.infra.authstore.domain.models.AuthRequest
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.config.ConfigManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.security.SecurityManager

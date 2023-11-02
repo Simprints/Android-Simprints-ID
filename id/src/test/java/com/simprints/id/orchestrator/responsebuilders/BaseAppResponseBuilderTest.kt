@@ -19,7 +19,7 @@ import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.response.ExitFormResponse
 import com.simprints.id.orchestrator.steps.core.response.FetchGUIDResponse
 import com.simprints.id.orchestrator.steps.core.response.SetupResponse
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import org.junit.Test
 
 class BaseAppResponseBuilderTest {

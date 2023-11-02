@@ -1,8 +1,17 @@
 package com.simprints.infra.eventsync.event.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
-import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.*
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BACKEND_MAINTENANCE_ERROR
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.BAD_CREDENTIALS
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_ERROR
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.INTEGRITY_SERVICE_TEMPORARY_DOWN_ERROR
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.MISSING_OR_OUTDATED_PLAY_STORE_ERROR
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.OFFLINE
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.TECHNICAL_FAILURE
+import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.UNKNOWN
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayload.ApiResult
 
 @Keep
@@ -17,7 +26,7 @@ internal data class ApiAuthenticationPayload(
     @Keep
     data class ApiUserInfo(val projectId: String, val userId: String) {
         constructor(userInfoDomain: AuthenticationPayload.UserInfo) :
-            this(userInfoDomain.projectId, userInfoDomain.userId)
+            this(userInfoDomain.projectId, userInfoDomain.userId.value)
     }
 
     @Keep
@@ -38,6 +47,11 @@ internal data class ApiAuthenticationPayload(
             domainPayload.endedAt,
             ApiUserInfo(domainPayload.userInfo),
             domainPayload.result.fromDomainToApi())
+
+    override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? = when(tokenKeyType) {
+        TokenKeyType.AttendantId -> "userInfo.userId"
+        else -> null
+    }
 }
 
 

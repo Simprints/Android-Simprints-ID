@@ -2,8 +2,8 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.matcher.FaceMatchResult
-import com.simprints.infra.config.domain.models.DecisionPolicy
-import com.simprints.infra.config.domain.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.DecisionPolicy
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

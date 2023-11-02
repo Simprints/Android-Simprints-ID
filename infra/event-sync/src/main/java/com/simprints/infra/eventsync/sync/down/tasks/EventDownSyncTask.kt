@@ -1,19 +1,26 @@
 package com.simprints.infra.eventsync.sync.down.tasks
 
 import androidx.annotation.VisibleForTesting
+import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
-import com.simprints.infra.enrolment.records.domain.models.SubjectAction
-import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Creation
-import com.simprints.infra.enrolment.records.domain.models.SubjectAction.Deletion
-import com.simprints.infra.events.event.domain.models.subject.*
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordDeletionEvent
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
+import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordCreationInMove
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent.EnrolmentRecordDeletionInMove
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
-import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.*
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
 import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +34,7 @@ internal class EventDownSyncTask @Inject constructor(
     private val subjectRepository: EnrolmentRecordManager,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val eventRemoteDataSource: EventRemoteDataSource,
 ) {
@@ -167,11 +174,11 @@ internal class EventDownSyncTask @Inject constructor(
                 }
             }
             attendantUnderSyncing != null -> {
-                if (attendantUnderSyncing == enrolmentRecordDeletion.attendantId) {
+                if (attendantUnderSyncing == enrolmentRecordDeletion.attendantId.value) {
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 }
 
-                if (attendantUnderSyncing == enrolmentRecordCreation.attendantId) {
+                if (attendantUnderSyncing == enrolmentRecordCreation.attendantId.value) {
                     createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
                         actions.add(
                             it
@@ -204,13 +211,13 @@ internal class EventDownSyncTask @Inject constructor(
 
 
     private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleIds?.let { moduleId.partOf(it) } ?: false
+        op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
 
     private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleIds?.let { moduleId.partOf(it) } ?: false
+        op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
 
     private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
-        moduleId.partOf(configManager.getDeviceConfiguration().selectedModules)
+        moduleId.value.partOf(configRepository.getDeviceConfiguration().selectedModules.values())
 
     private fun String.partOf(modules: List<String>) = modules.contains(this)
 

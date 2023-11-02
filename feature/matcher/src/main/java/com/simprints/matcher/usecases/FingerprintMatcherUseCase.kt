@@ -8,9 +8,9 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifi
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.FingerprintConfiguration
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import kotlinx.coroutines.flow.map

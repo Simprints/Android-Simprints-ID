@@ -1,7 +1,14 @@
 package com.simprints.feature.dashboard.tools.di
 
-import com.simprints.core.*
+import com.simprints.core.CoreModule
+import com.simprints.core.DeviceID
+import com.simprints.core.DispatcherIO
+import com.simprints.core.ExternalScope
+import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.utils.EncodingUtils
+import com.simprints.core.tools.utils.StringTokenizer
+import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
@@ -44,4 +51,13 @@ object FakeCoreModule {
     @ExternalScope
     @Provides
     fun provideExternalScope(): CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
+
+    @Provides
+    @Singleton
+    fun provideStringTokenizer(): StringTokenizer = mockk()
+
+
+    @Provides
+    @Singleton
+    fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImplForTests
 }

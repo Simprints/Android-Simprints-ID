@@ -16,7 +16,7 @@ import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
 import com.simprints.feature.fetchsubject.FetchSubjectResult
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import dagger.hilt.android.AndroidEntryPoint

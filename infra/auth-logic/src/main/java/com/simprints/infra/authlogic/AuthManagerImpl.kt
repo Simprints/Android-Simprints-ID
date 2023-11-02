@@ -1,5 +1,6 @@
 package com.simprints.infra.authlogic
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authlogic.authenticator.Authenticator
 import com.simprints.infra.authlogic.authenticator.SignerManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
@@ -11,8 +12,18 @@ internal class AuthManagerImpl @Inject constructor(
     private val signerManager: SignerManager,
 ) : AuthManager {
 
-    override suspend fun authenticateSafely(userId: String, projectId: String, projectSecret: String, deviceId: String) =
-        authenticator.authenticate(userId, projectId, projectSecret, deviceId)
+    override suspend fun authenticateSafely(
+        userId: String,
+        projectId: String,
+        projectSecret: String,
+        deviceId: String
+    ) =
+        authenticator.authenticate(
+            userId = userId.asTokenizableRaw(),
+            projectId = projectId,
+            projectSecret = projectSecret,
+            deviceId = deviceId
+        )
 
     override fun startSecurityStateCheck() = securityStateScheduler.startSecurityStateCheck()
 

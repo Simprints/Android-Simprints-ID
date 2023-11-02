@@ -1,9 +1,10 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFlow.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.instanceOf
@@ -63,7 +64,10 @@ class AppResponseBuilderForEnrolTest {
     }
 
     private fun mockRequest() = AppEnrolRequest(
-        "projectId", "userId", "moduleId", "metadata"
+        projectId = "projectId",
+        userId = "userId".asTokenizableRaw(),
+        moduleId = "moduleId".asTokenizableRaw(),
+        metadata = "metadata"
     )
 
     private fun mockSteps(modalities: List<GeneralConfiguration.Modality>): List<Step> {

@@ -11,4 +11,5 @@ message ProtoRecentUserActivity {
     int32 identifications_today = 5;
     int32 verifications_today = 6;
     int64 last_activity_time = 7;
+    bool is_user_id_tokenized = 8;
 }

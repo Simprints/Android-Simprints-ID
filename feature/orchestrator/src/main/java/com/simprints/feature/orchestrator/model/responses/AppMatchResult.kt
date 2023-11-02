@@ -1,6 +1,6 @@
 package com.simprints.feature.orchestrator.model.responses
 
-import com.simprints.infra.config.domain.models.DecisionPolicy
+import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.moduleapi.app.responses.IAppMatchConfidence
 import com.simprints.moduleapi.app.responses.IAppMatchResult
 import com.simprints.moduleapi.app.responses.IAppResponseTier

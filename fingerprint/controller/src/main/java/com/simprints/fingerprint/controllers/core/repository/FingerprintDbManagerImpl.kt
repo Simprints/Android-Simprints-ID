@@ -4,7 +4,7 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.fingerprint.fromModuleApiToDomain
-import com.simprints.infra.enrolment.records.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.io.Serializable

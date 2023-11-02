@@ -3,7 +3,7 @@ package com.simprints.fingerprint.data.domain.fingerprint
 /**
  * This enum represents the image quality of the fingerprint image to be captured
  */
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.store.models.Vero2Configuration
 
 
 fun Vero2Configuration.CaptureStrategy.toInt(): Int =

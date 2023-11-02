@@ -1,13 +1,15 @@
 package com.simprints.infra.events.event.domain.models.face
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.FACE_CAPTURE_CONFIRMATION
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result
-import java.util.*
+import java.util.UUID
 
 @Keep
 data class FaceCaptureConfirmationEvent(
@@ -26,7 +28,12 @@ data class FaceCaptureConfirmationEvent(
         UUID.randomUUID().toString(),
         labels,
         FaceCaptureConfirmationPayload(startTime, endTime, EVENT_VERSION, result),
-        FACE_CAPTURE_CONFIRMATION)
+        FACE_CAPTURE_CONFIRMATION
+    )
+
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
 
 
     @Keep

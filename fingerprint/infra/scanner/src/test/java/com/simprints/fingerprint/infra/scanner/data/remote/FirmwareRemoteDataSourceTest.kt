@@ -4,8 +4,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.infra.scanner.data.FirmwareTestData
 import com.simprints.fingerprint.infra.scanner.data.remote.network.FingerprintFileDownloader
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.models.Vero2Configuration
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

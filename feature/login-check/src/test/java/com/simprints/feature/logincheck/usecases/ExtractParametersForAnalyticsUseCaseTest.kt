@@ -45,9 +45,9 @@ internal class ExtractParametersForAnalyticsUseCaseTest {
         useCase(ActionFactory.getFlowRequest())
 
         verify {
-            Simber.i(ActionFactory.MOCK_USER_ID)
+            Simber.i(ActionFactory.MOCK_USER_ID.toString())
             Simber.i(ActionFactory.MOCK_PROJECT_ID)
-            Simber.i(ActionFactory.MOCK_MODULE_ID)
+            Simber.i(ActionFactory.MOCK_MODULE_ID.toString())
             Simber.i("deviceId")
             Simber.i("sessionId")
         }
@@ -59,9 +59,9 @@ internal class ExtractParametersForAnalyticsUseCaseTest {
         useCase(ActionFactory.getFolowUpRequest())
 
         verify(exactly = 0) {
-            Simber.i(ActionFactory.MOCK_USER_ID)
+            Simber.i(ActionFactory.MOCK_USER_ID.toString())
             Simber.i(ActionFactory.MOCK_PROJECT_ID)
-            Simber.i(ActionFactory.MOCK_MODULE_ID)
+            Simber.i(ActionFactory.MOCK_MODULE_ID.toString())
             Simber.i("deviceId")
         }
     }

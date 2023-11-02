@@ -2,7 +2,7 @@ package com.simprints.matcher
 
 import android.os.Parcelable
 import com.simprints.core.domain.common.FlowProvider
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import kotlinx.parcelize.Parcelize

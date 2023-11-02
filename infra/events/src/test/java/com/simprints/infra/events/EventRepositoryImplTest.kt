@@ -3,8 +3,7 @@ package com.simprints.infra.events
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.ConfigManager
-import com.simprints.infra.config.domain.models.GeneralConfiguration.Modality
+import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
@@ -22,6 +21,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import com.simprints.infra.config.store.ConfigRepository
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -59,7 +59,7 @@ internal class EventRepositoryImplTest {
     lateinit var sessionDataCache: SessionDataCache
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @Before
     fun setup() {
@@ -69,25 +69,25 @@ internal class EventRepositoryImplTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
             }
         }
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { language } returns LANGUAGE
         }
 
         eventRepo = EventRepositoryImpl(
-            DEVICE_ID,
-            APP_VERSION_NAME,
-            LIB_VERSION_NAME,
-            authStore,
-            eventLocalDataSource,
-            timeHelper,
-            sessionEventValidatorsFactory,
-            sessionDataCache,
-            configManager,
+            deviceId = DEVICE_ID,
+            appVersionName = APP_VERSION_NAME,
+            libSimprintsVersionName = LIB_VERSION_NAME,
+            authStore = authStore,
+            eventLocalDataSource = eventLocalDataSource,
+            timeHelper = timeHelper,
+            validatorsFactory = sessionEventValidatorsFactory,
+            sessionDataCache = sessionDataCache,
+            configRepository = configRepository,
         )
     }
 
@@ -406,8 +406,10 @@ internal class EventRepositoryImplTest {
     fun `when observeEventCount called with type return events of type`() = runTest {
         coEvery { eventLocalDataSource.observeCount(any(), any()) } returns flowOf(7)
 
-        assertThat(eventRepo.observeEventCount("test", CALLBACK_ENROLMENT)
-            .firstOrNull()).isEqualTo(7)
+        assertThat(
+            eventRepo.observeEventCount("test", CALLBACK_ENROLMENT)
+                .firstOrNull()
+        ).isEqualTo(7)
 
         coVerify(exactly = 0) { eventLocalDataSource.observeCount(any()) }
         coVerify(exactly = 1) { eventLocalDataSource.observeCount(any(), any()) }

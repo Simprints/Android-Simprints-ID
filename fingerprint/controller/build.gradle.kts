@@ -17,9 +17,11 @@ dependencies {
 
     // Simprints
     implementation(project(":infra:events"))
-    implementation(project(":infra:enrolment-records"))
+    implementation(project(":infra:enrolment-records-sync"))
+    implementation(project(":infra:enrolment-records-store"))
     implementation(project(":fingerprint:infra:scanner"))
-    implementation(project(":infra:config"))
+    implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:images"))
     implementation(project(":infra:recent-user-activity"))

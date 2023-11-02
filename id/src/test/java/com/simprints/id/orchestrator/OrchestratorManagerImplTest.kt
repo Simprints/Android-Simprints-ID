@@ -8,6 +8,7 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.capture.FaceCaptureResult
@@ -27,7 +28,7 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.infra.config.domain.models.GeneralConfiguration
+import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -77,10 +78,10 @@ class OrchestratorManagerImplTest {
     private val modalities = listOf(GeneralConfiguration.Modality.FACE)
 
     private val appEnrolRequest = AppEnrolRequest(
-        "some_project_id",
-        "some_user_id",
-        "some_module_id",
-        "{\"key\": \"some_metadata\"}"
+        projectId = "some_project_id",
+        userId = "some_user_id".asTokenizableRaw(),
+        moduleId = "some_module_id".asTokenizableRaw(),
+        metadata = "{\"key\": \"some_metadata\"}"
     )
 
     @Before

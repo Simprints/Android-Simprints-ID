@@ -5,7 +5,7 @@ import androidx.core.os.bundleOf
 import com.simprints.core.domain.common.FlowProvider
 import com.simprints.matcher.MatchContract
 import com.simprints.matcher.MatchParams
-import com.simprints.infra.enrolment.records.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import kotlinx.parcelize.Parcelize
 
 /**

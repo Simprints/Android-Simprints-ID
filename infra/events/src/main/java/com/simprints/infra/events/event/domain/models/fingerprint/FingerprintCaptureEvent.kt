@@ -1,7 +1,9 @@
 package com.simprints.infra.events.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.randomUUID
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
@@ -43,6 +45,10 @@ data class FingerprintCaptureEvent(
         FINGERPRINT_CAPTURE
     )
 
+    override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
+
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+
     @Keep
     data class FingerprintCapturePayload(
         override val createdAt: Long,
@@ -60,7 +66,7 @@ data class FingerprintCaptureEvent(
         data class Fingerprint(
             val finger: IFingerIdentifier,
             val quality: Int,
-            val format:String
+            val format: String
         )
 
         @Keep
