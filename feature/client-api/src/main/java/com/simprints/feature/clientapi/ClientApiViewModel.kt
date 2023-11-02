@@ -73,9 +73,7 @@ class ClientApiViewModel @Inject internal constructor(
             if (createSessionIfRequiredUseCase(action)) {
                 _newSessionCreated.send()
             }
-            val project =
-                runCatching { configManager.getProject(authStore.signedInProjectId) }.getOrNull()
-            intentMapper(action = action, extras = extrasMap, project = project)
+            intentMapper(action = action, extras = extrasMap, project = getProject())
         } catch (validationException: InvalidRequestException) {
             Simber.e(validationException)
             simpleEventReporter.addInvalidIntentEvent(action, extrasMap)
