@@ -10,7 +10,7 @@
     <fragment
         android:id="@+id/enrolLastBiometricFragment"
         android:name="com.simprints.feature.enrollast.screen.EnrolLastBiometricFragment"
-        android:label="FetchSubjectFragment"
+        android:label="EnrolLastBiometricFragment"
         tools:layout="@layout/fragment_enrol_last">
 
         <argument
