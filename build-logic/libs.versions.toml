@@ -60,7 +60,7 @@ fuzzywuzzy_version = "1.4.0"
 rootbeer_version = "0.1.0"
 commons_io_version = "2.15.0"
 kronos_version = "0.0.1-alpha11"
-protobuf_version = "3.24.4"
+protobuf_version = "3.25.0"
 circleImageView_version = "3.1.0"
 timber_version = "5.0.1"
 
