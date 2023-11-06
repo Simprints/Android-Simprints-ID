@@ -15,8 +15,6 @@ data class Step(
     var result: Parcelable? = null,
 ) : Parcelable {
 
-    // TODO Figure out why using @Parcelize is causing ShadowParcel$UnreliableBehaviorError in pipeline tests
-
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readInt(),
