@@ -65,8 +65,6 @@ internal class OrchestratorViewModel @Inject constructor(
 
         cache.actionRequest = action
 
-        // TODO figure out restoring state for active session and follow-up actions
-
         doNextStep()
     }
 
@@ -77,7 +75,6 @@ internal class OrchestratorViewModel @Inject constructor(
             // Shortcut the flow execution if any refusal or error result is found
             addCallbackEvent(errorResponse)
             _appResponse.send(OrchestratorResult(cache.actionRequest, errorResponse))
-            // TODO cleanup?
             return
         }
 
@@ -98,7 +95,6 @@ internal class OrchestratorViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         cache.steps = steps
-        // TODO cleanup?
     }
 
     private fun doNextStep() {
