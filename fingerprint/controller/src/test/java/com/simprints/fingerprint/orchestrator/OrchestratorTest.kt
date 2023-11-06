@@ -2,7 +2,7 @@ package com.simprints.fingerprint.orchestrator
 
 import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.fingerprint.activities.alert.AlertError.BLUETOOTH_NOT_SUPPORTED
+import com.simprints.fingerprint.activities.alert.AlertError.UNEXPECTED_ERROR
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
@@ -137,7 +137,7 @@ class OrchestratorTest {
     private fun Orchestrator.alertResult() {
         handleActivityTaskResult(ResultCode.ALERT) { key ->
             assertEquals(AlertTaskResult.BUNDLE_KEY, key)
-            AlertTaskResult(BLUETOOTH_NOT_SUPPORTED)
+            AlertTaskResult(UNEXPECTED_ERROR)
         }
     }
 

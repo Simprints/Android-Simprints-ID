@@ -25,7 +25,7 @@ import com.simprints.fingerprint.activities.collect.state.CollectFingerprintsSta
 import com.simprints.fingerprint.activities.collect.state.FingerState
 import com.simprints.fingerprint.activities.collect.state.ScanResult
 import com.simprints.fingerprint.activities.collect.tryagainsplash.SplashScreenActivity
-import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
+import com.simprints.fingerprint.connect.screens.ConnectScannerWrapperActivity
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -336,11 +336,11 @@ class CollectFingerprintsActivityTest {
         scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS_IDS).toIntent())
         Intents.init()
 
-        Intents.intending(hasComponent(ConnectScannerActivity::class.java.name))
+        Intents.intending(hasComponent(ConnectScannerWrapperActivity::class.java.name))
             .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null))
 
         launchReconnect.postEvent()
-        Intents.intended(hasComponent(ConnectScannerActivity::class.java.name))
+        Intents.intended(hasComponent(ConnectScannerWrapperActivity::class.java.name))
 
         Intents.release()
     }
