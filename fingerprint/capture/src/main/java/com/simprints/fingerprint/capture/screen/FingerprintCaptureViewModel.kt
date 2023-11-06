@@ -71,7 +71,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
         private set(value) {
             field = value
-            _stateLiveData.value = value
+            _stateLiveData.postValue(value)
         }
     private val _stateLiveData = MutableLiveData<CollectFingerprintsState>()
     val stateLiveData: LiveData<CollectFingerprintsState> = _stateLiveData
@@ -213,10 +213,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    private fun setStartingState(fingerprintsToCapture: List<IFingerIdentifier>) = updateState {
-        CollectFingerprintsState.EMPTY.copy(
+    private fun setStartingState(fingerprintsToCapture: List<IFingerIdentifier>) {
+        val initialState = CollectFingerprintsState.EMPTY.copy(
             fingerStates = getStartState(fingerprintsToCapture)
         )
+        state = initialState
+        _stateLiveData.value = initialState
     }
 
     fun isImageTransferRequired(): Boolean =
