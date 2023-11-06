@@ -13,7 +13,9 @@ import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 interface FingerprintStepProcessor {
 
 
-    suspend fun buildStepToCapture(): Step
+    suspend fun buildStepToCapture(
+        flowType: FlowProvider.FlowType,
+    ): Step
 
     fun buildStepToMatch(
         probeSamples: List<FingerprintCaptureSample>,
@@ -21,8 +23,10 @@ interface FingerprintStepProcessor {
         flowType: FlowProvider.FlowType,
     ): Step
 
-    fun processResult(requestCode: Int,
-                      resultCode: Int,
-                      data: Intent?): Step.Result?
+    fun processResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+    ): Step.Result?
 
 }

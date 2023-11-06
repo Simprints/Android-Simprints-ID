@@ -5,11 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.common.FlowProvider
+import com.simprints.fingerprint.capture.FingerprintCaptureContract
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
-import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
@@ -70,17 +73,16 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForCapturing() = runTest {
-        with(enrolAppRequest) {
-            val step = fingerprintStepProcess.buildStepToCapture()
-            verifyFingerprintIntent<FingerprintCaptureRequest>(step, FingerprintRequestCode.CAPTURE.value)
-        }
+        val step = fingerprintStepProcess.buildStepToCapture(FlowProvider.FlowType.ENROL)
+        verifyFingerprintCaptureIntent<Bundle>(step)
     }
 
     @Test
     fun stepProcessorShouldProcessFingerprintEnrolResult() {
-        fingerprintStepProcess.processResult(FingerprintRequestCode.CAPTURE.value, Activity.RESULT_OK, result)
+        val captureResult = Intent().putExtra(FingerprintCaptureContract.RESULT, FingerprintCaptureResult(emptyList()))
+        val result = fingerprintStepProcess.processResult(FingerprintRequestCode.CAPTURE.value, Activity.RESULT_OK, captureResult)
 
-        verify { fingerprintResponseMock.fromModuleApiToDomain() }
+        assertThat(result).isInstanceOf(FingerprintCaptureResponse::class.java)
     }
 
     @Test

@@ -47,7 +47,7 @@ class ModalityFlowVerify @Inject constructor(
         addModalityConfigurationSteps()
         addCoreFetchGuidStep(appRequest.projectId, appRequest.verifyGuid)
         addCoreConsentStepIfRequired(ConsentType.VERIFY)
-        addModalitiesStepsList()
+        addModalitiesStepsList(FlowProvider.FlowType.VERIFY)
     }
 
     private fun addCoreFetchGuidStep(projectId: String, verifyGuid: String) =

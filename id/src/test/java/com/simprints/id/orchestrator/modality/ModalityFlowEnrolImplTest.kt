@@ -95,7 +95,7 @@ class ModalityFlowEnrolImplTest {
         every { faceStepMock.activityName } returns FACE_ACTIVITY_NAME
         every { consentStepMock.activityName } returns CONSENT_ACTIVITY_NAME
 
-        coEvery { fingerprintStepProcessor.buildStepToCapture() } returns fingerprintStepMock
+        coEvery { fingerprintStepProcessor.buildStepToCapture(any()) } returns fingerprintStepMock
         coEvery { faceStepProcessor.buildCaptureStep() } returns faceStepMock
         every { faceStepProcessor.buildConfigurationStep(any(), any()) } returns faceStepMock
         every { coreStepProcessor.buildStepSetup() } returns setupStepMock
@@ -108,7 +108,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest)
 
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
-        coVerify(exactly = 0) { fingerprintStepProcessor.buildStepToCapture() }
+        coVerify(exactly = 0) { fingerprintStepProcessor.buildStepToCapture(any()) }
         coVerify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
     }
 
@@ -118,7 +118,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest)
 
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
-        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
+        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture(any()) }
         coVerify(exactly = 0) { faceStepProcessor.buildCaptureStep() }
     }
 
@@ -128,7 +128,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest)
 
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
-        coVerify(exactly = 0) { fingerprintStepProcessor.buildStepToCapture() }
+        coVerify(exactly = 0) { fingerprintStepProcessor.buildStepToCapture(any()) }
         coVerify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
     }
 
@@ -138,7 +138,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest)
 
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
-        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
+        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture(any()) }
         coVerify(exactly = 0) { faceStepProcessor.buildCaptureStep() }
     }
 
@@ -148,7 +148,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest)
 
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
-        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
+        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture(any()) }
         coVerify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
         assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(
@@ -168,7 +168,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest)
 
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
-        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
+        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture(any()) }
 
         assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(
             listOf(
@@ -187,7 +187,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest)
 
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
-        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
+        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture(any()) }
         coVerify(exactly = 1) { faceStepProcessor.buildCaptureStep() }
 
         assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(
@@ -206,7 +206,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest)
 
         verify(exactly = 1) { coreStepProcessor.buildStepSetup() }
-        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture() }
+        coVerify(exactly = 1) { fingerprintStepProcessor.buildStepToCapture(any()) }
 
         assertThat(modalityFlowEnrol.steps.map { it.activityName }).isEqualTo(
             listOf(

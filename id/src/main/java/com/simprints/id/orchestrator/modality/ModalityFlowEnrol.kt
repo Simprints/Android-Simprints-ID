@@ -46,7 +46,7 @@ class ModalityFlowEnrol @Inject constructor(
         addSetupStep()
         addModalityConfigurationSteps()
         addCoreConsentStepIfRequired(ConsentType.ENROL)
-        addModalitiesStepsList()
+        addModalitiesStepsList(FlowProvider.FlowType.ENROL)
     }
 
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }

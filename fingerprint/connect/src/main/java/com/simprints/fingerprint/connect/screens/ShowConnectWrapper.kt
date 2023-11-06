@@ -16,7 +16,7 @@ class ShowConnectWrapper : ActivityResultContract<Boolean, Parcelable>() {
     override fun createIntent(context: Context, input: Boolean): Intent =
         Intent(context, ConnectScannerWrapperActivity::class.java).putExtra(
             ConnectScannerWrapperActivity.SCANNER_CONNECT_ARGS_EXTRA,
-            ConnectScannerControllerFragmentArgs(FingerprintConnectParams(isReconnect = input)).toBundle()
+            FingerprintConnectContract.getArgs(input)
         )
 
     override fun parseResult(resultCode: Int, intent: Intent?): Parcelable = intent

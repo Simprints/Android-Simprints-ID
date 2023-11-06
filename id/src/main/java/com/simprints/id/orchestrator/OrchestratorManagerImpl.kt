@@ -17,7 +17,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.AppRequestFollo
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponseType
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.ModalityFlow
@@ -25,6 +24,7 @@ import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import javax.inject.Inject
@@ -74,7 +74,8 @@ class OrchestratorManagerImpl @Inject constructor(
         if (appRequest !is AppRequest.AppRequestFollowUp) {
             val fingerprintCaptureCompleted =
                 !modalities.contains(GeneralConfiguration.Modality.FINGERPRINT) ||
-                    modalitiesFlow.steps.filter { it.payload is FingerprintCaptureRequest }.all { it.getResult() is FingerprintCaptureResponse }
+                    modalitiesFlow.steps.filter { it.requestCode == FingerprintRequestCode.CAPTURE.value }
+                        .all { it.getResult() is FingerprintCaptureResponse }
 
             val faceCaptureCompleted =
                 !modalities.contains(GeneralConfiguration.Modality.FACE) ||
