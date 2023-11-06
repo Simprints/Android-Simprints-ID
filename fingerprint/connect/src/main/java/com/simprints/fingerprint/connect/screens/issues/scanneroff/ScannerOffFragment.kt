@@ -63,7 +63,7 @@ class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
             }
         })
         connectScannerViewModel.showScannerIssueScreen.observe(viewLifecycleOwner, LiveDataEventWithContentObserver {
-            connectScannerViewModel.stopConnectingAndResetState()
+            connectScannerViewModel.resetConnectionState()
         })
     }
 

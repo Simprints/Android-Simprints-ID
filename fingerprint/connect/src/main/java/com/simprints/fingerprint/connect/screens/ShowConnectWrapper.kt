@@ -2,7 +2,6 @@ package com.simprints.fingerprint.connect.screens
 
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.result.contract.ActivityResultContract
 import com.simprints.fingerprint.connect.FingerprintConnectContract
