@@ -161,8 +161,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     binding.fingerprintScanButton.setBackgroundColor(resources.getColor(buttonBackgroundColour(), null))
                 }
 
-                listenForConfirmDialog(state)
-                listenForSplashScreen(state)
+                updateConfirmDialog(state)
+                updateSplashScreen(state)
             }
         }
 
@@ -208,7 +208,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         super.onPause()
     }
 
-    private fun listenForConfirmDialog(state: CollectFingerprintsState) {
+    private fun updateConfirmDialog(state: CollectFingerprintsState) {
         confirmDialog = if (state.isShowingConfirmDialog && confirmDialog == null) {
             val dialogItems = state.fingerStates.map {
                 ConfirmFingerprintsDialog.Item(
@@ -235,7 +235,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         }
     }
 
-    private fun listenForSplashScreen(state: CollectFingerprintsState) {
+    private fun updateSplashScreen(state: CollectFingerprintsState) {
         if (state.isShowingSplashScreen && lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
             if (!hasSplashScreenBeenTriggered) {
                 FullScreenSplashDialog().show(childFragmentManager, "splash")
