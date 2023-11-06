@@ -1,0 +1,103 @@
+# This action is used to run the PR checks workflow
+name: PR Checks
+on: # this checks should be triggered on pull request and before deployment
+    pull_request:
+        branches:
+            - '*'
+    workflow_call:
+    workflow_dispatch:
+
+jobs:
+    id-unit-tests:
+        name: Id Unit Tests
+        uses: ./.github/workflows/run-unit-tests.yml
+        with:
+            modules: id
+            reportsId: id
+    clientapi-unit-tests:
+        name: Client API Unit Tests
+        uses: ./.github/workflows/run-unit-tests.yml
+        with:
+            modules: clientapi
+            reportsId: clientapi
+
+    infra-unit-tests-1:
+        name: Infra Unit Tests 1
+        uses: ./.github/workflows/run-unit-tests.yml
+        with:
+            modules: |
+                core
+                infra:ui-base
+                infra:network
+                infra:logging
+                infra:security
+                infra:license
+                infra:images
+                infra:images
+                infra:event-sync
+            reportsId: infra1
+
+    infra-unit-tests-2:
+        name: Infra Unit Tests 2
+        uses: ./.github/workflows/run-unit-tests.yml
+        with:
+            modules: |
+                infra:config
+                infra:events
+                infra:enrolment-records
+                infra:auth-store
+                infra:auth-logic
+                infra:project-security-store
+                infra:realm
+                infra:recent-user-activity
+                infra:orchestrator-data
+            reportsId: infra2
+
+    feature-unit-tests:
+        name: Feature Unit Tests
+        uses: ./.github/workflows/run-unit-tests.yml
+        with:
+            modules: |
+                feature:orchestrator
+                feature:client-api
+                feature:login-check
+                feature:alert
+                feature:exit-form
+                feature:consent
+                feature:login
+                feature:fetch-subject
+                feature:select-subject
+                feature:setup
+                feature:enrol-last-biometric
+                feature:matcher
+            reportsId: feature
+
+    feature-dashboard-unit-tests:
+        name: Feature Dashboard Unit Tests
+        us: ./.github/workflows/run-unit-tests.yml
+        with:
+            modules: feature:dashboard
+            reportsId: dashboard
+
+    face-unit-tests:
+        name: Face Unit Tests
+        uses: ./.github/workflows/run-unit-tests.yml
+        with:
+            modules: |
+                face:configuration
+                face:capture
+                face:infra:face-bio-sdk
+                face:infra:roc-wrapper
+            reportsId: face
+
+    fingerprint-unit-tests:
+        name: Fingerprint Unit Tests
+        uses: ./.github/workflows/run-unit-tests.yml
+        with:
+            modules: |
+                fingerprint:controller
+                fingerprint:infra:bio-sdk
+                fingerprint:infra:simprints-bio-sdk
+                fingerprint:infra:scanner
+                fingerprint:infra:simafis-wrapper
+            reportsId: fingerprint
