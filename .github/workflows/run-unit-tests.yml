@@ -31,7 +31,7 @@ jobs:
             -   name: Set up Gradle
                 uses: gradle/gradle-build-action@v2
 
-            -   name: setup
+            -   name: setup local.properties
                 run: |
                     source ci/pipeline/setup
                     echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties

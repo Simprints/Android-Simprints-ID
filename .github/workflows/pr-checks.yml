@@ -37,7 +37,6 @@ jobs:
                 infra:security
                 infra:license
                 infra:images
-                infra:images
                 infra:event-sync
             reportsId: infra1
 
@@ -47,9 +46,11 @@ jobs:
         secrets: inherit
         with:
             modules: |
-                infra:config
+                infra:config-store
+                infra:config-sync
                 infra:events
-                infra:enrolment-records
+                infra:enrolment-records-store
+                infra:enrolment-records-sync
                 infra:auth-store
                 infra:auth-logic
                 infra:project-security-store
@@ -104,7 +105,8 @@ jobs:
         secrets: inherit
         with:
             modules: |
-                fingerprint:controller
+                fingerprint:connect
+                fingerprint:capture
                 fingerprint:infra:bio-sdk
                 fingerprint:infra:simprints-bio-sdk
                 fingerprint:infra:scanner
