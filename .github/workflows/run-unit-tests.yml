@@ -44,8 +44,8 @@ jobs:
                     echo "modules_array=${modules_array[@]}">> $GITHUB_OUTPUT
             -   name: Run tests
                 env:
-                    GH_NAME: ${{ vars.GH_NAME }}
-                    GH_TOKEN: ${{ vars.GH_TOKEN }}
+                    GH_PACKAGE_NAME: ${{ secrets.GH_PACKAGE_NAME }}
+                    GH_PACKAGE_TOKEN: ${{ secrets.GH_TOKEN }}
                 run: |
                     
                     # Get the modules array from the previous step
