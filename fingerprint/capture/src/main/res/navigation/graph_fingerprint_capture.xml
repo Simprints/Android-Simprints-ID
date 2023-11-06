@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/graph_fingerprint_capture"
+    app:startDestination="@id/fingerprintCaptureFragment">
+
+    <fragment
+        android:id="@+id/fingerprintCaptureFragment"
+        android:name="com.simprints.fingerprint.capture.screen.FingerprintCaptureFragment"
+        android:label="FingerprintCapture">
+
+        <argument
+            android:name="params"
+            app:argType="com.simprints.fingerprint.capture.FingerprintCaptureParams" />
+
+        <action
+            android:id="@+id/action_fingerprintCaptureFragment_to_graphConnectScanner"
+            app:destination="@id/graph_connect_scanner.xml" />
+        <action
+            android:id="@+id/action_fingerprintCaptureFragment_to_graphAlert"
+            app:destination="@id/graph_alert" />
+        <action
+            android:id="@+id/action_fingerprintCaptureFragment_to_graphExitForm"
+            app:destination="@id/graph_exit_form" />
+    </fragment>
+
+    <include app:graph="@navigation/graph_exit_form" />
+
+    <include app:graph="@navigation/graph_alert" />
+
+    <include app:graph="@navigation/graph_connect_scanner" />
+
+</navigation>

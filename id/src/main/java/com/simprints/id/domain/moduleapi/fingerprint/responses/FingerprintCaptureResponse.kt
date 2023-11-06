@@ -7,8 +7,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class FingerprintCaptureResponse(
-    override val type: FingerprintResponseType = FingerprintResponseType.ENROL,
-    val captureResult: List<FingerprintCaptureResult>
+    val captureResult: List<FingerprintCaptureResult>,
+    override val type: FingerprintResponseType = FingerprintResponseType.ENROL
 ) : FingerprintResponse
 
 fun IFingerprintCaptureResponse.fromModuleApiToDomain() = FingerprintCaptureResponse(

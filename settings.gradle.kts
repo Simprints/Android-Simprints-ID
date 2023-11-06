@@ -53,7 +53,7 @@ include(":id")
 //Fingerprint modality modules
 include(
     ":fingerprint:connect",
-    ":fingerprint:controller",
+    ":fingerprint:capture",
     ":fingerprint:infra:scanner",
     ":fingerprint:infra:scannermock",
     ":fingerprint:infra:base-bio-sdk",

@@ -10,6 +10,8 @@ import com.simprints.feature.enrollast.EnrolLastBiometricWrapperActivity
 import com.simprints.feature.fetchsubject.FetchSubjectWrapperActivity
 import com.simprints.feature.selectsubject.SelectSubjectWrapperActivity
 import com.simprints.feature.setup.SetupWrapperActivity
+import com.simprints.fingerprint.capture.FingerprintCaptureContract
+import com.simprints.fingerprint.capture.screen.FingerprintCaptureWrapperActivity
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode
@@ -23,11 +25,11 @@ open class BaseStepProcessorTest {
         SetupWrapperActivity.SETUP_ARGS_EXTRA,
     )
 
-    protected inline fun <reified T : Parcelable> verifyFingerprintIntent(step: Step, expectedRequestCode: Int) = verifyStep<T>(
+    protected inline fun <reified T : Parcelable> verifyFingerprintCaptureIntent(step: Step) = verifyStep<T>(
         step,
-        expectedRequestCode,
-        "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity",
-        "FingerprintRequestBundleKey",
+        FingerprintRequestCode.CAPTURE.value,
+        "com.simprints.fingerprint.capture.screen.FingerprintCaptureWrapperActivity",
+        FingerprintCaptureWrapperActivity.FINGERPRINT_CAPTURE_ARGS_EXTRA,
     )
 
     protected inline fun <reified T : Parcelable> verifyFingerprintMatcherIntent(step: Step) = verifyStep<T>(

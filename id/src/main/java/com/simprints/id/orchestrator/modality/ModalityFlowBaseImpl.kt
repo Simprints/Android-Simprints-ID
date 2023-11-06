@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
+import com.simprints.core.domain.common.FlowProvider
 import com.simprints.feature.consent.ConsentType
 import com.simprints.id.domain.moduleapi.face.responses.FaceErrorResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceExitFormResponse
@@ -51,12 +52,12 @@ abstract class ModalityFlowBaseImpl(
         steps.addAll(buildModalityConfigurationSteps(projectConfiguration.general.modalities))
     }
 
-    protected suspend fun addModalitiesStepsList() {
+    protected suspend fun addModalitiesStepsList(flowType: FlowProvider.FlowType) {
         val projectConfiguration = configManager.getProjectConfiguration()
         steps.addAll(
             projectConfiguration.general.modalities.map {
                 when (it) {
-                    Modality.FINGERPRINT -> fingerprintStepProcessor.buildStepToCapture()
+                    Modality.FINGERPRINT -> fingerprintStepProcessor.buildStepToCapture(flowType)
                     Modality.FACE -> faceStepProcessor.buildCaptureStep()
                 }
             }
