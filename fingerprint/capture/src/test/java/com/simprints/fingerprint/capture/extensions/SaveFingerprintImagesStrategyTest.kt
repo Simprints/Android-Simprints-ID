@@ -6,7 +6,7 @@ import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStr
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy.ONLY_GOOD_SCAN
 import org.junit.Test
 
-internal class SaveFingerprintImagesStrategyKtTest {
+internal class SaveFingerprintImagesStrategyTest {
 
     @Test
     fun deduceFileExtension() {
