@@ -6,7 +6,6 @@ import android.os.Parcelable
 import androidx.navigation.findNavController
 import com.simprints.core.tools.activity.BaseActivity
 import com.simprints.fingerprint.connect.FingerprintConnectContract
-import com.simprints.fingerprint.connect.FingerprintConnectParams
 import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.ActivityConnectScannerWrapperBinding
 import com.simprints.infra.uibase.navigation.handleResult

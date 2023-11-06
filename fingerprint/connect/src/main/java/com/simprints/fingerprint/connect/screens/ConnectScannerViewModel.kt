@@ -95,7 +95,7 @@ internal class ConnectScannerViewModel @Inject constructor(
 
     private suspend fun startSetup() {
         _isConnecting.postValue(true)
-        stopConnectingAndResetState()
+        resetConnectionState()
 
         try {
             disconnectVero()
@@ -113,7 +113,7 @@ internal class ConnectScannerViewModel @Inject constructor(
         }
     }
 
-    fun stopConnectingAndResetState() {
+    fun resetConnectionState() {
         _currentStep.postValue(Step.Preparation)
         backButtonBehaviour.postValue(BackButtonBehaviour.EXIT_FORM)
     }

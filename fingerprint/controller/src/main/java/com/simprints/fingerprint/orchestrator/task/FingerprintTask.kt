@@ -1,14 +1,10 @@
 package com.simprints.fingerprint.orchestrator.task
 
 import android.os.Parcelable
-import androidx.core.os.bundleOf
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.connect.FingerprintConnectContract
-import com.simprints.fingerprint.connect.FingerprintConnectParams
-import com.simprints.fingerprint.connect.screens.ConnectScannerWrapperActivity
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 
 /**
