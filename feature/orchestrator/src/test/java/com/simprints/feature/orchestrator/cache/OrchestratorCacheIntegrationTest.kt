@@ -1,0 +1,129 @@
+package com.simprints.feature.orchestrator.cache
+
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.os.Parcelable
+import androidx.core.os.bundleOf
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.utils.EncodingUtilsImpl
+import com.simprints.feature.orchestrator.steps.Step
+import com.simprints.feature.orchestrator.steps.StepId
+import com.simprints.feature.orchestrator.steps.StepStatus
+import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.infra.orchestration.data.ActionRequestIdentifier
+import com.simprints.infra.security.SecurityManager
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.justRun
+import io.mockk.slot
+import kotlinx.parcelize.Parcelize
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
+@RunWith(AndroidJUnit4::class)
+class OrchestratorCacheIntegrationTest {
+
+    @MockK
+    private lateinit var securityManager: SecurityManager
+
+    @MockK
+    private lateinit var prefs: SharedPreferences
+
+    private var encodingUtils = EncodingUtilsImpl
+    private var jsonHelper = JsonHelper
+    private var parcelableConverter = ParcelableConverter()
+
+    private lateinit var cache: OrchestratorCache
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { securityManager.buildEncryptedSharedPreferences(any()) } returns prefs
+
+        // Mock prefs set and get behaviour
+        val stringSlot = slot<String>()
+        justRun { prefs.edit().putString(any(), capture(stringSlot)).commit() }
+        every { prefs.getString(any(), any()) } answers { stringSlot.captured }
+
+        cache = OrchestratorCache(
+            securityManager,
+            encodingUtils,
+            jsonHelper,
+            parcelableConverter
+        )
+    }
+
+    @Test
+    fun `Stores and restores action request`() {
+        val expected = ActionRequest.EnrolActionRequest(
+            actionIdentifier = ActionRequestIdentifier("name", "package"),
+            projectId = "projectId",
+            userId = TokenizableString.Raw("userId"),
+            moduleId = TokenizableString.Raw("moduleId"),
+            metadata = "meta",
+            unknownExtras = listOf("key" to "value"),
+        )
+
+        cache.actionRequest = expected
+        val actual = cache.actionRequest
+
+        assertThat(actual).isEqualTo(expected)
+    }
+
+
+    @Test
+    fun `Stores and restores steps`() {
+        val expected = listOf(
+            Step(
+                id = StepId.FINGERPRINT_CAPTURE,
+                navigationActionId = 3,
+                destinationId = 4,
+                payload = bundleOf("key" to "value"),
+                status = StepStatus.COMPLETED,
+                result = ResultStub(
+                    stringValue = "string",
+                    intValue = 1,
+                    subResult = ResultStub("subString", 2, null)
+                ),
+            ),
+            Step(
+                id = StepId.FACE_CAPTURE,
+                navigationActionId = 5,
+                destinationId = 6,
+                payload = Bundle.EMPTY,
+                status = StepStatus.COMPLETED,
+                result = null,
+            )
+        )
+
+        cache.steps = expected
+        val actual = cache.steps
+
+        compareStubs(expected[0], actual[0])
+        compareStubs(expected[1], actual[1])
+    }
+
+    private fun compareStubs(expected: Step, actual: Step) {
+        assertThat(actual.id).isEqualTo(expected.id)
+        assertThat(actual.navigationActionId).isEqualTo(expected.navigationActionId)
+        assertThat(actual.destinationId).isEqualTo(expected.destinationId)
+        assertThat(actual.status).isEqualTo(expected.status)
+        assertThat(actual.result).isEqualTo(expected.result)
+
+        // Direct comparison does not work with bundles due to implementation details
+        assertThat(actual.payload.keySet()).isEqualTo(expected.payload.keySet())
+    }
+
+    @Parcelize
+    data class ResultStub(
+        val stringValue: String,
+        val intValue: Int,
+        val subResult: ResultStub?,
+    ) : Parcelable
+}
