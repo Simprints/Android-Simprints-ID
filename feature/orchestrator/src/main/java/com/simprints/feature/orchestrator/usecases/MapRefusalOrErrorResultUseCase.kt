@@ -24,7 +24,7 @@ class MapRefusalOrErrorResultUseCase @Inject constructor() {
         }
 
         is SetupResult -> result.takeUnless { it.permissionGranted }
-            ?.let { AppErrorResponse(IAppErrorReason.LOGIN_NOT_COMPLETE) }
+            ?.let { AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR) }
 
         is FingerprintConnectResult -> result.takeUnless { it.isSuccess }
             ?.let { AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR) }

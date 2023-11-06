@@ -35,7 +35,7 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
 
 
     @Test
-    fun `maps FaceMatchResponse correctly`() {
+    fun `maps FaceMatchResult correctly`() {
         val result = useCase(listOf(
             FaceMatchResult(emptyList())
         ))
@@ -68,7 +68,7 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
     }
 
     @Test
-    fun `maps FingerprintMatchResponse correctly`() {
+    fun `maps FingerprintMatchResult correctly`() {
         val result = useCase(listOf(
             FingerprintMatchResult(emptyList())
         ))
