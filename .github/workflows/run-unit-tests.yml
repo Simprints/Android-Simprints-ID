@@ -45,7 +45,7 @@ jobs:
             -   name: Run tests
                 env:
                     GH_PACKAGE_NAME: ${{ secrets.GH_PACKAGE_NAME }}
-                    GH_PACKAGE_TOKEN: ${{ secrets.GH_TOKEN }}
+                    GH_PACKAGE_TOKEN: ${{ secrets.GH_PACKAGE_TOKEN }}
                 run: |
                     
                     # Get the modules array from the previous step
