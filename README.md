@@ -82,8 +82,8 @@ Ensure the Gradle Offline Mode is disabled:
 Generate a new Github token at <https://github.com/settings/tokens/new>, which generates a "Classic" token. The only scope needed is `read:packages`. Then add it to the `local.properties` file:
 
 ```properties
-GH_PACKAGE_NAME=<your-github-username>
-GH_PACKAGE_TOKEN=<the-token-you-just-created>
+GITHUB_USERNAME=<your-github-username>
+GITHUB_TOKEN=<the-token-you-just-created>
 ```
 
 ## Full CI Workflow

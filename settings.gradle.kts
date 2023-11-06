@@ -37,8 +37,8 @@ dependencyResolutionManagement {
             url = uri("https://maven.pkg.github.com/simprints/lib-android-simmatcher")
             credentials {
                 username =
-                    properties.getProperty("GH_PACKAGE_NAME", System.getenv("GH_PACKAGE_NAME"))
-                password = properties.getProperty("GH_PACKAGE_TOKEN", System.getenv("GH_PACKAGE_TOKEN"))
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
             }
         }
 

@@ -32,7 +32,10 @@ jobs:
                 uses: gradle/gradle-build-action@v2
 
             -   name: setup
-                run: source ci/pipeline/setup
+                run: |
+                    source ci/pipeline/setup
+                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
+                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
 
             -   name: Create modules array
                 id: create-modules-array
@@ -43,11 +46,7 @@ jobs:
                     # output the array in the step output so that it can be used in the next step
                     echo "modules_array=${modules_array[@]}">> $GITHUB_OUTPUT
             -   name: Run tests
-                env:
-                    GH_PACKAGE_NAME: ${{ secrets.GH_PACKAGE_NAME }}
-                    GH_PACKAGE_TOKEN: ${{ secrets.GH_PACKAGE_TOKEN }}
-                run: |
-                    
+                run: |                    
                     # Get the modules array from the previous step
                     modules_array=("${{ steps.create-modules-array.outputs.modules_array}}")
                     modules_array=(${modules_array// / })
