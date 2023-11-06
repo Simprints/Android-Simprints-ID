@@ -8,6 +8,7 @@ import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.setup.SetupResult
+import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
 import org.junit.Before
@@ -29,6 +30,7 @@ class MapRefusalOrErrorResultUseCaseTest {
             FetchSubjectResult(found = false) to IAppErrorResponse::class.java,
             SetupResult(permissionGranted = false) to IAppErrorResponse::class.java,
             FaceConfigurationResult(isSuccess = false) to IAppErrorResponse::class.java,
+            FingerprintConnectResult(isSuccess = false) to IAppErrorResponse::class.java,
         ).forEach { (result, responseClass) -> assertThat(useCase(result)).isInstanceOf(responseClass) }
     }
 

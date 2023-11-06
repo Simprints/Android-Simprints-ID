@@ -1,9 +1,10 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.FingerprintMatchResult
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -43,7 +44,25 @@ internal class IsNewEnrolmentUseCaseTest {
     }
 
     @Test
-    fun `Results are new enrolment if match results are of lower then medium confidence`() {
+    fun `Results are new enrolment if fingerprint match results are of lower then medium confidence`() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        assertThat(useCase(projectConfiguration, listOf(
+            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore))),
+        ))).isTrue()
+    }
+
+    @Test
+    fun `Results are not new enrolment if fingerprint match results are of higher then medium confidence`() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        assertThat(useCase(projectConfiguration, listOf(
+            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", higherThanMediumConfidenceScore))),
+        ))).isFalse()
+    }
+
+    @Test
+    fun `Results are new enrolment if face match results are of lower then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
@@ -52,7 +71,7 @@ internal class IsNewEnrolmentUseCaseTest {
     }
 
     @Test
-    fun `Results are not new enrolment if match results are of higher then medium confidence`() {
+    fun `Results are not new enrolment if face match results are of higher then medium confidence`() {
         every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
 
         assertThat(useCase(projectConfiguration, listOf(
@@ -60,7 +79,35 @@ internal class IsNewEnrolmentUseCaseTest {
         ))).isFalse()
     }
 
-    // TODO add same for fingerprint results and both results
+    @Test
+    fun `Results are new enrolment if all match results are of lower then medium confidence`() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        assertThat(useCase(projectConfiguration, listOf(
+            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore))),
+            FaceMatchResult(listOf(FaceMatchResult.Item("", lowerThanMediumConfidenceScore))),
+        ))).isTrue()
+    }
+
+    @Test
+    fun `Results are not new enrolment if one (fingerprint) match results are of higher then medium confidence`() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        assertThat(useCase(projectConfiguration, listOf(
+            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", lowerThanMediumConfidenceScore))),
+            FaceMatchResult(listOf(FaceMatchResult.Item("", higherThanMediumConfidenceScore))),
+        ))).isFalse()
+    }
+
+    @Test
+    fun `Results are not new enrolment if one (face) match results are of higher then medium confidence`() {
+        every { projectConfiguration.general.duplicateBiometricEnrolmentCheck } returns true
+
+        assertThat(useCase(projectConfiguration, listOf(
+            FingerprintMatchResult(listOf(FingerprintMatchResult.Item("", higherThanMediumConfidenceScore))),
+            FaceMatchResult(listOf(FaceMatchResult.Item("", lowerThanMediumConfidenceScore))),
+        ))).isFalse()
+    }
 
     companion object {
         private const val mediumConfidenceScore = 30

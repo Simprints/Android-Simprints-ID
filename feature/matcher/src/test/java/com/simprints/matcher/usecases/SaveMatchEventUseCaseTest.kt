@@ -2,12 +2,15 @@ package com.simprints.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowProvider
+import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -29,6 +32,10 @@ class SaveMatchEventUseCaseTest {
     @MockK
     private lateinit var eventRepository: EventRepository
 
+    @MockK
+    private lateinit var configManager: ConfigManager
+
+
     private lateinit var useCase: SaveMatchEventUseCase
 
     @Before
@@ -37,20 +44,60 @@ class SaveMatchEventUseCaseTest {
 
         coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
 
+        coEvery {
+            configManager.getProjectConfiguration().fingerprint?.comparisonStrategyForVerification
+        } returns FingerComparisonStrategy.SAME_FINGER
+
         useCase = SaveMatchEventUseCase(
             eventRepository,
-            CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
+            configManager,
+            CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
 
     @Test
-    fun `Correctly saves one to one match event`() = runTest {
+    fun `Correctly saves one to one face match event`() = runTest {
         useCase.invoke(
             1L,
             2L,
             MatchParams(
                 flowType = FlowProvider.FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
+                probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
+            ),
+            2,
+            "faceMatcherName",
+            listOf(
+                FaceMatchResult.Item("guid1", 0.5f),
+                FaceMatchResult.Item("guid2", 0.1f)
+            ),
+        )
+
+        // Then
+        coVerify {
+            eventRepository.addOrUpdateEvent(withArg<OneToOneMatchEvent> {
+                assertThat(it).isInstanceOf(OneToOneMatchEvent::class.java)
+                assertThat(it.payload.createdAt).isEqualTo(1L)
+                assertThat(it.payload.endedAt).isEqualTo(2L)
+                assertThat(it.payload.candidateId).isEqualTo("subjectId")
+                assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
+                assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
+                assertThat(it.payload.result?.score).isEqualTo(0.5f)
+            })
+        }
+    }
+
+    @Test
+    fun `Correctly saves one to one fingerprint match event`() = runTest {
+        useCase.invoke(
+            1L,
+            2L,
+            MatchParams(
+                flowType = FlowProvider.FlowType.VERIFY,
+                queryForCandidates = SubjectQuery(subjectId = "subjectId"),
+                probeFingerprintSamples = listOf(
+                    MatchParams.FingerprintSample(IFingerIdentifier.RIGHT_5TH_FINGER, "format", byteArrayOf(1, 2, 3))
+                ),
             ),
             2,
             "faceMatcherName",

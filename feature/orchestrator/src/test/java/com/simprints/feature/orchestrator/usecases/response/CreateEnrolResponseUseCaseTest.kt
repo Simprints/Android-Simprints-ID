@@ -7,6 +7,8 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
 import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.orchestration.data.ActionRequest
 import io.mockk.MockKAnnotations
 import io.mockk.coJustRun
@@ -20,7 +22,7 @@ import org.junit.Test
 class CreateEnrolResponseUseCaseTest {
 
     @MockK
-    lateinit var buildSubject: BuildEnrolledSubjectUseCase
+    lateinit var subjectFactory: SubjectFactory
 
     @MockK
     lateinit var enrolSubject: EnrolSubjectUseCase
@@ -39,27 +41,27 @@ class CreateEnrolResponseUseCaseTest {
 
         coJustRun { enrolSubject.invoke(any()) }
 
-        useCase = CreateEnrolResponseUseCase(buildSubject, enrolSubject)
+        useCase = CreateEnrolResponseUseCase(subjectFactory, enrolSubject)
     }
 
     @Test
     fun `Converts correct results to response`() = runTest {
         every {
-            buildSubject.invoke(any(), any(), any(), any())
+            subjectFactory.buildSubjectFromCaptureResults(any(), any(), any(), any(), any())
         } returns mockk { every { subjectId } returns "guid" }
 
 
         assertThat(useCase(action, listOf(
+            FingerprintCaptureResult(emptyList()),
             FaceCaptureResult(emptyList()),
             Bundle(),
         ))).isInstanceOf(AppEnrolResponse::class.java)
     }
 
-
     @Test
     fun `Returns error if no valid response`() = runTest {
         every {
-            buildSubject.invoke(any(), any(), any(), null)
+            subjectFactory.buildSubjectFromCaptureResults(any(), any(), any(), null, null)
         } throws MissingCaptureException()
 
         assertThat(useCase(action, emptyList())).isInstanceOf(AppErrorResponse::class.java)

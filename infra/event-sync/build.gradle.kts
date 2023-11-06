@@ -35,6 +35,7 @@ android {
 
 dependencies {
     implementation(project(":face:capture"))
+    implementation(project(":fingerprint:capture"))
     implementation(project(":infra:events"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))

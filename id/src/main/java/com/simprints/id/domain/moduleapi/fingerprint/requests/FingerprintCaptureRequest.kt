@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.requests
 
-import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
 import kotlinx.parcelize.Parcelize

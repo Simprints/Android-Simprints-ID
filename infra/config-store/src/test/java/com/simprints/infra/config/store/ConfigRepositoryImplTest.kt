@@ -1,7 +1,6 @@
-package com.simprints.infra.config.store.domain
+package com.simprints.infra.config.store
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.ConfigRepositoryImpl
 import com.simprints.infra.config.store.ConfigRepositoryImpl.Companion.PRIVACY_NOTICE_FILE
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
