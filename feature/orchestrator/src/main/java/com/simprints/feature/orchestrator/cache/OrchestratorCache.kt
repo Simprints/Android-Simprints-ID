@@ -40,7 +40,10 @@ internal class OrchestratorCache @Inject constructor(
 
     var steps: List<Step>
         set(value) {
-            val encodedSteps = value.map { parcelableConverter.marshall(StepWrapper(it)) }
+            val encodedSteps = value.map {
+                val stepBytes = parcelableConverter.marshall(StepWrapper(it))
+                encodingUtils.byteArrayToBase64(stepBytes)
+            }
             prefs.edit(commit = true) {
                 putString(KEY_STEPS, jsonHelper.toJson(encodedSteps))
             }
@@ -48,7 +51,7 @@ internal class OrchestratorCache @Inject constructor(
         get() = prefs.getString(KEY_STEPS, null)
             ?.let { jsonHelper.fromJson<List<String>>(it) }
             ?.map {
-                val stepByteArray = it.toByteArray(charsetsForStepToByteArray)
+                val stepByteArray = encodingUtils.base64ToBytes(it)
                 parcelableConverter.unmarshall(stepByteArray, StepWrapper.CREATOR).step
             }
             ?: emptyList()
@@ -64,8 +67,6 @@ internal class OrchestratorCache @Inject constructor(
 
         private const val KEY_REQUEST = "actionRequest"
         private const val KEY_STEPS = "steps"
-
-        private val charsetsForStepToByteArray = Charsets.ISO_8859_1
     }
 
     @Parcelize
