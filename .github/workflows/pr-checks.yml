@@ -75,7 +75,7 @@ jobs:
 
     feature-dashboard-unit-tests:
         name: Feature Dashboard Unit Tests
-        us: ./.github/workflows/run-unit-tests.yml
+        uses: ./.github/workflows/run-unit-tests.yml
         with:
             modules: feature:dashboard
             reportsId: dashboard
