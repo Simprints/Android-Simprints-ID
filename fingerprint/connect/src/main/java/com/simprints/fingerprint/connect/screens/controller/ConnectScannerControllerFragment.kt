@@ -7,6 +7,7 @@ import android.view.View
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -50,6 +51,8 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     private val viewModel: ConnectScannerViewModel by activityViewModels()
 
     private val alertHelper = AlertActivityHelper()
+
+    private var knownScannedDialog: AlertDialog? = null
 
     @RequiresApi(Build.VERSION_CODES.S)
     private val bluetoothPermissions = arrayOf(
@@ -105,19 +108,7 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                     ScannerOffFragmentArgs(screen.currentScannerId).toBundle()
                 )
 
-                is ConnectScannerIssueScreen.ScannerError -> screen.currentScannerId?.let {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(getString(IDR.string.scanner_id_confirmation_message, it))
-                        .setPositiveButton(IDR.string.scanner_confirmation_yes) { _, _ ->
-                            viewModel.handleScannerDisconnectedYesClick()
-                        }
-                        .setNegativeButton(IDR.string.scanner_confirmation_no) { _, _ ->
-                            viewModel.handleScannerDisconnectedNoClick()
-                        }
-                        .setCancelable(false)
-                        .create()
-                        .show()
-                }
+                is ConnectScannerIssueScreen.ScannerError -> screen.currentScannerId?.let { showKnownScannerDialog(it) }
 
                 is ConnectScannerIssueScreen.Ota -> internalNavController()?.navigate(
                     R.id.otaFragment,
@@ -148,13 +139,32 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         } else {
             alertHelper.handleResume { shouldRequestPermissions = true }
         }
-
     }
 
+    private fun showKnownScannerDialog(scannerId: String) {
+        if (knownScannedDialog == null) {
+            knownScannedDialog = MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(IDR.string.scanner_id_confirmation_message, scannerId))
+                .setPositiveButton(IDR.string.scanner_confirmation_yes) { _, _ ->
+                    viewModel.handleScannerDisconnectedYesClick()
+                }
+                .setNegativeButton(IDR.string.scanner_confirmation_no) { _, _ ->
+                    viewModel.handleScannerDisconnectedNoClick()
+                }
+                .setCancelable(false)
+                .create()
+        }
+        knownScannedDialog?.takeUnless { it.isShowing }?.show()
+    }
 
     override fun onResume() {
         super.onResume()
         alertHelper.handleResume { shouldRequestPermissions = true }
+    }
+
+    override fun onPause() {
+        knownScannedDialog?.dismiss()
+        super.onPause()
     }
 
     private fun checkBluetoothPermissions() {
