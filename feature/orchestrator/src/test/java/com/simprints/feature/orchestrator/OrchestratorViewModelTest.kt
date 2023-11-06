@@ -208,7 +208,7 @@ internal class OrchestratorViewModelTest {
     }
 
     @Test
-    fun `Updates fingerprint matcher step payload when receiving face capture`() = runTest {
+    fun `Updates fingerprint matcher step payload when receiving fingerprint capture`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(StepId.FINGERPRINT_CAPTURE),
             createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(FlowProvider.FlowType.VERIFY, SubjectQuery())),

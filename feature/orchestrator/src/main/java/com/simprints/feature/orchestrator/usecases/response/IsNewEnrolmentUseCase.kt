@@ -25,16 +25,16 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
         val fingerprintResult = results.lastOrNull { it is FingerprintMatchResult } as? FingerprintMatchResult
 
         val isNewFaceEnrolment = isNewEnrolmentFaceResult(projectConfiguration, faceResult)
-        val isNewFingerprintEnrolment = isValidEnrolmentFaceResult(projectConfiguration, fingerprintResult)
+        val isNewFingerprintEnrolment = isValidEnrolmentFingerprintResult(projectConfiguration, fingerprintResult)
 
         return isNewFaceEnrolment && isNewFingerprintEnrolment
     }
 
     // Missing results and configuration are ignored as "valid" to allow creating new records.
-    private fun isValidEnrolmentFaceResult(
+    private fun isValidEnrolmentFingerprintResult(
         projectConfiguration: ProjectConfiguration,
         fingerprintResult: FingerprintMatchResult?
-    ): Boolean = projectConfiguration.face
+    ): Boolean = projectConfiguration.fingerprint
         ?.decisionPolicy
         ?.medium?.toFloat()
         ?.let { threshold -> fingerprintResult?.results?.all { it.confidence < threshold } }
