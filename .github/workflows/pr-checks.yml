@@ -11,6 +11,7 @@ jobs:
     id-unit-tests:
         name: Id Unit Tests
         uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
         with:
             modules: id
             reportsId: id
@@ -18,6 +19,7 @@ jobs:
     clientapi-unit-tests:
         name: Client API Unit Tests
         uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
         with:
             modules: clientapi
             reportsId: clientapi
@@ -25,6 +27,7 @@ jobs:
     infra-unit-tests-1:
         name: Infra Unit Tests 1
         uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
         with:
             modules: |
                 core
@@ -41,6 +44,7 @@ jobs:
     infra-unit-tests-2:
         name: Infra Unit Tests 2
         uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
         with:
             modules: |
                 infra:config
@@ -57,6 +61,7 @@ jobs:
     feature-unit-tests:
         name: Feature Unit Tests
         uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
         with:
             modules: |
                 feature:orchestrator
@@ -76,6 +81,7 @@ jobs:
     feature-dashboard-unit-tests:
         name: Feature Dashboard Unit Tests
         uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
         with:
             modules: feature:dashboard
             reportsId: dashboard
@@ -83,6 +89,7 @@ jobs:
     face-unit-tests:
         name: Face Unit Tests
         uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
         with:
             modules: |
                 face:configuration
@@ -94,6 +101,7 @@ jobs:
     fingerprint-unit-tests:
         name: Fingerprint Unit Tests
         uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
         with:
             modules: |
                 fingerprint:controller
