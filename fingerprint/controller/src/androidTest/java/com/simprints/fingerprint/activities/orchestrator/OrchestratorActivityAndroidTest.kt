@@ -64,9 +64,8 @@ class OrchestratorActivityAndroidTest {
     @Test
     fun orchestratorActivityCallsNextActivityAndSchedulesFirmwareUpdate_returnsWithResult_handlesActivityResult() {
         every { orchestratorMock.isFinished() } returns false
-        every { orchestratorMock.getNextTask() } returns FingerprintTask.ConnectScanner("connect") {
-            launchTaskRequest()
-        }
+        every { orchestratorMock.getNextTask() } returns FingerprintTask.ConnectScanner("connect")
+
         every { orchestratorMock.getFinalResult() } returns
             FinalResult(Activity.RESULT_OK, Intent().putExtra("test_key", 42))
 

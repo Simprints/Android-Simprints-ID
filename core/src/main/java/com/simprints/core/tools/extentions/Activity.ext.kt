@@ -24,9 +24,7 @@ fun Activity.hasPermission(permission: String): Boolean {
     return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 }
 
-fun Activity.hasPermissions(permissions: List<String>): Boolean {
-    return permissions.all(::hasPermission)
-}
+fun Activity.hasPermissions(permissions: Array<String>): Boolean = permissions.all(::hasPermission)
 
 fun Activity.permissionFromResult(permission: String, grantResult: Boolean): PermissionStatus =
     when (grantResult) {
