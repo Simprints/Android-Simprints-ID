@@ -64,8 +64,14 @@
         android:id="@+id/action_orchestratorFragment_to_faceCapture"
         app:destination="@id/graph_face_capture" />
 
+    <include app:graph="@navigation/graph_fingerprint_capture" />
+    <action
+        android:id="@+id/action_orchestratorFragment_to_fingerprintCapture"
+        app:destination="@id/graph_fingerprint_capture" />
+
+
     <include app:graph="@navigation/graph_matcher" />
     <action
-        android:id="@+id/action_orchestratorFragment_to_faceMatcher"
-        app:destination="@id/graph_face_matcher" />
+        android:id="@+id/action_orchestratorFragment_to_matcher"
+        app:destination="@id/graph_matcher" />
 </navigation>

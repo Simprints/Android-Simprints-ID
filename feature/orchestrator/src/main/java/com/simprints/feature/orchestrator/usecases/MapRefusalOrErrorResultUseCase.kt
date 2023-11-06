@@ -7,6 +7,7 @@ import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
 import com.simprints.feature.orchestrator.model.responses.AppRefusalResponse
 import com.simprints.feature.setup.SetupResult
+import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
@@ -23,7 +24,10 @@ class MapRefusalOrErrorResultUseCase @Inject constructor() {
         }
 
         is SetupResult -> result.takeUnless { it.permissionGranted }
-            ?.let { AppErrorResponse(IAppErrorReason.LOGIN_NOT_COMPLETE) }
+            ?.let { AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR) }
+
+        is FingerprintConnectResult -> result.takeUnless { it.isSuccess }
+            ?.let { AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR) }
 
         is FaceConfigurationResult -> result.takeUnless { it.isSuccess }
             ?.let { AppErrorResponse(it.error ?: IAppErrorReason.UNEXPECTED_ERROR) }

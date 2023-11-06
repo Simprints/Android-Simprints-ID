@@ -3,27 +3,22 @@ package com.simprints.id.orchestrator
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
-import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
-import com.simprints.id.domain.moduleapi.fingerprint.models.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.testtools.TestData.defaultSubject
 import com.simprints.infra.config.store.models.Finger
+import com.simprints.infra.config.store.models.fromDomainToModuleApi
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
-import com.simprints.infra.events.sampledata.FACE_TEMPLATE_FORMAT
-import com.simprints.infra.events.sampledata.SampleDefaults
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.STATIC_GUID
 import com.simprints.infra.events.sampledata.createPersonCreationEvent
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
-import com.simprints.testtools.common.mock.mockTemplate
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -40,7 +35,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.Date
 import java.util.UUID
 
 class EnrolmentHelperImplTest {

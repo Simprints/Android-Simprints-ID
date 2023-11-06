@@ -1,19 +1,10 @@
-package com.simprints.infra.config.store.domain
+package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.*
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.CoSyncUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.*
-import com.simprints.infra.config.store.models.canCoSyncAllData
-import com.simprints.infra.config.store.models.canCoSyncAnalyticsData
-import com.simprints.infra.config.store.models.canCoSyncBiometricData
-import com.simprints.infra.config.store.models.canCoSyncData
-import com.simprints.infra.config.store.models.canSyncAllDataToSimprints
-import com.simprints.infra.config.store.models.canSyncAnalyticsDataToSimprints
-import com.simprints.infra.config.store.models.canSyncBiometricDataToSimprints
-import com.simprints.infra.config.store.models.canSyncDataToSimprints
-import com.simprints.infra.config.store.models.isEventDownSyncAllowed
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.config.store.testtools.synchronizationConfiguration
 import org.junit.Test

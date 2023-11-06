@@ -32,6 +32,7 @@ class BuildSubjectUseCaseTest {
         every { timeHelper.now() }.returns(1L)
         subjectFactory = SubjectFactory(
             encodingUtils = EncodingUtilsImplForTests,
+            timeHelper = timeHelper,
         )
         useCase = BuildSubjectUseCase(timeHelper = timeHelper, subjectFactory = subjectFactory)
     }

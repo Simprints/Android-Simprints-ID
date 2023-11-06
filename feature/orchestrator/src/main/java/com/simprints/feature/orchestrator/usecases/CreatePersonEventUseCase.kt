@@ -8,6 +8,7 @@ import com.simprints.core.domain.fingerprint.uniqueId
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
@@ -52,12 +53,11 @@ class CreatePersonEventUseCase @Inject constructor(
         .mapNotNull { it.sample }
         .map { FaceSample(it.template, it.format) }
 
-    private fun extractFingerprintSamples(responses: List<Parcelable>) = emptyList<FingerprintSample>()
-// TODO
-//        .filterIsInstance<FingerprintCaptureResult>()
-//        .flatMap { it.results }
-//        .mapNotNull { it.sample }
-//        .map { FingerprintSample(...) }
+    private fun extractFingerprintSamples(responses: List<Parcelable>) = responses
+        .filterIsInstance<FingerprintCaptureResult>()
+        .flatMap { it.results }
+        .mapNotNull { it.sample }
+        .map { FingerprintSample(it.fingerIdentifier, it.template, it.templateQualityScore, it.format) }
 
     private fun build(
         faceCaptureBiometricsEvents: List<FaceCaptureBiometricsEvent>,

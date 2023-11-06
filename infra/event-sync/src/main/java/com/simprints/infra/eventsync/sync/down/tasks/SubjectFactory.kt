@@ -6,6 +6,7 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.event.domain.models.subject.BiometricReference
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent.EnrolmentRecordCreationPayload
@@ -19,7 +20,8 @@ import java.util.UUID
 import javax.inject.Inject
 
 class SubjectFactory @Inject constructor(
-    private val encodingUtils: EncodingUtils
+    private val encodingUtils: EncodingUtils,
+    private val timeHelper: TimeHelper,
 ) {
 
     fun buildSubjectFromCreationPayload(payload: EnrolmentRecordCreationPayload) =
@@ -46,21 +48,22 @@ class SubjectFactory @Inject constructor(
             )
         }
 
-    fun buildSubjectFromFace(
+    fun buildSubjectFromCaptureResults(
         projectId: String,
-        userId: TokenizableString,
+        attendantId: TokenizableString,
         moduleId: TokenizableString,
-        faceResponse: FaceCaptureResult,
-        timeHelper: TimeHelper
+        fingerprintResponse: FingerprintCaptureResult?,
+        faceResponse: FaceCaptureResult?,
     ): Subject {
         val subjectId = UUID.randomUUID().toString()
-        return Subject(
-            subjectId,
-            projectId,
-            userId,
-            moduleId,
+        return buildSubject(
+            subjectId = subjectId,
+            projectId = projectId,
+            attendantId = attendantId,
+            moduleId = moduleId,
             createdAt = Date(timeHelper.now()),
-            faceSamples = extractFaceSamples(faceResponse)
+            fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
+            faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
         )
     }
 
@@ -83,6 +86,19 @@ class SubjectFactory @Inject constructor(
         fingerprintSamples = fingerprintSamples,
         faceSamples = faceSamples
     )
+
+    private fun extractFingerprintSamples(
+        fingerprintResponse: FingerprintCaptureResult
+    ) = fingerprintResponse.results.mapNotNull { captureResult ->
+        captureResult.sample?.let { sample ->
+            FingerprintSample(
+                captureResult.identifier,
+                sample.template,
+                sample.templateQualityScore,
+                sample.format
+            )
+        }
+    }
 
     private fun extractFaceSamples(faceResponse: FaceCaptureResult) = faceResponse.results
         .mapNotNull { it.sample }

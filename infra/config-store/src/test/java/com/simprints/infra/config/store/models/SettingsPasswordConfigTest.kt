@@ -1,7 +1,6 @@
-package com.simprints.infra.config.store.domain.models
+package com.simprints.infra.config.store.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import org.junit.Test
 
 class SettingsPasswordConfigTest {

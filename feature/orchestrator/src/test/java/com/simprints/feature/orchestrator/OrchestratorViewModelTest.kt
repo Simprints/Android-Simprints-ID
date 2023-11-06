@@ -23,6 +23,7 @@ import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUs
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.moduleapi.app.responses.IAppErrorReason
@@ -203,7 +204,23 @@ internal class OrchestratorViewModelTest {
 
         viewModel.currentStep.test().value().peekContent()?.let { step ->
             assertThat(step.id).isEqualTo(StepId.FACE_MATCHER)
-          //  assertThat(step.payload.keySet()).doesNotContain(MatchStepStubPayload.STUB_KEY)
+        }
+    }
+
+    @Test
+    fun `Updates fingerprint matcher step payload when receiving fingerprint capture`() = runTest {
+        every { stepsBuilder.build(any(), any()) } returns listOf(
+            createMockStep(StepId.FINGERPRINT_CAPTURE),
+            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(FlowProvider.FlowType.VERIFY, SubjectQuery())),
+        )
+        every { mapRefusalOrErrorResult(any()) } returns null
+        every { shouldCreatePerson(any(), any(), any()) } returns false
+
+        viewModel.handleAction(mockk())
+        viewModel.handleResult(FingerprintCaptureResult(emptyList()))
+
+        viewModel.currentStep.test().value().peekContent()?.let { step ->
+            assertThat(step.id).isEqualTo(StepId.FINGERPRINT_MATCHER)
         }
     }
 

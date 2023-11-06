@@ -3,10 +3,15 @@ package com.simprints.feature.orchestrator.usecases
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.matcher.FaceMatchResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
+import com.simprints.feature.enrollast.FingerTemplateCaptureResult
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.models.Finger
+import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Before
 import org.junit.Test
 
@@ -30,7 +35,7 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
 
 
     @Test
-    fun `maps FaceMatchResponse correctly`() {
+    fun `maps FaceMatchResult correctly`() {
         val result = useCase(listOf(
             FaceMatchResult(emptyList())
         ))
@@ -39,7 +44,7 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
     }
 
     @Test
-    fun `maps mapFaceCaptureResult correctly`() {
+    fun `maps FaceCaptureResult correctly`() {
         val result = useCase(listOf(
             FaceCaptureResult(
                 results = listOf(
@@ -62,5 +67,39 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
         )))
     }
 
-    // TODO add fingerprint tests
+    @Test
+    fun `maps FingerprintMatchResult correctly`() {
+        val result = useCase(listOf(
+            FingerprintMatchResult(emptyList())
+        ))
+
+        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FingerprintMatchResult(emptyList()))
+    }
+
+    @Test
+    fun `maps FingerprintCaptureResult correctly`() {
+        val result = useCase(listOf(
+            FingerprintCaptureResult(
+                results = listOf(
+                    FingerprintCaptureResult.Item(IFingerIdentifier.LEFT_THUMB, null),
+                    FingerprintCaptureResult.Item(IFingerIdentifier.RIGHT_THUMB, FingerprintCaptureResult.Sample(
+                        fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
+                        template = byteArrayOf(),
+                        templateQualityScore = 0,
+                        imageRef = null,
+                        format = "format"
+                    ))
+                ),
+            )
+        ))
+
+        assertThat(result.first()).isEqualTo(EnrolLastBiometricStepResult.FingerprintCaptureResult(listOf(
+            FingerTemplateCaptureResult(
+                template = byteArrayOf(),
+                templateQualityScore = 0,
+                format = "format",
+                finger = Finger.RIGHT_THUMB
+            )
+        )))
+    }
 }

@@ -8,11 +8,11 @@ import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 
 class ShouldCreatePersonUseCaseTest {
@@ -62,7 +62,6 @@ class ShouldCreatePersonUseCaseTest {
         ).isFalse()
     }
 
-    @Ignore("Enable when fingerprint modality is refactored")
     @Test
     fun `Returns false when only fingerprint required and no results`() {
         assertThat(
@@ -85,25 +84,19 @@ class ShouldCreatePersonUseCaseTest {
         ).isFalse()
     }
 
-    @Ignore("Enable when fingerprint modality is refactored")
     @Test
     fun `Returns true when only fingerprint required and provided`() {
         assertThat(
             useCase(
                 actionRequest = flowAction,
                 modalities = setOf(GeneralConfiguration.Modality.FINGERPRINT),
-                // TODO change to FingerprintCaptureResult
                 results = listOf(
-                    createStep(
-                        StepId.FINGERPRINT_CAPTURE,
-                        FaceCaptureResult(emptyList())
-                    )
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList()))
                 )
             )
         ).isTrue()
     }
 
-    @Ignore("Enable when fingerprint modality is refactored")
     @Test
     fun `Returns false when both modalities required and face result missing`() {
         assertThat(
@@ -115,14 +108,12 @@ class ShouldCreatePersonUseCaseTest {
                 ),
                 results = listOf(
                     createStep(StepId.FACE_CAPTURE, null),
-                    // TODO change to FingerprintCaptureResult
-                    createStep(StepId.FINGERPRINT_CAPTURE, FaceCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
                 )
             )
         ).isFalse()
     }
 
-    @Ignore("Enable when fingerprint modality is refactored")
     @Test
     fun `Returns false when both modalities required and fingerprint result missing`() {
         assertThat(
@@ -151,7 +142,6 @@ class ShouldCreatePersonUseCaseTest {
         ).isTrue()
     }
 
-    @Ignore("Enable when fingerprint modality is refactored")
     @Test
     fun `Returns true when both modalities required and both results provided`() {
         assertThat(
@@ -163,8 +153,7 @@ class ShouldCreatePersonUseCaseTest {
                 ),
                 results = listOf(
                     createStep(StepId.FACE_CAPTURE, FaceCaptureResult(emptyList())),
-                    // TODO change to FingerprintCaptureResult
-                    createStep(StepId.FINGERPRINT_CAPTURE, FaceCaptureResult(emptyList())),
+                    createStep(StepId.FINGERPRINT_CAPTURE, FingerprintCaptureResult(emptyList())),
                 )
             )
         ).isTrue()
