@@ -112,3 +112,9 @@ jobs:
                 fingerprint:infra:scanner
                 fingerprint:infra:simafis-wrapper
             reportsId: fingerprint
+
+    sonarqube:
+        name: SonarQube
+        secrets: inherit
+        needs: [ id-unit-tests, clientapi-unit-tests, infra-unit-tests-1, infra-unit-tests-2, feature-unit-tests, feature-dashboard-unit-tests, face-unit-tests, fingerprint-unit-tests ]
+        uses: ./.github/workflows/sonarqube-scan.yml
