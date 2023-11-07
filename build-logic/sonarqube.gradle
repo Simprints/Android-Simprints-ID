@@ -8,8 +8,8 @@ sonarqube {
     properties {
         property "sonar.projectName", "Simprints ID"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.organization", "simprints"
-        property "sonar.projectKey", "simprints_android-simprints-id"
+        property "sonar.organization", "simprints-github"
+        property "sonar.projectKey", "Simprints_Android-Simprints-ID"
         property "sonar.c.file.suffixes", "-"
         property "sonar.java.coveragePlugin", "jacoco"
     }
