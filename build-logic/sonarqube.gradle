@@ -7,6 +7,9 @@ def binariesDir = "${File.separator}build${File.separator}intermediates${File.se
 sonarqube {
     properties {
         property "sonar.projectName", "Simprints ID"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.organization", "simprints"
+        property "sonar.projectKey", "simprints_android-simprints-id"
         property "sonar.c.file.suffixes", "-"
         property "sonar.java.coveragePlugin", "jacoco"
     }
