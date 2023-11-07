@@ -86,14 +86,6 @@ GITHUB_USERNAME=<your-github-username>
 GITHUB_TOKEN=<the-token-you-just-created>
 ```
 
-If you are on a Mac with Apple Silicon, and Gradle's built-in NDK doesn't work, then you must also specify as the minimum version of the NDK in the `local.properties` file:
-
-```properties
-ndk.Version=24.0.8215888
-```
-
-<br>
-
 ## Full CI Workflow
 
 The aim of the `ci` workflow is to run all tests in all modules, assemble production and debug builds of the APK, and report to the main CI Slack channel.

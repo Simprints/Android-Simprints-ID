@@ -1,13 +1,5 @@
 #!/bin/bash
-# Install make
-apk add --no-cache make
-
+chmod +x gradlew
 echo "org.gradle.caching=true" >>gradle.properties
-
-
-#########################################################################################
-# https://confluence.atlassian.com/bitbucket/configure-bitbucket-pipelines-yml-792298910.html
-#########################################################################################
-echo "org.gradle.jvmargs=-Xmx6g"
-
-touch /opt/atlassian/pipelines/agent/build/local.properties
+echo "org.gradle.jvmargs=-Xmx7g"
+touch local.properties
