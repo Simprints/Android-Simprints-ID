@@ -1,7 +1,8 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import io.mockk.MockKAnnotations
@@ -23,6 +24,9 @@ class StartBackgroundSyncUseCaseTest {
     @MockK
     lateinit var configManager: ConfigManager
 
+    @MockK
+    lateinit var authManager: AuthManager
+
     private lateinit var useCase: StartBackgroundSyncUseCase
 
     @Before
@@ -32,7 +36,8 @@ class StartBackgroundSyncUseCaseTest {
         useCase = StartBackgroundSyncUseCase(
             eventSyncManager,
             imageUpSyncScheduler,
-            configManager
+            configManager,
+            authManager,
         )
     }
 
@@ -46,6 +51,7 @@ class StartBackgroundSyncUseCaseTest {
             eventSyncManager.scheduleSync()
             imageUpSyncScheduler.scheduleImageUpSync()
             configManager.scheduleSyncConfiguration()
+            authManager.scheduleSecurityStateCheck()
         }
     }
 

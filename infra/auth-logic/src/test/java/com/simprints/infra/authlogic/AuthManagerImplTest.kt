@@ -61,9 +61,21 @@ internal class AuthManagerImplTest {
     }
 
     @Test
+    fun `should call securityStateScheduler when scheduleSecurityStateCheck is called`() {
+        authManager.scheduleSecurityStateCheck()
+        verify(exactly = 1) { securityStateScheduler.scheduleSecurityStateCheck() }
+    }
+
+    @Test
     fun `should call securityStateScheduler when startSecurityStateCheck is called`() {
         authManager.startSecurityStateCheck()
         verify(exactly = 1) { securityStateScheduler.startSecurityStateCheck() }
+    }
+
+    @Test
+    fun `should call securityStateScheduler when cancelSecurityStateCheck is called`() {
+        authManager.cancelSecurityStateCheck()
+        verify(exactly = 1) { securityStateScheduler.cancelSecurityStateCheck() }
     }
 
     @Test

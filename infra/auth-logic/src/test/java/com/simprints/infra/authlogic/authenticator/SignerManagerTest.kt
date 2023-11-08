@@ -132,7 +132,6 @@ internal class SignerManagerTest {
 
         verify { mockAuthStore.clearFirebaseToken() }
         coVerify { mockConfigManager.clearData() }
-        verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
         verify { mockAuthStore.cleanCredentials() }
     }
 
@@ -147,7 +146,6 @@ internal class SignerManagerTest {
 
         verify { mockAuthStore.clearFirebaseToken() }
         coVerify { mockConfigManager.clearData() }
-        verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
         verify { mockAuthStore.cleanCredentials() }
     }
 
@@ -159,18 +157,6 @@ internal class SignerManagerTest {
         mockFetchingProjectConfiguration()
 
         signIn()
-    }
-
-    @Test
-    fun signIn_shouldScheduleSecurityStateCheck() = runTest(UnconfinedTestDispatcher()) {
-        mockRemoteSignedIn()
-        mockStoreCredentialsLocally()
-        mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
-
-        signIn()
-
-        verify { mockSecurityStateScheduler.scheduleSecurityStateCheck() }
     }
 
     @Test

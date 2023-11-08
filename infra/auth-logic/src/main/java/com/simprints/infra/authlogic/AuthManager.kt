@@ -15,7 +15,9 @@ interface AuthManager {
         deviceId: String
     ): AuthenticateDataResult
 
+    fun scheduleSecurityStateCheck()
     fun startSecurityStateCheck()
+    fun cancelSecurityStateCheck()
 
     suspend fun signOut()
 }
