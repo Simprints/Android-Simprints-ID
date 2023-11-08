@@ -1,5 +1,4 @@
 # ROC Wrapper
 
 This module provides a wrapper for accessing all ROC SDK APIs.
-It implements all operations in [`infrafacebiosdk module`](./../infrafacebiosdk)
-and provides the implemented classes in [`RocWrapperModule`](./src/main/java/com/simprints/feature/rocwrapper/RocWrapperModule.kt)
+It implements all operations in `infra:face-bio-sdk module` and provides the implemented classes in `RocWrapperModule`.
