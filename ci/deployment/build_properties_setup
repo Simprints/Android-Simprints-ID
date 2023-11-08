@@ -14,7 +14,7 @@ if [[ $BRANCH_NAME =~ ^release\/ ]]; then
   VERSION_NAME=${BRANCH_NAME#release\/}
 else
   # Read the VERSION_NAME from the env variable VERSION_NAME
-  VERSION_NAME=${VERSION_NAME:-"0.0.0"}
+  VERSION_NAME=${$BRANCH_NAME}
 fi
 
 # Get the current timestamp
