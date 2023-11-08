@@ -66,6 +66,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
+    private var captureStatusChecked = false
+
     lateinit var configuration: FingerprintConfiguration
 
     private var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
@@ -156,6 +158,17 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             originalFingerprintsToCapture = fingerprintsToCapture
             setStartingState(fingerprintsToCapture)
             startObserverForLiveFeedback()
+        }
+    }
+
+    fun checkScannerConnectionStatus(): ScannerConnectionStatus {
+        if (captureStatusChecked) return ScannerConnectionStatus.Started
+        captureStatusChecked = true
+
+        return if (scannerManager.isScannerAvailable) {
+            ScannerConnectionStatus.Connected
+        } else {
+            ScannerConnectionStatus.NotConnected
         }
     }
 
@@ -615,7 +628,13 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         else
             configuration.vero2!!.qualityThreshold
 
+
+    enum class ScannerConnectionStatus {
+        NotConnected, Connected, Started;
+    }
+
     companion object {
+
         const val targetNumberOfGoodScans = 2
         const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
