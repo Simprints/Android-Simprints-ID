@@ -52,12 +52,20 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                             appId = "1:423867324644:android:7c4e84b7f391800f44b4f1"
                             artifactType = "APK"
                             artifactPath = "$rootDir/id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk"
-                            serviceCredentialsFile = "id/src/staging/serviceCredentialsFile.json"
+                            serviceCredentialsFile = "$rootDir/id/src/main/serviceCredentialsFile.json"
                             groups = "pre-release-testers"
                         }
                     }
                     getByName("debug") {
                         signingConfig = signingConfigs.getByName("config")
+                        firebaseAppDistribution {
+                            appId = "1:79630518081:android:868e99ed20a4f9a5"
+                            artifactType = "APK"
+                            artifactPath = "$rootDir/id/build/outputs/apk_from_bundle/debug/id-debug-universal.apk"
+                            serviceCredentialsFile = "$rootDir/id/src/main/serviceCredentialsFile.json"
+                            groups = "pre-release-testers"
+                        }
+
                     }
                 }
             }
