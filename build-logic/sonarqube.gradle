@@ -1,6 +1,8 @@
 apply plugin: "org.sonarqube"
 
 def jacocoDir = "${File.separator}build${File.separator}reports${File.separator}jacoco${File.separator}jacocoTestReport${File.separator}jacocoTestReport.xml"
+def sourceDir = "${File.separator}src${File.separator}main${File.separator}java${File.separator}com${File.separator}simprints"
+def binariesDir = "${File.separator}build${File.separator}intermediates${File.separator}**"
 
 sonarqube {
     properties {
@@ -8,13 +10,16 @@ sonarqube {
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.organization", "simprints-github"
         property "sonar.projectKey", "Simprints_Android-Simprints-ID"
+        property "sonar.java.coveragePlugin", "jacoco"
     }
 }
 
 subprojects {
     sonarqube {
         properties {
-              property "sonar.coverage.jacoco.xmlReportPaths", [
+            property "sonar.sources", "$projectDir$sourceDir"
+            property "sonar.java.binaries", "$projectDir$binariesDir"
+            property "sonar.coverage.jacoco.xmlReportPaths", [
                 "$projectDir$jacocoDir"
             ]
         }
