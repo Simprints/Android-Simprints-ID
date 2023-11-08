@@ -51,8 +51,7 @@ jobs:
                         echo ${{ secrets.FIREBASE_STAGING_KEY_BASE64 }} | base64 --decode > id/src/main/serviceCredentialsFile.json
                     fi
             -   name: build apk
-                run: |
-                    bash ./ci/deployment/build_properties_setup
+                run: |                 
                     #check if the build type is dev or staging
                     if [ "${{ inputs.buildType }}" = "dev" ]; then
                         ./gradlew id:packageDebugUniversalApk
