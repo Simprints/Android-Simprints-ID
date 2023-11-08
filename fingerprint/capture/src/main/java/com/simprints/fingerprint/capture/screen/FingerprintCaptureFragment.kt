@@ -2,6 +2,7 @@ package com.simprints.fingerprint.capture.screen
 
 import android.graphics.Paint
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
@@ -25,8 +26,10 @@ import com.simprints.feature.exitform.exitFormConfiguration
 import com.simprints.feature.exitform.scannerOptions
 import com.simprints.feature.exitform.toArgs
 import com.simprints.fingerprint.capture.R
+import com.simprints.fingerprint.capture.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
+import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel.ScannerConnectionStatus
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
@@ -34,7 +37,6 @@ import com.simprints.fingerprint.capture.views.fingerviewpager.FingerViewPagerMa
 import com.simprints.fingerprint.capture.views.tryagainsplash.FullScreenSplashDialog
 import com.simprints.fingerprint.connect.FingerprintConnectContract
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.fingerprint.capture.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
 import com.simprints.infra.logging.Simber
@@ -76,11 +78,14 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
-        findNavController().handleResult<FingerprintConnectResult>(
+        findNavController().handleResult<Parcelable>(
             viewLifecycleOwner,
             R.id.fingerprintCaptureFragment,
             FingerprintConnectContract.DESTINATION
-        ) { startCollection() }
+        ) {
+            if (it is FingerprintConnectResult && it.isSuccess) startCollection()
+            else findNavController().finishWithResult(this, it)
+        }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             vm.handleOnBackPressed()
@@ -89,7 +94,11 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
-        if (vm.hasScanner()) startCollection() else launchConnection()
+        when (vm.checkScannerConnectionStatus()) {
+            ScannerConnectionStatus.NotConnected -> launchConnection()
+            ScannerConnectionStatus.Connected -> startCollection()
+            ScannerConnectionStatus.Started -> {}
+        }
     }
 
     private fun startCollection() {
