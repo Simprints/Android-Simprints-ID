@@ -1,35 +1,30 @@
-# ConnectScannerActivity
+# Connect Scanner
 
-> This document is describing deprecated implementation. While it is still mostly correct, there are parts that need to be updated. 
+This is the module that handles the setup with the scanner, and any associated issues that might occur.
+The desired side-effect of this module is creating a connected instance of `Scanner` in the `ScannerManager` singleton, which can then be used by proceeding modules.
 
-This is the activity that handles the setup with the scanner, and any associated issues that might occur.
-The desired side-effect of this activity is creating a connected instance of `Scanner` in the `ScannerManager` singleton, which can then be used by proceeding activities.
-
-It is a single Activity design using the [Navigation Architecture Component](https://developer.android.com/guide/navigation) to switch between fragments.
+It is a nested nav-graph design using the [Navigation Architecture Component](https://developer.android.com/guide/navigation) to switch between fragments.
 There is a shared view model for all fragments, `ConnectScannerViewModel`, which handles the setup flow with the scanner.
 The more complex fragments additionally have their own view models.
 
-The primary fragment is `ConnectScannerMainFragment`.
-This fragment acts as a container for either the `InitialConnectFragment` when it's launched for the first time during the flow, or the `ReconnectFragment` when we need to reconnect mid-flow.
-The choice is fragment is determined by the `connectionMode` included in the `ConnectScannerTaskRequest`.
-The `InitialConnectFragment` has more UI and info for the user, whereas the `ReconnectFragment` is minimum and mostly translucent.
+The primary fragment is `ConnectScannerControllerFragment`.
+This fragment acts as a container for either the `ConnectFragment` when it's launched for the first time during the flow.
 
-During the setup flow, `FingerpintAlert`s can be triggered by the `ScannerManager`.
-Most of these are turned into `ConnectScannerIssue`s, which represents a particular screen to show to the user for them to deal with.
+During the setup flow several exceptions can be triggered by the `ScannerManager`.
+Most of these are turned into issue fragments, which represents a particular screen to show to the user for them to deal with.
 There is a fragment for each issue, and they can be launched from the main fragment during the flow and sometimes launch each other.
 
-After connecting is successful, automatically transitions to the `CollectFingerprintsActivity` via the `Orchestrator`.
-
-Pressing the back button at any time triggers the exit form (`RefusalActivity`), and there should be no issue returning to this activity if the user changes their mind.
-
-Some `FingerprintAlert`s can still trigger the `AlertActivity`. These are:
+Several specific case are handled by calling `:feature:alert` module.These are:
 - `BLUETOOTH_NOT_SUPPORTED` - we didn't bother to update the UI for this as it's so rare (and inconceivable in production)
 - `LOW_BATTERY` - this can currently only be triggered by Vero 1, and in practice was never seen, so left as is
 - `UNEXPECTED_ERROR` - this occurs when an irrecoverable programmatic error has occurred
 
+After connecting is successful or if the connection reached unrecoverable state, the `ConnectScannerControllerFragment` finishes with the appropriate result data.
+
+Pressing the back button at any time triggers the exit form, and there should be no issue returning to the connection flow if the user changes their mind.
+
 ### BluetoothOffFragment
-This can be launched at the start of the flow when bluetooth is off.
-The button programmatically turns bluetooth on.
+This can be launched at the start of the flow when bluetooth is off. The button programmatically turns bluetooth on.
 This makes use of the `BLUETOOTH_ADMIN` permission, which appears to be granted automatically upon install.
 
 Returns to the `ConnectScannerMainFragment` upon finish.
@@ -69,7 +64,8 @@ If the user is struggling to detect the NFC chip, there is link to the `SerialEn
 Upon successful pairing, restarts connecting and returns to the `ConnectScannerMainFragment`.
 
 ### SerialEntryPairFragment
-This fragment is the fallback to `NfcPairFragment`, and is triggered when the user confirms the wrong scanner is paired, if there are no scanners paired, or if there are multiple scanners paired, but in projects using Vero 1 or if the phone does not have an NFC adapter.
+This fragment is the fallback to `NfcPairFragment`, and is triggered when the user confirms the wrong scanner is paired, if there are no scanners paired,
+or if there are multiple scanners paired, but in projects using Vero 1 or if the phone does not have an NFC adapter.
 Can additionally be triggered by the `NfcPairFragment` if the user had difficulty detecting the NFC chip.
 
 The user can enter a serial number as a stand-in for the NFC chip in the `NfcPairFragment`, and the consequent pairing, listening for bond state action, retry, and timeout behaviour is identical.
@@ -97,4 +93,4 @@ If the reconnect fails for whatever reason, we assume the scanner is in an irrec
 
 ### OtaFailedFragment
 This fragment only displays a message to the user to contact their supervisor as the scanner may be in an irrecoverable state after a failed OTA update attempt.
-Pressing Continue will exit the entire fingerprint flow with the `Activity.CANCELLED` result.
+Pressing Continue will exit the entire fingerprint flow failure result.

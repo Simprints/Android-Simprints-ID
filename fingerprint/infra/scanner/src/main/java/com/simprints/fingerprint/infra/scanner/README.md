@@ -1,9 +1,5 @@
 # Scanner Package
 
-This package provides a layer with which to interface with the
-[`fingerprintscanner`](../../../../../../../../fingerprint/infra/scanner)
-library.
-
 ### Scanner Wrapper
 
 The [`ScannerWrapper`](wrapper/ScannerWrapper.kt) interface acts as a
@@ -42,7 +38,7 @@ the proper `ScannerWrapper` instance.
 ### Controllers and Helper Classes
 
 To avoid `ScannerWrapperV2` from growing too large, a lot of controlling
-logic for Vero 2 is factored into [other classes](./controllers/v2/):
+logic for Vero 2 is factored into [other classes](v2/):
 
 - [`ConnectionHelper`](helpers/ConnectionHelper.kt) - This is
   for handling connecting and disconnecting to the scanner, as well as
@@ -79,9 +75,7 @@ are some helper classes and tools:
 
 ### Versioning System
 
-Vero 2 comes with 3 chips (see the documentation for
-[Scanner V2](../../../../../../../../fingerprint/infra/scanner/src/main/java/com/simprints/fingerprintscanner/v2/README.md)
-for details), each with its own app and API versions.
+Vero 2 comes with 3 chips (see the documentation for [Scanner V2](v2/README.md) for details), each with its own app and API versions.
 
 - The app version is of type `[Major].[Minor]` and refers to the version
   of the firmware binary running on the chip. Increments in minor
@@ -128,7 +122,7 @@ and letting the user proceed with the OTA update flow.
 Each of the chips have different procedures before and after the actual
 firmware binary is sent to the scanner. These are defined in
 [`OtaStep`](domain/ota/OtaStep.kt) and conducted by the three
-[`OtaHelper`s](./controllers/v2/). In addition to the OTA itself, these
+[`OtaHelper`s](v2/). In addition to the OTA itself, these
 steps involve various dances of reconnecting, mode switching, and
 updating the Unified Version information after the update.
 
