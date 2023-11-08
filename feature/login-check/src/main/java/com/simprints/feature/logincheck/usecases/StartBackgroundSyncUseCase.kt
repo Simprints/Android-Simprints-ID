@@ -1,5 +1,6 @@
 package com.simprints.feature.logincheck.usecases
 
+import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
@@ -10,12 +11,14 @@ internal class StartBackgroundSyncUseCase @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
     private val configManager: ConfigManager,
+    private val authManager: AuthManager,
 ) {
 
     suspend operator fun invoke() {
         eventSyncManager.scheduleSync()
         imageUpSyncScheduler.scheduleImageUpSync()
         configManager.scheduleSyncConfiguration()
+        authManager.scheduleSecurityStateCheck()
 
         val frequency = configManager.getProjectConfiguration().synchronization.frequency
         if (frequency == SynchronizationConfiguration.Frequency.PERIODICALLY_AND_ON_SESSION_START) {
