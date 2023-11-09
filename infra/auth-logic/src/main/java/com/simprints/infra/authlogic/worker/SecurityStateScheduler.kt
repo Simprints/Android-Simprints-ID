@@ -54,8 +54,8 @@ internal class SecurityStateScheduler @Inject constructor(
             .build()
 
     private companion object {
-        const val WORK_NAME = "security-status-check-work"
-        const val WORK_NAME_ONE_TIME = "security-status-check-work-one-time"
+        const val WORK_NAME = "security-status-check-work-v2"
+        const val WORK_NAME_ONE_TIME = "security-status-check-work-one-time-v2"
         const val REPEAT_INTERVAL = BuildConfig.SECURITY_STATE_PERIODIC_WORKER_INTERVAL_MINUTES
     }
 

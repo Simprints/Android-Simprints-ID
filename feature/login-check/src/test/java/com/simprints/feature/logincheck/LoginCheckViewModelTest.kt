@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
+import com.simprints.feature.logincheck.usecases.*
 import com.simprints.feature.logincheck.usecases.ActionFactory
 import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
 import com.simprints.feature.logincheck.usecases.CancelBackgroundSyncUseCase
@@ -64,6 +65,9 @@ internal class LoginCheckViewModelTest {
     lateinit var startBackgroundSync: StartBackgroundSyncUseCase
 
     @MockK
+    lateinit var cleanupDeprecatedWorkersUseCase: CleanupDeprecatedWorkersUseCase
+
+    @MockK
     lateinit var cancelBackgroundSync: CancelBackgroundSyncUseCase
 
     @MockK
@@ -88,6 +92,7 @@ internal class LoginCheckViewModelTest {
             isUserSignedInUseCase,
             getProjectStateUseCase,
             startBackgroundSync,
+            cleanupDeprecatedWorkersUseCase,
             cancelBackgroundSync,
             updateDatabaseCountsInCurrentSessionUseCase,
             updateProjectStateUseCase,
