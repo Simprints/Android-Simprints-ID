@@ -1,8 +1,9 @@
 package com.simprints.id.services.sync
 
+import com.simprints.infra.authlogic.AuthManager
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -10,6 +11,7 @@ class SyncSchedulerImpl @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
     private val configManager: ConfigManager,
+    private val authManager: AuthManager,
 ) : SyncManager {
 
     override fun scheduleBackgroundSyncs() {
@@ -17,6 +19,7 @@ class SyncSchedulerImpl @Inject constructor(
         eventSyncManager.scheduleSync()
         imageUpSyncScheduler.scheduleImageUpSync()
         configManager.scheduleSyncConfiguration()
+        authManager.scheduleSecurityStateCheck()
     }
 
     override fun cancelBackgroundSyncs() {
@@ -24,5 +27,6 @@ class SyncSchedulerImpl @Inject constructor(
         eventSyncManager.cancelScheduledSync()
         imageUpSyncScheduler.cancelImageUpSync()
         configManager.cancelScheduledSyncConfiguration()
+        authManager.cancelSecurityStateCheck()
     }
 }

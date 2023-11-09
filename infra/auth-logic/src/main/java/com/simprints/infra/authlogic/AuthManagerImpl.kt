@@ -25,7 +25,11 @@ internal class AuthManagerImpl @Inject constructor(
             deviceId = deviceId
         )
 
+    override fun scheduleSecurityStateCheck() = securityStateScheduler.scheduleSecurityStateCheck()
+
     override fun startSecurityStateCheck() = securityStateScheduler.startSecurityStateCheck()
+
+    override fun cancelSecurityStateCheck() = securityStateScheduler.cancelSecurityStateCheck()
 
     override suspend fun signOut() = signerManager.signOut()
 }
