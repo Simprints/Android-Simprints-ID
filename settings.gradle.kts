@@ -72,7 +72,6 @@ include(
 
 // Modules to be refactored
 include(
-    ":clientapi",
     ":moduleapi",
 )
 
