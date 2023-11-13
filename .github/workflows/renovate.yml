@@ -19,7 +19,7 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v4
             -   name: Run renovate
-                uses: renovatebot/github-action@v39
+                uses: renovatebot/github-action@v39.1.1
                 env:
                     RENOVATE_TOKEN: ${{secrets.GITHUB_TOKEN }}
                     LOG_LEVEL: debug
