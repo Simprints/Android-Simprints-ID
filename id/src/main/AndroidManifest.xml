@@ -2,20 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <!-- Permissions -->
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission
-        android:name="android.permission.BLUETOOTH_SCAN"
-        android:usesPermissionFlags="neverForLocation"
-        tools:targetApi="31" />
 
     <!-- usesCleartextTraffic ensures that it is also disabled on version that do not support security config -->
     <application
@@ -28,47 +19,6 @@
         android:theme="@style/Theme.Simprints"
         android:usesCleartextTraffic="false"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <activity
-            android:name="com.simprints.feature.dashboard.DashboardActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".activities.orchestrator.OrchestratorActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Simprints.Launcher" />
-        <activity
-            android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
-            android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="com.simprints.clientapp.REGISTER_LAST_BIOMETRICS" />
-                <action android:name="com.simprints.clientapp.REGISTER" />
-                <action android:name="com.simprints.clientapp.IDENTIFY" />
-                <action android:name="com.simprints.clientapp.VERIFY" />
-                <action android:name="com.simprints.clientapp.CONFIRM_IDENTITY" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.simprints.legacy.REGISTER" />
-                <action android:name="com.simprints.legacy.IDENTIFY" />
-                <action android:name="com.simprints.legacy.VERIFY" />
-                <action android:name="com.simprints.legacy.CONFIRM_IDENTITY" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
 
         <service
             android:name=".services.sync.events.down.EventDownSyncResetService"
@@ -85,13 +35,6 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
-
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
-        <meta-data
-            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
-            android:value="barcode" />
     </application>
 
 </manifest>
