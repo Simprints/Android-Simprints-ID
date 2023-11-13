@@ -8,7 +8,7 @@ on:
                 type: string
                 required: true
                 description: |
-                    A comma separated list of modules to test. For example: "id,clientapi,feature:orchestrator"
+                    A comma separated list of modules to test. For example: "id,feature:orchestrator"
             reportsId:
                 type: string
                 required: true

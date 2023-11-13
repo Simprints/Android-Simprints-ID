@@ -43,8 +43,7 @@ jobs:
             # Use -f to force the move and || true to prevent failure if the file doesn't exist
             -   name: Move reports
                 run: |
-                    rsync -arv test-reports/id/* .  || true
-                    rsync -arv test-reports/clientapi/* .  || true
+                    rsync -arv test-reports/core/* .  || true
                     rsync -arv test-reports/infra1/* .  || true
                     rsync -arv test-reports/infra2/* .  || true
                     rsync -arv test-reports/feature/* .  || true
