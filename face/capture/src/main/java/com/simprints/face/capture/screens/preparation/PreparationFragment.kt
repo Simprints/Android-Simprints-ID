@@ -17,7 +17,7 @@ import javax.inject.Inject
  * This class represents the screen the user is presented to prepare them on how to capture the face
  */
 @AndroidEntryPoint
-class PreparationFragment : Fragment(R.layout.fragment_preparation) {
+internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
 
     private val binding by viewBinding(FragmentPreparationBinding::bind)
 

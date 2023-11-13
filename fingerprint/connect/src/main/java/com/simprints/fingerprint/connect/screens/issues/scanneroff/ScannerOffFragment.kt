@@ -20,7 +20,7 @@ import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
+internal class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
 
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val binding by viewBinding(FragmentScannerOffBinding::bind)

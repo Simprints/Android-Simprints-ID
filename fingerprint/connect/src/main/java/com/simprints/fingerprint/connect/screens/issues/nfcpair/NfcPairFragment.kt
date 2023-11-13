@@ -37,7 +37,7 @@ import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
+internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
 
     private val binding by viewBinding(FragmentNfcPairBinding::bind)
     private val viewModel: NfcPairViewModel by viewModels()

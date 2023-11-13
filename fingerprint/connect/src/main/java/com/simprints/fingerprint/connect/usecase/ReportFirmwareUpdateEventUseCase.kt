@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ReportFirmwareUpdateEventUseCase @Inject constructor(
+internal class ReportFirmwareUpdateEventUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: EventRepository,
     @ExternalScope private val externalScope: CoroutineScope,

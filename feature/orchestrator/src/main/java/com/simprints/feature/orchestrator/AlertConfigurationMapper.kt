@@ -15,7 +15,7 @@ import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
-class AlertConfigurationMapper @Inject constructor() {
+internal class AlertConfigurationMapper @Inject constructor() {
 
     fun buildAlertConfig(clientApiError: ClientApiError): AlertConfigurationBuilder = alertConfiguration {
         color = AlertColor.Yellow

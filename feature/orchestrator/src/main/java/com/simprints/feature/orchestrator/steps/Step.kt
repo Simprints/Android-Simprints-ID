@@ -6,7 +6,7 @@ import android.os.Parcelable
 import androidx.annotation.IdRes
 
 
-data class Step(
+internal data class Step(
     val id: Int,
     @IdRes val navigationActionId: Int,
     @IdRes val destinationId: Int,

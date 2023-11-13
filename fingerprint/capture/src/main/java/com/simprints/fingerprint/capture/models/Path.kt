@@ -6,4 +6,4 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-class Path(override val parts: Array<String>) : IPath
+internal class Path(override val parts: Array<String>) : IPath

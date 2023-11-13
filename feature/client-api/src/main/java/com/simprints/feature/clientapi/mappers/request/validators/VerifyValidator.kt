@@ -5,7 +5,7 @@ import com.simprints.feature.clientapi.exceptions.InvalidRequestException
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
 import com.simprints.feature.clientapi.models.ClientApiError
 
-class VerifyValidator(
+internal class VerifyValidator(
     private val extractor: VerifyRequestExtractor,
 ) : RequestActionValidator(extractor) {
 

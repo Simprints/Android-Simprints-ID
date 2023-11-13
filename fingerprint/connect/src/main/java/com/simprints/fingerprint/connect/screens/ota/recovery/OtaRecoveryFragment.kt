@@ -22,7 +22,7 @@ import com.simprints.infra.resources.R as IDR
  * have a look at the readme for more details - /connect/README.md
  */
 @AndroidEntryPoint
-class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
+internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
 
     private val viewModel: OtaRecoveryViewModel by viewModels()
     private val binding by viewBinding(FragmentOtaRecoveryBinding::bind)

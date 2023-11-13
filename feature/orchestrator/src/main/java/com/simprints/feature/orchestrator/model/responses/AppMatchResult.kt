@@ -7,7 +7,7 @@ import com.simprints.moduleapi.app.responses.IAppResponseTier
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class AppMatchResult(
+internal data class AppMatchResult(
     override val guid: String,
     override val confidenceScore: Int,
     override val tier: IAppResponseTier,

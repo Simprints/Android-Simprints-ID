@@ -38,7 +38,7 @@ import com.simprints.infra.resources.R as IDR
  * @property leftButton  the specific action to be triggered when the left button is clicked
  * @property rightButton  the specific action to be triggered when the right button is clicked
  */
-enum class AlertError(
+internal enum class AlertError(
     @StringRes val title: Int,
     @StringRes val message: Int,
     val backgroundColor: AlertColor = AlertColor.Default,

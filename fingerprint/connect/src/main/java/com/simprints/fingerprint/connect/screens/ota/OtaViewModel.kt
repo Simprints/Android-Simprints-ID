@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OtaViewModel @Inject constructor(
+internal class OtaViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
     private val reportFirmwareUpdate: ReportFirmwareUpdateEventUseCase,
     private val timeHelper: TimeHelper,

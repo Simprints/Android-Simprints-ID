@@ -3,7 +3,7 @@ package com.simprints.matcher.usecases
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 
-interface MatcherUseCase {
+internal interface MatcherUseCase {
 
     val crashReportTag: String
     val matcherName: String

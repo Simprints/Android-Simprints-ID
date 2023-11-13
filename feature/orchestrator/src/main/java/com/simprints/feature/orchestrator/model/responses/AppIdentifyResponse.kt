@@ -6,7 +6,7 @@ import com.simprints.moduleapi.app.responses.IAppResponseType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class AppIdentifyResponse(
+internal data class AppIdentifyResponse(
     override val identifications: List<IAppMatchResult>,
     override val sessionId: String,
     override val type: IAppResponseType = IAppResponseType.IDENTIFY

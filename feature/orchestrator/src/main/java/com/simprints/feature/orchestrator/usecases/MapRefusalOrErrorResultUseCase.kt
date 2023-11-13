@@ -12,7 +12,7 @@ import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
-class MapRefusalOrErrorResultUseCase @Inject constructor() {
+internal class MapRefusalOrErrorResultUseCase @Inject constructor() {
 
     operator fun invoke(result: Parcelable): IAppResponse? = when (result) {
         is ExitFormResult -> AppRefusalResponse.fromResult(result)

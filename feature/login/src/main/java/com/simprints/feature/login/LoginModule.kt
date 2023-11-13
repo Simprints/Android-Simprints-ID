@@ -16,11 +16,5 @@ import kotlinx.coroutines.CoroutineDispatcher
 object LoginModule {
 
     @Provides
-    internal fun provideQrCodeAnalyzer(
-        qrCodeDetector: QrCodeDetector,
-        @DispatcherBG coroutineDispatcher: CoroutineDispatcher,
-    ) = QrCodeAnalyzer(qrCodeDetector, coroutineDispatcher)
-
-    @Provides
     fun provideGoogleApiAvailability() = GoogleApiAvailability.getInstance()
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class EnrolSubjectUseCase @Inject constructor(
+internal class EnrolSubjectUseCase @Inject constructor(
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper,
     private val enrolmentRecordManager: EnrolmentRecordManager

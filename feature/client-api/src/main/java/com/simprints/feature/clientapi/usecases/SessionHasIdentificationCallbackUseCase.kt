@@ -5,7 +5,7 @@ import com.simprints.infra.events.event.domain.models.callback.IdentificationCal
 import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 
-class SessionHasIdentificationCallbackUseCase @Inject constructor(
+internal class SessionHasIdentificationCallbackUseCase @Inject constructor(
     private val eventRepository: EventRepository,
 ) {
 

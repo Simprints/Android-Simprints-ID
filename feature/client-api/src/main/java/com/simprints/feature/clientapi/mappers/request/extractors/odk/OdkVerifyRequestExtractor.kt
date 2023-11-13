@@ -2,7 +2,7 @@ package com.simprints.feature.clientapi.mappers.request.extractors.odk
 
 import com.simprints.feature.clientapi.mappers.request.extractors.VerifyRequestExtractor
 
-class OdkVerifyRequestExtractor(
+internal class OdkVerifyRequestExtractor(
     extras: Map<String, Any>,
     acceptableExtras: List<String>,
 ) : VerifyRequestExtractor(extras) {

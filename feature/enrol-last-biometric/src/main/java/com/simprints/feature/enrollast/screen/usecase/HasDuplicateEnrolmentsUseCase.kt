@@ -7,7 +7,7 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag.ENROLMENT
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
-class HasDuplicateEnrolmentsUseCase @Inject constructor() {
+internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
 
     operator fun invoke(
         projectConfig: ProjectConfiguration,
