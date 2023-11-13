@@ -9,7 +9,7 @@ import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIden
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.matcher.MatchParams
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify

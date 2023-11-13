@@ -6,7 +6,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.fingerprint.capture.resources.nameTextId
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.resources.R as IDR
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")

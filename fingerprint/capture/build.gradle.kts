@@ -16,6 +16,7 @@ android {
 dependencies {
 
     // Simprints
+    implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:events"))
     implementation(project(":infra:enrolment-records-sync"))
     implementation(project(":infra:enrolment-records-store"))
@@ -25,6 +26,7 @@ dependencies {
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:images"))
     implementation(project(":infra:recent-user-activity"))
+
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
 

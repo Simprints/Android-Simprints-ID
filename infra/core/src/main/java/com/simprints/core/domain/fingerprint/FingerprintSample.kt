@@ -1,7 +1,6 @@
 package com.simprints.core.domain.fingerprint
 
 import android.os.Parcelable
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 

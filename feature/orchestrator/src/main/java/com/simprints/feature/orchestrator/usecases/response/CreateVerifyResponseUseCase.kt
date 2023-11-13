@@ -8,8 +8,8 @@ import com.simprints.feature.orchestrator.model.responses.AppVerifyResponse
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppResponse
+import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 internal class CreateVerifyResponseUseCase @Inject constructor() {
@@ -22,7 +22,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
         getFaceMatchResults(projectConfiguration.face?.decisionPolicy, results),
     ).maxByOrNull { it.confidenceScore }
         ?.let { AppVerifyResponse(it) }
-        ?: AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
+        ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
 
     private fun getFingerprintMatchResults(
         faceDecisionPolicy: DecisionPolicy?,

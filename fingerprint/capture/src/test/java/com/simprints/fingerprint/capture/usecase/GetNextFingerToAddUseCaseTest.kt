@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.capture.usecase
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 class GetNextFingerToAddUseCaseTest {

@@ -8,6 +8,4 @@ android {
 }
 
 dependencies {
-
-    api(project(":moduleapi"))
 }

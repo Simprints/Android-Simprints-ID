@@ -1,6 +1,6 @@
 package com.simprints.infra.config.store.models
 
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 
 enum class Finger {
     LEFT_THUMB,

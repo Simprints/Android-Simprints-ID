@@ -11,7 +11,7 @@ import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.CapturingSlot

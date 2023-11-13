@@ -1,50 +1,29 @@
 package com.simprints.infra.events.sampledata
 
 import android.os.Build
+import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
+import com.simprints.core.domain.response.AppMatchConfidence.MEDIUM
+import com.simprints.core.domain.response.AppResponseTier.TIER_1
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
-import com.simprints.infra.events.event.domain.models.AlertScreenEvent
+import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.infra.events.event.domain.models.AuthenticationEvent
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
-import com.simprints.infra.events.event.domain.models.AuthorizationEvent
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED
-import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.LocalResult.FOUND
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult.NOT_FOUND
-import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
-import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
-import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
-import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
-import com.simprints.infra.events.event.domain.models.EventLabels
-import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
-import com.simprints.infra.events.event.domain.models.GuidSelectionEvent
-import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent.IntentParsingPayload.IntegrationInfo.COMMCARE
-import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
-import com.simprints.infra.events.event.domain.models.MatchEntry
-import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPool
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent.OneToManyMatchPayload.MatchPoolType.PROJECT
-import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
-import com.simprints.infra.events.event.domain.models.PersonCreationEvent
-import com.simprints.infra.events.event.domain.models.RefusalEvent
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
-import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
-import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
-import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent
-import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
@@ -80,9 +59,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence.MEDIUM
-import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier.LEFT_THUMB
 
 const val FACE_TEMPLATE_FORMAT = "RANK_ONE_1_23"
 val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = DEFAULT_PROJECT_ID)

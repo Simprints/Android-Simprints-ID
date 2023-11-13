@@ -2,33 +2,31 @@ package com.simprints.fingerprint.capture
 
 import android.os.Parcelable
 import androidx.annotation.Keep
-import com.simprints.moduleapi.common.ISecuredImageRef
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import com.simprints.moduleapi.fingerprint.IFingerprintSample
-import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.infra.images.model.SecuredImageRef
 import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
 data class FingerprintCaptureResult(
-    var results: List<IFingerprintCaptureResult>,
+    var results: List<Item>,
 ) : Parcelable {
 
     @Keep
     @Parcelize
     data class Item(
-        override val identifier: IFingerIdentifier,
-        override val sample: IFingerprintSample?,
-    ) : IFingerprintCaptureResult, Parcelable
+        val identifier: IFingerIdentifier,
+        val sample: Sample?,
+    ) : Parcelable
 
     @Keep
     @Parcelize
     data class Sample(
-        override val fingerIdentifier: IFingerIdentifier,
-        override val template: ByteArray,
-        override val templateQualityScore: Int,
-        override val imageRef: ISecuredImageRef?,
-        override val format: String
-    ) : IFingerprintSample, Parcelable
+        val fingerIdentifier: IFingerIdentifier,
+        val template: ByteArray,
+        val templateQualityScore: Int,
+        val imageRef: SecuredImageRef?,
+        val format: String,
+    ) : Parcelable
 
 }

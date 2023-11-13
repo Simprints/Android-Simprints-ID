@@ -4,8 +4,8 @@ import android.os.Parcelable
 import com.simprints.feature.orchestrator.model.responses.AppConfirmationResponse
 import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
 import com.simprints.feature.selectsubject.SelectSubjectResult
-import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppResponse
+import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 internal class CreateConfirmIdentityResponseUseCase @Inject constructor() {
@@ -14,5 +14,5 @@ internal class CreateConfirmIdentityResponseUseCase @Inject constructor() {
         .filterIsInstance(SelectSubjectResult::class.java)
         .lastOrNull()
         ?.let { AppConfirmationResponse(true) }
-        ?: AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
+        ?: AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
 }

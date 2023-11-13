@@ -2,13 +2,12 @@ package com.simprints.infra.eventsync.event.remote.models.subject
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordMoveEvent
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 class ApiEnrolmentRecordMoveEventTest {

@@ -1,7 +1,7 @@
 package com.simprints.infra.orchestration.data
 
-import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppMatchResult
+import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppMatchResult
 
 sealed class ActionResponse(
     open val actionIdentifier: ActionRequestIdentifier,
@@ -56,7 +56,7 @@ sealed class ActionResponse(
         override val sessionId: String,
         override val eventsJson: String?,
 
-        val reason: IAppErrorReason,
+        val reason: AppErrorReason,
         val flowCompleted: Boolean,
     ) : ActionResponse(actionIdentifier, sessionId, eventsJson)
 

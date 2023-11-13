@@ -70,11 +70,6 @@ include(
     ":face:infra:roc-wrapper",
 )
 
-// Modules to be refactored
-include(
-    ":moduleapi",
-)
-
 // Feature modules
 include(
     ":feature:orchestrator",

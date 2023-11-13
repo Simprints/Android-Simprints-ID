@@ -9,7 +9,6 @@ android {
 }
 
 dependencies {
-    api(project(":moduleapi"))
     api(project(":infra:logging"))
     api(project(":infra:network"))
     api(project(":infra:resources"))

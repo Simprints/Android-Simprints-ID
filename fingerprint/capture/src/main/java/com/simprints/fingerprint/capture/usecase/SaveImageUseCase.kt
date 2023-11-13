@@ -2,15 +2,14 @@ package com.simprints.fingerprint.capture.usecase
 
 import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedException
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
-import com.simprints.fingerprint.capture.models.Path
-import com.simprints.fingerprint.capture.models.SecuredImageRef
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
+import com.simprints.infra.images.model.Path
+import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
-import com.simprints.infra.images.model.Path as DomainPath
 
 internal class SaveImageUseCase @Inject constructor(
     private val coreImageRepository: ImageRepository,
@@ -35,13 +34,13 @@ internal class SaveImageUseCase @Inject constructor(
     private suspend fun saveImage(
         imageBytes: ByteArray,
         captureEventId: String,
-        fileExtension: String
+        fileExtension: String,
     ): SecuredImageRef? = determinePath(captureEventId, fileExtension)?.let { path ->
         Simber.d("Saving fingerprint image ${path}")
         val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
         val projectId = currentSession.payload.projectId
 
-        val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, projectId, DomainPath(path.parts))
+        val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, projectId, Path(path.parts))
 
         if (securedImageRef != null) {
             SecuredImageRef(Path(securedImageRef.relativePath.parts))
@@ -69,6 +68,7 @@ internal class SaveImageUseCase @Inject constructor(
         }
 
     companion object {
+
         const val SESSIONS_PATH = "sessions"
         const val FINGERPRINTS_PATH = "fingerprints"
     }

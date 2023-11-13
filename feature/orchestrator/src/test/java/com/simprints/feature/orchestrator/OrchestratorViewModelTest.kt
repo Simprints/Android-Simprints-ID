@@ -26,7 +26,7 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.moduleapi.app.responses.IAppErrorReason
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -182,7 +182,7 @@ internal class OrchestratorViewModelTest {
             createMockStep(StepId.SETUP),
             createMockStep(StepId.CONSENT),
         )
-        every { mapRefusalOrErrorResult(any()) } returns AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
+        every { mapRefusalOrErrorResult(any()) } returns AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR)
 
         viewModel.handleAction(mockk())
         viewModel.handleResult(SetupResult(true))
