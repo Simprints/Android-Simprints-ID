@@ -6,4 +6,4 @@ import kotlinx.parcelize.Parcelize
 
 @Keep
 @Parcelize
-data class SecuredImageRef(override val path: Path) : ISecuredImageRef
+internal data class SecuredImageRef(override val path: Path) : ISecuredImageRef

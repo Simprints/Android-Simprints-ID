@@ -8,7 +8,7 @@ import com.simprints.infra.resources.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class ParentalConsentTextHelper @Inject constructor(
+internal class ParentalConsentTextHelper @Inject constructor(
     @ApplicationContext val context: Context
 ) {
     // TODO All the `getString(id).format(arg,arg)` calls should be `getString(id,arg,arg)` one strings are fixed

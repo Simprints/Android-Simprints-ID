@@ -23,7 +23,7 @@ import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class OtaFragment : Fragment(R.layout.fragment_ota) {
+internal class OtaFragment : Fragment(R.layout.fragment_ota) {
 
 
     private val viewModel: OtaViewModel by viewModels()

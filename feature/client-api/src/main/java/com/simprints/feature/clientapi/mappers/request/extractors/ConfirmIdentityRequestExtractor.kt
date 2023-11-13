@@ -5,7 +5,7 @@ import com.simprints.libsimprints.Constants.SIMPRINTS_SELECTED_GUID
 import com.simprints.libsimprints.Constants.SIMPRINTS_SESSION_ID
 
 
-class ConfirmIdentityRequestExtractor(val extras: Map<String, Any>) : ActionRequestExtractor(extras) {
+internal class ConfirmIdentityRequestExtractor(val extras: Map<String, Any>) : ActionRequestExtractor(extras) {
 
     fun getSessionId(): String = extras.extractString(SIMPRINTS_SESSION_ID)
 

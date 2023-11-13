@@ -34,7 +34,7 @@ import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry_pair) {
+internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry_pair) {
 
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
     private val viewModel: SerialEntryPairViewModel by viewModels()

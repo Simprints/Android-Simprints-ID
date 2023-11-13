@@ -6,8 +6,6 @@ object FaceConfigurationContract {
 
     val DESTINATION = R.id.faceConfigurationFragment
 
-    const val RESULT = "face_configuration_result"
-
     fun getArgs(
         projectId: String,
         deviceId: String,

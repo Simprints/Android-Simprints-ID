@@ -6,7 +6,7 @@ import com.simprints.moduleapi.app.responses.IAppResponseType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class AppRefusalResponse(
+internal data class AppRefusalResponse(
     override val reason: String,
     override val extra: String,
     override val type: IAppResponseType = IAppResponseType.REFUSAL

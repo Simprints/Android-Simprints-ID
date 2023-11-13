@@ -15,7 +15,7 @@ import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
-class BuildSubjectUseCase @Inject constructor(
+internal class BuildSubjectUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val subjectFactory: SubjectFactory
 ) {

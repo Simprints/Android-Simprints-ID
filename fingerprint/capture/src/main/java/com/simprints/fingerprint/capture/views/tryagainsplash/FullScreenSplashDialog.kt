@@ -10,7 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.simprints.infra.resources.R as IDR
 
-class FullScreenSplashDialog : DialogFragment(R.layout.activity_splash_screen) {
+internal class FullScreenSplashDialog : DialogFragment(R.layout.activity_splash_screen) {
 
     override fun getTheme() = IDR.style.Theme_Simprints_Dialog_FullScreen
 

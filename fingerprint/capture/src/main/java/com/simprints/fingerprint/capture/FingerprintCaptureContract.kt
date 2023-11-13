@@ -8,8 +8,6 @@ object FingerprintCaptureContract {
 
     val DESTINATION = R.id.fingerprintCaptureFragment
 
-    const val RESULT = "fingerprint_capture_result"
-
     fun getArgs(
         flowType: FlowProvider.FlowType,
         fingers: List<IFingerIdentifier>,

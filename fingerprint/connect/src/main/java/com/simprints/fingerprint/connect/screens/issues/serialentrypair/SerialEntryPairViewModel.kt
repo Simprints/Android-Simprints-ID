@@ -11,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SerialEntryPairViewModel @Inject constructor(
+internal class SerialEntryPairViewModel @Inject constructor(
     private val scannerPairingManager: ScannerPairingManager,
     private val serialNumberConverter: SerialNumberConverter
 ) : ViewModel() {

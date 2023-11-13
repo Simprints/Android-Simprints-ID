@@ -5,7 +5,7 @@ import com.simprints.moduleapi.app.responses.IAppResponseType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class AppConfirmationResponse(
+internal data class AppConfirmationResponse(
     override val identificationOutcome: Boolean,
     override val type: IAppResponseType = IAppResponseType.CONFIRMATION
 ) : IAppConfirmationResponse

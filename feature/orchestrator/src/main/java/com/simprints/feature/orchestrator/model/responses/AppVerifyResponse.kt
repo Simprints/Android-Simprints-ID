@@ -6,7 +6,7 @@ import com.simprints.moduleapi.app.responses.IAppVerifyResponse
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class AppVerifyResponse(
+internal data class AppVerifyResponse(
     override val matchResult: IAppMatchResult,
     override val type: IAppResponseType = IAppResponseType.VERIFY
 ) : IAppVerifyResponse

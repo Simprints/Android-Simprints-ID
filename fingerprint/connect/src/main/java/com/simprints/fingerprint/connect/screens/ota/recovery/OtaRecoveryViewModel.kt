@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class OtaRecoveryViewModel @Inject constructor(
+internal class OtaRecoveryViewModel @Inject constructor(
     private val scannerManager: ScannerManager
 ) : ViewModel() {
 

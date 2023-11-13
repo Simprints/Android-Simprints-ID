@@ -8,8 +8,6 @@ object MatchContract {
 
     val DESTINATION = R.id.matcherFragment
 
-    const val RESULT = "match_result"
-
     fun getArgs(
         fingerprintSamples: List<MatchParams.FingerprintSample> = emptyList(),
         faceSamples: List<MatchParams.FaceSample> = emptyList(),

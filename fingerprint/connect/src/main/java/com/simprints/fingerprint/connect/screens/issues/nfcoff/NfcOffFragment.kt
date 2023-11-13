@@ -20,7 +20,7 @@ import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class NfcOffFragment : Fragment(R.layout.fragment_nfc_off) {
+internal class NfcOffFragment : Fragment(R.layout.fragment_nfc_off) {
 
     private var handlingNfcEnabled = false
 

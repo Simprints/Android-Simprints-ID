@@ -3,6 +3,7 @@ package com.simprints.feature.login.tools.camera
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.simprints.core.DispatcherBG
 import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.BufferOverflow
@@ -11,10 +12,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
-internal class QrCodeAnalyzer(
+internal class QrCodeAnalyzer @Inject constructor(
     private val qrCodeDetector: QrCodeDetector,
-    private val bgDispatcher: CoroutineDispatcher,
+    @DispatcherBG private val bgDispatcher: CoroutineDispatcher,
 ) : ImageAnalysis.Analyzer {
 
     private val _scannedCode = MutableStateFlow<String?>(null)
