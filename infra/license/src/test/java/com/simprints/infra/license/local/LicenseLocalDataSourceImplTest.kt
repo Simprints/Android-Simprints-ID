@@ -1,15 +1,16 @@
 package com.simprints.infra.license.local
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.security.crypto.EncryptedFile
+import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.license.Vendor
 import com.simprints.infra.security.SecurityManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.MockKAnnotations
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -25,106 +26,80 @@ class LicenseLocalDataSourceImplTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private lateinit var dispatcher: CoroutineDispatcher
+    @MockK
+    private lateinit var context: Context
+
+    @MockK
+    private lateinit var securityManager: SecurityManager
+
+    @MockK
+    private lateinit var encryptedFile: EncryptedFile
+
     private val licenseVendor = Vendor("vendor1")
     private val filesDirPath = "testpath"
 
+    private lateinit var localSource: LicenseLocalDataSourceImpl
+
     @Before
     fun setUp() {
-        dispatcher = testCoroutineRule.testCoroutineDispatcher
+        MockKAnnotations.init(this, relaxUnitFun = true)
+
+        every { context.filesDir } returns File(filesDirPath)
+        every { securityManager.getEncryptedFileBuilder(any(), any()) } returns encryptedFile
+
+        localSource = LicenseLocalDataSourceImpl(
+            context = context,
+            keyHelper = securityManager,
+            dispatcherIo = testCoroutineRule.testCoroutineDispatcher,
+        )
     }
 
     @Test
     fun `check saving the file opens a file output`() = runTest {
-
-        val file = File(filesDirPath)
-        val mockFile = mockk<EncryptedFile>()
-
-        val encryptedFileMock = mockk<SecurityManager> {
-            every { getEncryptedFileBuilder(any(), any()) } returns mockFile
-        }
-
-        val localSource = LicenseLocalDataSourceImpl(context = mockk {
-            every { filesDir } returns file
-        }, encryptedFileMock, dispatcher)
-
-
         val fileName = "testfile"
         localSource.saveLicense(licenseVendor, fileName)
 
         assert(File("$filesDirPath/${LicenseLocalDataSource.LICENSES_FOLDER}").exists())
 
-        verify(exactly = 1) { mockFile.openFileOutput() }
+        verify(exactly = 1) { encryptedFile.openFileOutput() }
     }
 
     @Test
     fun `check getting the file requests the created file`() = runTest {
-
-        val file = File(filesDirPath)
-        val mockFile = mockk<EncryptedFile>()
-
-        val encryptedFileMock = mockk<SecurityManager> {
-            every { getEncryptedFileBuilder(any(), any()) } returns mockFile
-        }
-
-        val localSource = LicenseLocalDataSourceImpl(context = mockk {
-            every { filesDir } returns file
-        }, encryptedFileMock, dispatcher)
-
         localSource.getLicense(licenseVendor)
 
-        verify(exactly = 1) { encryptedFileMock.getEncryptedFileBuilder(any(), any()) }
-        verify(exactly = 1) { mockFile.openFileInput() }
+        verify(exactly = 1) { securityManager.getEncryptedFileBuilder(any(), any()) }
+        verify(exactly = 1) { encryptedFile.openFileInput() }
     }
 
     @Test
     fun `check file delete deletes the dir`() = runTest {
-
-        val file = File(filesDirPath)
-
-        val localSource = LicenseLocalDataSourceImpl(context = mockk() {
-            every { filesDir } returns file
-        }, mockk(), UnconfinedTestDispatcher())
-
         localSource.deleteCachedLicense()
 
-        assert(!File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists())
+        assertThat(File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists()).isFalse()
     }
 
     @Test
     fun `check getting the file renames old Roc license file to RANK_ONE_FACE `() = runTest {
-
         // Create the license folder and the old ROC.lic file
-        File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}").mkdirs()
-        val oldRocLicenseFile =
-            File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}/ROC.lic")
+        val licenceFolderPath = "${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}"
+        File(licenceFolderPath).mkdirs()
+        val oldRocLicenseFile = File("$licenceFolderPath/ROC.lic")
         oldRocLicenseFile.createNewFile()
-        val newRocLicenseFile =
-            File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}/RANK_ONE_FACE")
-
-        val localSource = LicenseLocalDataSourceImpl(context = mockk() {
-            every { filesDir } returns File(filesDirPath)
-        }, mockk(), dispatcher)
+        val newRocLicenseFile = File("$licenceFolderPath/RANK_ONE_FACE")
 
         localSource.getLicense(licenseVendor)
 
         // Check that the old ROC.lic file has been renamed to RANK_ONE_FACE
-        assert(!oldRocLicenseFile.exists())
-        assert(newRocLicenseFile.exists())
-
-
+        assertThat(oldRocLicenseFile.exists()).isFalse()
+        assertThat(newRocLicenseFile.exists()).isTrue()
     }
 
     @Test
     fun `check getting the file returns null if file does not exist`() = runTest {
-
-        val localSource = LicenseLocalDataSourceImpl(context = mockk {
-            every { filesDir } returns File(filesDirPath)
-        }, mockk(), dispatcher)
-
         val license = localSource.getLicense(licenseVendor)
 
-        assert(license == null)
+        assertThat(license).isNull()
     }
 
     @After
