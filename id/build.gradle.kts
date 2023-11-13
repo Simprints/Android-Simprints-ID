@@ -26,8 +26,7 @@ android {
 
 dependencies {
 
-    implementation(project(":core"))
-
+    implementation(project(":infra:core"))
     implementation(project(":infra:event-sync"))
 
     implementation(project(":feature:orchestrator"))
