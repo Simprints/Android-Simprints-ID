@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -46,7 +46,7 @@ class FaceMatcherUseCaseTest {
 
         useCase.invoke(
             MatchParams(
-                flowType = FlowProvider.FlowType.VERIFY,
+                flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery()
             ),
         )
@@ -72,7 +72,7 @@ class FaceMatcherUseCaseTest {
                 probeFaceSamples = listOf(
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))
                 ),
-                flowType = FlowProvider.FlowType.VERIFY,
+                flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery()
             ),
             { onLoadingCalled = true },

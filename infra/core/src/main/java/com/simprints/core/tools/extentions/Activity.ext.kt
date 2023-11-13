@@ -17,9 +17,6 @@ fun Activity.hideKeyboard() {
     inputMethodManager.hideSoftInputFromWindow(focusedView.windowToken, flags)
 }
 
-fun Activity.removeAnimationsToNextActivity() =
-    overridePendingTransition(0, 0)
-
 fun Activity.hasPermission(permission: String): Boolean {
     return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 }

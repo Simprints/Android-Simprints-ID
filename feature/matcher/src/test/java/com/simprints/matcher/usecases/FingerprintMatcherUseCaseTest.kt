@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.sync.ConfigManager
@@ -47,7 +47,7 @@ class FingerprintMatcherUseCaseTest {
 
         useCase.invoke(
             MatchParams(
-                flowType = FlowProvider.FlowType.VERIFY,
+                flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery()
             ),
         )
@@ -84,7 +84,7 @@ class FingerprintMatcherUseCaseTest {
                 probeFingerprintSamples = listOf(
                     MatchParams.FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, "format", byteArrayOf(1, 2, 3)),
                 ),
-                flowType = FlowProvider.FlowType.VERIFY,
+                flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery()
             ),
             { onLoadingCalled = true },

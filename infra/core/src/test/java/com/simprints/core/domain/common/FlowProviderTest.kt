@@ -7,17 +7,17 @@ class FlowProviderTest {
 
     @Test
     fun `enrol value returns current type`() {
-        assert(FlowProvider.FlowType.valueOf("ENROL") == FlowProvider.FlowType.ENROL)
+        assert(FlowType.valueOf("ENROL") == FlowType.ENROL)
     }
 
     @Test
     fun `identify value returns current type`() {
-        assert(FlowProvider.FlowType.valueOf("IDENTIFY") == FlowProvider.FlowType.IDENTIFY)
+        assert(FlowType.valueOf("IDENTIFY") == FlowType.IDENTIFY)
     }
 
     @Test
     fun `verify value returns current type`() {
-        assert(FlowProvider.FlowType.valueOf("VERIFY") == FlowProvider.FlowType.VERIFY)
+        assert(FlowType.valueOf("VERIFY") == FlowType.VERIFY)
     }
 
 }

@@ -3,7 +3,7 @@ package com.simprints.feature.orchestrator.usecases.steps
 import androidx.core.os.bundleOf
 import com.simprints.core.DeviceID
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.face.capture.FaceCaptureContract
 import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.feature.consent.ConsentContract
@@ -42,12 +42,12 @@ internal class BuildStepsUseCase @Inject constructor(
             buildConsentStep(ConsentType.ENROL),
             buildModalityCaptureSteps(
                 projectConfiguration,
-                FlowProvider.FlowType.ENROL,
+                FlowType.ENROL,
             ),
             if (projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
                 buildModalityMatcherSteps(
                     projectConfiguration,
-                    FlowProvider.FlowType.ENROL,
+                    FlowType.ENROL,
                     buildMatcherSubjectQuery(projectConfiguration, action),
                 )
             } else emptyList(),
@@ -59,11 +59,11 @@ internal class BuildStepsUseCase @Inject constructor(
             buildConsentStep(ConsentType.IDENTIFY),
             buildModalityCaptureSteps(
                 projectConfiguration,
-                FlowProvider.FlowType.IDENTIFY,
+                FlowType.IDENTIFY,
             ),
             buildModalityMatcherSteps(
                 projectConfiguration,
-                FlowProvider.FlowType.IDENTIFY,
+                FlowType.IDENTIFY,
                 buildMatcherSubjectQuery(projectConfiguration, action),
             )
         )
@@ -75,11 +75,11 @@ internal class BuildStepsUseCase @Inject constructor(
             buildConsentStep(ConsentType.VERIFY),
             buildModalityCaptureSteps(
                 projectConfiguration,
-                FlowProvider.FlowType.VERIFY,
+                FlowType.VERIFY,
             ),
             buildModalityMatcherSteps(
                 projectConfiguration,
-                FlowProvider.FlowType.VERIFY,
+                FlowType.VERIFY,
                 SubjectQuery(subjectId = action.verifyGuid),
             )
         )
@@ -133,8 +133,8 @@ internal class BuildStepsUseCase @Inject constructor(
 
 
     private fun buildModalityCaptureSteps(
-        projectConfiguration: ProjectConfiguration,
-        flowType: FlowProvider.FlowType,
+      projectConfiguration: ProjectConfiguration,
+      flowType: FlowType,
     ) = projectConfiguration.general.modalities.map {
         when (it) {
             Modality.FINGERPRINT -> {
@@ -162,9 +162,9 @@ internal class BuildStepsUseCase @Inject constructor(
     }
 
     private fun buildModalityMatcherSteps(
-        projectConfiguration: ProjectConfiguration,
-        flowType: FlowProvider.FlowType,
-        subjectQuery: SubjectQuery,
+      projectConfiguration: ProjectConfiguration,
+      flowType: FlowType,
+      subjectQuery: SubjectQuery,
     ) = projectConfiguration.general.modalities.map {
         Step(
             id = when (it) {

@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.simprints.core.ExternalScope
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
@@ -32,7 +32,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
     ) {
         externalScope.launch {
             val matchEntries = results.map { MatchEntry(it.subjectId, it.confidence) }
-            val event = if (matchParams.flowType == FlowProvider.FlowType.VERIFY) {
+            val event = if (matchParams.flowType == FlowType.VERIFY) {
                 getOneToOneEvent(
                     startTime, endTime,
                     matcherName,

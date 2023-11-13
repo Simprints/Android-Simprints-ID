@@ -10,7 +10,6 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.DispatcherBG
-import com.simprints.core.tools.delegates.lazyVar
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.events.event.domain.EventCount
@@ -18,7 +17,11 @@ import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
-import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncCountTask
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
 import com.simprints.infra.logging.Simber
@@ -43,11 +46,9 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
         const val OUTPUT_COUNT_WORKER_DOWN = "OUTPUT_COUNT_WORKER_DOWN"
     }
 
-    override val tag: String = EventDownSyncCountWorker::class.java.simpleName
+    private val wm = WorkManager.getInstance(context)
 
-    var wm: WorkManager by lazyVar {
-        WorkManager.getInstance(context)
-    }
+    override val tag: String = EventDownSyncCountWorker::class.java.simpleName
 
     private val downSyncScope by lazy {
         val jsonInput = inputData.getString(INPUT_COUNT_WORKER_DOWN)

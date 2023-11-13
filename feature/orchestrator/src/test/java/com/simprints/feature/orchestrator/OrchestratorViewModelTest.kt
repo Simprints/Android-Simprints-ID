@@ -5,7 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
@@ -194,7 +194,7 @@ internal class OrchestratorViewModelTest {
     fun `Updates face matcher step payload when receiving face capture`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(StepId.FACE_CAPTURE),
-            createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(FlowProvider.FlowType.VERIFY, SubjectQuery())),
+            createMockStep(StepId.FACE_MATCHER, MatchStepStubPayload.asBundle(FlowType.VERIFY, SubjectQuery())),
         )
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false
@@ -211,7 +211,7 @@ internal class OrchestratorViewModelTest {
     fun `Updates fingerprint matcher step payload when receiving fingerprint capture`() = runTest {
         every { stepsBuilder.build(any(), any()) } returns listOf(
             createMockStep(StepId.FINGERPRINT_CAPTURE),
-            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(FlowProvider.FlowType.VERIFY, SubjectQuery())),
+            createMockStep(StepId.FINGERPRINT_MATCHER, MatchStepStubPayload.asBundle(FlowType.VERIFY, SubjectQuery())),
         )
         every { mapRefusalOrErrorResult(any()) } returns null
         every { shouldCreatePerson(any(), any(), any()) } returns false

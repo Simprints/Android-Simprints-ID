@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.steps
 
 import android.os.Parcelable
 import androidx.core.os.bundleOf
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.matcher.MatchContract
 import com.simprints.matcher.MatchParams
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -16,8 +16,8 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 internal data class MatchStepStubPayload(
-    val flowType: FlowProvider.FlowType,
-    val subjectQuery: SubjectQuery,
+  val flowType: FlowType,
+  val subjectQuery: SubjectQuery,
 ) : Parcelable {
 
     fun toFaceStepArgs(samples: List<MatchParams.FaceSample>) = MatchContract.getArgs(
@@ -36,8 +36,8 @@ internal data class MatchStepStubPayload(
         const val STUB_KEY = "match_step_stub_payload"
 
         fun asBundle(
-            flowType: FlowProvider.FlowType,
-            subjectQuery: SubjectQuery,
+          flowType: FlowType,
+          subjectQuery: SubjectQuery,
         ) = bundleOf(STUB_KEY to MatchStepStubPayload(flowType, subjectQuery))
     }
 }
