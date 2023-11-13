@@ -1,12 +1,12 @@
 # Update the project dependencies using Renovate.
-# runs on a schedule every two weeks
+# runs on a schedule every Sunday
 # Can run on demand using the workflow_dispatch event
 
 name: Renovate
 on:
     workflow_dispatch:
     schedule:
-        -   cron: '0 0 * * SUN/2' # every two weeks on Sunday at midnight
+        -   cron: '0 0 * * SUN'
 
 jobs:
     renovate:
