@@ -49,11 +49,6 @@ class ConfirmationFragmentTest {
         )
     }
 
-    @BindValue
-    @JvmField
-    val flowProvider = mockk<FlowProvider>()
-
-
     @Test
     fun onLaunchConfirmationFragmentAssertTextAndNavigation() {
         val navController = TestNavHostController(
