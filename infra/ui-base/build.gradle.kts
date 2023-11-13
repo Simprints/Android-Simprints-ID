@@ -32,5 +32,5 @@ dependencies {
 
     api(libs.androidX.navigation.fragment)
 
-    testImplementation(project(":testtools"))
+    testImplementation(project(":infra:test-tools"))
 }

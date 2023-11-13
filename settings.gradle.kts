@@ -95,6 +95,7 @@ include(
 // Infra modules
 include(
     ":infra:core",
+    ":infra:test-tools",
     ":infra:events",
     ":infra:event-sync",
     ":infra:config-store",
@@ -114,9 +115,4 @@ include(
     ":infra:security",
     ":infra:orchestrator-data",
     ":infra:ui-base",
-)
-
-// Tooling modules
-include(
-    ":testtools",
 )
