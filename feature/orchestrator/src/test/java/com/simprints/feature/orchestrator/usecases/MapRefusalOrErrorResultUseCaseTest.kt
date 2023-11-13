@@ -9,8 +9,8 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.moduleapi.app.responses.IAppErrorResponse
-import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppErrorResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppRefusalFormResponse
 import org.junit.Before
 import org.junit.Test
 

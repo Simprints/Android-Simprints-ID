@@ -8,7 +8,7 @@ import com.simprints.fingerprint.capture.state.ScanResult
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import io.mockk.MockKAnnotations
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -56,7 +56,8 @@ internal class AddCaptureEventsUseCaseTest {
     fun `Saves only capture event when not a good scan and not too many bad scans`() = runTest {
         useCase.invoke(
             1L,
-            FingerState(IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
+            FingerState(
+              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
                 ScanResult(0, byteArrayOf(), "", null, 10)))
             ),
             10,
@@ -71,7 +72,8 @@ internal class AddCaptureEventsUseCaseTest {
     fun `Saves biometric event when good scan`() = runTest {
         useCase.invoke(
             1L,
-            FingerState(IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
+            FingerState(
+              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
                 ScanResult(100, byteArrayOf(), "", null, 10)))
             ),
             10,
@@ -89,7 +91,8 @@ internal class AddCaptureEventsUseCaseTest {
     fun `Saves biometric event when too many bad scans`() = runTest {
         useCase.invoke(
             1L,
-            FingerState(IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
+            FingerState(
+              IFingerIdentifier.LEFT_THUMB, listOf(CaptureState.Collected(
                 ScanResult(0, byteArrayOf(), "", null, 10)))
             ),
             10,

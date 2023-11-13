@@ -14,9 +14,9 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
-import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence
-import com.simprints.moduleapi.app.responses.IAppResponseTier
+import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.response.AppResponseTier
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -50,14 +50,14 @@ class LibSimprintsResponseMapperTest {
                 StubMatchResult(
                     guid = "guid-1",
                     confidenceScore = 100,
-                    tier = IAppResponseTier.TIER_5,
-                    matchConfidence = IAppMatchConfidence.MEDIUM,
+                    tier = AppResponseTier.TIER_5,
+                    matchConfidence = AppMatchConfidence.MEDIUM,
                 ),
                 StubMatchResult(
                     guid = "guid-2",
                     confidenceScore = 75,
-                    tier = IAppResponseTier.TIER_3,
-                    matchConfidence = IAppMatchConfidence.LOW,
+                    tier = AppResponseTier.TIER_3,
+                    matchConfidence = AppMatchConfidence.LOW,
                 ),
             )
         ))
@@ -91,8 +91,8 @@ class LibSimprintsResponseMapperTest {
             matchResult = StubMatchResult(
                 guid = "guid",
                 confidenceScore = 50,
-                tier = IAppResponseTier.TIER_2,
-                matchConfidence = IAppMatchConfidence.HIGH,
+                tier = AppResponseTier.TIER_2,
+                matchConfidence = AppMatchConfidence.HIGH,
             ),
         ))
 
@@ -127,7 +127,7 @@ class LibSimprintsResponseMapperTest {
             actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
-            reason = IAppErrorReason.UNEXPECTED_ERROR,
+            reason = AppErrorReason.UNEXPECTED_ERROR,
             flowCompleted = true,
         ))
 
@@ -139,23 +139,23 @@ class LibSimprintsResponseMapperTest {
     @Test
     fun `correctly maps error code override`() {
         mapOf(
-            IAppErrorReason.UNEXPECTED_ERROR to Constants.SIMPRINTS_UNEXPECTED_ERROR,
-            IAppErrorReason.ROOTED_DEVICE to Constants.SIMPRINTS_ROOTED_DEVICE,
-            IAppErrorReason.LOGIN_NOT_COMPLETE to Constants.SIMPRINTS_LOGIN_NOT_COMPLETE,
-            IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN to Constants.SIMPRINTS_INVALID_PROJECT_ID,
-            IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN to Constants.SIMPRINTS_INVALID_USER_ID,
-            IAppErrorReason.GUID_NOT_FOUND_ONLINE to Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE,
-            IAppErrorReason.GUID_NOT_FOUND_OFFLINE to Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE,
-            IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED to Constants.SIMPRINTS_ENROLMENT_LAST_BIOMETRICS_FAILED,
-            IAppErrorReason.BLUETOOTH_NOT_SUPPORTED to Constants.SIMPRINTS_BLUETOOTH_NOT_SUPPORTED,
-            IAppErrorReason.BLUETOOTH_NO_PERMISSION to Constants.SIMPRINTS_BLUETOOTH_NO_PERMISSION,
-            IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR to Constants.SIMPRINTS_FINGERPRINT_CONFIGURATION_ERROR,
-            IAppErrorReason.FACE_CONFIGURATION_ERROR to Constants.SIMPRINTS_FACE_CONFIGURATION_ERROR,
-            IAppErrorReason.FACE_LICENSE_MISSING to Constants.SIMPRINTS_FACE_LICENSE_MISSING,
-            IAppErrorReason.FACE_LICENSE_INVALID to Constants.SIMPRINTS_FACE_LICENSE_INVALID,
-            IAppErrorReason.BACKEND_MAINTENANCE_ERROR to Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR,
-            IAppErrorReason.PROJECT_PAUSED to Constants.SIMPRINTS_PROJECT_PAUSED,
-            IAppErrorReason.PROJECT_ENDING to Constants.SIMPRINTS_PROJECT_ENDING,
+            AppErrorReason.UNEXPECTED_ERROR to Constants.SIMPRINTS_UNEXPECTED_ERROR,
+            AppErrorReason.ROOTED_DEVICE to Constants.SIMPRINTS_ROOTED_DEVICE,
+            AppErrorReason.LOGIN_NOT_COMPLETE to Constants.SIMPRINTS_LOGIN_NOT_COMPLETE,
+            AppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN to Constants.SIMPRINTS_INVALID_PROJECT_ID,
+            AppErrorReason.DIFFERENT_USER_ID_SIGNED_IN to Constants.SIMPRINTS_INVALID_USER_ID,
+            AppErrorReason.GUID_NOT_FOUND_ONLINE to Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE,
+            AppErrorReason.GUID_NOT_FOUND_OFFLINE to Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE,
+            AppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED to Constants.SIMPRINTS_ENROLMENT_LAST_BIOMETRICS_FAILED,
+            AppErrorReason.BLUETOOTH_NOT_SUPPORTED to Constants.SIMPRINTS_BLUETOOTH_NOT_SUPPORTED,
+            AppErrorReason.BLUETOOTH_NO_PERMISSION to Constants.SIMPRINTS_BLUETOOTH_NO_PERMISSION,
+            AppErrorReason.FINGERPRINT_CONFIGURATION_ERROR to Constants.SIMPRINTS_FINGERPRINT_CONFIGURATION_ERROR,
+            AppErrorReason.FACE_CONFIGURATION_ERROR to Constants.SIMPRINTS_FACE_CONFIGURATION_ERROR,
+            AppErrorReason.FACE_LICENSE_MISSING to Constants.SIMPRINTS_FACE_LICENSE_MISSING,
+            AppErrorReason.FACE_LICENSE_INVALID to Constants.SIMPRINTS_FACE_LICENSE_INVALID,
+            AppErrorReason.BACKEND_MAINTENANCE_ERROR to Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR,
+            AppErrorReason.PROJECT_PAUSED to Constants.SIMPRINTS_PROJECT_PAUSED,
+            AppErrorReason.PROJECT_ENDING to Constants.SIMPRINTS_PROJECT_ENDING,
         ).forEach { (reason, expectedCode) ->
             val extras = mapper(ActionResponse.ErrorActionResponse(
                 actionIdentifier = EnrolActionFactory.getIdentifier(),

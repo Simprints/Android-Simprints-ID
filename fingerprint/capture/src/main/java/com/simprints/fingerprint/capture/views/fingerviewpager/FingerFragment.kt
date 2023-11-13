@@ -25,7 +25,7 @@ import com.simprints.fingerprint.capture.views.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.capture.views.timeoutbar.ScanningWithImageTransferTimeoutBar
 import com.simprints.fingerprint.capture.databinding.FragmentFingerBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

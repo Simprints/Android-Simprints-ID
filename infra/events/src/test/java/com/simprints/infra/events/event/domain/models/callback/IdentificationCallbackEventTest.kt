@@ -7,8 +7,8 @@ import com.simprints.infra.events.event.domain.models.callback.IdentificationCal
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence
-import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.response.AppResponseTier.TIER_1
 import org.junit.Test
 
 class IdentificationCallbackEventTest {
@@ -16,7 +16,7 @@ class IdentificationCallbackEventTest {
     @Test
     fun create_IdentificationCallbackEvent() {
         val labels = EventLabels(sessionId = GUID1)
-        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, IAppMatchConfidence.NONE)
+        val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, AppMatchConfidence.NONE)
 
         val event = IdentificationCallbackEvent(CREATED_AT, GUID1, listOf(comparisonScore), labels)
         assertThat(event.id).isNotNull()

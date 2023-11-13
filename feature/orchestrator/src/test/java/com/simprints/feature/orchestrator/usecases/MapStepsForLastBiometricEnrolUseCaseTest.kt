@@ -11,7 +11,7 @@ import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Before
 import org.junit.Test
 
@@ -82,7 +82,8 @@ class MapStepsForLastBiometricEnrolUseCaseTest {
             FingerprintCaptureResult(
                 results = listOf(
                     FingerprintCaptureResult.Item(IFingerIdentifier.LEFT_THUMB, null),
-                    FingerprintCaptureResult.Item(IFingerIdentifier.RIGHT_THUMB, FingerprintCaptureResult.Sample(
+                    FingerprintCaptureResult.Item(
+                      IFingerIdentifier.RIGHT_THUMB, FingerprintCaptureResult.Sample(
                         fingerIdentifier = IFingerIdentifier.RIGHT_THUMB,
                         template = byteArrayOf(),
                         templateQualityScore = 0,

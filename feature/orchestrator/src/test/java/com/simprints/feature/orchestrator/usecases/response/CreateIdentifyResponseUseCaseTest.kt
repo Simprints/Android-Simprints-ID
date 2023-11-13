@@ -173,10 +173,10 @@ class CreateIdentifyResponseUseCaseTest {
     }
 
     private fun createFaceMatchResult(vararg confidences: Float): Parcelable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(guid = "1", confidence = it) }
+        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) }
     )
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Parcelable = FingerprintMatchResult(
-        confidences.map { FingerprintMatchResult.Item(personId = "1", confidenceScore = it) }
+        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) }
     )
 }

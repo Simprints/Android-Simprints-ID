@@ -4,8 +4,6 @@ import androidx.annotation.Keep
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.infra.eventsync.event.remote.models.ApiConfidenceMatch
 import com.simprints.infra.eventsync.event.remote.models.ApiTier
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence
-import com.simprints.moduleapi.app.responses.IAppResponseTier
 
 @Keep
 internal sealed class ApiCallbackComparisonScore {

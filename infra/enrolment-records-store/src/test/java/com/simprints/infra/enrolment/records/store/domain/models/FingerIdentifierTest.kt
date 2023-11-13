@@ -1,7 +1,7 @@
 package com.simprints.infra.enrolment.records.store.domain.models
 
 import com.google.common.truth.Truth
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 class FingerIdentifierTest {

@@ -34,13 +34,13 @@ import com.simprints.infra.orchestration.data.results.AppResult
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
-import com.simprints.moduleapi.app.responses.IAppEnrolResponse
-import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppErrorResponse
-import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
-import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
-import com.simprints.moduleapi.app.responses.IAppVerifyResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppConfirmationResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppEnrolResponse
+import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppErrorResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppIdentifyResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppRefusalFormResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppVerifyResponse
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -132,7 +132,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         })
 
         loginCheckVm.returnLoginNotComplete.observe(viewLifecycleOwner, LiveDataEventObserver {
-            clientApiVm.handleErrorResponse(args.requestAction, AppErrorResponse(IAppErrorReason.LOGIN_NOT_COMPLETE))
+            clientApiVm.handleErrorResponse(args.requestAction, AppErrorResponse(AppErrorReason.LOGIN_NOT_COMPLETE))
         })
 
         loginCheckVm.proceedWithAction.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { action ->
@@ -164,7 +164,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         })
         orchestratorVm.appResponse.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { response ->
             if (response.request == null) {
-                clientApiVm.handleErrorResponse(args.requestAction, AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR))
+                clientApiVm.handleErrorResponse(args.requestAction, AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR))
             } else {
                 when (response.response) {
                     is IAppEnrolResponse -> clientApiVm.handleEnrolResponse(response.request, response.response)
@@ -173,7 +173,8 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
                     is IAppVerifyResponse -> clientApiVm.handleVerifyResponse(response.request, response.response)
                     is IAppRefusalFormResponse -> clientApiVm.handleExitFormResponse(response.request, response.response)
                     is IAppErrorResponse -> clientApiVm.handleErrorResponse(args.requestAction, response.response)
-                    else -> clientApiVm.handleErrorResponse(args.requestAction, AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR))
+                    else -> clientApiVm.handleErrorResponse(args.requestAction, AppErrorResponse(
+                        AppErrorReason.UNEXPECTED_ERROR))
                 }
             }
         })

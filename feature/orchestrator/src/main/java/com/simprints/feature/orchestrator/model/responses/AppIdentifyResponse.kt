@@ -1,8 +1,8 @@
 package com.simprints.feature.orchestrator.model.responses
 
-import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
-import com.simprints.moduleapi.app.responses.IAppMatchResult
-import com.simprints.moduleapi.app.responses.IAppResponseType
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppIdentifyResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppMatchResult
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppResponseType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

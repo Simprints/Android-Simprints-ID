@@ -2,8 +2,8 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
-import com.simprints.moduleapi.app.responses.IAppResponse
-import com.simprints.moduleapi.app.responses.IAppResponseType
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.IAppResponseType
 import javax.inject.Inject
 
 internal class UpdateDailyActivityUseCase @Inject constructor(

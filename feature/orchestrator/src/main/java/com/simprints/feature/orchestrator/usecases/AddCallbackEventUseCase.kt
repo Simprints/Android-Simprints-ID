@@ -1,6 +1,8 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.simprints.core.ExternalScope
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
@@ -10,16 +12,7 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
-import com.simprints.moduleapi.app.responses.IAppEnrolResponse
-import com.simprints.moduleapi.app.responses.IAppErrorResponse
-import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence
-import com.simprints.moduleapi.app.responses.IAppMatchResult
-import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
-import com.simprints.moduleapi.app.responses.IAppResponse
-import com.simprints.moduleapi.app.responses.IAppResponseTier
-import com.simprints.moduleapi.app.responses.IAppVerifyResponse
+import com.simprints.infra.orchestration.moduleapi.app.responses.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -65,8 +58,8 @@ internal class AddCallbackEventUseCase @Inject constructor(
     private fun buildComparisonScore(matchResult: IAppMatchResult) = CallbackComparisonScore(
         matchResult.guid,
         matchResult.confidenceScore,
-        IAppResponseTier.valueOf(matchResult.tier.name),
-        IAppMatchConfidence.valueOf(matchResult.matchConfidence.name),
+        AppResponseTier.valueOf(matchResult.tier.name),
+        AppMatchConfidence.valueOf(matchResult.matchConfidence.name),
     )
 
     private fun buildRefusalCallbackEvent(appResponse: IAppRefusalFormResponse) = RefusalCallbackEvent(

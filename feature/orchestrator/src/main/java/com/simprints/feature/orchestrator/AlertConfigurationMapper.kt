@@ -10,7 +10,7 @@ import com.simprints.feature.alert.config.AlertColor
 import com.simprints.feature.clientapi.models.ClientApiError
 import com.simprints.feature.logincheck.LoginCheckError
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
-import com.simprints.moduleapi.app.responses.IAppErrorReason
+import com.simprints.core.domain.response.AppErrorReason
 import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
@@ -126,27 +126,27 @@ internal class AlertConfigurationMapper @Inject constructor() {
 
     companion object {
 
-        fun reasonFromPayload(extras: Bundle): IAppErrorReason {
-            val type = extras.getString(PAYLOAD_TYPE_KEY) ?: return IAppErrorReason.UNEXPECTED_ERROR
-            val payload = extras.getString(PAYLOAD_KEY) ?: return IAppErrorReason.UNEXPECTED_ERROR
+        fun reasonFromPayload(extras: Bundle): AppErrorReason {
+            val type = extras.getString(PAYLOAD_TYPE_KEY) ?: return AppErrorReason.UNEXPECTED_ERROR
+            val payload = extras.getString(PAYLOAD_KEY) ?: return AppErrorReason.UNEXPECTED_ERROR
 
             return when (type) {
-                ClientApiError::name.name -> IAppErrorReason.UNEXPECTED_ERROR
+                ClientApiError::name.name -> AppErrorReason.UNEXPECTED_ERROR
                 LoginCheckError::name.name -> when (LoginCheckError.valueOf(payload)) {
                     LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES,
                     LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED,
                     LoginCheckError.INTEGRITY_SERVICE_ERROR,
                     LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP,
                     LoginCheckError.UNEXPECTED_LOGIN_ERROR,
-                    -> IAppErrorReason.UNEXPECTED_ERROR
+                    -> AppErrorReason.UNEXPECTED_ERROR
 
-                    LoginCheckError.DIFFERENT_PROJECT_ID -> IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
-                    LoginCheckError.PROJECT_PAUSED -> IAppErrorReason.PROJECT_PAUSED
-                    LoginCheckError.PROJECT_ENDING -> IAppErrorReason.PROJECT_ENDING
-                    LoginCheckError.ROOTED_DEVICE -> IAppErrorReason.ROOTED_DEVICE
+                    LoginCheckError.DIFFERENT_PROJECT_ID -> AppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
+                    LoginCheckError.PROJECT_PAUSED -> AppErrorReason.PROJECT_PAUSED
+                    LoginCheckError.PROJECT_ENDING -> AppErrorReason.PROJECT_ENDING
+                    LoginCheckError.ROOTED_DEVICE -> AppErrorReason.ROOTED_DEVICE
                 }
 
-                else -> IAppErrorReason.UNEXPECTED_ERROR
+                else -> AppErrorReason.UNEXPECTED_ERROR
             }
         }
 

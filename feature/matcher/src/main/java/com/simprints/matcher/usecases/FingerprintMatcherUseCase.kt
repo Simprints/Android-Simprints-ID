@@ -12,7 +12,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import java.io.Serializable

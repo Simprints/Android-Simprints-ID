@@ -10,7 +10,7 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs

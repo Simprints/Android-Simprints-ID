@@ -9,7 +9,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
-import com.simprints.moduleapi.app.responses.IAppErrorReason
+import com.simprints.core.domain.response.AppErrorReason
 import javax.inject.Inject
 
 internal class LibSimprintsResponseMapper @Inject constructor() {
@@ -63,24 +63,24 @@ internal class LibSimprintsResponseMapper @Inject constructor() {
         actions?.let { putString(Constants.SIMPRINTS_COSYNC_SUBJECT_ACTIONS, it) }
     }
 
-    private fun IAppErrorReason.libSimprintsResultCode() = when (this) {
-        IAppErrorReason.UNEXPECTED_ERROR -> Constants.SIMPRINTS_UNEXPECTED_ERROR
-        IAppErrorReason.ROOTED_DEVICE -> Constants.SIMPRINTS_ROOTED_DEVICE
-        IAppErrorReason.LOGIN_NOT_COMPLETE -> Constants.SIMPRINTS_LOGIN_NOT_COMPLETE
-        IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN -> Constants.SIMPRINTS_INVALID_PROJECT_ID
-        IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN -> Constants.SIMPRINTS_INVALID_USER_ID
-        IAppErrorReason.GUID_NOT_FOUND_ONLINE -> Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE
-        IAppErrorReason.GUID_NOT_FOUND_OFFLINE -> Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE
-        IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> Constants.SIMPRINTS_ENROLMENT_LAST_BIOMETRICS_FAILED
-        IAppErrorReason.BLUETOOTH_NOT_SUPPORTED -> Constants.SIMPRINTS_BLUETOOTH_NOT_SUPPORTED
-        IAppErrorReason.BLUETOOTH_NO_PERMISSION -> Constants.SIMPRINTS_BLUETOOTH_NO_PERMISSION
-        IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR -> Constants.SIMPRINTS_FINGERPRINT_CONFIGURATION_ERROR
-        IAppErrorReason.FACE_CONFIGURATION_ERROR -> Constants.SIMPRINTS_FACE_CONFIGURATION_ERROR
-        IAppErrorReason.FACE_LICENSE_MISSING -> Constants.SIMPRINTS_FACE_LICENSE_MISSING
-        IAppErrorReason.FACE_LICENSE_INVALID -> Constants.SIMPRINTS_FACE_LICENSE_INVALID
-        IAppErrorReason.BACKEND_MAINTENANCE_ERROR -> Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR
-        IAppErrorReason.PROJECT_PAUSED -> Constants.SIMPRINTS_PROJECT_PAUSED
-        IAppErrorReason.PROJECT_ENDING -> Constants.SIMPRINTS_PROJECT_ENDING
+    private fun AppErrorReason.libSimprintsResultCode() = when (this) {
+        AppErrorReason.UNEXPECTED_ERROR -> Constants.SIMPRINTS_UNEXPECTED_ERROR
+        AppErrorReason.ROOTED_DEVICE -> Constants.SIMPRINTS_ROOTED_DEVICE
+        AppErrorReason.LOGIN_NOT_COMPLETE -> Constants.SIMPRINTS_LOGIN_NOT_COMPLETE
+        AppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN -> Constants.SIMPRINTS_INVALID_PROJECT_ID
+        AppErrorReason.DIFFERENT_USER_ID_SIGNED_IN -> Constants.SIMPRINTS_INVALID_USER_ID
+        AppErrorReason.GUID_NOT_FOUND_ONLINE -> Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE
+        AppErrorReason.GUID_NOT_FOUND_OFFLINE -> Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE
+        AppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED -> Constants.SIMPRINTS_ENROLMENT_LAST_BIOMETRICS_FAILED
+        AppErrorReason.BLUETOOTH_NOT_SUPPORTED -> Constants.SIMPRINTS_BLUETOOTH_NOT_SUPPORTED
+        AppErrorReason.BLUETOOTH_NO_PERMISSION -> Constants.SIMPRINTS_BLUETOOTH_NO_PERMISSION
+        AppErrorReason.FINGERPRINT_CONFIGURATION_ERROR -> Constants.SIMPRINTS_FINGERPRINT_CONFIGURATION_ERROR
+        AppErrorReason.FACE_CONFIGURATION_ERROR -> Constants.SIMPRINTS_FACE_CONFIGURATION_ERROR
+        AppErrorReason.FACE_LICENSE_MISSING -> Constants.SIMPRINTS_FACE_LICENSE_MISSING
+        AppErrorReason.FACE_LICENSE_INVALID -> Constants.SIMPRINTS_FACE_LICENSE_INVALID
+        AppErrorReason.BACKEND_MAINTENANCE_ERROR -> Constants.SIMPRINTS_BACKEND_MAINTENANCE_ERROR
+        AppErrorReason.PROJECT_PAUSED -> Constants.SIMPRINTS_PROJECT_PAUSED
+        AppErrorReason.PROJECT_ENDING -> Constants.SIMPRINTS_PROJECT_ENDING
 
         /*
         TODO incorporate these error codes into the client api
