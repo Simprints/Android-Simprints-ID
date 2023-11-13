@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    api(project(":core"))
+    api(project(":infra:core"))
 
     api(libs.testing.androidX.core)
     api(libs.androidX.multidex)
