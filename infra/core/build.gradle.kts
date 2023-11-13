@@ -32,5 +32,5 @@ dependencies {
     implementation(libs.kronos.kronos)
     implementation(libs.tink.core)
 
-    testImplementation(project(":testtools"))
+    testImplementation(project(":infra:test-tools"))
 }
