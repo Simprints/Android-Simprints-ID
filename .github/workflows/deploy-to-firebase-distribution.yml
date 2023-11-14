@@ -19,6 +19,17 @@ on:
 jobs:
     deploy:
         runs-on: ubuntu-latest
+
+        concurrency:
+            group: firebase-${{ inputs.buildType }}-workflow #only one instance of this workflow can run at a time
+
+        environment: ${{ inputs.buildType }}
+
+        env:
+            BUILD_IS_DEBUGGABLE: ${{ vars.BUILD_IS_DEBUGGABLE }}
+            DB_IS_ENCRYPTED: ${{ vars.DB_IS_ENCRYPTED }}
+            FIREBASE_DIST_CREDENTIALS: ${{ secrets.FIREBASE_DIST_CREDENTIALS}}
+
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
@@ -31,7 +42,7 @@ jobs:
             -   name: Set up Gradle
                 uses: gradle/gradle-build-action@v2
 
-            -   name: setup local.properties
+            -   name: Set up local.properties
                 run: |
                     source ci/pipeline/setup
                     echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
@@ -39,19 +50,14 @@ jobs:
 
             -   name: Update build properties
                 run: |
-                    source ci/deployment/build_properties_setup ${{ inputs.buildType }} true true
-            # if the build type is staging,write secret.firebaseStagingCredintials to serviceCredentialsFile.json
-            # if the build type is dev,write the secret.firebasedevCredintials to the file serviceCredentialsFile.json
-            # decode the base64 encoded credentials before writing them to the file
+                    source ci/deployment/build_properties_setup ${{ inputs.buildType }} $BUILD_IS_DEBUGGABLE $DB_IS_ENCRYPTED
+
+
             -   name: write firebase credentials
-                run: |
-                    if [ "${{ inputs.buildType }}" = "dev" ]; then
-                        echo ${{ secrets.FIREBASE_DEV_KEY_BASE64}} | base64 --decode >  id/src/main/serviceCredentialsFile.json
-                    else
-                        echo ${{ secrets.FIREBASE_STAGING_KEY_BASE64 }} | base64 --decode > id/src/main/serviceCredentialsFile.json
-                    fi
+                run: echo "$FIREBASE_DIST_CREDENTIALS" >  id/src/main/serviceCredentialsFile.json
+
             -   name: build apk
-                run: |                 
+                run: |
                     #check if the build type is dev or staging
                     if [ "${{ inputs.buildType }}" = "dev" ]; then
                         ./gradlew id:packageDebugUniversalApk
@@ -63,8 +69,8 @@ jobs:
                 run: |
                     #check if the build type is dev or staging
                     if [ "${{ inputs.buildType }}" = "dev" ]; then
-                        ./gradlew id:appDistributionUploadDebug
+                        ./gradlew id:appDistributionUploadDebug --artifactPath=id/build/outputs/apk_from_bundle/debug/id-debug-universal.apk
                     else
-                        ./gradlew id:appDistributionUploadStaging
+                        ./gradlew id:appDistributionUploadStaging  --artifactPath=id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk    
                     fi
                     echo "### An Apk was deployed into firebase ${{ inputs.buildType }} channel :rocket:" >> $GITHUB_STEP_SUMMARY

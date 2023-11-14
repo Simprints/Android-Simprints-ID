@@ -1,6 +1,6 @@
 # This workflow build and sign android bundle and uploads it to google play internal testing track
 
-name: Release to Internal
+name: Deploy to Internal
 
 on:
     # Manual trigger for workflow dispatch (e.g., when clicking "Run workflow" button)
@@ -12,12 +12,12 @@ on:
         branches:
             - 'release/*'
 jobs:
-    build-and-deploy:
+    deploy-to-internal:
 
         runs-on: ubuntu-latest
 
         concurrency:
-            group: release-workflow #only one instance of this workflow can run at a time
+            group: release-internal-workflow #only one instance of this workflow can run at a time
 
         permissions:
             contents: write # A write permission For Auto tagging the releases
@@ -47,7 +47,7 @@ jobs:
             -   name: Set up Gradle
                 uses: gradle/gradle-build-action@v2
 
-            -   name: setup local.properties
+            -   name: Set up local.properties
                 run: |
                     source ci/pipeline/setup
                     echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
@@ -66,7 +66,7 @@ jobs:
             -   name: Set up signing properties
                 run: source ci/deployment/signing_properties_setup
 
-            -   name: Build and deploy Release bundle
+            -   name: Build the Release bundle
                 run: ./gradlew id:bundleRelease
 
             -   name: Publish Release bundle
