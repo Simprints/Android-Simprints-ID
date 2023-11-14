@@ -33,7 +33,6 @@ sealed class TokenizableString : Parcelable {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (this.javaClass != other?.javaClass) return false
         if (this === other) return true
 
         return other is TokenizableString && other.value == value

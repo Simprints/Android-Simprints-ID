@@ -11,8 +11,6 @@ import androidx.lifecycle.Observer
  */
 class LiveDataEventObserver(private val onEventUnhandledContent: () -> Unit) : Observer<LiveDataEvent> {
     override fun onChanged(value: LiveDataEvent) {
-        value.getIfNotHandled()?.let {
-            onEventUnhandledContent()
-        }
+        value.getIfNotHandled()?.let { onEventUnhandledContent() }
     }
 }

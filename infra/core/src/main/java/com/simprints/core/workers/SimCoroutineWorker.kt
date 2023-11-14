@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.CancellationException
 
+@ExcludedFromGeneratedTestCoverageReports("Abstract base class")
 abstract class SimCoroutineWorker(
     context: Context,
     params: WorkerParameters,
