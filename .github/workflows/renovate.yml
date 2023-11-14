@@ -1,0 +1,28 @@
+# Update the project dependencies using Renovate.
+# runs on a schedule every Sunday
+# Can run on demand using the workflow_dispatch event
+
+name: Renovate
+on:
+    workflow_dispatch:
+    schedule:
+        -   cron: '0 0 * * SUN'
+
+jobs:
+    renovate:
+        runs-on: ubuntu-latest
+        permissions: # Renovate should have permissions to commit updates and create PRs
+            contents: write
+            pull-requests: write
+            repository-projects: write
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+            -   name: Run renovate
+                uses: renovatebot/github-action@v39.1.1
+                env:
+                    RENOVATE_TOKEN: ${{secrets.GITHUB_TOKEN }}
+                    LOG_LEVEL: debug
+                with:
+                    configurationFile: renovate.json
+                    token: ${{ secrets.GITHUB_TOKEN }}

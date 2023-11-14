@@ -1,9 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "major": {
-    "dependencyDashboardApproval": "false"
-  },
-  "extends": [
-    "github>TWiStErRob/renovate-config"
-  ]
+  "branchPrefix": "renovate/",
+  "dependencyDashboardTitle": "Dependency Dashboard",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "onboarding": false,
+  "platform": "github",
+  "repositories": ["Simprints/Android-Simprints-ID"]
 }
