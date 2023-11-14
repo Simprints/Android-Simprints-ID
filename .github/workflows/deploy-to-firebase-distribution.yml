@@ -1,0 +1,70 @@
+# Deploy APKs to Firebase App Distribution
+name: Deploy to Firebase
+on:
+    workflow_call:
+        inputs:
+            buildType:
+                type: string
+                required: true
+
+    workflow_dispatch:
+        inputs:
+            buildType:
+                type: choice
+                required: true
+                default: dev
+                options:
+                    - dev
+                    - staging
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v3
+                with:
+                    java-version: 17
+                    distribution: 'temurin'
+
+            -   name: Set up Gradle
+                uses: gradle/gradle-build-action@v2
+
+            -   name: setup local.properties
+                run: |
+                    source ci/pipeline/setup
+                    echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
+                    echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
+
+            -   name: Update build properties
+                run: |
+                    source ci/deployment/build_properties_setup ${{ inputs.buildType }} true true
+            # if the build type is staging,write secret.firebaseStagingCredintials to serviceCredentialsFile.json
+            # if the build type is dev,write the secret.firebasedevCredintials to the file serviceCredentialsFile.json
+            # decode the base64 encoded credentials before writing them to the file
+            -   name: write firebase credentials
+                run: |
+                    if [ "${{ inputs.buildType }}" = "dev" ]; then
+                        echo ${{ secrets.FIREBASE_DEV_KEY_BASE64}} | base64 --decode >  id/src/main/serviceCredentialsFile.json
+                    else
+                        echo ${{ secrets.FIREBASE_STAGING_KEY_BASE64 }} | base64 --decode > id/src/main/serviceCredentialsFile.json
+                    fi
+            -   name: build apk
+                run: |                 
+                    #check if the build type is dev or staging
+                    if [ "${{ inputs.buildType }}" = "dev" ]; then
+                        ./gradlew id:packageDebugUniversalApk
+                    else
+                        ./gradlew id:packageStagingUniversalApk
+                    fi
+
+            -   name: deploy to firebase
+                run: |
+                    #check if the build type is dev or staging
+                    if [ "${{ inputs.buildType }}" = "dev" ]; then
+                        ./gradlew id:appDistributionUploadDebug
+                    else
+                        ./gradlew id:appDistributionUploadStaging
+                    fi
+                    echo "### An Apk was deployed into firebase ${{ inputs.buildType }} channel :rocket:" >> $GITHUB_STEP_SUMMARY

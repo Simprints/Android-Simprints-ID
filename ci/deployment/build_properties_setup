@@ -1,16 +1,40 @@
 #!/bin/bash
 
-echo "$GOOGLE_API_KEY_JSON" >google_api_key.json
+# Get the input parameters
+VERSION_SUFFIX=${1:-""}
+DEBUGGABLE=${2:-"false"}
+DB_ENCRYPTION=${3:-"true"}
 
-# Get the branch name after the last '/'. ex release/2020.4.0 = 2020.4.0
-var_branchSuffix=$(echo "$BITBUCKET_BRANCH" | sed 's:.*/::')
 
+# Get the branch name
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+
+# Extract the VERSION_NAME from the branch name if the branch name starts with release
+if [[ $BRANCH_NAME =~ ^release\/ ]]; then
+  VERSION_NAME=${BRANCH_NAME#release\/}
+else
+  # Read the VERSION_NAME from the env variable VERSION_NAME
+  VERSION_NAME="${VERSION_NAME:-"0.0.0"}-$BRANCH_NAME"
+fi
+
+# Get the current timestamp
+TIMESTAMP=$(date +%s)
+
+# Calculate the VERSION_CODE
+VERSION_CODE=$((TIMESTAMP / 1000))
+
+#overwrite the existing file with an empty file
+truncate -s 0 build-logic/build_properties.gradle.kts
+#Write the build properties
 cat << EOF >> build-logic/build_properties.gradle.kts
 extra.apply {
-    set("VERSION_CODE", ${BITBUCKET_BUILD_NUMBER})
-    set("VERSION_NAME", "${var_branchSuffix}")
-    set("VERSION_SUFFIX", "${BITBUCKET_DEPLOYMENT_ENVIRONMENT}")
-    set("DEBUGGABLE", ${BUILD_IS_DEBUGGABLE:-false})
-    set("DB_ENCRYPTION", ${DB_IS_ENCRYPTED:-true})
+    set("VERSION_CODE", $VERSION_CODE)
+    set("VERSION_NAME", "$VERSION_NAME")
+    set("VERSION_SUFFIX", "$VERSION_SUFFIX")
+    set("DEBUGGABLE", $DEBUGGABLE)
+    set("DB_ENCRYPTION", $DB_ENCRYPTION)
 }
 EOF
+
+echo "Wrote build_properties.gradle.kts file with VERSION_NAME='$VERSION_NAME', VERSION_CODE='$VERSION_CODE', VERSION_SUFFIX='$VERSION_SUFFIX', DEBUGGABLE='$DEBUGGABLE', and DB_ENCRYPTION='$DB_ENCRYPTION'"
+
