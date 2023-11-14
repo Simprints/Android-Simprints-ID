@@ -9,6 +9,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.ExternalScope
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.SYNC
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 // This is implemented as a service so it can be invoked indirectly by class name and avoid a
 // circular module dependency
+@ExcludedFromGeneratedTestCoverageReports("Workaround for circular module dependency")
 @AndroidEntryPoint
 class EventDownSyncResetService : Service() {
 

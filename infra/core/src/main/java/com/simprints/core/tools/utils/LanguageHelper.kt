@@ -3,8 +3,10 @@ package com.simprints.core.tools.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import java.util.*
 
+@ExcludedFromGeneratedTestCoverageReports("Testing this class is more effort than it's worth")
 object LanguageHelper {
 
     private const val SHARED_PREFS_LANGUAGE_KEY = "SelectedLanguage"
