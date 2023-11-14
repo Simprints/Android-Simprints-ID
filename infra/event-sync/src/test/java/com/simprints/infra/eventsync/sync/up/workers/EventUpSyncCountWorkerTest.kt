@@ -100,6 +100,5 @@ internal class EventUpSyncCountWorkerTest {
             )
         )
         every { mockWm.getWorkInfosByTag(any()) } returns mockWorkInfo
-        countWorker.wm = mockWm
     }
 }

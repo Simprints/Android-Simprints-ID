@@ -12,7 +12,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class SerialEntryPairViewModelTest {
+internal class SerialEntryPairViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()

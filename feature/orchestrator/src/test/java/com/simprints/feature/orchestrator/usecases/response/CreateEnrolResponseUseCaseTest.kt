@@ -19,7 +19,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class CreateEnrolResponseUseCaseTest {
+internal class CreateEnrolResponseUseCaseTest {
 
     @MockK
     lateinit var subjectFactory: SubjectFactory
