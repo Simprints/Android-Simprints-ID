@@ -15,7 +15,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Before
 import org.junit.Test
 
-class MapStepsForLastBiometricEnrolUseCaseTest {
+internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
     private lateinit var useCase: MapStepsForLastBiometricEnrolUseCase
 

@@ -25,7 +25,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class CreatePersonEventUseCaseTest {
+internal class CreatePersonEventUseCaseTest {
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()

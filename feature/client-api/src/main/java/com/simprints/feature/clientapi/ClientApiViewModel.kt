@@ -86,7 +86,6 @@ class ClientApiViewModel @Inject internal constructor(
     // Response handling
     // *********************************************************************************************
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleEnrolResponse(
         action: ActionRequest,
         enrolResponse: IAppEnrolResponse,
@@ -119,7 +118,6 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleIdentifyResponse(
         action: ActionRequest,
         identifyResponse: IAppIdentifyResponse,
@@ -144,7 +142,6 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleConfirmResponse(
         action: ActionRequest,
         confirmResponse: IAppConfirmationResponse,
@@ -170,7 +167,6 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleVerifyResponse(
         action: ActionRequest,
         verifyResponse: IAppVerifyResponse,
@@ -197,7 +193,6 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleExitFormResponse(
         action: ActionRequest,
         exitFormResponse: IAppRefusalFormResponse,
@@ -225,7 +220,6 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     // Error is a special case where it might be called before action has been parsed,
     // therefore it can only rely on the identifier from action string to be present
     fun handleErrorResponse(

@@ -28,7 +28,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class EnrolLastBiometricViewModelTest {
+internal class EnrolLastBiometricViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()

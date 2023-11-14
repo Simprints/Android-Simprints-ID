@@ -41,7 +41,7 @@ fun List<FaceSample>.uniqueId(): String? {
 }
 
 fun List<FaceSample>.concatTemplates(): ByteArray {
-    return this.sortedBy { it.template.hashCode() }.fold(byteArrayOf()) { acc, sample ->
+    return this.sortedBy { it.template.contentHashCode() }.fold(byteArrayOf()) { acc, sample ->
         acc + sample.template
     }
 }
