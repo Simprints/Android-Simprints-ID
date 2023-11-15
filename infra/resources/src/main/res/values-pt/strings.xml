@@ -11,20 +11,13 @@
     <string name="title_activity_settings">Definições</string>
     <string name="title_activity_settings_about">Sobre</string>
     <string name="title_activity_sync_information">Informações de sincronização</string>
-    <string name="finger_selection_confirm_dialog_no">Cancelar</string>
     <string name="select_modules_button_title">Selecione os módulos</string>
     <string name="sync_info_selected_modules">Módulos selecionados</string>
-    <string name="calculating_overlay">Calculando ...</string>
     <string name="why_did_you_skip_face_capture">Por que pulou a captura de rosto?</string>
     <string name="exit_form_capture_face">Capturar rosto</string>
     <string name="confirm_module_selection_yes">Confirmar</string>
-    <string name="modality_downloading">Baixando…%1$s</string>
-    <string name="modality_installing">Instalando…</string>
-    <string name="modality_download_taking_longer">Download demorando mais do que o esperado ...</string>
     <string name="confirm_module_selection_cancel">Cancelar</string>
     <string name="dashboard_sync_card_try_again_button">Tente novamente</string>
-    <string name="toast_login_failed">Falha na autenticação. Entre em contacto com o seu supervisor.</string>
-    <string name="modality_starting_download">Iniciando download</string>
     <string name="alert_title">Alerta</string>
     <string name="consent_enrol_only">Gostaria de %1$s inscrevê-lo em %2$s.</string>
     <string name="consent_enrol">Gostaria que %2$s inscrevesse você em %1$s e identificasse você no futuro.</string>
@@ -50,21 +43,13 @@
     <string name="consent_general_title">Consentimento Geral</string>
     <string name="consent_parental_title">Consentimento dos pais</string>
     <string name="cancel_button" tools:ignore="ButtonCase">Cancelar</string>
-    <string name="ok">OK</string>
     <string name="configuration_error_title">Erro de configuração</string>
     <string name="verify_guid_not_found_title">Pessoa não encontrada</string>
     <string name="error_occurred_title">Ocorreu um erro</string>
-    <string name="alert_try_again">Tente novamente</string>
-    <string name="modality_installation_offline_title">Erro ao baixar modalidades</string>
-    <string name="feature_not_downloaded_title">Download do Simprints incompleto</string>
     <string name="different_projectId_message">Ocorreu um erro de configuração (ID de projecto diferente), saia da tela inicial ou entre em contacto com o administrador do sistema</string>
-    <string name="different_userId_message">Ocorreu um erro de configuração (ID de usuário diferente), saia da tela inicial ou entre em contacto com o administrador do sistema</string>
     <string name="verify_guid_not_found_online_message">A pessoa seleccionada para verificação não está no banco de dados</string>
     <string name="verify_guid_not_found_offline_message">Pessoa não encontrada, verifique se está conectado à internet e tente novamente</string>
     <string name="unforeseen_error_message">Por favor, tente novamente e se o Simprints não funcionar entre em contacto com o administrador do sistema</string>
-    <string name="modality_installation_offline">Verifique se o Wi-Fi ou os dados móveis estão activados nas configurações para concluir o download</string>
-    <string name="feature_not_downloaded">Para usar Simprints, continue e baixe o %1$s</string>
-    <string name="face_feature_alert">característica do rosto</string>
     <string name="close">Fechar</string>
     <string name="settings_label">Configurações do telefone</string>
     <string name="button_submit">Enviar</string>
@@ -77,7 +62,6 @@
     <string name="login_user_id_hint">ID do usuário</string>
     <string name="login_title">Solicitar credenciais do projecto</string>
     <string name="requestLogin_message">Precisa fazer o login. Use o seu aplicativo cliente para abrir o Simprints ID e fazer login.</string>
-    <string name="requestLogin_title">Login necessário</string>
     <string name="login">Conecte-se</string>
     <string name="login_qr_code_scanning_problem">Ocorreu um problema ao ler o código QR</string>
     <string name="login_invalid_qr_code">O código QR é inválido.</string>
@@ -89,7 +73,6 @@
     <string name="dashboard_label">Painel de controle</string>
     <string name="confirmation_logout_title">Sair</string>
     <string name="confirmation_logout_message">Quer sair?</string>
-    <string name="records_up_to_date">Todos os registos são actualizados</string>
     <string name="dashboard_sync_card_complete">Sincronização completa</string>
     <string name="dashboard_sync_card_incomplete">Sincronização incompleta</string>
     <string name="dashboard_sync_card_connecting">Conectando</string>
@@ -102,7 +85,6 @@
     <string name="dashboard_card_sync_title">Status de sincronização</string>
     <string name="dashboard_card_sync_last_sync">Última sincronização: %1$s</string>
     <string name="dashboard_card_current_user">Usuário actual: %1$</string>
-    <string name="dashboard_card_calculating">Calculando ...</string>
     <string name="dashboard_card_activity">Atividade: %1$s</string>
     <string name="menu_privacy_notice">Aviso de privacidade</string>
     <string name="menu_settings">Definições</string>
@@ -110,7 +92,6 @@
     <string name="settings_app_details">DETALHES DO APP</string>
     <string name="settings_no_modules_toast">Seleção inválida. Selecione pelo menos um módulo.</string>
     <string name="settings_too_many_modules_toast">Selecção inválida. Selecione não mais do que %1$d módulos.</string>
-    <string name="settings_invalid_selection">Selecção inválida</string>
     <string name="preference_app_details_title">Sobre</string>
     <string name="preference_sync_and_search_title">Configuração de sincronização e pesquisa</string>
     <string name="preference_logout_title">Sair</string>
@@ -130,7 +111,6 @@
     <string name="sync_info_images_to_upload">Imagens para fazer upload</string>
     <string name="sync_info_sync_now">Sincronize agora</string>
     <string name="sync_info_sync_in_progress">Sincronizando</string>
-    <string name="progress_sync_overlay">Sincronizando ...</string>
     <string name="refusal_toast_select_option_submit">Selecione uma opção e envie</string>
     <string name="refusal_toast_submit">Por favor, envie o formulário</string>
     <string name="refusal_religious_concerns">Preocupações religiosas</string>
@@ -163,23 +143,9 @@
         <item quantity="one">Identificação</item>
         <item quantity="other">Identificações</item>
     </plurals>
-    <string name="dashboard_card_available_on_phone">Disponível no telefone</string>
-    <string name="dashboard_card_enrol_title">Última inscrição</string>
-    <string name="dashboard_card_enrolment_info">Informações de inscrição</string>
-    <string name="dashboard_card_identification_title">Última Identificação</string>
-    <string name="dashboard_card_lastscanner_used">Scanner usado %1$s</string>
-    <string name="dashboard_card_to_download">Para baixar</string>
-    <string name="dashboard_card_to_upload">Para fazer o upload</string>
-    <string name="dashboard_card_verification_title">Última Verificação</string>
-    <string name="safetynet_down_alert_message">1. Tente novamente após 5 a 10 minutos \n 2. Toque em fechar</string>
-    <string name="id_error_save">Incapaz de salvar</string>
-    <string name="id_save_message">1. Falha ao salvar registro de %1$s \n 2. Toque em Fechar</string>
-    <string name="id_enrolment_successful">Inscrição com sucesso</string>
-    <string name="id_config_error_enrol_last_biometrics">Ocorreu um erro de configuração (intenção Simprints inválida), entre em contacto com o administrador do sistema.</string>
     <string name="enrol_last_biometrics_alert_message">1. Falha ao salvar o registro %1$s \n 2. Toque em fechar</string>
     <string name="enrol_last_biometrics_alert_title">Incapaz de salvar</string>
     <string name="enrol_last_biometrics_success">Inscrição bem-sucedida</string>
-    <string name="configuration_error_message">Ocorreu um erro de configuração (%1$s), entre em contacto com o administrador do sistema</string>
     <string name="error_backend_maintenance_message">O sistema está atualmente offline para manutenção. Por favor, tente novamente mais tarde.</string>
     <string name="error_backend_maintenance_with_time_message">O sistema está atualmente offline para manutenção. Por favor, tente novamente após %s</string>
     <string name="dashboard_sync_card_records_to_upload">%1$d registro para carregar</string>
@@ -198,29 +164,7 @@
     <string name="finger_selection_fragment_title">Ver Dedos</string>
     <string name="pair_scanner_label">Definições</string>
     <string name="serial_entry_ok">OK</string>
-    <plurals name="returned_results">
-        <item quantity="one">Retorno %de resultado.</item>
-        <item quantity="other">Retornou %d resultados.</item>
-    </plurals>
-    <plurals name="tier1or2_matches">
-        <item quantity="zero">Sem combinações muito boas</item>
-        <item quantity="one">%d combinação muito boa</item>
-        <item quantity="other">%d combinações muito boas</item>
-    </plurals>
-    <plurals name="tier3_matches">
-        <item quantity="zero">Sem boas combinações</item>
-        <item quantity="one">%d boa combinação</item>
-        <item quantity="other">%d boas combinações</item>
-    </plurals>
-    <plurals name="tier4_matches">
-        <item quantity="zero">Sem combinações</item>
-        <item quantity="one">%d combinação</item>
-        <item quantity="other">%d combinações</item>
-    </plurals>
-    <plurals name="loaded_candidates_result">
-        <item quantity="one">%d candidato carregado.</item>
-        <item quantity="other">%d candidatos carregados.</item>
-    </plurals>
+
 
     <string name="invalid_projectId_message">Ocorreu um erro de configuração (ID do projeto inválido), entre em contacto com o administrador do sistema</string>
     <string name="invalid_selectedId_message">Ocorreu um erro de configuração (ID selecionado inválido), entre em contacto com o administrador do sistema</string>
@@ -232,34 +176,23 @@
     <string name="invalid_verifyId_message">Ocorreu um erro de configuração (inválido verificar GUID), entre em contacto com o administrador do sistema</string>
     <string name="rooted_device_title">Dispositivo enraizado detectado</string>
     <string name="rooted_device_message">1. Contacte o seu supervisor - dispositivo enraizado detectado\n2. Toque em Fechar</string>
-    <string name="guid_selection_data_sent">Dados enviados</string>
-    <string name="guid_selection_result_sent">Resultado enviado</string>
 
     <string name="exit_form_return_to_face_capture">Capturar rosto</string>
     <string name="face_match_loading_candidates">Carregando candidatos…</string>
     <string name="face_match_please_wait">Espere enquanto procedemos com a identificação</string>
     <string name="error_licence_invalid_title">Licença inválida</string>
     <string name="error_licence_invalid_message">A licença facial é inválida, entre em contacto com o administrador do sistema</string>
-    <string name="error_licence_missing_title">Licença ausente</string>
-    <string name="error_licence_missing_message">Falta licença facial, entre em contacto com o administrador do sistema</string>
     <string name="error_configuration_error_title">Erro de configuração</string>
     <string name="error_configuration_error_message">Ocorreu um erro ao configurar a modalidade facial, entre em contacto com o administrador do sistema</string>
     <string name="face_configuration_started">Configurando a modalidade facial</string>
     <string name="face_configuration_downloading">Baixando arquivos necessários</string>
-    <string name="error_close_button">Fechar</string>
-    <string name="error_unexpected_error_title">Ocorreu um erro</string>
-    <string name="error_unexpected_error_message">Por favor, tente novamente e se o Simprints não funcionar entre em contacto com o administrador do sistema</string>
-    <string name="capture_title_howto">Como escanear um rosto</string>
     <string name="capture_title_previewing">Preparando para digitalizar</string>
-    <string name="capture_title_looks_good">A digitalização está pronta!</string>
     <string name="capture_error_no_face">Certifique-se de que o rosto preencha o círculo</string>
     <string name="capture_error_face_too_far">Aproxime-se</string>
     <string name="capture_error_face_too_close">Anda para trás</string>
     <string name="capture_error_look_straight">Certifique-se que a pessoa está olhando directamente para a câmera</string>
-    <string name="capture_ready">Pronto para capturar</string>
     <string name="capture_prep_begin_btn">Toque para capturar</string>
     <string name="capture_prep_begin_btn_capturing">Capturando ...</string>
-    <string name="capture_title_scan_progress">Digitalização em andamento</string>
     <string name="capture_hold">Mantenha a posição ...</string>
     <string name="captured_successfully">O rosto foi capturado com sucesso.</string>
     <string name="title_confirmation">Confirmação</string>
@@ -267,8 +200,6 @@
     <string name="title_preparation">Preparação</string>
     <string name="btn_recapture">Recaptura</string>
     <string name="btn_finish">Toque para continuar</string>
-    <string name="btn_capture_again">Capturar novamente</string>
-    <string name="captured_unsuccessful">Não foi possível capturar o rosto devido a um problema técnico.</string>
     <string name="onboarding_light">Encontre um lugar bem iluminado.</string>
     <string name="onboarding_fill">Preencha o rosto no círculo.</string>
     <string name="onboarding_straight">Certifique-se de que a pessoa está olhando directamente.</string>
@@ -277,7 +208,6 @@
     <string name="capture_title_no_face">Nenhum rosto detectado</string>
     <string name="capture_title_too_close">Muito perto</string>
     <string name="capture_title_face_too_far">Muito longe</string>
-    <string name="matching_x_records">Comparando com %s registos</string>
     <string name="face_match_matching_candidates">Candidatos correspondentes</string>
 
 
@@ -312,6 +242,5 @@
         <item quantity="other">%d combinações</item>
     </plurals>
 
-    <string name="retry_tips">Veja como pode corrigir o problema:\n\n1. Certifique-se estar num espaço bem iluminado.\n2. Certifique-se que a pessoa está olhando directamente.\n3. Fique parado e mantenha a posição.</string>
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
 </resources>

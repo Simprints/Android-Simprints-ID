@@ -20,7 +20,6 @@
     <!-- Screen Text -->
     <!-- Button Labels -->
     <string name="cancel_button" tools:ignore="ButtonCase">لغو کول</string>
-    <string name="ok">اوکی</string>
     <!-- Content Descriptions -->
 
 
@@ -106,7 +105,6 @@
     <string name="register_title">شاملیدل</string>
     <string name="identify_title">مشخص کول</string>
     <string name="verify_title">پیدا کول</string>
-    <string name="refusal_label">د انکار فورم</string>
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
@@ -124,20 +122,15 @@
     <string name="scanning">د سکن کولو په حال کې …</string>
     <string name="good_scan_message">ښه سکن</string>
     <string name="poor_scan_message">ضعیفه سکن</string>
-    <string name="reconnecting_message">بیا ځلې نښلیدل</string>
     <!-- Button Labels -->
     <string name="rescan_label">بیا ځلې سکن</string>
     <string name="rescan_label_question">بیا ځلې سکن یعنی څه؟</string>
     <string name="scan_label">سکن</string>
-    <string name="scan">سکن</string>
     <!-- Content Descriptions -->
 
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
-    <string name="please_wait">صبر وکړئ څو مو تشخیص ته ادامه ورکړو</string>
     <!-- Loading text -->
-    <string name="loading_candidates">د ګډونوالو د آماده کولو په حال</string>
-    <string name="matching_fingerprints">د ګوتو د نښانو د مطابقت په حال کی</string>
 
 
     <!-- AlertActivity : the Simprints ID reason message screen -->

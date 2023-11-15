@@ -11,7 +11,6 @@
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <!-- Button Labels -->
-    <string name="ok">ঠিক আছে</string>
     <string name="cancel_button">বাতিল করুন</string>
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
@@ -63,7 +62,6 @@
     <string name="hint_other_reason">অতিরিক্ত তথ্য</string>
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="alert_try_again">আবার চেষ্টা করুন</string>
     <string name="confirmation_logout_cancel">বাতিল করুন</string>
     <string name="confirmation_logout_message">আপনি কি লগআউট করতে চান?</string>
     <string name="confirmation_logout_title">লগআউট করুন</string>
@@ -73,12 +71,10 @@
     <string name="consent_parental_share_data_yes">%1$s এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
     <string name="consent_privacy_rights">সম্মতি দেবার পরেও যেকোনো সময় আপনি অনুমতি ফিরিয়ে নিতে এবং আপনার তথ্যাদি মুছে ফেলতে বলতে পারেন।</string>
     <string name="consent_share_data_yes">%1$s এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %2$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
-    <string name="dashboard_card_calculating">হিসাাব করা হচ্ছে</string>
     <string name="dashboard_card_current_user">বর্তমান ব্যবহারকারী: %1$s</string>
     <string name="dashboard_card_scanner_used">স্ক্যানার ব্যবহার করা হয়েছে: %1$s</string>
     <string name="dashboard_card_sync_last_sync">সর্বশেষ সিঙ্ক: %1$s</string>
     <string name="dashboard_label">ড্যাশবোর্ড</string>
-    <string name="different_userId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (ভিন্ন ব্যবহারকারী আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="login">লগইন করুন</string>
     <string name="login_id_hint">প্রজেক্ট আইডি</string>
     <string name="login_invalid_credentials">তথ্য সঠিক নয়। প্রজেক্ট আইডি এবং কী চেক করুন।</string>
@@ -104,13 +100,10 @@
     <string name="preference_select_modules_title">মডিউল নির্বাচন করুন</string>
     <string name="preference_summary_settings_fingers">যে আঙ্গুল গুলো স্ক্যান করবেন সেগুলো সিলেক্ট করুন</string>
     <string name="preference_sync_and_search_title">সিঙ্ক করুন এবং কনফিগারেশন খুজুন</string>
-    <string name="records_up_to_date">সকল তথ্য আপডেটেড আছে</string>
     <string name="requestLogin_message">আপনাকে লগইন করতে হবে। সিমপ্রিন্টস আইডি খুলতে আপনার ক্লায়েন্ট অ্যাপ ব্যবহার করুন এবং লগইন করুন</string>
-    <string name="requestLogin_title">লগইন প্রয়োজন</string>
     <string name="scan_qr">কিউআর কোড স্ক্যান করুন</string>
     <string name="settings_app_details">অ্যাপ বিবরন</string>
     <string name="settings_general">সাধারণ</string>
-    <string name="settings_invalid_selection">অবৈধ নির্বাচন</string>
     <string name="settings_no_modules_toast">অবৈধ নির্বাচন। অন্তত একটি মডিউল নির্বাচন করুন।</string>
     <string name="settings_too_many_modules_toast">অবৈধ নির্বাচন। %1$d এর বেশি মডিউল নির্বাচন করবেন না।</string>
     <string name="simprints_logo">সিমপ্রিন্টস লোগো</string>
@@ -174,7 +167,6 @@
     <string name="dashboard_sync_card_try_again_button">আবার চেষ্টা করুন</string>
     <string name="dashboard_sync_card_progress">সিঙ্ক করা হচ্ছে… %1$s</string>
     <string name="dashboard_card_activity">কার্যক্রম তথ্য: %1$s</string>
-    <string name="progress_sync_overlay">সিঙ্ক হচ্ছে</string>
     <string name="different_projectId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (ভিন্ন প্রজেক্ট আই ডি), সাইন আউট করুন এবং আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="fetch_guid_checking_person_in_database">ব্যক্তির তথ্য ডাটাবেসে আছে কি না খুঁজে দেখা হচ্ছে</string>
     <string name="enrol_last_biometrics_alert_message">1. %1$s রেকর্ড সংরক্ষণ করতে ব্যর্থ 2. বন্ধ করুন</string>
@@ -183,15 +175,6 @@
     <string name="enrol_last_biometrics_alert_message_all_param">মুখ/আঙুলের ছাপ</string>
     <string name="enrol_last_biometrics_success">নিবন্ধন সফল হয়েছে</string>
     <string name="enrol_last_biometrics_alert_title">সেভ করা যায়নি</string>
-    <string name="modality_installation_offline_title">মোডালিটি ডাউনলোডে সমস্যা হচ্ছে</string>
-    <string name="feature_not_downloaded_title">সিমপ্রিন্টস ডাউনলোড অসম্পূর্ণ</string>
-    <string name="modality_installation_offline">আপনার ওয়াই-ফাই অথবা ফোন ইন্টারনেট চালু আছে কিনা দেখুন। ডাউনলোড সম্পূর্ণ করতে সেটিংস থেকে ইন্টারনেট চালু করুন।</string>
-    <string name="feature_not_downloaded">সিমপ্রিন্টস ব্যবহার করতে %1$s ডাউনলোড করুন।</string>
-    <string name="modality_download_taking_longer">ডাউলোড</string>
-    <string name="fingerprint_feature_alert">আঙ্গুলের ছাপ এর বৈশিষ্ট্য</string>
-    <string name="modality_starting_download">ডাউনলোড শুরু করুন</string>
-    <string name="modality_downloading">%1$s ডাউনলোড হচ্ছে</string>
-    <string name="modality_installing">ইন্সটল হচ্ছে</string>
     <string name="biometrics_access_fingerprint_face">আঙ্গুলের ছাপের তথ্য, ছবি</string>
     <string name="consent_enrol_only">আমি আপনাকে %2$s এ নিবন্ধন করতে চাই %1$s</string>
     <string name="consent_share_data_no">সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার %1$s ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
@@ -201,7 +184,6 @@
     <string name="consent_parental_confirmation">আমি কি আপনার সন্তানের %1$s ব্যবহার করতে পারি\? অনুগ্রহ করে বলুন- \"আমি অনুমতি দিচ্ছি \", \" আমি প্রত্যাখ্যান করছি\" অথবা \"আমার প্রশ্ন আছে।\"</string>
     <string name="biometrics_general_fingerprint">আপনার আঙ্গুলের ছাপ ব্যবহার</string>
     <string name="biometrics_parental_face">আপানার সন্তানের ছবি</string>
-    <string name="fingerprint_face_feature_alert">আঙ্গুলের ছাপ ও ছবি তোলার ফিচার</string>
     <string name="consent_parental_enrol_only">আমি %2$s তাঁকে %1$s এ নিবন্ধন করতে চাই।</string>
     <string name="consent_parental_enrol">আমি %2$s তাঁকে %1Ss নিবন্ধন করে, ভবিষ্যতে সনাক্ত করতে চাই।</string>
     <string name="biometrics_access_fingerprint">আঙ্গুলের ছাপের তথ্য</string>
@@ -209,31 +191,13 @@
     <string name="biometrics_access_face">ছবি</string>
     <string name="biometrics_parental_fingerprint">আপনার সন্তানের আঙ্গুলের ছাপ ব্যবহার</string>
     <string name="biometric_concat_modalities">এবং</string>
-    <string name="face_feature_alert">ছবি তোলার ফিচার</string>
     <string name="sync_info_images_to_upload">আপলোড বাকি</string>
     <string name="why_did_you_skip_biometrics">বায়োমেট্রিক তথ্য এড়িয়ে গেলেন কেন\?</string>
     <string name="confirmation_sent">নিশ্চিত করা হয়েছে</string>
     <string name="redirecting_you_back">আপনাকে ফিরিয়ে আনা হচ্ছে</string>
     <string name="confirm_module_selection_cancel">বাতিল করুন</string>
     <string name="confirm_module_selection_yes">নিশ্চিত করুন</string>
-    <string name="dashboard_card_available_on_phone">ফোন এ সংরক্ষিত</string>
-    <string name="dashboard_card_enrol_title">সর্বশেষ নিবন্ধন</string>
-    <string name="dashboard_card_enrolment_info">নিবন্ধন তথ্য</string>
-    <string name="dashboard_card_identification_title">সর্বশেষ সনাক্তকরন</string>
-    <string name="dashboard_card_lastscanner_used">ব্যবহারকৃত স্ক্যানার %1$s</string>
-    <string name="dashboard_card_to_download">ডাউনলোড করতে</string>
-    <string name="dashboard_card_to_upload">আপলোড করতে</string>
-    <string name="dashboard_card_verification_title">সর্বশেষ যাচাই</string>
-    <string name="safetynet_down_alert_message">৫-১০ মিনিট পর চেষ্টা করুন</string>
-    <string name="id_error_save">সেভ করা যায়নি</string>
-    <string name="id_save_message">১। %1$s রেকর্ড সেভ করা যায়নি \n ২। বন্ধ করুন</string>
-    <string name="id_continue">সামনে আগান</string>
-    <string name="id_enrolment_successful">নিবন্ধন সফল হয়েছে</string>
-    <string name="id_config_error_enrol_last_biometrics">একটি কনফিগারেশন সমস্যা ঘটেছে (অবৈধ সিমপ্রিন্টস এন্ট্রি),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="toast_login_failed">লগ ইন অসফল হয়েছে। আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
-    <string name="calculating_overlay">হিসাাব করা হচ্ছে</string>
     <string name="long_consent_downloading">গোপনীয়তা বিজ্ঞপ্তি ডাউনলোড করা হচ্ছে</string>
-    <string name="configuration_error_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (%1$s), অনুগ্রহ করে আপনার সিস্টেম অ্যাডমিন এর সাথে যোগাযোগ করুন৷</string>
     <string name="error_backend_maintenance_message">সিস্টেমটি বর্তমানে রক্ষণাবেক্ষণের জন্য অফলাইনে রয়েছে। অনুগ্রহ করে একটু পরে আবার চেষ্টা করুন.</string>
     <string name="error_backend_maintenance_with_time_message">সিস্টেমটি বর্তমানে রক্ষণাবেক্ষণের জন্য অফলাইনে রয়েছে। %s পরে আবার চেষ্টা করুন</string>
     <string name="dashboard_sync_card_records_to_upload">আপলোড করার জন্য %1$d রেকর্ড</string>
@@ -255,13 +219,7 @@
     <string name="project_paused_body">প্র্রকল্পটি বর্তমানে বিরতিতে থাকার কারণে সেশনটি চালু করা যাচ্ছেনা। আরও তথ্যের জন্য সুপারভাইসরের সাথে যোগাযোগ করুন।</string>
     <string name="project_ending_title">প্রকল্পটি বর্তমানে শেষ হচ্ছে</string>
     <string name="project_ending_body">প্র্রকল্পটি বর্তমানে শেষ হবার কারণে সেশনটি চালু করা যাচ্ছেনা। আরও তথ্যের জন্য সুপারভাইসরের সাথে যোগাযোগ করুন।</string>
-    <string name="preference_select_fingers_title">নির্ধারিত আঙ্গুল গুলো সমূহ নির্বাচন করুন</string>
-    <string name="finger_selection_confirm_dialog_text">সেটিংস সেভ করতে চাচ্ছেন?</string>
-    <string name="finger_selection_confirm_dialog_yes">সেভ করুন</string>
-    <string name="finger_selection_confirm_dialog_no">বাতিল করুন</string>
     <string name="finger_selection_reset">পুনরায় নির্বাচন</string>
-    <string name="finger_selection_add_finger">আঙ্গুল যোগ করুন</string>
-    <string name="finger_selection_invalid">অবৈধ নির্বাচন- এক আঙ্গুল ৫ বারের বেশি আছে</string>
     <string name="bluetooth_error_pair_scanner_and_device_message">১। স্ক্যানার চালু আছে কিনা দেখুন।
 \n২। \"সেটিংস\" চাপুন।
 \n৩। অন্য কোন স্ক্যানার অসংযুক্ত করুন।
@@ -281,27 +239,21 @@
     <string name="good_scan_direction">পরবর্তী আঙ্গুল স্ক্যান করতে বামে সোয়াইপ করুন</string>
     <string name="good_scan_message">ছাপ নেয়া সঠিক হয়েছে</string>
     <string name="identify_title">সনাক্তকরণ</string>
-    <string name="loading_candidates">অংশগ্রহণকারীদের তথ্য লোড হচ্ছে</string>
     <string name="low_battery_message">স্ক্যানারের ব্যাটারি চার্জ করুন।</string>
     <string name="low_battery_title">ব্যাটারি চার্জ করুন</string>
-    <string name="matching_fingerprints">আঙ্গুলের ছাপ মেলানো হচ্ছে</string>
     <string name="missing_finger">আঙ্গুল নেই / কাটা</string>
     <string name="multiple_scanners_found_message">এক এর অধিক স্ক্যানার সংযুক্ত আছে, অপ্রয়োজনীয় স্ক্যানার বাতিল করুন।</string>
     <string name="no_finger_detected_message">আঙ্গুল সনাক্ত করা যাচ্ছেনা</string>
     <string name="no_fingers_scanned">অন্তত ১টি আঙ্গুলের ছাপ নিন</string>
     <string name="pair_scanner_label">স্ক্যানার যোগ করুন</string>
     <string name="please_scan">স্ক্যান করুন</string>
-    <string name="please_wait">আঙ্গুলের ছাপ মিলানো হচ্ছে, অপেক্ষা করুন</string>
     <string name="please_wait_button">অপেক্ষা করুন</string>
     <string name="poor_scan_direction">আবার স্ক্যান করুন</string>
     <string name="poor_scan_message">ছাপ নেয়া ভুল হয়েছে</string>
-    <string name="reconnecting_message">পুনঃসংযোগ করা হচ্ছে</string>
-    <string name="refusal_label">প্রত্যাখ্যান ফর্ম</string>
     <string name="register_title">তালিকাভুক্তকরণ</string>
     <string name="rescan_label">আবার স্ক্যান করুন</string>
     <string name="rescan_label_question">আবার স্ক্যান করতে চান?</string>
     <string name="restart">আবার শুরু করুন</string>
-    <string name="scan">স্ক্যান</string>
     <string name="scan_label">স্ক্যান</string>
     <string name="scanner_confirmation_no">না</string>
     <string name="scanner_confirmation_yes">হ্যা</string>
@@ -309,7 +261,6 @@
     <string name="scanner_error_turn_scanner_on_title">স্ক্যানার চালু করুন</string>
     <string name="scanner_id_confirmation_message">%1$s কি আপনার স্ক্যানার?</string>
     <string name="scanning">স্ক্যান করা হচ্ছে</string>
-    <string name="title_fingerprint">আঙ্গুলের ছাপ</string>
     <string name="transfering_data">তথ্য প্রদান করা হচ্ছে</string>
     <string name="try_another_finger">আরেকটি আঙ্গুল চেষ্টা করুন</string>
     <string name="verify_title">যাচাইকরণ</string>
@@ -351,30 +302,6 @@
     <string name="continue_button">সামনে আগান</string>
     <string name="capture_number_text">%2$s এর %1$s স্ক্যান করুন</string>
     <string name="please_scan_again">আবার স্ক্যান করুন</string>
-    <string name="finger_selection_activity_title">আঙ্গুল নির্বাচন করুন</string>
-    <plurals name="returned_results">
-        <item quantity="one">%d ফলাফল ফিরে এসেছে</item>
-        <item quantity="other">%d রেজাল্ট ফেরত</item>
-    </plurals>
-    <plurals name="tier1or2_matches">
-        <item quantity="zero">খুব ভালো মিল পাওয়া যায়নি</item>
-        <item quantity="one">%d খুব ভালো মিল</item>
-        <item quantity="other">%d খুব ভালো মিল</item>
-    </plurals>
-    <plurals name="tier3_matches">
-        <item quantity="zero">ভালো মিল পাওয়া যায়নি</item>
-        <item quantity="one">%d ভালো মিল</item>
-        <item quantity="other">%d ভালো মিল</item>
-    </plurals>
-    <plurals name="tier4_matches">
-        <item quantity="zero">কোন মিল পাওয়া যায়নি</item>
-        <item quantity="one">%d মিল</item>
-        <item quantity="other">%d মিল</item>
-    </plurals>
-    <plurals name="loaded_candidates_result">
-        <item quantity="one">%d সদস্য লোড হয়েছে।</item>
-        <item quantity="other">%d সদস্য লোড হয়েছে।</item>
-    </plurals>
 
     <string name="invalid_projectId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (অবৈধ প্রোজেক্ট আইডি), আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="invalid_selectedId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (অবৈধ সিলেক্টেড আই ডি), আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
@@ -386,28 +313,20 @@
     <string name="invalid_verifyId_message">একটি কনফিগারেশন সমস্যা ঘটেছে (অবৈধ জি ইউ আইডি যাচাই),আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন</string>
     <string name="rooted_device_title">রুটেড ডিভাইস সনাক্ত হয়েছে</string>
     <string name="rooted_device_message">১। আপনার সুপারভাইসর এর সাথে যোগাযোগ করুন- রুটেড ডিভাইস সনাক্ত হয়েছে।\n২। বন্ধ করুন।</string>
-    <string name="guid_selection_data_sent">তথ্য পাঠানো হয়েছে</string>
-    <string name="guid_selection_result_sent">রেজাল্ট পাঠানো হয়েছে</string>
 
-    <string name="capture_title_howto">"ডাউনলোড হতে অনেক সময় নিচ্ছে "</string>
     <string name="capture_title_previewing">স্ক্যান প্রস্তুত হচ্ছে</string>
-    <string name="capture_title_looks_good">স্ক্যান প্র্রস্তুত</string>
     <string name="capture_error_no_face">ব্যক্তির চেহারা বৃত্তের ভেতর থাকতে হবে</string>
     <string name="capture_error_face_too_far">কাছে যান</string>
     <string name="capture_error_face_too_close">পেছনে যান</string>
     <string name="capture_error_look_straight">ব্যক্তি ক্যামেরার দিকে সোজা তাকাচ্ছে কিনা নিশ্চিত করুন</string>
-    <string name="capture_ready">ছবি তুলতে প্রস্তুত</string>
     <string name="capture_prep_begin_btn">ছবি তুলতে এখানে চাপুন</string>
     <string name="capture_prep_begin_btn_capturing">ছবি তোলা হচ্ছে</string>
-    <string name="capture_title_scan_progress">স্ক্যান হচ্ছে</string>
     <string name="capture_hold">স্থির থাকুন</string>
     <string name="captured_successfully">ব্যক্তির মুখের ছবি তোলা সফল হয়েছে</string>
     <string name="title_confirmation">নিশ্চিত করা হচ্ছে</string>
     <string name="title_preparation">প্রস্তু্তি</string>
     <string name="btn_recapture">আবার ছবি তুলুন</string>
     <string name="btn_finish">সামনে আগাতে এখানে চাপুন</string>
-    <string name="captured_unsuccessful">যান্ত্রিক সমস্যার কারনে ছবি তোলা যায়নি</string>
-    <string name="retry_tips">সমস্যা সমাধানের জন্য: \n\n1. ভালো আলো আছে এমন স্থানে দাঁড়ান \n2. ব্যক্তির ক্যামেরার দিকে সোজা তাকানো নিশ্চিত করুন \n3. ছবি তোলার সময় স্থিরভাবে দাঁড়ান</string>
     <string name="onboarding_light">ভালো আলো আছে এমন স্থান খুঁজে বের করুন</string>
     <string name="onboarding_fill">ব্যক্তির মুুখ ফ্রেম এর বৃত্তে বসান</string>
     <string name="onboarding_straight">ব্যক্তির সোজা ক্যামেরার দিকে তাকানো নিশ্চিত করুন</string>
@@ -416,11 +335,8 @@
     <string name="capture_title_no_face">মুখ খুঁজে পাওয়া যাচ্ছে না</string>
     <string name="capture_title_too_close">বেশি কাছে</string>
     <string name="capture_title_face_too_far">বেশি দূরে</string>
-    <string name="matching_x_records">%s রেকর্ড এর সাথে মিলানো হচ্ছে</string>
     <string name="face_match_please_wait">আঙ্গুলের ছাপ মিলানো হচ্ছে, অপেক্ষা করুন</string>
     <string name="face_match_loading_candidates">অংশগ্রহণকারীদের তথ্য লোড হচ্ছে</string>
-
-
 
     <string name="face_match_matching_candidates">অংশগ্রহণকারীদের তথ্য মিলানো হচ্ছে</string>
     <plurals name="face_match_matched_candidates">
@@ -451,21 +367,13 @@
         <item quantity="other">%d মিল</item>
     </plurals>
 
-
-
     <string name="error_licence_invalid_title">অবৈধ লাইসেন্স</string>
     <string name="error_licence_invalid_message">মুুখের লাইসেন্স অবৈধ, আপনার সুপেরভাইসার এর সাথে যোগাযোগ করুন</string>
     <string name="error_licence_invalid_button">বন্ধ করুন</string>
-    <string name="error_licence_missing_title">লাইসেন্স খুঁজে পাওয়া যাচ্ছে না</string>
     <string name="error_licence_missing_button">বন্ধ করুন</string>
     <string name="title_capturing">ছবি তুলুন</string>
-    <string name="btn_capture_again">আবার ছবি তুলুন</string>
     <string name="error_configuration_error_title">কনফিগারেশন সমস্যা</string>
-    <string name="error_licence_missing_message">মুুখের লাইসেন্স পাওয়া যাচ্ছে না, আপনার সুপেরভাইসার এর সাথে যোগাযোগ করুন</string>
     <string name="error_configuration_error_message">মুখের মোডালিটি কনফিগার করার সময় সমস্যা হয়েছে। সিস্টেম অ্যাডমিন এর সাথে যোগাযোগ করুন</string>
     <string name="face_configuration_started">মুখের মোডালিটি কনফিগার করা হচ্ছে</string>
     <string name="face_configuration_downloading">প্রয়োজনীয় ফাইল ডাউনলোড করা হচ্ছে</string>
-    <string name="error_close_button">বন্ধ করুন</string>
-    <string name="error_unexpected_error_title">সমস্যা ঘটেছে</string>
-    <string name="error_unexpected_error_message">আবার চেষ্টা করুন এবং সিমপ্রিন্টস কাজ না করলে আপনার সুপারভাইসর এর সঙ্গে যোগাযোগ করুন।</string>
 </resources>

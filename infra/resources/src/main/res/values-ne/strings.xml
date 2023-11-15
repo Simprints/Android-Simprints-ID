@@ -20,7 +20,6 @@
     <!-- Screen Text -->
     <!-- Button Labels -->
     <string name="cancel_button">रद्द गर्नुहोस </string>
-    <string name="ok">ठिक छ </string>
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
@@ -102,7 +101,6 @@
     <string name="register_title">भर्ना </string>
     <string name="identify_title">पहिचान गर्नुहोस </string>
     <string name="verify_title">प्रमाणित</string>
-    <string name="refusal_label">असहमति फारम</string>
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
@@ -119,19 +117,14 @@
     <string name="scanning">स्क्यान हुँदै छ </string>
     <string name="good_scan_message">स्क्यान राम्रो भयो </string>
     <string name="poor_scan_message">स्क्यान राम्रो भएन </string>
-    <string name="reconnecting_message">पुन: जडान</string>
     <!-- Button Labels -->
     <string name="rescan_label">फेरी स्क्यान गर्नुहोस </string>
     <string name="rescan_label_question">फेरी स्क्यान गर्नुहोस?</string>
     <string name="scan_label">स्क्यान</string>
-    <string name="scan">स्क्यान</string>
 
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
-    <string name="please_wait">एकैछिन पर्खनुहोस, हामी पहिचान गर्दैछौं </string>
     <!-- Loading Text -->
-    <string name="loading_candidates">व्यक्तिहरु लोड गर्दै …</string>
-    <string name="matching_fingerprints">औठाछापहरू मिलाई रहेको अवस्था…</string>
 
 
     <!-- AlertActivity : the Simprints ID reason message screen -->
