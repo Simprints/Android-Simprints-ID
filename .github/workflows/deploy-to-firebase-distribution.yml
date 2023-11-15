@@ -13,6 +13,7 @@ on:
                 type: choice
                 required: true
                 default: dev
+                description: "Choose the build variant"
                 options:
                     - dev
                     - staging
@@ -23,7 +24,7 @@ jobs:
         concurrency:
             group: firebase-${{ inputs.buildType }}-workflow #only one instance of this workflow can run at a time
 
-        environment: ${{ inputs.buildType }}
+        environment: ${{ inputs.buildType }}   # Dynamically set the job environment based on the input
 
         env:
             BUILD_IS_DEBUGGABLE: ${{ vars.BUILD_IS_DEBUGGABLE }}
@@ -56,21 +57,17 @@ jobs:
             -   name: write firebase credentials
                 run: echo "$FIREBASE_DIST_CREDENTIALS" >  id/src/main/serviceCredentialsFile.json
 
-            -   name: build apk
+            -   name: build and deploy debug apk
+                if: ${{ inputs.buildType == 'dev' }}
                 run: |
-                    #check if the build type is dev or staging
-                    if [ "${{ inputs.buildType }}" = "dev" ]; then
-                        ./gradlew id:packageDebugUniversalApk
-                    else
-                        ./gradlew id:packageStagingUniversalApk
-                    fi
+                    ./gradlew id:packageDebugUniversalApk
+                    ./gradlew id:appDistributionUploadDebug --artifactPath=id/build/outputs/apk_from_bundle/debug/id-debug-universal.apk
 
-            -   name: deploy to firebase
+            -   name: build and deploy staging apk
+                if: ${{ inputs.buildType == 'staging' }}
                 run: |
-                    #check if the build type is dev or staging
-                    if [ "${{ inputs.buildType }}" = "dev" ]; then
-                        ./gradlew id:appDistributionUploadDebug --artifactPath=id/build/outputs/apk_from_bundle/debug/id-debug-universal.apk
-                    else
-                        ./gradlew id:appDistributionUploadStaging  --artifactPath=id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk    
-                    fi
-                    echo "### An Apk was deployed into firebase ${{ inputs.buildType }} channel :rocket:" >> $GITHUB_STEP_SUMMARY
+                    ./gradlew id:packageStagingUniversalApk
+                    ./gradlew id:appDistributionUploadStaging  --artifactPath=id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk
+
+            -   name: deploy to firebase completed
+                run: echo "### An Apk was deployed into firebase ${{ inputs.buildType }} channel :rocket:" >> $GITHUB_STEP_SUMMARY
