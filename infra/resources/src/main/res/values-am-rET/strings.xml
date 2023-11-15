@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simprints ID</string>
-    <string name="alert_title">ማንቂያ</string>
+  <string name="alert_title">ማንቂያ</string>
     <string name="configuration_error_title">የተግበቦት ስህተት</string>
     <string name="error_occurred_title">ስህተት አጋጥሟል</string>
     <string name="different_projectId_message">የተለየ የፕሮጀክት መለያ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>

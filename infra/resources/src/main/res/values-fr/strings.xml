@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Simprints ID</string>
     <string name="alert_title">Alerte</string>
     <string name="alert_try_again">Réessayez</string>
     <string name="biometric_concat_modalities">et</string>
