@@ -1,5 +1,8 @@
 package com.simprints.core.domain.response
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+
+@ExcludedFromGeneratedTestCoverageReports("Enum")
 enum class AppErrorReason {
     DIFFERENT_PROJECT_ID_SIGNED_IN,
     DIFFERENT_USER_ID_SIGNED_IN,

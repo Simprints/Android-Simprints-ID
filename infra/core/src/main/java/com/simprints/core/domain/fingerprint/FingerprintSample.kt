@@ -1,10 +1,14 @@
 package com.simprints.core.domain.fingerprint
 
 import android.os.Parcelable
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
+import javax.annotation.processing.Generated
+
 
 @Parcelize
+@ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
 data class FingerprintSample(
     val fingerIdentifier: IFingerIdentifier,
     val template: ByteArray,
@@ -36,14 +40,10 @@ data class FingerprintSample(
 
 // Generates a unique id for a list of samples.
 // It concats the templates (sorted by quality score) and creates a UUID from that.
-fun List<FingerprintSample>.uniqueId(): String? {
-    return if (this.isNotEmpty()) {
-        UUID.nameUUIDFromBytes(
-            concatTemplates()
-        ).toString()
-    } else {
-        null
-    }
+fun List<FingerprintSample>.uniqueId(): String? = if (this.isNotEmpty()) {
+    UUID.nameUUIDFromBytes(concatTemplates()).toString()
+} else {
+    null
 }
 
 fun List<FingerprintSample>.concatTemplates(): ByteArray {
