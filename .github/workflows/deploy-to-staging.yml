@@ -1,0 +1,16 @@
+on:
+    # Manual trigger for workflow dispatch (e.g., when clicking "Run workflow" button)
+    workflow_dispatch:
+        branches:
+            - 'release/*'
+    # Triggered when a push occurs on branches starting with 'release/'
+    push:
+        branches:
+            - 'release/*'
+jobs:
+    deploy-to-staging:
+
+        uses: ./.github/workflows/deploy-to-firebase-distribution.yml
+        secrets: inherit
+        with:
+            buildType: staging

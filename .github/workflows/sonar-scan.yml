@@ -28,7 +28,7 @@ jobs:
                     key: ${{ runner.os }}-sonar
                     restore-keys: ${{ runner.os }}-sonar
 
-            -   name: setup local.properties
+            -   name: Set up local.properties
                 run: |
                     source ci/pipeline/setup
                     echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
