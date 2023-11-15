@@ -34,7 +34,6 @@
     <string name="dashboard_sync_card_offline_message">कृपया सेटिंग में जाकर इंटरनेट को चालू करें</string>
     <string name="dashboard_card_sync_title">सिंक की स्थिति</string>
     <string name="dashboard_card_sync_last_sync">अंतिम बार सिंक: %1$s</string>
-    <string name="dashboard_card_calculating">गणना की जा रही है</string>
     <string name="dashboard_card_activity">गतिविधि: %1$s</string>
     <plurals name="dashboard_card_enrolments">
         <item quantity="one">पंजीकरण</item>
@@ -50,18 +49,11 @@
     </plurals>
     <string name="exit_form_capture_face">चेहरे की फ़ोटो लें</string>
     <string name="fetch_guid_checking_person_in_database">व्यक्ति को डाटाबेस में खोजा जा रहा है</string>
-    <string name="different_userId_message">एक कॉन्फ़िगरेशन त्रुटि हो रही है (भिन्न यूज़र ID), कृपया होम स्क्रीन से लॉग-आउट करें या अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
     <string name="launch_consent_decline_button">असहमत</string>
-    <string name="ok">ठीक</string>
-    <string name="verify_guid_not_found_title">व्यक्ति नहीं मिला।</string>
-    <string name="modality_installation_offline_title">प्रकार (मोडेलीटीज़) डाउनलोड करने में त्रुटि</string>
-    <string name="feature_not_downloaded_title">सिम्प्रिंट डाउनलोड पूर्ण नहीं हो सका।</string>
+  <string name="verify_guid_not_found_title">व्यक्ति नहीं मिला।</string>
     <string name="verify_guid_not_found_online_message">सत्यापन के लिए चुना गया व्यक्ति डेटाबेस में नहीं हैं।</string>
     <string name="verify_guid_not_found_offline_message">व्यक्ति नहीं मिला, कृपया इंटरनेट की कनेक्टीवीटी सुनिश्चित करें और पुनः प्रयास करें</string>
     <string name="unforeseen_error_message">कृपया पुनः प्रयास करें, और यदि सिंप्रिंट्स फिर भी काम न करे तो कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
-    <string name="modality_installation_offline">डाउनलोड पूरा करने के लिए सेटिंग्स में वाई-फाई या मोबाइल डेटा की जाँच करें</string>
-    <string name="feature_not_downloaded">सिम्प्रिंट का उपयोग करने के लिए कृपया जारी रखें और %1$s डाउनलोड करें</string>
-    <string name="face_feature_alert">चेहरे की विशेषता</string>
     <string name="settings_label">फोन सेटिंग</string>
     <string name="hint_other_reason">अतिरिक्त जानकारी</string>
     <string name="long_consent_download_button_text">गोपनीयता की सूचना डाउनलोड करें</string>
@@ -72,7 +64,6 @@
     <string name="login_secret_hint">प्रोजेक्ट कुंजी</string>
     <string name="login_title">प्रोजेक्ट क्रेडेंशियल</string>
     <string name="requestLogin_message">कृपया लॉग-इन करें। सिंप्रिंट्स ID व लॉग-इन खोलने के लिए कृपया अपने क्लाइंट एप का उपयोग करें।</string>
-    <string name="requestLogin_title">लॉग-इन किया जाना आवश्यक है</string>
     <string name="login_qr_code_scanning_problem">क्यूआर कोड स्कैन करने में त्रुटि आ रही है</string>
     <string name="login_invalid_qr_code">स्कैन किया गया क्यूआर कोड अमान्य है</string>
     <string name="login_missing_credentials">कोई प्रविष्टि छूट रही है। कृपया यूज़र ID, प्रोजेक्ट ID व कुंजी को जाँच लें व पुनः प्रयास करें।</string>
@@ -85,7 +76,6 @@
     <string name="settings_app_details">एप का विवरण</string>
     <string name="settings_no_modules_toast">अमान्य चुनाव। कृपया कम से कम एक मॉड्यूल चुनें</string>
     <string name="settings_too_many_modules_toast">अमान्य चुनाव। कृपया %1$d से अधिक मॉड्यूल्स नहीं चुनें।</string>
-    <string name="settings_invalid_selection">अमान्य चुनाव</string>
     <string name="preference_app_details_title">एप के बारे में</string>
     <string name="preference_sync_and_search_title">सिंक व खोज कॉन्फ़िगरेशन</string>
     <string name="preference_logout_title">लॉग-आउट</string>
@@ -105,7 +95,6 @@
     <string name="sync_info_images_to_upload">अपलोड करने के लिए चित्र</string>
     <string name="sync_info_sync_now">अभी सिंक करें</string>
     <string name="sync_info_sync_in_progress">सिंक हो रहा है …</string>
-    <string name="progress_sync_overlay">सिंक हो रहा है ...</string>
     <string name="refusal_toast_select_option_submit">कृपया किसी एक विकल्प का चयन करें और सबमिट करें</string>
     <string name="refusal_toast_submit">कृपया फ़ॉर्म सबमिट करें</string>
     <string name="refusal_religious_concerns">धार्मिक कारण</string>
@@ -118,14 +107,9 @@
     <string name="hint_search_modules">मॉड्यूल खोजें</string>
     <string name="no_modules_selected">कोई भी मॉड्यूल नहीं चुना गया</string>
     <string name="no_results">कोई परिणाम नहीं</string>
-    <string name="modality_starting_download">डाउनलोड आरम्भ हो रहा है</string>
-    <string name="modality_downloading">डाउनलोड हो रहा है...............%1$s</string>
-    <string name="modality_installing">इंस्टॉल हो रहा है....</string>
-    <string name="modality_download_taking_longer">डाउनलोड करने में अपेक्षा से अधिक समय लग रहा है.......</string>
     <string name="settings_title">सेटिंग</string>
     <string name="privacy_notice_title">गोपनीयता की सूचना</string>
     <string name="title_activity_sync_information">सिंक सम्बंधित जानकारी</string>
-    <string name="finger_selection_confirm_dialog_no">रद्द करें</string>
     <string name="confirm_module_selection_cancel">रद्द करें</string>
     <string name="login_user_id_hint">यूज़र आईडी</string>
     <string name="logout">लॉग-आउट</string>
@@ -139,7 +123,6 @@
     <string name="launch_consent_accept_button">सहमत</string>
     <string name="cancel_button" tools:ignore="ButtonCase">रद्द करें</string>
     <string name="configuration_error_title">कॉन्फ़िगरेशन त्रुटि</string>
-    <string name="alert_try_again">पुनः प्रयास करें</string>
     <string name="close">बंद करें</string>
     <string name="button_submit">सबमिट करें</string>
     <string name="menu_privacy_notice">गोपनीयता की सूचना</string>
@@ -147,32 +130,16 @@
     <string name="title_activity_settings_about">एप के बारे में</string>
     <string name="login">लॉग-इन</string>
     <string name="confirmation_logout_cancel">रद्द करें</string>
-    <string name="records_up_to_date">सभी रिकोर्ड अपडेटेड हैं</string>
     <string name="select_modules_button_title">मॉड्यूल का चुनाव करें</string>
     <string name="sync_info_selected_modules">चुने गए मॉड्यूल</string>
-    <string name="calculating_overlay">गणना की जा रही है</string>
     <string name="refusal_other">अन्य</string>
     <string name="why_did_you_skip_face_capture">आपने चेहरे की पहचान क्यों नहीं ली?</string>
     <string name="dashboard_sync_card_try_again_button">पुनः प्रयास करें</string>
     <string name="confirmation_sent">पुष्टिकरण भेजा गया</string>
     <string name="redirecting_you_back">आपको वापस रीडायरेक्ट कर रहा है</string>
-    <string name="dashboard_card_available_on_phone">फ़ोन पर उपलब्ध है</string>
     <string name="dashboard_card_current_user">वर्तमान उपयोगकर्ता: %1$s</string>
-    <string name="dashboard_card_enrol_title">अंतिम बार पंजीकृत</string>
-    <string name="dashboard_card_enrolment_info">पंजीकरण की जानकारी</string>
-    <string name="dashboard_card_identification_title">अंतिम पहचान</string>
-    <string name="dashboard_card_lastscanner_used">उपयोग किया गया स्कैनर %1$s</string>
-    <string name="dashboard_card_to_download">डाउनलोड करने हेतु</string>
-    <string name="dashboard_card_to_upload">अपलोड करने हेतु</string>
-    <string name="dashboard_card_verification_title">अंतिम बार सत्यापन</string>
-    <string name="safetynet_down_alert_message">1. कृपया 5-10 मिनट बात पुनः प्रयास करें 2. बंद करें पर क्लिक करें।</string>
     <string name="try_again_label">पुनः प्रयास करें</string>
     <string name="dashboard_sync_card_offline_button">सेटिंग</string>
-    <string name="id_error_save">सेव नहीं किया जा सकता</string>
-    <string name="id_save_message">1. %1$s रिकोर्ड को सेव करने में असफल \n 2. बंद करें पर क्लिक करें</string>
-    <string name="id_enrolment_successful">पंजीकरण सफल रहा</string>
-    <string name="id_config_error_enrol_last_biometrics">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य सिंप्रिंट्स इंटेंट), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
-    <string name="toast_login_failed">लॉग-इन असफल रहा। कृपया अपने सुपरवाईज़र से सम्पर्क करें।</string>
     <string name="enrol_last_biometrics_alert_title">सेव नहीं किया जा सकता</string>
     <string name="error_backend_maintenance_message">सिस्टम वर्तमान में रखरखाव के लिए ऑफ़लाइन है। कृपया बाद में पुन: प्रयास करें।</string>
     <string name="error_backend_maintenance_with_time_message">सिस्टम वर्तमान में रखरखाव के लिए ऑफ़लाइन है। कृपया %s के बाद पुन: प्रयास करें</string>
@@ -197,35 +164,11 @@
     <string name="project_ending_title">प्रोजेक्ट फिलहाल ख़त्म हो रहा है</string>
     <string name="project_ending_body">सत्र लॉन्च करने में असमर्थ क्योंकि परियोजना वर्तमान में समाप्त हो रही है। अधिक जानकारी के लिए कृपया अपने पर्यवेक्षक से संपर्क करें</string>
     <string name="enrol_last_biometrics_success">पुष्टिकरण भेजा गया</string>
-    <string name="configuration_error_message">आपको वापस रीडायरेक्ट कर रहा है</string>
-    <string name="finger_selection_invalid">अमान्य चयन - एक उंगलियाँ 5 से अधिक हैं</string>
     <string name="preference_view_fingers_title">डिफ़ॉल्ट उंगलियां देखें</string>
     <string name="finger_selection_fragment_title">उंगलियां देखें</string>
     <string name="pair_scanner_label">सेटिंग</string>
     <string name="serial_entry_ok">ठीक</string>
-    <plurals name="returned_results">
-        <item quantity="one">%d परिणाम लौटाया गया</item>
-        <item quantity="other">%d परिणाम आए।</item>
-    </plurals>
-    <plurals name="tier1or2_matches">
-        <item quantity="zero">कोई बहुत अच्छा मेल नहीं है</item>
-        <item quantity="one">%d बहुत अच्छा मेल</item>
-        <item quantity="other">%d बहुत अच्छा मेल हैं</item>
-    </plurals>
-    <plurals name="tier3_matches">
-        <item quantity="zero">कोई अच्छा मेल नहीं</item>
-        <item quantity="one">%d अच्छा मेल है</item>
-        <item quantity="other">%d अच्छे मेल हैं</item>
-    </plurals>
-    <plurals name="tier4_matches">
-        <item quantity="zero">कोई मेल नही</item>
-        <item quantity="one">%d मेल</item>
-        <item quantity="other">%d मेल खाते हैं</item>
-    </plurals>
-    <plurals name="loaded_candidates_result">
-        <item quantity="one">%d उम्मीदवार को लोड किया गया।</item>
-        <item quantity="other">%d उम्मीदवारों को लोड किया गया।</item>
-    </plurals>
+
     <string name="enrol_last_biometrics_alert_message">1. %1$s रिकॉर्ड सहेजने में विफल \n2. बंद करें टैप करें</string>
     <string name="long_consent_downloading">गोपनीयता सूचना डाउनलोड हो रही है</string>
     <string name="enrol_last_biometrics_alert_message_all_param">चेहरा/फ़िंगरप्रिंट</string>
@@ -240,32 +183,21 @@
     <string name="invalid_verifyId_message">कॉन्फ़िगरेशन त्रुटि हो रही है (अमान्य GUID), कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
     <string name="rooted_device_title">रूटेड डिवाइस का पता लगा है</string>
     <string name="rooted_device_message">1. अपने सुपरवाइज़र से सम्पर्क करें - रूटेड डिवाइस मिली है 2. बंद करें पर क्लिक करें</string>
-    <string name="guid_selection_data_sent">डाटा भेजना सफल रहा</string>
-    <string name="guid_selection_result_sent">परिणाम भेजना सफल रहा</string>
 
     <string name="exit_form_return_to_face_capture">चेहरे की फ़ोटो लें</string>
     <string name="error_licence_invalid_title">लाइसेंस अमान्य है</string>
     <string name="error_licence_invalid_message">बायोमेट्रिक लाइसेंस अमान्य है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
-    <string name="error_licence_missing_title">बायोमेट्रिक लाइसेंस नहीं है</string>
-    <string name="error_licence_missing_message">बायोमेट्रिक लाइसेंस नहीं है, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
     <string name="error_configuration_error_title">कॉन्फ़िगरेशन त्रुटि</string>
     <string name="error_configuration_error_message">फेस के प्रकार को कॉन्फ़िगर करते समय त्रुटि हुई, कृपया अपने कार्यकारी प्रबंधक से संपर्क करें</string>
     <string name="face_configuration_started">चेहरे की प्रारूप को कॉन्फ़िगर करना</string>
     <string name="face_configuration_downloading">आवश्यक फ़ाइलें डाउनलोड हो रही हैं</string>
-    <string name="error_unexpected_error_title">त्रुटि</string>
-    <string name="error_unexpected_error_message">कृपया पुनः प्रयास करें, और यदि सिंप्रिंट्स फिर भी काम न करे तो कृपया अपने सिस्टम ऐडमिनिस्ट्रेटर से सम्पर्क करें</string>
-    <string name="error_close_button">बंद करें</string>
-    <string name="capture_title_howto">चेहरे को कैसे स्कैन करें</string>
     <string name="capture_title_previewing">स्कैन करने के लिए तैयार हो रहा है</string>
-    <string name="capture_title_looks_good">स्कैन तैयार है!</string>
     <string name="capture_error_no_face">सुनिश्चित करें कि चेहरा सर्कल फ्रेम में है</string>
     <string name="capture_error_face_too_far">पास आएं</string>
     <string name="capture_error_face_too_close">पीछे जाएँ</string>
     <string name="capture_error_look_straight">सुनिश्चित करें कि व्यक्ति सीधे कैमरे में देख रहा है</string>
-    <string name="capture_ready">कैप्चर करने के लिए तैयार</string>
     <string name="capture_prep_begin_btn">कैप्चर करने के लिए टैप करें</string>
     <string name="capture_prep_begin_btn_capturing">कैप्चर हो रहा है.......</string>
-    <string name="capture_title_scan_progress">स्कैन प्रगति पर है</string>
     <string name="capture_hold">अपनी जगह पर रहें</string>
     <string name="captured_successfully">चेहरे को सफलतापूर्वक कैप्चर कर लिया गया है।</string>
     <string name="title_confirmation">पुष्टीकरण</string>
@@ -273,12 +205,6 @@
     <string name="title_preparation">तैयारी</string>
     <string name="btn_recapture">फिर से कैप्चर करें</string>
     <string name="btn_finish">जारी रखने के लिए टैप करें</string>
-    <string name="btn_capture_again">फिर से कैप्चर करें</string>
-    <string name="captured_unsuccessful">तकनीकी समस्या के कारण चेहरे को कैप्चर नहीं किया जा सकता।</string>
-    <string name="retry_tips">यहां बताया गया है कि आप इस परेशानी को कैसे ठीक कर सकते हैं:
-\n1. सुनिश्चित करें कि आप अच्छे प्रकाश वाले स्थान पर हैं।
-\n2. सुनिश्चित करें कि व्यक्ति सीधा देख रहा है।
-\n3. अपनी जगह पर सीधे रहें।</string>
     <string name="onboarding_light">अच्छी रोशनी वाली जगह पर जायें।</string>
     <string name="onboarding_fill">चेहरा सर्कल फ्रेम में लें।</string>
     <string name="onboarding_straight">सुनिश्चित करें कि व्यक्ति सीधा देख रहा है।</string>
@@ -287,7 +213,6 @@
     <string name="capture_title_no_face">चेहरा नहीं दिख रहा</string>
     <string name="capture_title_too_close">बहुत पास हैं</string>
     <string name="capture_title_face_too_far">बहुत दूर हैं</string>
-    <string name="matching_x_records">% S रिकॉर्ड से मिलान</string>
 
 
     <string name="face_match_matching_candidates">उम्मीदवार में से मिलान हो रहा हैं</string>

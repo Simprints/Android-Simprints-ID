@@ -4,13 +4,10 @@
     <string name="configuration_error_title">የተግበቦት ስህተት</string>
     <string name="error_occurred_title">ስህተት አጋጥሟል</string>
     <string name="different_projectId_message">የተለየ የፕሮጀክት መለያ ስለተጠቀሙ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="different_userId_message">የተለየ የተጠቃሚ መለያ ቁጥር ስለተጠቀሙ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="alert_try_again">እንደገና ይሞክሩ</string>
     <string name="close">ይዝጉ</string>
     <string name="confirmation_logout_cancel">ሰርዝ</string>
     <string name="confirmation_logout_message">ጨርሰው መውጣት ይፈልጋሉ</string>
     <string name="confirmation_logout_title">መውጣት</string>
-    <string name="dashboard_card_calculating">በማስላት ላይ</string>
     <string name="dashboard_card_current_user">አሁን ያለ ተጠቃሚ: %1$s</string>
     <string name="dashboard_card_scanner_used">እስካነር ይጠቀሙ: %1$s</string>
     <string name="dashboard_label">የሁነቶች ማሳያ</string>
@@ -41,13 +38,10 @@
     <string name="preference_select_modules_title">ሞጅውሎችን ይምረጡ</string>
     <string name="preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
     <string name="preference_sync_and_search_title">የሲንክ እና የፍለጋ ተግባቦት</string>
-    <string name="records_up_to_date">ሁሉም መረጃዎች ወቅታዊ ሆነዋል</string>
     <string name="requestLogin_message">መግባት ከፈለጉ፡ እባክዎ የደንበኛውን አፕልኬሽን ከፍተው የሲም ፕሪንትን መለያቁጥር በመጠቀም መግባት ይችላሉ</string>
-    <string name="requestLogin_title">መግባት ይጠበቅበዎታል፡፡</string>
     <string name="scan_qr">የፈጣን ምላሽ መለያ እስካን ያድርጉ</string>
     <string name="settings_app_details">ስለ አፕልኬሽኑ የበለጠ</string>
     <string name="settings_general">አጠቃላይ</string>
-    <string name="settings_invalid_selection">የተሳሳተ ምርጫ</string>
     <string name="settings_no_modules_toast">የተሳሳተ ምርጫ፡ እባክዎት ካለው የምዕራፍ አማራጭ ውስጥ ቢያንስ አንድ ይምረጡ</string>
     <string name="simprints_logo">የስምፕሪንት አርማ</string>
     <string name="title_activity_settings">ማስተካከያ</string>
@@ -125,7 +119,6 @@
     <string name="l_5_finger_name">የግራ እጅ አምስተኛ ጣት</string>
     <string name="no_modules_selected">የተመረጠ ሞጁል የለም</string>
     <string name="no_results">ምንም ውጤት የለም</string>
-    <string name="ok">እሽ</string>
     <string name="r_1_finger_name">የቀኝ አውራጣትዎን</string>
     <string name="r_2_finger_name">የቀኝ እጅ ጠቋሚ ጣት</string>
     <string name="r_3_finger_name">የቀኝ እጅ ሶስተኛ ጣት</string>
@@ -150,7 +143,6 @@
     <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
     <string name="preference_summary_sync_information">ሲንክ ላይ ተጨማሪ ዝርዝር መረጃ</string>
     <string name="preference_sync_information_title">ሲንክ የተደረገ መረጃ</string>
-    <string name="progress_sync_overlay">መረጃውን በመላላክ ላይ...</string>
     <string name="enrol_last_biometrics_alert_message">1. %1$s ሪኮርድን ማስቀመጥ አልተሳካም \n 2. ዝጋን መታ ያድርጉ</string>
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
@@ -164,33 +156,8 @@
     <string name="biometric_concat_modalities">እና</string>
     <string name="consent_collect_yes">ሲምፕሪንትስ መረጃውን ለጥናት አላማ ሊጠቀምበት ይችላል</string>
     <string name="consent_share_data_no">ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ  ለትርፍ ያልተቃቑመ ድርጅት, የ %1$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
-    <string name="dashboard_card_available_on_phone">ከስልከዎ ላይ ይገኛል</string>
-    <string name="dashboard_card_enrol_title">የመጨረሻ ምዝገባ</string>
-    <string name="dashboard_card_enrolment_info">የምዝገባ መረጃ</string>
-    <string name="dashboard_card_identification_title">የመጨረሻው መለያ</string>
-    <string name="dashboard_card_lastscanner_used">በመጠቀም ላይ ያለው ስካነር %1$s</string>
-    <string name="dashboard_card_to_download">ለ ማውረድ</string>
-    <string name="dashboard_card_to_upload">ለ መጫን</string>
-    <string name="dashboard_card_verification_title">የመጨረሻው ማጣሪያ</string>
-    <string name="safetynet_down_alert_message">1. እባክዎ ከ5 እስከ 10 ደቂቃ ቆይተው ይሞክሩ</string>
     <string name="why_did_you_skip_biometrics">ለምንየጣት አሻራዉን ዘለሉ?</string>
-    <string name="id_error_save">የመጨረሻውን ባዮሜትሪክስ ለመመዝግብ ማንቂያ</string>
-    <string name="id_save_message">1 የማህደሩን %1$s መመዝገብ አልተሳካም\n2 መዝጊያውን ይጫኑ</string>
-    <string name="id_continue">ቀጥል</string>
-    <string name="id_enrolment_successful">ምዝገባ ተሳክቷል</string>
-    <string name="id_config_error_enrol_last_biometrics">የማዋቀር(configuration) ስህተት አጋጥሟል(የተሳሳተ ሲምፕሪንስ ኢንተንት) እባክዎ ለሲስተም አድሚኒስትሬተር ያሳውቁ</string>
-    <string name="toast_login_failed">ወደ አፕሊኬሽኑ መግባት አለተሳካም፣ለሱፕርቫይዘሩ አሳዉቅ</string>
-    <string name="modality_starting_download">ማዉረድ በመጀመር ላይ</string>
-    <string name="modality_downloading">በማዉረድ ላይ %1$s</string>
-    <string name="modality_installing">በመጫን ላይ ...</string>
-    <string name="modality_installation_offline_title">ሞዳሊቲ በማውረድ ላይ ሰህተት አጋጥሟል</string>
-    <string name="feature_not_downloaded_title">ሲምፕሪንት ማዉረድ አልተጠናቀቀም</string>
-    <string name="modality_installation_offline">ዳውንሎዱን ለመጨረስ የስልኩ ማስተካከያ ላይ ዋይፋይ እና ሞባይል ዳታ መብራቱን ያረጋግጡ</string>
-    <string name="feature_not_downloaded">ሲምፕሪንስን መጠቀም ለመቀጠል እና አዉርዱ %1$s</string>
-    <string name="modality_download_taking_longer">ማዉረዱ ከተጠበቀው በላይ እየወሰደ ነው...</string>
-    <string name="calculating_overlay">በማስላት ላይ</string>
     <string name="long_consent_downloading">የግላዊነት ማስታወቂያ በማውረድ ላይ</string>
-    <string name="configuration_error_message">የማዋቀር ስህተት ተፈጥሯል (%1$s)፣ እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
     <string name="error_backend_maintenance_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ቆየት ብለው ይሞክሩ.</string>
     <string name="error_backend_maintenance_with_time_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ከ%s በኋላ እንደገና ይሞክሩ</string>
     <string name="dashboard_sync_card_records_to_upload">ለመስቀል %1$d መዝገብ</string>
@@ -204,8 +171,6 @@
     <string name="biometrics_parental_face">የልጅዎትን ፎቶግራፍ ልውሰድ</string>
     <string name="exit_form_return_to_simprints">የፊቱን ፎቶ ይመዝግቡ</string>
     <string name="why_did_you_skip_face_capture">ለምን የፊት ፎቶ መዉሰዱን ዘለሉ?</string>
-    <string name="face_feature_alert">የፊት ፊቸር</string>
-    <string name="fingerprint_face_feature_alert">የጣት አሻራና የፊት ፊቸር</string>
     <string name="sync_info_images_to_upload">የሚጫኑ ምስሎች</string>
     <string name="password_lock_title_default">ለመክፈት የይለፍ ቃል ያስገቡ</string>
     <string name="password_lock_title_logout">ለመውጣት የይለፍ ቃል ያስገቡ</string>
@@ -225,15 +190,9 @@
     <string name="biometrics_access_fingerprint_face">የጣት አሻራ መረጃ፤ፎቶግራፍ</string>
     <string name="biometrics_general_fingerprint">የጣት አሻራዎትን ይጠቀሙ</string>
     <string name="biometrics_parental_fingerprint">የልጅዎትን የጣት አሻራ ልውሰድ</string>
-    <string name="preference_select_fingers_title">ለአሻራ የሚሆን ቋሚ እጣት ይምረጡ</string>
-    <string name="finger_selection_confirm_dialog_text">ቅንብሮች ይቀመጡ?</string>
-    <string name="finger_selection_confirm_dialog_yes">አስቀምጥ</string>
-    <string name="finger_selection_confirm_dialog_no">ሰርዝ</string>
     <string name="finger_selection_finger_label">ጣት</string>
     <string name="finger_selection_quantity_label">ብዛት</string>
     <string name="finger_selection_reset">ዳግም አስጀምር</string>
-    <string name="finger_selection_add_finger">ጣት ጨምር</string>
-    <string name="finger_selection_invalid">ልክ ያልሆነ ምርጫ - ከአንድ ጣት ከ 5 በላይ አለ</string>
     <string name="finger_selection_fragment_title">ጣቶች እይ</string>
     <string name="bluetooth_error_pair_scanner_and_device_message">1. እስካነሩ መብራቱን ያረጋግጡ
 \n2. መቸቱን /ሴቲንግ ይምረጡ
@@ -254,27 +213,21 @@
     <string name="good_scan_direction">ለቀጣዩ ጣትዎ ወደ ግራ ያንሸራቱ</string>
     <string name="good_scan_message">ጥሩ የሆነ እስካን</string>
     <string name="identify_title">መለየት</string>
-    <string name="loading_candidates">ዕጩዎችን በመጫን ላይ ነው</string>
     <string name="low_battery_message">የእስካነሩ ባትሪ እያለቀ ነው እባክዎ እስካነሩን ቻርጅ ያድርጉ</string>
     <string name="low_battery_title">ዝቅተኛ ባትሪ</string>
-    <string name="matching_fingerprints">የጣት አሻራውን ማመሳከር</string>
     <string name="missing_finger">የተዘለለ ጣት</string>
     <string name="multiple_scanners_found_message">በስልኩ ላይ ከአንድ በላይ እስካነር ተገናኝቷል፣ እባክዎ የማይፈልጉትን እስካነር ግንኙነቱን ያቋርጡ</string>
     <string name="no_finger_detected_message">ምንም አይነት ጣት አላገኘም</string>
     <string name="no_fingers_scanned">እባክዎ ቢያንስ አንድ ጣትዎን ለአሻራ ይስጡ</string>
     <string name="pair_scanner_label">ማስተካከያ</string>
     <string name="please_scan">እባክዎ እስካን ያድርጉ</string>
-    <string name="please_wait">የመለየት ሰራውን እስኪጠናቀቅ እባክዎት ትንሽ ይጠብቁ</string>
     <string name="please_wait_button">እባክዎትን ይጠብቁ</string>
     <string name="poor_scan_direction">እባክዎ እንደገና እስካን ያድርጉ</string>
     <string name="poor_scan_message">ጥሩ ያልሆነ እስካን</string>
-    <string name="reconnecting_message">እንደገና ያገናኙ</string>
-    <string name="refusal_label">ከቅጹ መውጣት</string>
     <string name="register_title">ወደ ሲስተሙ ማስገባት</string>
     <string name="rescan_label">እንደገና እስካን ያድርጉ</string>
     <string name="rescan_label_question">እንደገና እስካን ይደረግ?</string>
     <string name="restart">እንደገና መስነሳት</string>
-    <string name="scan">እስካን</string>
     <string name="scan_label">እስካን</string>
     <string name="scanner_confirmation_no">አይ</string>
     <string name="scanner_confirmation_yes">አዎ</string>
@@ -282,7 +235,6 @@
     <string name="scanner_error_turn_scanner_on_title">እስካነሩን ያብሩ</string>
     <string name="scanner_id_confirmation_message">እስካነሩ %1$s ነው?</string>
     <string name="scanning">እስካን ማድረግ</string>
-    <string name="title_fingerprint">የጣት አሻራ</string>
     <string name="transfering_data">መረጃ በማስተላለፍ ላይ ነው</string>
     <string name="try_another_finger">እባክዎት ሌላ ጣት ይሞክሩ</string>
     <string name="verify_title">ማመሳከር</string>
@@ -324,31 +276,6 @@
     <string name="continue_button">ቀጥል</string>
     <string name="capture_number_text">ከ%2$s %1$s ይቃኙ</string>
     <string name="please_scan_again">እባክዎ እንደገና ይቃኙ</string>
-    <string name="fingerprint_feature_alert">የጣት አሻራ ፊቸር</string>
-    <string name="finger_selection_activity_title">ጣቶችን ይምረጡ</string>
-    <plurals name="returned_results">
-        <item quantity="one">%d ዉጤቶችን ይዟል</item>
-        <item quantity="other">%d ዉጤቶችን ይዟል</item>
-    </plurals>
-    <plurals name="tier1or2_matches">
-        <item quantity="zero">በጣም ጥሩ ግጥሚያዎች የሉም</item>
-        <item quantity="one">%d በጣም ጥሩ ተመራጭ</item>
-        <item quantity="other">%d በጣም ጥሩ ተመራጮች</item>
-    </plurals>
-    <plurals name="tier3_matches">
-        <item quantity="zero">ጥሩ ተመራጮች የሉም</item>
-        <item quantity="one">%d ጥሩ ተመራጭ</item>
-        <item quantity="other">%d ጥሩ ተመራጮች</item>
-    </plurals>
-    <plurals name="tier4_matches">
-        <item quantity="zero">ተመራጮች የሉም</item>
-        <item quantity="one">%d ተመራጭ</item>
-        <item quantity="other">%d ተዛምዶ</item>
-    </plurals>
-    <plurals name="loaded_candidates_result">
-        <item quantity="one">%d እጩ ተጭኗል</item>
-        <item quantity="other">የተጫኑ %d እጩዎች</item>
-    </plurals>
 
     <string name="invalid_projectId_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="invalid_selectedId_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
@@ -360,20 +287,14 @@
     <string name="invalid_verifyId_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ማጣሪያ ስላደረጉ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="rooted_device_title">ዋናው መሳሪያ ተገኝቷል</string>
     <string name="rooted_device_message">1. ተቆጣጣሪዎን ያግኙ-ዋናው መሳሪያ ተገኝቷል\n2. መዝጊያውን ይጫኑ</string>
-    <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
-    <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
 
-    <string name="capture_title_howto">እንዴት ፊትን ማንሳት ይቻላል</string>
     <string name="capture_title_previewing">ለማንሳት እየተዘጋጀ</string>
-    <string name="capture_title_looks_good">ለማንሳት ዝግጁ ነዉ!</string>
     <string name="capture_error_no_face">ፊቱ ክቡን መሙላቱን ያረጋግጡ</string>
     <string name="capture_error_face_too_far">ቀረብ አድርግ(ፊት ርቋል)</string>
     <string name="capture_error_face_too_close">ወደኋላ ተመለስ</string>
     <string name="capture_error_look_straight">ሰዉየዉ ቀጥታ ካሜራዉን እንዲያይ አድርግ</string>
-    <string name="capture_ready">ለማንሳት ዝግጁ</string>
     <string name="capture_prep_begin_btn">ለማንሳት ተጫን</string>
     <string name="capture_prep_begin_btn_capturing">በማንሳት ላይ....</string>
-    <string name="capture_title_scan_progress">ማንሳት በሂደት ላይ</string>
     <string name="capture_hold">ባለበት ፖዚሽኑ ላይ አቆይ....</string>
     <string name="captured_successfully">የፊት ምስል በስኬት ተመዝግቧል</string>
     <string name="title_confirmation">ማረጋገጥ</string>
@@ -381,9 +302,6 @@
     <string name="title_preparation">ለማንሳት በዝግጅት ላይ</string>
     <string name="btn_recapture">እንደገና ማንሳት</string>
     <string name="btn_finish">ለመቀጠል ተጫን</string>
-    <string name="btn_capture_again">እንደገና ማንሳት</string>
-    <string name="captured_unsuccessful">የፊቱን ምስል ማንሳት አልቻኩም፣በቴክኒክ ምክንያት</string>
-    <string name="retry_tips">ይሄን ቸግር ማስተካከል የምትችሉት እንዲህ ነው። 1/ በቂ ብርህን ያለው ቦታ ምረጡ 2/ሰዉየው ወደ ካሜራው አተኩሮ ይመልከት 3/ካሜራዉን እንደያዝክክ ሳታንቀሳቅሰ ማቆየት</string>
     <string name="onboarding_light">በቂ ብርሀን ያለበት ቦታ መምረጥ</string>
     <string name="onboarding_fill">በካሜራው ክብ ዉስጥ ፊቱ እንዲገባ ማድረግ</string>
     <string name="onboarding_straight">ሰዉየው ወደ ስልኩ ቀጥ ብሎ ይመልከት</string>
@@ -392,23 +310,17 @@
     <string name="capture_title_no_face">ምንም ፊት ማግኘት አልቻለም</string>
     <string name="capture_title_too_close">ፊቱ በጣም ቀርቧል</string>
     <string name="capture_title_face_too_far">ፊቱ በጣም ርቋል</string>
-    <string name="matching_x_records">ካሉት %s ማህደር ዉስጥ እየለየ</string>
     <string name="exit_form_return_to_face_capture">የፊቱን ፎቶ ይመዝግቡ</string>
     <string name="face_match_please_wait">የመለየት ሰራውን እስኪጠናቀቅ እባክዎት ትንሽ ይጠብቁ</string>
     <string name="face_match_loading_candidates">ዕጩዎችን በመጫን ላይ ነው</string>
     <string name="face_match_matching_candidates">ካሉት %s ማህደር ዉስጥ እየለየ</string>
     <string name="error_licence_invalid_title">ፍቃድ ልክ ያልሆነ</string>
     <string name="error_licence_invalid_message">የፊት ፈቃድ ልክ ያልሆነ ነው፣ እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
-    <string name="error_close_button">ይዝጉ</string>
-    <string name="error_licence_missing_title">ፍቃድ ጠፍቷል</string>
-    <string name="error_licence_missing_message">የፊት ፈቃድ ይጎድላል፣ እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
     <string name="face_configuration_started">የፊት ሁነታን በማዋቀር ላይ</string>
     <string name="face_configuration_downloading">አስፈላጊ ፋይሎችን በማውረድ ላይ</string>
     <string name="error_configuration_error_title">የማዋቀር ስህተት</string>
     <string name="error_configuration_error_message">የፊት ሁነታን በማዋቀር ላይ ስህተት ነበር፣እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
     <string name="exit_form_capture_face">የፊቱን ፎቶ ይመዝግቡ</string>
-    <string name="error_unexpected_error_title">ስህተት አጋጥሟል</string>
-    <string name="error_unexpected_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
     <plurals name="face_match_matched_candidates">
         <item quantity="one">እያወዳደረ %d ተመራጭ</item>
         <item quantity="other">እያወዳደረ %d ተመራጮችን</item>
@@ -432,5 +344,4 @@
         <item quantity="one">%d ተመራጭ</item>
         <item quantity="other">%d ተዛምዶ</item>
     </plurals>
-    <string name="returning_results">ውጤቱን መመለስ</string>
 </resources>

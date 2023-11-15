@@ -22,7 +22,6 @@
     <!-- Screen Text -->
     <!-- Button Labels -->
     <string name="cancel_button" tools:ignore="ButtonCase">لغو کردن</string>
-    <string name="ok">اوکی</string>
     <!-- Content Descriptions -->
 
 
@@ -113,7 +112,6 @@
     <string name="register_title">شامل شدن</string>
     <string name="identify_title">مشخص کردن</string>
     <string name="verify_title">تشخیص</string>
-    <string name="refusal_label">فورم انکار</string>
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
@@ -130,20 +128,15 @@
     <string name="scanning">در حال اسکن کردن ....</string>
     <string name="good_scan_message">اسکن خوب</string>
     <string name="poor_scan_message">اسکن ضعیف</string>
-    <string name="reconnecting_message">وصل شده دوباره</string>
     <!-- Button Labels -->
     <string name="rescan_label">اسکن دوباره</string>
     <string name="rescan_label_question">اسکن دوباره ؟</string>
     <string name="scan_label">اسکن</string>
-   <string name="scan">اسکن</string>
     <!-- Content Descriptions -->
 
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
-    <string name="please_wait">صبر کنید تا ما به شناسایی ادامه دهیم</string>
     <!-- Loading text -->
-    <string name="loading_candidates">در حال آماده سازی اشتراک کنندگان</string>
-    <string name="matching_fingerprints">در حال مطابقت نشان انگشتان</string>
 
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->

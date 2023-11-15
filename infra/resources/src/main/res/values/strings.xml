@@ -1,20 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Dynamic module names -->
-    <string name="title_face" translatable="false">Face</string>
-    <string name="title_fingerprint" translatable="false">Fingerprint</string>
-    <string name="module_feature_finger" translatable="false">fingerprint</string>
-    <string name="module_feature_face" translatable="false">face</string>
-
-    <!-- AndroidManifest : activity titles throughout the app -->
-    <!-- App Name -->
-    <!-- Activity Titles -->
     <string name="settings_title">Settings</string>
     <string name="alert_title">Alert</string>
-
-
-    <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
 
     <!-- Version Names -->
     <string name="front_simprintsId_version" translatable="false">Simprints ID: %1$s</string>
@@ -23,9 +11,6 @@
     <!-- Content Descriptions -->
     <string name="launch_background_description" translatable="false">Simprints\' logo as background image</string>
 
-
-    <!-- SetupActivity : the loading screen -->
-    <!-- Consent Text -->
     <!-- First argument in consent text should always be program name, second is modality specific access/use case text -->
     <string name="consent_enrol_only">I\'d like to %2$s to enrol you in %1$s.</string>
     <string name="consent_enrol">I\'d like to %2$s to enrol you in %1$s and identify you in the future.</string>
@@ -60,15 +45,8 @@
     <string name="consent_parental_title">Parental Consent</string>
     <string name="privacy_notice_text">Privacy Notice</string>
 
-    <!-- CollectFingerprintsActivity : screen where the scanning happens -->
-    <!-- Screen Text -->
-    <!-- Button Labels -->
     <string name="cancel_button" tools:ignore="ButtonCase">Cancel</string>
-    <string name="ok">OK</string>
-    <!-- Content Descriptions -->
 
-    <!--SyncerSync Button Text -->
-    <!-- Toast Messages -->
     <!-- Finger Names -->
     <string name="l_5_finger_name">Left Fifth Finger</string>
     <string name="l_4_finger_name">Left Fourth Finger</string>
@@ -82,28 +60,15 @@
     <string name="r_5_finger_name">Right Fifth Finger</string>
     <!-- Content descriptions -->
 
-    <!-- MatchingActivity : the waiting screen after an identification -->
-    <!-- Screen Text -->
-    <!-- Loading text -->
-    <string name="test_loaded_candidates_quantity_key" translatable="false">test_loaded_candidates</string>
-    <plurals name="test_loaded_candidates">
-        <item quantity="one">Loaded %d candidate.</item>
-        <item quantity="other">Loaded %d candidates.</item>
-    </plurals>
-
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->
     <string name="configuration_error_title">Configuration Error</string>
     <string name="verify_guid_not_found_title">Person not found</string>
     <string name="error_occurred_title">Error occurred</string>
-    <string name="alert_try_again">Try again</string>
     <string name="enrol_last_biometrics_alert_title">Unable to save</string>
-    <string name="modality_installation_offline_title">Error in downloading modalities</string>
-    <string name="feature_not_downloaded_title">Simprints download incomplete</string>
 
     <!-- Error Message Text -->
     <string name="different_projectId_message">A configuration error has occurred (different Project Id), please sign out from the home screen or contact your system administrator</string>
-    <string name="different_userId_message">A configuration error has occurred (different User Id), please sign out from the home screen or contact your system administrator</string>
     <string name="verify_guid_not_found_online_message">The person selected for verification is not in the database</string>
     <string name="verify_guid_not_found_offline_message">Person not found, please make sure you are connected to the internet and try again</string>
     <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
@@ -112,30 +77,12 @@
     <string name="enrol_last_biometrics_alert_message_face_param">Face</string>
     <string name="enrol_last_biometrics_alert_message_fingerprint_param">Fingerprint</string>
     <string name="enrol_last_biometrics_alert_message_all_param">Face/Fingerprint</string>
-    <string name="modality_installation_offline">Check Wi-Fi or mobile data is turned on in settings to complete download</string>
-    <string name="feature_not_downloaded">To use Simprints please continue and download the %1$s</string>
-    <string name="fingerprint_feature_alert">fingerprint feature</string>
-    <string name="face_feature_alert">face feature</string>
-    <string name="fingerprint_face_feature_alert">fingerprint and face features</string>
 
     <!-- Button Labels For Error Messages -->
     <string name="close">Close</string>
     <string name="try_again_label">Try Again</string>
     <string name="settings_label">Phone settings</string>
-    <!-- Content Descriptions -->
 
-
-    <!-- DebugActivity : the screen that shows project statistics and version numbers -->
-    <!-- Screen Text -->
-    <!-- Button Labels -->
-    <!-- Recovery dialogs -->
-
-
-    <!-- SettingsActivity : the detailed settings screen -->
-    <!-- Setting Labels -->
-
-
-    <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
     <string name="why_did_you_skip_fingerprinting">Why did you skip fingerprinting?</string>
     <!-- Button Labels -->
@@ -144,23 +91,18 @@
     <!-- Text Prompt -->
     <string name="hint_other_reason">Additional Information</string>
 
-
     <!-- Long Consent Activity : the screen where the user can find the long consent form -->
     <string name="long_consent_download_button_text">Download Privacy Notice</string>
     <string name="long_consent_downloading">Downloading Privacy Notice</string>
     <string name="long_consent_failed_to_download">Failed to download privacy notice.</string>
 
     <!-- LoginActivity -->
-    <!-- TODO: what about translation? -->
-    <string name="empty" translatable="false" />
     <string name="simprints_logo">Simprints Logo</string>
     <string name="scan_qr">Scan QR</string>
     <string name="login_id_hint">Project ID</string>
     <string name="login_secret_hint">Project key</string>
     <string name="login_user_id_hint">User ID</string>
-    <string name="login_title">Request Project credentials</string>
     <string name="requestLogin_message">You need to login. Please use your client app to open Simprints ID and log in.</string>
-    <string name="requestLogin_title">Login Required</string>
     <string name="device_id">DeviceID: %s</string>
     <string name="login">Login</string>
     <!-- QR code scanning messages -->
@@ -183,8 +125,6 @@
     <string name="confirmation_logout_title">Logout</string>
     <string name="confirmation_logout_message">Do you want to logout?</string>
     <string name="confirmation_logout_cancel">Cancel</string>
-
-    <string name="records_up_to_date">All records are updated</string>
 
     <string name="dashboard_sync_card_complete">Sync complete</string>
     <string name="dashboard_sync_card_incomplete">Sync incomplete</string>
@@ -209,7 +149,6 @@
 
     <string name="dashboard_card_scanner_used">Scanner used: %1$s</string>
     <string name="dashboard_card_current_user">Current user: %1$s</string>
-    <string name="dashboard_card_calculating">Calculating…</string>
     <string name="dashboard_card_activity">Activity: %1$s</string>
 
     <plurals name="dashboard_card_enrolments">
@@ -244,7 +183,6 @@
     <string name="settings_app_details">APP DETAILS</string>
     <string name="settings_no_modules_toast">Invalid Selection. Please select at least one module.</string>
     <string name="settings_too_many_modules_toast">Invalid Selection. Please select no more than %1$d modules.</string>
-    <string name="settings_invalid_selection">Invalid Selection</string>
     <string name="title_activity_settings_about">About</string>
     <string name="title_activity_sync_information">Sync Information</string>
 
@@ -261,8 +199,6 @@
     <string name="preference_device_id_title">Device ID</string>
     <string name="preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="preference_summary_sync_information">Further details on sync</string>
-    <string name="preferences_general_key">preferences_general</string>
-    <string name="preferences_app_details_key">app_details_key</string>
 
     <!-- View Fingers Activity -->
     <string name="finger_selection_fragment_title">View Fingers</string>
@@ -283,10 +219,7 @@
     <string name="sync_info_sync_now">Sync now</string>
     <string name="sync_info_sync_in_progress">Syncing…</string>
 
-    <string name="re_fetch_sync_info" translatable="false">Re-fetch Sync Info</string>
-
-    <string name="progress_sync_overlay">Syncing…</string>
-    <string name="calculating_overlay">Calculating…</string>
+    <string name="re_fetch_sync_info">Re-fetch Sync Info</string>
 
     <!--Exit form-->
     <string name="refusal_toast_select_option_submit">Please select an option and submit</string>
@@ -303,7 +236,7 @@
     <string name="why_did_you_skip_biometrics">Why did you skip Biometrics?</string>
     <string name="why_did_you_skip_face_capture">Why did you skip face capture?</string>
     <string name="fetch_guid_checking_person_in_database">Checking person in database</string>
-    <!-- region Module selection -->
+
     <string name="hint_search_modules">Search modules</string>
     <string name="no_modules_selected">No modules selected</string>
     <string name="no_results">No results</string>
@@ -313,14 +246,8 @@
     <string name="confirm_module_selection_cancel">Cancel</string>
     <string name="dashboard_sync_card_try_again_button">Try again</string>
     <string name="enrol_last_biometrics_success">Successful enrolment</string>
-    <!-- endregion -->
-    <string name="toast_login_failed">Login failed. Please contact your supervisor.</string>
 
     <!--SetupActivity-->
-    <string name="modality_starting_download">Starting download</string>
-    <string name="modality_downloading">Downloading… %1$s</string>
-    <string name="modality_installing">Installing…</string>
-    <string name="modality_download_taking_longer">Download taking longer than expected…</string>
     <string name="confirmation_sent">Confirmation sent</string>
     <string name="redirecting_you_back">Redirecting you back</string>
     <string name="outdated_google_play_services_alert_title">Outdated \"Google Play Services\"</string>
@@ -343,27 +270,7 @@
     <string name="password_lock_wrong_pin">Incorrect password</string>
     <string name="password_lock_overlay_title">Tap to unlock</string>
 
-    <string name="dashboard_card_available_on_phone">Available on Phone</string>
-    <string name="dashboard_card_enrol_title">Last Enrol</string>
-    <string name="dashboard_card_enrolment_info">Enrolment Info</string>
-    <string name="dashboard_card_identification_title">Last Identification</string>
-    <string name="dashboard_card_lastscanner_used">Scanner used %1$s</string>
-    <string name="dashboard_card_to_download">To Download</string>
-    <string name="dashboard_card_to_upload">To Upload</string>
-    <string name="dashboard_card_verification_title">Last Verification</string>
-    <string name="safetynet_down_alert_message">1. Please try again after 5–10 minutes \n 2. Tap close</string>
-    <string name="id_error_save">Unable to save</string>
-    <string name="id_save_message">1. Failed to save %1$s record \n 2. Tap Close</string>
-    <string name="id_continue">Continue</string>
-    <string name="id_enrolment_successful">Enrolment successful</string>
-    <string name="id_config_error_enrol_last_biometrics">A configuration error has occurred (invalid Simprints intent), please contact your system administrator.</string>
-    <string name="configuration_error_message">A configuration error has occurred (%1$s), please contact your system administrator</string>
     <string name="refusal_scanner_not_working">Scanner not working</string>
-
-    <!-- region Error Screen Layout -->
-    <string name="main_error_graphic" translatable="false">Main Error Graphic</string>
-    <string name="failed_to_retrieve_message" translatable="false">Failed to retrieve message</string>
-    <!-- endregion -->
 
     <!-- region Error Screen Text -->
     <string name="invalid_projectId_message">A configuration error has occurred (invalid Project Id), please contact your system administrator</string>
@@ -378,25 +285,15 @@
     <string name="rooted_device_message">1. Contact your supervisor - rooted device detected\n2. Tap Close</string>
     <!-- endregion -->
 
-    <!-- region GUID selection -->
-    <string name="guid_selection_data_sent">Data sent</string>
-    <string name="guid_selection_result_sent">Result sent</string>
-    <!-- endregion -->
-
     <!--  Face modality  -->
-    <string name="capture_title_howto">How to scan a face</string>
     <string name="capture_title_previewing">Preparing to scan</string>
-    <string name="capture_title_looks_good">Scan is ready!</string>
     <string name="capture_error_no_face">Make sure the face fills the circle</string>
     <string name="capture_error_face_too_far">Move closer</string>
     <string name="capture_error_face_too_close">Move back</string>
     <string name="capture_error_look_straight">Make sure the person is looking straight at the camera</string>
-    <string name="capture_ready">Ready to capture</string>
     <string name="capture_prep_begin_btn">Tap to capture</string>
     <string name="capture_prep_begin_btn_capturing">Capturing…</string>
-    <string name="capture_title_scan_progress">Scan in progress</string>
     <string name="capture_hold">Hold the position…</string>
-    <string name="capture_debug_features" translatable="false">Yaw: %s\nRoll: %s\n</string>
 
     <string name="captured_successfully">Face has been successfully captured.</string>
     <string name="title_confirmation">Confirmation</string>
@@ -405,9 +302,6 @@
 
     <string name="btn_recapture">Recapture</string>
     <string name="btn_finish">Tap to continue</string>
-    <string name="btn_capture_again">Capture again</string>
-    <string name="captured_unsuccessful">Couldn\'t capture the face due to technical issue.</string>
-    <string name="retry_tips">Here’s how you can fix the issue: \n\n1. Make sure you are in a well lighted space.\n2. Make sure the person is looking straight.\n3. Stay still and hold the position.</string>
     <string name="onboarding_light">Find a well-lighted place.</string>
     <string name="onboarding_fill">Fill the face in the circle frame.</string>
     <string name="onboarding_straight">Make sure the person is looking straight.</string>
@@ -416,7 +310,6 @@
     <string name="capture_title_no_face">No face detected</string>
     <string name="capture_title_too_close">Too close</string>
     <string name="capture_title_face_too_far">Too far</string>
-    <string name="matching_x_records">Matching against %s records</string>
     <string name="exit_form_return_to_face_capture">Capture face</string>
 
     <!--  Matching activity  -->
@@ -428,7 +321,6 @@
         <item quantity="one">Compared to %d candidate.</item>
         <item quantity="other">Compared to %d candidates.</item>
     </plurals>
-
 
     <plurals name="face_match_returned_results">
         <item quantity="one">Returned %d result.</item>
@@ -459,22 +351,14 @@
     <!--  Error screens  -->
     <string name="error_licence_invalid_title">License invalid</string>
     <string name="error_licence_invalid_message">Face license is invalid, please contact your system administrator</string>
-    <string name="error_close_button">Close</string>
-    <string name="error_licence_missing_title">License missing</string>
-    <string name="error_licence_missing_message">Face license is missing, please contact your system administrator</string>
     <string name="error_configuration_error_title">Configuration error</string>
     <string name="error_configuration_error_message">There was an error while configuring face modality, please contact your system administrator</string>
-    <string name="error_unexpected_error_title">Error occurred</string>
-    <string name="error_unexpected_error_message">Please try again and if Simprints does not work contact your system administrator</string>
-
-
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
     <string name="register_title">Enrolment</string>
     <string name="identify_title">Identification</string>
     <string name="verify_title">Verification</string>
-    <string name="refusal_label">Refusal Form</string>
 
     <!-- ConnectScannerActivity : the activity for connecting to the scanner -->
     <!-- Dialog messages -->
@@ -518,7 +402,6 @@
     <string name="serial_entry_pair_failed">Please ensure scanner %1$s is turned on and try again.</string>
     <string name="serial_entry_pair_rejected">Pairing cancelled, please try again and accept the pairing request when prompted.</string>
     <string name="serial_entry_pair_toast_invalid">Please enter the 6 digits of the serial number</string>
-    <string name="sp" translatable="false">SP</string>
     <!-- OtaFragment -->
     <string name="ota_title">Scanner needs updating</string>
     <string name="ota_instructions">Keep scanner turned on as it is updating</string>
@@ -535,7 +418,6 @@
     <string name="ota_failed_instructions">Please contact your supervisor for help</string>
     <string name="continue_button">Continue</string>
 
-
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <string name="good_scan_direction">Swipe left to next finger</string>
@@ -548,7 +430,6 @@
     <string name="no_finger_detected_message">No finger detected</string>
     <string name="finger_skipped_message">Finger skipped</string>
     <string name="no_fingers_scanned">Please scan at least 1 required finger</string>
-    <string name="reconnecting_message">Reconnecting…</string>
     <string name="confirm_fingers_dialog_title">Fingers Scanned</string>
     <string name="capture_number_text">Scan %1$s of %2$s</string>
     <string name="please_scan_again">Please scan again</string>
@@ -557,55 +438,9 @@
     <string name="rescan_label_question">Re-scan?</string>
     <string name="scan_label">Scan</string>
     <string name="please_wait_button">Please Wait</string>
-    <string name="scan">Scan</string>
     <string name="confirm">Confirm</string>
     <string name="restart">Restart</string>
-    <!-- Content Descriptions -->
 
-    <!-- MatchingActivity : the waiting screen after an identification -->
-    <!-- Screen Text -->
-    <string name="please_wait">Please wait while we proceed to identification</string>
-    <!-- Loading text -->
-    <string name="loading_candidates">Loading candidates…</string>
-    <plurals name="loaded_candidates_result">
-        <item quantity="one">Loaded %d candidate.</item>
-        <item quantity="other">Loaded %d candidates.</item>
-    </plurals>
-
-
-    <string name="matching_fingerprints">Matching fingerprints…</string>
-    <string name="returning_results">Returning results…</string>
-
-
-
-    <plurals name="returned_results">
-        <item quantity="one">Returned %d result.</item>
-        <item quantity="other">Returned %d results.</item>
-    </plurals>
-
-
-    <plurals name="tier1or2_matches">
-        <item quantity="zero">No very good matches</item>
-        <item quantity="one">%d very good match</item>
-        <item quantity="other">%d very good matches</item>
-    </plurals>
-
-
-    <plurals name="tier3_matches">
-        <item quantity="zero">No good matches</item>
-        <item quantity="one">%d good match</item>
-        <item quantity="other">%d good matches</item>
-    </plurals>
-
-
-    <plurals name="tier4_matches">
-        <item quantity="zero">No matches</item>
-        <item quantity="one">%d match</item>
-        <item quantity="other">%d matches</item>
-    </plurals>
-
-
-    <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
     <string name="low_battery_title">Low battery</string>
     <string name="bluetooth_error_pair_scanner_and_device_title">Pair scanner and device</string>
@@ -621,24 +456,9 @@
     <string name="scanner_error_turn_scanner_on_message">1. Turn scanner on \n 2. Tap Try Again</string>
     <!-- Button Labels For Error Messages -->
     <string name="pair_scanner_label">Settings</string>
-    <!-- Content Descriptions -->
-
-
-    <!-- Dashboard Activity -->
 
     <string name="get_ready">Get Ready</string>
     <string name="try_another_finger">Let\'s Try Another Finger!</string>
     <string name="missing_finger"><u>Missing Finger</u></string>
 
-    <!--Settings Activity-->
-
-    <!--Settings Preferences titles and summaries-->
-
-    <string name="preference_select_fingers_title">Select default fingers</string>
-    <string name="finger_selection_confirm_dialog_text">Save settings?</string>
-    <string name="finger_selection_confirm_dialog_yes">Save</string>
-    <string name="finger_selection_confirm_dialog_no">Cancel</string>
-    <string name="finger_selection_add_finger">Add Finger</string>
-    <string name="finger_selection_invalid">Invalid Selection - there is more than 5 of one finger</string>
-    <string name="finger_selection_activity_title">Select Fingers</string>
 </resources>
