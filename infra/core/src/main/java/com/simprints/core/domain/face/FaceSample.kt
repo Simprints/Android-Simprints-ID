@@ -1,10 +1,13 @@
 package com.simprints.core.domain.face
 
 import android.os.Parcelable
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
+import javax.annotation.processing.Generated
 
 @Parcelize
+@ExcludedFromGeneratedTestCoverageReports("Data class with generated code")
 data class FaceSample(
     val template: ByteArray,
     val format: String,

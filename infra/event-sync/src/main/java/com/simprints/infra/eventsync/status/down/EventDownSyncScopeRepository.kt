@@ -1,6 +1,6 @@
 package com.simprints.infra.eventsync.status.down
 
-import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.common.Group
 import com.simprints.core.domain.modality.Modes
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.eventsync.exceptions.MissingArgumentForDownSyncScopeException
@@ -23,15 +23,15 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     suspend fun getDownSyncScope(
         modes: List<Modes>,
         selectedModuleIDs: List<String>,
-        syncGroup: GROUP
+        syncGroup: Group
     ): EventDownSyncScope {
         val projectId = getProjectId()
         val possibleUserId = getUserId()
 
         val syncScope = when (syncGroup) {
-            GROUP.GLOBAL -> SubjectProjectScope(projectId, modes)
-            GROUP.USER -> SubjectUserScope(projectId, possibleUserId, modes)
-            GROUP.MODULE -> SubjectModuleScope(projectId, selectedModuleIDs, modes)
+            Group.GLOBAL -> SubjectProjectScope(projectId, modes)
+            Group.USER -> SubjectUserScope(projectId, possibleUserId, modes)
+            Group.MODULE -> SubjectModuleScope(projectId, selectedModuleIDs, modes)
         }
 
         syncScope.operations = syncScope.operations.map { op -> refreshState(op) }

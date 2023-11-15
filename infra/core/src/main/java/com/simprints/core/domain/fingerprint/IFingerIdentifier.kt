@@ -1,5 +1,8 @@
 package com.simprints.core.domain.fingerprint
 
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+
+@ExcludedFromGeneratedTestCoverageReports("Enum")
 enum class IFingerIdentifier {
     RIGHT_5TH_FINGER,
     RIGHT_4TH_FINGER,

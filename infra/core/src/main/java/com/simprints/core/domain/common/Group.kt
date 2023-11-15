@@ -1,6 +1,9 @@
 package com.simprints.core.domain.common
 
-enum class GROUP {
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+
+@ExcludedFromGeneratedTestCoverageReports("Enum")
+enum class Group {
     GLOBAL,
     USER,
     MODULE

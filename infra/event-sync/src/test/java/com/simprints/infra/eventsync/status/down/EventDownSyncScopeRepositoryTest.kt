@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.status.down
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.common.Group
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authstore.AuthStore
@@ -85,7 +85,7 @@ internal class EventDownSyncScopeRepositoryTest {
             val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
                 listOf(Modes.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
-                GROUP.GLOBAL
+                Group.GLOBAL
             )
 
             assertProjectSyncScope(syncScope)
@@ -99,7 +99,7 @@ internal class EventDownSyncScopeRepositoryTest {
             val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
                 listOf(Modes.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
-                GROUP.USER
+                Group.USER
             )
 
             assertUserSyncScope(syncScope)
@@ -112,7 +112,7 @@ internal class EventDownSyncScopeRepositoryTest {
             val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
                 listOf(Modes.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
-                GROUP.MODULE
+                Group.MODULE
             )
 
             assertModuleSyncScope(syncScope)
@@ -128,7 +128,7 @@ internal class EventDownSyncScopeRepositoryTest {
                 eventDownSyncScopeRepository.getDownSyncScope(
                     listOf(Modes.FINGERPRINT),
                     DEFAULT_MODULES.toList(),
-                    GROUP.GLOBAL
+                    Group.GLOBAL
                 )
             }
         }
@@ -145,7 +145,7 @@ internal class EventDownSyncScopeRepositoryTest {
                 eventDownSyncScopeRepository.getDownSyncScope(
                     listOf(Modes.FINGERPRINT),
                     DEFAULT_MODULES.toList(),
-                    GROUP.GLOBAL
+                    Group.GLOBAL
                 )
             }
         }

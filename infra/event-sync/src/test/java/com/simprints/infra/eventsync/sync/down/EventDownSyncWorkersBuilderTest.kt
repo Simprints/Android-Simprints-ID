@@ -3,7 +3,7 @@ package com.simprints.infra.eventsync.sync.down
 import androidx.work.WorkRequest
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.common.Group
 import com.simprints.core.domain.modality.Modes
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.domain.tokenization.values
@@ -81,7 +81,7 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncGroup = GROUP.GLOBAL,
+                syncGroup = Group.GLOBAL,
             )
         } returns SampleSyncScopes.projectDownSyncScope
 
@@ -102,7 +102,7 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncGroup = GROUP.USER
+                syncGroup = Group.USER
             )
         } returns SampleSyncScopes.userDownSyncScope
 
@@ -122,7 +122,7 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncGroup = GROUP.MODULE
+                syncGroup = Group.MODULE
             )
         } returns SampleSyncScopes.modulesDownSyncScope
 
@@ -142,7 +142,7 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FACE),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncGroup = GROUP.GLOBAL
+                syncGroup = Group.GLOBAL
             )
         } returns SampleSyncScopes.projectDownSyncScope
         val uniqueSyncId = "uniqueSyncId"
@@ -163,7 +163,7 @@ class EventDownSyncWorkersBuilderTest {
             eventDownSyncScopeRepository.getDownSyncScope(
                 modes = listOf(Modes.FINGERPRINT),
                 selectedModuleIDs = SELECTED_MODULE.values(),
-                syncGroup = GROUP.GLOBAL
+                syncGroup = Group.GLOBAL
             )
         } returns SampleSyncScopes.projectDownSyncScope
 

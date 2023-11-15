@@ -139,12 +139,5 @@ annotation class ExternalScope
 Use this annotation to ignore a class or function from test coverage reports.
  */
 @MustBeDocumented
-@Retention(AnnotationRetention.SOURCE)
-@Target(
-    AnnotationTarget.CLASS,
-    AnnotationTarget.CONSTRUCTOR,
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.FIELD,
-    AnnotationTarget.TYPE, AnnotationTarget.PROPERTY, AnnotationTarget.EXPRESSION
-)
+@Retention(AnnotationRetention.BINARY)
 annotation class ExcludedFromGeneratedTestCoverageReports(val reason: String)
