@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simprints ID</string>
-    <string name="alert_title">Yaadachiisa</string>
+  <string name="alert_title">Yaadachiisa</string>
     <string name="alert_try_again">Irra deebi\'ii yaali</string>
     <string name="confirmation_logout_cancel">Haquu</string>
     <string name="confirmation_logout_message">Keessa bahuu barbaadda?</string>

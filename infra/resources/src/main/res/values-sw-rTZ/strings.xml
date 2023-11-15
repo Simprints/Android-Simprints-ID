@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simprints ID</string>
-    <string name="alert_title">Arifu</string>
+  <string name="alert_title">Arifu</string>
     <string name="alert_try_again">Jaribu tena</string>
     <string name="button_submit">Tuma</string>
     <string name="cancel_button">Ghairi</string>

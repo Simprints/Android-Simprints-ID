@@ -9,9 +9,7 @@
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- App Name -->
-    <string name="app_name" translatable="false">Simprints ID</string>
     <!-- Activity Titles -->
-    <string name="title_activity_front" translatable="false">Simprints ID</string>
     <string name="settings_title">Settings</string>
     <string name="alert_title">Alert</string>
 
@@ -21,7 +19,6 @@
     <!-- Version Names -->
     <string name="front_simprintsId_version" translatable="false">Simprints ID: %1$s</string>
     <!-- App Titles -->
-    <string name="simprints_label" translatable="false">Simprints</string>
     <string name="libsimprints_label" translatable="false">LibSimprints</string>
     <!-- Content Descriptions -->
     <string name="launch_background_description" translatable="false">Simprints\' logo as background image</string>
