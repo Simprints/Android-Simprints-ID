@@ -33,7 +33,7 @@ class PipelineJacocoConventionPlugin : Plugin<Project> {
             dependsOn(tasks.withType<Test>().matching { it.name.lowercase().contains("debug") })
 
             reports.xml.required.set(true)
-            reports.html.required.set(true) // Disable html reports to decrease report upload/download time in github pipeline
+            reports.html.required.set(false) // Disable html reports to decrease report upload/download time in github pipeline
 
             val javaTree = fileTree("${project.buildDir}/intermediates/javac/debug/classes") { exclude(fileFilter) }
             val kotlinTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") { exclude(fileFilter) }

@@ -139,7 +139,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
             modes = getProjectModes(projectConfig),
             selectedModuleIDs = deviceConfig.selectedModules.values(),
-            syncGroup = projectConfig.synchronization.down.partitionType.toGroup()
+            syncPartitioning = projectConfig.synchronization.down.partitionType.toDomain()
         )
 
         var creationsToDownload = 0
