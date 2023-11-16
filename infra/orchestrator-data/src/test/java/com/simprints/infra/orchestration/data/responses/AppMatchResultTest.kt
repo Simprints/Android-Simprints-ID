@@ -10,6 +10,24 @@ import org.junit.Test
 class AppMatchResultTest {
 
     @Test
+    fun testAppMatchResultConstructor() {
+        assertThat(
+            AppMatchResult(
+                guid = "guid",
+                confidenceScore = 25.0f,
+                decisionPolicy = DecisionPolicy(low = 10, medium = 20, high = 30)
+            )
+        ).isEqualTo(
+            AppMatchResult(
+                guid = "guid",
+                confidenceScore = 25,
+                tier = AppResponseTier.TIER_4,
+                matchConfidence = AppMatchConfidence.MEDIUM,
+            )
+        )
+    }
+
+    @Test
     fun testComputeTier() {
         mapOf(
             0.0f to AppResponseTier.TIER_5,
@@ -31,7 +49,7 @@ class AppMatchResultTest {
 
     @Test
     fun testComputeMatchConfidence() {
-        val policy = DecisionPolicy(low = 10, medium = 20, high = 30,)
+        val policy = DecisionPolicy(low = 10, medium = 20, high = 30)
         mapOf(
             0 to AppMatchConfidence.NONE,
             10 to AppMatchConfidence.LOW,
@@ -41,6 +59,7 @@ class AppMatchResultTest {
             30 to AppMatchConfidence.HIGH,
             35 to AppMatchConfidence.HIGH,
         ).forEach { (score, expected) ->
-            assertThat(AppMatchResult.computeMatchConfidence(score, policy)).isEqualTo(expected)}
+            assertThat(AppMatchResult.computeMatchConfidence(score, policy)).isEqualTo(expected)
+        }
     }
 }

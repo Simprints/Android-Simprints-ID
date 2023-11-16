@@ -50,7 +50,7 @@ class KronosTimeHelperImplTest {
         assertThat(result).isEqualTo(2000L)
     }
 
-    @Ignore("This test fails on pipeline")
+    @Ignore("This test is failing in pipeline tests for unknown reasons")
     @Test
     fun testTodayInMillis() {
         every { kronosClock.getCurrentTimeMs() } returns TIMESTAMP
@@ -60,7 +60,7 @@ class KronosTimeHelperImplTest {
         assertThat(result).isEqualTo(TIMESTAMP_TODAY)
     }
 
-    @Ignore("This test fails on pipeline")
+    @Ignore("This test is failing in pipeline tests for unknown reasons")
     @Test
     fun testTomorrowInMillis() {
         every { kronosClock.getCurrentTimeMs() } returns TIMESTAMP

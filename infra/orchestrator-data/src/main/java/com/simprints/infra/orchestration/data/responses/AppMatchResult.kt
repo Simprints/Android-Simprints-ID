@@ -1,6 +1,7 @@
 package com.simprints.infra.orchestration.data.responses
 
 import android.os.Parcelable
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.infra.config.store.models.DecisionPolicy
