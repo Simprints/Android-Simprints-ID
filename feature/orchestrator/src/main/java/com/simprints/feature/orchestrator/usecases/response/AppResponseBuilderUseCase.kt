@@ -1,11 +1,11 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.infra.orchestration.moduleapi.app.responses.IAppResponse
+import com.simprints.infra.orchestration.data.responses.AppResponse
 import javax.inject.Inject
 
 internal class AppResponseBuilderUseCase @Inject constructor(
@@ -21,7 +21,7 @@ internal class AppResponseBuilderUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         request: ActionRequest?,
         results: List<Parcelable>,
-    ): IAppResponse = when (request) {
+    ): AppResponse = when (request) {
         is ActionRequest.EnrolActionRequest -> if (isNewEnrolment(projectConfiguration, results)) {
             handleEnrolment(request, results)
         } else {

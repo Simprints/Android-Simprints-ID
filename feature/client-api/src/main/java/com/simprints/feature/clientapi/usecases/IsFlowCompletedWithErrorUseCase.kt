@@ -2,13 +2,13 @@ package com.simprints.feature.clientapi.usecases
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.infra.orchestration.moduleapi.app.responses.IAppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("Code is basically a just mapping of constants to boolean")
 internal class IsFlowCompletedWithErrorUseCase @Inject constructor() {
 
-    operator fun invoke(errorResponse: IAppErrorResponse) = when (errorResponse.reason) {
+    operator fun invoke(errorResponse: AppErrorResponse) = when (errorResponse.reason) {
         AppErrorReason.UNEXPECTED_ERROR,
         AppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN,
         AppErrorReason.DIFFERENT_USER_ID_SIGNED_IN,

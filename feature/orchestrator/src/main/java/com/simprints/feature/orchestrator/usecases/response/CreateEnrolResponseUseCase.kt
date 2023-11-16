@@ -2,13 +2,13 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.infra.orchestration.moduleapi.app.responses.IAppResponse
+import com.simprints.infra.orchestration.data.responses.AppResponse
 import javax.inject.Inject
 
 internal class CreateEnrolResponseUseCase @Inject constructor(
@@ -16,7 +16,7 @@ internal class CreateEnrolResponseUseCase @Inject constructor(
     private val enrolSubject: EnrolSubjectUseCase,
 ) {
 
-    suspend operator fun invoke(request: ActionRequest.EnrolActionRequest, results: List<Parcelable>): IAppResponse {
+    suspend operator fun invoke(request: ActionRequest.EnrolActionRequest, results: List<Parcelable>): AppResponse {
         val fingerprintCapture = results.filterIsInstance(FingerprintCaptureResult::class.java).lastOrNull()
         val faceCapture = results.filterIsInstance(FaceCaptureResult::class.java).lastOrNull()
 

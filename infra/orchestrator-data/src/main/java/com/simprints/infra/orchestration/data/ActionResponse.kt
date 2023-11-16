@@ -1,7 +1,7 @@
 package com.simprints.infra.orchestration.data
 
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.infra.orchestration.moduleapi.app.responses.IAppMatchResult
+import com.simprints.infra.orchestration.data.responses.AppMatchResult
 
 sealed class ActionResponse(
     open val actionIdentifier: ActionRequestIdentifier,
@@ -23,7 +23,7 @@ sealed class ActionResponse(
         override val sessionId: String,
         override val eventsJson: String?,
 
-        val identifications: List<IAppMatchResult>,
+        val identifications: List<AppMatchResult>,
     ) : ActionResponse(actionIdentifier, sessionId, eventsJson)
 
     data class ConfirmActionResponse(
@@ -39,7 +39,7 @@ sealed class ActionResponse(
         override val sessionId: String,
         override val eventsJson: String?,
 
-        val matchResult: IAppMatchResult,
+        val matchResult: AppMatchResult,
     ) : ActionResponse(actionIdentifier, sessionId, eventsJson)
 
     data class ExitFormActionResponse(
