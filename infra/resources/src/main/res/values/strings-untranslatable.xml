@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="empty" translatable="false" />
-
-    <string name="preferences_general_key" translatable="false">preferences_general</string>
-    <string name="preferences_app_details_key" translatable="false">app_details_key</string>
-
-    <string name="sp" translatable="false">SP</string>
+    <string name="fingerprint_connect_sp" translatable="false">SP</string>
+    <string name="fingerprint_capture_empty" translatable="false" />
+    <string name="dashboard_request_login_simprints_version" translatable="false">Simprints ID: %1$s</string>
 
 </resources>
 

@@ -48,7 +48,7 @@ class SettingsPasswordDialogFragmentTest {
 
         onView(withId(MR.id.textinput_error))
             .check(matches(isDisplayed()))
-            .check(matches(withText(IDR.string.password_lock_wrong_pin)))
+            .check(matches(withText(IDR.string.dashboard_password_lock_wrong_pin)))
 
         onView(withId(R.id.password_input_field))
             .check(matches(withText("")))
@@ -70,7 +70,7 @@ class SettingsPasswordDialogFragmentTest {
         onView(withId(MR.id.textinput_error))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
-            .check(matches(withText(IDR.string.password_lock_wrong_pin)))
+            .check(matches(withText(IDR.string.dashboard_password_lock_wrong_pin)))
 
         onView(withId(R.id.password_input_field))
             .inRoot(isDialog())

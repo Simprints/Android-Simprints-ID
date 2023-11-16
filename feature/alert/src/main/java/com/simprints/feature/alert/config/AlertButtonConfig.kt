@@ -21,7 +21,7 @@ data class AlertButtonConfig(
 
         val Close = AlertButtonConfig(
             text = null,
-            textRes = IDR.string.close,
+            textRes = IDR.string.alert_button_close,
             resultKey = AlertContract.ALERT_BUTTON_PRESSED_BACK,
             closeOnClick = true,
         )

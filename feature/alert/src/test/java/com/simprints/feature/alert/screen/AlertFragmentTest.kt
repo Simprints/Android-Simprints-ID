@@ -111,17 +111,17 @@ class AlertFragmentTest {
         launchFragmentInHiltContainer<AlertFragment>(
             navController = navController,
             fragmentArgs = alertConfiguration {
-                titleRes = IDR.string.app_name
-                messageRes = IDR.string.unforeseen_error_message
-                leftButton = alertButton { textRes = IDR.string.login_server_error }
-                rightButton = alertButton { textRes = IDR.string.error_occurred_title }
+                titleRes = IDR.string.alert_title_fallback
+                messageRes = IDR.string.alert_title_fallback
+                leftButton = alertButton { textRes = IDR.string.alert_title_fallback }
+                rightButton = alertButton { textRes = IDR.string.alert_title_fallback }
             }.toArgs()
         )
 
-        onView(withId(R.id.alertTitle)).check(matches(withText(IDR.string.app_name)))
-        onView(withId(R.id.alertMessage)).check(matches(withText(IDR.string.unforeseen_error_message)))
-        onView(withId(R.id.alertLeftButton)).check(matches(withText(IDR.string.login_server_error)))
-        onView(withId(R.id.alertRightButton)).check(matches(withText(IDR.string.error_occurred_title)))
+        onView(withId(R.id.alertTitle)).check(matches(withText(IDR.string.alert_title_fallback)))
+        onView(withId(R.id.alertMessage)).check(matches(withText(IDR.string.alert_title_fallback)))
+        onView(withId(R.id.alertLeftButton)).check(matches(withText(IDR.string.alert_title_fallback)))
+        onView(withId(R.id.alertRightButton)).check(matches(withText(IDR.string.alert_title_fallback)))
     }
 
     @Test

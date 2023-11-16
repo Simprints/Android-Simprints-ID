@@ -51,15 +51,15 @@ internal class FingerSelectionItemAdapter(
 fun Finger.toString(context: Context) =
     context.getString(
         when (this) {
-            Finger.LEFT_THUMB -> IDR.string.l_1_finger_name
-            Finger.LEFT_INDEX_FINGER -> IDR.string.l_2_finger_name
-            Finger.LEFT_3RD_FINGER -> IDR.string.l_3_finger_name
-            Finger.LEFT_4TH_FINGER -> IDR.string.l_4_finger_name
-            Finger.LEFT_5TH_FINGER -> IDR.string.l_5_finger_name
-            Finger.RIGHT_THUMB -> IDR.string.r_1_finger_name
-            Finger.RIGHT_INDEX_FINGER -> IDR.string.r_2_finger_name
-            Finger.RIGHT_3RD_FINGER -> IDR.string.r_3_finger_name
-            Finger.RIGHT_4TH_FINGER -> IDR.string.r_4_finger_name
-            Finger.RIGHT_5TH_FINGER -> IDR.string.r_5_finger_name
+            Finger.LEFT_THUMB -> IDR.string.fingerprint_capture_finger_l_1
+            Finger.LEFT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_l_2
+            Finger.LEFT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_l_3
+            Finger.LEFT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_l_4
+            Finger.LEFT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_l_5
+            Finger.RIGHT_THUMB -> IDR.string.fingerprint_capture_finger_r_1
+            Finger.RIGHT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_r_2
+            Finger.RIGHT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_r_3
+            Finger.RIGHT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_r_4
+            Finger.RIGHT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_r_5
         }
     )

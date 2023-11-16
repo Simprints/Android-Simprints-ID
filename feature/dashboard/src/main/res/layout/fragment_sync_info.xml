@@ -21,7 +21,7 @@
             app:menu="@menu/sync_info_menu"
             app:navigationContentDescription="back"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:title="@string/title_activity_sync_information" />
+            app:title="@string/dashboard_sync_info_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -51,7 +51,7 @@
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:padding="5dp"
-                android:text="@string/sync_info_records_to_download" />
+                android:text="@string/dashboard_sync_info_records_to_download" />
 
             <TextView
                 android:id="@+id/recordsToDownloadCount"
@@ -103,7 +103,7 @@
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:padding="5dp"
-                android:text="@string/sync_info_records_to_delete" />
+                android:text="@string/dashboard_sync_info_records_to_delete" />
 
             <TextView
                 android:id="@+id/recordsToDeleteCount"
@@ -138,7 +138,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
-        android:text="@string/sync_info_sync_now"
+        android:text="@string/dashboard_sync_info_sync_now_button"
         app:layout_constraintBottom_toTopOf="@+id/modulesTabHost"
         app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
         app:layout_constraintStart_toStartOf="@+id/modulesTabHost"
@@ -169,7 +169,7 @@
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:padding="5dp"
-                android:text="@string/sync_info_total_records_on_device" />
+                android:text="@string/dashboard_sync_info_total_records_on_device" />
 
             <TextView
                 android:id="@+id/totalRecordsCount"
@@ -223,7 +223,7 @@
                 android:layout_weight="0.8"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="@string/sync_info_records_to_upload" />
+                android:text="@string/dashboard_sync_info_records_to_upload" />
 
             <TextView
                 android:id="@+id/recordsToUploadCount"
@@ -274,7 +274,7 @@
                 android:layout_weight="0.8"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="@string/sync_info_images_to_upload" />
+                android:text="@string/dashboard_sync_info_images_to_upload" />
 
             <TextView
                 android:id="@+id/imagesToUploadCount"
@@ -316,7 +316,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:text="@string/sync_info_selected_modules"
+            android:text="@string/dashboard_sync_info_selected_modules"
             android:textAlignment="center" />
 
         <View
@@ -347,7 +347,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
-        android:text="@string/select_modules_button_title"
+        android:text="@string/dashboard_sync_info_select_modules_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/modulesTabHost"
         app:layout_constraintStart_toStartOf="@+id/modulesTabHost"

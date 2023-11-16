@@ -62,6 +62,6 @@ internal class OtaFailedFragment : Fragment(R.layout.fragment_ota_failed) {
             } else {
                 getString(IDR.string.error_backend_maintenance_message)
             }
-        } else getString(IDR.string.ota_failed_instructions)
+        } else getString(IDR.string.fingerprint_connect_ota_failed_instructions)
     }
 }

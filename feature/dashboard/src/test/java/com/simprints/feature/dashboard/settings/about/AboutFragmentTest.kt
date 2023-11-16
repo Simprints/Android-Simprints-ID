@@ -89,7 +89,7 @@ class AboutFragmentTest {
 
         launchFragmentInHiltContainer<AboutFragment>()
 
-        onView(withText(IDR.string.preference_scanner_version_title)).check(doesNotExist())
+        onView(withText(IDR.string.dashboard_preference_scanner_version_title)).check(doesNotExist())
         onView(withText(SCANNER_VERSION)).check(doesNotExist())
     }
 
@@ -99,7 +99,7 @@ class AboutFragmentTest {
 
         launchFragmentInHiltContainer<AboutFragment>()
 
-        onView(withText(IDR.string.preference_scanner_version_title)).check(matches(isDisplayed()))
+        onView(withText(IDR.string.dashboard_preference_scanner_version_title)).check(matches(isDisplayed()))
         onView(withText(SCANNER_VERSION)).check(matches(isDisplayed()))
     }
 
@@ -130,7 +130,7 @@ class AboutFragmentTest {
         val navController = testNavController(R.navigation.graph_dashboard, R.id.aboutFragment)
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
-        onView(withText(IDR.string.preference_logout_title)).perform(click())
+        onView(withText(IDR.string.dashboard_preference_logout_title)).perform(click())
         onView(withId(android.R.id.button1))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
@@ -173,7 +173,7 @@ class AboutFragmentTest {
 
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
-        onView(withText(IDR.string.preference_logout_title)).perform(click())
+        onView(withText(IDR.string.dashboard_preference_logout_title)).perform(click())
         onView(withId(android.R.id.button2))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
@@ -191,7 +191,7 @@ class AboutFragmentTest {
 
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
-        onView(withText(IDR.string.preference_logout_title)).perform(click())
+        onView(withText(IDR.string.dashboard_preference_logout_title)).perform(click())
         onView(withId(R.id.password_input_field))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
@@ -209,7 +209,7 @@ class AboutFragmentTest {
 
 
         launchFragmentInHiltContainer<AboutFragment>(navController = navController)
-        onView(withText(IDR.string.preference_logout_title)).perform(click())
+        onView(withText(IDR.string.dashboard_preference_logout_title)).perform(click())
         onView(withId(R.id.password_input_field))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))

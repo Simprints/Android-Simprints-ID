@@ -93,14 +93,14 @@ internal class GeneralConsentTextHelper @Inject constructor(
     }
 
     private fun getConcatenatedModalitiesUseCaseText() = "%s %s %s".format(
-        context.getString(R.string.biometrics_general_fingerprint),
-        context.getString(R.string.biometric_concat_modalities),
-        context.getString(R.string.biometric_general_face)
+        context.getString(R.string.consent_biometrics_general_fingerprint),
+        context.getString(R.string.consent_biometric_concat_modalities),
+        context.getString(R.string.consent_biometric_general_face)
     )
 
     private fun getSingleModalitySpecificUseCaseText(modalities: List<GeneralConfiguration.Modality>) = when (modalities.first()) {
-        GeneralConfiguration.Modality.FACE -> context.getString(R.string.biometric_general_face)
-        GeneralConfiguration.Modality.FINGERPRINT -> context.getString(R.string.biometrics_general_fingerprint)
+        GeneralConfiguration.Modality.FACE -> context.getString(R.string.consent_biometric_general_face)
+        GeneralConfiguration.Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_general_fingerprint)
     }
 
     private fun getModalitySpecificAccessText(modalities: List<GeneralConfiguration.Modality>) = if (modalities.size == 1) {
@@ -109,11 +109,11 @@ internal class GeneralConsentTextHelper @Inject constructor(
         getConcatenatedModalitiesAccessText()
     }
 
-    private fun getConcatenatedModalitiesAccessText() = context.getString(R.string.biometrics_access_fingerprint_face)
+    private fun getConcatenatedModalitiesAccessText() = context.getString(R.string.consent_biometrics_access_fingerprint_face)
 
     private fun getSingleModalityAccessText(modalities: List<GeneralConfiguration.Modality>) = when (modalities.first()) {
-        GeneralConfiguration.Modality.FACE -> context.getString(R.string.biometrics_access_face)
-        GeneralConfiguration.Modality.FINGERPRINT -> context.getString(R.string.biometrics_access_fingerprint)
+        GeneralConfiguration.Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
+        GeneralConfiguration.Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
     }
 
 }

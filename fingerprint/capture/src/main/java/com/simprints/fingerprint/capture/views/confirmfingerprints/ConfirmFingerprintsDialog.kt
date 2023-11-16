@@ -18,10 +18,10 @@ internal class ConfirmFingerprintsDialog(
 ) {
 
     fun create(): AlertDialog = MaterialAlertDialogBuilder(context)
-        .setTitle(context.getString(IDR.string.confirm_fingers_dialog_title))
+        .setTitle(context.getString(IDR.string.fingerprint_capture_confirm_fingers_dialog_title))
         .setMessage(getMapOfFingersAndQualityAsText())
-        .setPositiveButton(context.getString(IDR.string.confirm)) { _, _ -> onConfirm() }
-        .setNegativeButton(context.getString(IDR.string.restart)) { _, _ -> onRestart() }
+        .setPositiveButton(context.getString(IDR.string.fingerprint_capture_confirm_fingers_dialog_yes)) { _, _ -> onConfirm() }
+        .setNegativeButton(context.getString(IDR.string.fingerprint_capture_confirm_fingers_dialog_no)) { _, _ -> onRestart() }
         .setCancelable(false)
         .create()
 

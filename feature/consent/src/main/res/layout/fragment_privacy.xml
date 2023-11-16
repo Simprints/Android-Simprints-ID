@@ -19,7 +19,7 @@
             android:minHeight="?android:attr/actionBarSize"
             app:navigationContentDescription="back"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:title="@string/privacy_notice_title" />
+            app:title="@string/consent_privacy_notice_title" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
-        android:text="@string/long_consent_download_button_text"
+        android:text="@string/consent_privacy_notice_download_button"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/privacyProgress"
         app:layout_constraintEnd_toEndOf="parent"
@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="@string/long_consent_downloading"
+        android:text="@string/consent_privacy_notice_downloading"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/privacyDownloadButton"
         app:layout_constraintEnd_toEndOf="parent"
