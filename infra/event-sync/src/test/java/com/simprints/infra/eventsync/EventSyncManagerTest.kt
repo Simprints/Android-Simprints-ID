@@ -7,7 +7,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.common.Group
+import com.simprints.core.domain.common.Partitioning
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.EventCount
@@ -79,7 +79,7 @@ internal class EventSyncManagerTest {
 
         coEvery { configRepository.getConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
-            every { synchronization.down.partitionType.toGroup() } returns Group.MODULE
+            every { synchronization.down.partitionType.toDomain() } returns Partitioning.MODULE
         }
 
         eventSyncManagerImpl = EventSyncManagerImpl(

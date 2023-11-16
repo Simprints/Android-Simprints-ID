@@ -15,27 +15,27 @@ class KronosTimeHelperImplTest {
     @MockK
     private lateinit var kronosClock: KronosClock
 
-    private lateinit var subject: KronosTimeHelperImpl
+    private lateinit var timeHelperImpl: KronosTimeHelperImpl
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        subject = KronosTimeHelperImpl(kronosClock)
+        timeHelperImpl = KronosTimeHelperImpl(kronosClock)
     }
 
     @Test
     fun testNow() {
         every { kronosClock.getCurrentTimeMs() } returns 1000L
 
-        assertThat(subject.now()).isEqualTo(1000L)
+        assertThat(timeHelperImpl.now()).isEqualTo(1000L)
     }
 
     @Test
     fun testNowMinus() {
         every { kronosClock.getCurrentTimeMs() } returns 2000L
 
-        val result = subject.nowMinus(1L, TimeUnit.SECONDS)
+        val result = timeHelperImpl.nowMinus(1L, TimeUnit.SECONDS)
 
         // 2000ms - 1s = 1000ms
         assertThat(result).isEqualTo(1000L)
@@ -45,7 +45,7 @@ class KronosTimeHelperImplTest {
     fun testMsBetweenNowAndTime() {
         every { kronosClock.getCurrentTimeMs() } returns 3000L
 
-        val result = subject.msBetweenNowAndTime(1000L)
+        val result = timeHelperImpl.msBetweenNowAndTime(1000L)
 
         assertThat(result).isEqualTo(2000L)
     }
@@ -55,7 +55,7 @@ class KronosTimeHelperImplTest {
     fun testTodayInMillis() {
         every { kronosClock.getCurrentTimeMs() } returns TIMESTAMP
 
-        val result = subject.todayInMillis()
+        val result = timeHelperImpl.todayInMillis()
 
         assertThat(result).isEqualTo(TIMESTAMP_TODAY)
     }
@@ -65,7 +65,7 @@ class KronosTimeHelperImplTest {
     fun testTomorrowInMillis() {
         every { kronosClock.getCurrentTimeMs() } returns TIMESTAMP
 
-        val result = subject.tomorrowInMillis()
+        val result = timeHelperImpl.tomorrowInMillis()
 
         assertThat(result).isEqualTo(TIMESTAMP_TOMORROW)
     }
