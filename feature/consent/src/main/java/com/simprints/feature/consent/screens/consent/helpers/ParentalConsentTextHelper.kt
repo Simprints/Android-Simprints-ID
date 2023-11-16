@@ -93,14 +93,14 @@ internal class ParentalConsentTextHelper @Inject constructor(
     }
 
     private fun getConcatenatedModalitiesUseCaseText() = "%s %s %s".format(
-        context.getString(R.string.biometrics_parental_fingerprint),
-        context.getString(R.string.biometric_concat_modalities),
-        context.getString(R.string.biometrics_parental_face)
+        context.getString(R.string.consent_biometrics_parental_fingerprint),
+        context.getString(R.string.consent_biometric_concat_modalities),
+        context.getString(R.string.consent_biometrics_parental_face)
     )
 
     private fun getSingleModalitySpecificUseCaseText(modalities: List<Modality>) = when (modalities.first()) {
-        Modality.FACE -> context.getString(R.string.biometrics_parental_face)
-        Modality.FINGERPRINT -> context.getString(R.string.biometrics_parental_fingerprint)
+        Modality.FACE -> context.getString(R.string.consent_biometrics_parental_face)
+        Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_parental_fingerprint)
         else -> ""
     }
 
@@ -110,11 +110,11 @@ internal class ParentalConsentTextHelper @Inject constructor(
         getConcatenatedModalitiesAccessText()
     }
 
-    private fun getConcatenatedModalitiesAccessText() = context.getString(R.string.biometrics_access_fingerprint_face)
+    private fun getConcatenatedModalitiesAccessText() = context.getString(R.string.consent_biometrics_access_fingerprint_face)
 
     private fun getSingleModalityAccessText(modalities: List<Modality>) = when (modalities.first()) {
-        Modality.FACE -> context.getString(R.string.biometrics_access_face)
-        Modality.FINGERPRINT -> context.getString(R.string.biometrics_access_fingerprint)
+        Modality.FACE -> context.getString(R.string.consent_biometrics_access_face)
+        Modality.FINGERPRINT -> context.getString(R.string.consent_biometrics_access_fingerprint)
         else -> ""
     }
 }

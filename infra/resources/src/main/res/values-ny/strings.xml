@@ -11,18 +11,18 @@
     <string name="consent_privacy_rights">Ngati mwavomereza kutenga nawo mbali, mutha kusiya kutenga nawo nthawi ina iliyonse ndipo mutha kunena ngati mukufuna kuti uthenga wanu womwe watengedwa utayidwe.&#160;</string>
     <string name="consent_confirmation">Kodi ndingathe kugwiritsa ntchito zidindo za dzala zanu? Chonde nenani \"Ndikuvomera\", \"Ndikukana\", kapena \"Ndili ndi mafunso.\"</string>
 
-    <string name="launch_consent_decline_button">Kukana</string>
-    <string name="launch_consent_accept_button">Kuvomereza</string>
+    <string name="consent_decline_button">Kukana</string>
+    <string name="consent_accept_button">Kuvomereza</string>
 
-    <plurals name="dashboard_card_enrolments">
+    <plurals name="dashboard_activity_card_enrolments">
         <item quantity="one">Enrolment</item>
         <item quantity="other">Enrolments</item>
     </plurals>
-    <plurals name="dashboard_card_identifications">
+    <plurals name="dashboard_activity_card_identifications">
         <item quantity="one">Identification</item>
         <item quantity="other">Identifications</item>
     </plurals>
-    <plurals name="dashboard_card_verifications">
+    <plurals name="dashboard_activity_card_verifications">
         <item quantity="one">Verification</item>
         <item quantity="other">Verifications</item>
     </plurals>

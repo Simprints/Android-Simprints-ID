@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
             app:menu="@menu/app_menu"
-            app:title="@string/dashboard_label" />
+            app:title="@string/dashboard_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

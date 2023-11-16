@@ -64,9 +64,9 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
             otaStatusTextView.visibility = View.VISIBLE
             otaStatusTextView.text =
                 when (val retry = args.params.currentRetryAttempt) {
-                    0 -> getString(IDR.string.updating)
+                    0 -> getString(IDR.string.fingerprint_connect_ota_updating)
                     else -> String.format(
-                        requireActivity().getString(IDR.string.updating_attempt),
+                        requireActivity().getString(IDR.string.fingerprint_connect_ota_updating_attempt),
                         "${retry + 1}", "${OtaViewModel.MAX_RETRY_ATTEMPTS + 1}"
                     )
                 }
@@ -101,7 +101,7 @@ internal class OtaFragment : Fragment(R.layout.fragment_ota) {
 
     private fun listenForCompleteEvent() {
         viewModel.otaComplete.observe(viewLifecycleOwner, LiveDataEventObserver {
-            binding.otaStatusTextView.text = getString(IDR.string.update_complete)
+            binding.otaStatusTextView.text = getString(IDR.string.fingerprint_connect_ota_update_complete)
 
             lifecycleScope.launch {
                 delay(FINISHED_TIME_DELAY_MS)

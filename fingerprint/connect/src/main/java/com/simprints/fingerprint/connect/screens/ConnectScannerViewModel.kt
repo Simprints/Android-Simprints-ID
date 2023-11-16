@@ -272,15 +272,15 @@ internal class ConnectScannerViewModel @Inject constructor(
         @StringRes val messageRes: Int,
     ) {
 
-        Preparation(0, R.string.connect_scanner_bt_connect),
-        DisconnectScanner(1, R.string.connect_scanner_bt_connect),
-        CheckBtEnabled(2, R.string.connect_scanner_bt_connect),
-        InitScanner(3, R.string.connect_scanner_bt_connect),
-        ConnectScanner(4, R.string.connect_scanner_bt_connect),
-        SetupScanner(5, R.string.connect_scanner_setup),
-        ResetScannerUi(6, R.string.connect_scanner_setup),
-        WakeUpScanner(7, R.string.connect_scanner_wake_un20),
-        Finish(8, R.string.connect_scanner_finished),
+        Preparation(0, R.string.fingerprint_connect_scanner_bt_connect),
+        DisconnectScanner(1, R.string.fingerprint_connect_scanner_bt_connect),
+        CheckBtEnabled(2, R.string.fingerprint_connect_scanner_bt_connect),
+        InitScanner(3, R.string.fingerprint_connect_scanner_bt_connect),
+        ConnectScanner(4, R.string.fingerprint_connect_scanner_bt_connect),
+        SetupScanner(5, R.string.fingerprint_connect_scanner_setup),
+        ResetScannerUi(6, R.string.fingerprint_connect_scanner_setup),
+        WakeUpScanner(7, R.string.fingerprint_connect_scanner_wake_un20),
+        Finish(8, R.string.fingerprint_connect_scanner_finished),
         ;
 
         val progress: Int

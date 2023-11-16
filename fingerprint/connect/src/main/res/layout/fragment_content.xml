@@ -24,7 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:text="@string/connect_scanner_bt_connect" />
+        tools:text="@string/fingerprint_connect_scanner_bt_connect" />
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/connect_progress"

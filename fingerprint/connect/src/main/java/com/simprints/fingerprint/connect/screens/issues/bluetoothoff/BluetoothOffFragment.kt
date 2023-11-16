@@ -90,7 +90,7 @@ internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) 
     }
 
     private fun handleCouldNotEnable() {
-        requireContext().showToast(IDR.string.bluetooth_off_toast_error)
+        requireContext().showToast(IDR.string.fingerprint_connect_bluetooth_off_error)
     }
 
     private fun handleBluetoothEnabled() {
@@ -98,7 +98,7 @@ internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) 
             turnOnBluetoothProgressBar.visibility = View.INVISIBLE
             turnOnBluetoothButton.visibility = View.VISIBLE
             turnOnBluetoothButton.isEnabled = false
-            turnOnBluetoothButton.text = getString(IDR.string.bluetooth_on)
+            turnOnBluetoothButton.text = getString(IDR.string.fingerprint_connect_bluetooth_on)
             turnOnBluetoothButton.setBackgroundColor(resources.getColor(IDR.color.simprints_green, null))
         }
 

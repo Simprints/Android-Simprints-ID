@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:minHeight="?android:attr/actionBarSize"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:title="@string/title_activity_settings_about" />
+            app:title="@string/dashboard_settings_about_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

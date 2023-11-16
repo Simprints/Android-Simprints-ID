@@ -26,20 +26,20 @@ internal enum class ErrorType(
 ) {
 
     LICENSE_INVALID(
-        IDR.string.error_licence_invalid_title,
-        IDR.string.error_licence_invalid_message,
+        IDR.string.face_configuration_licence_invalid_title,
+        IDR.string.face_configuration_licence_invalid_message,
         alertType = AlertScreenEventType.FACE_LICENSE_INVALID,
         errorReason = AppErrorReason.FACE_LICENSE_INVALID,
     ),
     BACKEND_MAINTENANCE_ERROR(
-        IDR.string.error_backend_maintenance_title,
-        IDR.string.error_backend_maintenance_message,
+        IDR.string.face_configuration_backend_maintenance_title,
+        IDR.string.face_configuration_backend_maintenance_message,
         alertType = AlertScreenEventType.BACKEND_MAINTENANCE_ERROR,
         errorReason = AppErrorReason.BACKEND_MAINTENANCE_ERROR,
     ),
     CONFIGURATION_ERROR(
-        IDR.string.error_configuration_error_title,
-        IDR.string.error_configuration_error_message,
+        IDR.string.face_configuration_generic_error_title,
+        IDR.string.face_configuration_generic_error_message,
         alertType = AlertScreenEventType.FACE_LICENSE_MISSING,
         errorReason = AppErrorReason.FACE_CONFIGURATION_ERROR,
     ),

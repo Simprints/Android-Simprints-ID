@@ -66,15 +66,15 @@ class FingerSelectionFragmentTest {
         onView(withId(R.id.fingerSelectionRecyclerView)).check(matches(hasChildCount(3)))
 
         onView(nThFingerSelection(0))
-            .check(matches(hasDescendant(withText(IDR.string.l_1_finger_name))))
+            .check(matches(hasDescendant(withText(IDR.string.fingerprint_capture_finger_l_1))))
             .check(matches(hasDescendant(withText("1"))))
 
         onView(nThFingerSelection(1))
-            .check(matches(hasDescendant(withText(IDR.string.r_1_finger_name))))
+            .check(matches(hasDescendant(withText(IDR.string.fingerprint_capture_finger_r_1))))
             .check(matches(hasDescendant(withText("3"))))
 
         onView(nThFingerSelection(2))
-            .check(matches(hasDescendant(withText(IDR.string.l_2_finger_name))))
+            .check(matches(hasDescendant(withText(IDR.string.fingerprint_capture_finger_l_2))))
             .check(matches(hasDescendant(withText("2"))))
     }
 

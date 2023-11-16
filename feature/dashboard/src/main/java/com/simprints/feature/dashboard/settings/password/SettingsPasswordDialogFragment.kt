@@ -11,15 +11,15 @@ import com.simprints.feature.dashboard.databinding.FragmentSettingsPasswordInput
 import com.simprints.infra.resources.R as IDR
 
 class SettingsPasswordDialogFragment(
-    @StringRes val title: Int = IDR.string.password_lock_title_default,
-    val passwordToMatch: String,
-    val onSuccess: () -> Unit,
+  @StringRes val title: Int = IDR.string.dashboard_password_lock_title_default,
+  val passwordToMatch: String,
+  val onSuccess: () -> Unit,
 ) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog = MaterialAlertDialogBuilder(requireContext())
         .setTitle(title)
         .setView(inflateInputView())
-        .setNegativeButton(IDR.string.password_lock_cancel) { _, _ -> dismiss() }
+        .setNegativeButton(IDR.string.dashboard_password_lock_cancel) { _, _ -> dismiss() }
         .create()
 
     private fun inflateInputView() = FragmentSettingsPasswordInputBinding.inflate(layoutInflater)
@@ -46,7 +46,7 @@ class SettingsPasswordDialogFragment(
                 dismiss()
             } else {
                 passwordInputField.text = null
-                passwordInputLayout.error = getString(IDR.string.password_lock_wrong_pin)
+                passwordInputLayout.error = getString(IDR.string.dashboard_password_lock_wrong_pin)
             }
         }
     }
