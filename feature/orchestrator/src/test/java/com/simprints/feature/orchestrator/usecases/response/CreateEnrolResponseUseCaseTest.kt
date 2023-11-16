@@ -5,8 +5,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.orchestrator.exceptions.MissingCaptureException
-import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.orchestration.data.ActionRequest

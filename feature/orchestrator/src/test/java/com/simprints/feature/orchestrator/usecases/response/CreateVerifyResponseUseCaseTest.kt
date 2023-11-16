@@ -3,8 +3,8 @@ package com.simprints.feature.orchestrator.usecases.response
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.matcher.FaceMatchResult
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
-import com.simprints.feature.orchestrator.model.responses.AppVerifyResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.matcher.FingerprintMatchResult
 import io.mockk.every

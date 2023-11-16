@@ -1,18 +1,18 @@
-package com.simprints.feature.orchestrator.model.responses
+package com.simprints.infra.orchestration.data.responses
 
-import com.simprints.infra.config.store.models.DecisionPolicy
+import android.os.Parcelable
 import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.infra.orchestration.moduleapi.app.responses.IAppMatchResult
 import com.simprints.core.domain.response.AppResponseTier
+import com.simprints.infra.config.store.models.DecisionPolicy
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class AppMatchResult(
-    override val guid: String,
-    override val confidenceScore: Int,
-    override val tier: AppResponseTier,
-    override val matchConfidence: AppMatchConfidence
-) : IAppMatchResult {
+data class AppMatchResult(
+    val guid: String,
+    val confidenceScore: Int,
+    val tier: AppResponseTier,
+    val matchConfidence: AppMatchConfidence,
+) : Parcelable {
 
     constructor(
         guid: String,

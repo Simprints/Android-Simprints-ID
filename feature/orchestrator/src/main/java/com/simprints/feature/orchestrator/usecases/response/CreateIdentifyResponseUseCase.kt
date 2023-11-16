@@ -1,14 +1,14 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
-import com.simprints.feature.orchestrator.model.responses.AppIdentifyResponse
-import com.simprints.feature.orchestrator.model.responses.AppMatchResult
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.infra.orchestration.moduleapi.app.responses.IAppResponse
+import com.simprints.infra.orchestration.data.responses.AppResponse
 import javax.inject.Inject
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
@@ -18,7 +18,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
     suspend operator fun invoke(
         projectConfiguration: ProjectConfiguration,
         results: List<Parcelable>,
-    ): IAppResponse {
+    ): AppResponse {
         val currentSessionId = eventRepository.getCurrentCaptureSessionEvent().id
 
         val faceDecisionPolicy = projectConfiguration.face?.decisionPolicy

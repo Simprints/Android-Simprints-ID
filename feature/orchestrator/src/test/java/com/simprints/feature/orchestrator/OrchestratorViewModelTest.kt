@@ -9,7 +9,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId

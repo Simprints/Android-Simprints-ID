@@ -2,10 +2,10 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
-import com.simprints.feature.orchestrator.model.responses.AppIdentifyResponse
-import com.simprints.feature.orchestrator.model.responses.AppRefusalResponse
-import com.simprints.feature.orchestrator.model.responses.AppVerifyResponse
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
+import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
 import io.mockk.MockKAnnotations

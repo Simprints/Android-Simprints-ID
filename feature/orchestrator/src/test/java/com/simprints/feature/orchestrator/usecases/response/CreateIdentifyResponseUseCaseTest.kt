@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.orchestrator.model.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.events.EventRepository
 import com.simprints.matcher.FaceMatchResult

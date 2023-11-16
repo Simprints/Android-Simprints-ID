@@ -2,21 +2,22 @@ package com.simprints.feature.clientapi.mappers.response
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.IdentifyRequestActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
 import com.simprints.infra.orchestration.data.ActionResponse
+import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Verification
-import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.core.domain.response.AppMatchConfidence
-import com.simprints.core.domain.response.AppResponseTier
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -27,56 +28,66 @@ class LibSimprintsResponseMapperTest {
 
     @Test
     fun `correctly maps enrol response`() {
-        val extras = mapper(ActionResponse.EnrolActionResponse(
-            actionIdentifier = EnrolActionFactory.getIdentifier(),
-            sessionId = "sessionId",
-            eventsJson = null,
-            enrolledGuid = "guid",
-            subjectActions = "subjects"
-        ))
+        val extras = mapper(
+            ActionResponse.EnrolActionResponse(
+                actionIdentifier = EnrolActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                eventsJson = null,
+                enrolledGuid = "guid",
+                subjectActions = "subjects"
+            )
+        )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelable<Registration>(Constants.SIMPRINTS_REGISTRATION)).isEqualTo(Registration("guid"))
+        assertThat(extras.getParcelable<Registration>(Constants.SIMPRINTS_REGISTRATION)).isEqualTo(
+            Registration("guid")
+        )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
     }
 
     @Test
     fun `correctly maps identify response`() {
-        val extras = mapper(ActionResponse.IdentifyActionResponse(
-            actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
-            sessionId = "sessionId",
-            eventsJson = null,
-            identifications = listOf(
-                StubMatchResult(
-                    guid = "guid-1",
-                    confidenceScore = 100,
-                    tier = AppResponseTier.TIER_5,
-                    matchConfidence = AppMatchConfidence.MEDIUM,
-                ),
-                StubMatchResult(
-                    guid = "guid-2",
-                    confidenceScore = 75,
-                    tier = AppResponseTier.TIER_3,
-                    matchConfidence = AppMatchConfidence.LOW,
-                ),
+        val extras = mapper(
+            ActionResponse.IdentifyActionResponse(
+                actionIdentifier = IdentifyRequestActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                eventsJson = null,
+                identifications = listOf(
+                    AppMatchResult(
+                        guid = "guid-1",
+                        confidenceScore = 100,
+                        tier = AppResponseTier.TIER_5,
+                        matchConfidence = AppMatchConfidence.MEDIUM,
+                    ),
+                    AppMatchResult(
+                        guid = "guid-2",
+                        confidenceScore = 75,
+                        tier = AppResponseTier.TIER_3,
+                        matchConfidence = AppMatchConfidence.LOW,
+                    ),
+                )
             )
-        ))
+        )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelableArray(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(arrayOf(
-            Identification("guid-1", 100, Tier.TIER_5),
-            Identification("guid-2", 75, Tier.TIER_3),
-        ))
+        assertThat(extras.getParcelableArray(Constants.SIMPRINTS_IDENTIFICATIONS)).isEqualTo(
+            arrayOf(
+                Identification("guid-1", 100, Tier.TIER_5),
+                Identification("guid-2", 75, Tier.TIER_3),
+            )
+        )
     }
 
     @Test
     fun `correctly maps confirm response`() {
-        val extras = mapper(ActionResponse.ConfirmActionResponse(
-            actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
-            sessionId = "sessionId",
-            eventsJson = null,
-            confirmed = true,
-        ))
+        val extras = mapper(
+            ActionResponse.ConfirmActionResponse(
+                actionIdentifier = ConfirmIdentityActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                eventsJson = null,
+                confirmed = true,
+            )
+        )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
@@ -84,17 +95,19 @@ class LibSimprintsResponseMapperTest {
 
     @Test
     fun `correctly maps verify response`() {
-        val extras = mapper(ActionResponse.VerifyActionResponse(
-            actionIdentifier = VerifyActionFactory.getIdentifier(),
-            sessionId = "sessionId",
-            eventsJson = null,
-            matchResult = StubMatchResult(
-                guid = "guid",
-                confidenceScore = 50,
-                tier = AppResponseTier.TIER_2,
-                matchConfidence = AppMatchConfidence.HIGH,
-            ),
-        ))
+        val extras = mapper(
+            ActionResponse.VerifyActionResponse(
+                actionIdentifier = VerifyActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                eventsJson = null,
+                matchResult = AppMatchResult(
+                    guid = "guid",
+                    confidenceScore = 50,
+                    tier = AppResponseTier.TIER_2,
+                    matchConfidence = AppMatchConfidence.HIGH,
+                ),
+            )
+        )
 
         // Verification does not implement equals, so we have to check each field individually
         val extraVerification = extras.getParcelable<Verification>(Constants.SIMPRINTS_VERIFICATION)
@@ -108,32 +121,40 @@ class LibSimprintsResponseMapperTest {
 
     @Test
     fun `correctly maps exit form response`() {
-        val extras = mapper(ActionResponse.ExitFormActionResponse(
-            actionIdentifier = EnrolLastBiometricsActionFactory.getIdentifier(),
-            sessionId = "sessionId",
-            eventsJson = null,
-            reason = "reason",
-            extraText = "extra",
-        ))
+        val extras = mapper(
+            ActionResponse.ExitFormActionResponse(
+                actionIdentifier = EnrolLastBiometricsActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                eventsJson = null,
+                reason = "reason",
+                extraText = "extra",
+            )
+        )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelable<RefusalForm>(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(RefusalForm("reason", "extra"))
+        assertThat(extras.getParcelable<RefusalForm>(Constants.SIMPRINTS_REFUSAL_FORM)).isEqualTo(
+            RefusalForm("reason", "extra")
+        )
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
     }
 
     @Test
     fun `correctly maps error response`() {
-        val extras = mapper(ActionResponse.ErrorActionResponse(
-            actionIdentifier = EnrolActionFactory.getIdentifier(),
-            sessionId = "sessionId",
-            eventsJson = null,
-            reason = AppErrorReason.UNEXPECTED_ERROR,
-            flowCompleted = true,
-        ))
+        val extras = mapper(
+            ActionResponse.ErrorActionResponse(
+                actionIdentifier = EnrolActionFactory.getIdentifier(),
+                sessionId = "sessionId",
+                eventsJson = null,
+                reason = AppErrorReason.UNEXPECTED_ERROR,
+                flowCompleted = true,
+            )
+        )
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
         assertThat(extras.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(true)
-        assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(Constants.SIMPRINTS_UNEXPECTED_ERROR)
+        assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(
+            Constants.SIMPRINTS_UNEXPECTED_ERROR
+        )
     }
 
     @Test
@@ -157,15 +178,19 @@ class LibSimprintsResponseMapperTest {
             AppErrorReason.PROJECT_PAUSED to Constants.SIMPRINTS_PROJECT_PAUSED,
             AppErrorReason.PROJECT_ENDING to Constants.SIMPRINTS_PROJECT_ENDING,
         ).forEach { (reason, expectedCode) ->
-            val extras = mapper(ActionResponse.ErrorActionResponse(
-                actionIdentifier = EnrolActionFactory.getIdentifier(),
-                sessionId = "sessionId",
-                eventsJson = null,
-                reason = reason,
-                flowCompleted = true,
-            ))
+            val extras = mapper(
+                ActionResponse.ErrorActionResponse(
+                    actionIdentifier = EnrolActionFactory.getIdentifier(),
+                    sessionId = "sessionId",
+                    eventsJson = null,
+                    reason = reason,
+                    flowCompleted = true,
+                )
+            )
 
-            assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(expectedCode)
+            assertThat(extras.getInt(LibSimprintsResponseMapper.RESULT_CODE_OVERRIDE)).isEqualTo(
+                expectedCode
+            )
         }
     }
 }
