@@ -19,11 +19,6 @@ val properties = File(rootDir, "local.properties").inputStream().use {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
 
-    versionCatalogs {
-        create("libs") {
-            from(files("build-logic${File.separator}libs.versions.toml"))
-        }
-    }
 
     repositories {
         google()
