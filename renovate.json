@@ -1,9 +1,0 @@
-{
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "branchPrefix": "renovate/",
-  "dependencyDashboardTitle": "Dependency Dashboard",
-  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
-  "onboarding": false,
-  "platform": "github",
-  "repositories": ["Simprints/Android-Simprints-ID"]
-}
