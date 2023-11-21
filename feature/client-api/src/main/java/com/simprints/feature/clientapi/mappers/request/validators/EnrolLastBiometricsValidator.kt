@@ -5,7 +5,7 @@ import com.simprints.feature.clientapi.mappers.request.extractors.EnrolLastBiome
 import com.simprints.feature.clientapi.models.ClientApiError
 
 
-class EnrolLastBiometricsValidator(
+internal class EnrolLastBiometricsValidator(
     private val extractor: EnrolLastBiometricsRequestExtractor,
     private val currentSession: String,
     private val isCurrentSessionAnEnrolmentOrIdentification: Boolean,

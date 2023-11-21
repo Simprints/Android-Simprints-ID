@@ -24,7 +24,7 @@ import com.simprints.infra.resources.R as IDR
  * have a look at the readme for more details - /connect/README.md
  */
 @AndroidEntryPoint
-class OtaFailedFragment : Fragment(R.layout.fragment_ota_failed) {
+internal class OtaFailedFragment : Fragment(R.layout.fragment_ota_failed) {
 
     private val args by navArgs<OtaFailedFragmentArgs>()
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()

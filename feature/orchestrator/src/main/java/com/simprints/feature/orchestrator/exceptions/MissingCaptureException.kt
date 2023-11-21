@@ -1,3 +1,3 @@
 package com.simprints.feature.orchestrator.exceptions
 
-class MissingCaptureException : IllegalStateException("Missing capture results")
+internal class MissingCaptureException : IllegalStateException("Missing capture results")

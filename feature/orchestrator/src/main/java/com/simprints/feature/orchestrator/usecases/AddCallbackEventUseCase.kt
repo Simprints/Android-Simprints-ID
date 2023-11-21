@@ -1,7 +1,10 @@
 package com.simprints.feature.orchestrator.usecases
 
 import com.simprints.core.ExternalScope
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
@@ -10,16 +13,13 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
-import com.simprints.moduleapi.app.responses.IAppEnrolResponse
-import com.simprints.moduleapi.app.responses.IAppErrorResponse
-import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence
-import com.simprints.moduleapi.app.responses.IAppMatchResult
-import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
-import com.simprints.moduleapi.app.responses.IAppResponse
-import com.simprints.moduleapi.app.responses.IAppResponseTier
-import com.simprints.moduleapi.app.responses.IAppVerifyResponse
+import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppMatchResult
+import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
+import com.simprints.infra.orchestration.data.responses.AppResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,18 +27,17 @@ import javax.inject.Inject
 internal class AddCallbackEventUseCase @Inject constructor(
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper,
-    @ExternalScope private val externalScope: CoroutineScope
+    @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
-    operator fun invoke(result: IAppResponse) {
+    operator fun invoke(result: AppResponse) {
         val callbackEvent = when (result) {
-            is IAppEnrolResponse -> buildEnrolmentCallbackEvent(result)
-            is IAppIdentifyResponse -> buildIdentificationCallbackEvent(result)
-            is IAppVerifyResponse -> buildVerificationCallbackEvent(result)
-            is IAppConfirmationResponse -> buildConfirmIdentityCallbackEvent(result)
-            is IAppRefusalFormResponse -> buildRefusalCallbackEvent(result)
-            is IAppErrorResponse -> buildErrorCallbackEvent(result)
-            else -> null
+            is AppEnrolResponse -> buildEnrolmentCallbackEvent(result)
+            is AppIdentifyResponse -> buildIdentificationCallbackEvent(result)
+            is AppVerifyResponse -> buildVerificationCallbackEvent(result)
+            is AppConfirmationResponse -> buildConfirmIdentityCallbackEvent(result)
+            is AppRefusalResponse -> buildRefusalCallbackEvent(result)
+            is AppErrorResponse -> buildErrorCallbackEvent(result)
         }
 
         if (callbackEvent != null) {
@@ -46,42 +45,47 @@ internal class AddCallbackEventUseCase @Inject constructor(
         }
     }
 
-    private fun buildEnrolmentCallbackEvent(appResponse: IAppEnrolResponse) = EnrolmentCallbackEvent(
+    private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) = EnrolmentCallbackEvent(
         timeHelper.now(),
         appResponse.guid
     )
 
-    private fun buildIdentificationCallbackEvent(appResponse: IAppIdentifyResponse) = IdentificationCallbackEvent(
-        timeHelper.now(),
-        appResponse.sessionId,
-        appResponse.identifications.map { buildComparisonScore(it) },
-    )
+    private fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
+        IdentificationCallbackEvent(
+            timeHelper.now(),
+            appResponse.sessionId,
+            appResponse.identifications.map { buildComparisonScore(it) },
+        )
 
-    private fun buildVerificationCallbackEvent(appResponse: IAppVerifyResponse) = VerificationCallbackEvent(
-        timeHelper.now(),
-        buildComparisonScore(appResponse.matchResult),
-    )
+    private fun buildVerificationCallbackEvent(appResponse: AppVerifyResponse) =
+        VerificationCallbackEvent(
+            timeHelper.now(),
+            buildComparisonScore(appResponse.matchResult),
+        )
 
-    private fun buildComparisonScore(matchResult: IAppMatchResult) = CallbackComparisonScore(
+    private fun buildComparisonScore(matchResult: AppMatchResult) = CallbackComparisonScore(
         matchResult.guid,
         matchResult.confidenceScore,
-        IAppResponseTier.valueOf(matchResult.tier.name),
-        IAppMatchConfidence.valueOf(matchResult.matchConfidence.name),
+        AppResponseTier.valueOf(matchResult.tier.name),
+        AppMatchConfidence.valueOf(matchResult.matchConfidence.name),
     )
 
-    private fun buildRefusalCallbackEvent(appResponse: IAppRefusalFormResponse) = RefusalCallbackEvent(
+    private fun buildRefusalCallbackEvent(appResponse: AppRefusalResponse) = RefusalCallbackEvent(
         timeHelper.now(),
         appResponse.reason,
         appResponse.extra,
     )
 
-    private fun buildErrorCallbackEvent(appResponse: IAppErrorResponse) = ErrorCallbackEvent(
+    private fun buildErrorCallbackEvent(appResponse: AppErrorResponse) = ErrorCallbackEvent(
         timeHelper.now(),
-        ErrorCallbackEvent.ErrorCallbackPayload.Reason.fromAppResponseErrorReasonToEventReason(appResponse.reason),
+        ErrorCallbackEvent.ErrorCallbackPayload.Reason.fromAppResponseErrorReasonToEventReason(
+            appResponse.reason
+        ),
     )
 
-    private fun buildConfirmIdentityCallbackEvent(appResponse: IAppConfirmationResponse) = ConfirmationCallbackEvent(
-        timeHelper.now(),
-        appResponse.identificationOutcome,
-    )
+    private fun buildConfirmIdentityCallbackEvent(appResponse: AppConfirmationResponse) =
+        ConfirmationCallbackEvent(
+            timeHelper.now(),
+            appResponse.identificationOutcome,
+        )
 }

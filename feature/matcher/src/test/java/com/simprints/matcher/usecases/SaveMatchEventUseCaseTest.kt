@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -10,7 +10,7 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -61,7 +61,7 @@ class SaveMatchEventUseCaseTest {
             1L,
             2L,
             MatchParams(
-                flowType = FlowProvider.FlowType.VERIFY,
+                flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFaceSamples = listOf(MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))),
             ),
@@ -93,7 +93,7 @@ class SaveMatchEventUseCaseTest {
             1L,
             2L,
             MatchParams(
-                flowType = FlowProvider.FlowType.VERIFY,
+                flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFingerprintSamples = listOf(
                     MatchParams.FingerprintSample(IFingerIdentifier.RIGHT_5TH_FINGER, "format", byteArrayOf(1, 2, 3))
@@ -129,7 +129,7 @@ class SaveMatchEventUseCaseTest {
             MatchParams(
                 emptyList(),
                 emptyList(),
-                FlowProvider.FlowType.IDENTIFY,
+                FlowType.IDENTIFY,
                 SubjectQuery(),
             ),
             2,
@@ -159,7 +159,7 @@ class SaveMatchEventUseCaseTest {
             1L,
             2L,
             MatchParams(
-                flowType = FlowProvider.FlowType.IDENTIFY,
+                flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(attendantId = "userId"),
             ),
             0,
@@ -182,7 +182,7 @@ class SaveMatchEventUseCaseTest {
             1L,
             2L,
             MatchParams(
-                flowType = FlowProvider.FlowType.IDENTIFY,
+                flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId"),
             ),
             0,
@@ -205,7 +205,7 @@ class SaveMatchEventUseCaseTest {
             2L,
             MatchParams(
                 emptyList(),
-                flowType = FlowProvider.FlowType.IDENTIFY,
+                flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery()
             ),
             0,

@@ -15,12 +15,11 @@ import com.simprints.infra.events.event.domain.models.subject.FaceReference
 import com.simprints.infra.events.event.domain.models.subject.FaceTemplate
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintTemplate
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockkStatic
-import io.mockk.unmockkAll
 import io.mockk.unmockkStatic
 import org.junit.After
 import org.junit.Before

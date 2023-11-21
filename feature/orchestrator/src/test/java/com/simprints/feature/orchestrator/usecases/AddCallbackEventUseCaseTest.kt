@@ -2,13 +2,13 @@ package com.simprints.feature.orchestrator.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.feature.orchestrator.model.responses.AppConfirmationResponse
-import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
-import com.simprints.feature.orchestrator.model.responses.AppIdentifyResponse
-import com.simprints.feature.orchestrator.model.responses.AppMatchResult
-import com.simprints.feature.orchestrator.model.responses.AppRefusalResponse
-import com.simprints.feature.orchestrator.model.responses.AppVerifyResponse
+import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppMatchResult
+import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
+import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent
@@ -16,9 +16,9 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence
-import com.simprints.moduleapi.app.responses.IAppResponseTier
+import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -70,10 +70,12 @@ class AddCallbackEventUseCaseTest {
 
     @Test
     fun `adds event for identification response`() {
-        useCase(AppIdentifyResponse(
-            listOf(AppMatchResult("guid", 0, IAppResponseTier.TIER_1, IAppMatchConfidence.HIGH)),
+        useCase(
+            AppIdentifyResponse(
+            listOf(AppMatchResult("guid", 0, AppResponseTier.TIER_1, AppMatchConfidence.HIGH)),
             "sessionId"
-        ))
+        )
+        )
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg {
@@ -84,7 +86,7 @@ class AddCallbackEventUseCaseTest {
 
     @Test
     fun `adds event for verification response`() {
-        useCase(AppVerifyResponse(AppMatchResult("guid", 0, IAppResponseTier.TIER_1, IAppMatchConfidence.HIGH)))
+        useCase(AppVerifyResponse(AppMatchResult("guid", 0, AppResponseTier.TIER_1, AppMatchConfidence.HIGH)))
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg {
@@ -117,7 +119,7 @@ class AddCallbackEventUseCaseTest {
 
     @Test
     fun `adds event for error response`() {
-        useCase(AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR))
+        useCase(AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR))
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg {

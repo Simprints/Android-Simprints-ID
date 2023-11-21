@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ReportAlertScreenEventUseCase @Inject constructor(
+internal class ReportAlertScreenEventUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val eventRepository: EventRepository,
     @ExternalScope private val externalScope: CoroutineScope,

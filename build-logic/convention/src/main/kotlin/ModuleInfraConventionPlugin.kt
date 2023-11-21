@@ -22,9 +22,7 @@ class ModuleInfraConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                add("implementation", project(":core"))
-                add("testImplementation", project(":testtools"))
-                add("androidTestImplementation", project(":testtools"))
+                add("implementation", project(":infra:core"))
             }
         }
     }

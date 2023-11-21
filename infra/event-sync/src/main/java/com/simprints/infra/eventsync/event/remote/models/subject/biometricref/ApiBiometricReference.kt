@@ -10,7 +10,7 @@ import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fa
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.face.ApiFaceTemplate
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintReference
 import com.simprints.infra.eventsync.event.remote.models.subject.biometricref.fingerprint.ApiFingerprintTemplate
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.events.event.domain.models.subject.FaceReference as DomainFaceReference
 import com.simprints.infra.events.event.domain.models.subject.FingerprintReference as DomainFingerprintReference
 

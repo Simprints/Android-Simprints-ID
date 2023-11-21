@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
@@ -122,11 +122,11 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         )
     }
 
-    private fun initToolbar(flowType: FlowProvider.FlowType) {
+    private fun initToolbar(flowType: FlowType) {
         binding.toolbar.title = when (flowType) {
-            FlowProvider.FlowType.ENROL -> getString(IDR.string.register_title)
-            FlowProvider.FlowType.IDENTIFY -> getString(IDR.string.identify_title)
-            FlowProvider.FlowType.VERIFY -> getString(IDR.string.verify_title)
+            FlowType.ENROL -> getString(IDR.string.register_title)
+            FlowType.IDENTIFY -> getString(IDR.string.identify_title)
+            FlowType.VERIFY -> getString(IDR.string.verify_title)
         }
     }
 

@@ -3,8 +3,8 @@ package com.simprints.feature.orchestrator.usecases.response
 import android.os.Bundle
 import com.google.common.truth.Truth
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
-import com.simprints.feature.orchestrator.model.responses.AppEnrolResponse
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import org.junit.Before
 import org.junit.Test
 

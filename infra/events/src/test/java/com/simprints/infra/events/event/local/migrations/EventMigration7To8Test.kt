@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fasterxml.jackson.core.type.TypeReference
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
@@ -20,7 +21,6 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.local.EventRoomDatabase
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Rule
 import org.junit.Test

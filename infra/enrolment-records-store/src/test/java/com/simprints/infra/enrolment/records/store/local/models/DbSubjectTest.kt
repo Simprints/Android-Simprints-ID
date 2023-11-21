@@ -5,7 +5,7 @@ import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Test
 import java.util.Date
 import java.util.UUID

@@ -1,6 +1,6 @@
 package com.simprints.matcher.usecases
 
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
@@ -12,7 +12,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import java.io.Serializable
@@ -65,9 +65,9 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         .toList()
 
     private suspend fun match(
-        probes: List<Fingerprint>,
-        candidates: List<FingerprintIdentity>,
-        flowType: FlowProvider.FlowType,
+      probes: List<Fingerprint>,
+      candidates: List<FingerprintIdentity>,
+      flowType: FlowType,
     ) = bioSdkWrapper
         .match(
             FingerprintIdentity("", probes),
@@ -77,8 +77,8 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         .map { FingerprintMatchResult.Item(it.id, it.score) }
         .sortedByDescending { it.confidence }
 
-    private suspend fun isCrossFingerMatchingEnabled(flowType: FlowProvider.FlowType): Boolean = configManager
-        .takeIf { flowType == FlowProvider.FlowType.VERIFY }
+    private suspend fun isCrossFingerMatchingEnabled(flowType: FlowType): Boolean = configManager
+        .takeIf { flowType == FlowType.VERIFY }
         ?.getProjectConfiguration()
         ?.fingerprint
         ?.comparisonStrategyForVerification == FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX

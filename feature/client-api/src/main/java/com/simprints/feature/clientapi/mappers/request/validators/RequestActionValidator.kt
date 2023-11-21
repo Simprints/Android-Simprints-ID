@@ -6,7 +6,7 @@ import com.simprints.feature.clientapi.mappers.request.extractors.ActionRequestE
 import com.simprints.feature.clientapi.models.ClientApiError
 
 
-abstract class RequestActionValidator(
+internal abstract class RequestActionValidator(
     private val extractor: ActionRequestExtractor,
 ) {
 

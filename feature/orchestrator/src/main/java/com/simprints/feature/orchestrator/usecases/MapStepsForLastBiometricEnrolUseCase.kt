@@ -14,7 +14,7 @@ import com.simprints.matcher.FingerprintMatchResult
 import javax.inject.Inject
 
 // Last biometric enrolment heavily depends on the previous execution step results
-class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
+internal class MapStepsForLastBiometricEnrolUseCase @Inject constructor() {
 
     operator fun invoke(results: List<Parcelable>) = results.mapNotNull { result ->
         when (result) {

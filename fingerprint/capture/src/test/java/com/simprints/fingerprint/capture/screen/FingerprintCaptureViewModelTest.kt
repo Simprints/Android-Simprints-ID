@@ -2,8 +2,8 @@ package com.simprints.fingerprint.capture.screen
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.fingerprint.capture.models.Path
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockAcquireImageResult.OK
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.BAD_SCAN
 import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModelTest.MockCaptureFingerprintResponse.DIFFERENT_GOOD_SCAN
@@ -33,20 +33,13 @@ import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.infra.images.model.Path
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventNotReceived
 import com.simprints.testtools.common.livedata.assertEventReceived
 import com.simprints.testtools.common.livedata.assertEventReceivedWithContentAssertions
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.coVerify
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.unmockkAll
-import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceTimeBy
@@ -1206,7 +1199,7 @@ class FingerprintCaptureViewModelTest {
     private fun withImageTransfer(isEager: Boolean = false) {
         every { vero2Configuration.imageSavingStrategy } returns if (isEager) ImageSavingStrategy.EAGER else ImageSavingStrategy.ONLY_GOOD_SCAN
         coEvery { saveImageUseCase.invoke(any(), any(), any()) } returns mockk {
-            every { path } returns Path(emptyArray())
+            every { relativePath } returns Path(emptyArray())
         }
     }
 

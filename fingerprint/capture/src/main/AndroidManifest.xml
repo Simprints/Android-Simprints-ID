@@ -3,8 +3,4 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
 
-    <application>
-        <activity android:name="com.simprints.fingerprint.capture.screen.FingerprintCaptureWrapperActivity" />
-    </application>
-
 </manifest>

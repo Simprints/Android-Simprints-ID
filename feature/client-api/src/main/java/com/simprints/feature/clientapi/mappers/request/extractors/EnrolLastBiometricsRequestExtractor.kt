@@ -3,7 +3,7 @@ package com.simprints.feature.clientapi.mappers.request.extractors
 import com.simprints.feature.clientapi.extensions.extractString
 import com.simprints.libsimprints.Constants
 
-class EnrolLastBiometricsRequestExtractor(val extras: Map<String, Any>) : ActionRequestExtractor(extras) {
+internal class EnrolLastBiometricsRequestExtractor(val extras: Map<String, Any>) : ActionRequestExtractor(extras) {
 
     fun getSessionId(): String = extras.extractString(Constants.SIMPRINTS_SESSION_ID)
 

@@ -1,6 +1,5 @@
 package com.simprints.feature.dashboard.settings.about
 
-import android.content.Context
 import androidx.annotation.IdRes
 import androidx.lifecycle.Observer
 import androidx.test.espresso.Espresso.onView

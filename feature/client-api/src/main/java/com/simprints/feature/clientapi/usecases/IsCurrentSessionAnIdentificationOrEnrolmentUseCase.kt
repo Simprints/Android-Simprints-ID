@@ -6,7 +6,7 @@ import com.simprints.infra.events.event.domain.models.callout.IdentificationCall
 import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 
-class IsCurrentSessionAnIdentificationOrEnrolmentUseCase @Inject constructor(
+internal class IsCurrentSessionAnIdentificationOrEnrolmentUseCase @Inject constructor(
         private val eventRepository: EventRepository,
 ) {
 

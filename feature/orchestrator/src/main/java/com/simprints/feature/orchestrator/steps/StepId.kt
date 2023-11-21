@@ -6,7 +6,7 @@ package com.simprints.feature.orchestrator.steps
  * IDs are prefixed and spaced out by modality to avoid collisions.
  * (e.g. common steps are 101+, fingerprint - 301+, face steps 501+)
  */
-object StepId {
+internal object StepId {
 
     // Common step ids
     private const val STEP_BASE_CORE = 100

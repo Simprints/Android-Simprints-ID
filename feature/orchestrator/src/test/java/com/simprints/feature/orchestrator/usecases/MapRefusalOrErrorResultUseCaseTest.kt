@@ -9,8 +9,8 @@ import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
-import com.simprints.moduleapi.app.responses.IAppErrorResponse
-import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
 import org.junit.Before
 import org.junit.Test
 
@@ -26,11 +26,11 @@ class MapRefusalOrErrorResultUseCaseTest {
     @Test
     fun `Maps terminal step results to appropriate response`() {
         mapOf(
-            ExitFormResult(true) to IAppRefusalFormResponse::class.java,
-            FetchSubjectResult(found = false) to IAppErrorResponse::class.java,
-            SetupResult(permissionGranted = false) to IAppErrorResponse::class.java,
-            FaceConfigurationResult(isSuccess = false) to IAppErrorResponse::class.java,
-            FingerprintConnectResult(isSuccess = false) to IAppErrorResponse::class.java,
+            ExitFormResult(true) to AppRefusalResponse::class.java,
+            FetchSubjectResult(found = false) to AppErrorResponse::class.java,
+            SetupResult(permissionGranted = false) to AppErrorResponse::class.java,
+            FaceConfigurationResult(isSuccess = false) to AppErrorResponse::class.java,
+            FingerprintConnectResult(isSuccess = false) to AppErrorResponse::class.java,
         ).forEach { (result, responseClass) -> assertThat(useCase(result)).isInstanceOf(responseClass) }
     }
 

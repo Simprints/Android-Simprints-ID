@@ -2,7 +2,7 @@ package com.simprints.feature.clientapi.mappers.request.extractors.odk
 
 import com.simprints.feature.clientapi.mappers.request.extractors.EnrolRequestExtractor
 
-class OdkEnrolRequestExtractor(
+internal class OdkEnrolRequestExtractor(
     extras: Map<String, Any>,
     acceptableExtras: List<String>,
 ) : EnrolRequestExtractor(extras) {

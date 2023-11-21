@@ -2,7 +2,7 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.orchestrator.model.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.events.EventRepository
 import com.simprints.matcher.FaceMatchResult
@@ -173,10 +173,10 @@ class CreateIdentifyResponseUseCaseTest {
     }
 
     private fun createFaceMatchResult(vararg confidences: Float): Parcelable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(guid = "1", confidence = it) }
+        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) }
     )
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Parcelable = FingerprintMatchResult(
-        confidences.map { FingerprintMatchResult.Item(personId = "1", confidenceScore = it) }
+        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) }
     )
 }

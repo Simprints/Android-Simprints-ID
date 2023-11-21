@@ -3,7 +3,7 @@ package com.simprints.matcher.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
-import com.simprints.core.domain.common.FlowProvider
+import com.simprints.core.domain.common.FlowType
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -11,7 +11,7 @@ import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.CapturingSlot
@@ -92,7 +92,7 @@ internal class MatchViewModelTest {
         val states = viewModel.matchState.test()
         viewModel.setupMatch(MatchParams(
             probeFaceSamples = listOf(getFaceSample()),
-            flowType = FlowProvider.FlowType.ENROL,
+            flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
 
@@ -132,7 +132,7 @@ internal class MatchViewModelTest {
 
         viewModel.setupMatch(MatchParams(
             probeFingerprintSamples = listOf(getFingerprintSample()),
-            flowType = FlowProvider.FlowType.ENROL,
+            flowType = FlowType.ENROL,
             queryForCandidates = mockk {}
         ))
 

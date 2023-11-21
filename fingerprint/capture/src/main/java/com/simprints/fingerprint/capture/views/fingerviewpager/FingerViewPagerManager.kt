@@ -10,7 +10,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.simprints.fingerprint.capture.resources.indicatorDrawableId
 import com.simprints.fingerprint.capture.state.FingerState
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 internal class FingerViewPagerManager(
@@ -19,7 +19,8 @@ internal class FingerViewPagerManager(
     private val viewPager: ViewPager2,
     private val indicatorLayout: LinearLayout,
     private val onFingerSelected: (Int) -> Unit,
-    private val isAbleToSelectNewFinger: () -> Boolean) {
+    private val isAbleToSelectNewFinger: () -> Boolean,
+) {
 
     private lateinit var pageAdapter: FingerPageAdapter
 

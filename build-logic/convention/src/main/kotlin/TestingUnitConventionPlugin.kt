@@ -21,7 +21,7 @@ class TestingUnitConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                add("testImplementation", project(":testtools"))
+                add("testImplementation", project(":infra:test-tools"))
             }
         }
     }

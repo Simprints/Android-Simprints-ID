@@ -21,6 +21,7 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,20 +40,22 @@ internal class EventDownSyncCountWorkerTest {
     @MockK
     lateinit var eventDownSyncCountTask: EventDownSyncCountTask
 
+    @MockK
+    lateinit var mockWm: WorkManager
 
     private lateinit var countWorker: EventDownSyncCountWorker
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
+        mockkStatic(WorkManager::class)
+        every { WorkManager.getInstance(any()) } returns mockWm
 
         countWorker = EventDownSyncCountWorker(
             mockk(relaxed = true),
             mockk(relaxed = true) {
                 every { inputData } returns workDataOf(
-                    INPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(
-                        projectDownSyncScope
-                    )
+                    INPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(projectDownSyncScope)
                 )
                 every { tags } returns setOf(tagForMasterSyncId)
             },
@@ -62,63 +65,51 @@ internal class EventDownSyncCountWorkerTest {
         )
     }
 
-    @Test
-    fun countWorker_shouldExtractTheDownSyncScopeFromTheRepo() {
-        runTest {
-            countWorker.doWork()
-
-            coVerify { eventDownSyncCountTask.getCount(any()) }
-        }
+    @After
+    fun tearDown() {
+        unmockkStatic(WorkManager::class)
     }
 
     @Test
-    fun countWorker_shouldExecuteTheTaskSuccessfully() {
-        runTest {
-            val counts = EventCount(EnrolmentRecordEventType.EnrolmentRecordMove, 1)
-            coEvery { eventDownSyncCountTask.getCount(any()) }  returns listOf(counts)
+    fun countWorker_shouldExtractTheDownSyncScopeFromTheRepo() = runTest {
+        countWorker.doWork()
 
-            val result = countWorker.doWork()
-
-            val output = JsonHelper.toJson(listOf(counts))
-            val expectedSuccessfulOutput = workDataOf(OUTPUT_COUNT_WORKER_DOWN to output)
-            assertThat(result).isEqualTo(ListenableWorker.Result.success(expectedSuccessfulOutput))
-        }
+        coVerify { eventDownSyncCountTask.getCount(any()) }
     }
 
     @Test
-    fun countWorkerFailed_syncStillRunning_shouldRetry() {
-        runTest {
-            coEvery { eventDownSyncCountTask.getCount(any()) } throws Throwable("IO Error")
-            mockDependenciesToHaveSyncStillRunning()
+    fun countWorker_shouldExecuteTheTaskSuccessfully() = runTest {
+        val counts = EventCount(EnrolmentRecordEventType.EnrolmentRecordMove, 1)
+        coEvery { eventDownSyncCountTask.getCount(any()) } returns listOf(counts)
 
-            val result = countWorker.doWork()
+        val result = countWorker.doWork()
 
-            assertThat(result).isEqualTo(ListenableWorker.Result.retry())
-        }
+        val output = JsonHelper.toJson(listOf(counts))
+        val expectedSuccessfulOutput = workDataOf(OUTPUT_COUNT_WORKER_DOWN to output)
+        assertThat(result).isEqualTo(ListenableWorker.Result.success(expectedSuccessfulOutput))
     }
 
     @Test
-    fun countWorkerFailed_syncIsNotRunning_shouldSucceed() {
-        runTest {
-            coEvery { eventDownSyncCountTask.getCount(any()) } throws Throwable("IO Error")
-            mockDependenciesToHaveSyncNotRunning()
-
-            val result = countWorker.doWork()
-
-            assertThat(result).isEqualTo(ListenableWorker.Result.success())
-        }
-    }
-
-    private fun mockDependenciesToHaveSyncStillRunning() {
+    fun countWorkerFailed_syncStillRunning_shouldRetry() = runTest {
+        coEvery { eventDownSyncCountTask.getCount(any()) } throws Throwable("IO Error")
         mockWorkManagerToReturnDownloaderWorkInfo(WorkInfo.State.RUNNING)
+
+        val result = countWorker.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.retry())
     }
 
-    private fun mockDependenciesToHaveSyncNotRunning() {
+    @Test
+    fun countWorkerFailed_syncIsNotRunning_shouldSucceed() = runTest {
+        coEvery { eventDownSyncCountTask.getCount(any()) } throws Throwable("IO Error")
         mockWorkManagerToReturnDownloaderWorkInfo(WorkInfo.State.CANCELLED)
+
+        val result = countWorker.doWork()
+
+        assertThat(result).isEqualTo(ListenableWorker.Result.success())
     }
 
     private fun mockWorkManagerToReturnDownloaderWorkInfo(state: WorkInfo.State) {
-        val mockWm = mockk<WorkManager>(relaxed = true)
         val mockWorkInfo = mockk<ListenableFuture<List<WorkInfo>>>()
         every { mockWorkInfo.get() } returns listOf(
             WorkInfo(
@@ -132,7 +123,5 @@ internal class EventDownSyncCountWorkerTest {
             )
         )
         every { mockWm.getWorkInfosByTag(any()) } returns mockWorkInfo
-        countWorker.wm = mockWm
     }
-
 }

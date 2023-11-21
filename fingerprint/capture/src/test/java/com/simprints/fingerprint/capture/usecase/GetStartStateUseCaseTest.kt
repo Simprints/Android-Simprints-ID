@@ -3,7 +3,7 @@ package com.simprints.fingerprint.capture.usecase
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.FingerState
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 internal class GetStartStateUseCaseTest {

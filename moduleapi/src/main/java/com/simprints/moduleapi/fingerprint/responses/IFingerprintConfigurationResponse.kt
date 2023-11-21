@@ -1,3 +1,0 @@
-package com.simprints.moduleapi.fingerprint.responses
-
-interface IFingerprintConfigurationResponse : IFingerprintResponse

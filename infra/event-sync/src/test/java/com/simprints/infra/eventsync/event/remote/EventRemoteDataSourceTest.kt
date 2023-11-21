@@ -1,7 +1,6 @@
 package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore

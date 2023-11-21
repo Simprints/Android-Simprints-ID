@@ -2,7 +2,7 @@ package com.simprints.infra.enrolment.records.store.local.models
 
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.infra.realm.models.DbFingerprintSample
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 
 internal fun DbFingerprintSample.fromDbToDomain(): FingerprintSample =
     FingerprintSample(

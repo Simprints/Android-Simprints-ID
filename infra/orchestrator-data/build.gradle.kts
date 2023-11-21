@@ -9,5 +9,8 @@ android {
 
 dependencies {
 
-    api(project(":moduleapi"))
+    implementation(project(":infra:config-store"))
+    implementation(project(":infra:events"))
+
+    implementation(project(":feature:exit-form"))
 }

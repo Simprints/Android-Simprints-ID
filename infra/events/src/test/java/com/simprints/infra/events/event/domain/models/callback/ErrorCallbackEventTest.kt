@@ -1,15 +1,15 @@
 package com.simprints.infra.events.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
-import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.moduleapi.app.responses.IAppErrorReason
 import org.junit.Test
+import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 
 class ErrorCallbackEventTest {
 
@@ -48,22 +48,22 @@ class ErrorCallbackEventTest {
     @Test
     fun `should map AppErrorReason correctly`() {
         mapOf(
-            IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN to ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN,
-            IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN to ErrorReason.DIFFERENT_USER_ID_SIGNED_IN,
-            IAppErrorReason.GUID_NOT_FOUND_ONLINE to ErrorReason.GUID_NOT_FOUND_ONLINE,
-            IAppErrorReason.GUID_NOT_FOUND_OFFLINE to ErrorReason.GUID_NOT_FOUND_OFFLINE,
-            IAppErrorReason.UNEXPECTED_ERROR to ErrorReason.UNEXPECTED_ERROR,
-            IAppErrorReason.BLUETOOTH_NOT_SUPPORTED to ErrorReason.BLUETOOTH_NOT_SUPPORTED,
-            IAppErrorReason.LOGIN_NOT_COMPLETE to ErrorReason.LOGIN_NOT_COMPLETE,
-            IAppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED to ErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED,
-            IAppErrorReason.FACE_LICENSE_MISSING to ErrorReason.FACE_LICENSE_MISSING,
-            IAppErrorReason.FACE_LICENSE_INVALID to ErrorReason.FACE_LICENSE_INVALID,
-            IAppErrorReason.FINGERPRINT_CONFIGURATION_ERROR to ErrorReason.FINGERPRINT_CONFIGURATION_ERROR,
-            IAppErrorReason.FACE_CONFIGURATION_ERROR to ErrorReason.FACE_CONFIGURATION_ERROR,
-            IAppErrorReason.BACKEND_MAINTENANCE_ERROR to ErrorReason.BACKEND_MAINTENANCE_ERROR,
-            IAppErrorReason.PROJECT_PAUSED to ErrorReason.PROJECT_PAUSED,
-            IAppErrorReason.PROJECT_ENDING to ErrorReason.PROJECT_ENDING,
-            IAppErrorReason.BLUETOOTH_NO_PERMISSION to ErrorReason.BLUETOOTH_NO_PERMISSION,
+            AppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN to ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN,
+            AppErrorReason.DIFFERENT_USER_ID_SIGNED_IN to ErrorReason.DIFFERENT_USER_ID_SIGNED_IN,
+            AppErrorReason.GUID_NOT_FOUND_ONLINE to ErrorReason.GUID_NOT_FOUND_ONLINE,
+            AppErrorReason.GUID_NOT_FOUND_OFFLINE to ErrorReason.GUID_NOT_FOUND_OFFLINE,
+            AppErrorReason.UNEXPECTED_ERROR to ErrorReason.UNEXPECTED_ERROR,
+            AppErrorReason.BLUETOOTH_NOT_SUPPORTED to ErrorReason.BLUETOOTH_NOT_SUPPORTED,
+            AppErrorReason.LOGIN_NOT_COMPLETE to ErrorReason.LOGIN_NOT_COMPLETE,
+            AppErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED to ErrorReason.ENROLMENT_LAST_BIOMETRICS_FAILED,
+            AppErrorReason.FACE_LICENSE_MISSING to ErrorReason.FACE_LICENSE_MISSING,
+            AppErrorReason.FACE_LICENSE_INVALID to ErrorReason.FACE_LICENSE_INVALID,
+            AppErrorReason.FINGERPRINT_CONFIGURATION_ERROR to ErrorReason.FINGERPRINT_CONFIGURATION_ERROR,
+            AppErrorReason.FACE_CONFIGURATION_ERROR to ErrorReason.FACE_CONFIGURATION_ERROR,
+            AppErrorReason.BACKEND_MAINTENANCE_ERROR to ErrorReason.BACKEND_MAINTENANCE_ERROR,
+            AppErrorReason.PROJECT_PAUSED to ErrorReason.PROJECT_PAUSED,
+            AppErrorReason.PROJECT_ENDING to ErrorReason.PROJECT_ENDING,
+            AppErrorReason.BLUETOOTH_NO_PERMISSION to ErrorReason.BLUETOOTH_NO_PERMISSION,
         ).forEach {
             assertThat(fromAppResponseErrorReasonToEventReason(it.key)).isEqualTo(it.value)
         }

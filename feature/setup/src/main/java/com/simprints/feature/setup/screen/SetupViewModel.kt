@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SetupViewModel @Inject constructor(
+internal class SetupViewModel @Inject constructor(
     private val locationStore: LocationStore,
     private val configManager: ConfigManager
 ) : ViewModel() {
