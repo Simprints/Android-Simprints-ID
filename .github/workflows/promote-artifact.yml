@@ -18,7 +18,7 @@ on:
                     - Prod-100-Percent-Rollout
 
 jobs:
-    deploy:
+    promote-artifact:
         runs-on: ubuntu-latest
 
         environment: ${{inputs.deployment-track}}   # Dynamically set the job environment based on the input

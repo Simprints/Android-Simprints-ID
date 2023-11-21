@@ -73,7 +73,7 @@ Following the guidelines above the end goal of SID should look roughly like:
 
 ## Development setup
 
-Clone with `git clone git@bitbucket.org:simprints/android-simprints-id.git`
+Clone with `git clone https://github.com/Simprints/Android-Simprints-ID.git`
 
 Ensure the Gradle Offline Mode is disabled:
 
@@ -151,17 +151,7 @@ After creating the universal apk from app bundle, run command to install apk on 
 
 <br>
 
-## Deploying to the Google Play Store
+## Deploying to the Google Play Store and Firebase distribution
 
-For a full guide go [here](https://simprints.atlassian.net/wiki/spaces/KB/pages/1761378305/Releasing+a+new+version) to get the complete breakdown.
-
-Deploying to the Google Play Store has several steps:
-
-1. Update the VersionCode and VersionName
-
-2. Building and signing a release bundle
-
-3. Uploading to the Google Play Store.
-
-These steps are done automatically with [Bitbuket Piplines Deployments](https://bitbucket.org/simprints/android-simprints-id/addon/pipelines/deployments).
-Pipelines in a release branch will have an extra step which can automatically upload the release to the internal test track.
+Deploying to the Google Play Store and Firebase distribution has several steps. For a full guide
+go [here](.github/workflows/README.md) to get more details. 
