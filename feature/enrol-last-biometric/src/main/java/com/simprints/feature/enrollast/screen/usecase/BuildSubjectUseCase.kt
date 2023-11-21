@@ -2,6 +2,7 @@ package com.simprints.feature.enrollast.screen.usecase
 
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.fingerprint.FingerprintSample
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
@@ -10,12 +11,11 @@ import com.simprints.feature.enrollast.FingerTemplateCaptureResult
 import com.simprints.infra.config.store.models.Finger
 import com.simprints.infra.eventsync.sync.down.tasks.SubjectFactory
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import java.util.Date
 import java.util.UUID
 import javax.inject.Inject
 
-class BuildSubjectUseCase @Inject constructor(
+internal class BuildSubjectUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
     private val subjectFactory: SubjectFactory
 ) {

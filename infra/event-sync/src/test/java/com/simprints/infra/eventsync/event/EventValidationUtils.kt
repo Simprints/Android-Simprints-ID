@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.extentions.isGuid
+import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
 import com.simprints.infra.eventsync.event.remote.models.ApiArtificialTerminationPayload.ApiReason
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayload
@@ -244,7 +244,7 @@ fun validateCandidateReadEventApiModel(json: JSONObject) {
         assertThat(getInt("version")).isEqualTo(1)
         assertThat(getInt("startTime"))
         assertThat(getLong("endTime"))
-        assertThat(getString("candidateId").isGuid()).isTrue()
+        assertThat(getString("candidateId").isValidGuid()).isTrue()
         assertThat(getString("localResult")).isAnyOf("FOUND", "NOT_FOUND")
         if (has("remoteResult")) {
             assertThat(getString("remoteResult")).isAnyOf("FOUND", "NOT_FOUND")
@@ -303,7 +303,7 @@ fun validateEnrolmentEventV1ApiModel(json: JSONObject) {
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(1)
         assertThat(getLong("startTime"))
-        assertThat(getString("personId").isGuid()).isTrue()
+        assertThat(getString("personId").isValidGuid()).isTrue()
         assertThat(length()).isEqualTo(4)
     }
 }
@@ -475,13 +475,13 @@ fun validateGuidSelectionEventApiModel(json: JSONObject) {
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(1)
         assertThat(getLong("startTime"))
-        assertThat(getString("selectedId").isGuid()).isTrue()
+        assertThat(getString("selectedId").isValidGuid()).isTrue()
         assertThat(length()).isEqualTo(4)
     }
 }
 
 fun validateMatchEntryApiModel(json: JSONObject) {
-    assertThat(json.getString("candidateId").isGuid()).isTrue()
+    assertThat(json.getString("candidateId").isValidGuid()).isTrue()
     assertThat(json.getInt("score"))
     assertThat(json.length()).isEqualTo(2)
 }
@@ -514,7 +514,7 @@ fun validateOneToOneMatchEventApiModel(json: JSONObject) {
         assertThat(getInt("version")).isEqualTo(2)
         assertThat(getLong("startTime"))
         assertThat(getLong("endTime"))
-        assertThat(getString("candidateId").isGuid()).isTrue()
+        assertThat(getString("candidateId").isValidGuid()).isTrue()
         assertThat(getString("matcher")).isAnyOf("SIM_AFIS", "RANK_ONE")
         assertThat(getString("fingerComparisonStrategy")).isAnyOf(
             "null", "SAME_FINGER", "CROSS_FINGER_USING_MEAN_OF_MAX")
@@ -533,13 +533,13 @@ fun validatePersonCreationEvent(json: JSONObject) {
         assertThat(getString("fingerprintReferenceId")).isNotNull()
         val fingerprintCaptureIds = getJSONArray("fingerprintCaptureIds")
         for (i in 0 until fingerprintCaptureIds.length()) {
-            assertThat(fingerprintCaptureIds.getString(i).isGuid()).isTrue()
+            assertThat(fingerprintCaptureIds.getString(i).isValidGuid()).isTrue()
         }
 
         assertThat(getString("faceReferenceId")).isNotNull()
         val faceCaptureIds = getJSONArray("faceCaptureIds")
         for (i in 0 until faceCaptureIds.length()) {
-            assertThat(faceCaptureIds.getString(i).isGuid()).isTrue()
+            assertThat(faceCaptureIds.getString(i).isValidGuid()).isTrue()
         }
         assertThat(length()).isEqualTo(7)
     }

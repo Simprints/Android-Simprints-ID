@@ -28,7 +28,7 @@ import javax.inject.Inject
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) {
+internal class BluetoothOffFragment : Fragment(R.layout.fragment_bluetooth_off) {
 
     private val connectScannerViewModel: ConnectScannerViewModel by activityViewModels()
 

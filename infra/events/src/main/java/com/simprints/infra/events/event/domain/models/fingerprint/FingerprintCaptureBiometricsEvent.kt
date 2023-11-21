@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models.fingerprint
 
 import androidx.annotation.Keep
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
@@ -8,7 +9,6 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 @Keep
 data class FingerprintCaptureBiometricsEvent(

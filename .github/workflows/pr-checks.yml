@@ -8,21 +8,19 @@ on: # this checks should be triggered on pull request, before deployments, and m
     workflow_dispatch:
 
 jobs:
-    id-unit-tests:
-        name: Id Unit Tests
+    core-unit-tests:
+        name: Core Unit Tests
         uses: ./.github/workflows/run-unit-tests.yml
         secrets: inherit
         with:
-            modules: id
-            reportsId: id
-
-    clientapi-unit-tests:
-        name: Client API Unit Tests
-        uses: ./.github/workflows/run-unit-tests.yml
-        secrets: inherit
-        with:
-            modules: clientapi
-            reportsId: clientapi
+            modules: |
+                id
+                infra:core
+                infra:ui-base
+                infra:network
+                infra:logging
+                infra:security
+            reportsId: core
 
     infra-unit-tests-1:
         name: Infra Unit Tests 1
@@ -30,14 +28,12 @@ jobs:
         secrets: inherit
         with:
             modules: |
-                core
-                infra:ui-base
-                infra:network
-                infra:logging
-                infra:security
+                infra:orchestrator-data
                 infra:license
                 infra:images
-                infra:event-sync
+                infra:realm
+                infra:project-security-store
+                infra:recent-user-activity
             reportsId: infra1
 
     infra-unit-tests-2:
@@ -49,14 +45,11 @@ jobs:
                 infra:config-store
                 infra:config-sync
                 infra:events
+                infra:event-sync
                 infra:enrolment-records-store
                 infra:enrolment-records-sync
                 infra:auth-store
                 infra:auth-logic
-                infra:project-security-store
-                infra:realm
-                infra:recent-user-activity
-                infra:orchestrator-data
             reportsId: infra2
 
     feature-unit-tests:
@@ -116,5 +109,5 @@ jobs:
     sonarqube:
         name: SonarQube
         secrets: inherit
-        needs: [ id-unit-tests, clientapi-unit-tests, infra-unit-tests-1, infra-unit-tests-2, feature-unit-tests, feature-dashboard-unit-tests, face-unit-tests, fingerprint-unit-tests ]
+        needs: [ core-unit-tests, infra-unit-tests-1, infra-unit-tests-2, feature-unit-tests, feature-dashboard-unit-tests, face-unit-tests, fingerprint-unit-tests ]
         uses: ./.github/workflows/sonar-scan.yml

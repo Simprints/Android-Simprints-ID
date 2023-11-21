@@ -5,7 +5,7 @@ import com.simprints.feature.clientapi.extensions.extractString
 import com.simprints.libsimprints.Constants
 
 
-abstract class ActionRequestExtractor(private val extras: Map<String, Any>) {
+internal abstract class ActionRequestExtractor(private val extras: Map<String, Any>) {
 
     abstract val expectedKeys: List<String>
 

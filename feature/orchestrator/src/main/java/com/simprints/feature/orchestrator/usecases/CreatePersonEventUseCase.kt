@@ -16,7 +16,7 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import kotlinx.coroutines.flow.toList
 import javax.inject.Inject
 
-class CreatePersonEventUseCase @Inject constructor(
+internal class CreatePersonEventUseCase @Inject constructor(
     private val eventRepository: EventRepository,
     private val timeHelper: TimeHelper,
     private val encodingUtils: EncodingUtils,

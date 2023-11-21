@@ -1,7 +1,7 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.ActionRequest
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

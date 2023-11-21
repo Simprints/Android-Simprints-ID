@@ -11,7 +11,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.common.FlowProvider
 import com.simprints.face.capture.R
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.screens.FaceCaptureViewModel
@@ -48,11 +47,6 @@ class ConfirmationFragmentTest {
             detectionEndTime = 0
         )
     }
-
-    @BindValue
-    @JvmField
-    val flowProvider = mockk<FlowProvider>()
-
 
     @Test
     fun onLaunchConfirmationFragmentAssertTextAndNavigation() {

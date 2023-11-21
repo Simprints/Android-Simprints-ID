@@ -6,8 +6,8 @@ import com.simprints.infra.orchestration.data.ActionConstants
 import com.simprints.feature.clientapi.models.OdkConstants
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence
-import com.simprints.moduleapi.app.responses.IAppMatchResult
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import javax.inject.Inject
 
 internal class OdkResponseMapper @Inject constructor() {
@@ -59,14 +59,14 @@ internal class OdkResponseMapper @Inject constructor() {
         }
     }
 
-    private fun List<IAppMatchResult>.joinField(block: (IAppMatchResult) -> String) = joinToString(separator = " ", transform = block).trim()
+    private fun List<AppMatchResult>.joinField(block: (AppMatchResult) -> String) = joinToString(separator = " ", transform = block).trim()
 
-    private fun List<IAppMatchResult>.getHighestConfidence() = this.map { it.matchConfidence }.toSet().let {
+    private fun List<AppMatchResult>.getHighestConfidence() = this.map { it.matchConfidence }.toSet().let {
         when {
-            it.contains(IAppMatchConfidence.HIGH) -> IAppMatchConfidence.HIGH
-            it.contains(IAppMatchConfidence.MEDIUM) -> IAppMatchConfidence.MEDIUM
-            it.contains(IAppMatchConfidence.LOW) -> IAppMatchConfidence.LOW
-            else -> IAppMatchConfidence.NONE
+            it.contains(AppMatchConfidence.HIGH) -> AppMatchConfidence.HIGH
+            it.contains(AppMatchConfidence.MEDIUM) -> AppMatchConfidence.MEDIUM
+            it.contains(AppMatchConfidence.LOW) -> AppMatchConfidence.LOW
+            else -> AppMatchConfidence.NONE
         }
     }
 }

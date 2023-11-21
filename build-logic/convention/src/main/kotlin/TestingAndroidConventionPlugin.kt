@@ -31,7 +31,7 @@ class TestingAndroidConventionPlugin : Plugin<Project> {
             dependencies {
                 add("androidTestUtil", libs.findLibrary("testing.AndroidX.orchestrator").get())
 
-                add("androidTestImplementation", project(":testtools"))
+                add("androidTestImplementation", project(":infra:test-tools"))
                 androidTestImplementation(libs, "testing.Mockk.android")
                 androidTestImplementation(libs, "testing.AndroidX.uiAutomator")
             }

@@ -20,18 +20,18 @@ import com.simprints.feature.clientapi.usecases.GetEnrolmentCreationEventForSubj
 import com.simprints.feature.clientapi.usecases.GetEventsForCoSyncUseCase
 import com.simprints.feature.clientapi.usecases.IsFlowCompletedWithErrorUseCase
 import com.simprints.feature.clientapi.usecases.SimpleEventReporter
+import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import com.simprints.infra.orchestration.data.ActionResponse
-import com.simprints.moduleapi.app.responses.IAppConfirmationResponse
-import com.simprints.moduleapi.app.responses.IAppEnrolResponse
-import com.simprints.moduleapi.app.responses.IAppErrorResponse
-import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
-import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
-import com.simprints.moduleapi.app.responses.IAppVerifyResponse
+import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
+import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -86,10 +86,9 @@ class ClientApiViewModel @Inject internal constructor(
     // Response handling
     // *********************************************************************************************
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleEnrolResponse(
         action: ActionRequest,
-        enrolResponse: IAppEnrolResponse,
+        enrolResponse: AppEnrolResponse,
     ) = viewModelScope.launch {
         // need to get sessionId before it is closed and null
         val currentSessionId = getCurrentSessionId()
@@ -119,10 +118,9 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleIdentifyResponse(
         action: ActionRequest,
-        identifyResponse: IAppIdentifyResponse,
+        identifyResponse: AppIdentifyResponse,
     ) = viewModelScope.launch {
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
@@ -144,10 +142,9 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleConfirmResponse(
         action: ActionRequest,
-        confirmResponse: IAppConfirmationResponse,
+        confirmResponse: AppConfirmationResponse,
     ) = viewModelScope.launch {
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
@@ -170,10 +167,9 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleVerifyResponse(
         action: ActionRequest,
-        verifyResponse: IAppVerifyResponse,
+        verifyResponse: AppVerifyResponse,
     ) = viewModelScope.launch {
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
@@ -197,10 +193,9 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     fun handleExitFormResponse(
         action: ActionRequest,
-        exitFormResponse: IAppRefusalFormResponse,
+        exitFormResponse: AppRefusalResponse,
     ) = viewModelScope.launch {
         val currentSessionId = getCurrentSessionId()
         simpleEventReporter.addCompletionCheckEvent(flowCompleted = true)
@@ -225,12 +220,11 @@ class ClientApiViewModel @Inject internal constructor(
         )
     }
 
-    // TODO review if parameters should be replaced with :feature:orchestrator models
     // Error is a special case where it might be called before action has been parsed,
     // therefore it can only rely on the identifier from action string to be present
     fun handleErrorResponse(
         action: String,
-        errorResponse: IAppErrorResponse,
+        errorResponse: AppErrorResponse,
     ) = viewModelScope.launch {
         val currentSessionId = getCurrentSessionId()
 

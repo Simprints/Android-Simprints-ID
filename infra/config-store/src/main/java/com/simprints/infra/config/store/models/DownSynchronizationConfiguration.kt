@@ -1,6 +1,6 @@
 package com.simprints.infra.config.store.models
 
-import com.simprints.core.domain.common.GROUP
+import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.tokenization.TokenizableString
 
 data class DownSynchronizationConfiguration(
@@ -14,10 +14,10 @@ data class DownSynchronizationConfiguration(
         MODULE,
         USER;
 
-        fun toGroup(): GROUP = when (this) {
-            PROJECT -> GROUP.GLOBAL
-            MODULE -> GROUP.MODULE
-            USER -> GROUP.USER
+        fun toDomain(): Partitioning = when (this) {
+            PROJECT -> Partitioning.GLOBAL
+            MODULE -> Partitioning.MODULE
+            USER -> Partitioning.USER
         }
     }
 }

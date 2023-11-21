@@ -2,27 +2,27 @@ package com.simprints.feature.login.screens.form
 
 internal sealed class SignInState {
 
-    object Success : SignInState()
+    data object Success : SignInState()
 
-    object MissingCredential : SignInState()
-    object ProjectIdMismatch : SignInState()
+    data object MissingCredential : SignInState()
+    data object ProjectIdMismatch : SignInState()
 
     data class QrCodeValid(
         val projectId: String,
         val projectSecret: String,
     ) : SignInState()
 
-    object QrNoCameraPermission : SignInState()
-    object QrCameraUnavailable : SignInState()
-    object QrInvalidCode : SignInState()
-    object QrGenericError : SignInState()
+    data object QrNoCameraPermission : SignInState()
+    data object QrCameraUnavailable : SignInState()
+    data object QrInvalidCode : SignInState()
+    data object QrGenericError : SignInState()
 
-    object BadCredentials : SignInState()
-    object Offline : SignInState()
-    object TechnicalFailure : SignInState()
-    object IntegrityException : SignInState()
-    object IntegrityServiceTemporaryDown : SignInState()
-    object MissingOrOutdatedGooglePlayStoreApp : SignInState()
+    data object BadCredentials : SignInState()
+    data object Offline : SignInState()
+    data object TechnicalFailure : SignInState()
+    data object IntegrityException : SignInState()
+    data object IntegrityServiceTemporaryDown : SignInState()
+    data object MissingOrOutdatedGooglePlayStoreApp : SignInState()
     data class BackendMaintenanceError(val estimatedOutage: String? = null) : SignInState()
-    object Unknown : SignInState()
+    data object Unknown : SignInState()
 }

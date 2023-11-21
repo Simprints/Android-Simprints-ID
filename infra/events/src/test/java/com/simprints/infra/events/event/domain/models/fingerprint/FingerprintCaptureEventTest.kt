@@ -1,11 +1,11 @@
 package com.simprints.infra.events.event.domain.models.fingerprint
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.sampledata.FingerprintCaptureEventSample
 import com.simprints.infra.events.sampledata.SampleDefaults
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.junit.Test
 
 class FingerprintCaptureEventTest {

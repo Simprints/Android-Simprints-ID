@@ -65,12 +65,6 @@ include(
     ":face:infra:roc-wrapper",
 )
 
-// Modules to be refactored
-include(
-    ":clientapi",
-    ":moduleapi",
-)
-
 // Feature modules
 include(
     ":feature:orchestrator",
@@ -90,6 +84,8 @@ include(
 
 // Infra modules
 include(
+    ":infra:core",
+    ":infra:test-tools",
     ":infra:events",
     ":infra:event-sync",
     ":infra:config-store",
@@ -109,10 +105,4 @@ include(
     ":infra:security",
     ":infra:orchestrator-data",
     ":infra:ui-base",
-)
-
-// Tooling modules
-include(
-    ":core",
-    ":testtools",
 )

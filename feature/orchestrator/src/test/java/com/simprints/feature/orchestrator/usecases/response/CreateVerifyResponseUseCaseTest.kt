@@ -3,8 +3,8 @@ package com.simprints.feature.orchestrator.usecases.response
 import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.matcher.FaceMatchResult
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
-import com.simprints.feature.orchestrator.model.responses.AppVerifyResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.matcher.FingerprintMatchResult
 import io.mockk.every
@@ -94,10 +94,10 @@ class CreateVerifyResponseUseCaseTest {
     }
 
     private fun createFingerprintMatchResult(vararg confidences: Float): Parcelable = FingerprintMatchResult(
-        confidences.map { FingerprintMatchResult.Item(personId = "1", confidenceScore = it) }
+        confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) }
     )
 
     private fun createFaceMatchResult(vararg confidences: Float): Parcelable = FaceMatchResult(
-        confidences.map { FaceMatchResult.Item(guid = "1", confidence = it) }
+        confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) }
     )
 }

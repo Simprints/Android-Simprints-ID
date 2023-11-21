@@ -3,6 +3,9 @@ package com.simprints.feature.clientapi.mappers.response
 import androidx.core.os.bundleOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.core.domain.response.AppMatchConfidence
+import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.feature.clientapi.mappers.request.requestFactories.ConfirmIdentityActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolActionFactory
 import com.simprints.feature.clientapi.mappers.request.requestFactories.EnrolLastBiometricsActionFactory
@@ -10,13 +13,11 @@ import com.simprints.feature.clientapi.mappers.request.requestFactories.Identify
 import com.simprints.feature.clientapi.mappers.request.requestFactories.VerifyActionFactory
 import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.infra.orchestration.data.ActionResponse
+import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
-import com.simprints.moduleapi.app.responses.IAppErrorReason
-import com.simprints.moduleapi.app.responses.IAppMatchConfidence
-import com.simprints.moduleapi.app.responses.IAppResponseTier
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -47,17 +48,17 @@ class CommCareResponseMapperTest {
             sessionId = "sessionId",
             eventsJson = null,
             identifications = listOf(
-                StubMatchResult(
+                AppMatchResult(
                     guid = "guid-1",
                     confidenceScore = 100,
-                    tier = IAppResponseTier.TIER_5,
-                    matchConfidence = IAppMatchConfidence.MEDIUM,
+                    tier = AppResponseTier.TIER_5,
+                    matchConfidence = AppMatchConfidence.MEDIUM,
                 ),
-                StubMatchResult(
+                AppMatchResult(
                     guid = "guid-2",
                     confidenceScore = 75,
-                    tier = IAppResponseTier.TIER_3,
-                    matchConfidence = IAppMatchConfidence.LOW,
+                    tier = AppResponseTier.TIER_3,
+                    matchConfidence = AppMatchConfidence.LOW,
                 ),
             )
         ))
@@ -89,11 +90,11 @@ class CommCareResponseMapperTest {
             actionIdentifier = VerifyActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
-            matchResult = StubMatchResult(
+            matchResult = AppMatchResult(
                 guid = "guid",
                 confidenceScore = 50,
-                tier = IAppResponseTier.TIER_2,
-                matchConfidence = IAppMatchConfidence.HIGH,
+                tier = AppResponseTier.TIER_2,
+                matchConfidence = AppMatchConfidence.HIGH,
             ),
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
@@ -126,7 +127,7 @@ class CommCareResponseMapperTest {
             actionIdentifier = EnrolActionFactory.getIdentifier(),
             sessionId = "sessionId",
             eventsJson = null,
-            reason = IAppErrorReason.UNEXPECTED_ERROR,
+            reason = AppErrorReason.UNEXPECTED_ERROR,
             flowCompleted = true,
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 

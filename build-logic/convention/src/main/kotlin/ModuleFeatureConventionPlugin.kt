@@ -28,10 +28,7 @@ class ModuleFeatureConventionPlugin : Plugin<Project> {
 
             dependencies {
                 add("implementation", project(":infra:ui-base"))
-                add("implementation", project(":core"))
-
-                add("testImplementation", project(":testtools"))
-                add("androidTestImplementation", project(":testtools"))
+                add("implementation", project(":infra:core"))
             }
         }
     }

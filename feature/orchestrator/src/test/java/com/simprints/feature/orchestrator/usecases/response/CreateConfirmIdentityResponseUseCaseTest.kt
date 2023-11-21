@@ -2,8 +2,8 @@ package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
-import com.simprints.feature.orchestrator.model.responses.AppConfirmationResponse
-import com.simprints.feature.orchestrator.model.responses.AppErrorResponse
+import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.feature.selectsubject.SelectSubjectResult
 import org.junit.Before
 import org.junit.Test

@@ -6,9 +6,9 @@ import javax.inject.Inject
 
 internal class ParcelableConverter @Inject constructor() {
 
-    fun marshall(parceable: Parcelable): ByteArray {
+    fun marshall(parcelable: Parcelable): ByteArray {
         val parcel = Parcel.obtain()
-        parceable.writeToParcel(parcel, 0)
+        parcelable.writeToParcel(parcel, 0)
         val bytes = parcel.marshall()
         parcel.recycle()
         return bytes

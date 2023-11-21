@@ -7,8 +7,6 @@ object FaceCaptureContract {
 
     val DESTINATION = R.id.faceCaptureControllerFragment
 
-    const val RESULT = "face_capture_result"
-
     fun getArgs(
         samplesToCapture: Int,
     ): Bundle = FaceCaptureControllerFragmentArgs(samplesToCapture).toBundle()

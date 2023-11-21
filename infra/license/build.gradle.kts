@@ -1,5 +1,6 @@
 plugins {
     id("simprints.infra")
+    id("simprints.testing.android")
 }
 
 android {

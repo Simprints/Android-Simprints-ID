@@ -22,14 +22,13 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class EnrolLastBiometricViewModelTest {
+internal class EnrolLastBiometricViewModelTest {
 
     @get:Rule
     val rule = InstantTaskExecutorRule()

@@ -5,7 +5,7 @@ import com.simprints.feature.clientapi.mappers.request.extractors.ConfirmIdentit
 import com.simprints.feature.clientapi.models.ClientApiError
 
 
-class ConfirmIdentityValidator(
+internal class ConfirmIdentityValidator(
     private val extractor: ConfirmIdentityRequestExtractor,
     private val currentSessionId: String,
     private val isSessionHasIdentificationCallback: Boolean,

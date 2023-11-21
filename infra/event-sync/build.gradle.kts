@@ -1,6 +1,7 @@
 plugins {
     id("simprints.infra")
     id("simprints.library.room")
+    id("simprints.testing.android")
 }
 
 android {
@@ -36,6 +37,7 @@ android {
 dependencies {
     implementation(project(":face:capture"))
     implementation(project(":fingerprint:capture"))
+    implementation(project(":infra:images"))
     implementation(project(":infra:events"))
     implementation(project(":infra:config-store"))
     implementation(project(":infra:config-sync"))

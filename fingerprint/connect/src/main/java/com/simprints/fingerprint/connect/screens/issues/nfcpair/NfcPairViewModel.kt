@@ -14,7 +14,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
-class NfcPairViewModel @Inject constructor(
+internal class NfcPairViewModel @Inject constructor(
     private val nfcManager: NfcManager,
     private val scannerPairingManager: ScannerPairingManager
 ) : ViewModel() {
