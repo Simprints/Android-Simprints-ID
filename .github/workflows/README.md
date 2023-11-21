@@ -33,7 +33,7 @@ The CD Workflow is responsible for automatically deploying new code changes to d
 
 4.  **Promotion to Google Play Tracks:** Promotes the release build to different Google Play tracks in a controlled manner, starting with alpha and gradually progressing to the production track.
 
-5.  **Dependency Updates:** Updates project dependencies using Renovate, an automated dependency management tool, ensuring that the project always uses the latest stable versions of its dependencies.
+5.  **Dependency Updates:** Updates project dependencies using Dependabot, an automated dependency management tool, ensuring that the project always uses the latest stable versions of its dependencies.
 
 
 **Workflow Trigger and Jobs**
