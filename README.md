@@ -101,7 +101,7 @@ To run test for a specific module, run `./gradlew moduleName:testDebugUnitTest` 
 
 ### Technical documentation on features
 
-A high level documentation on how each module works can be found in the [project's wiki](https://bitbucket.org/simprints/android-simprints-id/wiki/Home) on bitbucket.
+A high level documentation on how each module works can be found in the [project's wiki](https://simprints.gitbook.io/docs/architecture/system-architecture/mobile/simprints-id-sid).
 More details about each feature or how each module work can be seen inside every module README files or inside respective folders. Higher level features that touch all modules are documented in the [id module](id/README.md).
 
 <br>
