@@ -10,7 +10,6 @@ import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
-import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 internal class GetEnrolmentCreationEventForSubjectUseCase @Inject constructor(

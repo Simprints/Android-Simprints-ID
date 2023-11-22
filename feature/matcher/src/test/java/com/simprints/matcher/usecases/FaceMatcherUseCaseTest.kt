@@ -12,7 +12,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -36,7 +35,7 @@ class FaceMatcherUseCaseTest {
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns flowOf(
+        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))
@@ -56,7 +55,7 @@ class FaceMatcherUseCaseTest {
 
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns flowOf(
+        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))

@@ -6,7 +6,6 @@ import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
@@ -14,7 +13,6 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.exceptions.RealmUninitialisedException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -46,6 +44,7 @@ internal class EnrolmentRecordRepositoryImpl(
     private val prefs = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE)
 
     companion object {
+
         private const val BATCH_SIZE = 80
         private const val PREF_FILE_NAME = "UPLOAD_ENROLMENT_RECORDS_PROGRESS"
         private const val PROGRESS_KEY = "PROGRESS"
@@ -61,19 +60,12 @@ internal class EnrolmentRecordRepositoryImpl(
                 afterSubjectId = lastUploadedRecord
             )
         }
-        var subjects = mutableListOf<Subject>()
-        subjectRepository.load(query).collect {
-            subjects.add(it)
-            if (subjects.size >= batchSize) {
+        subjectRepository.load(query)
+            .chunked(batchSize)
+            .forEach { subjects ->
                 remoteDataSource.uploadRecords(subjects)
                 prefs.edit().putString(PROGRESS_KEY, subjects.last().subjectId).apply()
-                subjects = mutableListOf()
             }
-        }
-        if (subjects.isNotEmpty()) {
-            // The last batch
-            remoteDataSource.uploadRecords(subjects)
-        }
         prefs.edit().remove(PROGRESS_KEY).apply()
     }
 
@@ -81,7 +73,7 @@ internal class EnrolmentRecordRepositoryImpl(
         try {
             val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
             val tokenizedSubjectsCreateAction =
-                subjectRepository.load(query).toList().mapNotNull { subject ->
+                subjectRepository.load(query).mapNotNull { subject ->
                     if (subject.projectId != project.id) return@mapNotNull null
                     val moduleId = tokenizeIfNecessary(
                         value = subject.moduleId,
@@ -107,7 +99,7 @@ internal class EnrolmentRecordRepositoryImpl(
     private fun tokenizeIfNecessary(
         value: TokenizableString,
         tokenKeyType: TokenKeyType,
-        project: Project
+        project: Project,
     ) = when (value) {
         is TokenizableString.Tokenized -> value
         is TokenizableString.Raw -> tokenizationProcessor.encrypt(
