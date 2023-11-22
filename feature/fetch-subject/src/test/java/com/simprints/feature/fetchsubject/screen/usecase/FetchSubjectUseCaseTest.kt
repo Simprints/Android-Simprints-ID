@@ -2,9 +2,9 @@ package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.network.ConnectivityTracker
 import io.mockk.MockKAnnotations
@@ -12,8 +12,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -45,7 +43,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should check local DB first`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
+        coEvery { enrolmentRecordManager.load(any()) } returns listOf(subject)
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
 
@@ -55,7 +53,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should not check remote if present in local DB`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns flowOf(subject)
+        coEvery { enrolmentRecordManager.load(any()) } returns listOf(subject)
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
 
@@ -65,7 +63,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should try down syncing if not present in local DB`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns emptyFlow()
+        coEvery { enrolmentRecordManager.load(any()) } returns emptyList()
 
         useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
 
@@ -74,7 +72,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should return from local DB if present after downsync`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returnsMany listOf(emptyFlow(), flowOf(subject))
+        coEvery { enrolmentRecordManager.load(any()) } returnsMany listOf(emptyList(), listOf(subject))
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
 
@@ -84,7 +82,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should return notFound if not present after downsync and connected`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns emptyFlow()
+        coEvery { enrolmentRecordManager.load(any()) } returns emptyList()
         every { connectivityTracker.isConnected() } returns true
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
@@ -94,7 +92,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should return connection error if not present after downsync and not connected`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns emptyFlow()
+        coEvery { enrolmentRecordManager.load(any()) } returns emptyList()
         every { connectivityTracker.isConnected() } returns false
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)

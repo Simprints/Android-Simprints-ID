@@ -16,9 +16,6 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmUUID
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -36,14 +33,13 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
         const val IS_MODULE_ID_TOKENIZED_FIELD = "isModuleIdTokenized"
     }
 
-    override suspend fun load(query: SubjectQuery): Flow<Subject> = realmWrapper.readRealm {
+    override suspend fun load(query: SubjectQuery): List<Subject> = realmWrapper.readRealm {
         it.query(DbSubject::class).buildRealmQueryForSubject(query)
             .find()
             .map { dbSubject -> dbSubject.fromDbToDomain() }
-            .asFlow()
     }
 
-    override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
+    override suspend fun loadFingerprintIdentities(query: Serializable): List<FingerprintIdentity> =
         if (query is SubjectQuery) {
             load(query).map { subject ->
                 FingerprintIdentity(subject.subjectId, subject.fingerprintSamples)
@@ -52,7 +48,7 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
             throw InvalidQueryToLoadRecordsException()
         }
 
-    override suspend fun loadFaceIdentities(query: Serializable): Flow<FaceIdentity> =
+    override suspend fun loadFaceIdentities(query: Serializable): List<FaceIdentity> =
         if (query is SubjectQuery) {
             load(query).map { subject ->
                 FaceIdentity(subject.subjectId, subject.faceSamples)

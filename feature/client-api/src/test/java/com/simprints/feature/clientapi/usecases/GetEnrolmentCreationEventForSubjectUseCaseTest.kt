@@ -3,8 +3,8 @@ package com.simprints.feature.clientapi.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -13,8 +13,6 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -83,7 +81,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
 
-        coEvery { enrolmentRecordManager.load(any()) } returns emptyFlow()
+        coEvery { enrolmentRecordManager.load(any()) } returns emptyList()
 
         val result = useCase("projectId", "subjectId")
 
@@ -96,7 +94,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
 
-        coEvery { enrolmentRecordManager.load(any()) } returns flowOf(mockk(relaxed = true))
+        coEvery { enrolmentRecordManager.load(any()) } returns listOf(mockk(relaxed = true))
 
         val result = useCase("projectId", "subjectId")
 
