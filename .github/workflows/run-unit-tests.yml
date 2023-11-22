@@ -28,8 +28,6 @@ jobs:
                     java-version: 17
                     distribution: 'temurin'
 
-            -   name: Set up Gradle
-                uses: gradle/gradle-build-action@v2
 
             -   name: Set up local.properties
                 run: |
@@ -59,7 +57,7 @@ jobs:
                         echo "=========================================="
                         echo "=========================================="
                         echo -e "\n\n"
-                        gradle $module:jacocoTestReport
+                        ./gradlew $module:jacocoTestReport
                     done
 
             -   name: Upload Folders
