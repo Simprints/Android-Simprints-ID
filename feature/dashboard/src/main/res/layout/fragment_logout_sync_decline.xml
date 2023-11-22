@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:minHeight="?android:attr/actionBarSize"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:title="@string/logout" />
+            app:title="@string/dashboard_logout_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -51,7 +51,7 @@
                 android:paddingHorizontal="@dimen/margin_large"
                 android:paddingVertical="@dimen/margin_default"
                 android:paddingTop="@dimen/margin_default"
-                android:text="@string/logout_sync_decline_warning_title"
+                android:text="@string/dashboard_logout_confirmation_sync_decline_warning_title"
                 app:drawableStartCompat="@drawable/ic_warning"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="@dimen/margin_large"
                 android:paddingVertical="@dimen/margin_default"
-                android:text="@string/logout_sync_decline_warning_body"
+                android:text="@string/dashboard_logout_confirmation_sync_decline_warning_body"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/title_container" />
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
                 android:layout_marginVertical="@dimen/margin_large"
-                android:text="@string/cancel_button"
+                android:text="@string/dashboard_logout_confirmation_cancel_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/horizontalGuideline"
                 app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
                 android:layout_marginVertical="@dimen/margin_large"
-                android:text="@string/logout"
+                android:text="@string/dashboard_logout_confirmation_log_out_button"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/horizontalGuideline"

@@ -150,7 +150,7 @@ class ConsentViewModelTest {
         vm.declineClicked(ConsentTab.PARENTAL)
         val result = vm.showExitForm.getOrAwaitValue()
 
-        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.why_did_you_skip_face_capture)
+        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_face)
     }
 
     @Test
@@ -160,7 +160,7 @@ class ConsentViewModelTest {
         vm.declineClicked(ConsentTab.PARENTAL)
         val result = vm.showExitForm.getOrAwaitValue()
 
-        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.why_did_you_skip_fingerprinting)
+        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_fingerprinting)
     }
 
     @Test
@@ -173,7 +173,7 @@ class ConsentViewModelTest {
         vm.declineClicked(ConsentTab.PARENTAL)
         val result = vm.showExitForm.getOrAwaitValue()
 
-        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.why_did_you_skip_biometrics)
+        Truth.assertThat(result.getContentIfNotHandled()?.titleRes).isEqualTo(IDR.string.exit_form_title_biometrics)
     }
 
     @Test

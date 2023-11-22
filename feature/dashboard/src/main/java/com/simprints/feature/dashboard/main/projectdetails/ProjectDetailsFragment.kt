@@ -23,7 +23,7 @@ internal class ProjectDetailsFragment : Fragment(R.layout.fragment_dashboard_car
             binding.dashboardProjectDetailsCard.isVisible = it.isLoaded
             binding.dashboardProjectDetailsCardTitle.text = it.title
             binding.dashboardProjectDetailsCardCurrentUser.text = String.format(
-                getString(IDR.string.dashboard_card_current_user),
+                getString(IDR.string.dashboard_project_card_current_user),
                 it.lastUser
             )
             with(binding.dashboardProjectDetailsCardScannerUsed) {
@@ -32,7 +32,7 @@ internal class ProjectDetailsFragment : Fragment(R.layout.fragment_dashboard_car
                 } else {
                     visibility = View.VISIBLE
                     text = String.format(
-                        context.getString(IDR.string.dashboard_card_scanner_used),
+                        context.getString(IDR.string.dashboard_project_card_scanner_used),
                         it.lastScanner
                     )
                 }

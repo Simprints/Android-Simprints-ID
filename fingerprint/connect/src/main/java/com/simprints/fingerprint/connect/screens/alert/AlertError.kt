@@ -51,8 +51,8 @@ internal enum class AlertError(
 
     // Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(
-        title = IDR.string.error_occurred_title,
-        message = IDR.string.bluetooth_not_supported_message,
+        title = IDR.string.fingerprint_connect_error_title,
+        message = IDR.string.fingerprint_connect_bluetooth_not_supported_error_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         eventType = AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED,
@@ -60,8 +60,8 @@ internal enum class AlertError(
     ),
 
     BLUETOOTH_NOT_ENABLED(
-        title = IDR.string.scanner_error_turn_scanner_on_title,
-        message = IDR.string.bluetooth_not_enabled_message,
+        title = IDR.string.fingerprint_connect_turn_scanner_on_error_title,
+        message = IDR.string.fingerprint_connect_bluetooth_not_enabled_error_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         eventType = AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED,
@@ -70,8 +70,8 @@ internal enum class AlertError(
     ),
 
     BLUETOOTH_NO_PERMISSION(
-        title = IDR.string.no_permission_title,
-        message = IDR.string.bluetooth_no_permission_message,
+        title = IDR.string.fingerprint_connect_no_permission_error_title,
+        message = IDR.string.fingerprint_connect_no_permission_error_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         eventType = AlertScreenEventType.BLUETOOTH_NO_PERMISSION,
@@ -79,8 +79,8 @@ internal enum class AlertError(
     ),
 
     NOT_PAIRED(
-        title = IDR.string.bluetooth_error_pair_scanner_and_device_title,
-        message = IDR.string.bluetooth_error_pair_scanner_and_device_message,
+        title = IDR.string.fingerprint_connect_pair_scanner_and_device_error_title,
+        message = IDR.string.fingerprint_connect_pair_scanner_and_device_error_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = IDR.drawable.ic_alert_hint_bt_disabled,
         eventType = AlertScreenEventType.NOT_PAIRED,
@@ -88,8 +88,8 @@ internal enum class AlertError(
     ),
 
     MULTIPLE_PAIRED_SCANNERS(
-        title = IDR.string.scanner_error_turn_scanner_on_title,
-        message = IDR.string.multiple_scanners_found_message,
+        title = IDR.string.fingerprint_connect_turn_scanner_on_error_title,
+        message = IDR.string.fingerprint_connect_multiple_scanners_found_error_message,
         mainDrawable = IDR.drawable.ic_alert_bt,
         hintDrawable = R.drawable.multiple_scanners_found,
         eventType = AlertScreenEventType.MULTIPLE_PAIRED_SCANNERS,
@@ -99,8 +99,8 @@ internal enum class AlertError(
 
     // Scanner errors
     DISCONNECTED(
-        title = IDR.string.scanner_error_turn_scanner_on_title,
-        message = IDR.string.scanner_error_turn_scanner_on_message,
+        title = IDR.string.fingerprint_connect_turn_scanner_on_error_title,
+        message = IDR.string.fingerprint_connect_turn_scanner_on_error_message,
         backgroundColor = AlertColor.Default,
         mainDrawable = R.drawable.scanner_error_icon,
         eventType = AlertScreenEventType.DISCONNECTED,
@@ -108,8 +108,8 @@ internal enum class AlertError(
     ),
 
     LOW_BATTERY(
-        title = IDR.string.low_battery_title,
-        message = IDR.string.low_battery_message,
+        title = IDR.string.fingerprint_connect_low_battery_error_title,
+        message = IDR.string.fingerprint_connect_low_battery_error_message,
         backgroundColor = AlertColor.Default,
         mainDrawable = R.drawable.scanner_error_icon,
         hintDrawable = IDR.drawable.ic_alert_hint_battery,
@@ -119,8 +119,8 @@ internal enum class AlertError(
 
     //Unexpected errors
     UNEXPECTED_ERROR(
-        title = IDR.string.error_occurred_title,
-        message = IDR.string.unforeseen_error_message,
+        title = IDR.string.fingerprint_connect_error_title,
+        message = IDR.string.fingerprint_connect_unexpected_error_message,
         backgroundColor = AlertColor.Red,
         mainDrawable = IDR.drawable.ic_alert_default,
         eventType = AlertScreenEventType.UNEXPECTED_ERROR,
@@ -130,37 +130,37 @@ internal enum class AlertError(
     private object Buttons {
 
         fun closeButton() = alertButton {
-            textRes = IDR.string.close
+            textRes = IDR.string.fingerprint_connect_error_close_button
             closeOnClick = true
             resultKey = ACTION_CLOSE
         }
 
         fun closeWithRefusalButton() = alertButton {
-            textRes = IDR.string.close
+            textRes = IDR.string.fingerprint_connect_error_close_button
             closeOnClick = true
             resultKey = ACTION_REFUSAL
         }
 
         fun bluetoothSettingsButton() = alertButton {
-            textRes = IDR.string.settings_label
+            textRes = IDR.string.fingerprint_connect_phone_settings_button
             closeOnClick = true
             resultKey = ACTION_BT_SETTINGS
         }
 
         fun appSettingsButton() = alertButton {
-            textRes = IDR.string.settings_label
+            textRes = IDR.string.fingerprint_connect_phone_settings_button
             closeOnClick = true
             resultKey = ACTION_APP_SETTINGS
         }
 
         fun tryAgainButton() = alertButton {
-            textRes = IDR.string.try_again_label
+            textRes = IDR.string.fingerprint_connect_try_again_button
             closeOnClick = true
             resultKey = ACTION_RETRY
         }
 
         fun pairScannerButton() = alertButton {
-            textRes = IDR.string.pair_scanner_label
+            textRes = IDR.string.fingerprint_connect_pair_scanner_button
             closeOnClick = true
             resultKey = ACTION_PAIR
         }

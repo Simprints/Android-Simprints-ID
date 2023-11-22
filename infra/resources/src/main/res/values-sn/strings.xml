@@ -9,7 +9,7 @@
     <string name="consent_privacy_rights">Kana mukapa mvumo, munokwanisa kubuda chero nguva ipi zvayo motiudza kuti tidzime zvese zvatinazvo zvine chekuita nemi.&#160;</string>
     <string name="consent_confirmation">Ndinokumbira kutora fingerprint yenyu. Tapota tiudzei kuti \"Ndabvuma\", \"Handibvumi\" kana \"Ndine mibvunzo\".</string>
 
-    <string name="launch_consent_decline_button">Kuramba</string>
-    <string name="launch_consent_accept_button">Kubvuma</string>
+    <string name="consent_decline_button">Kuramba</string>
+    <string name="consent_accept_button">Kubvuma</string>
 
 </resources>

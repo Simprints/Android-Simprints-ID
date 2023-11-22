@@ -156,8 +156,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun renderCapturingNotStarted() {
         binding.apply {
             captureOverlay.drawSemiTransparentTarget()
-            captureTitle.text = getString(IDR.string.title_preparation)
-            captureFeedbackTxtTitle.text = getString(IDR.string.capture_title_previewing)
+            captureTitle.text = getString(IDR.string.face_capture_preparation_title)
+            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_title_previewing)
         }
         toggleCaptureButtons(false)
     }
@@ -166,15 +166,15 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         renderCapturingStateColors()
         binding.apply {
             captureProgress.isVisible = true
-            captureTitle.text = getString(IDR.string.title_capturing)
-            captureFeedbackTxtTitle.text = getString(IDR.string.capture_prep_begin_btn_capturing)
+            captureTitle.text = getString(IDR.string.face_capture_capturing_title)
+            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_prep_begin_button_capturing)
         }
         toggleCaptureButtons(false)
     }
 
     private fun renderValidFace() {
         binding.apply {
-            captureFeedbackTxtTitle.text = getString(IDR.string.capture_prep_begin_btn)
+            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_begin_button)
             captureFeedbackTxtExplanation.text = null
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
@@ -186,8 +186,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderValidCapturingFace() {
         binding.apply {
-            captureFeedbackTxtTitle.text = getString(IDR.string.capture_prep_begin_btn_capturing)
-            captureFeedbackTxtExplanation.text = getString(IDR.string.capture_hold)
+            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_prep_begin_button_capturing)
+            captureFeedbackTxtExplanation.text = getString(IDR.string.face_capture_hold)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
                 true, ContextCompat.getDrawable(requireContext(), R.drawable.ic_checked_white_18dp)
@@ -199,8 +199,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderFaceTooFar() {
         binding.apply {
-            captureFeedbackTxtTitle.text = getString(IDR.string.capture_title_face_too_far)
-            captureFeedbackTxtExplanation.text = getString(IDR.string.capture_error_face_too_far)
+            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_title_too_far)
+            captureFeedbackTxtExplanation.text = getString(IDR.string.face_capture_error_too_far)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
         }
@@ -211,8 +211,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderFaceTooClose() {
         binding.apply {
-            captureFeedbackTxtTitle.text = getString(IDR.string.capture_title_too_close)
-            captureFeedbackTxtExplanation.text = getString(IDR.string.capture_error_face_too_close)
+            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_title_too_close)
+            captureFeedbackTxtExplanation.text = getString(IDR.string.face_capture_error_too_close)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
         }
@@ -223,8 +223,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderNoFace() {
         binding.apply {
-            captureFeedbackTxtTitle.text = getString(IDR.string.capture_title_no_face)
-            captureFeedbackTxtExplanation.text = getString(IDR.string.capture_error_no_face)
+            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_title_no_face)
+            captureFeedbackTxtExplanation.text = getString(IDR.string.face_capture_error_no_face)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
         }
@@ -235,8 +235,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderFaceNotStraight() {
         binding.apply {
-            captureFeedbackTxtTitle.text = getString(IDR.string.capture_title_look_straight)
-            captureFeedbackTxtExplanation.text = getString(IDR.string.capture_error_look_straight)
+            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_title_look_straight)
+            captureFeedbackTxtExplanation.text = getString(IDR.string.face_capture_error_look_straight)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
         }

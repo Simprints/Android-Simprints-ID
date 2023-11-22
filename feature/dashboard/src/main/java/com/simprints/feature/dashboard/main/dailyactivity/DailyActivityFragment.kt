@@ -38,7 +38,7 @@ internal class DailyActivityFragment : Fragment(R.layout.fragment_dashboard_card
 
     private fun displayDailyActivity(dailyActivityState: DashboardDailyActivityState) {
         binding.dashboardDailyActivityCardTitle.text = String.format(
-            getString(IDR.string.dashboard_card_activity),
+            getString(IDR.string.dashboard_activity_card_activity),
             viewModel.getCurrentDateAsString()
         )
         setEnrolmentsCount(dailyActivityState.enrolments)
@@ -52,7 +52,7 @@ internal class DailyActivityFragment : Fragment(R.layout.fragment_dashboard_card
             binding.groupEnrolments.visibility = View.VISIBLE
             binding.dashboardDailyActivityCardEnrolmentsCount.text = count.toString()
             binding.enrolmentsLabel.text = resources.getQuantityString(
-                IDR.plurals.dashboard_card_enrolments,
+                IDR.plurals.dashboard_activity_card_enrolments,
                 count
             )
         } else {
@@ -65,7 +65,7 @@ internal class DailyActivityFragment : Fragment(R.layout.fragment_dashboard_card
             binding.groupIdentifications.visibility = View.VISIBLE
             binding.dashboardDailyActivityCardIdentificationsCount.text = count.toString()
             binding.identificationsLabel.text = resources.getQuantityString(
-                IDR.plurals.dashboard_card_identifications,
+                IDR.plurals.dashboard_activity_card_identifications,
                 count
             )
         } else {
@@ -78,7 +78,7 @@ internal class DailyActivityFragment : Fragment(R.layout.fragment_dashboard_card
             binding.groupVerifications.visibility = View.VISIBLE
             binding.dashboardDailyActivityCardVerificationsCount.text = count.toString()
             binding.verificationsLabel.text = resources.getQuantityString(
-                IDR.plurals.dashboard_card_verifications,
+                IDR.plurals.dashboard_activity_card_verifications,
                 count
             )
         } else {

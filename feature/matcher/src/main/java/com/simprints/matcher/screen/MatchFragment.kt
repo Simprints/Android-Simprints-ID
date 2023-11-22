@@ -74,28 +74,28 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
     private fun renderLoadingCandidates() {
         binding.apply {
             faceMatchTvMatchingProgressStatus1.isVisible = true
-            faceMatchTvMatchingProgressStatus1.text = getString(IDR.string.face_match_loading_candidates)
+            faceMatchTvMatchingProgressStatus1.text = getString(IDR.string.matcher_loading_candidates)
             faceMatchProgress.isVisible = true
         }
         setIdentificationProgress(LOADING_PROGRESS)
     }
 
     private fun renderMatching() {
-        binding.faceMatchTvMatchingProgressStatus1.text = getString(IDR.string.face_match_matching_candidates)
+        binding.faceMatchTvMatchingProgressStatus1.text = getString(IDR.string.matcher_matching_candidates)
 
         setIdentificationProgress(MATCHING_PROGRESS)
     }
 
     private fun renderFinished(matchState: Finished) {
         binding.faceMatchTvMatchingProgressStatus1.text = resources.getQuantityString(
-            IDR.plurals.face_match_matched_candidates,
+            IDR.plurals.matcher_matched_candidates,
             matchState.candidatesMatched,
             matchState.candidatesMatched
         )
 
         binding.faceMatchTvMatchingProgressStatus2.isVisible = true
         binding.faceMatchTvMatchingProgressStatus2.text = resources.getQuantityString(
-            IDR.plurals.face_match_returned_results,
+            IDR.plurals.matcher_returned_results,
             matchState.returnSize,
             matchState.returnSize
         )
@@ -103,7 +103,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         if (matchState.veryGoodMatches > 0) {
             binding.faceMatchTvMatchingResultStatus1.isVisible = true
             binding.faceMatchTvMatchingResultStatus1.text = resources.getQuantityString(
-                IDR.plurals.face_match_tier1or2_matches,
+                IDR.plurals.matcher_tier1or2_matches,
                 matchState.veryGoodMatches,
                 matchState.veryGoodMatches
             )
@@ -111,7 +111,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         if (matchState.goodMatches > 0) {
             binding.faceMatchTvMatchingResultStatus2.isVisible = true
             binding.faceMatchTvMatchingResultStatus2.text = resources.getQuantityString(
-                IDR.plurals.face_match_tier3_matches,
+                IDR.plurals.matcher_tier3_matches,
                 matchState.goodMatches,
                 matchState.goodMatches
             )
@@ -119,7 +119,7 @@ internal class MatchFragment : Fragment(R.layout.fragment_matcher) {
         if (matchState.veryGoodMatches < 1 && matchState.goodMatches < 1 || matchState.fairMatches > 1) {
             binding.faceMatchTvMatchingResultStatus3.isVisible = true
             binding.faceMatchTvMatchingResultStatus3.text = resources.getQuantityString(
-                IDR.plurals.face_match_tier4_matches,
+                IDR.plurals.matcher_tier4_matches,
                 matchState.fairMatches,
                 matchState.fairMatches
             )

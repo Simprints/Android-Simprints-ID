@@ -75,7 +75,7 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
-        onView(withText(IDR.string.preference_view_fingers_title)).check(doesNotExist())
+        onView(withText(IDR.string.dashboard_preference_view_fingers_title)).check(doesNotExist())
     }
 
     @Test
@@ -84,7 +84,7 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>()
 
-        onView(withText(IDR.string.preference_view_fingers_title)).check(matches(isDisplayed()))
+        onView(withText(IDR.string.dashboard_preference_view_fingers_title)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -95,7 +95,7 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>(navController = navController)
 
-        onView(withText(IDR.string.preference_sync_information_title)).perform(click())
+        onView(withText(IDR.string.dashboard_preference_sync_information_title)).perform(click())
         assertThat(navController.currentDestination?.id).isEqualTo(R.id.syncInfoFragment)
     }
 
@@ -107,7 +107,7 @@ class SettingsFragmentTest {
 
         launchFragmentInHiltContainer<SettingsFragment>(navController = navController)
 
-        onView(withText(IDR.string.preference_view_fingers_title)).perform(click())
+        onView(withText(IDR.string.dashboard_preference_view_fingers_title)).perform(click())
         assertThat(navController.currentDestination?.id).isEqualTo(R.id.fingerSelectionFragment)
     }
 
@@ -121,10 +121,10 @@ class SettingsFragmentTest {
 
         onView(withId(androidx.preference.R.id.recycler_view)).perform(
             RecyclerViewActions.scrollTo<RecyclerView.ViewHolder>(
-                hasDescendant(withText(IDR.string.preference_app_details_title))
+                hasDescendant(withText(IDR.string.dashboard_preference_app_details_title))
             ),
         )
-        onView(withText(IDR.string.preference_app_details_title)).perform(click())
+        onView(withText(IDR.string.dashboard_preference_app_details_title)).perform(click())
         assertThat(navController.currentDestination?.id).isEqualTo(R.id.aboutFragment)
     }
 

@@ -51,11 +51,11 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
 
     private val confirmModuleSelectionDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(IDR.string.confirm_module_selection_title))
+            .setTitle(getString(IDR.string.dashboard_select_modules_confirm_title))
             .setMessage(getModulesSelectedTextForDialog())
             .setCancelable(false)
-            .setPositiveButton(getString(IDR.string.confirm_module_selection_yes)) { _, _ -> handleModulesConfirmClick() }
-            .setNegativeButton(getString(IDR.string.confirm_module_selection_cancel)) { _, _ -> findNavController().popBackStack() }
+            .setPositiveButton(getString(IDR.string.dashboard_select_modules_confirm_yes)) { _, _ -> handleModulesConfirmClick() }
+            .setNegativeButton(getString(IDR.string.dashboard_select_modules_confirm_no)) { _, _ -> findNavController().popBackStack() }
             .create()
     }
 
@@ -181,7 +181,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private fun notifyNoModulesSelected() {
         Toast.makeText(
             requireContext(),
-            IDR.string.settings_no_modules_toast,
+            IDR.string.dashboard_select_modules_no_modules,
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -189,7 +189,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             requireContext(),
-            String.format(getString(IDR.string.settings_too_many_modules_toast), maxAllowed),
+            String.format(getString(IDR.string.dashboard_select_modules_too_many_modules), maxAllowed),
             Toast.LENGTH_SHORT
         ).show()
     }

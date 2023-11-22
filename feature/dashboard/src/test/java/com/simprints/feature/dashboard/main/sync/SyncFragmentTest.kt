@@ -78,7 +78,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
             )
         )
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_default_items_to_upload)).check(matches(withText(
             context.getString(IDR.string.dashboard_sync_card_records_uploaded)
@@ -105,7 +105,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
             )
         )
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_default_items_to_upload)).check(matches(withText(
             context.resources.getQuantityString(IDR.plurals.dashboard_sync_card_records_to_upload, 2, 2)
@@ -134,7 +134,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_failed_message)))
     }
@@ -155,7 +155,7 @@ class SyncFragmentTest {
                 R.id.sync_card_try_again,
             )
         )
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.error_backend_maintenance_message)))
     }
@@ -182,7 +182,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         val text =
             context.getString(IDR.string.error_backend_maintenance_with_time_message, "10 seconds")
@@ -206,7 +206,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_failed_message)).check(matches(withText(IDR.string.dashboard_sync_card_too_many_modules_message)))
     }
@@ -228,7 +228,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_try_again_sync_button))
             .check(matches(isDisplayed()))
@@ -255,7 +255,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_select_no_modules_button))
             .check(matches(isDisplayed()))
@@ -281,7 +281,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_offline_button))
             .check(matches(isDisplayed()))
@@ -305,7 +305,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
             matches(
@@ -340,7 +340,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
             matches(isDisplayed())
@@ -370,7 +370,7 @@ class SyncFragmentTest {
             )
         )
 
-        val lastSyncText = context.getString(IDR.string.dashboard_card_sync_last_sync, LAST_SYNC_TIME)
+        val lastSyncText = context.getString(IDR.string.dashboard_sync_card_last_sync, LAST_SYNC_TIME)
         onView(withId(R.id.sync_card_last_sync)).check(matches(withText(lastSyncText)))
         onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
             matches(not(isDisplayed()))

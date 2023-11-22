@@ -66,19 +66,19 @@ internal class FetchSubjectFragment : Fragment(R.layout.fragment_subject_fetch) 
 
     private fun getExitFormFromModalities(modalities: List<GeneralConfiguration.Modality>): Bundle = when {
         modalities.size == 1 && modalities.first() == GeneralConfiguration.Modality.FACE -> exitFormConfiguration {
-            titleRes = IDR.string.why_did_you_skip_face_capture
-            backButtonRes = IDR.string.exit_form_capture_face
+            titleRes = IDR.string.exit_form_title_face
+            backButtonRes = IDR.string.exit_form_continue_face_button
         }
 
         modalities.size == 1 && modalities.first() == GeneralConfiguration.Modality.FINGERPRINT -> exitFormConfiguration {
-            titleRes = IDR.string.why_did_you_skip_fingerprinting
-            backButtonRes = IDR.string.button_scan_prints
+            titleRes = IDR.string.exit_form_title_fingerprinting
+            backButtonRes = IDR.string.exit_form_continue_fingerprints_button
             visibleOptions = scannerOptions()
         }
 
         else -> exitFormConfiguration {
-            titleRes = IDR.string.why_did_you_skip_biometrics
-            backButtonRes = IDR.string.button_scan_prints
+            titleRes = IDR.string.exit_form_title_biometrics
+            backButtonRes = IDR.string.exit_form_continue_fingerprints_button
             visibleOptions = scannerOptions()
         }
     }.toArgs()

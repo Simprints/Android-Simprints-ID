@@ -81,7 +81,7 @@ class PrivacyNoticesFragmentTest {
 
         onView(withId(R.id.privacyDownloadButton)).check(matches(isDisplayed()))
 
-        ShadowToast.showedToast(context?.getString(IDR.string.long_consent_failed_to_download))
+        ShadowToast.showedToast(context?.getString(IDR.string.consent_privacy_notice_failed_to_download))
     }
 
     @Test

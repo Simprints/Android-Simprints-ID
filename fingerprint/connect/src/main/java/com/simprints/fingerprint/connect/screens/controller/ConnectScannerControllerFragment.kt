@@ -144,11 +144,11 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     private fun showKnownScannerDialog(scannerId: String) {
         if (knownScannedDialog == null) {
             knownScannedDialog = MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(IDR.string.scanner_id_confirmation_message, scannerId))
-                .setPositiveButton(IDR.string.scanner_confirmation_yes) { _, _ ->
+                .setTitle(getString(IDR.string.fingerprint_connect_scanner_id_confirmation_message, scannerId))
+                .setPositiveButton(IDR.string.fingerprint_connect_scanner_confirmation_yes) { _, _ ->
                     viewModel.handleScannerDisconnectedYesClick()
                 }
-                .setNegativeButton(IDR.string.scanner_confirmation_no) { _, _ ->
+                .setNegativeButton(IDR.string.fingerprint_connect_scanner_confirmation_no) { _, _ ->
                     viewModel.handleScannerDisconnectedNoClick()
                 }
                 .setCancelable(false)
@@ -201,8 +201,8 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
         findNavController().navigate(
             R.id.action_global_to_exitFormFragment,
             exitFormConfiguration {
-                titleRes = IDR.string.why_did_you_skip_fingerprinting
-                backButtonRes = IDR.string.button_scan_prints
+                titleRes = IDR.string.exit_form_title_fingerprinting
+                backButtonRes = IDR.string.exit_form_continue_fingerprints_button
                 visibleOptions = scannerOptions()
             }.toArgs()
         )

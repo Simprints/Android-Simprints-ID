@@ -58,7 +58,7 @@ class NfcPairViewModelTest {
         val errorObserver = viewModel.showToastWithStringRes.testObserver()
         viewModel.handleNfcTagDetected(mockk())
 
-        errorObserver.assertEventReceivedWithContent(R.string.nfc_pair_toast_invalid)
+        errorObserver.assertEventReceivedWithContent(R.string.fingerprint_connect_nfc_pair_toast_invalid)
         verify(exactly = 0) { scannerPairingManager.startPairingToDevice(ADDRESS) }
     }
 
@@ -71,7 +71,7 @@ class NfcPairViewModelTest {
         val errorObserver = viewModel.showToastWithStringRes.testObserver()
         viewModel.handleNfcTagDetected(mockk())
 
-        errorObserver.assertEventReceivedWithContent(R.string.nfc_pair_toast_try_again)
+        errorObserver.assertEventReceivedWithContent(R.string.fingerprint_connect_nfc_pair_toast_try_again)
     }
 
     companion object {

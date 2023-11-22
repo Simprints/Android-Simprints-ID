@@ -73,7 +73,7 @@ internal class EnrolLastBiometricFragment : Fragment(R.layout.fragment_enrol_las
     }
 
     private fun getAlertMessage(errorType: ErrorType) = when (errorType) {
-        DUPLICATE_ENROLMENTS -> IDR.string.enrol_last_biometrics_duplicate_records_alert_message
+        DUPLICATE_ENROLMENTS -> IDR.string.enrol_last_biometrics_alert_message_duplicate_records
         GENERAL_ERROR -> IDR.string.enrol_last_biometrics_alert_message
     }
 
