@@ -28,8 +28,9 @@ jobs:
                     java-version: 17
                     distribution: 'temurin'
 
-            -   name: Cache Gradle global directory
-                uses: actions/cache@v3
+            -   name: Restore gradle global directory
+                uses: actions/cache/restore@v3
+                id: cache
                 with:
                     path: ~/.gradle/
                     key: global-gradle
@@ -78,3 +79,9 @@ jobs:
                     name: "${{ inputs.reportsId }}"
                     path: "*/**/build/reports/jacoco/jacocoTestReport"
 
+            -   name: Save Gradle global directory
+                if: ${{ inputs.reportsId  == 'feature' }}
+                uses: actions/cache/save@v3
+                with:
+                    path: ~/.gradle/
+                    key: global-gradle
