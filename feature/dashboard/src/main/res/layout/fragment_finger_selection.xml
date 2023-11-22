@@ -20,7 +20,7 @@
             android:minHeight="?attr/actionBarSize"
             app:navigationContentDescription="back"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:title="@string/finger_selection_fragment_title" />
+            app:title="@string/dashboard_select_fingers_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -30,7 +30,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="@dimen/finger_selection_item_padding"
-        android:text="@string/finger_selection_finger_label"
+        android:text="@string/dashboard_select_fingers_finger_label"
         app:layout_constraintBottom_toTopOf="@id/fingerHeaderDivider"
         app:layout_constraintEnd_toStartOf="@id/quantityLabelTextView"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="@dimen/finger_selection_item_padding"
-        android:text="@string/finger_selection_quantity_label"
+        android:text="@string/dashboard_select_fingers_quantity_label"
         app:layout_constraintBottom_toTopOf="@id/fingerHeaderDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/fingerLabelTextView"

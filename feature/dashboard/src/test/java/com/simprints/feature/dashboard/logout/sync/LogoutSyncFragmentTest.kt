@@ -79,7 +79,7 @@ internal class LogoutSyncFragmentTest {
             )
         )
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -111,7 +111,7 @@ internal class LogoutSyncFragmentTest {
             )
         )
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -152,7 +152,7 @@ internal class LogoutSyncFragmentTest {
         )
 
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -179,7 +179,7 @@ internal class LogoutSyncFragmentTest {
             )
         )
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -212,7 +212,7 @@ internal class LogoutSyncFragmentTest {
         )
 
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -245,7 +245,7 @@ internal class LogoutSyncFragmentTest {
         )
 
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -273,7 +273,7 @@ internal class LogoutSyncFragmentTest {
         )
 
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -305,7 +305,7 @@ internal class LogoutSyncFragmentTest {
         )
 
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -336,7 +336,7 @@ internal class LogoutSyncFragmentTest {
         )
 
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -375,7 +375,7 @@ internal class LogoutSyncFragmentTest {
         )
 
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))
@@ -410,7 +410,7 @@ internal class LogoutSyncFragmentTest {
         )
 
         val lastSyncText = context.getString(
-            IDR.string.dashboard_card_sync_last_sync,
+            IDR.string.dashboard_sync_card_last_sync,
             LAST_SYNC_TIME
         )
         onView(withId(R.id.sync_card_last_sync))

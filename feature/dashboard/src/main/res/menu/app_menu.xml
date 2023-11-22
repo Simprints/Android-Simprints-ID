@@ -4,10 +4,10 @@
     android:id="@+id/app_menu">
     <item
         android:id="@+id/menuPrivacyNotice"
-        android:title="@string/menu_privacy_notice" />
+        android:title="@string/dashboard_menu_privacy_notice" />
     <item
         android:id="@+id/menuSettings"
-        android:title="@string/menu_settings" />
+        android:title="@string/dashboard_menu_settings" />
 
     <item
         android:id="@+id/debug"

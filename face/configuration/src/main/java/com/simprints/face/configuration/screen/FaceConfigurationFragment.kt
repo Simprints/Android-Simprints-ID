@@ -91,7 +91,7 @@ internal class FaceConfigurationFragment : Fragment(R.layout.fragment_configurat
     }
 
     private fun renderFinishedWithError(errorCode: String) {
-        val errorTitle = "${getString(IDR.string.error_configuration_error_title)} ($errorCode)"
+        val errorTitle = "${getString(IDR.string.face_configuration_generic_error_title)} ($errorCode)"
         Simber.tag(CrashReportTag.FACE_LICENSE.name).i("Error with configuration download. Error = $errorTitle")
         findNavController().navigate(
             R.id.action_global_errorFragment,

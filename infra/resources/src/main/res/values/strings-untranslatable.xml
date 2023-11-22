@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="fingerprint_connect_sp" translatable="false">SP</string>
+    <string name="fingerprint_capture_empty" translatable="false" />
+    <string name="dashboard_request_login_simprints_version" translatable="false">Simprints ID: %1$s</string>
+
+</resources>
+

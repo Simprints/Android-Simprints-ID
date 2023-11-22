@@ -10,7 +10,7 @@
         android:id="@+id/tryAgainButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/try_again_label"
+        android:text="@string/fingerprint_connect_try_again_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/otaRecoveryEndGuideline"
         app:layout_constraintStart_toStartOf="@+id/otaRecoveryStartGuideline"
@@ -30,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/otaRecoveryImageGuideline"
         app:layout_constraintVertical_weight="0.25"
-        tools:text="@string/ota_recovery_hard_reset" />
+        tools:text="@string/fingerprint_connect_ota_recovery_hard_reset" />
 
     <ImageView
         android:id="@+id/otaRecoveryImageView"
@@ -64,7 +64,7 @@
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="@string/ota_recovery_title"
+        android:text="@string/fingerprint_connect_ota_recovery_title"
         app:layout_constraintBottom_toTopOf="@id/otaRecoveryImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

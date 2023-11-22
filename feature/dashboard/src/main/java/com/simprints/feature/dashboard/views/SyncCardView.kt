@@ -166,7 +166,7 @@ internal class SyncCardView : MaterialCardView {
         } else {
             binding.syncCardLastSync.visibility = View.VISIBLE
             binding.syncCardLastSync.text = String.format(
-                resources.getString(R.string.dashboard_card_sync_last_sync),
+                resources.getString(R.string.dashboard_sync_card_last_sync),
                 lastSync
             )
         }

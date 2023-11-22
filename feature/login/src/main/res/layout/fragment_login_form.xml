@@ -23,7 +23,6 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginBottom="48dp"
-            android:contentDescription="@string/simprints_logo"
             android:src="@drawable/simprints_logo" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -81,14 +80,14 @@
             android:layout_marginTop="16dp"
             android:drawableEnd="@drawable/scan_qr"
             android:padding="8dp"
-            android:text="@string/scan_qr" />
+            android:text="@string/login_scan_qr_button" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/loginButtonSignIn"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/login" />
+            android:text="@string/login_log_in_button" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/loginErrorCard"

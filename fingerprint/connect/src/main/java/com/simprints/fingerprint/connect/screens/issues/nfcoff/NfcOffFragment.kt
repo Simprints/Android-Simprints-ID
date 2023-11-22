@@ -61,7 +61,7 @@ internal class NfcOffFragment : Fragment(R.layout.fragment_nfc_off) {
         if (handlingNfcEnabled) return
         handlingNfcEnabled = true
         binding.turnOnNfcButton.isEnabled = false
-        binding.turnOnNfcButton.text = getString(IDR.string.nfc_on)
+        binding.turnOnNfcButton.text = getString(IDR.string.fingerprint_connect_nfc_on)
         binding.turnOnNfcButton.setBackgroundColor(
             resources.getColor(
                 IDR.color.simprints_green,

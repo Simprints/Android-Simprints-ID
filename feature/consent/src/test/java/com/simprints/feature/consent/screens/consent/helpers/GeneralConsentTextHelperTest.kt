@@ -16,9 +16,9 @@ class GeneralConsentTextHelperTest {
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val modalitiesUseCaseText = String.format(
-        "%s %s %s", context.getString(R.string.biometrics_general_fingerprint),
-        context.getString(R.string.biometric_concat_modalities),
-        context.getString(R.string.biometric_general_face)
+        "%s %s %s", context.getString(R.string.consent_biometrics_general_fingerprint),
+        context.getString(R.string.consent_biometric_concat_modalities),
+        context.getString(R.string.consent_biometric_general_face)
     )
 
     companion object {
@@ -42,7 +42,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_enrol_only)
-            .format(PROGRAM_NAME, context.getString(R.string.biometrics_general_fingerprint))
+            .format(PROGRAM_NAME, context.getString(R.string.consent_biometrics_general_fingerprint))
 
         assertThat(generalConsentText).contains(expectedString)
     }
@@ -84,7 +84,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_enrol)
-            .format(PROGRAM_NAME, context.getString(R.string.biometric_general_face))
+            .format(PROGRAM_NAME, context.getString(R.string.consent_biometric_general_face))
 
         assertThat(generalConsentText).contains(expectedString)
     }
@@ -126,7 +126,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_id_verify)
-            .format(PROGRAM_NAME, context.getString(R.string.biometrics_general_fingerprint))
+            .format(PROGRAM_NAME, context.getString(R.string.consent_biometrics_general_fingerprint))
 
         assertThat(generalConsentText).contains(expectedString)
     }
@@ -148,7 +148,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_id_verify)
-            .format(PROGRAM_NAME, context.getString(R.string.biometrics_general_fingerprint))
+            .format(PROGRAM_NAME, context.getString(R.string.consent_biometrics_general_fingerprint))
 
         assertThat(generalConsentText).contains(expectedString)
     }
@@ -190,7 +190,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_share_data_no)
-            .format(context.getString(R.string.biometrics_access_fingerprint))
+            .format(context.getString(R.string.consent_biometrics_access_fingerprint))
 
         assertThat(generalConsentText).contains(expectedString)
         assertThat(generalConsentText).doesNotContain(ORGANIZATION_NAME)
@@ -212,7 +212,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_share_data_no)
-            .format(context.getString(R.string.biometrics_access_face))
+            .format(context.getString(R.string.consent_biometrics_access_face))
 
         assertThat(generalConsentText).contains(expectedString)
         assertThat(generalConsentText).doesNotContain(ORGANIZATION_NAME)
@@ -234,7 +234,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_share_data_no)
-            .format(context.getString(R.string.biometrics_access_fingerprint_face))
+            .format(context.getString(R.string.consent_biometrics_access_fingerprint_face))
 
         assertThat(generalConsentText).contains(expectedString)
         assertThat(generalConsentText).doesNotContain(ORGANIZATION_NAME)
@@ -256,7 +256,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_share_data_yes)
-            .format(ORGANIZATION_NAME, context.getString(R.string.biometrics_access_fingerprint))
+            .format(ORGANIZATION_NAME, context.getString(R.string.consent_biometrics_access_fingerprint))
 
         assertThat(generalConsentText).contains(expectedString)
     }
@@ -357,7 +357,7 @@ class GeneralConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_confirmation)
-            .format(context.getString(R.string.biometrics_general_fingerprint))
+            .format(context.getString(R.string.consent_biometrics_general_fingerprint))
 
         assertThat(generalConsentText).contains(expectedString)
     }

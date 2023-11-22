@@ -45,7 +45,7 @@
             android:layout_gravity="start"
             android:layout_marginStart="40dp"
             android:layout_marginTop="6dp"
-            android:text="@string/missing_finger" />
+            android:text="@string/fingerprint_capture_missing_finger_button" />
 
         <LinearLayout
             android:id="@+id/fingerprintIndicator"
@@ -69,7 +69,7 @@
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
             android:longClickable="true"
-            tools:text="@string/scan_label" />
+            tools:text="@string/fingerprint_capture_scan" />
 
         <View
             android:layout_width="match_parent"

@@ -9,20 +9,20 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 internal fun CaptureState.buttonTextId(isAskingRescan: Boolean): Int = when (this) {
-    is CaptureState.NotCollected -> R.string.scan_label
-    is CaptureState.Scanning -> R.string.cancel_button
-    is CaptureState.TransferringImage -> R.string.please_wait_button
+    is CaptureState.NotCollected -> R.string.fingerprint_capture_scan
+    is CaptureState.Scanning -> R.string.fingerprint_capture_cancel_button
+    is CaptureState.TransferringImage -> R.string.fingerprint_capture_please_wait
     is CaptureState.Skipped,
-    is CaptureState.NotDetected -> R.string.rescan_label
+    is CaptureState.NotDetected -> R.string.fingerprint_capture_rescan
 
     is CaptureState.Collected -> if (scanResult.isGoodScan()) {
         if (isAskingRescan) {
-            R.string.rescan_label_question
+            R.string.fingerprint_capture_rescan_question
         } else {
-            R.string.good_scan_message
+            R.string.fingerprint_capture_good_scan_message
         }
     } else {
-        R.string.rescan_label
+        R.string.fingerprint_capture_rescan
     }
 }
 
@@ -46,20 +46,20 @@ internal fun CaptureState.buttonBackgroundColour(): Int = when (this) {
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 internal fun CaptureState.resultTextId(): Int = when (this) {
-    is CaptureState.NotCollected -> R.string.empty
-    is CaptureState.Scanning -> R.string.empty
+    is CaptureState.NotCollected -> R.string.fingerprint_capture_empty
+    is CaptureState.Scanning -> R.string.fingerprint_capture_empty
     is CaptureState.TransferringImage -> if (scanResult.isGoodScan()) {
-        R.string.good_scan_message
+        R.string.fingerprint_capture_good_scan_message
     } else {
-        R.string.poor_scan_message
+        R.string.fingerprint_capture_poor_scan_message
     }
 
-    is CaptureState.Skipped -> R.string.finger_skipped_message
-    is CaptureState.NotDetected -> R.string.no_finger_detected_message
+    is CaptureState.Skipped -> R.string.fingerprint_capture_finger_skipped_message
+    is CaptureState.NotDetected -> R.string.fingerprint_capture_no_finger_detected_message
     is CaptureState.Collected -> if (scanResult.isGoodScan()) {
-        R.string.good_scan_message
+        R.string.fingerprint_capture_good_scan_message
     } else {
-        R.string.poor_scan_message
+        R.string.fingerprint_capture_poor_scan_message
     }
 }
 

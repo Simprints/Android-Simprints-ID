@@ -33,7 +33,7 @@ internal class PrivacyNoticeFragment : Fragment(R.layout.fragment_privacy) {
 
     private fun observeState() {
         viewModel.showOffline().observe(viewLifecycleOwner) {
-            showToast(IDR.string.login_no_network)
+            showToast(IDR.string.login_no_network_error)
         }
         viewModel.viewState().observe(viewLifecycleOwner) {
             when (it) {
@@ -78,7 +78,7 @@ internal class PrivacyNoticeFragment : Fragment(R.layout.fragment_privacy) {
 
     private fun setConsentNotAvailable() {
         setNoPrivacyNoticeFound()
-        showToast(IDR.string.long_consent_failed_to_download)
+        showToast(IDR.string.consent_privacy_notice_failed_to_download)
     }
 
     private fun setBackendMaintenance(estimatedOutage: String?) = with(binding) {

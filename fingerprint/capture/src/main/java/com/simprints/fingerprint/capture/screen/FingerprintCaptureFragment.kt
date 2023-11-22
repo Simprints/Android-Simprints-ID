@@ -115,8 +115,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         findNavController().navigate(
             R.id.action_fingerprintCaptureFragment_to_graphExitForm,
             exitFormConfiguration {
-                titleRes = com.simprints.infra.resources.R.string.why_did_you_skip_fingerprinting
-                backButtonRes = com.simprints.infra.resources.R.string.button_scan_prints
+                titleRes = com.simprints.infra.resources.R.string.exit_form_title_fingerprinting
+                backButtonRes = com.simprints.infra.resources.R.string.exit_form_continue_fingerprints_button
                 visibleOptions = scannerOptions()
             }.toArgs()
         )
@@ -124,9 +124,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
 
     private fun initToolbar(flowType: FlowType) {
         binding.toolbar.title = when (flowType) {
-            FlowType.ENROL -> getString(IDR.string.register_title)
-            FlowType.IDENTIFY -> getString(IDR.string.identify_title)
-            FlowType.VERIFY -> getString(IDR.string.verify_title)
+            FlowType.ENROL -> getString(IDR.string.fingerprint_capture_enrol_title)
+            FlowType.IDENTIFY -> getString(IDR.string.fingerprint_capture_identify_title)
+            FlowType.VERIFY -> getString(IDR.string.fingerprint_capture_verify_title)
         }
     }
 
@@ -178,15 +178,15 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         vm.vibrate.observe(viewLifecycleOwner, LiveDataEventObserver { Vibrate.vibrate(requireContext()) })
 
         vm.noFingersScannedToast.observe(viewLifecycleOwner, LiveDataEventObserver {
-            requireContext().showToast(IDR.string.no_fingers_scanned)
+            requireContext().showToast(IDR.string.fingerprint_capture_no_fingers_scanned)
         })
 
         vm.launchAlert.observe(viewLifecycleOwner, LiveDataEventObserver {
             findNavController().navigate(
                 R.id.action_fingerprintCaptureFragment_to_graphAlert,
                 alertConfiguration {
-                    titleRes = IDR.string.error_occurred_title
-                    messageRes = IDR.string.unforeseen_error_message
+                    titleRes = IDR.string.fingerprint_capture_error_title
+                    messageRes = IDR.string.fingerprint_capture_unexpected_error_message
                     color = AlertColor.Red
                     image = IDR.drawable.ic_alert_default
                     eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR

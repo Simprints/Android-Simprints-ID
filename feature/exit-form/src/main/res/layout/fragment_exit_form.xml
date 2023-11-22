@@ -21,7 +21,7 @@
             style="@style/Text.Headline5.White.Bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/why_did_you_skip_biometrics"
+            android:text="@string/exit_form_title_biometrics"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -41,35 +41,35 @@
                 style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_religious_concerns" />
+                android:text="@string/exit_form_reason_religious_concerns" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioDataConcerns"
                 style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_data_concerns" />
+                android:text="@string/exit_form_reason_data_concerns" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioNoPermission"
                 style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_does_not_have_permission" />
+                android:text="@string/exit_form_reason_does_not_have_permission" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioAppNotWorking"
                 style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_app_not_working" />
+                android:text="@string/exit_form_reason_app_not_working" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioScannerNotWorking"
                 style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_scanner_not_working"
+                android:text="@string/exit_form_reason_scanner_not_working"
                 android:visibility="gone" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
@@ -77,21 +77,21 @@
                 style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_person_not_present" />
+                android:text="@string/exit_form_reason_person_not_present" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioTooYoung"
                 style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_too_young" />
+                android:text="@string/exit_form_reason_too_young" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/exitFormRadioOther"
                 style="@style/Widget.Simprints.RadioButton.White"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_other" />
+                android:text="@string/exit_form_reason_other" />
         </RadioGroup>
 
         <com.google.android.material.textfield.TextInputEditText
@@ -103,7 +103,7 @@
             android:background="@drawable/text_box_background"
             android:enabled="false"
             android:gravity="top|start"
-            android:hint="@string/hint_other_reason"
+            android:hint="@string/exit_form_other_reason_hint"
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:maxLength="100"
@@ -135,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:text="@string/exit_form_return_to_simprints" />
+                android:text="@string/exit_form_continue_default_button" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/exitFormSubmit"
@@ -144,7 +144,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:enabled="false"
-                android:text="@string/button_submit"
+                android:text="@string/exit_form_submit_button"
                 tools:enabled="true" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
