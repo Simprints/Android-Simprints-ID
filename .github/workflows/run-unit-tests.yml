@@ -32,14 +32,12 @@ jobs:
                 uses: actions/cache/restore@v3
                 id: cache
                 with:
-                    path: ~/.gradle/
-                    key: global-gradle
+                    path: |
+                        ~/.gradle/
+                        .gradle/
 
-            -   name: Cache Gradle project directory
-                uses: actions/cache@v3
-                with:
-                    path: .gradle/
-                    key: ${{ inputs.reportsId }}-project-gradle
+                    key: global-gradle-
+                    restore-keys: global-gradle-
 
 
             -   name: Set up local.properties
@@ -78,10 +76,3 @@ jobs:
                 with:
                     name: "${{ inputs.reportsId }}"
                     path: "*/**/build/reports/jacoco/jacocoTestReport"
-
-            -   name: Save Gradle global directory
-                if: ${{ inputs.reportsId  == 'feature' }}
-                uses: actions/cache/save@v3
-                with:
-                    path: ~/.gradle/
-                    key: global-gradle

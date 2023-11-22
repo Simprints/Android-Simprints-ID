@@ -18,17 +18,15 @@ jobs:
                     java-version: 17
                     distribution: 'temurin'
 
-            -   name: Cache Gradle global directory
-                uses: actions/cache@v3
+            -   name: Restore gradle global directory
+                uses: actions/cache/restore@v3
+                id: cache
                 with:
-                    path: ~/.gradle/
-                    key: global-gradle
-
-            -   name: Cache Gradle project directory
-                uses: actions/cache@v3
-                with:
-                    path: .gradle/
-                    key: ${{ inputs.reportsId }}-project-gradle
+                    path: |
+                        ~/.gradle/
+                        .gradle/
+                    key: global-gradle-
+                    restore-keys: global-gradle-
 
             -   name: Set up local.properties
                 run: |
