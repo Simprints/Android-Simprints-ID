@@ -17,14 +17,18 @@ jobs:
                 with:
                     java-version: 17
                     distribution: 'temurin'
-                    cache: 'gradle'
 
-            -   name: Cache sonarqube
+            -   name: Cache Gradle global directory
                 uses: actions/cache@v3
                 with:
-                    path: ~/.sonar/cache
-                    key: ${{ runner.os }}-sonar
-                    restore-keys: ${{ runner.os }}-sonar
+                    path: ~/.gradle/
+                    key: global-gradle
+
+            -   name: Cache Gradle project directory
+                uses: actions/cache@v3
+                with:
+                    path: .gradle/
+                    key: ${{ inputs.reportsId }}-project-gradle
 
             -   name: Set up local.properties
                 run: |

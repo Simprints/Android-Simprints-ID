@@ -27,7 +27,18 @@ jobs:
                 with:
                     java-version: 17
                     distribution: 'temurin'
-                    cache: 'gradle'
+
+            -   name: Cache Gradle global directory
+                uses: actions/cache@v3
+                with:
+                    path: ~/.gradle/
+                    key: global-gradle
+
+            -   name: Cache Gradle project directory
+                uses: actions/cache@v3
+                with:
+                    path: .gradle/
+                    key: ${{ inputs.reportsId }}-project-gradle
 
 
             -   name: Set up local.properties
@@ -45,7 +56,7 @@ jobs:
                     # output the array in the step output so that it can be used in the next step
                     echo "modules_array=${modules_array[@]}">> $GITHUB_OUTPUT
             -   name: Run tests
-                run: |                    
+                run: |
                     # Get the modules array from the previous step
                     modules_array=("${{ steps.create-modules-array.outputs.modules_array}}")
                     modules_array=(${modules_array// / })
