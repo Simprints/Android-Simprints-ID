@@ -75,10 +75,6 @@ Following the guidelines above the end goal of SID should look roughly like:
 
 Clone with `git clone https://github.com/Simprints/Android-Simprints-ID.git`
 
-Ensure the Gradle Offline Mode is disabled:
-
-![Disable Gradle Offline Mode](./img/disable-gradle-offline-mode.jpg)
-
 Generate a new Github token at <https://github.com/settings/tokens/new>, which generates a "Classic" token. The only scope needed is `read:packages`. Then add it to the `local.properties` file:
 
 ```properties
