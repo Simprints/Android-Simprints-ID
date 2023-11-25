@@ -46,7 +46,8 @@ jobs:
                     rsync -arv test-reports/core/* .  || true
                     rsync -arv test-reports/infra1/* .  || true
                     rsync -arv test-reports/infra2/* .  || true
-                    rsync -arv test-reports/feature/* .  || true
+                    rsync -arv test-reports/feature1/* .  || true
+                    rsync -arv test-reports/feature2/* .  || true
                     rsync -arv test-reports/dashboard/* .  || true
                     rsync -arv test-reports/face/* .  || true
                     rsync -arv test-reports/fingerprint/* .  || true
