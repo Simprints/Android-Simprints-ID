@@ -14,6 +14,7 @@ import com.simprints.feature.dashboard.databinding.FragmentLogoutSyncDeclineBind
 import com.simprints.feature.dashboard.logout.LogoutSyncViewModel
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
 class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline) {
@@ -27,11 +28,11 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
 
     private val confirmationDialogForLogout: AlertDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(com.simprints.infra.resources.R.string.confirmation_logout_title))
-            .setMessage(getString(com.simprints.infra.resources.R.string.confirmation_logout_message))
-            .setPositiveButton(getString(com.simprints.infra.resources.R.string.logout)) { _, _ -> processLogoutConfirmation() }
+            .setTitle(getString(IDR.string.dashboard_logout_confirmation_title))
+            .setMessage(getString(IDR.string.dashboard_logout_confirmation_message))
+            .setPositiveButton(getString(IDR.string.dashboard_logout_confirmation_log_out_button)) { _, _ -> processLogoutConfirmation() }
             .setNegativeButton(
-                getString(com.simprints.infra.resources.R.string.confirmation_logout_cancel), null
+                getString(IDR.string.dashboard_logout_confirmation_cancel_button), null
             ).create()
     }
 
@@ -49,7 +50,7 @@ class LogoutSyncDeclineFragment : Fragment(R.layout.fragment_logout_sync_decline
                     val password = config.getNullablePassword()
                     if (password != null) {
                         SettingsPasswordDialogFragment(
-                            title = com.simprints.infra.resources.R.string.password_lock_title_logout,
+                            title = IDR.string.dashboard_password_lock_title_logout,
                             passwordToMatch = password,
                             onSuccess = { processLogoutConfirmation() }
                         ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)

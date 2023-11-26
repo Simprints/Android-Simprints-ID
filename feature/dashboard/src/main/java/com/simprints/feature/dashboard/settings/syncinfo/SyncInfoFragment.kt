@@ -101,8 +101,8 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
 
     private fun updateSyncButton(isSyncInProgress: Boolean) {
         binding.syncButton.text = getString(
-            if (isSyncInProgress) IDR.string.sync_info_sync_in_progress
-            else IDR.string.sync_info_sync_now
+            if (isSyncInProgress) IDR.string.dashboard_sync_info_sync_in_progress
+            else IDR.string.dashboard_sync_info_sync_now_button
         )
     }
 
@@ -144,7 +144,7 @@ internal class SyncInfoFragment : Fragment(R.layout.fragment_sync_info) {
         }
 
         val totalRecordsEntry = ModuleCount(
-            getString(IDR.string.sync_info_total_records),
+            getString(IDR.string.dashboard_sync_info_total_records),
             moduleCounts.sumOf { it.count }
         )
         moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)

@@ -40,7 +40,7 @@ internal class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
             binding.couldNotConnectTextView.paintFlags =
                 binding.couldNotConnectTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
-            binding.couldNotConnectTextView.text = getString(IDR.string.not_my_scanner, it)
+            binding.couldNotConnectTextView.text = getString(IDR.string.fingerprint_connect_not_my_scanner, it)
             binding.couldNotConnectTextView.setOnClickListener { connectScannerViewModel.handleIncorrectScanner() }
             binding.couldNotConnectTextView.visibility = View.VISIBLE
         }
@@ -73,7 +73,7 @@ internal class ScannerOffFragment : Fragment(R.layout.fragment_scanner_off) {
             couldNotConnectTextView.visibility = View.INVISIBLE
             tryAgainButton.visibility = View.VISIBLE
             tryAgainButton.isEnabled = false
-            tryAgainButton.text = getString(IDR.string.scanner_on)
+            tryAgainButton.text = getString(IDR.string.fingerprint_connect_scanner_on)
             tryAgainButton.setBackgroundColor(resources.getColor(IDR.color.simprints_green, null))
         }
 

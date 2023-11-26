@@ -17,7 +17,7 @@
             android:layout_height="?android:attr/actionBarSize"
             app:navigationContentDescription="back"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:title="@string/preference_select_modules_title" />
+            app:title="@string/dashboard_preference_select_modules_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_large"
-        android:text="@string/selected_modules"
+        android:text="@string/dashboard_select_modules_selected"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
@@ -59,7 +59,7 @@
         style="@style/Text.Body1.Secondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/no_modules_selected"
+        android:text="@string/dashboard_select_modules_no_modules_selected"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -101,7 +101,7 @@
             android:id="@+id/searchViewInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_search_modules"
+            android:hint="@string/dashboard_select_modules_search_hint"
             tools:text="Module A" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -135,7 +135,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_huge"
-        android:text="@string/no_results"
+        android:text="@string/dashboard_select_modules_no_results"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -162,7 +162,7 @@
             android:layout_gravity="center"
             android:drawablePadding="16dp"
             android:padding="24dp"
-            android:text="@string/password_lock_overlay_title"
+            android:text="@string/dashboard_password_lock_overlay_title"
             app:drawableTopCompat="@drawable/ic_overlay_lock" />
     </FrameLayout>
 

@@ -39,10 +39,10 @@ internal class AboutFragment : PreferenceFragmentCompat() {
 
     private val confirmationDialogForLogout: AlertDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(IDR.string.confirmation_logout_title))
-            .setMessage(getString(IDR.string.confirmation_logout_message))
-            .setPositiveButton(getString(IDR.string.logout)) { _, _ -> viewModel.processLogoutRequest() }
-            .setNegativeButton(getString(IDR.string.confirmation_logout_cancel), null)
+            .setTitle(getString(IDR.string.dashboard_logout_confirmation_title))
+            .setMessage(getString(IDR.string.dashboard_logout_confirmation_message))
+            .setPositiveButton(getString(IDR.string.dashboard_logout_confirmation_log_out_button)) { _, _ -> viewModel.processLogoutRequest() }
+            .setNegativeButton(getString(IDR.string.dashboard_logout_confirmation_cancel_button), null)
             .create()
     }
 
@@ -97,7 +97,7 @@ internal class AboutFragment : PreferenceFragmentCompat() {
                 val password = viewModel.settingsLocked.value?.getNullablePassword()
                 if (password != null) {
                     SettingsPasswordDialogFragment(
-                        title = IDR.string.password_lock_title_logout,
+                        title = IDR.string.dashboard_password_lock_title_logout,
                         passwordToMatch = password,
                         onSuccess = { viewModel.processLogoutRequest() }
                     ).show(childFragmentManager, SettingsPasswordDialogFragment.TAG)

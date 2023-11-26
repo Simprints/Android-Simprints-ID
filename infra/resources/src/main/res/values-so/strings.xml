@@ -14,7 +14,7 @@
     <string name="consent_confirmation">Ma kaa qaadi karaa karaa faraha? Fadlan dheh \"Waan ogolahay\", \"Ma rabo\", ama \"Su\'aal baan qabaa\".</string>
     <string name="consent_parental_confirmation">Ma ka qaadi karaa faraha ilmahaaga? Fadlan dheh \"Waan ogolahay\", \"Ma rabo\", ama \"Su\'aal baan qabaa\".</string>
 
-    <string name="launch_consent_decline_button">Diidid</string>
-    <string name="launch_consent_accept_button">Aqbalo</string>
+    <string name="consent_decline_button">Diidid</string>
+    <string name="consent_accept_button">Aqbalo</string>
 
 </resources>

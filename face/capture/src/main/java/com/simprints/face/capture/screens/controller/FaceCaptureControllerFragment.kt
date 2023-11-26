@@ -53,8 +53,8 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             findNavController().navigate(
                 R.id.action_global_refusalFragment,
                 exitFormConfiguration {
-                    titleRes = IDR.string.why_did_you_skip_face_capture
-                    backButtonRes = IDR.string.exit_form_return_to_face_capture
+                    titleRes = IDR.string.exit_form_title_face
+                    backButtonRes = IDR.string.exit_form_continue_face_button
                 }.toArgs()
             )
         })

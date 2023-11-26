@@ -47,7 +47,7 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
             },
             null
         ))
-        binding.alertTitle.setTextWithFallbacks(config.title, config.titleRes, IDR.string.alert_title)
+        binding.alertTitle.setTextWithFallbacks(config.title, config.titleRes, IDR.string.alert_title_fallback)
 
         binding.alertImage.setImageResource(config.image)
         binding.alertMessage.setTextWithFallbacks(config.message, config.messageRes)

@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="@string/title_confirmation"
+        android:text="@string/face_capture_confirmation_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -35,7 +35,7 @@
         android:layout_marginEnd="16dp"
         android:drawablePadding="16dp"
         android:gravity="start"
-        android:text="@string/captured_successfully"
+        android:text="@string/face_capture_successfully_title"
         app:drawableStartCompat="@drawable/ic_checked_green_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +49,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/btn_recapture"
+        android:text="@string/face_capture_recapture_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/confirmation_btn"
         app:layout_constraintStart_toStartOf="parent" />
@@ -60,7 +60,7 @@
         android:layout_height="56dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/btn_finish"
+        android:text="@string/face_capture_finish_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/recapture_btn" />

@@ -56,20 +56,20 @@ internal fun FingerState.nameTextColour(): Int = IDR.color.simprints_blue
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @Suppress("unused")
 @StringRes
-internal fun FingerState.captureNumberTextId(): Int = IDR.string.capture_number_text
+internal fun FingerState.captureNumberTextId(): Int = IDR.string.fingerprint_capture_capture_number_text
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 internal fun FingerState.directionTextId(isLastFinger: Boolean): Int = when (val currentCapture = this.currentCapture()) {
-    is CaptureState.NotCollected -> if (currentCaptureIndex == 0) IDR.string.please_scan else IDR.string.please_scan_again
-    is CaptureState.Scanning -> IDR.string.scanning
-    is CaptureState.TransferringImage -> IDR.string.transfering_data
-    is CaptureState.Skipped -> IDR.string.good_scan_direction
-    is CaptureState.NotDetected -> IDR.string.poor_scan_direction
+    is CaptureState.NotCollected -> if (currentCaptureIndex == 0) IDR.string.fingerprint_capture_please_scan else IDR.string.fingerprint_capture_please_scan_again
+    is CaptureState.Scanning -> IDR.string.fingerprint_capture_scanning
+    is CaptureState.TransferringImage -> IDR.string.fingerprint_capture_transfering_data
+    is CaptureState.Skipped -> IDR.string.fingerprint_capture_good_scan_direction
+    is CaptureState.NotDetected -> IDR.string.fingerprint_capture_poor_scan_direction
     is CaptureState.Collected -> if (currentCapture.scanResult.isGoodScan()) {
-        if (isLastFinger || currentCaptureIndex + 1 < captures.size) IDR.string.empty else IDR.string.good_scan_direction
+        if (isLastFinger || currentCaptureIndex + 1 < captures.size) IDR.string.fingerprint_capture_empty else IDR.string.fingerprint_capture_good_scan_direction
     } else {
-        IDR.string.poor_scan_direction
+        IDR.string.fingerprint_capture_poor_scan_direction
     }
 }
 

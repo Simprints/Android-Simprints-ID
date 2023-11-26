@@ -100,7 +100,7 @@ class ModuleSelectionFragmentTest {
 
         onView(allOf(withParent(withId(R.id.rvModules)), withParentIndex(0))).perform(click())
 
-        ShadowToast.showedToast(context?.getString(IDR.string.settings_too_many_modules_toast, 2))
+        ShadowToast.showedToast(context?.getString(IDR.string.dashboard_select_modules_too_many_modules, 2))
     }
 
     @Test
@@ -125,7 +125,7 @@ class ModuleSelectionFragmentTest {
             clickCloseChipIcon()
         )
 
-        ShadowToast.showedToast(context?.getString(IDR.string.settings_no_modules_toast))
+        ShadowToast.showedToast(context?.getString(IDR.string.dashboard_select_modules_no_modules))
     }
 
     @Test

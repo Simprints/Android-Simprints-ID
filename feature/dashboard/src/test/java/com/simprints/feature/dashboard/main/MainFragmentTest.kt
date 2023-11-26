@@ -80,7 +80,7 @@ class MainFragmentTest {
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
         openContextualActionModeOverflowMenu()
-        onView(withText(IDR.string.menu_settings)).perform(click())
+        onView(withText(IDR.string.dashboard_menu_settings)).perform(click())
         assertThat(navController.currentDestination?.id).isEqualTo(R.id.settingsFragment)
     }
 
@@ -93,7 +93,7 @@ class MainFragmentTest {
         launchFragmentInHiltContainer<MainFragment>(navController = navController)
 
         openContextualActionModeOverflowMenu()
-        onView(withText(IDR.string.menu_privacy_notice)).perform(click())
+        onView(withText(IDR.string.dashboard_menu_privacy_notice)).perform(click())
         assertThat(navController.currentDestination?.id).isEqualTo(PrivacyR.id.privacyNoticeFragment)
     }
 

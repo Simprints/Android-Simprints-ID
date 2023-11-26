@@ -19,7 +19,7 @@
     <string name="consent_confirmation">Kodi ndinga gwiritse nchito chizindikilo cha chala chanu? Nenani \"Ndibvomela\", \"Ai\", kapena \"Ndili ndi mafunso\".</string>
     <string name="consent_parental_confirmation">Kodi ndinga gwiritse nchito chizindikilo cha chala chamwanayu? Nenani \"Ndibvomela\", \"Ai\", kapena \"Ndili ndi mafunso\".</string>
 
-    <string name="launch_consent_decline_button">Kukana</string>
-    <string name="launch_consent_accept_button">Kubvomera</string>
+    <string name="consent_decline_button">Kukana</string>
+    <string name="consent_accept_button">Kubvomera</string>
 
 </resources>

@@ -26,16 +26,16 @@ internal fun IFingerIdentifier.fingerDrawable(): Int = when (this) {
 @ExcludedFromGeneratedTestCoverageReports("UI code")
 @StringRes
 internal fun IFingerIdentifier.nameTextId(): Int = when (this) {
-    IFingerIdentifier.RIGHT_5TH_FINGER -> IDR.string.r_5_finger_name
-    IFingerIdentifier.RIGHT_4TH_FINGER -> IDR.string.r_4_finger_name
-    IFingerIdentifier.RIGHT_3RD_FINGER -> IDR.string.r_3_finger_name
-    IFingerIdentifier.RIGHT_INDEX_FINGER -> IDR.string.r_2_finger_name
-    IFingerIdentifier.RIGHT_THUMB -> IDR.string.r_1_finger_name
-    IFingerIdentifier.LEFT_THUMB -> IDR.string.l_1_finger_name
-    IFingerIdentifier.LEFT_INDEX_FINGER -> IDR.string.l_2_finger_name
-    IFingerIdentifier.LEFT_3RD_FINGER -> IDR.string.l_3_finger_name
-    IFingerIdentifier.LEFT_4TH_FINGER -> IDR.string.l_4_finger_name
-    IFingerIdentifier.LEFT_5TH_FINGER -> IDR.string.l_5_finger_name
+    IFingerIdentifier.RIGHT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_r_5
+    IFingerIdentifier.RIGHT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_r_4
+    IFingerIdentifier.RIGHT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_r_3
+    IFingerIdentifier.RIGHT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_r_2
+    IFingerIdentifier.RIGHT_THUMB -> IDR.string.fingerprint_capture_finger_r_1
+    IFingerIdentifier.LEFT_THUMB -> IDR.string.fingerprint_capture_finger_l_1
+    IFingerIdentifier.LEFT_INDEX_FINGER -> IDR.string.fingerprint_capture_finger_l_2
+    IFingerIdentifier.LEFT_3RD_FINGER -> IDR.string.fingerprint_capture_finger_l_3
+    IFingerIdentifier.LEFT_4TH_FINGER -> IDR.string.fingerprint_capture_finger_l_4
+    IFingerIdentifier.LEFT_5TH_FINGER -> IDR.string.fingerprint_capture_finger_l_5
 }
 
 @ExcludedFromGeneratedTestCoverageReports("UI code")

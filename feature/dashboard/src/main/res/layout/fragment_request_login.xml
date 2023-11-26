@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="43dp"
-            android:text="@string/libsimprints_label"
+            android:text="@string/dashboard_request_login_libsimprints_label"
             android:textColor="@color/simprints_white" />
 
         <TextView
@@ -52,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:gravity="center"
-            android:text="@string/requestLogin_message"
+            android:text="@string/dashboard_request_login_message"
             android:textColor="@color/simprints_white" />
 
         <TextView
