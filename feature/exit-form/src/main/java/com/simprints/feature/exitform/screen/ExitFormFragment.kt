@@ -40,12 +40,12 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
         binding.exitFormTitle.setTextWithFallbacks(
             rawText = config.title,
             textFallback = config.titleRes,
-            default = IDR.string.why_did_you_skip_biometrics,
+            default = IDR.string.exit_form_title_biometrics,
         )
         binding.exitFormGoBack.setTextWithFallbacks(
             rawText = config.backButton,
             textFallback = config.backButtonRes,
-            default = IDR.string.exit_form_return_to_simprints,
+            default = IDR.string.exit_form_continue_default_button,
         )
 
         setLayoutChangeListener()
@@ -107,10 +107,10 @@ internal class ExitFormFragment : Fragment(R.layout.fragment_exit_form) {
             setFocusOnExitReasonAndDisableSubmit()
         }
         viewModel.requestSelectOptionEvent.observe(viewLifecycleOwner) {
-            requireContext().showToast(IDR.string.refusal_toast_select_option_submit)
+            requireContext().showToast(IDR.string.exit_form_select_option_submit_warning)
         }
         viewModel.requestFormSubmitEvent.observe(viewLifecycleOwner) {
-            requireContext().showToast(IDR.string.refusal_toast_submit)
+            requireContext().showToast(IDR.string.exit_form_submit_warning)
         }
         viewModel.submitEnabled.observe(viewLifecycleOwner) {
             binding.exitFormSubmit.isEnabled = true == it

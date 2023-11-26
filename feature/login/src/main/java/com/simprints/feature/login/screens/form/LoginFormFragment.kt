@@ -114,15 +114,15 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
         when (result) {
             // Showing toast
-            MissingCredential -> showToast(IDR.string.login_missing_credentials)
-            BadCredentials -> showToast(IDR.string.login_invalid_credentials)
-            ProjectIdMismatch -> showToast(IDR.string.login_project_id_intent_mismatch)
-            Offline -> showToast(IDR.string.login_no_network)
-            IntegrityServiceTemporaryDown -> showToast(IDR.string.integrity_service_down)
+            MissingCredential -> showToast(IDR.string.login_missing_credentials_error)
+            BadCredentials -> showToast(IDR.string.login_invalid_credentials_error)
+            ProjectIdMismatch -> showToast(IDR.string.login_project_id_intent_mismatch_error)
+            Offline -> showToast(IDR.string.login_no_network_error)
+            IntegrityServiceTemporaryDown -> showToast(IDR.string.login_integrity_service_down_error)
             TechnicalFailure -> showToast(IDR.string.login_server_error)
             QrCameraUnavailable -> showToast(IDR.string.login_qr_code_scanning_camera_unavailable_error)
-            QrGenericError -> showToast(IDR.string.login_qr_code_scanning_problem)
-            QrInvalidCode -> showToast(IDR.string.login_invalid_qr_code)
+            QrGenericError -> showToast(IDR.string.login_qr_code_scanning_problem_error)
+            QrInvalidCode -> showToast(IDR.string.login_invalid_qr_code_error)
             QrNoCameraPermission -> showToast(IDR.string.login_qr_code_scanning_camera_permission_error)
 
             // Showing error card

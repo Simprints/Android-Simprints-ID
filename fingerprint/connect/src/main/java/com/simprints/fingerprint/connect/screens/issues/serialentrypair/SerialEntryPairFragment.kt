@@ -17,7 +17,6 @@ import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.fingerprint.connect.R
 import com.simprints.fingerprint.connect.databinding.FragmentSerialEntryPairBinding
 import com.simprints.fingerprint.connect.screens.ConnectScannerViewModel
-import com.simprints.fingerprint.connect.screens.issues.bluetoothoff.BluetoothOffFragmentDirections
 import com.simprints.fingerprint.connect.usecase.ReportAlertScreenEventUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerPairingManager
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothDevice
@@ -128,7 +127,7 @@ internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry
             )
             viewModel.startPairing(serialNumber)
         } catch (e: NumberFormatException) {
-            context?.showToast(IDR.string.serial_entry_pair_toast_invalid)
+            context?.showToast(IDR.string.fingerprint_connect_serial_entry_pair_toast_invalid)
         }
     }
 
@@ -153,10 +152,10 @@ internal class SerialEntryPairFragment : Fragment(R.layout.fragment_serial_entry
             binding.serialEntryOkButton.visibility = View.VISIBLE
             binding.serialEntryPairInstructionsDetailTextView.visibility = View.INVISIBLE
             binding.serialEntryPairInstructionsTextView.text = if (pairingRejected) {
-                getString(IDR.string.serial_entry_pair_rejected)
+                getString(IDR.string.fingerprint_connect_serial_entry_pair_rejected)
             } else {
                 getString(
-                    IDR.string.serial_entry_pair_failed,
+                    IDR.string.fingerprint_connect_serial_entry_pair_failed,
                     serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
                 )
             }

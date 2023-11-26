@@ -56,7 +56,7 @@ class LiveFeedbackFragmentTest {
         onView(
             allOf(
                 withId(R.id.capture_feedback_txt_title),
-                withText(IDR.string.capture_title_previewing)
+                withText(IDR.string.face_capture_title_previewing)
             )
         )
             .check(matches(isDisplayed()))

@@ -19,7 +19,7 @@ internal class AlertConfigurationMapper @Inject constructor() {
 
     fun buildAlertConfig(clientApiError: ClientApiError): AlertConfigurationBuilder = alertConfiguration {
         color = AlertColor.Yellow
-        titleRes = IDR.string.configuration_error_title
+        titleRes = IDR.string.orchestrator_configuration_error_title
         image = IDR.drawable.ic_alert_default
         messageRes = getMessage(clientApiError)
         eventType = getEventType(clientApiError)
@@ -32,14 +32,14 @@ internal class AlertConfigurationMapper @Inject constructor() {
     }
 
     private fun getMessage(clientApiError: ClientApiError) = when (clientApiError) {
-        ClientApiError.INVALID_STATE_FOR_INTENT_ACTION -> IDR.string.invalid_intentAction_message
-        ClientApiError.INVALID_METADATA -> IDR.string.invalid_metadata_message
-        ClientApiError.INVALID_MODULE_ID -> IDR.string.invalid_moduleId_message
-        ClientApiError.INVALID_PROJECT_ID -> IDR.string.invalid_projectId_message
-        ClientApiError.INVALID_SELECTED_ID -> IDR.string.invalid_selectedId_message
-        ClientApiError.INVALID_SESSION_ID -> IDR.string.invalid_sessionId_message
-        ClientApiError.INVALID_USER_ID -> IDR.string.invalid_userId_message
-        ClientApiError.INVALID_VERIFY_ID -> IDR.string.invalid_verifyId_message
+        ClientApiError.INVALID_STATE_FOR_INTENT_ACTION -> IDR.string.orcehstrator_invalid_action_error_message
+        ClientApiError.INVALID_METADATA -> IDR.string.orchestrator_invalid_metadata_error_message
+        ClientApiError.INVALID_MODULE_ID -> IDR.string.orchestrator_invalid_module_id_error_message
+        ClientApiError.INVALID_PROJECT_ID -> IDR.string.orchestrator_invalid_project_id_error_message
+        ClientApiError.INVALID_SELECTED_ID -> IDR.string.orchestrator_invalid_selected_id_error_message
+        ClientApiError.INVALID_SESSION_ID -> IDR.string.orchestrator_invalid_session_id_error_message
+        ClientApiError.INVALID_USER_ID -> IDR.string.orchestrator_invalid_user_id_error_message
+        ClientApiError.INVALID_VERIFY_ID -> IDR.string.orchestrator_invalid_verify_id_error_message
     }
 
 
@@ -70,27 +70,27 @@ internal class AlertConfigurationMapper @Inject constructor() {
     }
 
     private fun getTitle(loginCheckError: LoginCheckError) = when (loginCheckError) {
-        LoginCheckError.PROJECT_PAUSED -> IDR.string.project_paused_title
-        LoginCheckError.PROJECT_ENDING -> IDR.string.project_ending_title
-        LoginCheckError.ROOTED_DEVICE -> IDR.string.rooted_device_title
-        LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES -> IDR.string.missing_google_play_services_alert_title
-        LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED -> IDR.string.outdated_google_play_services_alert_title
-        LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> IDR.string.missing_or_outdated_google_play_store_app_alert_title
-        LoginCheckError.INTEGRITY_SERVICE_ERROR -> IDR.string.error_occurred_title
-        LoginCheckError.UNEXPECTED_LOGIN_ERROR -> IDR.string.error_occurred_title
-        LoginCheckError.DIFFERENT_PROJECT_ID -> IDR.string.configuration_error_title
+        LoginCheckError.PROJECT_PAUSED -> IDR.string.orchestrator_project_paused_title
+        LoginCheckError.PROJECT_ENDING -> IDR.string.orchestrator_project_ending_title
+        LoginCheckError.ROOTED_DEVICE -> IDR.string.orchestrator_rooted_device_error_title
+        LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES -> IDR.string.orchestrator_missing_google_play_services_alert_title
+        LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED -> IDR.string.orchestrator_outdated_google_play_services_alert_title
+        LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> IDR.string.orchestrator_missing_or_outdated_google_play_store_app_alert_title
+        LoginCheckError.INTEGRITY_SERVICE_ERROR -> IDR.string.orchestrator_generic_error_title
+        LoginCheckError.UNEXPECTED_LOGIN_ERROR -> IDR.string.orchestrator_generic_error_title
+        LoginCheckError.DIFFERENT_PROJECT_ID -> IDR.string.orchestrator_configuration_error_title
     }
 
     private fun getMessage(loginCheckError: LoginCheckError) = when (loginCheckError) {
-        LoginCheckError.DIFFERENT_PROJECT_ID -> IDR.string.different_projectId_message
-        LoginCheckError.PROJECT_PAUSED -> IDR.string.project_paused_body
-        LoginCheckError.PROJECT_ENDING -> IDR.string.project_ending_body
-        LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES -> IDR.string.missing_google_play_services_alert_message
-        LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED -> IDR.string.outdated_google_play_services_alert_message
-        LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> IDR.string.missing_or_outdated_google_play_store_app_alert_message
-        LoginCheckError.INTEGRITY_SERVICE_ERROR -> IDR.string.unforeseen_error_message
-        LoginCheckError.UNEXPECTED_LOGIN_ERROR -> IDR.string.unforeseen_error_message
-        LoginCheckError.ROOTED_DEVICE -> IDR.string.rooted_device_message
+        LoginCheckError.DIFFERENT_PROJECT_ID -> IDR.string.orchestrator_project_id_error_message
+        LoginCheckError.PROJECT_PAUSED -> IDR.string.orchestrator_project_paused_body
+        LoginCheckError.PROJECT_ENDING -> IDR.string.orchestrator_project_ending_body
+        LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES -> IDR.string.orchestrator_missing_google_play_services_alert_message
+        LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED -> IDR.string.orchestrator_outdated_google_play_services_alert_message
+        LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP -> IDR.string.orchestrator_missing_or_outdated_google_play_store_app_alert_message
+        LoginCheckError.INTEGRITY_SERVICE_ERROR -> IDR.string.orchestrator_unexpected_error_message
+        LoginCheckError.UNEXPECTED_LOGIN_ERROR -> IDR.string.orchestrator_unexpected_error_message
+        LoginCheckError.ROOTED_DEVICE -> IDR.string.orcehstrator_rooted_device_error_message
     }
 
     private fun getMessageIcon(clientApiError: LoginCheckError) = when (clientApiError) {

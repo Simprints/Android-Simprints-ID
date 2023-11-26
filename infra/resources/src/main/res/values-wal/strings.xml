@@ -18,7 +18,7 @@
     <string name="consent_confirmation">Taani ne ashaara ekkoo? Hagaadan gaada zaara: \"Taani maayas\", \"Taani maayikke\", woykko \"Taayyoo oyshay de\'ees\".</string>
     <string name="consent_parental_confirmation">Taani ne na\'aa ashaara ekkoo? Hagaadan gaada zaara: \"Taani maayas\", \"Taani maayikke\", woykko \"Taayyoo oyshay de\'ees\".</string>
 
-    <string name="launch_consent_decline_button">Maayikke</string>
-    <string name="launch_consent_accept_button">Maayaas</string>
+    <string name="consent_decline_button">Maayikke</string>
+    <string name="consent_accept_button">Maayaas</string>
 
 </resources>

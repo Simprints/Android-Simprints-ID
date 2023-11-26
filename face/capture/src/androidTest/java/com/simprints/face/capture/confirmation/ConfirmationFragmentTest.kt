@@ -65,7 +65,7 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.face_confirm_title),
-                withText(IDR.string.title_confirmation)
+                withText(IDR.string.face_capture_confirmation_title)
             )
         )
             .check(matches(isDisplayed()))
@@ -73,7 +73,7 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.confirmation_txt),
-                withText(IDR.string.captured_successfully)
+                withText(IDR.string.face_capture_successfully_title)
             )
         )
             .check(matches(isDisplayed()))
@@ -81,7 +81,7 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.recapture_btn),
-                withText(IDR.string.btn_recapture)
+                withText(IDR.string.face_capture_recapture_button)
             )
         )
             .check(matches(isDisplayed()))
@@ -89,7 +89,7 @@ class ConfirmationFragmentTest {
         onView(
             allOf(
                 withId(R.id.confirmation_btn),
-                withText(IDR.string.btn_finish)
+                withText(IDR.string.face_capture_finish_button)
             )
         )
             .check(matches(isDisplayed()))

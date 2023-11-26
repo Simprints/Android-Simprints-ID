@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/face_match_please_wait"
+        android:text="@string/matcher_please_wait"
         app:layout_constraintBottom_toTopOf="@id/face_match_progress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

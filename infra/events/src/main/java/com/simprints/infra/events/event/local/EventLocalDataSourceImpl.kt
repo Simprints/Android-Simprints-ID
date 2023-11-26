@@ -14,6 +14,8 @@ import com.simprints.infra.logging.Simber
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -23,7 +25,7 @@ import kotlin.coroutines.CoroutineContext
 internal open class EventLocalDataSourceImpl @Inject constructor(
     private val eventDatabaseFactory: EventDatabaseFactory,
     @DispatcherIO private val readingDispatcher: CoroutineDispatcher,
-    @NonCancellableIO private val writingContext: CoroutineContext
+    @NonCancellableIO private val writingContext: CoroutineContext,
 ) : EventLocalDataSource {
 
     private var eventDao: EventRoomDao = eventDatabaseFactory.build().eventDao
@@ -47,11 +49,19 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
     private suspend fun <R> useRoomFlow(context: CoroutineContext, block: () -> Flow<R>): Flow<R> =
         withContext(context) {
             try {
-                block()
+                block().catch { cause ->
+                    if (isFileCorruption(cause)) {
+                        rebuildDatabase(cause)
+                        // Recreate flow and re-emit values with the new file and key
+                        emitAll(block())
+                    } else {
+                        throw cause
+                    }
+                }
             } catch (ex: SQLiteException) {
                 if (isFileCorruption(ex)) {
                     rebuildDatabase(ex)
-                    // Retry operation with new file and key
+                    // Recreate flow with the new file and key
                     block()
                 } else {
                     throw ex

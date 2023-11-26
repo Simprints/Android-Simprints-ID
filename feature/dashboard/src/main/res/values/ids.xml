@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="preference_app_version_key">app_version_preference_key</string>
-    <string name="preference_scanner_version_key">scanner_version_preference_key</string>
-    <string name="preference_sync_and_search_key">sync_and_search_preference_key</string>
-    <string name="preference_device_id_key">device_id_preference_key</string>
-    <string name="preference_logout_key">logout_preference_key</string>
-    <string name="preference_select_language_key">select_language_preference_key</string>
-    <string name="preference_select_fingers_key">select_fingers_preference_key</string>
-    <string name="preference_app_details_key">app_details_preference_key</string>
-    <string name="preference_sync_info_key">sync_info_preference_key</string>
+    <string name="preference_app_version_key" translatable="false">app_version_preference_key</string>
+    <string name="preference_scanner_version_key" translatable="false">scanner_version_preference_key</string>
+    <string name="preference_sync_and_search_key" translatable="false">sync_and_search_preference_key</string>
+    <string name="preference_device_id_key" translatable="false">device_id_preference_key</string>
+    <string name="preference_logout_key" translatable="false">logout_preference_key</string>
+
+    <string name="preferences_general_key" translatable="false">preferences_general</string>
+    <string name="preference_select_language_key" translatable="false">select_language_preference_key</string>
+    <string name="preference_select_fingers_key" translatable="false">select_fingers_preference_key</string>
+    <string name="preference_sync_info_key" translatable="false">sync_info_preference_key</string>
+
+    <string name="preferences_app_details_key" translatable="false">app_details_key</string>
+    <string name="preference_app_details_key" translatable="false">app_details_preference_key</string>
 </resources>

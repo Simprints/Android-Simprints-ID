@@ -35,9 +35,9 @@ internal class NfcPairViewModel @Inject constructor(
             }
             startPairing(macAddress)
         } catch (e: IOException) {
-            _showToastWithStringRes.send(R.string.nfc_pair_toast_try_again)
+            _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_try_again)
         } catch (e: IllegalArgumentException) {
-            _showToastWithStringRes.send(R.string.nfc_pair_toast_invalid)
+            _showToastWithStringRes.send(R.string.fingerprint_connect_nfc_pair_toast_invalid)
         }
     }
 

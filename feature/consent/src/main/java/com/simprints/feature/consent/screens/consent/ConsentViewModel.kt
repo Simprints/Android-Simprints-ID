@@ -111,18 +111,18 @@ internal class ConsentViewModel @Inject constructor(
 
     private fun getExitFormFromModalities(modalities: List<GeneralConfiguration.Modality>) = when {
         modalities.size != 1 -> exitFormConfiguration {
-            titleRes = R.string.why_did_you_skip_biometrics
-            backButtonRes = R.string.button_scan_prints
+            titleRes = R.string.exit_form_title_biometrics
+            backButtonRes = R.string.exit_form_continue_fingerprints_button
         }
 
         modalities.first() == GeneralConfiguration.Modality.FACE -> exitFormConfiguration {
-            titleRes = R.string.why_did_you_skip_face_capture
-            backButtonRes = R.string.exit_form_capture_face
+            titleRes = R.string.exit_form_title_face
+            backButtonRes = R.string.exit_form_continue_face_button
         }
 
         else -> exitFormConfiguration {
-            titleRes = R.string.why_did_you_skip_fingerprinting
-            backButtonRes = R.string.button_scan_prints
+            titleRes = R.string.exit_form_title_fingerprinting
+            backButtonRes = R.string.exit_form_continue_fingerprints_button
             visibleOptions = scannerOptions()
         }
     }

@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:minHeight="?android:attr/actionBarSize"
             app:navigationIcon="?android:attr/homeAsUpIndicator"
-            app:title="@string/logout" />
+            app:title="@string/dashboard_logout_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="@dimen/margin_large"
                 android:paddingVertical="@dimen/margin_default"
-                android:text="@string/logout_sync_info"
+                android:text="@string/dashboard_logout_confirmation_sync_info"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/margin_large"
                 android:layout_marginVertical="@dimen/margin_large"
-                android:text="@string/logout"
+                android:text="@string/dashboard_logout_confirmation_log_out_button"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -81,7 +81,7 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/margin_large"
         android:layout_marginVertical="@dimen/margin_large"
-        android:text="@string/logout_sync_decline_button"
+        android:text="@string/dashboard_logout_confirmation_sync_decline_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

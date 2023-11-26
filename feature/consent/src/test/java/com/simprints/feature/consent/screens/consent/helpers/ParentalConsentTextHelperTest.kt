@@ -16,9 +16,9 @@ class ParentalConsentTextHelperTest {
 
     private val context: Context = ApplicationProvider.getApplicationContext()
     private val modalitiesUseCaseText = String.format(
-        "%s %s %s", context.getString(R.string.biometrics_parental_fingerprint),
-        context.getString(R.string.biometric_concat_modalities),
-        context.getString(R.string.biometrics_parental_face)
+        "%s %s %s", context.getString(R.string.consent_biometrics_parental_fingerprint),
+        context.getString(R.string.consent_biometric_concat_modalities),
+        context.getString(R.string.consent_biometrics_parental_face)
     )
 
     companion object {
@@ -42,7 +42,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_enrol_only)
-            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_fingerprint))
+            .format(PROGRAM_NAME, context.getString(R.string.consent_biometrics_parental_fingerprint))
 
         assertThat(parentalConsentText).contains(expectedString)
     }
@@ -84,7 +84,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_enrol)
-            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_face))
+            .format(PROGRAM_NAME, context.getString(R.string.consent_biometrics_parental_face))
 
         assertThat(parentalConsentText).contains(expectedString)
     }
@@ -126,7 +126,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_id_verify)
-            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_fingerprint))
+            .format(PROGRAM_NAME, context.getString(R.string.consent_biometrics_parental_fingerprint))
 
         assertThat(parentalConsentText).contains(expectedString)
     }
@@ -147,7 +147,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_id_verify)
-            .format(PROGRAM_NAME, context.getString(R.string.biometrics_parental_fingerprint))
+            .format(PROGRAM_NAME, context.getString(R.string.consent_biometrics_parental_fingerprint))
 
         assertThat(parentalConsentText).contains(expectedString)
     }
@@ -189,7 +189,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_share_data_no)
-            .format(context.getString(R.string.biometrics_access_fingerprint))
+            .format(context.getString(R.string.consent_biometrics_access_fingerprint))
 
         assertThat(parentalConsentText).contains(expectedString)
         assertThat(parentalConsentText).doesNotContain(ORGANIZATION_NAME)
@@ -211,7 +211,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_share_data_no)
-            .format(context.getString(R.string.biometrics_access_face))
+            .format(context.getString(R.string.consent_biometrics_access_face))
 
         assertThat(parentalConsentText).contains(expectedString)
         assertThat(parentalConsentText).doesNotContain(ORGANIZATION_NAME)
@@ -233,7 +233,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_share_data_no)
-            .format(context.getString(R.string.biometrics_access_fingerprint_face))
+            .format(context.getString(R.string.consent_biometrics_access_fingerprint_face))
 
         assertThat(parentalConsentText).contains(expectedString)
         assertThat(parentalConsentText).doesNotContain(ORGANIZATION_NAME)
@@ -255,7 +255,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_share_data_yes)
-            .format(ORGANIZATION_NAME, context.getString(R.string.biometrics_access_fingerprint))
+            .format(ORGANIZATION_NAME, context.getString(R.string.consent_biometrics_access_fingerprint))
 
         assertThat(parentalConsentText).contains(expectedString)
     }
@@ -356,7 +356,7 @@ class ParentalConsentTextHelperTest {
 
         val expectedString = context
             .getString(R.string.consent_parental_confirmation)
-            .format(context.getString(R.string.biometrics_parental_fingerprint))
+            .format(context.getString(R.string.consent_biometrics_parental_fingerprint))
 
         assertThat(parentalConsentText).contains(expectedString)
     }

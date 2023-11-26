@@ -4,8 +4,8 @@
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
-    <string name="settings_title">تنظیمات</string>
-    <string name="alert_title">پاملرنه</string>
+    <string name="dashboard_settings_title">تنظیمات</string>
+    <string name="alert_title_fallback">پاملرنه</string>
 
 
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
@@ -19,8 +19,6 @@
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
     <!-- Button Labels -->
-    <string name="cancel_button" tools:ignore="ButtonCase">لغو کول</string>
-    <string name="ok">اوکی</string>
     <!-- Content Descriptions -->
 
 
@@ -28,16 +26,16 @@
     <!-- Sync Button Text -->
     <!-- Toast Messages -->
     <!-- Finger Names -->
-    <string name="l_5_finger_name">د چپ لاس پنځمه ګوته</string>
-    <string name="l_4_finger_name">د چپ لاس څلورمه ګوته</string>
-    <string name="l_3_finger_name">د چپ لاس دریمه ګوته</string>
-    <string name="l_2_finger_name">د چپ لاس د شهادت ګوته</string>
-    <string name="l_1_finger_name">چپ لاس غټه ګوته</string>
-    <string name="r_1_finger_name">د ښی لاس غټه ګوته</string>
-    <string name="r_2_finger_name">د ښې لاس د شهادت ګوته</string>
-    <string name="r_3_finger_name">د ښې لاس دریمه ګوته</string>
-    <string name="r_4_finger_name">د ښې لاس څلورمه ګوته</string>
-    <string name="r_5_finger_name">د ښې لاس پنځمه ګوته</string>
+    <string name="fingerprint_capture_finger_l_5">د چپ لاس پنځمه ګوته</string>
+    <string name="fingerprint_capture_finger_l_4">د چپ لاس څلورمه ګوته</string>
+    <string name="fingerprint_capture_finger_l_3">د چپ لاس دریمه ګوته</string>
+    <string name="fingerprint_capture_finger_l_2">د چپ لاس د شهادت ګوته</string>
+    <string name="fingerprint_capture_finger_l_1">چپ لاس غټه ګوته</string>
+    <string name="fingerprint_capture_finger_r_1">د ښی لاس غټه ګوته</string>
+    <string name="fingerprint_capture_finger_r_2">د ښې لاس د شهادت ګوته</string>
+    <string name="fingerprint_capture_finger_r_3">د ښې لاس دریمه ګوته</string>
+    <string name="fingerprint_capture_finger_r_4">د ښې لاس څلورمه ګوته</string>
+    <string name="fingerprint_capture_finger_r_5">د ښې لاس پنځمه ګوته</string>
 
 
     <!-- MatchingActivity : the waiting screen after an identification -->
@@ -47,23 +45,23 @@
 
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->
-    <string name="configuration_error_title">به تنظماتو کې تیروتنه</string>
-    <string name="verify_guid_not_found_title">کس پیدا نشو</string>
-    <string name="error_occurred_title">تیروتنه رامنځته شوه</string>
+    <string name="orchestrator_configuration_error_title">به تنظماتو کې تیروتنه</string>
+    <string name="fetch_subject_guid_not_found_alert_title">کس پیدا نشو</string>
+    <string name="fingerprint_connect_error_title">تیروتنه رامنځته شوه</string>
     <!-- Error Message Text -->
-    <string name="verify_guid_not_found_online_message">هغه کس چي د تشخیص لپاره انتخاب شوی په ډیټابیس کې شتون نلری</string>
-    <string name="verify_guid_not_found_offline_message">کس پیدا نشو، په مهربانۍ سره ځان ډاډه کړئ چې انټرنټ سره وصل یاست او بیا له سر نه کوښښ وکړئ</string>
-    <string name="unforeseen_error_message">بښنه غواړو، غیر مترقبه تیروتنه ترسره شوی، د دوام لپاره پروګرام بند کړئ</string>
+    <string name="fetch_subject_guid_not_found_online_message">هغه کس چي د تشخیص لپاره انتخاب شوی په ډیټابیس کې شتون نلری</string>
+    <string name="fetch_subject_guid_not_found_offline_message">کس پیدا نشو، په مهربانۍ سره ځان ډاډه کړئ چې انټرنټ سره وصل یاست او بیا له سر نه کوښښ وکړئ</string>
+    <string name="fingerprint_capture_unexpected_error_message">بښنه غواړو، غیر مترقبه تیروتنه ترسره شوی، د دوام لپاره پروګرام بند کړئ</string>
     <!-- Button Labels For Error Messages -->
-    <string name="close">بندول</string>
-    <string name="try_again_label">په مهربانۍ سره بیا کوښښ وکړئ</string>
-    <string name="settings_label">د ټیلفون تنظیمات</string>
+    <string name="fingerprint_connect_error_close_button">بندول</string>
+    <string name="fingerprint_connect_try_again_button">په مهربانۍ سره بیا کوښښ وکړئ</string>
+    <string name="fingerprint_connect_phone_settings_button">د ټیلفون تنظیمات</string>
 
 
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="preference_app_version_title">د اپلیکيشن نسخه :</string>
-    <string name="preference_scanner_version_title">د سکینر نسخه یا ډول :</string>
+    <string name="dashboard_preference_app_version_title">د اپلیکيشن نسخه :</string>
+    <string name="dashboard_preference_scanner_version_title">د سکینر نسخه یا ډول :</string>
     <!-- Button Labels -->
     <!-- Recovery dialogs -->
 
@@ -74,82 +72,76 @@
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
     <!-- Screen Text -->
-    <string name="why_did_you_skip_fingerprinting">د گوتي د نښان ورکولو څخه مو ولې ډډه وکړه؟</string>
+    <string name="exit_form_title_fingerprinting">د گوتي د نښان ورکولو څخه مو ولې ډډه وکړه؟</string>
     <!-- Button Labels -->
-    <string name="button_submit">سپارل</string>
-    <string name="button_scan_prints">اوکی</string>
+    <string name="exit_form_submit_button">سپارل</string>
+    <string name="exit_form_continue_fingerprints_button">اوکی</string>
     <!-- Refusal Selection Points -->
     <!-- Text Prompt -->
-    <string name="hint_other_reason">لا ډير معلومات</string>
+    <string name="exit_form_other_reason_hint">لا ډير معلومات</string>
 
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
 
-    <plurals name="dashboard_card_enrolments">
+    <plurals name="dashboard_activity_card_enrolments">
         <item quantity="one">شاملیدل</item>
         <item quantity="other">Enrolments</item>
     </plurals>
-    <plurals name="dashboard_card_identifications">
+    <plurals name="dashboard_activity_card_identifications">
         <item quantity="one">مشخص کول</item>
         <item quantity="other">Identifications</item>
     </plurals>
-    <plurals name="dashboard_card_verifications">
+    <plurals name="dashboard_activity_card_verifications">
         <item quantity="one">پیدا کول</item>
         <item quantity="other">Verifications</item>
     </plurals>
 
-    <string name="invalid_intentAction_message">د (invalid Intent Action)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
-    <string name="invalid_metadata_message">د (invalid metadata)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="orcehstrator_invalid_action_error_message">د (invalid Intent Action)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="orchestrator_invalid_metadata_error_message">د (invalid metadata)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
-    <string name="register_title">شاملیدل</string>
-    <string name="identify_title">مشخص کول</string>
-    <string name="verify_title">پیدا کول</string>
-    <string name="refusal_label">د انکار فورم</string>
+    <string name="fingerprint_capture_enrol_title">شاملیدل</string>
+    <string name="fingerprint_capture_identify_title">مشخص کول</string>
+    <string name="fingerprint_capture_verify_title">پیدا کول</string>
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- Loading Messages-->
-    <string name="connect_scanner_bt_connect">له Veroسره د اړیکې په حال کې</string>
-    <string name="connect_scanner_wake_un20">د .... برابرول</string>
-    <string name="connect_scanner_setup">د .... آماده کول</string>
+    <string name="fingerprint_connect_scanner_bt_connect">له Veroسره د اړیکې په حال کې</string>
+    <string name="fingerprint_connect_scanner_wake_un20">د .... برابرول</string>
+    <string name="fingerprint_connect_scanner_setup">د .... آماده کول</string>
 
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
-    <string name="good_scan_direction">د بلي ګوتې لپاره چپ خواته پر صفحې ګوته راکیکاږئ</string>
-    <string name="please_scan">په مهربانۍ سره سکن یې کړئ</string>
-    <string name="poor_scan_direction">په مهربانۍ سره بیا سکن کړئ</string>
-    <string name="scanning">د سکن کولو په حال کې …</string>
-    <string name="good_scan_message">ښه سکن</string>
-    <string name="poor_scan_message">ضعیفه سکن</string>
-    <string name="reconnecting_message">بیا ځلې نښلیدل</string>
+    <string name="fingerprint_capture_good_scan_direction">د بلي ګوتې لپاره چپ خواته پر صفحې ګوته راکیکاږئ</string>
+    <string name="fingerprint_capture_please_scan">په مهربانۍ سره سکن یې کړئ</string>
+    <string name="fingerprint_capture_poor_scan_direction">په مهربانۍ سره بیا سکن کړئ</string>
+    <string name="fingerprint_capture_scanning">د سکن کولو په حال کې …</string>
+    <string name="fingerprint_capture_good_scan_message">ښه سکن</string>
+    <string name="fingerprint_capture_poor_scan_message">ضعیفه سکن</string>
     <!-- Button Labels -->
-    <string name="rescan_label">بیا ځلې سکن</string>
-    <string name="rescan_label_question">بیا ځلې سکن یعنی څه؟</string>
-    <string name="scan_label">سکن</string>
-    <string name="scan">سکن</string>
+    <string name="fingerprint_capture_rescan">بیا ځلې سکن</string>
+    <string name="fingerprint_capture_rescan_question">بیا ځلې سکن یعنی څه؟</string>
+    <string name="fingerprint_capture_scan">سکن</string>
     <!-- Content Descriptions -->
 
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
-    <string name="please_wait">صبر وکړئ څو مو تشخیص ته ادامه ورکړو</string>
     <!-- Loading text -->
-    <string name="loading_candidates">د ګډونوالو د آماده کولو په حال</string>
-    <string name="matching_fingerprints">د ګوتو د نښانو د مطابقت په حال کی</string>
 
 
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
-    <string name="low_battery_title">د بطرۍ چارج لږ دی</string>
+    <string name="fingerprint_connect_low_battery_error_title">د بطرۍ چارج لږ دی</string>
     <!-- Error Message Text -->
-    <string name="bluetooth_not_supported_message">په دغه دستګاه کې بلوتوت کار نه ورکوي، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
-    <string name="bluetooth_not_enabled_message">بلوتوت فعاله نه ده، په مهربانۍ سره ځان ډاده کړئ چې بلوتوت په تنظیماتو کې فعال شوي دی او بیا کوښښ وکړئ.</string>
-    <string name="multiple_scanners_found_message">له یوه څخه ډیر سکینر له موبایل سره وصل شوی، په مهربانۍ سره د هغه سکینر ارتباط چې تاسو ورته اړتیا نه لرئ له موبایل سره قطع کړئ.</string>
-    <string name="low_battery_message">د سکینر بطري په ختمیدو ده. په مهربانۍ سره د خپل سکینر بطري چارج کړئ.</string>
+    <string name="fingerprint_connect_bluetooth_not_supported_error_message">په دغه دستګاه کې بلوتوت کار نه ورکوي، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="fingerprint_connect_bluetooth_not_enabled_error_message">بلوتوت فعاله نه ده، په مهربانۍ سره ځان ډاده کړئ چې بلوتوت په تنظیماتو کې فعال شوي دی او بیا کوښښ وکړئ.</string>
+    <string name="fingerprint_connect_multiple_scanners_found_error_message">له یوه څخه ډیر سکینر له موبایل سره وصل شوی، په مهربانۍ سره د هغه سکینر ارتباط چې تاسو ورته اړتیا نه لرئ له موبایل سره قطع کړئ.</string>
+    <string name="fingerprint_connect_low_battery_error_message">د سکینر بطري په ختمیدو ده. په مهربانۍ سره د خپل سکینر بطري چارج کړئ.</string>
 
     <!-- Refusal Selection Points -->
-    <string name="refusal_other">نور</string>
+    <string name="exit_form_reason_other">نور</string>
 
 </resources>

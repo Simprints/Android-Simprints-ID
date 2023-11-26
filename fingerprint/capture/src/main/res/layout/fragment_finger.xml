@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        tools:text="@string/good_scan_message" />
+        tools:text="@string/fingerprint_capture_good_scan_message" />
 
     <TextView
         android:id="@+id/fingerNumberText"
@@ -40,7 +40,7 @@
         android:gravity="center"
         android:textAllCaps="true"
         android:textSize="20sp"
-        tools:text="@string/r_5_finger_name" />
+        tools:text="@string/fingerprint_capture_finger_r_5" />
 
     <TextView
         android:id="@+id/fingerCaptureNumberText"
@@ -50,7 +50,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:visibility="gone"
-        tools:text="@string/capture_number_text"
+        tools:text="@string/fingerprint_capture_capture_number_text"
         tools:visibility="visible" />
 
     <TextView
@@ -61,7 +61,7 @@
         android:layout_gravity="center"
         android:layout_marginBottom="10dp"
         android:gravity="center"
-        tools:text="@string/please_scan" />
+        tools:text="@string/fingerprint_capture_please_scan" />
 
     <LinearLayout
         android:id="@+id/progressBarContainer"

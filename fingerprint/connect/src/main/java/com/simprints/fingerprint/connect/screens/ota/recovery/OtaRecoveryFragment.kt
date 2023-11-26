@@ -46,9 +46,9 @@ internal class OtaRecoveryFragment : Fragment(R.layout.fragment_ota_recovery) {
     private fun setRecoveryStrategyInstructions() {
         binding.otaRecoveryInstructionsTextView.setText(
             when (args.params.recoveryStrategy) {
-                OtaRecoveryStrategy.HARD_RESET -> IDR.string.ota_recovery_hard_reset
+                OtaRecoveryStrategy.HARD_RESET -> IDR.string.fingerprint_connect_ota_recovery_hard_reset
                 OtaRecoveryStrategy.SOFT_RESET,
-                OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY -> IDR.string.ota_recovery_soft_reset
+                OtaRecoveryStrategy.SOFT_RESET_AFTER_DELAY -> IDR.string.fingerprint_connect_ota_recovery_soft_reset
             }
         )
     }

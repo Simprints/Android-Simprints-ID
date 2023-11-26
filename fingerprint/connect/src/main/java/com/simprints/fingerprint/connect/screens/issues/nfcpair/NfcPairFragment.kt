@@ -140,7 +140,7 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
             couldNotPairTextView.visibility = View.GONE
             nfcPairingProgressBar.visibility = View.VISIBLE
             nfcPairInstructionsTextView.text = String.format(
-                getString(IDR.string.nfc_pairing_in_progress),
+                getString(IDR.string.fingerprint_connect_nfc_pairing_in_progress),
                 serialNumberConverter.convertMacAddressToSerialNumber(macAddress)
             )
         }
@@ -177,10 +177,10 @@ internal class NfcPairFragment : Fragment(R.layout.fragment_nfc_pair) {
                 nfcPairingProgressBar.visibility = View.INVISIBLE
                 tryAgainButton.visibility = View.VISIBLE
                 nfcPairInstructionsTextView.text = if (pairingRejected) {
-                    getString(IDR.string.nfc_pairing_rejected_instruction)
+                    getString(IDR.string.fingerprint_connect_nfc_pairing_rejected_instruction)
                 } else {
                     getString(
-                        IDR.string.nfc_pairing_try_again_instruction,
+                        IDR.string.fingerprint_connect_nfc_pairing_try_again_instruction,
                         serialNumberConverter.convertMacAddressToSerialNumber(macAddressEvent.peekContent())
                     )
                 }

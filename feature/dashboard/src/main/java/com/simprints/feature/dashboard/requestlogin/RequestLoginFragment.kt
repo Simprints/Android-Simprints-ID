@@ -38,9 +38,9 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         wasLogoutReasonDisplayed = savedInstanceState?.getBoolean(KEY_WAS_LOGOUT_REASON_DISPLAYED) ?: false
-        binding.tvDeviceId.text = getString(IDR.string.device_id, deviceId)
+        binding.tvDeviceId.text = getString(IDR.string.dashboard_request_login_device_id, deviceId)
         binding.simprintsIdVersionTextView.text =
-            String.format(getString(IDR.string.front_simprintsId_version), packageVersionName)
+            String.format(getString(IDR.string.dashboard_request_login_simprints_version), packageVersionName)
         args.logoutReason?.takeIf { !wasLogoutReasonDisplayed }?.run(::displayLogoutReasonDialog)
     }
 
@@ -61,7 +61,7 @@ internal class RequestLoginFragment : Fragment(R.layout.fragment_request_login) 
             .setTitle(logoutReason.title)
             .setMessage(logoutReason.body)
             .setPositiveButton(
-                getString(com.simprints.infra.resources.R.string.close)
+                getString(IDR.string.dashboard_request_login_close_reason_dialog)
             ) { di, _ -> di.dismiss() }.create()
             .show()
     }

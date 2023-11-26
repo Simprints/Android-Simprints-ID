@@ -22,6 +22,7 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.*
 import io.mockk.impl.annotations.RelaxedMockK
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -209,6 +210,108 @@ internal class EventLocalDataSourceImplTest {
         }
 
     @Test
+    fun `test handleDatabaseCorruption gets called on SQLiteDatabaseCorruptExceptions inside of the flow`() =
+        runTest {
+            //Given
+            coEvery { eventDao.observeCount(any()) }
+                .returns(flow { throw SQLiteDatabaseCorruptException() })
+                .andThen(flowOf(1))
+            // When
+            eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            // Then
+            verify {
+                eventDatabaseFactory.deleteDatabase()
+                eventDatabaseFactory.recreateDatabaseKey()
+                eventDatabaseFactory.build()
+            }
+            coVerify(exactly = 2) { eventDao.observeCount(any()) }
+        }
+
+    @Test
+    fun `test handleDatabaseCorruption not called on SQLiteExceptions that don't  contain 'file is not a database' inside of the flow`() =
+        runTest {
+            //Given
+            coEvery { eventDao.observeCount(any()) }.returns(flow { throw SQLiteException() })
+            // When
+            assertThrows<SQLiteException> {
+                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            }
+            // Then
+            verify(exactly = 0) { eventDatabaseFactory.deleteDatabase() }
+            coVerify(exactly = 1) { eventDao.observeCount(any()) }
+        }
+
+    @Test
+    fun `test handleDatabaseCorruption gets called on SQLiteExceptions that contains 'file is not a database' inside of the flow`() =
+        runTest {
+            //Given
+            coEvery { eventDao.observeCount(any()) }
+                .returns(flow { throw SQLiteException("file is not a database") })
+                .andThen(flowOf(1))
+            // When
+            eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            // Then
+            verify {
+                eventDatabaseFactory.deleteDatabase()
+                eventDatabaseFactory.recreateDatabaseKey()
+                eventDatabaseFactory.build()
+            }
+            coVerify(exactly = 2) { eventDao.observeCount(any()) }
+        }
+
+    @Test
+    fun `test handleDatabaseCorruption not called on other Exceptions inside of the flow`() =
+        runTest {
+            //Given
+            coEvery { eventDao.observeCount(any()) }.returns(flow { throw Exception() })
+            // When
+            assertThrows<Exception> {
+                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            }
+            // Then
+            verify(exactly = 0) { eventDatabaseFactory.deleteDatabase() }
+            coVerify(exactly = 1) { eventDao.observeCount(any()) }
+        }
+
+    @Test
+    fun `returns value after handleDatabaseCorruption gets called on SQLiteDatabaseCorruptException inside of the flow`() =
+        runTest {
+            //Given
+            coEvery { eventDao.observeCount(any()) }
+                .returns(flow { throw SQLiteDatabaseCorruptException() })
+                .andThen(flowOf(1, 2, 3))
+            // When
+            val count = eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            // Then
+            verify {
+                eventDatabaseFactory.deleteDatabase()
+                eventDatabaseFactory.recreateDatabaseKey()
+                eventDatabaseFactory.build()
+            }
+            coVerify(exactly = 2) { eventDao.observeCount(any()) }
+            assertThat(count).isEqualTo(listOf(1, 2, 3))
+        }
+
+    @Test
+    fun `is not stuck when handleDatabaseCorruption gets called on SQLiteDatabaseCorruptException inside of the flow`() =
+        runTest {
+            //Given
+            coEvery { eventDao.observeCount(any()) }
+                .returns(flow { throw SQLiteDatabaseCorruptException() })
+            // When
+            assertThrows<SQLiteDatabaseCorruptException> {
+                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            }
+            // Then
+            verify {
+                eventDatabaseFactory.deleteDatabase()
+                eventDatabaseFactory.recreateDatabaseKey()
+                eventDatabaseFactory.build()
+            }
+            coVerify(exactly = 2) { eventDao.observeCount(any()) }
+        }
+
+    @Test
     fun loadAll() = runTest {
         eventLocalDataSource.loadAll()
 
@@ -259,7 +362,6 @@ internal class EventLocalDataSourceImplTest {
 
         coVerify { eventDao.countFromType(type = SESSION_CAPTURE) }
     }
-
 
     @Test
     fun countWithAProjectIdQuery() = runTest {
