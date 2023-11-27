@@ -16,7 +16,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.kotlin.MutableRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.exceptions.RealmException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -47,24 +46,35 @@ class RealmWrapperImpl @Inject constructor(
                 // is no legitimate way to forcefully restart the realm instance,
                 // so we need to catch this exception and try opening realm again.
                 // If the exception repeats, it should be propagated up the call stack.
-                Realm.open(config)
+                if (!isFileCorruptException(ex)) {
+                    Realm.open(config)
+                } else {
+                    throw ex
+                }
             }
-        } catch (ex: RealmException) {
-            //DB corruption detected; either DB file or key is corrupt
-            //1. Delete DB file in order to create a new one at next init
-            Realm.deleteRealm(config)
-            //2. Recreate the DB key
-            recreateLocalDbKey()
-            //3. Log exception after recreating the key so we get extra info
-            Simber.tag(DB_CORRUPTION.name).e(ex)
-            //4. Update Realm config with the new key
-            config = createAndSaveRealmConfig()
-            //5. Delete "last sync" info and start new sync
-            resetDownSyncState()
-            //6. Retry operation with new file and key
-            Realm.open(config)
+        } catch (ex: Exception) {
+            if (isFileCorruptException(ex)) {
+                //DB corruption detected; either DB file or key is corrupt
+                //1. Delete DB file in order to create a new one at next init
+                Realm.deleteRealm(config)
+                //2. Recreate the DB key
+                recreateLocalDbKey()
+                //3. Log exception after recreating the key so we get extra info
+                Simber.tag(DB_CORRUPTION.name).e(ex)
+                //4. Update Realm config with the new key
+                config = createAndSaveRealmConfig()
+                //5. Delete "last sync" info and start new sync
+                resetDownSyncState()
+                //6. Retry operation with new file and key
+                Realm.open(config)
+            } else {
+                throw ex
+            }
         }
     }
+
+    private fun isFileCorruptException(ex: Exception) = ex is IllegalStateException
+        && ex.message?.contains("RLM_ERR_INVALID_DATABASE") == true
 
     /**
      * Executes provided block ensuring a valid Realm instance is used and closed.
