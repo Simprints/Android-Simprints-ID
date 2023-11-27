@@ -73,15 +73,15 @@
     <string name="exit_form_other_reason_hint">ተጨማሪ ኢንፎርሜሽን</string>
 
     <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">ወደ ሲስተሙ ማስገባት</item>
+        <item quantity="one">%d ወደ ሲስተሙ ማስገባት</item>
         <item quantity="other">ወደ ሲስተሙ ማስገባት</item>
     </plurals>
     <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">መለየት</item>
+        <item quantity="one">%d መለየት</item>
         <item quantity="other">መለየት</item>
     </plurals>
     <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">ማመሳከር</item>
+        <item quantity="one">%d ማመሳከር</item>
         <item quantity="other">ማመሳከር</item>
     </plurals>
     <string name="dashboard_sync_card_try_again_button">እንደገና ይሞክሩ</string>
@@ -314,17 +314,14 @@
         <item quantity="other">%d ዉጤቶችን ይዟል</item>
     </plurals>
     <plurals name="matcher_tier1or2_matches">
-        <item quantity="zero">በጣም ጥሩ ግጥሚያዎች የሉም</item>
         <item quantity="one">%d በጣም ጥሩ ተመራጭ</item>
         <item quantity="other">%d በጣም ጥሩ ተመራጮች</item>
     </plurals>
     <plurals name="matcher_tier3_matches">
-        <item quantity="zero">ጥሩ ተመራጮች የሉም</item>
         <item quantity="one">%d ጥሩ ተመራጭ</item>
         <item quantity="other">%d ጥሩ ተመራጮች</item>
     </plurals>
     <plurals name="matcher_tier4_matches">
-        <item quantity="zero">ተመራጮች የሉም</item>
         <item quantity="one">%d  ተመራጭ</item>
         <item quantity="other">%d  ተመራጮች</item>
     </plurals>

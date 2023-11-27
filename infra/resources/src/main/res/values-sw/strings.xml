@@ -306,19 +306,16 @@
     </plurals>
 
     <plurals name="matcher_tier1or2_matches">
-        <item quantity="zero">Hakuna inazofanana nayo vizuri sana</item>
         <item quantity="one">%d inafanana vizuri</item>
         <item quantity="other">%d inafananisha vizuri sana</item>
     </plurals>
 
     <plurals name="matcher_tier3_matches">
-        <item quantity="zero">Hakuna inazofanana nayo vizuri</item>
         <item quantity="one">%d inayofanana nayo vizuri</item>
         <item quantity="other">%d inayofanana nazo vizuri</item>
     </plurals>
 
     <plurals name="matcher_tier4_matches">
-        <item quantity="zero">Hakuna zinazofanana nayo</item>
         <item quantity="one">%d inayofanana</item>
         <item quantity="other">%d inayofanana</item>
     </plurals>
