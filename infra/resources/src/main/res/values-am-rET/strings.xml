@@ -1,310 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <string name="alert_title_fallback">ማንቂያ</string>
-    <string name="orchestrator_configuration_error_title">የተግበቦት ስህተት</string>
-    <string name="fingerprint_connect_error_title">ስህተት አጋጥሟል</string>
-    <string name="orchestrator_project_id_error_message">የተለየ የፕሮጀክት መለያ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="fingerprint_connect_error_close_button">ይዝጉ</string>
-    <string name="dashboard_logout_confirmation_cancel_button">ሰርዝ</string>
-    <string name="dashboard_logout_confirmation_message">ጨርሰው መውጣት ይፈልጋሉ</string>
-    <string name="dashboard_logout_confirmation_title">መውጣት</string>
-    <string name="dashboard_sync_card_title">መረጃውን መገናኘት</string>
-    <string name="dashboard_title">የሁነቶች ማሳያ</string>
-    <string name="login_log_in_button">መግባት</string>
-    <string name="login_id_hint">የፕሮጀክት መለያ ቁጥር</string>
-    <string name="login_invalid_credentials_error">ትክክል ያልሆነ ተጠቃሚ ነው ፡ እባክዎ የፕሮጀክት ቁጥር እና ቁልፍ ያረጋግጡ፡፡</string>
-    <string name="login_invalid_qr_code_error">እስካን የተደረገው የፈጣን ምላሽ ሚስጥር ቁጥር ትክክል አይደለም</string>
-    <string name="login_missing_credentials_error">ተጠቃሚው ተዘሏል ፡ እባክዎ የተጠቃሚውን መለያ ቁጥር ፡ የፕሮጀክት ቁጥር እና ቁልፍ በማረጋገጥ እንደገና ይሞክሩ፡፡</string>
-    <string name="login_no_network_error">አሁን ከግንኙነት ውጭ ነዎት፡ እባክዎት የኢንተርኔት ግንኙነቱን መኖሩን ያረጋግጡ</string>
-    <string name="login_project_id_intent_mismatch_error">የፕሮጀክት ቁጥሩ አቅራቢው ውስጥ ካለው ዝርዝር ጋር የተለየ ነው፡ እብክዎት የስስተም አስተዳዳሪውን ያነጋግሩ፡፡</string>
-    <string name="login_qr_code_scanning_problem_error">የፈጣን ምላሽ ሚስጥር ቁጥርን እስካን በሚያደረግበት ጊዜ ስህተት አጋጥሞታል</string>
-    <string name="login_secret_hint">የፕሮጀክት ቁልፍ</string>
-    <string name="login_server_error">ሰርቨሩን ለማግኘት ሲሞክሩ ስህተት አጋጥሞታል ፡ እባክዎት ተንሽ ቆይተው ይሞክሩት፡፡</string>
-    <string name="login_user_id_hint">የተጠቀሚ መለያ ቁጥር</string>
-    <string name="dashboard_logout_title">መውጣት</string>
-    <string name="consent_privacy_notice_download_button">የደህንነት ጽሁፍን ያውርዱ</string>
-    <string name="consent_privacy_notice_failed_to_download">የደህንነት ጽሁፍን ማውረዱ ተቋርጧል</string>
-    <string name="dashboard_menu_privacy_notice">የደህንነት ማሳታወቂያ</string>
-    <string name="dashboard_menu_settings">ማስተካከያ</string>
-    <string name="dashboard_preference_app_details_title">የበለጠ</string>
-    <string name="dashboard_preference_app_version_title">የሶፍትዌር ስሪት</string>
-    <string name="dashboard_preference_device_id_title">የመሳሪያው መለያ</string>
-    <string name="dashboard_preference_logout_title">ይውጡ</string>
-    <string name="dashboard_preference_scanner_version_title">የእስካነር  ስሪት</string>
-    <string name="dashboard_preference_view_fingers_title">ነባሪ ጣቶችን ይመልከቱ</string>
-    <string name="dashboard_preference_select_language_title">ቋንቋ</string>
-    <string name="dashboard_preference_select_modules_title">ሞጅውሎችን ይምረጡ</string>
-    <string name="dashboard_preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
-    <string name="dashboard_preference_sync_and_search_title">የሲንክ እና የፍለጋ ተግባቦት</string>
-    <string name="dashboard_request_login_message">መግባት ከፈለጉ፡ እባክዎ የደንበኛውን አፕልኬሽን ከፍተው የሲም ፕሪንትን መለያቁጥር በመጠቀም መግባት ይችላሉ</string>
-    <string name="login_scan_qr_button">የፈጣን ምላሽ መለያ እስካን ያድርጉ</string>
-    <string name="dashboard_preference_app_details_category_title">ስለ አፕልኬሽኑ የበለጠ</string>
-    <string name="dashboard_preferences_general_category_title">አጠቃላይ</string>
-    <string name="dashboard_select_modules_no_modules">የተሳሳተ ምርጫ፡ እባክዎት ካለው የምዕራፍ አማራጭ ውስጥ ቢያንስ አንድ ይምረጡ</string>
-    <string name="dashboard_settings_about_title">የበለጠ</string>
-    <string name="fingerprint_capture_unexpected_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
-    <string name="dashboard_sync_card_last_sync">ያለፈው ግንኙነት: %1$s</string>
-    <string name="dashboard_select_modules_too_many_modules">የተሳሳተ ምርጫ ፡ካሉት ምዕራፎች ውስጥ ከ %1$d በላይ መምረጥ አይችሉም</string>
-    <string name="dashboard_settings_title">ማስተካከያ</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Alert -->
+    <string name="alert_title_fallback">ማንቂያ</string>
+    <!-- Consent -->
+    <string name="consent_general_title">ፈቃደኝነት</string>
+    <string name="consent_enrol">ወደፊት የጣት አሻራዎትን እርስዎን መለየት ይቻል ዘንድ እና የጣት አሻራ መረጃዎትን ለመመዝገብ %1$s እና %2$s መጠቀም እፈልጋለሁ</string>
+    <string name="consent_id_verify">ወደፊት %2$s የእርስዎን መረጃ ለማግኘት የጣት አሻራዎትን መጠቀም እፈልጋለሁ %1$s ::</string>
+    <string name="consent_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
+    <string name="consent_confirmation">እችላለሁ %1$s?  እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
+    <string name="consent_parental_title">የወላጅ ፈቃደኝነት</string>
+    <string name="consent_parental_enrol">እርስዎን %2$s ለመመዝገብ አንዲቻል  ዉስጥ %1$s እና ወደፊት መለየት አንዲቻል ::</string>
     <string name="consent_parental_id_verify">እርስዎን %2$s ወደፊት መለየት አንዲቻል %1$s ::</string>
     <string name="consent_parental_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
     <string name="consent_parental_confirmation">የልጅዎን የጣት አሻራ መጠቀም እችላለሁ %1$s? እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
-    <string name="consent_share_data_yes">%1$s አና ሲምፕሪንትስ, በእንግሊዝ ሀገር የሚገኝ ለትርፍ ያልተቃቑመ ድርጅት, የ %2$s አና የጂፒኤስ መረጃዉን ሊያገኙ ይችላሉ።</string>
-    <string name="consent_confirmation">እችላለሁ %1$s?  እባክዎ መቀበል, አለመቀበል, ወይም ጥያቄ አለኝ ይበሉ</string>
+    <string name="consent_biometrics_general_fingerprint">የጣት አሻራን ተጠቀም</string>
+    <string name="consent_biometric_general_face">የፊቱን ፎቶግራፍ ማንሳት</string>
+    <string name="consent_biometrics_access_fingerprint">የጣት አሻራ መረጃ</string>
+    <string name="consent_biometrics_access_face">ፎቶግራፎች</string>
+    <string name="consent_biometrics_access_fingerprint_face">የጣት አሻራ መረጃ፣ፎቶግራፍ</string>
+    <string name="consent_biometrics_parental_fingerprint">የልጅዎትን ጣት አሻራ ተጠቀሚ</string>
+    <string name="consent_biometrics_parental_face">የልጅዎትን ፎቶግራፍ ማንሳት</string>
+    <string name="consent_biometric_concat_modalities">እና</string>
     <string name="consent_decline_button">አለመቀበል</string>
     <string name="consent_accept_button">መቀበል</string>
-    <string name="consent_general_title">ፈቃደኝነት</string>
-    <string name="consent_parental_title">የወላጅ ፈቃደኝነት</string>
     <string name="consent_privacy_notice_button"><u>የደህንነት ማሳታወቂያ</u></string>
     <string name="consent_privacy_notice_title">የደህንነት ማሳታወቂያ</string>
-    <string name="exit_form_select_option_submit_warning">እባክዎት ካሉት አማራጮች ይምረጡ እና ይላኩ</string>
-    <string name="exit_form_submit_warning">እባክዎት ቅጽን ይላኩ</string>
-    <string name="exit_form_reason_data_concerns">መረጃውን ለመስጠት አልፈለጉም</string>
-    <string name="exit_form_reason_person_not_present">ተጠቃሚው አልተገኝም</string>
-    <string name="exit_form_reason_does_not_have_permission">ምንም አይነት ፈቃድ የለዎትም</string>
-    <string name="exit_form_reason_religious_concerns">የሀይማኖት ጉዳይ</string>
-    <string name="exit_form_reason_too_young">ጨቅላ</string>
-    <string name="exit_form_reason_app_not_working">አፕልኬሽኑ አይሰራም</string>
-    <string name="exit_form_reason_other">ተጨማሪ</string>
-    <string name="exit_form_title_fingerprinting">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
-    <string name="exit_form_continue_fingerprints_button">የጣት አሻራውን እስካን ያድርጉ</string>
-    <string name="exit_form_submit_button">ይላኩ</string>
-    <string name="exit_form_other_reason_hint">ተጨማሪ ኢንፎርሜሽን</string>
+    <string name="consent_privacy_notice_download_button">የደህንነት ጽሁፍን ያውርዱ</string>
+    <string name="consent_privacy_notice_downloading">የግላዊነት ማስታወቂያ በማውረድ ላይ</string>
+    <string name="consent_privacy_notice_failed_to_download">የደህንነት ጽሁፍን ማውረዱ ተቋርጧል</string>
 
-    <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">%d ወደ ሲስተሙ ማስገባት</item>
-        <item quantity="other">ወደ ሲስተሙ ማስገባት</item>
-    </plurals>
-    <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">%d መለየት</item>
-        <item quantity="other">መለየት</item>
-    </plurals>
-    <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">%d ማመሳከር</item>
-        <item quantity="other">ማመሳከር</item>
-    </plurals>
-    <string name="dashboard_sync_card_try_again_button">እንደገና ይሞክሩ</string>
-    <string name="consent_enrol">ወደፊት የጣት አሻራዎትን እርስዎን መለየት ይቻል ዘንድ እና የጣት አሻራ መረጃዎትን ለመመዝገብ %1$s እና %2$s መጠቀም እፈልጋለሁ</string>
-    <string name="consent_id_verify">ወደፊት %2$s የእርስዎን መረጃ ለማግኘት የጣት አሻራዎትን መጠቀም እፈልጋለሁ %1$s ::</string>
-    <string name="consent_parental_enrol">እርስዎን %2$s ለመመዝገብ አንዲቻል  ዉስጥ %1$s እና ወደፊት መለየት አንዲቻል ::</string>
-    <string name="dashboard_select_modules_confirm_no">ሰርዝ</string>
-    <string name="dashboard_select_modules_confirm_title">ሞጁል ተመርጧል</string>
-    <string name="dashboard_select_modules_confirm_yes">ማረጋገጥ</string>
-    <string name="dashboard_activity_card_activity">የየዕለት ተግባር: %1$s</string>
-    <string name="dashboard_project_card_current_user">አሁን ያለ ተጠቃሚ: %1$s</string>
-    <string name="dashboard_project_card_scanner_used">እስካነር ይጠቀሙ: %1$s</string>
-    <string name="dashboard_sync_card_complete">ሲንክ ማድረጉ ተጠናቋል</string>
-    <string name="dashboard_sync_card_connecting">በመገኛኘት ላይ ነው</string>
-    <string name="dashboard_sync_card_failed_message">ሲንክ ማድረግ አልተቻለም እባክዎ የበላይ አካል ያግኙ</string>
-    <string name="dashboard_sync_card_incomplete">ሲንክ ማድረጉ አልተጠናቀቀም</string>
-    <string name="dashboard_sync_card_no_modules_button">ሞጁሎች</string>
-    <string name="dashboard_sync_card_no_modules_message">ሲንክ ለማድረግ ሞጁል ይምረጡ</string>
-    <string name="dashboard_sync_card_offline_button">ማስተካከያ</string>
-    <string name="dashboard_sync_card_offline_message">የስልኩ ሴቲንግ በመግባት የሞባይል ዳታ ያብሩ</string>
-    <string name="dashboard_sync_card_progress">በግንኙነት ላይ...%1$s</string>
-    <string name="dashboard_sync_card_sync_button">አሁን ግንኙነት ፍጠር</string>
-    <string name="dashboard_select_modules_search_hint">ሞጁሎችን መፈለግ</string>
-    <string name="fingerprint_capture_finger_l_1">የግራ አውራጣትዎን</string>
-    <string name="fingerprint_capture_finger_l_2">የግራ እጅ ጠቋሚ ጣት</string>
-    <string name="fingerprint_capture_finger_l_3">የግራ እጅ ሶስተኛ ጣት</string>
-    <string name="fingerprint_capture_finger_l_4">የግራ እጅ አራተኛ ጣት</string>
-    <string name="fingerprint_capture_finger_l_5">የግራ እጅ አምስተኛ ጣት</string>
-    <string name="dashboard_select_modules_no_modules_selected">የተመረጠ ሞጁል የለም</string>
-    <string name="dashboard_select_modules_no_results">ምንም ውጤት የለም</string>
-    <string name="dashboard_preference_summary_sync_information">ሲንክ ላይ ተጨማሪ ዝርዝር መረጃ</string>
-    <string name="dashboard_preference_sync_information_title">ሲንክ የተደረገ መረጃ</string>
-    <string name="fingerprint_capture_finger_r_1">የቀኝ አውራጣትዎን</string>
-    <string name="fingerprint_capture_finger_r_2">የቀኝ እጅ ጠቋሚ ጣት</string>
-    <string name="fingerprint_capture_finger_r_3">የቀኝ  እጅ ሶስተኛ ጣት</string>
-    <string name="fingerprint_capture_finger_r_4">የቀኝ እጅ አራተኛ ጣት</string>
-    <string name="fingerprint_capture_finger_r_5">የቀኝ እጅ አምስተኛ ጣት</string>
-    <string name="dashboard_sync_info_select_modules_button">ሞጅውሎችን ይምረጡ</string>
-    <string name="dashboard_select_modules_selected">የተመረጠ ሞጁል</string>
-    <string name="fingerprint_connect_phone_settings_button">የስልክ ማስተካከያ</string>
-    <string name="dashboard_sync_info_records_to_delete">የተመዘገበውን ለመሰረዝ</string>
-    <string name="dashboard_sync_info_records_to_download">የተመዘገበውን ለመማውረድ</string>
-    <string name="dashboard_sync_info_records_to_upload">የተመዘገበውን ለመጫን</string>
-    <string name="dashboard_sync_info_selected_modules">የተመረጠ ሞጁል</string>
-    <string name="dashboard_sync_info_total_records">አጠቃላይ የተመዘገበ</string>
-    <string name="dashboard_sync_info_total_records_on_device">በስልኩ አጠቃላይ የተመዘገበ</string>
-    <string name="dashboard_sync_info_unselected_modules">ያልተመረጡ ሞጁሎች</string>
-    <string name="dashboard_sync_info_sync_now_button">አሁን ግንኙነት ፍጠር</string>
-    <string name="dashboard_sync_info_sync_in_progress">በግንኙነት ላይ</string>
-    <string name="dashboard_sync_info_title">ሲንክ የተደረገ መረጃ</string>
-    <string name="fingerprint_connect_try_again_button">እንደገና ይሞክሩ</string>
-    <string name="fetch_subject_guid_not_found_offline_message">ግለሰቡ የለም፡ እባክዎ ከኢንተርኔት ጋር መገናኘትዎን አረጋግጠው እንደገና ይሞክሩ</string>
-    <string name="fetch_subject_guid_not_found_online_message">አንዲጠራ የተመረጠው ግለሰብ ዳታቤዙ ውስጥ የለም</string>
-    <string name="fetch_subject_guid_not_found_alert_title">ግለሰቡ አልተገኘም</string>
-    <string name="fetch_subject_checking_person">ተገልጋዩ ዳታቤዝ ውስጥ መኖሩን ማረጋገጥ</string>
-    <string name="enrol_last_biometrics_alert_message">1. %1$s ሪኮርድን ማስቀመጥ አልተሳካም \n 2. ዝጋን መታ ያድርጉ</string>
-    <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
-    <string name="enrol_last_biometrics_alert_message_all_param">ፊት /የጣት አሻራ</string>
+    <!-- Enrol last -->
     <string name="enrol_last_biometrics_success">የተሳካ ምዝገባ</string>
     <string name="enrol_last_biometrics_alert_title">መመዝገብ አልተቻለም</string>
-    <string name="select_subject_confirmation_sent">ማረጋገጫ ተልኳል</string>
-    <string name="select_subject_redirecting_back">እርስዎን መልሰው በማዛወር ላይ</string>
+    <string name="enrol_last_biometrics_alert_message">1. %1$s ሪኮርድን ማስቀመጥ አልተሳካም \n 2. ዝጋን መታ ያድርጉ</string>
+    <string name="enrol_last_biometrics_alert_message_face_param">ፊት</string>
+    <string name="enrol_last_biometrics_alert_message_fingerprint_param">የጣት አሻራ</string>
+    <string name="enrol_last_biometrics_alert_message_all_param">ፊት /የጣት አሻራ</string>
 
-    <string name="consent_biometric_concat_modalities">እና</string>
-    <string name="consent_privacy_notice_downloading">የግላዊነት ማስታወቂያ በማውረድ ላይ</string>
-    <string name="error_backend_maintenance_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ቆየት ብለው ይሞክሩ.</string>
-    <string name="error_backend_maintenance_with_time_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ከ%s በኋላ እንደገና ይሞክሩ</string>
-    <string name="dashboard_sync_card_records_uploaded">ሁሉም መዝገቦች ተጭነዋል።</string>
-    <string name="orchestrator_outdated_google_play_services_alert_title">ጊዜው ያለፈበት የጉግል ፕለይ አገልግሎቶች</string>
-    <string name="orchestrator_outdated_google_play_services_alert_message">በዚህ መሳሪያ ላይ የተጫነው የጉግል ፕለይ አገልግሎት ስሪት በSID ከሚያስፈልገው በላይ የቆየ ነው።</string>
-    <string name="orchestrator_missing_google_play_services_alert_title">የጎግል ፕሌይ አገልግሎቶች ይጎድላሉ</string>
-    <string name="orchestrator_missing_google_play_services_alert_message">የጉግል ፕለይ አገልግሎቶች በዚህ መሳሪያ ላይ አልተጫነም።</string>
-    <string name="consent_biometric_general_face">የፊቱን ፎቶግራፍ ማንሳት</string>
-    <string name="consent_biometrics_access_face">ፎቶግራፎች</string>
-    <string name="consent_biometrics_parental_face">የልጅዎትን ፎቶግራፍ ማንሳት</string>
-    <string name="dashboard_sync_info_images_to_upload">የሚጫኑ ምስሎች</string>
-    <string name="dashboard_password_lock_title_default">ለመክፈት የይለፍ ቃል ያስገቡ</string>
-    <string name="dashboard_password_lock_title_logout">ለመውጣት የይለፍ ቃል ያስገቡ</string>
-    <string name="dashboard_password_lock_hint">የይለፍ ቃል</string>
-    <string name="dashboard_password_lock_wrong_pin">የተሳሳተ የይለፍ ቃል</string>
-    <string name="dashboard_password_lock_overlay_title">ለመክፈት መታ ያድርጉ</string>
+    <!-- Exit form -->
+    <string name="exit_form_title_fingerprinting">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
+    <string name="exit_form_other_reason_hint">ተጨማሪ ኢንፎርሜሽን</string>
+    <string name="exit_form_continue_fingerprints_button">የጣት አሻራውን እስካን ያድርጉ</string>
+    <string name="exit_form_submit_button">ይላኩ</string>
+    <string name="exit_form_select_option_submit_warning">እባክዎት ካሉት አማራጮች ይምረጡ እና ይላኩ</string>
+    <string name="exit_form_submit_warning">እባክዎት ቅጽን ይላኩ</string>
+    <string name="exit_form_reason_religious_concerns">የሀይማኖት ጉዳይ</string>
+    <string name="exit_form_reason_data_concerns">መረጃውን ለመስጠት አልፈለጉም</string>
+    <string name="exit_form_reason_does_not_have_permission">ምንም አይነት ፈቃድ የለዎትም</string>
+    <string name="exit_form_reason_app_not_working">አፕልኬሽኑ አይሰራም</string>
     <string name="exit_form_reason_scanner_not_working">ስካነር አይሰራም</string>
-    <string name="dashboard_logout_confirmation_sync_decline_button">ሳይመሳሰል ውጣ</string>
-    <string name="dashboard_logout_confirmation_sync_info">በመሳሪያዎ ላይ ከመውጣትዎ በፊት መመሳሰል ያለባቸው መዝገቦች አሉ። እባክህ የማመሳሰል ሂደቱ እንዲጠናቀቅ ፍቀድ። ማመሳሰል እንደጨረሰ ዘግተህ መውጣት ትችላለህ።</string>
-    <string name="dashboard_logout_confirmation_sync_decline_warning_title">ማስጠንቀቂያ</string>
-    <string name="dashboard_logout_confirmation_sync_decline_warning_body">የእርስዎ ፕሮጀክት ወቅታዊ መዛግብት እንዳለው ለማረጋገጥ የውሂብ ማመሳሰል አስፈላጊ ነው። ያለ ትክክለኛ ምክንያት የእርስዎን ውሂብ ማመሳሰል አለመቻል የስራ ባልደረቦችዎ ጠቃሚ መዝገቦችን ማግኘት እና የፕሮጀክቱን ትክክለኛ ሪፖርት የማድረግ ችሎታ ላይ ተጽእኖ ያሳድራል። እና ለእርስዎ እና ለፕሮጀክቱ የማይፈለጉ ውጤቶችን ሊያስከትል ይችላል.</string>
-    <string name="orchestrator_project_paused_title">ፕሮጀክቱ በአሁኑ ጊዜ ባለበት ቆሟል</string>
-    <string name="orchestrator_project_paused_body">ክፍለ-ጊዜን ማስጀመር አልተቻለም ምክንያቱም ፕሮጀክቱ በአሁኑ ጊዜ ባለበት ቆሟል። ለበለጠ መረጃ እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
-    <string name="dashboard_sync_project_ending_alert_title">ፕሮጀክቱ በአሁኑ ጊዜ እየተጠናቀቀ ነው።</string>
-    <string name="dashboard_sync_project_ending_message">ፕሮጀክቱ በአሁኑ ጊዜ እያለቀ ስለሆነ ክፍለ-ጊዜን ማስጀመር አልተቻለም። ለበለጠ መረጃ እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
-    <string name="consent_biometrics_access_fingerprint">የጣት አሻራ መረጃ</string>
-    <string name="consent_biometrics_access_fingerprint_face">የጣት አሻራ መረጃ፣ፎቶግራፍ</string>
-    <string name="consent_biometrics_general_fingerprint">የጣት አሻራን ተጠቀም</string>
-    <string name="consent_biometrics_parental_fingerprint">የልጅዎትን ጣት አሻራ ተጠቀሚ</string>
-    <string name="dashboard_select_fingers_finger_label">ጣት</string>
-    <string name="dashboard_select_fingers_quantity_label">ብዛት</string>
-    <string name="dashboard_select_fingers_title">የእይታ ጣቶች</string>
-    <string name="fingerprint_connect_pair_scanner_and_device_error_message">1. እስካነሩ መብራቱን ያረጋግጡ
-\n2. መቸቱን /ሴቲንግ ይምረጡ
-\n3. የተጣመረውን እስካነር ያለያዩ
-\n4.እስካነርና ስልኩን ያጣምሩ
-\n5. ወደ ሲምፕሪንት ይመለሱ</string>
-    <string name="fingerprint_connect_pair_scanner_and_device_error_title">እስካነርና ስልኩን ያጣምሩ</string>
-    <string name="fingerprint_connect_bluetooth_not_enabled_error_message">ብሉቱዝ አልተከፈተም ፡ለመጠቀም አያስችልም፤እባክዎ ማስተካከያው ውስጥ ገብተው ብሉቱዙን ከፍተው እንደገና ይሞክሩ</string>
-    <string name="fingerprint_connect_bluetooth_not_supported_error_message">የሚጠቀሙበት መሳሪያ ብሉቱዝ ለመጠቀም አያስችልም፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="fingerprint_capture_confirm_fingers_dialog_yes">ማረጋገጥ</string>
-    <string name="fingerprint_capture_confirm_fingers_dialog_title">ጣትዎ አሻራ ተነስቷል</string>
-    <string name="fingerprint_connect_scanner_bt_connect">ከቬሮ ጋር መገናኘት</string>
-    <string name="fingerprint_connect_scanner_finished">ተገናኝቷል</string>
-    <string name="fingerprint_connect_scanner_setup">የቬሮ መማስተካከያ</string>
-    <string name="fingerprint_connect_scanner_wake_un20">ቬሮ እየተነሳ ነው</string>
-    <string name="fingerprint_capture_finger_skipped_message">ጣት አሻረው ተዘሏል</string>
-    <string name="fingerprint_capture_try_another_title">ዝግጁ ነው</string>
-    <string name="fingerprint_capture_good_scan_direction">ለቀጣዩ ጣትዎ ወደ ግራ ያንሸራቱ</string>
-    <string name="fingerprint_capture_good_scan_message">ጥሩ የሆነ እስካን</string>
-    <string name="fingerprint_capture_identify_title">መለየት</string>
-    <string name="fingerprint_connect_low_battery_error_message">የእስካነሩ ባትሪ እያለቀ ነው እባክዎ እስካነሩን ቻርጅ ያድርጉ</string>
-    <string name="fingerprint_connect_low_battery_error_title">ዝቅተኛ ባትሪ</string>
-    <string name="fingerprint_capture_missing_finger_button">ይህ ጣት የለም</string>
-    <string name="fingerprint_connect_multiple_scanners_found_error_message">በስልኩ ላይ ከአንድ በላይ እስካነር ተገናኝቷል፣ እባክዎ የማይፈልጉትን እስካነር ግንኙነቱን ያቋርጡ</string>
-    <string name="fingerprint_capture_no_finger_detected_message">ምንም አይነት ጣት አላገኘም</string>
-    <string name="fingerprint_capture_no_fingers_scanned">እባክዎ ቢያንስ አንድ ጣትዎን ለአሻራ ይስጡ</string>
-    <string name="fingerprint_connect_pair_scanner_button">ማስተካከያ</string>
-    <string name="fingerprint_capture_please_scan">እባክዎ እስካን ያድርጉ</string>
-    <string name="fingerprint_capture_please_wait">እባክዎትን ይጠብቁ</string>
-    <string name="fingerprint_capture_poor_scan_direction">እባክዎ እንደገና እስካን ያድርጉ</string>
-    <string name="fingerprint_capture_poor_scan_message">ጥሩ ያልሆነ እስካን</string>
-    <string name="fingerprint_capture_enrol_title">ወደ ሲስተሙ ማስገባት</string>
-    <string name="fingerprint_capture_rescan">እንደገና እስካን ያድርጉ</string>
-    <string name="fingerprint_capture_rescan_question">እንደገና እስካን ይደረግ?</string>
-    <string name="fingerprint_capture_confirm_fingers_dialog_no">እንደገና መስነሳት</string>
-    <string name="fingerprint_capture_scan">እስካን</string>
-    <string name="fingerprint_connect_scanner_confirmation_no">አይ</string>
-    <string name="fingerprint_connect_scanner_confirmation_yes">አዎ</string>
-    <string name="fingerprint_connect_turn_scanner_on_error_message">1. እስካነሩን ያስነሱ\n2. እንደገና ይሞክሩ</string>
-    <string name="fingerprint_connect_turn_scanner_on_error_title">እስካነሩን ያብሩ</string>
-    <string name="fingerprint_connect_scanner_id_confirmation_message">እስካነሩ %1$s ነው?</string>
-    <string name="fingerprint_capture_scanning">እስካን ማድረግ</string>
-    <string name="fingerprint_capture_transfering_data">መረጃ በማስተላለፍ ላይ ነው</string>
-    <string name="fingerprint_capture_try_another_finger">እባክዎት ሌላ ጣት ይሞክሩ</string>
-    <string name="fingerprint_capture_verify_title">ማመሳከር</string>
-    <string name="fingerprint_connect_bluetooth_off_title">ብሉቱዙ ጠፍቷል</string>
-    <string name="fingerprint_connect_nfc_off_title">NFC ጠፍቷል</string>
-    <string name="fingerprint_connect_scanner_off_title">ስካነሩ ጠፍቷል</string>
-    <string name="fingerprint_connect_nfc_pair_title">ስካነሩ እና የሚጠቀሙት መሳሪያ አልተገናኘም</string>
-    <string name="fingerprint_connect_serial_entry_pair_title">ስካነሩ እና የሚጠቀሙት መሳሪያ አልተገናኘም</string>
-    <string name="fingerprint_connect_turn_on_bluetooth">ብሉቱዙውን ያብሩት</string>
-    <string name="fingerprint_connect_bluetooth_on">✓ ብሉቱዙው በርቷል</string>
-    <string name="fingerprint_connect_turn_on_nfc">NFC ያብሩት</string>
-    <string name="fingerprint_connect_nfc_on">✓ NFC በርቷል</string>
-    <string name="fingerprint_connect_scanner_off_instructions">የስካነሩን ማስነሻ ቁልፍ ይጫኑ</string>
-    <string name="fingerprint_connect_nfc_pair_instructions">የስካነሩን ጀርባ ከስልኩ ጀርባ ጋር ያገናኙ</string>
-    <string name="fingerprint_connect_enter_scanner_number">የስካነሩን ቁጥር ቀጥሎ ካለው ሳጥን ላይ ይፃፉ</string>
-    <string name="fingerprint_connect_enter_scanner_number_detail">ይህ የሚገኘው በስካነሩ የታችኛው ክፍል ነው</string>
-    <string name="fingerprint_connect_nfc_cannot_connect_devices">የሚጠቀሙበት መሳሪያ ሊገናኝ አልቻለም</string>
-    <string name="fingerprint_connect_scanner_on">✓ ስካነሩ በርቷል</string>
-    <string name="fingerprint_connect_nfc_pairing_in_progress">የተገኘው ስካነር  %1$s</string>
-    <string name="fingerprint_connect_nfc_pairing_try_again_instruction">እባክዎ ስካነር ቁጥር %1$s መብራቱን አረጋግጠው እንደገና ይሞክሩ</string>
-    <string name="fingerprint_connect_serial_entry_pair_failed">እባክዎ ስካነር ቁጥር %1$s መብራቱን አረጋግጠው እንደገና ይሞክሩ</string>
-    <string name="fingerprint_connect_nfc_pair_toast_try_again">የNFC ቺፑን ማንበብ አልተቻለም፤ እባክዎ እንደገና ይሞክሩ</string>
-    <string name="fingerprint_connect_nfc_pair_toast_invalid">የተሳሳተ NFC ቺፕ ተገኝቷል</string>
-    <string name="fingerprint_connect_bluetooth_off_error">ብሉቱዙን ማብራት አልተቻለም። እባክዎ ብሉቱዙን የስልኩ መቸት (settings) ውስጥ ገብተው ያብሩ</string>
-    <string name="fingerprint_connect_serial_entry_pair_toast_invalid">እባክዎ የሲሪያል ቁጥሩን 6 አሃዞች ያስገቡ</string>
-    <string name="fingerprint_connect_not_my_scanner">%1$s የእኔ እስካነር አይደለም።</string>
-    <string name="fingerprint_connect_serial_entry_ok">እሽ</string>
-    <string name="fingerprint_connect_ota_title">ስካነሩ አፕዴት አድርግ</string>
-    <string name="fingerprint_connect_ota_instructions">ስካነሩ አፕዴት እስኪጨርስ እንደበራ ይቆይ</string>
-    <string name="fingerprint_connect_ota_updating">አፕዴት በማድረግ ላይ...</string>
-    <string name="fingerprint_connect_ota_updating_attempt">አፕዴት ሙከራ %1$s of %2$s…</string>
-    <string name="fingerprint_connect_ota_update_complete">✓ አፕዴት ተጠናቋል</string>
-    <string name="fingerprint_connect_ota_start_update">አፕዴት አስጀምር</string>
-    <string name="fingerprint_connect_ota_recovery_title">ስካነር አፕዴት አልተሳካም</string>
-    <string name="fingerprint_connect_ota_recovery_soft_reset">ስካነሩን አጥፍተህ እንደገና አብራ</string>
-    <string name="fingerprint_connect_ota_recovery_hard_reset">ማስነሻና ማጥፊያውን ለ 5 ሴኮንድ መጫን</string>
-    <string name="fingerprint_connect_ota_failed_title">ስካነር አፕዴት አልተሳካም</string>
-    <string name="fingerprint_connect_ota_failed_instructions">ለእርዳታ ሱፐርቫይዘሩን አሳዉቅ</string>
-    <string name="fingerprint_connect_ota_continue_button">ቀጥል</string>
-    <string name="fingerprint_capture_capture_number_text">ከ%2$s %1$s ይቃኙ</string>
-    <string name="fingerprint_capture_please_scan_again">እባክዎ እንደገና ይቃኙ</string>
+    <string name="exit_form_reason_person_not_present">ተጠቃሚው አልተገኝም</string>
+    <string name="exit_form_reason_too_young">ጨቅላ</string>
+    <string name="exit_form_reason_other">ተጨማሪ</string>
 
-    <string name="orchestrator_invalid_project_id_error_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="orchestrator_invalid_selected_id_error_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="orchestrator_invalid_session_id_error_message">የተሳሳተ የቆይታ መለያ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="orcehstrator_invalid_action_error_message">በሲስተሙ ያልተፈቀደ ፍላጎት ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="orchestrator_invalid_metadata_error_message">ልተፈቀደ ሜታዳታ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="orchestrator_invalid_user_id_error_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ስላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="orchestrator_invalid_module_id_error_message">የተሳሳተ የምዕራፍ መለያ ቁጥር ስላላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="orchestrator_invalid_verify_id_error_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ማጣሪያ ስላደረጉ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="orchestrator_rooted_device_error_title">ዋናው መሳሪያ ተገኝቷል</string>
-    <string name="orcehstrator_rooted_device_error_message">1. ተቆጣጣሪዎን ያግኙ-ዋናው መሳሪያ ተገኝቷል\n2. መዝጊያውን ይጫኑ</string>
+    <!-- Fetch subject -->
+    <string name="fetch_subject_checking_person">ተገልጋዩ ዳታቤዝ ውስጥ መኖሩን ማረጋገጥ</string>
+    <string name="fetch_subject_guid_not_found_alert_title">ግለሰቡ አልተገኘም</string>
+    <string name="fetch_subject_guid_not_found_online_message">አንዲጠራ የተመረጠው ግለሰብ ዳታቤዙ ውስጥ የለም</string>
+    <string name="fetch_subject_guid_not_found_offline_message">ግለሰቡ የለም፡ እባክዎ ከኢንተርኔት ጋር መገናኘትዎን አረጋግጠው እንደገና ይሞክሩ</string>
+    <!-- Login -->
+    <string name="login_id_hint">የፕሮጀክት መለያ ቁጥር</string>
+    <string name="login_secret_hint">የፕሮጀክት ቁልፍ</string>
+    <string name="login_user_id_hint">የተጠቀሚ መለያ ቁጥር</string>
+    <string name="login_scan_qr_button">የፈጣን ምላሽ መለያ እስካን ያድርጉ</string>
+    <string name="login_log_in_button">መግባት</string>
+    <string name="login_qr_code_scanning_problem_error">የፈጣን ምላሽ ሚስጥር ቁጥርን እስካን በሚያደረግበት ጊዜ ስህተት አጋጥሞታል</string>
+    <string name="login_invalid_qr_code_error">እስካን የተደረገው የፈጣን ምላሽ ሚስጥር ቁጥር ትክክል አይደለም</string>
+    <string name="login_missing_credentials_error">ተጠቃሚው ተዘሏል ፡ እባክዎ የተጠቃሚውን መለያ ቁጥር ፡ የፕሮጀክት ቁጥር እና ቁልፍ በማረጋገጥ እንደገና ይሞክሩ፡፡</string>
+    <string name="login_invalid_credentials_error">ትክክል ያልሆነ ተጠቃሚ ነው ፡ እባክዎ የፕሮጀክት ቁጥር እና ቁልፍ ያረጋግጡ፡፡</string>
+    <string name="login_project_id_intent_mismatch_error">የፕሮጀክት ቁጥሩ አቅራቢው ውስጥ ካለው ዝርዝር ጋር የተለየ ነው፡ እብክዎት የስስተም አስተዳዳሪውን ያነጋግሩ፡፡</string>
+    <string name="login_no_network_error">አሁን ከግንኙነት ውጭ ነዎት፡ እባክዎት የኢንተርኔት ግንኙነቱን መኖሩን ያረጋግጡ</string>
+    <string name="login_server_error">ሰርቨሩን ለማግኘት ሲሞክሩ ስህተት አጋጥሞታል ፡ እባክዎት ተንሽ ቆይተው ይሞክሩት፡፡</string>
 
-    <string name="face_capture_title_previewing">ለማንሳት እየተዘጋጀ</string>
-    <string name="face_capture_error_no_face">ፊቱ ክቡን መሙላቱን ያረጋግጡ</string>
-    <string name="face_capture_error_too_far">ቀረብ አድርግ(ፊት ርቋል)</string>
-    <string name="face_capture_error_too_close">ወደኋላ ተመለስ</string>
-    <string name="face_capture_error_look_straight">ሰዉየዉ ቀጥታ ካሜራዉን  እንዲያይ አድርግ</string>
-    <string name="face_capture_begin_button">ለማንሳት ተጫን</string>
-    <string name="face_capture_prep_begin_button_capturing">በማንሳት ላይ....</string>
-    <string name="face_capture_hold">ባለበት ፖዚሽኑ ላይ አቆይ....</string>
-    <string name="face_capture_successfully_title">የፊት ምስል በስኬት ተመዝግቧል</string>
-    <string name="face_capture_confirmation_title">ማረጋገጥ</string>
-    <string name="face_capture_capturing_title">አሁን ላይ(ላይቭ) ማንሳት</string>
-    <string name="face_capture_preparation_title">ለማንሳት በዝግጅት ላይ</string>
-    <string name="face_capture_recapture_button">እንደገና ማንሳት</string>
-    <string name="face_capture_finish_button">ለመቀጠል ተጫን</string>
-    <string name="face_capture_onboarding_light">በቂ ብርሀን ያለበት ቦታ መምረጥ</string>
-    <string name="face_capture_onboarding_fill">በካሜራው ክብ ዉስጥ ፊቱ እንዲገባ ማድረግ</string>
-    <string name="face_capture_onboarding_straight">ሰዉየው ወደ ስልኩ ቀጥ ብሎ ይመልከት</string>
-    <string name="face_capture_onboarding_continue_button">ለመቀጠል ስልኩ ሰሌዳ(የትኛውም ቦታ)  ተጫን</string>
-    <string name="face_capture_title_look_straight">ቀጥ ብሎ እየተመለከተ አይደለም</string>
-    <string name="face_capture_title_no_face">ምንም ፊት ማግኘት አልቻለም</string>
-    <string name="face_capture_title_too_close">ፊቱ በጣም ቀርቧል</string>
-    <string name="face_capture_title_too_far">ፊቱ በጣም ርቋል</string>
+    <!-- Matcher -->
     <string name="matcher_please_wait">የመለየት ሰራውን እስኪጠናቀቅ እባክዎት ትንሽ ይጠብቁ</string>
     <string name="matcher_loading_candidates">ዕጩዎችን በመጫን ላይ ነው</string>
     <string name="matcher_matching_candidates">ካሉት %s ማህደር ዉስጥ እየለየ</string>
-    <string name="face_configuration_licence_invalid_title">ፍቃድ አይሰራም/ትክክል አይደለም</string>
-    <string name="face_configuration_licence_invalid_message">የፊት ላይሰንሱ/ ፍቃድ የማይሰራ ነው፤እባክዎ የሲስተም አስተዳዳሪውን ያሳውቁ</string>
-    <string name="face_configuration_started">የፊት ሞዳሊቲ አልተገኘም</string>
-    <string name="face_configuration_downloading">አስፈላጊ ፋይሎችን በማውረድ ላይ</string>
-    <string name="face_configuration_generic_error_title">የማዋቀር ስህተት</string>
-    <string name="face_configuration_generic_error_message">የፊት ሁነታን በማዋቀር ላይ ስህተት ነበር፣እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
-    <string name="enrol_last_biometrics_alert_message_face_param">ፊት</string>
     <plurals name="matcher_matched_candidates">
         <item quantity="one">እያወዳደረ %d ተመራጭ</item>
         <item quantity="other">እያወዳደረ %d ተመራጮችን</item>
@@ -325,4 +97,272 @@
         <item quantity="one">%d  ተመራጭ</item>
         <item quantity="other">%d  ተመራጮች</item>
     </plurals>
+
+    <string name="orchestrator_configuration_error_title">የተግበቦት ስህተት</string>
+    <string name="orchestrator_project_id_error_message">የተለየ የፕሮጀክት መለያ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_outdated_google_play_services_alert_title">ጊዜው ያለፈበት የጉግል ፕለይ አገልግሎቶች</string>
+    <string name="orchestrator_outdated_google_play_services_alert_message">በዚህ መሳሪያ ላይ የተጫነው የጉግል ፕለይ አገልግሎት ስሪት በSID ከሚያስፈልገው በላይ የቆየ ነው።</string>
+    <string name="orchestrator_missing_google_play_services_alert_title">የጎግል ፕሌይ አገልግሎቶች ይጎድላሉ</string>
+    <string name="orchestrator_missing_google_play_services_alert_message">የጉግል ፕለይ አገልግሎቶች በዚህ መሳሪያ ላይ አልተጫነም።</string>
+    <string name="orchestrator_project_paused_title">ፕሮጀክቱ በአሁኑ ጊዜ ባለበት ቆሟል</string>
+    <string name="orchestrator_project_paused_body">ክፍለ-ጊዜን ማስጀመር አልተቻለም ምክንያቱም ፕሮጀክቱ በአሁኑ ጊዜ ባለበት ቆሟል። ለበለጠ መረጃ እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_invalid_project_id_error_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_invalid_selected_id_error_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_invalid_session_id_error_message">የተሳሳተ የቆይታ መለያ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orcehstrator_invalid_action_error_message">በሲስተሙ ያልተፈቀደ ፍላጎት ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_invalid_metadata_error_message">ልተፈቀደ ሜታዳታ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_invalid_user_id_error_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ስላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_invalid_module_id_error_message">የተሳሳተ የምዕራፍ መለያ ቁጥር ስላላስገቡ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_invalid_verify_id_error_message">የተሳሳተ የተጠቃሚ መለያ ቁጥር ማጣሪያ ስላደረጉ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="orchestrator_rooted_device_error_title">ዋናው መሳሪያ ተገኝቷል</string>
+    <string name="orcehstrator_rooted_device_error_message">1. ተቆጣጣሪዎን ያግኙ-ዋናው መሳሪያ ተገኝቷል\n2. መዝጊያውን ይጫኑ</string>
+
+    <!-- Select subject -->
+    <string name="select_subject_confirmation_sent">ማረጋገጫ ተልኳል</string>
+    <string name="select_subject_redirecting_back">እርስዎን መልሰው በማዛወር ላይ</string>
+
+    <!-- Face config -->
+    <string name="face_configuration_started">የፊት ሞዳሊቲ አልተገኘም</string>
+    <string name="face_configuration_downloading">አስፈላጊ ፋይሎችን በማውረድ ላይ</string>
+    <string name="face_configuration_licence_invalid_title">ፍቃድ አይሰራም/ትክክል አይደለም</string>
+    <string name="face_configuration_licence_invalid_message">የፊት ላይሰንሱ/ ፍቃድ የማይሰራ ነው፤እባክዎ የሲስተም አስተዳዳሪውን ያሳውቁ</string>
+    <string name="face_configuration_generic_error_title">የማዋቀር ስህተት</string>
+    <string name="face_configuration_generic_error_message">የፊት ሁነታን በማዋቀር ላይ ስህተት ነበር፣እባክዎ የስርዓት አስተዳዳሪዎን ያግኙ</string>
+
+    <!-- Face capture -->
+    <string name="face_capture_onboarding_light">በቂ ብርሀን ያለበት ቦታ መምረጥ</string>
+    <string name="face_capture_onboarding_fill">በካሜራው ክብ ዉስጥ ፊቱ እንዲገባ ማድረግ</string>
+    <string name="face_capture_onboarding_straight">ሰዉየው ወደ ስልኩ ቀጥ ብሎ ይመልከት</string>
+    <string name="face_capture_onboarding_continue_button">ለመቀጠል ስልኩ ሰሌዳ(የትኛውም ቦታ)  ተጫን</string>
+    <string name="face_capture_capturing_title">አሁን ላይ(ላይቭ) ማንሳት</string>
+    <string name="face_capture_preparation_title">ለማንሳት በዝግጅት ላይ</string>
+    <string name="face_capture_title_previewing">ለማንሳት እየተዘጋጀ</string>
+    <string name="face_capture_title_no_face">ምንም ፊት ማግኘት አልቻለም</string>
+    <string name="face_capture_error_no_face">ፊቱ ክቡን መሙላቱን ያረጋግጡ</string>
+    <string name="face_capture_title_too_far">ፊቱ በጣም ርቋል</string>
+    <string name="face_capture_error_too_far">ቀረብ አድርግ(ፊት ርቋል)</string>
+    <string name="face_capture_title_too_close">ፊቱ በጣም ቀርቧል</string>
+    <string name="face_capture_error_too_close">ወደኋላ ተመለስ</string>
+    <string name="face_capture_title_look_straight">ቀጥ ብሎ እየተመለከተ አይደለም</string>
+    <string name="face_capture_error_look_straight">ሰዉየዉ ቀጥታ ካሜራዉን  እንዲያይ አድርግ</string>
+    <string name="face_capture_begin_button">ለማንሳት ተጫን</string>
+    <string name="face_capture_prep_begin_button_capturing">በማንሳት ላይ....</string>
+    <string name="face_capture_hold">ባለበት ፖዚሽኑ ላይ አቆይ....</string>
+    <string name="face_capture_successfully_title">የፊት ምስል በስኬት ተመዝግቧል</string>
+    <string name="face_capture_confirmation_title">ማረጋገጥ</string>
+    <string name="face_capture_recapture_button">እንደገና ማንሳት</string>
+    <string name="face_capture_finish_button">ለመቀጠል ተጫን</string>
+
+    <!-- Fingerprint connect -->
+    <string name="fingerprint_connect_error_title">ስህተት አጋጥሟል</string>
+    <string name="fingerprint_connect_error_close_button">ይዝጉ</string>
+    <string name="fingerprint_connect_try_again_button">እንደገና ይሞክሩ</string>
+    <string name="fingerprint_connect_phone_settings_button">የስልክ ማስተካከያ</string>
+    <string name="fingerprint_connect_pair_scanner_button">ማስተካከያ</string>
+    <string name="fingerprint_connect_scanner_id_confirmation_message">እስካነሩ %1$s ነው?</string>
+    <string name="fingerprint_connect_scanner_confirmation_yes">አዎ</string>
+    <string name="fingerprint_connect_scanner_confirmation_no">አይ</string>
+    <string name="fingerprint_connect_scanner_bt_connect">ከቬሮ ጋር መገናኘት</string>
+    <string name="fingerprint_connect_scanner_wake_un20">ቬሮ እየተነሳ ነው</string>
+    <string name="fingerprint_connect_scanner_setup">የቬሮ መማስተካከያ</string>
+    <string name="fingerprint_connect_scanner_finished">ተገናኝቷል</string>
+    <string name="fingerprint_connect_bluetooth_off_title">ብሉቱዙ ጠፍቷል</string>
+    <string name="fingerprint_connect_turn_on_bluetooth">ብሉቱዙውን ያብሩት</string>
+    <string name="fingerprint_connect_bluetooth_on">✓ ብሉቱዙው በርቷል</string>
+    <string name="fingerprint_connect_bluetooth_off_error">ብሉቱዙን ማብራት አልተቻለም። እባክዎ ብሉቱዙን የስልኩ መቸት (settings) ውስጥ ገብተው ያብሩ</string>
+    <string name="fingerprint_connect_nfc_off_title">NFC ጠፍቷል</string>
+    <string name="fingerprint_connect_turn_on_nfc">NFC ያብሩት</string>
+    <string name="fingerprint_connect_nfc_on">✓ NFC በርቷል</string>
+    <string name="fingerprint_connect_scanner_off_title">ስካነሩ ጠፍቷል</string>
+    <string name="fingerprint_connect_scanner_off_instructions">የስካነሩን ማስነሻ ቁልፍ ይጫኑ</string>
+    <string name="fingerprint_connect_scanner_on">✓ ስካነሩ በርቷል</string>
+    <string name="fingerprint_connect_not_my_scanner">%1$s የእኔ እስካነር አይደለም።</string>
+    <string name="fingerprint_connect_nfc_pair_title">ስካነሩ እና የሚጠቀሙት መሳሪያ አልተገናኘም</string>
+    <string name="fingerprint_connect_nfc_pair_instructions">የስካነሩን ጀርባ ከስልኩ ጀርባ ጋር ያገናኙ</string>
+    <string name="fingerprint_connect_nfc_cannot_connect_devices">የሚጠቀሙበት መሳሪያ ሊገናኝ አልቻለም</string>
+    <string name="fingerprint_connect_nfc_pairing_in_progress">የተገኘው ስካነር  %1$s</string>
+    <string name="fingerprint_connect_nfc_pairing_try_again_instruction">እባክዎ ስካነር ቁጥር %1$s መብራቱን አረጋግጠው እንደገና ይሞክሩ</string>
+    <string name="fingerprint_connect_nfc_pair_toast_try_again">የNFC ቺፑን ማንበብ አልተቻለም፤ እባክዎ እንደገና ይሞክሩ</string>
+    <string name="fingerprint_connect_nfc_pair_toast_invalid">የተሳሳተ NFC ቺፕ ተገኝቷል</string>
+    <string name="fingerprint_connect_serial_entry_ok">እሽ</string>
+    <string name="fingerprint_connect_serial_entry_pair_title">ስካነሩ እና የሚጠቀሙት መሳሪያ አልተገናኘም</string>
+    <string name="fingerprint_connect_enter_scanner_number">የስካነሩን ቁጥር ቀጥሎ ካለው ሳጥን ላይ ይፃፉ</string>
+    <string name="fingerprint_connect_enter_scanner_number_detail">ይህ የሚገኘው በስካነሩ የታችኛው ክፍል ነው</string>
+    <string name="fingerprint_connect_serial_entry_pair_failed">እባክዎ ስካነር ቁጥር %1$s መብራቱን አረጋግጠው እንደገና ይሞክሩ</string>
+    <string name="fingerprint_connect_serial_entry_pair_toast_invalid">እባክዎ የሲሪያል ቁጥሩን 6 አሃዞች ያስገቡ</string>
+    <string name="fingerprint_connect_ota_title">ስካነሩ አፕዴት አድርግ</string>
+    <string name="fingerprint_connect_ota_instructions">ስካነሩ አፕዴት እስኪጨርስ እንደበራ ይቆይ</string>
+    <string name="fingerprint_connect_ota_updating">አፕዴት በማድረግ ላይ...</string>
+    <string name="fingerprint_connect_ota_updating_attempt">አፕዴት ሙከራ %1$s of %2$s…</string>
+    <string name="fingerprint_connect_ota_update_complete">✓ አፕዴት ተጠናቋል</string>
+    <string name="fingerprint_connect_ota_start_update">አፕዴት አስጀምር</string>
+    <string name="fingerprint_connect_ota_recovery_title">ስካነር አፕዴት አልተሳካም</string>
+    <string name="fingerprint_connect_ota_recovery_soft_reset">ስካነሩን አጥፍተህ እንደገና አብራ</string>
+    <string name="fingerprint_connect_ota_recovery_hard_reset">ማስነሻና ማጥፊያውን ለ 5 ሴኮንድ መጫን</string>
+    <string name="fingerprint_connect_ota_failed_title">ስካነር አፕዴት አልተሳካም</string>
+    <string name="fingerprint_connect_ota_failed_instructions">ለእርዳታ ሱፐርቫይዘሩን አሳዉቅ</string>
+    <string name="fingerprint_connect_ota_continue_button">ቀጥል</string>
+    <string name="fingerprint_connect_low_battery_error_title">ዝቅተኛ ባትሪ</string>
+    <string name="fingerprint_connect_low_battery_error_message">የእስካነሩ ባትሪ እያለቀ ነው እባክዎ እስካነሩን ቻርጅ ያድርጉ</string>
+    <string name="fingerprint_connect_pair_scanner_and_device_error_title">እስካነርና ስልኩን ያጣምሩ</string>
+    <string name="fingerprint_connect_pair_scanner_and_device_error_message">1. እስካነሩ መብራቱን ያረጋግጡ
+\n2. መቸቱን /ሴቲንግ ይምረጡ
+\n3. የተጣመረውን እስካነር ያለያዩ
+\n4.እስካነርና ስልኩን ያጣምሩ
+\n5. ወደ ሲምፕሪንት ይመለሱ</string>
+    <string name="fingerprint_connect_turn_scanner_on_error_title">እስካነሩን ያብሩ</string>
+    <string name="fingerprint_connect_turn_scanner_on_error_message">1. እስካነሩን ያስነሱ\n2. እንደገና ይሞክሩ</string>
+    <string name="fingerprint_connect_bluetooth_not_supported_error_message">የሚጠቀሙበት መሳሪያ ብሉቱዝ ለመጠቀም አያስችልም፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="fingerprint_connect_bluetooth_not_enabled_error_message">ብሉቱዝ አልተከፈተም ፡ለመጠቀም አያስችልም፤እባክዎ ማስተካከያው ውስጥ ገብተው ብሉቱዙን ከፍተው እንደገና ይሞክሩ</string>
+    <string name="fingerprint_connect_multiple_scanners_found_error_message">በስልኩ ላይ ከአንድ በላይ እስካነር ተገናኝቷል፣ እባክዎ የማይፈልጉትን እስካነር ግንኙነቱን ያቋርጡ</string>
+
+    <!-- Fingerprint capture -->
+    <string name="fingerprint_capture_enrol_title">ወደ ሲስተሙ ማስገባት</string>
+    <string name="fingerprint_capture_identify_title">መለየት</string>
+    <string name="fingerprint_capture_verify_title">ማመሳከር</string>
+    <string name="fingerprint_capture_finger_l_5">የግራ እጅ አምስተኛ ጣት</string>
+    <string name="fingerprint_capture_finger_l_4">የግራ እጅ አራተኛ ጣት</string>
+    <string name="fingerprint_capture_finger_l_3">የግራ እጅ ሶስተኛ ጣት</string>
+    <string name="fingerprint_capture_finger_l_2">የግራ እጅ ጠቋሚ ጣት</string>
+    <string name="fingerprint_capture_finger_l_1">የግራ አውራጣትዎን</string>
+    <string name="fingerprint_capture_finger_r_1">የቀኝ አውራጣትዎን</string>
+    <string name="fingerprint_capture_finger_r_2">የቀኝ እጅ ጠቋሚ ጣት</string>
+    <string name="fingerprint_capture_finger_r_3">የቀኝ  እጅ ሶስተኛ ጣት</string>
+    <string name="fingerprint_capture_finger_r_4">የቀኝ እጅ አራተኛ ጣት</string>
+    <string name="fingerprint_capture_finger_r_5">የቀኝ እጅ አምስተኛ ጣት</string>
+    <string name="fingerprint_capture_unexpected_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
+    <string name="fingerprint_capture_please_scan">እባክዎ እስካን ያድርጉ</string>
+    <string name="fingerprint_capture_good_scan_direction">ለቀጣዩ ጣትዎ ወደ ግራ ያንሸራቱ</string>
+    <string name="fingerprint_capture_poor_scan_direction">እባክዎ እንደገና እስካን ያድርጉ</string>
+    <string name="fingerprint_capture_scanning">እስካን ማድረግ</string>
+    <string name="fingerprint_capture_transfering_data">መረጃ በማስተላለፍ ላይ ነው</string>
+    <string name="fingerprint_capture_good_scan_message">ጥሩ የሆነ እስካን</string>
+    <string name="fingerprint_capture_poor_scan_message">ጥሩ ያልሆነ እስካን</string>
+    <string name="fingerprint_capture_no_finger_detected_message">ምንም አይነት ጣት አላገኘም</string>
+    <string name="fingerprint_capture_finger_skipped_message">ጣት አሻረው ተዘሏል</string>
+    <string name="fingerprint_capture_no_fingers_scanned">እባክዎ ቢያንስ አንድ ጣትዎን ለአሻራ ይስጡ</string>
+    <string name="fingerprint_capture_confirm_fingers_dialog_title">ጣትዎ አሻራ ተነስቷል</string>
+    <string name="fingerprint_capture_confirm_fingers_dialog_yes">ማረጋገጥ</string>
+    <string name="fingerprint_capture_confirm_fingers_dialog_no">እንደገና መስነሳት</string>
+    <string name="fingerprint_capture_capture_number_text">ከ%2$s %1$s ይቃኙ</string>
+    <string name="fingerprint_capture_please_scan_again">እባክዎ እንደገና ይቃኙ</string>
+    <string name="fingerprint_capture_rescan">እንደገና እስካን ያድርጉ</string>
+    <string name="fingerprint_capture_rescan_question">እንደገና እስካን ይደረግ?</string>
+    <string name="fingerprint_capture_scan">እስካን</string>
+    <string name="fingerprint_capture_please_wait">እባክዎትን ይጠብቁ</string>
+    <string name="fingerprint_capture_missing_finger_button">ይህ ጣት የለም</string>
+    <string name="fingerprint_capture_try_another_title">ዝግጁ ነው</string>
+    <string name="fingerprint_capture_try_another_finger">እባክዎት ሌላ ጣት ይሞክሩ</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">የሁነቶች ማሳያ</string>
+    <string name="dashboard_menu_privacy_notice">የደህንነት ማሳታወቂያ</string>
+    <string name="dashboard_menu_settings">ማስተካከያ</string>
+    <string name="dashboard_sync_project_ending_alert_title">ፕሮጀክቱ በአሁኑ ጊዜ እየተጠናቀቀ ነው።</string>
+    <string name="dashboard_sync_project_ending_message">ፕሮጀክቱ በአሁኑ ጊዜ እያለቀ ስለሆነ ክፍለ-ጊዜን ማስጀመር አልተቻለም። ለበለጠ መረጃ እባክዎን ተቆጣጣሪዎን ያነጋግሩ</string>
+
+    <string name="dashboard_request_login_message">መግባት ከፈለጉ፡ እባክዎ የደንበኛውን አፕልኬሽን ከፍተው የሲም ፕሪንትን መለያቁጥር በመጠቀም መግባት ይችላሉ</string>
+    <!-- Dashboard - Project card -->
+    <string name="dashboard_project_card_scanner_used">እስካነር ይጠቀሙ: %1$s</string>
+    <string name="dashboard_project_card_current_user">አሁን ያለ ተጠቃሚ: %1$s</string>
+
+    <!-- Dashboard - Sync card -->
+    <string name="dashboard_sync_card_title">መረጃውን መገናኘት</string>
+    <string name="dashboard_sync_card_complete">ሲንክ ማድረጉ ተጠናቋል</string>
+    <string name="dashboard_sync_card_incomplete">ሲንክ ማድረጉ አልተጠናቀቀም</string>
+    <string name="dashboard_sync_card_connecting">በመገኛኘት ላይ ነው</string>
+    <string name="dashboard_sync_card_progress">በግንኙነት ላይ...%1$s</string>
+    <string name="dashboard_sync_card_sync_button">አሁን ግንኙነት ፍጠር</string>
+    <string name="dashboard_sync_card_failed_message">ሲንክ ማድረግ አልተቻለም እባክዎ የበላይ አካል ያግኙ</string>
+    <string name="dashboard_sync_card_no_modules_message">ሲንክ ለማድረግ ሞጁል ይምረጡ</string>
+    <string name="dashboard_sync_card_no_modules_button">ሞጁሎች</string>
+    <string name="dashboard_sync_card_offline_message">የስልኩ ሴቲንግ በመግባት የሞባይል ዳታ ያብሩ</string>
+    <string name="dashboard_sync_card_offline_button">ማስተካከያ</string>
+    <string name="dashboard_sync_card_last_sync">ያለፈው ግንኙነት: %1$s</string>
+    <string name="dashboard_sync_card_records_uploaded">ሁሉም መዝገቦች ተጭነዋል።</string>
+    <string name="dashboard_sync_card_try_again_button">እንደገና ይሞክሩ</string>
+
+    <!-- Dashboard - Daily activity card -->
+    <string name="dashboard_activity_card_activity">የየዕለት ተግባር: %1$s</string>
+    <plurals name="dashboard_activity_card_enrolments">
+        <item quantity="one">%d ወደ ሲስተሙ ማስገባት</item>
+        <item quantity="other">ወደ ሲስተሙ ማስገባት</item>
+    </plurals>
+    <plurals name="dashboard_activity_card_identifications">
+        <item quantity="one">%d መለየት</item>
+        <item quantity="other">መለየት</item>
+    </plurals>
+    <plurals name="dashboard_activity_card_verifications">
+        <item quantity="one">%d ማመሳከር</item>
+        <item quantity="other">ማመሳከር</item>
+    </plurals>
+
+    <!-- Dashboard - Settings -->
+    <string name="dashboard_settings_title">ማስተካከያ</string>
+    <string name="dashboard_settings_about_title">የበለጠ</string>
+    <string name="dashboard_preferences_general_category_title">አጠቃላይ</string>
+    <string name="dashboard_preference_app_details_category_title">ስለ አፕልኬሽኑ የበለጠ</string>
+    <string name="dashboard_preference_app_details_title">የበለጠ</string>
+    <string name="dashboard_preference_sync_and_search_title">የሲንክ እና የፍለጋ ተግባቦት</string>
+    <string name="dashboard_preference_logout_title">ይውጡ</string>
+    <string name="dashboard_preference_select_language_title">ቋንቋ</string>
+    <string name="dashboard_preference_view_fingers_title">ነባሪ ጣቶችን ይመልከቱ</string>
+    <string name="dashboard_preference_select_modules_title">ሞጅውሎችን ይምረጡ</string>
+    <string name="dashboard_preference_app_version_title">የሶፍትዌር ስሪት</string>
+    <string name="dashboard_preference_sync_information_title">ሲንክ የተደረገ መረጃ</string>
+    <string name="dashboard_preference_scanner_version_title">የእስካነር  ስሪት</string>
+    <string name="dashboard_preference_device_id_title">የመሳሪያው መለያ</string>
+    <string name="dashboard_preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
+    <string name="dashboard_preference_summary_sync_information">ሲንክ ላይ ተጨማሪ ዝርዝር መረጃ</string>
+
+    <!-- Dashboard - Sync info -->
+    <string name="dashboard_sync_info_title">ሲንክ የተደረገ መረጃ</string>
+    <string name="dashboard_sync_info_select_modules_button">ሞጅውሎችን ይምረጡ</string>
+    <string name="dashboard_sync_info_records_to_upload">የተመዘገበውን ለመጫን</string>
+    <string name="dashboard_sync_info_records_to_download">የተመዘገበውን ለመማውረድ</string>
+    <string name="dashboard_sync_info_records_to_delete">የተመዘገበውን ለመሰረዝ</string>
+    <string name="dashboard_sync_info_total_records_on_device">በስልኩ አጠቃላይ የተመዘገበ</string>
+    <string name="dashboard_sync_info_selected_modules">የተመረጠ ሞጁል</string>
+    <string name="dashboard_sync_info_unselected_modules">ያልተመረጡ ሞጁሎች</string>
+    <string name="dashboard_sync_info_total_records">አጠቃላይ የተመዘገበ</string>
+    <string name="dashboard_sync_info_images_to_upload">የሚጫኑ ምስሎች</string>
+    <string name="dashboard_sync_info_sync_now_button">አሁን ግንኙነት ፍጠር</string>
+    <string name="dashboard_sync_info_sync_in_progress">በግንኙነት ላይ</string>
+    <!-- Dashboard - Module selection -->
+    <string name="dashboard_select_modules_no_modules">የተሳሳተ ምርጫ፡ እባክዎት ካለው የምዕራፍ አማራጭ ውስጥ ቢያንስ አንድ ይምረጡ</string>
+    <string name="dashboard_select_modules_too_many_modules">የተሳሳተ ምርጫ ፡ካሉት ምዕራፎች ውስጥ ከ %1$d በላይ መምረጥ አይችሉም</string>
+    <string name="dashboard_select_modules_search_hint">ሞጁሎችን መፈለግ</string>
+    <string name="dashboard_select_modules_no_modules_selected">የተመረጠ ሞጁል የለም</string>
+    <string name="dashboard_select_modules_no_results">ምንም ውጤት የለም</string>
+    <string name="dashboard_select_modules_selected">የተመረጠ ሞጁል</string>
+    <string name="dashboard_select_modules_confirm_title">ሞጁል ተመርጧል</string>
+    <string name="dashboard_select_modules_confirm_yes">ማረጋገጥ</string>
+    <string name="dashboard_select_modules_confirm_no">ሰርዝ</string>
+
+    <!-- Dashboard - Finger selection -->
+    <string name="dashboard_select_fingers_title">የእይታ ጣቶች</string>
+    <string name="dashboard_select_fingers_finger_label">ጣት</string>
+    <string name="dashboard_select_fingers_quantity_label">ብዛት</string>
+
+    <!-- Dashboard - Settings lock dialog-->
+    <string name="dashboard_password_lock_title_default">ለመክፈት የይለፍ ቃል ያስገቡ</string>
+    <string name="dashboard_password_lock_title_logout">ለመውጣት የይለፍ ቃል ያስገቡ</string>
+    <string name="dashboard_password_lock_hint">የይለፍ ቃል</string>
+    <string name="dashboard_password_lock_wrong_pin">የተሳሳተ የይለፍ ቃል</string>
+    <string name="dashboard_password_lock_overlay_title">ለመክፈት መታ ያድርጉ</string>
+
+    <!-- Dashboard - Logout request -->
+    <string name="dashboard_logout_title">መውጣት</string>
+    <string name="dashboard_logout_confirmation_sync_decline_button">ሳይመሳሰል ውጣ</string>
+    <string name="dashboard_logout_confirmation_sync_info">በመሳሪያዎ ላይ ከመውጣትዎ በፊት መመሳሰል ያለባቸው መዝገቦች አሉ። እባክህ የማመሳሰል ሂደቱ እንዲጠናቀቅ ፍቀድ። ማመሳሰል እንደጨረሰ ዘግተህ መውጣት ትችላለህ።</string>
+    <string name="dashboard_logout_confirmation_sync_decline_warning_title">ማስጠንቀቂያ</string>
+    <string name="dashboard_logout_confirmation_sync_decline_warning_body">የእርስዎ ፕሮጀክት ወቅታዊ መዛግብት እንዳለው ለማረጋገጥ የውሂብ ማመሳሰል አስፈላጊ ነው። ያለ ትክክለኛ ምክንያት የእርስዎን ውሂብ ማመሳሰል አለመቻል የስራ ባልደረቦችዎ ጠቃሚ መዝገቦችን ማግኘት እና የፕሮጀክቱን ትክክለኛ ሪፖርት የማድረግ ችሎታ ላይ ተጽእኖ ያሳድራል። እና ለእርስዎ እና ለፕሮጀክቱ የማይፈለጉ ውጤቶችን ሊያስከትል ይችላል.</string>
+    <string name="dashboard_logout_confirmation_title">መውጣት</string>
+    <string name="dashboard_logout_confirmation_message">ጨርሰው መውጣት ይፈልጋሉ</string>
+    <string name="dashboard_logout_confirmation_cancel_button">ሰርዝ</string>
+
+    <!-- Maintenance mode errors -->
+    <string name="error_backend_maintenance_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ቆየት ብለው ይሞክሩ.</string>
+    <string name="error_backend_maintenance_with_time_message">ስርዓቱ በአሁኑ ጊዜ ለጥገና ከመስመር ውጭ ነው። እባክዎ ከ%s በኋላ እንደገና ይሞክሩ</string>
+
 </resources>
