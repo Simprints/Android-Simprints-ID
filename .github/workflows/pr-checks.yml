@@ -30,11 +30,13 @@ jobs:
         with:
             modules: |
                 infra:orchestrator-data
-                infra:license
-                infra:images
                 infra:realm
                 infra:project-security-store
                 infra:recent-user-activity
+                infra:config-store
+                infra:config-sync
+                infra:auth-store
+                infra:auth-logic
             reportsId: infra1
 
     infra-unit-tests-2:
@@ -43,18 +45,16 @@ jobs:
         secrets: inherit
         with:
             modules: |
-                infra:config-store
-                infra:config-sync
                 infra:events
                 infra:event-sync
                 infra:enrolment-records-store
                 infra:enrolment-records-sync
-                infra:auth-store
-                infra:auth-logic
+                infra:license
+                infra:images
             reportsId: infra2
 
-    feature-unit-tests:
-        name: Feature Unit Tests
+    feature-unit-tests1:
+        name: Feature Unit Tests 1
         uses: ./.github/workflows/run-unit-tests.yml
         secrets: inherit
         with:
@@ -64,6 +64,14 @@ jobs:
                 feature:login-check
                 feature:alert
                 feature:exit-form
+            reportsId: feature1
+
+    feature-unit-tests2:
+        name: Feature Unit Tests 2
+        uses: ./.github/workflows/run-unit-tests.yml
+        secrets: inherit
+        with:
+            modules: |
                 feature:consent
                 feature:login
                 feature:fetch-subject
@@ -71,7 +79,7 @@ jobs:
                 feature:setup
                 feature:enrol-last-biometric
                 feature:matcher
-            reportsId: feature
+            reportsId: feature2
 
     feature-dashboard-unit-tests:
         name: Feature Dashboard Unit Tests
@@ -110,5 +118,12 @@ jobs:
     sonarqube:
         name: SonarQube
         secrets: inherit
-        needs: [ core-unit-tests, infra-unit-tests-1, infra-unit-tests-2, feature-unit-tests, feature-dashboard-unit-tests, face-unit-tests, fingerprint-unit-tests ]
+        needs: [ core-unit-tests,
+                 infra-unit-tests-1,
+                 infra-unit-tests-2,
+                 feature-unit-tests1,
+                 feature-unit-tests2,
+                 feature-dashboard-unit-tests,
+                 face-unit-tests,
+                 fingerprint-unit-tests ]
         uses: ./.github/workflows/sonar-scan.yml

@@ -1,4 +1,3 @@
-
 # Please follow the specified deployment order: alpha -> prod-25 -> prod-50 -> prod-100
 # Failing to adhere to this order will result in an exception.
 # TODO The execution for this workflow should be restricted to the "deployment leads"  github team.
@@ -37,9 +36,6 @@ jobs:
                 with:
                     java-version: 17
                     distribution: 'temurin'
-
-            -   name: Set up Gradle
-                uses: gradle/gradle-build-action@v2
 
             -   name: Set up local.properties
                 run: |

@@ -28,8 +28,17 @@ jobs:
                     java-version: 17
                     distribution: 'temurin'
 
-            -   name: Set up Gradle
-                uses: gradle/gradle-build-action@v2
+            -   name: Restore gradle global directory
+                uses: actions/cache/restore@v3
+                id: cache
+                with:
+                    path: |
+                        ~/.gradle/
+                        .gradle/
+
+                    key: global-gradle-
+                    restore-keys: global-gradle-
+
 
             -   name: Set up local.properties
                 run: |
@@ -46,7 +55,7 @@ jobs:
                     # output the array in the step output so that it can be used in the next step
                     echo "modules_array=${modules_array[@]}">> $GITHUB_OUTPUT
             -   name: Run tests
-                run: |                    
+                run: |
                     # Get the modules array from the previous step
                     modules_array=("${{ steps.create-modules-array.outputs.modules_array}}")
                     modules_array=(${modules_array// / })
@@ -59,7 +68,7 @@ jobs:
                         echo "=========================================="
                         echo "=========================================="
                         echo -e "\n\n"
-                        gradle $module:jacocoTestReport
+                        ./gradlew $module:jacocoTestReport
                     done
 
             -   name: Upload Folders
@@ -67,4 +76,3 @@ jobs:
                 with:
                     name: "${{ inputs.reportsId }}"
                     path: "*/**/build/reports/jacoco/jacocoTestReport"
-
