@@ -1,6 +1,10 @@
 package com.simprints.infra.enrolment.records.store.local
 
-import com.simprints.infra.enrolment.records.store.domain.models.*
+import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
+import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.store.exceptions.InvalidQueryToLoadRecordsException
 import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
@@ -8,22 +12,19 @@ import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbSubject
-import io.realm.Realm
-import io.realm.RealmAny
-import io.realm.RealmQuery
-import io.realm.Sort
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.query.RealmQuery
+import io.realm.kotlin.query.Sort
+import io.realm.kotlin.types.RealmUUID
 import java.io.Serializable
-import java.util.*
 import javax.inject.Inject
 
-internal class SubjectLocalDataSourceImpl @Inject constructor(private val realmWrapper: RealmWrapper) :
-    SubjectLocalDataSource {
+internal class SubjectLocalDataSourceImpl @Inject constructor(
+    private val realmWrapper: RealmWrapper,
+) : SubjectLocalDataSource {
 
     companion object {
+
         const val PROJECT_ID_FIELD = "projectId"
         const val USER_ID_FIELD = "attendantId"
         const val SUBJECT_ID_FIELD = "subjectId"
@@ -32,17 +33,13 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(private val realmW
         const val IS_MODULE_ID_TOKENIZED_FIELD = "isModuleIdTokenized"
     }
 
-    override suspend fun load(query: SubjectQuery): Flow<Subject> =
-        realmWrapper.useRealmInstance {
-            it.buildRealmQueryForSubject(query)
-                .findAll()
-                ?.map { dbSubject -> dbSubject.fromDbToDomain() }
-                ?.asFlow()
-                ?: flowOf()
-        }
+    override suspend fun load(query: SubjectQuery): List<Subject> = realmWrapper.readRealm {
+        it.query(DbSubject::class).buildRealmQueryForSubject(query)
+            .find()
+            .map { dbSubject -> dbSubject.fromDbToDomain() }
+    }
 
-
-    override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
+    override suspend fun loadFingerprintIdentities(query: Serializable): List<FingerprintIdentity> =
         if (query is SubjectQuery) {
             load(query).map { subject ->
                 FingerprintIdentity(subject.subjectId, subject.fingerprintSamples)
@@ -51,7 +48,7 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(private val realmW
             throw InvalidQueryToLoadRecordsException()
         }
 
-    override suspend fun loadFaceIdentities(query: Serializable): Flow<FaceIdentity> =
+    override suspend fun loadFaceIdentities(query: Serializable): List<FaceIdentity> =
         if (query is SubjectQuery) {
             load(query).map { subject ->
                 FaceIdentity(subject.subjectId, subject.faceSamples)
@@ -61,14 +58,9 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(private val realmW
         }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
-
-        realmWrapper.useRealmInstance { realmInstance ->
-            realmInstance.executeTransaction { realm ->
-                queries.forEach {
-                    realm.buildRealmQueryForSubject(it)
-                        .findAll()
-                        .deleteAllFromRealm()
-                }
+        realmWrapper.writeRealm { realm ->
+            queries.forEach {
+                realm.delete(realm.query(DbSubject::class).buildRealmQueryForSubject(it))
             }
         }
     }
@@ -77,11 +69,13 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(private val realmW
         delete(listOf(SubjectQuery()))
     }
 
-    override suspend fun count(query: SubjectQuery): Int =
-        realmWrapper.useRealmInstance { realm ->
-            realm.buildRealmQueryForSubject(query)
-                .count().toInt()
-        }
+    override suspend fun count(query: SubjectQuery): Int = realmWrapper.readRealm { realm ->
+        realm.query(DbSubject::class)
+            .buildRealmQueryForSubject(query)
+            .count()
+            .find()
+            .toInt()
+    }
 
 
     override suspend fun performActions(actions: List<SubjectAction>) {
@@ -92,54 +86,65 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(private val realmW
             return
         }
 
-        realmWrapper.useRealmInstance {
-            it.executeTransaction { realm ->
-                actions.forEach { action ->
-                    when (action) {
-                        is SubjectAction.Creation -> {
-                            realm.insertOrUpdate(action.subject.fromDomainToDb())
-                        }
-                        is SubjectAction.Deletion -> {
-                            realm.buildRealmQueryForSubject(
-                                query = SubjectQuery(
-                                    subjectId =
-                                    action.subjectId
-                                )
+        realmWrapper.writeRealm { realm ->
+            actions.forEach { action ->
+                when (action) {
+                    is SubjectAction.Creation -> realm.copyToRealm(
+                        action.subject.fromDomainToDb(),
+                        updatePolicy = UpdatePolicy.ALL
+                    )
+
+                    is SubjectAction.Deletion -> realm.delete(
+                        realm.query(DbSubject::class).buildRealmQueryForSubject(
+                            query = SubjectQuery(
+                                subjectId =
+                                action.subjectId
                             )
-                                .findAll()
-                                .deleteAllFromRealm()
-                        }
-                    }
+                        ).find()
+                    )
                 }
             }
         }
     }
 
-    private fun Realm.buildRealmQueryForSubject(query: SubjectQuery): RealmQuery<DbSubject> =
-        where(DbSubject::class.java)
-            .apply {
-                query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
-                query.subjectId?.let { this.equalTo(SUBJECT_ID_FIELD, UUID.fromString(it)) }
-                query.subjectIds?.let { subjectIds ->
-                    this.`in`(
-                        SUBJECT_ID_FIELD,
-                        subjectIds.map { RealmAny.valueOf(UUID.fromString(it)) }.toTypedArray()
-                    )
-                }
-                query.attendantId?.let { this.equalTo(USER_ID_FIELD, it) }
-                query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
-                query.afterSubjectId?.let {
-                    this.greaterThan(
-                        SUBJECT_ID_FIELD,
-                        UUID.fromString(it)
-                    )
-                }
-                query.hasUntokenizedFields?.let {
-                    this.equalTo(IS_ATTENDANT_ID_TOKENIZED_FIELD, false)
-                        .or()
-                        .equalTo(IS_MODULE_ID_TOKENIZED_FIELD, false)
-                }
-                if (query.sort)
-                    this.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
-            }
+    private fun RealmQuery<DbSubject>.buildRealmQueryForSubject(
+        query: SubjectQuery,
+    ): RealmQuery<DbSubject> {
+        var realmQuery = this
+
+        if (query.projectId != null) {
+            realmQuery = realmQuery.query("$PROJECT_ID_FIELD == $0", query.projectId)
+        }
+        if (query.subjectId != null) {
+            realmQuery = realmQuery.query(
+                "$SUBJECT_ID_FIELD == $0",
+                RealmUUID.from(query.subjectId)
+            )
+        }
+        if (query.subjectIds != null) {
+            realmQuery = realmQuery.query(
+                "$SUBJECT_ID_FIELD IN $0",
+                query.subjectIds.map { RealmUUID.from(it) }
+            )
+        }
+        if (query.attendantId != null) {
+            realmQuery = realmQuery.query("$USER_ID_FIELD == $0", query.attendantId)
+        }
+        if (query.moduleId != null) {
+            realmQuery = realmQuery.query("$MODULE_ID_FIELD == $0", query.moduleId)
+        }
+        if (query.afterSubjectId != null) {
+            realmQuery = realmQuery.query(
+                "$SUBJECT_ID_FIELD >= $0",
+                RealmUUID.from(query.afterSubjectId)
+            )
+        }
+        if (query.hasUntokenizedFields != null) {
+            realmQuery = realmQuery.query("$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1", false, false)
+        }
+        if (query.sort) {
+            realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
+        }
+        return realmQuery
+    }
 }

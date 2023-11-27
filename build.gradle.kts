@@ -5,8 +5,7 @@ plugins {
     alias(libs.plugins.android.test) apply false
     alias(libs.plugins.kotlin.android) apply false
 
-    // TODO Uncomment when issue with realm plugin is solved
-    // alias(libs.plugins.realm) apply false
+    alias(libs.plugins.realm) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.protobuf) apply false
     alias(libs.plugins.navigation.args) apply false
@@ -20,19 +19,6 @@ plugins {
     alias(libs.plugins.retry) apply false
     alias(libs.plugins.sonar) apply false
     alias(libs.plugins.depsGraph) apply false
-}
-
-
-// TODO Due to a bug either in plugin dsl or in the plugin packaging realm-android does not
-//   resolve to correct path when added in plugins block abd build-logic dependencies.
-//   This is temporary workaround until we find a way to add realm plugin or replace it with realm-kotlin.
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath(libs.plugin.realm)
-    }
 }
 
 apply {

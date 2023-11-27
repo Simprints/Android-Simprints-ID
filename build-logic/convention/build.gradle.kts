@@ -25,10 +25,6 @@ dependencies {
     compileOnly(libs.plugin.sonar)
     compileOnly(libs.plugin.jacoco)
     compileOnly(libs.plugin.retry)
-
-    // TODO Uncomment when issue in root build.gradle.kts is solved
-    // Realm Database
-    // compileOnly(libs.plugin.realm)
 }
 
 gradlePlugin {

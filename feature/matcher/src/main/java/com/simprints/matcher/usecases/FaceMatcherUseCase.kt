@@ -1,15 +1,13 @@
 package com.simprints.matcher.usecases
 
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
-import com.simprints.matcher.FaceMatchResult
-import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
 import com.simprints.infra.facebiosdk.matching.FaceIdentity
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.infra.facebiosdk.matching.FaceSample
 import com.simprints.infra.logging.LoggingConstants
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResultItem
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -50,7 +48,6 @@ internal class FaceMatcherUseCase @Inject constructor(
                 it.faces.map { face -> FaceSample(face.id, face.template) }
             )
         }
-        .toList()
 
     private suspend fun match(
         probes: List<FaceSample>,
