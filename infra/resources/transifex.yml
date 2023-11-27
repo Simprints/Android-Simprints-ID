@@ -7,5 +7,6 @@ git:
     translation_files_expression: 'infra/resources/src/main/res/values-<lang>/strings.xml'
   settings:
     pr_branch_name: translations/<br_unique_id>
+    # Transifex has different format for locales with region code so manual mapping is required
     language_mapping:
       am_ET: am-rET
