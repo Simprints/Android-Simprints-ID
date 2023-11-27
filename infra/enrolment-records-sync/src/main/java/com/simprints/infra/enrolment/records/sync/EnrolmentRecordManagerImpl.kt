@@ -2,9 +2,12 @@ package com.simprints.infra.enrolment.records.sync
 
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.SubjectRepository
-import com.simprints.infra.enrolment.records.store.domain.models.*
+import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
+import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
+import com.simprints.infra.enrolment.records.store.domain.models.Subject
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordScheduler
-import kotlinx.coroutines.flow.Flow
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -17,15 +20,15 @@ internal class EnrolmentRecordManagerImpl @Inject constructor(
     override fun upload(id: String, subjectIds: List<String>) =
         enrolmentRecordScheduler.upload(id, subjectIds)
 
-    override suspend fun loadFaceIdentities(query: Serializable): Flow<FaceIdentity> =
+    override suspend fun loadFaceIdentities(query: Serializable): List<FaceIdentity> =
         subjectRepository.loadFaceIdentities(query)
 
-    override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
+    override suspend fun loadFingerprintIdentities(query: Serializable): List<FingerprintIdentity> =
         subjectRepository.loadFingerprintIdentities(query)
 
     override suspend fun uploadRecords(subjectIds: List<String>) = enrolmentRecordRepository.uploadRecords(subjectIds)
 
-    override suspend fun load(query: SubjectQuery): Flow<Subject> =
+    override suspend fun load(query: SubjectQuery): List<Subject> =
         subjectRepository.load(query)
 
     override suspend fun delete(queries: List<SubjectQuery>) = subjectRepository.delete(queries)

@@ -1,20 +1,15 @@
 package com.simprints.infra.realm.models
 
 import androidx.annotation.Keep
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.Required
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
 
 @Keep
-open class DbFaceSample(
+@ExcludedFromGeneratedTestCoverageReports("Data model definition for Realm table")
+class DbFaceSample : RealmObject {
     @PrimaryKey
-    @Required
-    var id: String = "",
-
-    @Required
-    var template: ByteArray = byteArrayOf(),
-
-    @Required
+    var id: String = ""
+    var template: ByteArray = byteArrayOf()
     var format: String = ""
-) : RealmObject()
-
+}

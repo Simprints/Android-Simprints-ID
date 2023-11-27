@@ -1,9 +1,7 @@
 package com.simprints.matcher.usecases
 
 import com.simprints.core.domain.common.FlowType
-import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.matcher.MatchParams
-import com.simprints.matcher.MatchResultItem
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
@@ -12,9 +10,9 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import com.simprints.matcher.FingerprintMatchResult
+import com.simprints.matcher.MatchParams
+import com.simprints.matcher.MatchResultItem
 import java.io.Serializable
 import javax.inject.Inject
 
@@ -62,7 +60,6 @@ internal class FingerprintMatcherUseCase @Inject constructor(
                 }
             )
         }
-        .toList()
 
     private suspend fun match(
       probes: List<Fingerprint>,

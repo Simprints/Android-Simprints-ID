@@ -1,12 +1,11 @@
 package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.ConnectivityTracker
-import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 internal class FetchSubjectUseCase @Inject constructor(

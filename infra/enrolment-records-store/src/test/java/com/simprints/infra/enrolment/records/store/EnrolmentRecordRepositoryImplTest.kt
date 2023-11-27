@@ -15,7 +15,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -79,7 +78,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should upload the records correctly when there is more than one batch`() = runTest {
         val expectedSubjectQuery = SubjectQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns flowOf(
+        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
             SUBJECT_3
@@ -97,7 +96,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should upload the records correctly when there is exactly one batch`() = runTest {
         val expectedSubjectQuery = SubjectQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns flowOf(
+        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2
         )
@@ -113,7 +112,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should upload the records correctly when there is more than two batches`() = runTest {
         val expectedSubjectQuery = SubjectQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns flowOf(
+        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
             SUBJECT_3,
@@ -136,7 +135,7 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedSubjectQuery =
             SubjectQuery(sort = true, subjectIds = listOf(SUBJECT_ID_1, SUBJECT_ID_2))
         every { prefs.getString(any(), null) } returns null
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns flowOf(
+        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
         )
@@ -155,7 +154,7 @@ class EnrolmentRecordRepositoryImplTest {
             afterSubjectId = SUBJECT_ID_3
         )
         every { prefs.getString(any(), null) } returns SUBJECT_ID_3
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns flowOf(
+        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
         )
@@ -187,7 +186,7 @@ class EnrolmentRecordRepositoryImplTest {
                 faceSamples = emptyList()
             )
             every { project.id } returns projectId
-            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+            coEvery { subjectRepository.load(any()) } returns listOf(subject)
             every {
                 tokenizationProcessor.encrypt(
                     decrypted = attendantIdRaw,
@@ -230,7 +229,7 @@ class EnrolmentRecordRepositoryImplTest {
                 faceSamples = emptyList()
             )
             every { project.id } returns projectId
-            coEvery { subjectRepository.load(any()) } returns flowOf(subject)
+            coEvery { subjectRepository.load(any()) } returns listOf(subject)
 
             repository.tokenizeExistingRecords(project)
             coVerify { subjectRepository.performActions(emptyList()) }
