@@ -95,7 +95,7 @@ class RealmWrapperImplTest {
     @Test
     fun `test recreate db if it is corrupted`() = runTest {
         //Given
-        every { Realm.open(configuration) } throws RealmException("file not found") andThen mockk<Realm>(relaxed = true)
+        every { Realm.open(configuration) } throws IllegalStateException("[RLM_ERR_INVALID_DATABASE]: Failed to open Realm file at path") andThen mockk<Realm>(relaxed = true)
         every { Realm.deleteRealm(configuration) } just Runs
 
         //When

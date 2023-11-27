@@ -140,7 +140,7 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
             )
         }
         if (query.hasUntokenizedFields != null) {
-            realmQuery = realmQuery.query("NOT $IS_ATTENDANT_ID_TOKENIZED_FIELD OR NOT $IS_MODULE_ID_TOKENIZED_FIELD")
+            realmQuery = realmQuery.query("$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1", false, false)
         }
         if (query.sort) {
             realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
