@@ -158,15 +158,18 @@
 
 
     <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">Inscription</item>
+        <item quantity="one">%d Inscription</item>
+        <item quantity="many">Inscriptions</item>
         <item quantity="other">Inscriptions</item>
     </plurals>
     <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">Identification</item>
+        <item quantity="one">%d Identification</item>
+        <item quantity="many">Identifications</item>
         <item quantity="other">Identifications</item>
     </plurals>
     <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">Vérification</item>
+        <item quantity="one">%d Vérification</item>
+        <item quantity="many">Vérifications</item>
         <item quantity="other">Vérifications</item>
     </plurals>
 
@@ -238,29 +241,31 @@
 
     <plurals name="matcher_matched_candidates">
         <item quantity="one">Comparé à %d candidats.</item>
+        <item quantity="many">Comparé à %d candidats.</item>
         <item quantity="other">Comparé à %d candidats.</item>
     </plurals>
 
     <plurals name="matcher_returned_results">
         <item quantity="one">A retourné %d résultats.</item>
+        <item quantity="many">A retourné %d résultats.</item>
         <item quantity="other">A retourné %d résultats.</item>
     </plurals>
 
     <plurals name="matcher_tier1or2_matches">
-        <item quantity="zero">Pas de très bonnes correspondances</item>
         <item quantity="one">%d très bonne correspondance</item>
+        <item quantity="many">%d très bonnes correspondances</item>
         <item quantity="other">%d très bonnes correspondances</item>
     </plurals>
 
     <plurals name="matcher_tier3_matches">
-        <item quantity="zero">Pas de bonnes correspondances</item>
         <item quantity="one">%d bonne correspondance</item>
+        <item quantity="many">%d bonnes correspondances</item>
         <item quantity="other">%d bonnes correspondances</item>
     </plurals>
 
     <plurals name="matcher_tier4_matches">
-        <item quantity="zero">Aucune correspondance</item>
         <item quantity="one">%d correspondance</item>
+        <item quantity="many">%d correspondances</item>
         <item quantity="other">%d correspondances</item>
     </plurals>
 

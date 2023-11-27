@@ -1,0 +1,11 @@
+git:
+  filters:
+  - filter_type: file
+    file_format: ANDROID
+    source_file: 'infra/resources/src/main/res/values/strings.xml'
+    source_language: en
+    translation_files_expression: 'infra/resources/src/main/res/values-<lang>/strings.xml'
+  settings:
+    pr_branch_name: translations/<br_unique_id>
+    language_mapping:
+      am_ET: am-rET

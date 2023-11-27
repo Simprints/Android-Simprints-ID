@@ -102,7 +102,7 @@
     <string name="dashboard_sync_card_no_modules_message">Maaloo moojuula sinkii gootuu filadhu</string>
     <string name="dashboard_sync_card_offline_button">Mijeessaa</string>
     <string name="dashboard_sync_card_offline_message">Maaloo gara mijeessaa internetii keetii deebi\'i</string>
-    <string name="dashboard_sync_card_progress">Siink gochaa jira...%1$s</string>
+    <string name="dashboard_sync_card_progress">Siink gochaa jira…%1$s</string>
     <string name="dashboard_sync_card_sync_button">Amma Siink godhi</string>
     <string name="dashboard_select_modules_search_hint">Mojuula barbaadi</string>
     <string name="fingerprint_capture_finger_l_1">Quba guddaa</string>
@@ -214,7 +214,7 @@
     <string name="fingerprint_connect_turn_scanner_on_error_title">Iskaanarii bani</string>
     <string name="fingerprint_connect_scanner_id_confirmation_message">Iskanara keetii %1$s?</string>
     <string name="fingerprint_capture_scanning">Scan\' gochaa jira</string>
-    <string name="fingerprint_capture_transfering_data">Odeffannoo dabarsi...</string>
+    <string name="fingerprint_capture_transfering_data">Odeffannoo dabarsi…</string>
     <string name="fingerprint_capture_try_another_finger">Quba biraa haa yaallu</string>
     <string name="fingerprint_capture_verify_title">Mirkaneeffannaa</string>
     <string name="fingerprint_connect_bluetooth_off_title">Bluetooth cufaa</string>
@@ -311,17 +311,14 @@
         <item quantity="other">Bu\'aa %d deebi\'e.</item>
     </plurals>
     <plurals name="matcher_tier1or2_matches">
-        <item quantity="zero">Taphoota baayyee gaarii ta\'an hin jiran</item>
         <item quantity="one">%d walsimsiisaa baay\'ee gaarii dha</item>
         <item quantity="other">%d walsimsiisaa baayyee gaarii dha</item>
     </plurals>
     <plurals name="matcher_tier3_matches">
-        <item quantity="zero">Taphoota gaarii hin qaban</item>
         <item quantity="one">%d walsimsiisaa gaarii</item>
         <item quantity="other">%d walsimsiisa gaarii</item>
     </plurals>
     <plurals name="matcher_tier4_matches">
-        <item quantity="zero">Walsimsiisaa hin jiru</item>
         <item quantity="one">%d walsimsiisa</item>
         <item quantity="other">%d walsimsiisa</item>
     </plurals>
