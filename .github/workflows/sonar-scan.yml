@@ -18,15 +18,15 @@ jobs:
                     java-version: 17
                     distribution: 'temurin'
 
-            -   name: Set up Gradle
-                uses: gradle/gradle-build-action@v2
-
-            -   name: Cache sonarqube
-                uses: actions/cache@v3
+            -   name: Restore gradle global directory
+                uses: actions/cache/restore@v3
+                id: cache
                 with:
-                    path: ~/.sonar/cache
-                    key: ${{ runner.os }}-sonar
-                    restore-keys: ${{ runner.os }}-sonar
+                    path: |
+                        ~/.gradle/
+                        .gradle/
+                    key: global-gradle-
+                    restore-keys: global-gradle-
 
             -   name: Set up local.properties
                 run: |
@@ -46,7 +46,8 @@ jobs:
                     rsync -arv test-reports/core/* .  || true
                     rsync -arv test-reports/infra1/* .  || true
                     rsync -arv test-reports/infra2/* .  || true
-                    rsync -arv test-reports/feature/* .  || true
+                    rsync -arv test-reports/feature1/* .  || true
+                    rsync -arv test-reports/feature2/* .  || true
                     rsync -arv test-reports/dashboard/* .  || true
                     rsync -arv test-reports/face/* .  || true
                     rsync -arv test-reports/fingerprint/* .  || true
@@ -62,4 +63,4 @@ jobs:
                     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 run: |
-                    gradle sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600 --info
+                    ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=3600 --info
