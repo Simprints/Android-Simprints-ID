@@ -120,18 +120,7 @@
     <string name="exit_form_submit_warning">ফর্ম জমা দিন</string>
     <string name="exit_form_reason_too_young">বয়স কম</string>
     <string name="exit_form_reason_other">অন্যান্য</string>
-    <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">নিবন্ধন সমূহ</item>
-        <item quantity="other"></item>
-    </plurals>
-    <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">সনাক্তকরণ সমূহ</item>
-        <item quantity="other"></item>
-    </plurals>
-    <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">যাচাইকরণ সমূহ</item>
-        <item quantity="other"></item>
-    </plurals>
+
     <string name="dashboard_sync_info_title">তথ্য সিঙ্ক করুন</string>
     <string name="dashboard_preference_sync_information_title">তথ্য সিঙ্ক করুন</string>
     <string name="dashboard_preference_summary_sync_information">সিঙ্ক- এর জন্য আরও তথ্য</string>
@@ -344,19 +333,16 @@
     </plurals>
 
     <plurals name="matcher_tier1or2_matches">
-        <item quantity="zero">খুব ভালো মিল পাওয়া যায়নি</item>
         <item quantity="one">%d খুব ভালো মিল</item>
         <item quantity="other">%d খুব ভালো মিল</item>
     </plurals>
 
     <plurals name="matcher_tier3_matches">
-        <item quantity="zero">ভালো মিল পাওয়া যায়নি</item>
         <item quantity="one">%d ভালো মিল</item>
         <item quantity="other">%d ভালো মিল</item>
     </plurals>
 
     <plurals name="matcher_tier4_matches">
-        <item quantity="zero">কোন মিল পাওয়া যায়নি</item>
         <item quantity="one">%d মিল</item>
         <item quantity="other">%d মিল</item>
     </plurals>

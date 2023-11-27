@@ -36,15 +36,15 @@
     <string name="dashboard_sync_card_last_sync">अंतिम बार सिंक: %1$s</string>
     <string name="dashboard_activity_card_activity">गतिविधि: %1$s</string>
     <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">पंजीकरण</item>
+        <item quantity="one">%d पंजीकरण</item>
         <item quantity="other">पंजीकरण</item>
     </plurals>
     <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">विभिन्न पहचान</item>
+        <item quantity="one">%d विभिन्न पहचान</item>
         <item quantity="other">विभिन्न पहचान</item>
     </plurals>
     <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">विभिन्न सत्यापन</item>
+        <item quantity="one">%d विभिन्न सत्यापन</item>
         <item quantity="other">विभिन्न सत्यापन</item>
     </plurals>
     <string name="exit_form_continue_face_button">चेहरे की फ़ोटो लें</string>
@@ -221,21 +221,18 @@
     </plurals>
 
     <plurals name="matcher_tier1or2_matches">
-        <item quantity="zero">कोई बहुत अच्छा मेल नहीं है</item>
         <item quantity="one">%d बहुत अच्छा मेल</item>
         <item quantity="other">%d बहुत अच्छा मेल हैं</item>
     </plurals>
 
 
     <plurals name="matcher_tier3_matches">
-        <item quantity="zero">कोई अच्छा मेल नहीं</item>
         <item quantity="one">%d अच्छा मेल है</item>
         <item quantity="other">%d अच्छे मेल हैं</item>
     </plurals>
 
 
     <plurals name="matcher_tier4_matches">
-        <item quantity="zero">कोई मेल नही</item>
         <item quantity="one">%d मेल</item>
         <item quantity="other">%d मेल खाते हैं</item>
     </plurals>
