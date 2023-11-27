@@ -124,7 +124,8 @@
     <string name="dashboard_select_modules_no_results">Sem resultados</string>
     <string name="dashboard_select_modules_selected">Módulos selecionados</string>
     <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">Verificação</item>
+        <item quantity="one">%d Verificação</item>
+        <item quantity="many">Verificações</item>
         <item quantity="other">Verificações</item>
     </plurals>
     <string name="dashboard_select_modules_confirm_title">Módulos selecionados</string>
@@ -132,11 +133,13 @@
     <string name="select_subject_confirmation_sent">Confirmação enviada</string>
     <string name="select_subject_redirecting_back">Redirecionando você de volta</string>
     <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">Inscrição</item>
+        <item quantity="one">%d Inscrição</item>
+        <item quantity="many">Inscrições</item>
         <item quantity="other">Inscrições</item>
     </plurals>
     <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">Identificação</item>
+        <item quantity="one">%d Identificação</item>
+        <item quantity="many">Identificações</item>
         <item quantity="other">Identificações</item>
     </plurals>
     <string name="enrol_last_biometrics_alert_message">1. Falha ao salvar o registro %1$s \n 2. Toque em fechar</string>
@@ -186,8 +189,8 @@
     <string name="face_capture_error_too_close">Anda para trás</string>
     <string name="face_capture_error_look_straight">Certifique-se que a pessoa está olhando directamente para a câmera</string>
     <string name="face_capture_begin_button">Toque para capturar</string>
-    <string name="face_capture_prep_begin_button_capturing">Capturando ...</string>
-    <string name="face_capture_hold">Mantenha a posição ...</string>
+    <string name="face_capture_prep_begin_button_capturing">Capturando …</string>
+    <string name="face_capture_hold">Mantenha a posição …</string>
     <string name="face_capture_successfully_title">O rosto foi capturado com sucesso.</string>
     <string name="face_capture_confirmation_title">Confirmação</string>
     <string name="face_capture_capturing_title">Captura ao Vivo</string>
@@ -208,31 +211,33 @@
 
     <plurals name="matcher_matched_candidates">
         <item quantity="one">Comparado com %d candidato.</item>
+        <item quantity="many">Comparado com %d candidatos.</item>
         <item quantity="other">Comparado com %d candidatos.</item>
     </plurals>
 
     <plurals name="matcher_returned_results">
         <item quantity="one">Retorno %de resultado.</item>
+        <item quantity="many">Retornou %d resultados.</item>
         <item quantity="other">Retornou %d resultados.</item>
     </plurals>
 
     <plurals name="matcher_tier1or2_matches">
-        <item quantity="zero">Sem combinações muito boas</item>
         <item quantity="one">%d combinação muito boa</item>
+        <item quantity="many">%d combinações muito boas</item>
         <item quantity="other">%d combinações muito boas</item>
     </plurals>
 
 
     <plurals name="matcher_tier3_matches">
-        <item quantity="zero">Sem boas combinações</item>
         <item quantity="one">%d boa combinação</item>
+        <item quantity="many">%d boas combinações</item>
         <item quantity="other">%d boas combinações</item>
     </plurals>
 
 
     <plurals name="matcher_tier4_matches">
-        <item quantity="zero">Sem combinações</item>
         <item quantity="one">%d combinação</item>
+        <item quantity="many">%d combinações</item>
         <item quantity="other">%d combinações</item>
     </plurals>
 
