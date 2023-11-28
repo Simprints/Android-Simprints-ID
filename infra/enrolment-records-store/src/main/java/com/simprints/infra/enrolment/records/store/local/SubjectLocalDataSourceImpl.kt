@@ -10,6 +10,8 @@ import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.models.DbFaceSample
+import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.DbSubject
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.query.RealmQuery
@@ -38,10 +40,28 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun loadFingerprintIdentities(query: SubjectQuery): List<FingerprintIdentity> =
-        load(query).map { subject -> FingerprintIdentity(subject.subjectId, subject.fingerprintSamples) }
+        realmWrapper.readRealm {
+            it.query(DbSubject::class).buildRealmQueryForSubject(query)
+                .find()
+                .map { subject ->
+                    FingerprintIdentity(
+                        subject.subjectId.toString(),
+                        subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain)
+                    )
+                }
+        }
 
     override suspend fun loadFaceIdentities(query: SubjectQuery): List<FaceIdentity> =
-        load(query).map { subject -> FaceIdentity(subject.subjectId, subject.faceSamples) }
+        realmWrapper.readRealm {
+            it.query(DbSubject::class).buildRealmQueryForSubject(query)
+                .find()
+                .map { subject ->
+                    FaceIdentity(
+                        subject.subjectId.toString(),
+                        subject.faceSamples.map(DbFaceSample::fromDbToDomain)
+                    )
+                }
+        }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
         realmWrapper.writeRealm { realm ->
@@ -126,7 +146,11 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
             )
         }
         if (query.hasUntokenizedFields != null) {
-            realmQuery = realmQuery.query("$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1", false, false)
+            realmQuery = realmQuery.query(
+                "$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1",
+                false,
+                false
+            )
         }
         if (query.sort) {
             realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
