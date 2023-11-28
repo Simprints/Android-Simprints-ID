@@ -20,9 +20,9 @@ import io.realm.kotlin.query.find
 import io.realm.kotlin.types.RealmUUID
 import javax.inject.Inject
 
-internal class SubjectLocalDataSourceImpl @Inject constructor(
+internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     private val realmWrapper: RealmWrapper,
-) : SubjectLocalDataSource {
+) : EnrolmentRecordLocalDataSource {
 
     companion object {
 

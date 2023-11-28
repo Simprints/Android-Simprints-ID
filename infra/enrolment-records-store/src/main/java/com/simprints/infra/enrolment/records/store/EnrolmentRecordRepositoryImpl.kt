@@ -8,6 +8,7 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.exceptions.RealmUninitialisedException
@@ -19,23 +20,23 @@ import javax.inject.Inject
 internal class EnrolmentRecordRepositoryImpl(
     context: Context,
     private val remoteDataSource: EnrolmentRecordRemoteDataSource,
-    private val subjectRepository: SubjectRepository,
+    private val localDataSource: EnrolmentRecordLocalDataSource,
     private val tokenizationProcessor: TokenizationProcessor,
     private val dispatcher: CoroutineDispatcher,
     private val batchSize: Int,
-) : EnrolmentRecordRepository {
+) : EnrolmentRecordRepository, EnrolmentRecordLocalDataSource by localDataSource {
 
     @Inject
     constructor(
         @ApplicationContext context: Context,
         remoteDataSource: EnrolmentRecordRemoteDataSource,
-        subjectRepository: SubjectRepository,
+        localDataSource: EnrolmentRecordLocalDataSource,
         tokenizationProcessor: TokenizationProcessor,
         @DispatcherIO dispatcher: CoroutineDispatcher,
     ) : this(
         context = context,
         remoteDataSource = remoteDataSource,
-        subjectRepository = subjectRepository,
+        localDataSource = localDataSource,
         tokenizationProcessor = tokenizationProcessor,
         dispatcher = dispatcher,
         batchSize = BATCH_SIZE
@@ -60,7 +61,7 @@ internal class EnrolmentRecordRepositoryImpl(
                 afterSubjectId = lastUploadedRecord
             )
         }
-        subjectRepository.load(query)
+        localDataSource.load(query)
             .chunked(batchSize)
             .forEach { subjects ->
                 remoteDataSource.uploadRecords(subjects)
@@ -73,7 +74,7 @@ internal class EnrolmentRecordRepositoryImpl(
         try {
             val query = SubjectQuery(projectId = project.id, hasUntokenizedFields = true)
             val tokenizedSubjectsCreateAction =
-                subjectRepository.load(query).mapNotNull { subject ->
+                localDataSource.load(query).mapNotNull { subject ->
                     if (subject.projectId != project.id) return@mapNotNull null
                     val moduleId = tokenizeIfNecessary(
                         value = subject.moduleId,
@@ -87,7 +88,7 @@ internal class EnrolmentRecordRepositoryImpl(
                     )
                     return@mapNotNull subject.copy(moduleId = moduleId, attendantId = attendantId)
                 }.map(SubjectAction::Creation)
-            subjectRepository.performActions(tokenizedSubjectsCreateAction)
+            localDataSource.performActions(tokenizedSubjectsCreateAction)
         } catch (e: Exception) {
             when (e) {
                 is RealmUninitialisedException -> Unit // AuthStore hasn't yet saved the project, no need to do anything
