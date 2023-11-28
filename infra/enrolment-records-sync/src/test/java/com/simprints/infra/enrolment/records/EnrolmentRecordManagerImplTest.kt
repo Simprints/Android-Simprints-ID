@@ -1,7 +1,6 @@
 package com.simprints.infra.enrolment.records
 
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
-import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManagerImpl
@@ -20,13 +19,11 @@ class EnrolmentRecordManagerImplTest {
     }
 
     private val enrolmentRecordScheduler = mockk<EnrolmentRecordScheduler>(relaxed = true)
-    private val subjectRepository = mockk<SubjectRepository>(relaxed = true)
     private val enrolmentRecordRepository = mockk<EnrolmentRecordRepository>(relaxed = true)
     private val enrolmentRecordManager =
         EnrolmentRecordManagerImpl(
             enrolmentRecordScheduler,
             enrolmentRecordRepository,
-            subjectRepository,
         )
 
     @Test
@@ -47,34 +44,34 @@ class EnrolmentRecordManagerImplTest {
     fun `load should call the correct method`() = runTest {
         enrolmentRecordManager.load(QUERY)
 
-        coVerify(exactly = 1) { subjectRepository.load(QUERY) }
+        coVerify(exactly = 1) { enrolmentRecordRepository.load(QUERY) }
     }
 
     @Test
     fun `delete should call the correct method`() = runTest {
         enrolmentRecordManager.delete(listOf(QUERY))
 
-        coVerify(exactly = 1) { subjectRepository.delete(listOf(QUERY)) }
+        coVerify(exactly = 1) { enrolmentRecordRepository.delete(listOf(QUERY)) }
     }
 
     @Test
     fun `deleteAll() should call the correct method`() = runTest {
         enrolmentRecordManager.deleteAll()
 
-        coVerify(exactly = 1) { subjectRepository.deleteAll() }
+        coVerify(exactly = 1) { enrolmentRecordRepository.deleteAll() }
     }
 
     @Test
     fun `count should call the correct method`() = runTest {
         enrolmentRecordManager.count(QUERY)
 
-        coVerify(exactly = 1) { subjectRepository.count(QUERY) }
+        coVerify(exactly = 1) { enrolmentRecordRepository.count(QUERY) }
     }
 
     @Test
     fun `performActions should call the correct method`() = runTest {
         enrolmentRecordManager.performActions(listOf(ACTION))
 
-        coVerify(exactly = 1) { subjectRepository.performActions(listOf(ACTION)) }
+        coVerify(exactly = 1) { enrolmentRecordRepository.performActions(listOf(ACTION)) }
     }
 }
