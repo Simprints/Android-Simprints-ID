@@ -6,12 +6,10 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.store.exceptions.InvalidQueryToLoadRecordsException
 import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
 import com.simprints.infra.realm.RealmWrapper
 import com.simprints.infra.realm.models.DbSubject
-import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.CapturingSlot
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -104,15 +102,6 @@ class SubjectLocalDataSourceImplTest {
     }
 
     @Test
-    fun givenInvalidSerializableQueryForFingerprints_aThrowableIsThrown() = runTest {
-        assertThrows<InvalidQueryToLoadRecordsException> {
-            (subjectLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(
-                mockk()
-            )
-        }
-    }
-
-    @Test
     fun givenValidSerializableQueryForFingerprints_loadIsCalled() = runTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
@@ -123,13 +112,6 @@ class SubjectLocalDataSourceImplTest {
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
             assertThat(subject.subjectId).isEqualTo(identity.patientId)
-        }
-    }
-
-    @Test
-    fun givenInvalidSerializableQueryForFace_aThrowableIsThrown() = runTest {
-        assertThrows<InvalidQueryToLoadRecordsException> {
-            (subjectLocalDataSource as FaceIdentityLocalDataSource).loadFaceIdentities(mockk())
         }
     }
 

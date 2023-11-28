@@ -10,8 +10,8 @@ import java.io.Serializable
 interface EnrolmentRecordManager {
     fun upload(id: String, subjectIds: List<String>)
 
-    suspend fun loadFaceIdentities(query: Serializable): List<FaceIdentity>
-    suspend fun loadFingerprintIdentities(query: Serializable): List<FingerprintIdentity>
+    suspend fun loadFaceIdentities(query: SubjectQuery): List<FaceIdentity>
+    suspend fun loadFingerprintIdentities(query: SubjectQuery): List<FingerprintIdentity>
     suspend fun uploadRecords(subjectIds: List<String>)
     suspend fun load(query: SubjectQuery): List<Subject>
     suspend fun delete(queries: List<SubjectQuery>)

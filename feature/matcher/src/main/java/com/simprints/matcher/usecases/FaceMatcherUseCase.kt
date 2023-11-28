@@ -1,5 +1,6 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.facebiosdk.matching.FaceIdentity
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
@@ -8,7 +9,6 @@ import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
-import java.io.Serializable
 import javax.inject.Inject
 
 internal class FaceMatcherUseCase @Inject constructor(
@@ -40,7 +40,7 @@ internal class FaceMatcherUseCase @Inject constructor(
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes
         .map { FaceSample(it.faceId, it.template) }
 
-    private suspend fun getCandidates(query: Serializable) = enrolmentRecordManager
+    private suspend fun getCandidates(query: SubjectQuery) = enrolmentRecordManager
         .loadFaceIdentities(query)
         .map {
             FaceIdentity(
