@@ -20,10 +20,10 @@ internal class EnrolmentRecordManagerImpl @Inject constructor(
     override fun upload(id: String, subjectIds: List<String>) =
         enrolmentRecordScheduler.upload(id, subjectIds)
 
-    override suspend fun loadFaceIdentities(query: Serializable): List<FaceIdentity> =
+    override suspend fun loadFaceIdentities(query: SubjectQuery): List<FaceIdentity> =
         subjectRepository.loadFaceIdentities(query)
 
-    override suspend fun loadFingerprintIdentities(query: Serializable): List<FingerprintIdentity> =
+    override suspend fun loadFingerprintIdentities(query: SubjectQuery): List<FingerprintIdentity> =
         subjectRepository.loadFingerprintIdentities(query)
 
     override suspend fun uploadRecords(subjectIds: List<String>) = enrolmentRecordRepository.uploadRecords(subjectIds)

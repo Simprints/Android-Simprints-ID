@@ -8,6 +8,7 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
@@ -62,7 +63,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
         .map { Fingerprint(it.fingerId.toMatcherDomain(), it.template, it.format) }
 
-    private suspend fun getCandidates(query: Serializable) = enrolmentRecordManager
+    private suspend fun getCandidates(query: SubjectQuery) = enrolmentRecordManager
         .loadFingerprintIdentities(query)
         .map {
             FingerprintIdentity(

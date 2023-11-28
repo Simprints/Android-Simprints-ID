@@ -5,7 +5,6 @@ import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIden
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.store.exceptions.InvalidQueryToLoadRecordsException
 import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
@@ -16,7 +15,6 @@ import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
 import io.realm.kotlin.types.RealmUUID
-import java.io.Serializable
 import javax.inject.Inject
 
 internal class SubjectLocalDataSourceImpl @Inject constructor(
@@ -39,23 +37,11 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
             .map { dbSubject -> dbSubject.fromDbToDomain() }
     }
 
-    override suspend fun loadFingerprintIdentities(query: Serializable): List<FingerprintIdentity> =
-        if (query is SubjectQuery) {
-            load(query).map { subject ->
-                FingerprintIdentity(subject.subjectId, subject.fingerprintSamples)
-            }
-        } else {
-            throw InvalidQueryToLoadRecordsException()
-        }
+    override suspend fun loadFingerprintIdentities(query: SubjectQuery): List<FingerprintIdentity> =
+        load(query).map { subject -> FingerprintIdentity(subject.subjectId, subject.fingerprintSamples) }
 
-    override suspend fun loadFaceIdentities(query: Serializable): List<FaceIdentity> =
-        if (query is SubjectQuery) {
-            load(query).map { subject ->
-                FaceIdentity(subject.subjectId, subject.faceSamples)
-            }
-        } else {
-            throw InvalidQueryToLoadRecordsException()
-        }
+    override suspend fun loadFaceIdentities(query: SubjectQuery): List<FaceIdentity> =
+        load(query).map { subject -> FaceIdentity(subject.subjectId, subject.faceSamples) }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
         realmWrapper.writeRealm { realm ->
