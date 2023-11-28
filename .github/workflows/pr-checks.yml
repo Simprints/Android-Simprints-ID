@@ -2,9 +2,8 @@
 name: PR Checks
 on: # this checks should be triggered on pull request, before deployments, and manually
     pull_request:
-        branches-ignore:
-            - 'translations/*'
-            - 'skipci/*'
+        paths-ignore:
+            - 'infra/resources/src/main/res/**'
     workflow_call:
     workflow_dispatch:
 
