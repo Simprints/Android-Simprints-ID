@@ -10,11 +10,14 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
 import java.io.Serializable
 import javax.inject.Inject
+import kotlin.time.TimedValue
+import kotlin.time.measureTimedValue
 
 internal class FingerprintMatcherUseCase @Inject constructor(
     private val enrolmentRecordManager: EnrolmentRecordManager,
@@ -30,17 +33,30 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         onLoadingCandidates: (tag: String) -> Unit,
         onMatching: (tag: String) -> Unit,
     ): List<MatchResultItem> {
-        if (matchParams.probeFingerprintSamples.isEmpty()) {
-            return emptyList()
+        val candidates: TimedValue<List<FingerprintIdentity>>
+        val matching: TimedValue<List<FingerprintMatchResult.Item>>
+
+        val totalDuration = measureTimedValue {
+            if (matchParams.probeFingerprintSamples.isEmpty()) {
+                return emptyList()
+            }
+            val samples = mapSamples(matchParams.probeFingerprintSamples)
+
+            onLoadingCandidates(crashReportTag)
+            candidates = measureTimedValue { getCandidates(matchParams.queryForCandidates) }
+
+            onMatching(crashReportTag)
+            matching = measureTimedValue { match(samples, candidates.value, matchParams.flowType) }
+            matching.value
         }
 
-        val samples = mapSamples(matchParams.probeFingerprintSamples)
-
-        onLoadingCandidates(crashReportTag)
-        val candidates = getCandidates(matchParams.queryForCandidates)
-
-        onMatching(crashReportTag)
-        return match(samples, candidates, matchParams.flowType)
+        // TODO remove this benchmarking code when we are confident in the performance of the matcher
+        Simber.d("BENCHMARK: ===========================================")
+        Simber.d("BENCHMARK: module ${matchParams.queryForCandidates.moduleId}")
+        Simber.d("BENCHMARK: \tReading\tMatching\tTotal")
+        Simber.d("BENCHMARK: \t${candidates.duration.inWholeMilliseconds}\t${matching.duration.inWholeMilliseconds}\t${totalDuration.duration.inWholeMilliseconds}")
+        Simber.d("BENCHMARK: ===========================================")
+        return totalDuration.value
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
@@ -62,9 +78,9 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         }
 
     private suspend fun match(
-      probes: List<Fingerprint>,
-      candidates: List<FingerprintIdentity>,
-      flowType: FlowType,
+        probes: List<Fingerprint>,
+        candidates: List<FingerprintIdentity>,
+        flowType: FlowType,
     ) = bioSdkWrapper
         .match(
             FingerprintIdentity("", probes),
