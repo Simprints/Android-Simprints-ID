@@ -16,6 +16,7 @@ import com.simprints.infra.realm.models.DbSubject
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
+import io.realm.kotlin.query.find
 import io.realm.kotlin.types.RealmUUID
 import javax.inject.Inject
 
@@ -39,17 +40,20 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
             .map { dbSubject -> dbSubject.fromDbToDomain() }
     }
 
-    override suspend fun loadFingerprintIdentities(query: SubjectQuery): List<FingerprintIdentity> =
-        realmWrapper.readRealm {
-            it.query(DbSubject::class).buildRealmQueryForSubject(query)
-                .find()
-                .map { subject ->
-                    FingerprintIdentity(
-                        subject.subjectId.toString(),
-                        subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain)
-                    )
-                }
-        }
+    override suspend fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+    ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
+        realm.query(DbSubject::class)
+            .buildRealmQueryForSubject(query)
+            .find { it.subList(range.first, range.last) }
+            .map { subject ->
+                FingerprintIdentity(
+                    subject.subjectId.toString(),
+                    subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain)
+                )
+            }
+    }
 
     override suspend fun loadFaceIdentities(query: SubjectQuery): List<FaceIdentity> =
         realmWrapper.readRealm {

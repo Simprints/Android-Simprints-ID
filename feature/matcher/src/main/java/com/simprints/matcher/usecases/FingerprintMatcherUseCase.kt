@@ -1,5 +1,6 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
@@ -15,14 +16,19 @@ import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
-import kotlin.time.TimedValue
 import kotlin.time.measureTimedValue
 
 internal class FingerprintMatcherUseCase @Inject constructor(
     private val subjectRepository: SubjectRepository,
     private val bioSdkWrapper: BioSdkWrapper,
     private val configManager: ConfigManager,
+    private val createRanges: CreateRangesUseCase,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
 
     override val crashReportTag = LoggingConstants.CrashReportTag.MATCHING.name
@@ -32,38 +38,47 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         matchParams: MatchParams,
         onLoadingCandidates: (tag: String) -> Unit,
         onMatching: (tag: String) -> Unit,
-    ): List<MatchResultItem> {
-        val candidates: TimedValue<List<FingerprintIdentity>>
-        val matching: TimedValue<List<FingerprintMatchResult.Item>>
+    ): List<MatchResultItem> = coroutineScope {
+        Simber.d("BENCHMARK: ===========================================")
+        Simber.d("BENCHMARK: module ${matchParams.queryForCandidates.moduleId}")
 
+        onLoadingCandidates(crashReportTag)
         val totalDuration = measureTimedValue {
             if (matchParams.probeFingerprintSamples.isEmpty()) {
-                return emptyList()
+                return@coroutineScope emptyList()
             }
             val samples = mapSamples(matchParams.probeFingerprintSamples)
 
-            onLoadingCandidates(crashReportTag)
-            candidates = measureTimedValue { getCandidates(matchParams.queryForCandidates) }
+            val totalCandidates = subjectRepository.count(matchParams.queryForCandidates)
+            val ranges = createRanges(totalCandidates, BATCH_SIZE)
 
-            onMatching(crashReportTag)
-            matching = measureTimedValue { match(samples, candidates.value, matchParams.flowType) }
-            matching.value
+            val batchResults = ranges.map { range ->
+                async(dispatcher) {
+                    val batchCandidates = getCandidates(matchParams.queryForCandidates, range)
+                    match(samples, batchCandidates, matchParams.flowType)
+                        .sortedByDescending { it.score }
+                        .take(MAX_RESULTS)
+                }
+            }.awaitAll()
+
+            batchResults
+                .flatten()
+                .sortedByDescending { it.score }
+                .take(MAX_RESULTS)
+                .map { FingerprintMatchResult.Item(it.id, it.score) }
         }
 
         // TODO remove this benchmarking code when we are confident in the performance of the matcher
+        Simber.d("BENCHMARK: \tTotal\t${totalDuration.duration.inWholeMilliseconds}")
         Simber.d("BENCHMARK: ===========================================")
-        Simber.d("BENCHMARK: module ${matchParams.queryForCandidates.moduleId}")
-        Simber.d("BENCHMARK: \tReading\tMatching\tTotal")
-        Simber.d("BENCHMARK: \t${candidates.duration.inWholeMilliseconds}\t${matching.duration.inWholeMilliseconds}\t${totalDuration.duration.inWholeMilliseconds}")
-        Simber.d("BENCHMARK: ===========================================")
-        return totalDuration.value
+        return@coroutineScope totalDuration.value
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
         .map { Fingerprint(it.fingerId.toMatcherDomain(), it.template, it.format) }
 
-    private suspend fun getCandidates(query: SubjectQuery) = subjectRepository
-        .loadFingerprintIdentities(query)
+    private suspend fun getCandidates(query: SubjectQuery, range: IntRange) = subjectRepository
+        .loadFingerprintIdentities(query, range)
         .map {
             FingerprintIdentity(
                 it.patientId,
@@ -81,14 +96,11 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         probes: List<Fingerprint>,
         candidates: List<FingerprintIdentity>,
         flowType: FlowType,
-    ) = bioSdkWrapper
-        .match(
-            FingerprintIdentity("", probes),
-            candidates,
-            isCrossFingerMatchingEnabled(flowType),
-        )
-        .map { FingerprintMatchResult.Item(it.id, it.score) }
-        .sortedByDescending { it.confidence }
+    ) = bioSdkWrapper.match(
+        FingerprintIdentity("", probes),
+        candidates,
+        isCrossFingerMatchingEnabled(flowType),
+    )
 
     private suspend fun isCrossFingerMatchingEnabled(flowType: FlowType): Boolean = configManager
         .takeIf { flowType == FlowType.VERIFY }
@@ -112,5 +124,9 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     companion object {
 
         private const val MATCHER_NAME = "SIM_AFIS"
+
+        // TODO add as parameters
+        const val MAX_RESULTS = 10
+        const val BATCH_SIZE = 2000
     }
 }

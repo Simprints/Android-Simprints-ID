@@ -107,7 +107,7 @@ class SubjectLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people = subjectLocalDataSource
-            .loadFingerprintIdentities(SubjectQuery())
+            .loadFingerprintIdentities(SubjectQuery(), IntRange(0, 20))
             .toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->
