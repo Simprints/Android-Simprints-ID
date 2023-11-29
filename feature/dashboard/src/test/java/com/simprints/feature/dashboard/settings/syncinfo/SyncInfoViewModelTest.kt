@@ -14,7 +14,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
@@ -56,7 +56,7 @@ class SyncInfoViewModelTest {
     private lateinit var configManager: ConfigManager
 
     @MockK
-    private lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
     private lateinit var authStore: AuthStore
@@ -96,7 +96,7 @@ class SyncInfoViewModelTest {
         viewModel = SyncInfoViewModel(
             configManager = configManager,
             connectivityTracker = connectivityTracker,
-            enrolmentRecordManager = enrolmentRecordManager,
+            enrolmentRecordRepository = enrolmentRecordRepository,
             authStore = authStore,
             imageRepository = imageRepository,
             eventSyncManager = eventSyncManager,
@@ -117,7 +117,7 @@ class SyncInfoViewModelTest {
     @Test
     fun `should initialize the recordsInLocal live data correctly`() = runTest {
         val number = 10
-        coEvery { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) } returns number
+        coEvery { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) } returns number
 
         viewModel.refreshInformation()
 
@@ -156,7 +156,7 @@ class SyncInfoViewModelTest {
             every { selectedModules } returns listOf(module1, module2)
         }
         coEvery {
-            enrolmentRecordManager.count(
+            enrolmentRecordRepository.count(
                 SubjectQuery(
                     projectId = PROJECT_ID,
                     moduleId = module1.value
@@ -164,7 +164,7 @@ class SyncInfoViewModelTest {
             )
         } returns numberForModule1
         coEvery {
-            enrolmentRecordManager.count(
+            enrolmentRecordRepository.count(
                 SubjectQuery(
                     projectId = PROJECT_ID,
                     moduleId = module2.value
@@ -212,7 +212,7 @@ class SyncInfoViewModelTest {
 
     @Test
     fun `refreshInformation should first reset the information and then reload`() = runTest {
-        coEvery { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) } returnsMany listOf(
+        coEvery { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) } returnsMany listOf(
             2,
             4
         )
@@ -244,7 +244,7 @@ class SyncInfoViewModelTest {
                 )
             )
 
-            coVerify(exactly = 0) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
+            coVerify(exactly = 0) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
         }
 
     @Test
@@ -265,7 +265,7 @@ class SyncInfoViewModelTest {
                 )
             )
 
-            coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
+            coVerify(exactly = 1) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
         }
 
     @Test
@@ -287,7 +287,7 @@ class SyncInfoViewModelTest {
             viewModel.fetchSyncInformationIfNeeded(state)
             viewModel.fetchSyncInformationIfNeeded(state)
 
-            coVerify(exactly = 1) { enrolmentRecordManager.count(SubjectQuery(projectId = PROJECT_ID)) }
+            coVerify(exactly = 1) { enrolmentRecordRepository.count(SubjectQuery(projectId = PROJECT_ID)) }
         }
 
     @Test

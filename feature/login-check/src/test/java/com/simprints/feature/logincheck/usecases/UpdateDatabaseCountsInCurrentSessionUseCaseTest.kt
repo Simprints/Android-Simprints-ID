@@ -1,7 +1,7 @@
 package com.simprints.feature.logincheck.usecases
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
@@ -20,7 +20,7 @@ internal class UpdateDatabaseCountsInCurrentSessionUseCaseTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     private lateinit var useCase: UpdateDatabaseCountsInCurrentSessionUseCase
 
@@ -28,12 +28,12 @@ internal class UpdateDatabaseCountsInCurrentSessionUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = UpdateDatabaseCountsInCurrentSessionUseCase(eventRepository, enrolmentRecordManager)
+        useCase = UpdateDatabaseCountsInCurrentSessionUseCase(eventRepository, enrolmentRecordRepository)
     }
 
     @Test
     fun `Updates current event with data from enrolments`() = runTest {
-        coEvery { enrolmentRecordManager.count() } returns 42
+        coEvery { enrolmentRecordRepository.count() } returns 42
 
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createBlankSessionEvent()
 

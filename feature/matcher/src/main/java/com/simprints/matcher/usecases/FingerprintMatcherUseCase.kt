@@ -9,8 +9,8 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
@@ -22,7 +22,7 @@ import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 internal class FingerprintMatcherUseCase @Inject constructor(
-    private val subjectRepository: SubjectRepository,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val bioSdkWrapper: BioSdkWrapper,
     private val configManager: ConfigManager,
     private val createRanges: CreateRangesUseCase,
@@ -40,7 +40,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             return@coroutineScope Pair(emptyList(), 0)
         }
         val samples = mapSamples(matchParams.probeFingerprintSamples)
-        val totalCandidates = subjectRepository.count(matchParams.queryForCandidates)
+        val totalCandidates = enrolmentRecordRepository.count(matchParams.queryForCandidates)
         if (totalCandidates == 0) {
             return@coroutineScope Pair(emptyList(), 0)
         }
@@ -64,7 +64,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
         .map { Fingerprint(it.fingerId.toMatcherDomain(), it.template, it.format) }
 
-    private suspend fun getCandidates(query: SubjectQuery, range: IntRange) = subjectRepository
+    private suspend fun getCandidates(query: SubjectQuery, range: IntRange) = enrolmentRecordRepository
         .loadFingerprintIdentities(query, range)
         .map {
             FingerprintIdentity(

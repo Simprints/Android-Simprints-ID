@@ -4,7 +4,7 @@ import androidx.annotation.VisibleForTesting
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 internal class EventDownSyncTask @Inject constructor(
-    private val subjectRepository: EnrolmentRecordManager,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventDownSyncScopeRepository: EventDownSyncScopeRepository,
     private val subjectFactory: SubjectFactory,
     private val configRepository: ConfigRepository,
@@ -105,7 +105,7 @@ internal class EventDownSyncTask @Inject constructor(
             }
         }.flatten()
 
-        subjectRepository.performActions(actions)
+        enrolmentRecordRepository.performActions(actions)
 
         Simber.tag(SYNC_LOG_TAG).d("[DOWN_SYNC_HELPER] batch processed")
 
@@ -141,7 +141,7 @@ internal class EventDownSyncTask @Inject constructor(
 
         val actions = mutableListOf<SubjectAction>()
         when {
-            modulesIdsUnderSyncing != null && modulesIdsUnderSyncing.isNotEmpty() -> {
+            !modulesIdsUnderSyncing.isNullOrEmpty() -> {
 
                 /**
                  * handleSubjectMoveEvent is executed by each worker to process a new moveEvent.

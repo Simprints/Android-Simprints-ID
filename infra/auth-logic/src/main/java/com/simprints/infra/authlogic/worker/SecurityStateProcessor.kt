@@ -1,7 +1,8 @@
 package com.simprints.infra.authlogic.worker
 
 import com.simprints.infra.authlogic.authenticator.SignerManager
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordScheduler
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageRepository
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 internal class SecurityStateProcessor @Inject constructor(
     private val imageRepository: ImageRepository,
-    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val enrolmentRecordScheduler: EnrolmentRecordScheduler,
     private val eventRepository: EventRepository,
     private val eventSyncManager: EventSyncManager,
     private val signerManager: SignerManager
@@ -25,7 +27,7 @@ internal class SecurityStateProcessor @Inject constructor(
         } else {
             securityState.mustUpSyncEnrolmentRecords?.let { upSyncEnrolmentRecords ->
                 Simber.i("subject ids ${upSyncEnrolmentRecords.subjectIds.size}")
-                enrolmentRecordManager.upload(
+                enrolmentRecordScheduler.upload(
                     upSyncEnrolmentRecords.id,
                     upSyncEnrolmentRecords.subjectIds
                 )
@@ -47,7 +49,7 @@ internal class SecurityStateProcessor @Inject constructor(
     private suspend fun deleteLocalData() {
         imageRepository.deleteStoredImages()
         eventRepository.deleteAll()
-        enrolmentRecordManager.deleteAll()
+        enrolmentRecordRepository.deleteAll()
     }
 
     private suspend fun signOut() {
