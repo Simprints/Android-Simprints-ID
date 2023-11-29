@@ -9,7 +9,7 @@ import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 interface SubjectLocalDataSource {
 
     suspend fun load(query: SubjectQuery): List<Subject>
-    suspend fun loadFingerprintIdentities(query: SubjectQuery): List<FingerprintIdentity>
+    suspend fun loadFingerprintIdentities(query: SubjectQuery, range: IntRange): List<FingerprintIdentity>
     suspend fun loadFaceIdentities(query: SubjectQuery): List<FaceIdentity>
 
     suspend fun delete(queries: List<SubjectQuery>)

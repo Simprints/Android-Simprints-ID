@@ -1,5 +1,6 @@
 package com.simprints.matcher.usecases
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.FingerprintSample
@@ -10,21 +11,32 @@ import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.matcher.MatchParams
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
-class FingerprintMatcherUseCaseTest {
+internal class FingerprintMatcherUseCaseTest {
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
     lateinit var subjectRepository: SubjectRepository
 
     @MockK
     lateinit var bioSdkWrapper: BioSdkWrapper
+
+    @MockK
+    lateinit var createRangesUseCase: CreateRangesUseCase
 
     @MockK
     lateinit var configManager: ConfigManager
@@ -35,7 +47,13 @@ class FingerprintMatcherUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = FingerprintMatcherUseCase(subjectRepository, bioSdkWrapper, configManager)
+        useCase = FingerprintMatcherUseCase(
+            subjectRepository,
+            bioSdkWrapper,
+            configManager,
+            createRangesUseCase,
+            testCoroutineRule.testCoroutineDispatcher,
+        )
     }
 
     @Test
@@ -55,7 +73,7 @@ class FingerprintMatcherUseCaseTest {
 
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { subjectRepository.loadFingerprintIdentities(any()) } returns listOf(
+        coEvery { subjectRepository.loadFingerprintIdentities(any(), any()) } returns listOf(
             FingerprintIdentity(
                 "personId",
                 listOf(
