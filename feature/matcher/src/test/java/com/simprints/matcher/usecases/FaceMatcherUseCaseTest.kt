@@ -3,9 +3,9 @@ package com.simprints.matcher.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.matcher.MatchParams
 import io.mockk.MockKAnnotations
@@ -19,7 +19,7 @@ import org.junit.Test
 class FaceMatcherUseCaseTest {
 
     @MockK
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var subjectRepository: SubjectRepository
 
     @MockK
     lateinit var faceMatcher: FaceMatcher
@@ -30,12 +30,12 @@ class FaceMatcherUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = FaceMatcherUseCase(enrolmentRecordManager, faceMatcher)
+        useCase = FaceMatcherUseCase(subjectRepository, faceMatcher)
     }
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns listOf(
+        coEvery { subjectRepository.loadFaceIdentities(any()) } returns listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))
@@ -55,7 +55,7 @@ class FaceMatcherUseCaseTest {
 
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns listOf(
+        coEvery { subjectRepository.loadFaceIdentities(any()) } returns listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))

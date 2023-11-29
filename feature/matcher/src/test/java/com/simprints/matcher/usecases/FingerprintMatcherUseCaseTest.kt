@@ -6,9 +6,9 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.matcher.MatchParams
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -21,7 +21,7 @@ import org.junit.Test
 class FingerprintMatcherUseCaseTest {
 
     @MockK
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var subjectRepository: SubjectRepository
 
     @MockK
     lateinit var bioSdkWrapper: BioSdkWrapper
@@ -35,12 +35,12 @@ class FingerprintMatcherUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = FingerprintMatcherUseCase(enrolmentRecordManager, bioSdkWrapper, configManager)
+        useCase = FingerprintMatcherUseCase(subjectRepository, bioSdkWrapper, configManager)
     }
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns emptyList()
+        coEvery { subjectRepository.loadFaceIdentities(any()) } returns emptyList()
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         useCase.invoke(
@@ -55,7 +55,7 @@ class FingerprintMatcherUseCaseTest {
 
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { enrolmentRecordManager.loadFingerprintIdentities(any()) } returns listOf(
+        coEvery { subjectRepository.loadFingerprintIdentities(any()) } returns listOf(
             FingerprintIdentity(
                 "personId",
                 listOf(

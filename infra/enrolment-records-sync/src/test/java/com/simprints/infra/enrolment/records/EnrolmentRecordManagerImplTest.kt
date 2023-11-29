@@ -44,20 +44,6 @@ class EnrolmentRecordManagerImplTest {
     }
 
     @Test
-    fun `loadFaceIdentities should call the correct method`() = runTest {
-        enrolmentRecordManager.loadFaceIdentities(QUERY)
-
-        coVerify(exactly = 1) { subjectRepository.loadFaceIdentities(QUERY) }
-    }
-
-    @Test
-    fun `loadFingerprintIdentities should call the correct method`() = runTest {
-        enrolmentRecordManager.loadFingerprintIdentities(QUERY)
-
-        coVerify(exactly = 1) { subjectRepository.loadFingerprintIdentities(QUERY) }
-    }
-
-    @Test
     fun `load should call the correct method`() = runTest {
         enrolmentRecordManager.load(QUERY)
 
