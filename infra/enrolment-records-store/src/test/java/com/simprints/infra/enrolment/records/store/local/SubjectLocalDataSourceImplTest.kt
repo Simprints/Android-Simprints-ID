@@ -106,7 +106,7 @@ class SubjectLocalDataSourceImplTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
-        val people = (subjectLocalDataSource as FingerprintIdentityLocalDataSource)
+        val people = subjectLocalDataSource
             .loadFingerprintIdentities(SubjectQuery())
             .toList()
 
@@ -120,7 +120,7 @@ class SubjectLocalDataSourceImplTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
-        val people = (subjectLocalDataSource as FaceIdentityLocalDataSource)
+        val people = subjectLocalDataSource
             .loadFaceIdentities(SubjectQuery())
             .toList()
 

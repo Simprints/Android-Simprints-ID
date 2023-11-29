@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.facebiosdk.matching.FaceIdentity
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.infra.facebiosdk.matching.FaceSample
@@ -12,7 +12,7 @@ import com.simprints.matcher.MatchResultItem
 import javax.inject.Inject
 
 internal class FaceMatcherUseCase @Inject constructor(
-    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val subjectRepository: SubjectRepository,
     private val faceMatcher: FaceMatcher,
 ) : MatcherUseCase {
 
@@ -40,7 +40,7 @@ internal class FaceMatcherUseCase @Inject constructor(
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes
         .map { FaceSample(it.faceId, it.template) }
 
-    private suspend fun getCandidates(query: SubjectQuery) = enrolmentRecordManager
+    private suspend fun getCandidates(query: SubjectQuery) = subjectRepository
         .loadFaceIdentities(query)
         .map {
             FaceIdentity(

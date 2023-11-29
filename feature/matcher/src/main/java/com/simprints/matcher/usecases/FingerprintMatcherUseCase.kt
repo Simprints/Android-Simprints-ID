@@ -8,20 +8,19 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
-import java.io.Serializable
 import javax.inject.Inject
 import kotlin.time.TimedValue
 import kotlin.time.measureTimedValue
 
 internal class FingerprintMatcherUseCase @Inject constructor(
-    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val subjectRepository: SubjectRepository,
     private val bioSdkWrapper: BioSdkWrapper,
     private val configManager: ConfigManager,
 ) : MatcherUseCase {
@@ -63,7 +62,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
         .map { Fingerprint(it.fingerId.toMatcherDomain(), it.template, it.format) }
 
-    private suspend fun getCandidates(query: SubjectQuery) = enrolmentRecordManager
+    private suspend fun getCandidates(query: SubjectQuery) = subjectRepository
         .loadFingerprintIdentities(query)
         .map {
             FingerprintIdentity(
