@@ -12,7 +12,6 @@ import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
@@ -24,6 +23,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.network.ConnectivityTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -36,7 +36,7 @@ import javax.inject.Inject
 internal class SyncInfoViewModel @Inject constructor(
     private val configManager: ConfigManager,
     connectivityTracker: ConnectivityTracker,
-    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val authStore: AuthStore,
     private val imageRepository: ImageRepository,
     private val eventSyncManager: EventSyncManager,
@@ -182,7 +182,7 @@ internal class SyncInfoViewModel @Inject constructor(
         synchronizationConfiguration.down.let { it.moduleOptions.isNotEmpty() && isModuleSync(it) }
 
     private suspend fun getRecordsInLocal(projectId: String): Int =
-        enrolmentRecordManager.count(SubjectQuery(projectId = projectId))
+        enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
 
     private suspend fun getRecordsToUpSync(projectId: String): Int =
         eventSyncManager.countEventsToUpload(projectId, EventType.ENROLMENT_V2)
@@ -206,7 +206,7 @@ internal class SyncInfoViewModel @Inject constructor(
 
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
         configManager.getDeviceConfiguration().selectedModules.map { moduleName ->
-            val count = enrolmentRecordManager.count(
+            val count = enrolmentRecordRepository.count(
                 SubjectQuery(projectId = projectId, moduleId = moduleName.value)
             )
             val decryptedName = when (moduleName) {

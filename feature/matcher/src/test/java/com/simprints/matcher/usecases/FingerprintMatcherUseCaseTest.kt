@@ -7,7 +7,7 @@ import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.store.SubjectRepository
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.matcher.MatchParams
@@ -30,7 +30,7 @@ internal class FingerprintMatcherUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var subjectRepository: SubjectRepository
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
     lateinit var bioSdkWrapper: BioSdkWrapper
@@ -48,7 +48,7 @@ internal class FingerprintMatcherUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         useCase = FingerprintMatcherUseCase(
-            subjectRepository,
+            enrolmentRecordRepository,
             bioSdkWrapper,
             configManager,
             createRangesUseCase,
@@ -70,8 +70,8 @@ internal class FingerprintMatcherUseCaseTest {
 
     @Test
     fun `Skips matching if there are no candidates`() = runTest {
-        coEvery { subjectRepository.count(any()) } returns 0
-        coEvery { subjectRepository.loadFaceIdentities(any(), any()) } returns emptyList()
+        coEvery { enrolmentRecordRepository.count(any()) } returns 0
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any()) } returns emptyList()
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         useCase.invoke(
@@ -91,12 +91,11 @@ internal class FingerprintMatcherUseCaseTest {
         coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
     }
 
-
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { subjectRepository.count(any()) } returns 100
+        coEvery { enrolmentRecordRepository.count(any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
-        coEvery { subjectRepository.loadFingerprintIdentities(any(), any()) } returns listOf(
+        coEvery { enrolmentRecordRepository.loadFingerprintIdentities(any(), any()) } returns listOf(
             FingerprintIdentity(
                 "personId",
                 listOf(

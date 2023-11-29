@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 class EnrolmentRecordWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val manager: EnrolmentRecordManager,
+    private val repository: EnrolmentRecordRepository,
     private val configManager: ConfigManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(context, params) {
@@ -31,7 +31,7 @@ class EnrolmentRecordWorker @AssistedInject constructor(
                     inputData.getStringArray(EnrolmentRecordSchedulerImpl.INPUT_SUBJECT_IDS_NAME)
                         ?: throw IllegalArgumentException("input required")
 
-                manager.uploadRecords(subjectIds.toList())
+                repository.uploadRecords(subjectIds.toList())
 
                 configManager.updateDeviceConfiguration {
                     it.apply { it.lastInstructionId = instructionId }

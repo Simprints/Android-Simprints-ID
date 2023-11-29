@@ -1,7 +1,7 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.core.DispatcherBG
-import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.facebiosdk.matching.FaceIdentity
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
@@ -17,7 +17,7 @@ import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 internal class FaceMatcherUseCase @Inject constructor(
-    private val subjectRepository: SubjectRepository,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val faceMatcher: FaceMatcher,
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
@@ -34,7 +34,7 @@ internal class FaceMatcherUseCase @Inject constructor(
             return@coroutineScope Pair(emptyList(), 0)
         }
         val samples = mapSamples(matchParams.probeFaceSamples)
-        val totalCandidates = subjectRepository.count(matchParams.queryForCandidates)
+        val totalCandidates = enrolmentRecordRepository.count(matchParams.queryForCandidates)
         if (totalCandidates == 0) {
             return@coroutineScope Pair(emptyList(), 0)
         }
@@ -55,7 +55,7 @@ internal class FaceMatcherUseCase @Inject constructor(
     private fun mapSamples(probes: List<MatchParams.FaceSample>) = probes
         .map { FaceSample(it.faceId, it.template) }
 
-    private suspend fun getCandidates(query: SubjectQuery, range: IntRange) = subjectRepository
+    private suspend fun getCandidates(query: SubjectQuery, range: IntRange) = enrolmentRecordRepository
         .loadFaceIdentities(query, range)
         .map {
             FaceIdentity(

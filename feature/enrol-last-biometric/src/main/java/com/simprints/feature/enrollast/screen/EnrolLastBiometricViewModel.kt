@@ -14,7 +14,7 @@ import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_E
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.events.EventRepository
@@ -33,7 +33,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configManager: ConfigManager,
     private val eventRepository: EventRepository,
-    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val hasDuplicateEnrolments: HasDuplicateEnrolmentsUseCase,
     private val buildSubject: BuildSubjectUseCase,
 ) : ViewModel() {
@@ -76,7 +76,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
             Simber.tag(ENROLMENT.name).d("Enrolment in progress")
             registerEvent(subject)
             Simber.tag(ENROLMENT.name).d("Create a subject record")
-            enrolmentRecordManager.performActions(listOf(SubjectAction.Creation(subject)))
+            enrolmentRecordRepository.performActions(listOf(SubjectAction.Creation(subject)))
             Simber.tag(ENROLMENT.name).d("Done!")
 
             _finish.send(EnrolLastState.Success(subject.subjectId))

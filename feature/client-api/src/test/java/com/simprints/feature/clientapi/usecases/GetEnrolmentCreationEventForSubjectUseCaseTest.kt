@@ -5,7 +5,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -27,7 +27,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
     private lateinit var configManager: ConfigManager
 
     @MockK
-    private lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
     private lateinit var encoder: EncodingUtils
@@ -45,7 +45,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
 
         useCase = GetEnrolmentCreationEventForSubjectUseCase(
             configManager,
-            enrolmentRecordManager,
+            enrolmentRecordRepository,
             encoder,
             jsonHelper
         )
@@ -59,7 +59,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
 
         val result = useCase("projectId", "subjectId")
 
-        coVerify(exactly = 0) { enrolmentRecordManager.load(any()) }
+        coVerify(exactly = 0) { enrolmentRecordRepository.load(any()) }
         assertThat(result).isNull()
     }
 
@@ -71,7 +71,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
 
         val result = useCase("projectId", "subjectId")
 
-        coVerify(exactly = 0) { enrolmentRecordManager.load(any()) }
+        coVerify(exactly = 0) { enrolmentRecordRepository.load(any()) }
         assertThat(result).isNull()
     }
 
@@ -81,7 +81,7 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
 
-        coEvery { enrolmentRecordManager.load(any()) } returns emptyList()
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
 
         val result = useCase("projectId", "subjectId")
 
@@ -94,11 +94,11 @@ class GetEnrolmentCreationEventForSubjectUseCaseTest {
             every { synchronization.up.coSync.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ONLY_BIOMETRICS
         }
 
-        coEvery { enrolmentRecordManager.load(any()) } returns listOf(mockk(relaxed = true))
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(mockk(relaxed = true))
 
         val result = useCase("projectId", "subjectId")
 
-        coVerify { enrolmentRecordManager.load(any()) }
+        coVerify { enrolmentRecordRepository.load(any()) }
         coVerify { jsonHelper.toJson(any()) }
         assertThat(result).isNotNull()
     }

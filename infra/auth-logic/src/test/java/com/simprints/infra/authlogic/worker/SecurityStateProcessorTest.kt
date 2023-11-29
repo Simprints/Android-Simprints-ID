@@ -1,7 +1,8 @@
 package com.simprints.infra.authlogic.worker
 
 import com.simprints.infra.authlogic.authenticator.SignerManager
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordScheduler
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageRepository
@@ -25,7 +26,10 @@ internal class SecurityStateProcessorTest {
     lateinit var mockSignerManager: SignerManager
 
     @MockK
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
+
+    @MockK
+    lateinit var enrolmentRecordScheduler: EnrolmentRecordScheduler
 
     @MockK
     lateinit var eventRepository: EventRepository
@@ -43,7 +47,8 @@ internal class SecurityStateProcessorTest {
         coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, null) } returns flowOf(0)
         securityStateProcessor = SecurityStateProcessor(
             imageRepository = mockImageRepository,
-            enrolmentRecordManager = enrolmentRecordManager,
+            enrolmentRecordRepository = enrolmentRecordRepository,
+            enrolmentRecordScheduler = enrolmentRecordScheduler,
             eventRepository = eventRepository,
             eventSyncManager = eventSyncManager,
             signerManager = mockSignerManager,
@@ -63,7 +68,7 @@ internal class SecurityStateProcessorTest {
             securityStateProcessor.processSecurityState(securityState)
 
             coVerify(exactly = 1) {
-                enrolmentRecordManager.upload(id = PROJECT_ID, subjectIds = SUBJECTS)
+                enrolmentRecordScheduler.upload(id = PROJECT_ID, subjectIds = SUBJECTS)
             }
         }
 
@@ -75,7 +80,7 @@ internal class SecurityStateProcessorTest {
         securityStateProcessor.processSecurityState(securityState)
 
         coVerify(exactly = 0) { mockImageRepository.deleteStoredImages() }
-        coVerify(exactly = 0) { enrolmentRecordManager.deleteAll() }
+        coVerify(exactly = 0) { enrolmentRecordRepository.deleteAll() }
         coVerify(exactly = 0) { eventRepository.deleteAll() }
         coVerify(exactly = 0) { mockSignerManager.signOut() }
     }
@@ -88,7 +93,7 @@ internal class SecurityStateProcessorTest {
         securityStateProcessor.processSecurityState(securityState)
 
         coVerify(exactly = 1) { mockImageRepository.deleteStoredImages() }
-        coVerify(exactly = 1) { enrolmentRecordManager.deleteAll() }
+        coVerify(exactly = 1) { enrolmentRecordRepository.deleteAll() }
         coVerify(exactly = 1) { eventRepository.deleteAll() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
     }
@@ -105,7 +110,7 @@ internal class SecurityStateProcessorTest {
                 eventSyncManager.countEventsToUpload(projectId = PROJECT_ID, type = null)
             }
             coVerify(exactly = 1) { mockImageRepository.deleteStoredImages() }
-            coVerify(exactly = 1) { enrolmentRecordManager.deleteAll() }
+            coVerify(exactly = 1) { enrolmentRecordRepository.deleteAll() }
             coVerify(exactly = 1) { eventRepository.deleteAll() }
             coVerify(exactly = 1) { mockSignerManager.signOut() }
         }
@@ -127,11 +132,11 @@ internal class SecurityStateProcessorTest {
                 eventSyncManager.countEventsToUpload(projectId = PROJECT_ID, type = null)
             }
             coVerify(exactly = 0) { mockImageRepository.deleteStoredImages() }
-            coVerify(exactly = 0) { enrolmentRecordManager.deleteAll() }
+            coVerify(exactly = 0) { enrolmentRecordRepository.deleteAll() }
             coVerify(exactly = 0) { eventRepository.deleteAll() }
             coVerify(exactly = 0) { mockSignerManager.signOut() }
             coVerify(exactly = 1) {
-                enrolmentRecordManager.upload(id = PROJECT_ID, subjectIds = SUBJECTS)
+                enrolmentRecordScheduler.upload(id = PROJECT_ID, subjectIds = SUBJECTS)
             }
         }
 
@@ -143,7 +148,7 @@ internal class SecurityStateProcessorTest {
         securityStateProcessor.processSecurityState(securityState)
 
         coVerify(exactly = 1) { mockImageRepository.deleteStoredImages() }
-        coVerify(exactly = 1) { enrolmentRecordManager.deleteAll() }
+        coVerify(exactly = 1) { enrolmentRecordRepository.deleteAll() }
         coVerify(exactly = 1) { eventRepository.deleteAll() }
         coVerify(exactly = 1) { mockSignerManager.signOut() }
     }
