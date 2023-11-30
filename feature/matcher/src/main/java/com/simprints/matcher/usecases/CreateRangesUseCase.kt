@@ -11,7 +11,7 @@ internal class CreateRangesUseCase @Inject constructor() {
      *
      * For example with minBatchSize = 10, returned batches will be 10, 10, 20, 30, 40, 50, 50 in size (if the total allows).
      */
-    operator fun invoke(max: Int, minBatchSize: Int): List<IntRange> {
+    operator fun invoke(totalCount: Int, minBatchSize: Int = DEFAULT_BATCH_SIZE): List<IntRange> {
         val ranges = mutableListOf<IntRange>()
         var index = 1
 
@@ -19,9 +19,9 @@ internal class CreateRangesUseCase @Inject constructor() {
         var start = 0
         var end = nextBatchSize
 
-        while (start < max) {
-            if (end > max) {
-                end = max
+        while (start < totalCount) {
+            if (end > totalCount) {
+                end = totalCount
             }
             ranges.add(start until end)
             start = end
@@ -32,5 +32,13 @@ internal class CreateRangesUseCase @Inject constructor() {
             index++
         }
         return ranges
+    }
+
+    companion object {
+
+        /**
+         * Experimentally determined batch size that works well for most cases.
+         */
+        private const val DEFAULT_BATCH_SIZE = 1000
     }
 }

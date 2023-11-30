@@ -121,7 +121,7 @@ class SubjectLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people = subjectLocalDataSource
-            .loadFaceIdentities(SubjectQuery())
+            .loadFaceIdentities(SubjectQuery(), IntRange(0, 20))
             .toList()
 
         listOf(fakePerson).zip(people).forEach { (subject, identity) ->

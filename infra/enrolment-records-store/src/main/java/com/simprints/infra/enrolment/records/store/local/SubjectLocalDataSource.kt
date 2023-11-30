@@ -10,7 +10,7 @@ interface SubjectLocalDataSource {
 
     suspend fun load(query: SubjectQuery): List<Subject>
     suspend fun loadFingerprintIdentities(query: SubjectQuery, range: IntRange): List<FingerprintIdentity>
-    suspend fun loadFaceIdentities(query: SubjectQuery): List<FaceIdentity>
+    suspend fun loadFaceIdentities(query: SubjectQuery, range: IntRange): List<FaceIdentity>
 
     suspend fun delete(queries: List<SubjectQuery>)
     suspend fun deleteAll()

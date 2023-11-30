@@ -12,7 +12,6 @@ import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.SubjectRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
-import com.simprints.infra.logging.Simber
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
@@ -21,7 +20,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
-import kotlin.time.measureTimedValue
 
 internal class FingerprintMatcherUseCase @Inject constructor(
     private val subjectRepository: SubjectRepository,
@@ -37,35 +35,30 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     override suspend operator fun invoke(
         matchParams: MatchParams,
         onLoadingCandidates: (tag: String) -> Unit,
-        onMatching: (tag: String) -> Unit,
-    ): List<MatchResultItem> = coroutineScope {
-        onLoadingCandidates(crashReportTag)
-        val totalDuration = measureTimedValue {
-            if (matchParams.probeFingerprintSamples.isEmpty()) {
-                return@coroutineScope emptyList()
-            }
-            val samples = mapSamples(matchParams.probeFingerprintSamples)
-            val totalCandidates = subjectRepository.count(matchParams.queryForCandidates)
-
-            createRanges(totalCandidates, BATCH_SIZE)
-                .map { range ->
-                    async(dispatcher) {
-                        val batchCandidates = getCandidates(matchParams.queryForCandidates, range)
-                        match(samples, batchCandidates, matchParams.flowType)
-                            .fold(MatchResultSet<FingerprintMatchResult.Item>(MAX_RESULTS)) { acc, item ->
-                                acc.add(FingerprintMatchResult.Item(item.id, item.score))
-                            }
-                    }
-                }
-                .awaitAll()
-                .reduce { acc, subSet -> acc.addAll(subSet) }
-                .toList()
+    ): Pair<List<MatchResultItem>, Int> = coroutineScope {
+        if (matchParams.probeFingerprintSamples.isEmpty()) {
+            return@coroutineScope Pair(emptyList(), 0)
+        }
+        val samples = mapSamples(matchParams.probeFingerprintSamples)
+        val totalCandidates = subjectRepository.count(matchParams.queryForCandidates)
+        if (totalCandidates == 0) {
+            return@coroutineScope Pair(emptyList(), 0)
         }
 
-        // TODO remove this benchmarking code when we are confident in the performance of the matcher
-        Simber.d("BENCHMARK: \tTotal\t${totalDuration.duration.inWholeMilliseconds}")
-
-        return@coroutineScope totalDuration.value
+        onLoadingCandidates(crashReportTag)
+        createRanges(totalCandidates)
+            .map { range ->
+                async(dispatcher) {
+                    val batchCandidates = getCandidates(matchParams.queryForCandidates, range)
+                    match(samples, batchCandidates, matchParams.flowType)
+                        .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
+                            acc.add(FingerprintMatchResult.Item(item.id, item.score))
+                        }
+                }
+            }
+            .awaitAll()
+            .reduce { acc, subSet -> acc.addAll(subSet) }
+            .toList() to totalCandidates
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
@@ -118,9 +111,5 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     companion object {
 
         private const val MATCHER_NAME = "SIM_AFIS"
-
-        // TODO add as parameters
-        const val MAX_RESULTS = 10
-        const val BATCH_SIZE = 1000
     }
 }
