@@ -54,18 +54,23 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
             val batchResults = ranges.map { range ->
                 async(dispatcher) {
-                    val batchCandidates = getCandidates(matchParams.queryForCandidates, range)
-                    match(samples, batchCandidates, matchParams.flowType)
-                        .sortedByDescending { it.score }
-                        .take(MAX_RESULTS)
+                    val batchCandidates =
+                        measureTimedValue { getCandidates(matchParams.queryForCandidates, range) }
+
+                    val results = measureTimedValue {
+                        match(samples, batchCandidates.value, matchParams.flowType)
+                            .fold(MatchResultSet<FingerprintMatchResult.Item>(MAX_RESULTS)) { acc, item ->
+                                acc.add(FingerprintMatchResult.Item(item.id, item.score))
+                            }
+                    }
+
+                    Simber.d("BENCHMARK: \tRange read\t$range\t${batchCandidates.duration.inWholeMilliseconds}")
+                    Simber.d("BENCHMARK: \tRange match\t$range\t${results.duration.inWholeMilliseconds}")
+                    results.value
                 }
             }.awaitAll()
 
-            batchResults
-                .flatten()
-                .sortedByDescending { it.score }
-                .take(MAX_RESULTS)
-                .map { FingerprintMatchResult.Item(it.id, it.score) }
+            batchResults.reduce { acc, subSet -> acc.addAll(subSet) }.toList()
         }
 
         // TODO remove this benchmarking code when we are confident in the performance of the matcher
@@ -127,6 +132,6 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
         // TODO add as parameters
         const val MAX_RESULTS = 10
-        const val BATCH_SIZE = 2000
+        const val BATCH_SIZE = 50000 // TODO No batching for now
     }
 }
