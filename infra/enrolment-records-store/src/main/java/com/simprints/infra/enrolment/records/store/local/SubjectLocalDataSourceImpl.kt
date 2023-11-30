@@ -55,17 +55,20 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
             }
     }
 
-    override suspend fun loadFaceIdentities(query: SubjectQuery): List<FaceIdentity> =
-        realmWrapper.readRealm {
-            it.query(DbSubject::class).buildRealmQueryForSubject(query)
-                .find()
-                .map { subject ->
-                    FaceIdentity(
-                        subject.subjectId.toString(),
-                        subject.faceSamples.map(DbFaceSample::fromDbToDomain)
-                    )
-                }
-        }
+    override suspend fun loadFaceIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+    ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
+        realm.query(DbSubject::class)
+            .buildRealmQueryForSubject(query)
+            .find { it.subList(range.first, range.last) }
+            .map { subject ->
+                FaceIdentity(
+                    subject.subjectId.toString(),
+                    subject.faceSamples.map(DbFaceSample::fromDbToDomain)
+                )
+            }
+    }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
         realmWrapper.writeRealm { realm ->

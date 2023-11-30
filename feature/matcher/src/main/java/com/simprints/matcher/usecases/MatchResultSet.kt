@@ -4,7 +4,7 @@ import com.simprints.matcher.MatchResultItem
 import java.util.TreeSet
 
 internal class MatchResultSet<T : MatchResultItem>(
-    private val maxSize: Int,
+    private val maxSize: Int = MAX_RESULTS,
 ) {
 
     private var lowestConfidence: Float = Float.MIN_VALUE
@@ -37,4 +37,13 @@ internal class MatchResultSet<T : MatchResultItem>(
     }
 
     fun toList(): List<T> = treeSet.toList()
+
+    companion object {
+
+        // TODO add as parameters
+        /**
+         * Default max size of the result set.
+         */
+        private const val MAX_RESULTS = 10
+    }
 }
