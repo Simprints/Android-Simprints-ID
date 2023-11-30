@@ -63,7 +63,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         }
 
         // TODO remove this benchmarking code when we are confident in the performance of the matcher
-        Simber.d("BENCHMARK: \tTotal\t$BATCH_SIZE\t${totalDuration.duration.inWholeMilliseconds}")
+        Simber.d("BENCHMARK: \tTotal\t${totalDuration.duration.inWholeMilliseconds}")
 
         return@coroutineScope totalDuration.value
     }
@@ -121,6 +121,6 @@ internal class FingerprintMatcherUseCase @Inject constructor(
 
         // TODO add as parameters
         const val MAX_RESULTS = 10
-        const val BATCH_SIZE = 2000
+        const val BATCH_SIZE = 1000
     }
 }

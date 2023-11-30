@@ -21,23 +21,26 @@ class CreateRangesUseCaseTest {
     }
 
     @Test
-    fun `Correctly calculates ranges for exact batches`() {
-        assertThat(useCase.invoke(20, 5)).isEqualTo(
-            listOf(
-                0 until 5,
-                5 until 10,
-                10 until 15,
-                15 until 20,
-            )
-        )
-    }
-
-    @Test
     fun `Correctly calculates last batch reminder`() {
         assertThat(useCase.invoke(17, 10)).isEqualTo(
             listOf(
                 0 until 10,
                 10 until 17,
+            )
+        )
+    }
+
+    @Test
+    fun `Correctly calculates ranges for exact batches`() {
+        assertThat(useCase.invoke(210, 10)).isEqualTo(
+            listOf(
+                0 until 10,    // size=10
+                10 until 20,   // size=10
+                20 until 40,   // size=20
+                40 until 70,   // size=30
+                70 until 110,  // size=40
+                110 until 160, // size=50
+                160 until 210, // size=50
             )
         )
     }
