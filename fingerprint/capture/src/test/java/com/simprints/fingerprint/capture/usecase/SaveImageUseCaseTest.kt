@@ -30,6 +30,8 @@ class SaveImageUseCaseTest {
     @MockK
     lateinit var configuration: FingerprintConfiguration
 
+    @MockK
+    lateinit var vero2Configuration: Vero2Configuration
 
     private lateinit var useCase: SaveImageUseCase
 
@@ -37,7 +39,7 @@ class SaveImageUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { configuration.vero2?.imageSavingStrategy } returns Vero2Configuration.ImageSavingStrategy.EAGER
+        every { vero2Configuration.imageSavingStrategy } returns Vero2Configuration.ImageSavingStrategy.EAGER
 
         useCase = SaveImageUseCase(imageRepo, eventRepo)
     }
@@ -45,7 +47,7 @@ class SaveImageUseCaseTest {
     @Test
     fun `Returns null if no scan image`() = runTest {
         val result = useCase.invoke(
-            configuration,
+            vero2Configuration,
             "captureEventId",
             createCollectedStub(null)
         )
@@ -55,7 +57,7 @@ class SaveImageUseCaseTest {
     @Test
     fun `Returns null if no capture event id`() = runTest {
         val result = useCase.invoke(
-            configuration,
+            vero2Configuration,
             null,
             createCollectedStub(byteArrayOf())
         )
@@ -80,7 +82,7 @@ class SaveImageUseCaseTest {
         } returns SecuredImageRef(expectedPath)
 
         assertThat(useCase.invoke(
-            configuration,
+            vero2Configuration,
             "captureEventId",
             createCollectedStub(byteArrayOf())
         )).isNotNull()
@@ -101,7 +103,7 @@ class SaveImageUseCaseTest {
         coEvery { eventRepo.getCurrentCaptureSessionEvent() } throws Exception("no session")
 
         assertThat(useCase.invoke(
-            configuration,
+            vero2Configuration,
             "captureEventId",
             createCollectedStub(byteArrayOf())
         )).isNull()
@@ -118,7 +120,7 @@ class SaveImageUseCaseTest {
         } returns null
 
         assertThat(useCase.invoke(
-            configuration,
+            vero2Configuration,
             "captureEventId",
             createCollectedStub(byteArrayOf())
         )).isNull()

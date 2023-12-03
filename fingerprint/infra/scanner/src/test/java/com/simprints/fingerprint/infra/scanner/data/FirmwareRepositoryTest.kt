@@ -4,8 +4,8 @@ import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSourc
 import com.simprints.fingerprint.infra.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.domain.versions.getAvailableVersionsForDownload
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.Ordering
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,9 +23,8 @@ class FirmwareRepositoryTest {
     private val vero2Configuration = mockk<Vero2Configuration>()
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
-            every { fingerprint } returns mockk {
-                every { vero2 } returns vero2Configuration
-            }
+            every { fingerprint?.bioSdkConfiguration?.vero2 } returns vero2Configuration
+
         }
     }
 

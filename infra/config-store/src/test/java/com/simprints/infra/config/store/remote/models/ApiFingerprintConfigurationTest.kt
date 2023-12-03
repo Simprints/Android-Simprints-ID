@@ -20,22 +20,30 @@ class ApiFingerprintConfigurationTest {
     @Test
     fun `should map correctly the model when the vero1 is missing`() {
         val apiFingerprintConfiguration = ApiFingerprintConfiguration(
-            listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
-            apiDecisionPolicy,
             listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
-            ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            listOf(ApiFingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
             true,
+            ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
+                listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+                apiDecisionPolicy,
+                ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                null,
+                apiFingerprintConfiguration.secugenSimMatcher?.vero2,
+            ),
             null,
-            apiFingerprintConfiguration.vero2,
         )
         val fingerprintConfiguration = FingerprintConfiguration(
-            listOf(Finger.LEFT_3RD_FINGER),
-            decisionPolicy,
             listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
-            FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
             true,
+            FingerprintConfiguration.FingerprintSdkConfiguration(
+                listOf(Finger.LEFT_3RD_FINGER),
+                decisionPolicy,
+                FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                null,
+                fingerprintConfiguration.secugenSimMatcher?.vero2,
+            ),
             null,
-            fingerprintConfiguration.vero2,
         )
 
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
@@ -44,23 +52,33 @@ class ApiFingerprintConfigurationTest {
     @Test
     fun `should map correctly the model when the vero2 is missing`() {
         val apiFingerprintConfiguration = ApiFingerprintConfiguration(
-            listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
-            apiDecisionPolicy,
-            listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_2),
-            ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            listOf(ApiFingerprintConfiguration.VeroGeneration.VERO_1),
+            listOf(ApiFingerprintConfiguration.BioSdk.NEC),
             true,
-            ApiVero1Configuration(10),
             null,
-        )
+            ApiFingerprintConfiguration.ApiFingerprintSdkConfiguration(
+                listOf(ApiFingerprintConfiguration.Finger.LEFT_3RD_FINGER),
+                apiDecisionPolicy,
+                ApiFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                ApiVero1Configuration(10),
+                null,
+            ),
+
+            )
         val fingerprintConfiguration = FingerprintConfiguration(
-            listOf(Finger.LEFT_3RD_FINGER),
-            decisionPolicy,
-            listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
-            FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+            listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
+            listOf(FingerprintConfiguration.BioSdk.NEC),
             true,
-            Vero1Configuration(10),
             null,
-        )
+            FingerprintConfiguration.FingerprintSdkConfiguration(
+                listOf(Finger.LEFT_3RD_FINGER),
+                decisionPolicy,
+                FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                Vero1Configuration(10),
+                null,
+            ),
+
+            )
 
         assertThat(apiFingerprintConfiguration.toDomain()).isEqualTo(fingerprintConfiguration)
     }

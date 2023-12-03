@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.infra.scanner.data.worker
 
 import androidx.work.WorkManager
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -35,7 +35,7 @@ class FirmwareFileUpdateSchedulerTest {
 
     @Test
     fun projectIsOnVero2Only_schedulesWork() = runTest {
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
+        every { fingerprintConfiguration.allowedScanners } returns listOf(
             FingerprintConfiguration.VeroGeneration.VERO_2
         )
         every { workManagerMock.enqueueUniquePeriodicWork(any(), any(), any()) } returns mockk()
@@ -47,7 +47,7 @@ class FirmwareFileUpdateSchedulerTest {
 
     @Test
     fun projectIsBothVero1AndVero2_schedulesWork() = runTest {
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
+        every { fingerprintConfiguration.allowedScanners } returns listOf(
             FingerprintConfiguration.VeroGeneration.VERO_1,
             FingerprintConfiguration.VeroGeneration.VERO_2
         )
@@ -60,7 +60,7 @@ class FirmwareFileUpdateSchedulerTest {
 
     @Test
     fun projectIsOnVero1Only_cancelsScheduledWork() = runTest {
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(
+        every { fingerprintConfiguration.allowedScanners } returns listOf(
             FingerprintConfiguration.VeroGeneration.VERO_1
         )
         every { workManagerMock.cancelUniqueWork(any()) } returns mockk()

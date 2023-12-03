@@ -24,7 +24,7 @@ internal class IsNewEnrolmentUseCaseTest {
 
 
         every { projectConfiguration.face?.decisionPolicy } returns faceConfidenceDecisionPolicy
-        every { projectConfiguration.fingerprint?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
+        every { projectConfiguration.fingerprint?.bioSdkConfiguration?.decisionPolicy } returns fingerprintConfidenceDecisionPolicy
 
         useCase = IsNewEnrolmentUseCase()
     }

@@ -3,7 +3,7 @@ package com.simprints.fingerprint.capture.usecase
 import com.simprints.fingerprint.capture.exceptions.FingerprintUnexpectedException
 import com.simprints.fingerprint.capture.extensions.deduceFileExtension
 import com.simprints.fingerprint.capture.state.CaptureState
-import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
@@ -17,14 +17,14 @@ internal class SaveImageUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(
-        configuration: FingerprintConfiguration,
+        vero2Configuration: Vero2Configuration,
         captureEventId: String?,
         collectedFinger: CaptureState.Collected,
     ) = if (collectedFinger.scanResult.image != null && captureEventId != null) {
         saveImage(
             collectedFinger.scanResult.image,
             captureEventId,
-            configuration.vero2!!.imageSavingStrategy.deduceFileExtension()
+            vero2Configuration.imageSavingStrategy.deduceFileExtension()
         )
     } else if (collectedFinger.scanResult.image != null && captureEventId == null) {
         Simber.e(FingerprintUnexpectedException("Could not save fingerprint image because of null capture ID"))

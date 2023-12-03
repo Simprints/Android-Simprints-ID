@@ -72,7 +72,7 @@ internal class ConnectScannerViewModel @Inject constructor(
         isReconnect = params.isReconnect
         allowedGenerations = configManager.getProjectConfiguration()
             .fingerprint
-            ?.allowedVeroGenerations
+            ?.allowedScanners
             .orEmpty()
     }
 

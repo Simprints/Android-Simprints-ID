@@ -45,7 +45,7 @@ class ScannerFactory @Inject internal constructor(
 
     suspend fun initScannerOperationWrappers(macAddress: String) {
         val availableScannerGenerations =
-            configManager.getProjectConfiguration().fingerprint?.allowedVeroGenerations ?: listOf()
+            configManager.getProjectConfiguration().fingerprint?.allowedScanners ?: listOf()
 
         val scannerGenerationToUse = when (availableScannerGenerations.size) {
             1 -> availableScannerGenerations.single()

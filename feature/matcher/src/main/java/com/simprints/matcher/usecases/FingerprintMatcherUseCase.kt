@@ -78,6 +78,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         .takeIf { flowType == FlowType.VERIFY }
         ?.getProjectConfiguration()
         ?.fingerprint
+        ?.bioSdkConfiguration
         ?.comparisonStrategyForVerification == FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 
     private fun IFingerIdentifier.toMatcherDomain() = when (this) {
