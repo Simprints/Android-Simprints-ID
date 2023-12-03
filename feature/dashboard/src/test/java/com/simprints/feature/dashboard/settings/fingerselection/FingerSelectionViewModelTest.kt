@@ -2,9 +2,18 @@ package com.simprints.feature.dashboard.settings.fingerselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.config.store.models.Finger.*
+import com.simprints.infra.config.store.models.Finger.LEFT_3RD_FINGER
+import com.simprints.infra.config.store.models.Finger.LEFT_4TH_FINGER
+import com.simprints.infra.config.store.models.Finger.LEFT_5TH_FINGER
+import com.simprints.infra.config.store.models.Finger.LEFT_INDEX_FINGER
+import com.simprints.infra.config.store.models.Finger.LEFT_THUMB
+import com.simprints.infra.config.store.models.Finger.RIGHT_3RD_FINGER
+import com.simprints.infra.config.store.models.Finger.RIGHT_4TH_FINGER
+import com.simprints.infra.config.store.models.Finger.RIGHT_5TH_FINGER
+import com.simprints.infra.config.store.models.Finger.RIGHT_INDEX_FINGER
+import com.simprints.infra.config.store.models.Finger.RIGHT_THUMB
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
@@ -20,7 +29,11 @@ class FingerSelectionViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
+    private val bioSdkConfigurationMock =
+        mockk<FingerprintConfiguration.FingerprintSdkConfiguration>()
+    private val fingerprintConfiguration = mockk<FingerprintConfiguration> {
+        every { bioSdkConfiguration } returns bioSdkConfigurationMock
+    }
     private val configManager = mockk<ConfigManager>(relaxed = true) {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns fingerprintConfiguration
@@ -32,7 +45,7 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun start_loadsFingerStateCorrectly() {
-        every { fingerprintConfiguration.fingersToCapture } returns listOf(
+        every { bioSdkConfigurationMock.fingersToCapture } returns listOf(
             LEFT_THUMB, LEFT_THUMB,
             RIGHT_THUMB, RIGHT_THUMB
         )
@@ -49,7 +62,7 @@ class FingerSelectionViewModelTest {
 
     @Test
     fun scatteredFingers_areAggregated() {
-        every { fingerprintConfiguration.fingersToCapture } returns listOf(
+        every { bioSdkConfigurationMock.fingersToCapture } returns listOf(
             LEFT_THUMB,
             RIGHT_THUMB,
             RIGHT_INDEX_FINGER,

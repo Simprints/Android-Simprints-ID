@@ -8,11 +8,11 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.utils.LanguageHelper
 import com.simprints.infra.config.store.local.models.toDomain
-import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.local.serializer.DeviceConfigurationSerializer
 import com.simprints.infra.config.store.local.serializer.ProjectConfigurationSerializer
 import com.simprints.infra.config.store.local.serializer.ProjectSerializer
+import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.testtools.*
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.mockk

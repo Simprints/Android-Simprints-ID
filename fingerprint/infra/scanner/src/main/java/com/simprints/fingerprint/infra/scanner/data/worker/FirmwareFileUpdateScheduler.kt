@@ -8,8 +8,8 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.fingerprint.infra.scanner.BuildConfig
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.FingerprintConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -27,7 +27,7 @@ class FirmwareFileUpdateScheduler @Inject constructor(
 ) {
 
     suspend fun scheduleOrCancelWorkIfNecessary() {
-        if (configManager.getProjectConfiguration().fingerprint?.allowedVeroGenerations?.contains(
+        if (configManager.getProjectConfiguration().fingerprint?.allowedScanners?.contains(
                 FingerprintConfiguration.VeroGeneration.VERO_2
             ) == true
         ) {

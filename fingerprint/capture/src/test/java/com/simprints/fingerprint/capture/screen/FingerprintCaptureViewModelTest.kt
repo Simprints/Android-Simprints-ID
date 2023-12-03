@@ -38,8 +38,15 @@ import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventNotReceived
 import com.simprints.testtools.common.livedata.assertEventReceived
 import com.simprints.testtools.common.livedata.assertEventReceivedWithContentAssertions
-import io.mockk.*
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.coJustRun
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
+import io.mockk.unmockkAll
+import io.mockk.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceTimeBy
@@ -98,7 +105,7 @@ class FingerprintCaptureViewModelTest {
         every { vero2Configuration.displayLiveFeedback } returns false
         every { vero2Configuration.captureStrategy } returns Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI
         every { vero2Configuration.imageSavingStrategy } returns ImageSavingStrategy.NEVER
-        coEvery { configManager.getProjectConfiguration().fingerprint } returns mockk {
+        coEvery { configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration } returns mockk {
             every { vero1 } returns Vero1Configuration(60)
             every { vero2 } returns vero2Configuration
         }

@@ -96,33 +96,35 @@ internal data class OldProjectConfig(
         if (fingerprintQualityThreshold == null) null
         else
             FingerprintConfiguration(
-                fingersToCapture = fingerprintsToCollect?.split(",")
-                    ?.map { Finger.valueOf(it) }
-                    ?: listOf(
-                        Finger.LEFT_THUMB,
-                        Finger.LEFT_INDEX_FINGER
-                    ),
-                decisionPolicy = fingerprintConfidenceThresholds?.let { parseDecisionPolicy(it) }
-                    ?: DecisionPolicy(0, 0, 700),
-                allowedVeroGenerations = scannerGenerations?.split(",")
+                allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+                displayHandIcons = fingerImagesExist.toBoolean(),
+                allowedScanners = scannerGenerations?.split(",")
                     ?.map {
                         FingerprintConfiguration.VeroGeneration.valueOf(
                             it
                         )
                     }
                     ?: listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
-                comparisonStrategyForVerification = fingerComparisonStrategyForVerification
-                    ?.let {
-                        FingerprintConfiguration.FingerComparisonStrategy.valueOf(
-                            it
-                        )
-                    }
-                    ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-                displayHandIcons = fingerImagesExist.toBoolean(),
-                vero1 = Vero1Configuration(
-                    fingerprintQualityThreshold.toInt()
+
+                secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
+                    fingersToCapture = fingerprintsToCollect?.split(",")
+                        ?.map { Finger.valueOf(it) }
+                        ?: listOf(
+                            Finger.LEFT_THUMB,
+                            Finger.LEFT_INDEX_FINGER
+                        ),
+                    decisionPolicy = fingerprintConfidenceThresholds?.let { parseDecisionPolicy(it) }
+                        ?: DecisionPolicy(0, 0, 700),
+
+                    comparisonStrategyForVerification = fingerComparisonStrategyForVerification
+                        ?.let {
+                            FingerprintConfiguration.FingerComparisonStrategy.valueOf(it)
+                        }
+                        ?: FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                    vero1 = Vero1Configuration(fingerprintQualityThreshold.toInt()),
+                    vero2 = vero2Configuration(),
                 ),
-                vero2 = vero2Configuration(),
+                nec = null,
             )
 
     private fun vero2Configuration(): Vero2Configuration? =

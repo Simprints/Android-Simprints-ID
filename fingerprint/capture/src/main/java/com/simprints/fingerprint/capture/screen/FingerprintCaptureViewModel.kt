@@ -69,6 +69,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private var captureStatusChecked = false
 
     lateinit var configuration: FingerprintConfiguration
+    lateinit var bioSdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
 
     private var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
         private set(value) {
@@ -153,6 +154,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
                 configuration = configManager.getProjectConfiguration().fingerprint!!
+                bioSdkConfiguration = configuration.bioSdkConfiguration
             }
 
             originalFingerprintsToCapture = fingerprintsToCapture
@@ -195,7 +197,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun shouldWeDoLiveFeedback(scanner: ScannerWrapper): Boolean =
-        scanner.isLiveFeedbackAvailable() && configuration.vero2?.displayLiveFeedback == true
+        scanner.isLiveFeedbackAvailable() && bioSdkConfiguration.vero2?.displayLiveFeedback == true
 
 
     private fun startLiveFeedback(scanner: ScannerWrapper) {
@@ -235,7 +237,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     fun isImageTransferRequired(): Boolean =
-        configuration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
+        bioSdkConfiguration.vero2?.imageSavingStrategy?.isImageTransferRequired() ?: false &&
             scannerManager.scanner.isImageTransferSupported()
 
     fun updateSelectedFinger(index: Int) {
@@ -306,7 +308,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             try {
                 scannerManager.scanner.setUiIdle()
                 val capturedFingerprint = bioSdk.acquireFingerprintTemplate(
-                    configuration.vero2?.captureStrategy?.toInt(),
+                    bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
                     scanningTimeoutMs.toInt(),
                     qualityThreshold()
                 )
@@ -342,7 +344,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private fun shouldProceedToImageTransfer(quality: Int) = isImageTransferRequired() &&
         (quality >= qualityThreshold() ||
             tooManyBadScans(state.currentCaptureState(), plusBadScan = true) ||
-            configuration.vero2?.imageSavingStrategy?.isEager() ?: false)
+            bioSdkConfiguration.vero2?.imageSavingStrategy?.isEager() ?: false)
 
     private fun proceedToImageTransfer() {
         imageTransferTask?.cancel()
@@ -393,7 +395,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun saveCurrentImageIfEager() {
-        if (configuration.vero2?.imageSavingStrategy?.isEager() == true) {
+        if (bioSdkConfiguration.vero2?.imageSavingStrategy?.isEager() == true) {
             with(state.currentFingerState()) {
                 (currentCapture() as? CaptureState.Collected)?.let { capture ->
                     runBlocking {
@@ -541,7 +543,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             _noFingersScannedToast.send()
             handleRestart()
         } else {
-            if (configuration.vero2?.imageSavingStrategy?.let { !it.isEager() && it.isImageTransferRequired() } == true) {
+            if (bioSdkConfiguration.vero2?.imageSavingStrategy?.let { !it.isEager() && it.isImageTransferRequired() } == true) {
                 saveImages(collectedFingers)
             }
             proceedToFinish(collectedFingers)
@@ -574,7 +576,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private suspend fun saveImageIfExists(id: CaptureId, collectedFinger: CaptureState.Collected) {
         val captureEventId = captureEventIds[id]
-        val imageRef = saveImage(configuration, captureEventId, collectedFinger)
+        val imageRef = saveImage(bioSdkConfiguration.vero2!!, captureEventId, collectedFinger)
         imageRefs[id] = imageRef
     }
 
@@ -624,9 +626,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun qualityThreshold(): Int =
         if (scannerManager.scanner.versionInformation().generation == ScannerGeneration.VERO_1)
-            configuration.vero1!!.qualityThreshold
+            bioSdkConfiguration.vero1!!.qualityThreshold
         else
-            configuration.vero2!!.qualityThreshold
+            bioSdkConfiguration.vero2!!.qualityThreshold
 
 
     enum class ScannerConnectionStatus {

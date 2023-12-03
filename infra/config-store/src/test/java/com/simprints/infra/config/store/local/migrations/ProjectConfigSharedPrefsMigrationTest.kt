@@ -32,7 +32,7 @@ class ProjectConfigSharedPrefsMigrationTest {
     @Before
     fun setup() {
         every { ctx.getSharedPreferences(any(), any()) } returns preferences
-        projectConfigSharedPrefsMigration = ProjectConfigSharedPrefsMigration(ctx,authStore)
+        projectConfigSharedPrefsMigration = ProjectConfigSharedPrefsMigration(ctx, authStore)
     }
 
     @Test
@@ -190,7 +190,12 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setGeneral(PROTO_GENERAL_CONFIGURATION)
             .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
             .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION)
-            .setFingerprint(PROTO_FINGERPRINT_CONFIGURATION)
+            .setFingerprint(
+                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setSecugenSimMatcher(
+                    PROTO_FINGERPRINT_CONFIGURATION.secugenSimMatcher.toBuilder().clearVero2()
+                        .build()
+                )
+            )
             .build()
 
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
@@ -216,11 +221,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setGeneral(PROTO_GENERAL_CONFIGURATION)
             .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
             .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION)
-            .setFingerprint(
-                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
-                    PROTO_VERO_2_CONFIGURATION
-                ).build()
-            )
+            .setFingerprint(PROTO_FINGERPRINT_CONFIGURATION)
             .build()
 
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
@@ -248,11 +249,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
             .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION)
             .setFace(PROTO_FACE_CONFIGURATION)
-            .setFingerprint(
-                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
-                    PROTO_VERO_2_CONFIGURATION
-                ).build()
-            )
+            .setFingerprint(PROTO_FINGERPRINT_CONFIGURATION)
             .build()
 
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
@@ -280,11 +277,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
             .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION_NULL_VALUES)
             .setFace(PROTO_FACE_CONFIGURATION)
-            .setFingerprint(
-                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
-                    PROTO_VERO_2_CONFIGURATION
-                ).build()
-            )
+            .setFingerprint(PROTO_FINGERPRINT_CONFIGURATION)
             .build()
 
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
@@ -312,11 +305,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
             .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION_EMPTY_VALUES)
             .setFace(PROTO_FACE_CONFIGURATION)
-            .setFingerprint(
-                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
-                    PROTO_VERO_2_CONFIGURATION
-                ).build()
-            )
+            .setFingerprint(PROTO_FINGERPRINT_CONFIGURATION)
             .build()
 
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
@@ -344,11 +333,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
             .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION_NON_NULL_VALUES)
             .setFace(PROTO_FACE_CONFIGURATION)
-            .setFingerprint(
-                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
-                    PROTO_VERO_2_CONFIGURATION
-                ).build()
-            )
+            .setFingerprint(PROTO_FINGERPRINT_CONFIGURATION)
             .build()
 
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
@@ -376,11 +361,7 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setIdentification(PROTO_IDENTIFICATION_CONFIGURATION)
             .setSynchronization(PROTO_SYNCHRONIZATION_CONFIGURATION)
             .setFace(PROTO_FACE_CONFIGURATION)
-            .setFingerprint(
-                PROTO_FINGERPRINT_CONFIGURATION.toBuilder().setVero2(
-                    PROTO_VERO_2_CONFIGURATION
-                ).build()
-            )
+            .setFingerprint(PROTO_FINGERPRINT_CONFIGURATION)
             .build()
 
         val proto = projectConfigSharedPrefsMigration.migrate(protoProjectConfiguration)
@@ -626,9 +607,10 @@ class ProjectConfigSharedPrefsMigrationTest {
         private val JSON_FACE_CONFIGURATION = JsonHelper.fromJson<Map<String, String>>(
             "{\"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
         )
-        private val JSON_FACE_CONFIGURATION_WITHOUT_FIELDS = JsonHelper.fromJson<Map<String, String>>(
-            "{\"FaceQualityThreshold\":\"-1\"}"
-        )
+        private val JSON_FACE_CONFIGURATION_WITHOUT_FIELDS =
+            JsonHelper.fromJson<Map<String, String>>(
+                "{\"FaceQualityThreshold\":\"-1\"}"
+            )
         private val JSON_FACE_CONFIGURATION_WITH_UNEXPECTED_FIELD =
             JsonHelper.fromJson<Map<String, String>>(
                 "{\"FaceMatchThreshold\":30, \"FaceConfidenceThresholds\":\"{\\\"LOW\\\":\\\"1\\\",\\\"MEDIUM\\\":\\\"20\\\",\\\"HIGH\\\":\\\"100\\\"}\",\"FaceNbOfFramesCaptured\":\"2\",\"FaceQualityThreshold\":\"-1\",\"SaveFaceImages\":\"true\"}"
@@ -637,14 +619,18 @@ class ProjectConfigSharedPrefsMigrationTest {
             .setNbOfImagesToCapture(2)
             .setQualityThreshold(-1)
             .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.ONLY_GOOD_SCAN)
-            .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build())
+            .setDecisionPolicy(
+                ProtoDecisionPolicy.newBuilder().setLow(1).setMedium(20).setHigh(100).build()
+            )
             .build()
 
         private val PROTO_FACE_DEFAULT_CONFIGURATION = ProtoFaceConfiguration.newBuilder()
             .setNbOfImagesToCapture(2)
             .setQualityThreshold(-1)
             .setImageSavingStrategy(ProtoFaceConfiguration.ImageSavingStrategy.NEVER)
-            .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build())
+            .setDecisionPolicy(
+                ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(0).build()
+            )
             .build()
 
         private val JSON_VERO_2_CONFIGURATION =
@@ -674,34 +660,55 @@ class ProjectConfigSharedPrefsMigrationTest {
                 "{\"FingerprintQualityThreshold\":\"60\"}"
             )
         private val PROTO_FINGERPRINT_CONFIGURATION = ProtoFingerprintConfiguration.newBuilder()
-            .addAllFingersToCapture(
-                listOf(
-                    ProtoFinger.LEFT_INDEX_FINGER,
-                    ProtoFinger.LEFT_INDEX_FINGER,
-                    ProtoFinger.LEFT_THUMB
-                )
-            )
-            .setDecisionPolicy(
-                ProtoDecisionPolicy.newBuilder().setLow(10).setMedium(40).setHigh(200).build()
-            )
-            .addAllAllowedVeroGenerations(
+            .addAllAllowedScanners(
                 listOf(
                     ProtoFingerprintConfiguration.VeroGeneration.VERO_1,
                     ProtoFingerprintConfiguration.VeroGeneration.VERO_2
                 )
             )
-            .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
-            .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build())
+            .addAllowedSdks(ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER)
             .setDisplayHandIcons(true)
-            .build()
+            .setSecugenSimMatcher(
+                ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.newBuilder()
+                    .addAllFingersToCapture(
+                        listOf(
+                            ProtoFinger.LEFT_INDEX_FINGER,
+                            ProtoFinger.LEFT_INDEX_FINGER,
+                            ProtoFinger.LEFT_THUMB
+                        )
+                    )
+                    .setDecisionPolicy(
+                        ProtoDecisionPolicy.newBuilder().setLow(10).setMedium(40).setHigh(200)
+                            .build()
+                    )
+                    .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
+                    .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build())
+                    .setVero2(PROTO_VERO_2_CONFIGURATION)
+                    .build()
+            ).build()
 
-        private val PROTO_FINGERPRINT_DEFAULT_CONFIGURATION = ProtoFingerprintConfiguration.newBuilder()
-            .addAllFingersToCapture(listOf(ProtoFinger.LEFT_THUMB, ProtoFinger.LEFT_INDEX_FINGER))
-            .setDecisionPolicy(ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(700).build())
-            .addAllAllowedVeroGenerations(listOf(ProtoFingerprintConfiguration.VeroGeneration.VERO_1))
-            .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
-            .setDisplayHandIcons(false)
-            .setVero1(ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build())
-            .build()
+        private val PROTO_FINGERPRINT_DEFAULT_CONFIGURATION =
+            ProtoFingerprintConfiguration.newBuilder()
+                .addAllAllowedScanners(listOf(ProtoFingerprintConfiguration.VeroGeneration.VERO_1))
+                .setDisplayHandIcons(false)
+                .addAllowedSdks(ProtoFingerprintConfiguration.ProtoBioSdk.SECUGEN_SIM_MATCHER)
+                .setSecugenSimMatcher(
+                    ProtoFingerprintConfiguration.ProtoFingerprintSdkConfiguration.newBuilder()
+                        .addAllFingersToCapture(
+                            listOf(
+                                ProtoFinger.LEFT_THUMB,
+                                ProtoFinger.LEFT_INDEX_FINGER
+                            )
+                        )
+                        .setDecisionPolicy(
+                            ProtoDecisionPolicy.newBuilder().setLow(0).setMedium(0).setHigh(700)
+                                .build()
+                        )
+                        .setComparisonStrategyForVerification(ProtoFingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER)
+                        .setVero1(
+                            ProtoVero1Configuration.newBuilder().setQualityThreshold(60).build()
+                        )
+                        .build()
+                ).build()
     }
 }
