@@ -69,7 +69,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private var captureStatusChecked = false
 
     lateinit var configuration: FingerprintConfiguration
-    lateinit var bioSdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
+    private lateinit var bioSdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
 
     private var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
         private set(value) {
@@ -84,18 +84,23 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun updateFingerState(newFingerState: (FingerState) -> FingerState) = updateState {
-        it.copy(fingerStates = it.fingerStates.updateOnIndex(
-            index = it.currentFingerIndex,
-            newItem = newFingerState
-        ))
+        it.copy(
+            fingerStates = it.fingerStates.updateOnIndex(
+                index = it.currentFingerIndex,
+                newItem = newFingerState
+            )
+        )
     }
 
-    private fun updateCaptureState(newCaptureState: (CaptureState) -> CaptureState) = updateFingerState {
-        it.copy(captures = it.captures.updateOnIndex(
-            index = it.currentCaptureIndex,
-            newItem = newCaptureState
-        ))
-    }
+    private fun updateCaptureState(newCaptureState: (CaptureState) -> CaptureState) =
+        updateFingerState {
+            it.copy(
+                captures = it.captures.updateOnIndex(
+                    index = it.currentCaptureIndex,
+                    newItem = newCaptureState
+                )
+            )
+        }
 
     val vibrate: LiveData<LiveDataEvent>
         get() = _vibrate
@@ -115,7 +120,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     val finishWithFingerprints: LiveData<LiveDataEventWithContent<FingerprintCaptureResult>>
         get() = _finishWithFingerprints
-    private val _finishWithFingerprints = MutableLiveData<LiveDataEventWithContent<FingerprintCaptureResult>>()
+    private val _finishWithFingerprints =
+        MutableLiveData<LiveDataEventWithContent<FingerprintCaptureResult>>()
 
     private lateinit var originalFingerprintsToCapture: List<IFingerIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
@@ -143,7 +149,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    fun hasScanner() = scannerManager.isScannerAvailable
 
     fun start(fingerprintsToCapture: List<IFingerIdentifier>) {
         if (!hasStarted) {
@@ -366,7 +371,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun handleCaptureFinished() = with(state) {
-        Simber.tag(FINGER_CAPTURE.name).i("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
+        Simber.tag(FINGER_CAPTURE.name)
+            .i("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
         addCaptureAndBiometricEventsInSession()
         saveCurrentImageIfEager()
         if (captureHasSatisfiedTerminalCondition(currentCaptureState())) {
@@ -535,7 +541,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleConfirmFingerprintsAndContinue() {
         val collectedFingers = state.fingerStates.flatMap {
             it.captures.mapIndexedNotNull { index, capture ->
-                if (capture is CaptureState.Collected) Pair(CaptureId(it.id, index), capture) else null
+                if (capture is CaptureState.Collected) Pair(
+                    CaptureId(it.id, index),
+                    capture
+                ) else null
             }
         }
 
