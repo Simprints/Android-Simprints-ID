@@ -24,7 +24,7 @@ internal class FirmwareRemoteDataSource @Inject constructor(
         hardwareVersion: String,
         localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>
     ): List<DownloadableFirmwareVersion> =
-        configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions?.getAvailableVersionsForDownload(
+        configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.getAvailableVersionsForDownload(
             hardwareVersion,
             localFirmwareVersions
         ) ?: listOf()

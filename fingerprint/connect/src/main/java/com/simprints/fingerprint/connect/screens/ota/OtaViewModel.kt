@@ -93,7 +93,7 @@ internal class OtaViewModel @Inject constructor(
     private suspend fun targetVersions(availableOta: AvailableOta): String {
         val scannerVersion = recentUserActivityManager.getRecentUserActivity().lastScannerVersion
         val availableFirmwareVersions =
-            configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions
+            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions
         return when (availableOta) {
             AvailableOta.CYPRESS -> availableFirmwareVersions?.get(scannerVersion)?.cypress ?: ""
             AvailableOta.STM -> availableFirmwareVersions?.get(scannerVersion)?.stm ?: ""
