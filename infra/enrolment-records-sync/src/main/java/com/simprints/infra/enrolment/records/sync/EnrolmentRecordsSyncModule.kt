@@ -12,8 +12,5 @@ import dagger.hilt.components.SingletonComponent
 abstract class EnrolmentRecordsSyncModule {
 
     @Binds
-    internal abstract fun bindEnrolmentRecordManager(impl: EnrolmentRecordManagerImpl): EnrolmentRecordManager
-
-    @Binds
     internal abstract fun bindEnrolmentRecordScheduler(impl: EnrolmentRecordSchedulerImpl): EnrolmentRecordScheduler
 }

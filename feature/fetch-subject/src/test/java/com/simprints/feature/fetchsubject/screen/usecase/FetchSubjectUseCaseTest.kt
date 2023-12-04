@@ -2,9 +2,9 @@ package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.network.ConnectivityTracker
 import io.mockk.MockKAnnotations
@@ -19,7 +19,7 @@ import org.junit.Test
 internal class FetchSubjectUseCaseTest {
 
     @MockK
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
     private lateinit var connectivityTracker: ConnectivityTracker
@@ -38,22 +38,22 @@ internal class FetchSubjectUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = FetchSubjectUseCase(connectivityTracker, enrolmentRecordManager, eventSyncManager)
+        useCase = FetchSubjectUseCase(connectivityTracker, enrolmentRecordRepository, eventSyncManager)
     }
 
     @Test
     fun `fetch should check local DB first`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns listOf(subject)
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
 
-        coVerify { enrolmentRecordManager.load(SubjectQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
+        coVerify { enrolmentRecordRepository.load(SubjectQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
         assertThat(result).isInstanceOf(FetchSubjectState.FoundLocal::class.java)
     }
 
     @Test
     fun `fetch should not check remote if present in local DB`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns listOf(subject)
+        coEvery { enrolmentRecordRepository.load(any()) } returns listOf(subject)
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
 
@@ -63,7 +63,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should try down syncing if not present in local DB`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns emptyList()
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
 
         useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
 
@@ -72,17 +72,17 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should return from local DB if present after downsync`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returnsMany listOf(emptyList(), listOf(subject))
+        coEvery { enrolmentRecordRepository.load(any()) } returnsMany listOf(emptyList(), listOf(subject))
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
 
-        coVerify(exactly = 2) { enrolmentRecordManager.load(SubjectQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
+        coVerify(exactly = 2) { enrolmentRecordRepository.load(SubjectQuery(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)) }
         assertThat(result).isInstanceOf(FetchSubjectState.FoundRemote::class.java)
     }
 
     @Test
     fun `fetch should return notFound if not present after downsync and connected`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns emptyList()
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
         every { connectivityTracker.isConnected() } returns true
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
@@ -92,7 +92,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should return connection error if not present after downsync and not connected`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } returns emptyList()
+        coEvery { enrolmentRecordRepository.load(any()) } returns emptyList()
         every { connectivityTracker.isConnected() } returns false
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
@@ -102,7 +102,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should return notFound if fails and connected`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } throws Exception("test")
+        coEvery { enrolmentRecordRepository.load(any()) } throws Exception("test")
         every { connectivityTracker.isConnected() } returns true
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)
@@ -112,7 +112,7 @@ internal class FetchSubjectUseCaseTest {
 
     @Test
     fun `fetch should return connection error if fails and not connected`() = runTest {
-        coEvery { enrolmentRecordManager.load(any()) } throws Exception("test")
+        coEvery { enrolmentRecordRepository.load(any()) } throws Exception("test")
         every { connectivityTracker.isConnected() } returns false
 
         val result = useCase(DEFAULT_PROJECT_ID, DEFAULT_SUBJECT_ID)

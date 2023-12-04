@@ -26,7 +26,7 @@ import org.junit.Test
 import java.util.UUID
 import kotlin.random.Random
 
-class SubjectLocalDataSourceImplTest {
+class EnrolmentRecordLocalDataSourceImplTest {
 
     @MockK
     private lateinit var realm: Realm
@@ -45,7 +45,7 @@ class SubjectLocalDataSourceImplTest {
 
     private var localSubjects: MutableList<Subject> = mutableListOf()
 
-    private lateinit var subjectLocalDataSource: SubjectLocalDataSource
+    private lateinit var enrolmentRecordLocalDataSource: EnrolmentRecordLocalDataSource
 
     @Before
     fun setup() {
@@ -74,14 +74,14 @@ class SubjectLocalDataSourceImplTest {
         every { realm.query(DbSubject::class) } returns realmQuery
         every { mutableRealm.query(DbSubject::class) } returns realmQuery
 
-        subjectLocalDataSource = SubjectLocalDataSourceImpl(realmWrapperMock)
+        enrolmentRecordLocalDataSource = EnrolmentRecordLocalDataSourceImpl(realmWrapperMock)
     }
 
     @Test
     fun givenOneRecordSaved_countShouldReturnOne() = runTest {
         saveFakePerson(getFakePerson())
 
-        val count = subjectLocalDataSource.count()
+        val count = enrolmentRecordLocalDataSource.count()
         assertThat(count).isEqualTo(1)
     }
 
@@ -89,7 +89,7 @@ class SubjectLocalDataSourceImplTest {
     fun givenManyPeopleSaved_countShouldReturnMany() = runTest {
         saveFakePeople(getRandomPeople(20))
 
-        val count = subjectLocalDataSource.count()
+        val count = enrolmentRecordLocalDataSource.count()
         assertThat(count).isEqualTo(20)
     }
 
@@ -97,7 +97,7 @@ class SubjectLocalDataSourceImplTest {
     fun givenManyPeopleSaved_countByProjectIdShouldReturnTheRightTotal() = runTest {
         saveFakePeople(getRandomPeople(20))
 
-        val count = subjectLocalDataSource.count()
+        val count = enrolmentRecordLocalDataSource.count()
         assertThat(count).isEqualTo(20)
     }
 
@@ -106,7 +106,7 @@ class SubjectLocalDataSourceImplTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
-        val people = subjectLocalDataSource
+        val people = enrolmentRecordLocalDataSource
             .loadFingerprintIdentities(SubjectQuery(), IntRange(0, 20))
             .toList()
 
@@ -120,7 +120,7 @@ class SubjectLocalDataSourceImplTest {
         val savedPersons = saveFakePeople(getRandomPeople(20))
         val fakePerson = savedPersons[0].fromDomainToDb()
 
-        val people = subjectLocalDataSource
+        val people = enrolmentRecordLocalDataSource
             .loadFaceIdentities(SubjectQuery(), IntRange(0, 20))
             .toList()
 
@@ -134,7 +134,7 @@ class SubjectLocalDataSourceImplTest {
         val fakePerson = getFakePerson()
         saveFakePerson(fakePerson)
 
-        val people = subjectLocalDataSource.load(SubjectQuery()).toList()
+        val people = enrolmentRecordLocalDataSource.load(SubjectQuery()).toList()
 
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
@@ -147,7 +147,7 @@ class SubjectLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people =
-            subjectLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId.value))
+            enrolmentRecordLocalDataSource.load(SubjectQuery(attendantId = savedPersons[0].attendantId.value))
                 .toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
@@ -160,7 +160,7 @@ class SubjectLocalDataSourceImplTest {
         val fakePerson = savedPersons[0].fromDomainToDb()
 
         val people =
-            subjectLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId)).toList()
+            enrolmentRecordLocalDataSource.load(SubjectQuery(moduleId = fakePerson.moduleId)).toList()
         listOf(fakePerson).zip(people).forEach { (dbSubject, subject) ->
             assertThat(dbSubject.deepEquals(subject.fromDomainToDb())).isTrue()
         }
@@ -169,10 +169,10 @@ class SubjectLocalDataSourceImplTest {
     @Test
     fun performSubjectCreationAction() = runTest {
         val subject = getFakePerson()
-        subjectLocalDataSource.performActions(
+        enrolmentRecordLocalDataSource.performActions(
             listOf(SubjectAction.Creation(subject.fromDbToDomain()))
         )
-        val peopleCount = subjectLocalDataSource.count()
+        val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
     }
 
@@ -180,10 +180,10 @@ class SubjectLocalDataSourceImplTest {
     fun performSubjectDeletionAction() = runTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
-        subjectLocalDataSource.performActions(
+        enrolmentRecordLocalDataSource.performActions(
             listOf(SubjectAction.Deletion(subject.subjectId.toString()))
         )
-        val peopleCount = subjectLocalDataSource.count()
+        val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
     }
 
@@ -191,10 +191,10 @@ class SubjectLocalDataSourceImplTest {
     fun performNoAction() = runTest {
         val subject = getFakePerson()
         saveFakePerson(subject)
-        subjectLocalDataSource.performActions(
+        enrolmentRecordLocalDataSource.performActions(
             listOf()
         )
-        val peopleCount = subjectLocalDataSource.count()
+        val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(1)
     }
 
@@ -202,9 +202,9 @@ class SubjectLocalDataSourceImplTest {
     fun shouldDeleteAllSubjects() = runTest {
         saveFakePeople(getRandomPeople(5))
 
-        subjectLocalDataSource.deleteAll()
+        enrolmentRecordLocalDataSource.deleteAll()
 
-        val peopleCount = subjectLocalDataSource.count()
+        val peopleCount = enrolmentRecordLocalDataSource.count()
         assertThat(peopleCount).isEqualTo(0)
     }
 

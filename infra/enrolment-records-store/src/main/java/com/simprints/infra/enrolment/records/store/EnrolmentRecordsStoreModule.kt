@@ -1,7 +1,7 @@
 package com.simprints.infra.enrolment.records.store
 
-import com.simprints.infra.enrolment.records.store.local.SubjectLocalDataSource
-import com.simprints.infra.enrolment.records.store.local.SubjectLocalDataSourceImpl
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSourceImpl
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSourceImpl
 import dagger.Binds
@@ -17,10 +17,7 @@ abstract class EnrolmentRecordsStoreModule {
     internal abstract fun bindEnrolmentRecordRepository(impl: EnrolmentRecordRepositoryImpl): EnrolmentRecordRepository
 
     @Binds
-    internal abstract fun bindSubjectRepository(impl: SubjectRepositoryImpl): SubjectRepository
-
-    @Binds
-    internal abstract fun bindSubjectLocalDataSource(impl: SubjectLocalDataSourceImpl): SubjectLocalDataSource
+    internal abstract fun bindEnrolmentRecordLocalDataSource(impl: EnrolmentRecordLocalDataSourceImpl): EnrolmentRecordLocalDataSource
 
     @Binds
     internal abstract fun bindEnrolmentRecordRemoteDataSource(impl: EnrolmentRecordRemoteDataSourceImpl): EnrolmentRecordRemoteDataSource
