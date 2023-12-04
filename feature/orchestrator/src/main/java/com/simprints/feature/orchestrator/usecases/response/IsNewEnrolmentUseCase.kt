@@ -35,6 +35,7 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
         projectConfiguration: ProjectConfiguration,
         fingerprintResult: FingerprintMatchResult?
     ): Boolean = projectConfiguration.fingerprint
+        ?.bioSdkConfiguration
         ?.decisionPolicy
         ?.medium?.toFloat()
         ?.let { threshold -> fingerprintResult?.results?.all { it.confidence < threshold } }
