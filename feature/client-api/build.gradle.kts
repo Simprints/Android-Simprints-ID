@@ -13,7 +13,6 @@ dependencies {
     implementation(project(":infra:config-sync"))
     implementation(project(":infra:events"))
     implementation(project(":infra:enrolment-records-store"))
-    implementation(project(":infra:enrolment-records-sync"))
     implementation(project(":infra:orchestrator-data"))
 
     implementation(libs.libsimprints)

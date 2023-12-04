@@ -10,6 +10,7 @@ import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.local.EnrolmentRecordLocalDataSource
 import com.simprints.infra.enrolment.records.store.remote.EnrolmentRecordRemoteDataSource
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -47,8 +48,8 @@ class EnrolmentRecordRepositoryImplTest {
         }
     }
 
-    private val subjectRepository = mockk<SubjectRepository>(relaxed = true)
     private val tokenizationProcessor = mockk<TokenizationProcessor>()
+    private val localDataSource = mockk<EnrolmentRecordLocalDataSource>(relaxed = true)
     private val remoteDataSource = mockk<EnrolmentRecordRemoteDataSource>(relaxed = true)
     private val prefsEditor = mockk<SharedPreferences.Editor>(relaxed = true)
     private val prefs = mockk<SharedPreferences> {
@@ -67,7 +68,7 @@ class EnrolmentRecordRepositoryImplTest {
         repository = EnrolmentRecordRepositoryImpl(
             context = ctx,
             remoteDataSource = remoteDataSource,
-            subjectRepository = subjectRepository,
+            localDataSource = localDataSource,
             tokenizationProcessor = tokenizationProcessor,
             dispatcher = UnconfinedTestDispatcher(),
             batchSize = BATCH_SIZE,
@@ -78,7 +79,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should upload the records correctly when there is more than one batch`() = runTest {
         val expectedSubjectQuery = SubjectQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
             SUBJECT_3
@@ -96,7 +97,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should upload the records correctly when there is exactly one batch`() = runTest {
         val expectedSubjectQuery = SubjectQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2
         )
@@ -112,7 +113,7 @@ class EnrolmentRecordRepositoryImplTest {
     fun `should upload the records correctly when there is more than two batches`() = runTest {
         val expectedSubjectQuery = SubjectQuery(sort = true)
         every { prefs.getString(any(), null) } returns null
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
             SUBJECT_3,
@@ -135,7 +136,7 @@ class EnrolmentRecordRepositoryImplTest {
         val expectedSubjectQuery =
             SubjectQuery(sort = true, subjectIds = listOf(SUBJECT_ID_1, SUBJECT_ID_2))
         every { prefs.getString(any(), null) } returns null
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
         )
@@ -154,7 +155,7 @@ class EnrolmentRecordRepositoryImplTest {
             afterSubjectId = SUBJECT_ID_3
         )
         every { prefs.getString(any(), null) } returns SUBJECT_ID_3
-        coEvery { subjectRepository.load(expectedSubjectQuery) } returns listOf(
+        coEvery { localDataSource.load(expectedSubjectQuery) } returns listOf(
             SUBJECT_1,
             SUBJECT_2,
         )
@@ -186,7 +187,7 @@ class EnrolmentRecordRepositoryImplTest {
                 faceSamples = emptyList()
             )
             every { project.id } returns projectId
-            coEvery { subjectRepository.load(any()) } returns listOf(subject)
+            coEvery { localDataSource.load(any()) } returns listOf(subject)
             every {
                 tokenizationProcessor.encrypt(
                     decrypted = attendantIdRaw,
@@ -208,7 +209,7 @@ class EnrolmentRecordRepositoryImplTest {
                 moduleId = moduleIdTokenized
             )
             val expectedSubjectActions = listOf(SubjectAction.Creation(expectedSubject))
-            coVerify { subjectRepository.performActions(expectedSubjectActions) }
+            coVerify { localDataSource.performActions(expectedSubjectActions) }
         }
 
     @Test
@@ -229,10 +230,10 @@ class EnrolmentRecordRepositoryImplTest {
                 faceSamples = emptyList()
             )
             every { project.id } returns projectId
-            coEvery { subjectRepository.load(any()) } returns listOf(subject)
+            coEvery { localDataSource.load(any()) } returns listOf(subject)
 
             repository.tokenizeExistingRecords(project)
-            coVerify { subjectRepository.performActions(emptyList()) }
+            coVerify { localDataSource.performActions(emptyList()) }
         }
     @Test
     fun `when tokenizing existing subjects throws exception, then it is captured and not thrown up the calling chain`() =
@@ -240,7 +241,7 @@ class EnrolmentRecordRepositoryImplTest {
             val projectId = "projectId"
             val project = mockk<Project>()
             every { project.id } returns projectId
-            coEvery { subjectRepository.load(any()) } throws Exception()
+            coEvery { localDataSource.load(any()) } throws Exception()
 
             repository.tokenizeExistingRecords(project)
         }

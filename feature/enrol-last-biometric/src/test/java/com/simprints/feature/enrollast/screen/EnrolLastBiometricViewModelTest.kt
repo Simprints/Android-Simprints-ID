@@ -11,7 +11,7 @@ import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
@@ -49,7 +49,7 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var eventRepository: EventRepository
 
     @MockK
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
     lateinit var hasDuplicateEnrolments: HasDuplicateEnrolmentsUseCase
@@ -81,7 +81,7 @@ internal class EnrolLastBiometricViewModelTest {
             timeHelper,
             configManager,
             eventRepository,
-            enrolmentRecordManager,
+            enrolmentRecordRepository,
             hasDuplicateEnrolments,
             buildSubject
         )
@@ -124,7 +124,7 @@ internal class EnrolLastBiometricViewModelTest {
         )
 
         coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any()) }
-        coVerify(exactly = 0) { enrolmentRecordManager.performActions(any()) }
+        coVerify(exactly = 0) { enrolmentRecordRepository.performActions(any()) }
     }
 
     @Test
@@ -173,14 +173,14 @@ internal class EnrolLastBiometricViewModelTest {
         viewModel.enrolBiometric(createParams(listOf()))
 
         coVerify { eventRepository.addOrUpdateEvent(any()) }
-        coVerify { enrolmentRecordManager.performActions(any()) }
+        coVerify { enrolmentRecordRepository.performActions(any()) }
     }
 
     @Test
     fun `returns failure record saving fails`() = runTest {
         every { hasDuplicateEnrolments.invoke(any(), any()) } returns false
         coEvery { buildSubject.invoke(any()) } returns subject
-        coEvery { enrolmentRecordManager.performActions(any()) } throws Exception()
+        coEvery { enrolmentRecordRepository.performActions(any()) } throws Exception()
 
         viewModel.enrolBiometric(createParams(listOf()))
 

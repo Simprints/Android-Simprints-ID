@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.settings.syncinfo.moduleselection.reposi
 
 import com.simprints.core.domain.tokenization.values
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.logging.LoggingConstants
@@ -13,7 +13,7 @@ import javax.inject.Inject
 // TODO move into the event system infra module?
 internal class ModuleRepositoryImpl @Inject constructor(
     private val configManager: ConfigManager,
-    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val eventSyncManager: EventSyncManager,
 ) : ModuleRepository {
 
@@ -48,7 +48,7 @@ internal class ModuleRepositoryImpl @Inject constructor(
         val queries = unselectedModules.map {
             SubjectQuery(moduleId = it.name.value)
         }
-        enrolmentRecordManager.delete(queries)
+        enrolmentRecordRepository.delete(queries)
 
         // Delete operations for unselected modules to ensure full sync if they are reselected
         // in the future

@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":feature:alert"))
     implementation(project(":feature:exit-form"))
 
-    implementation(project(":infra:enrolment-records-sync"))
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:events"))

@@ -5,7 +5,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordSchedulerImpl
 import com.simprints.infra.enrolment.records.sync.worker.EnrolmentRecordWorker
 import io.mockk.*
@@ -20,7 +20,7 @@ class EnrolmentRecordWorkerTest {
         private const val SUBJECT_ID = "subjectId"
     }
 
-    private val manager = mockk<EnrolmentRecordManager>(relaxed = true)
+    private val repository = mockk<EnrolmentRecordRepository>(relaxed = true)
     private val configManager = mockk<ConfigManager>()
     private val params = mockk<WorkerParameters>(relaxed = true) {
         every { inputData } returns workDataOf(
@@ -31,7 +31,7 @@ class EnrolmentRecordWorkerTest {
     private val worker = EnrolmentRecordWorker(
         mockk(relaxed = true),
         params,
-        manager,
+        repository,
         configManager,
         UnconfinedTestDispatcher(),
     )
@@ -44,7 +44,7 @@ class EnrolmentRecordWorkerTest {
 
         worker.doWork()
 
-        coVerify(exactly = 1) { manager.uploadRecords(listOf(SUBJECT_ID)) }
+        coVerify(exactly = 1) { repository.uploadRecords(listOf(SUBJECT_ID)) }
         val updatedConfig = updateConfigFn.captured(DeviceConfiguration("", listOf(), ""))
         assertThat(updatedConfig.lastInstructionId).isEqualTo(INSTRUCTION_ID)
     }
