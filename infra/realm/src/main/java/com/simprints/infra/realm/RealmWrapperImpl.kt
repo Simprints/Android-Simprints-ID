@@ -27,16 +27,20 @@ class RealmWrapperImpl @Inject constructor(
     private val authStore: AuthStore,
 ) : RealmWrapper {
 
+    // Kotlin-realm claims to be thread-safe and there is no need to handle closing manually
+    // https://www.mongodb.com/docs/realm/sdk/kotlin/realm-database/frozen-arch/#thread-safe-realms
+    private lateinit var realm: Realm
     private lateinit var config: RealmConfiguration
 
-    private fun initRealm() {
-        if (!this::config.isInitialized) {
+    private fun getRealm(): Realm {
+        if (!this::realm.isInitialized) {
             config = createAndSaveRealmConfig()
+            realm = createRealm()
         }
+        return realm
     }
 
-    private fun getRealm(): Realm {
-        initRealm()
+    private fun createRealm(): Realm {
         Simber.tag(REALM_DB.name).d("[RealmWrapperImpl] getting new realm instance")
         return try {
             try {
@@ -80,19 +84,14 @@ class RealmWrapperImpl @Inject constructor(
      * Executes provided block ensuring a valid Realm instance is used and closed.
      */
     override suspend fun <R> readRealm(block: (Realm) -> R): R {
-        val realm = getRealm()
-        val result = block(realm)
-        realm.close()
-        return result
+        return block(getRealm())
     }
 
     /**
      * Executes provided block in a transaction ensuring a valid Realm instance is used and closed.
      */
     override suspend fun <R> writeRealm(block: (MutableRealm) -> R) {
-        val realm = getRealm()
-        realm.write(block)
-        realm.close()
+        getRealm().write(block)
     }
 
     private fun createAndSaveRealmConfig(): RealmConfiguration {

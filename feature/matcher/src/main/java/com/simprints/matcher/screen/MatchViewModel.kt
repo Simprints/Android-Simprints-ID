@@ -46,35 +46,30 @@ internal class MatchViewModel @Inject constructor(
             else -> fingerprintMatcher
         }
 
-        val sortedResults = matcherUseCase(
+        val (sortedResults, totalCandidates) = matcherUseCase(
             params,
             onLoadingCandidates = { tag ->
                 Simber.tag(tag).i("Loading candidates")
                 _matchState.postValue(MatchState.LoadingCandidates)
             },
-            onMatching = { tag ->
-                Simber.tag(tag).i("Matching probe against candidates")
-                _matchState.postValue(MatchState.Matching)
-            }
         )
 
-        val maxFilteredResults = sortedResults.take(returnCount)
         val endTime = timeHelper.now()
 
         saveMatchEvent(
             startTime,
             endTime,
             params,
-            sortedResults.size,
+            totalCandidates,
             matcherUseCase.matcherName,
-            maxFilteredResults
+            sortedResults
         )
 
-        setMatchState(sortedResults.size, maxFilteredResults)
+        setMatchState(totalCandidates, sortedResults)
 
         _matchResponse.send(when {
-            isFaceMatch -> FaceMatchResult(maxFilteredResults)
-            else -> FingerprintMatchResult(maxFilteredResults)
+            isFaceMatch -> FaceMatchResult(sortedResults)
+            else -> FingerprintMatchResult(sortedResults)
         })
     }
 
@@ -110,7 +105,6 @@ internal class MatchViewModel @Inject constructor(
     // TODO This configuration should be provided by SDK or project configuration
     //   https://simprints.atlassian.net/browse/CORE-2923
     companion object {
-        const val returnCount = 10
         const val veryGoodMatchThreshold = 50.0
         const val goodMatchThreshold = 35.0
         const val fairMatchThreshold = 20.0

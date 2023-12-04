@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
@@ -11,18 +12,10 @@ import com.simprints.matcher.MatchParams
 import com.simprints.matcher.usecases.FaceMatcherUseCase
 import com.simprints.matcher.usecases.FingerprintMatcherUseCase
 import com.simprints.matcher.usecases.SaveMatchEventUseCase
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
-import io.mockk.CapturingSlot
-import io.mockk.MockKAnnotations
-import io.mockk.coEvery
-import io.mockk.coJustRun
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -38,7 +31,6 @@ internal class MatchViewModelTest {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-
     @MockK
     lateinit var faceMatcherUseCase: FaceMatcherUseCase
 
@@ -52,7 +44,6 @@ internal class MatchViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     private lateinit var cb1: CapturingSlot<(String) -> Unit>
-    private lateinit var cb2: CapturingSlot<(String) -> Unit>
 
     private lateinit var viewModel: MatchViewModel
 
@@ -61,13 +52,17 @@ internal class MatchViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         cb1 = slot()
-        cb2 = slot()
 
         every { timeHelper.now() } returns 0
         every { faceMatcherUseCase.matcherName } returns MATCHER_NAME
         every { fingerprintMatcherUseCase.matcherName } returns MATCHER_NAME
 
-        viewModel = MatchViewModel(faceMatcherUseCase, fingerprintMatcherUseCase, saveMatchEvent, timeHelper)
+        viewModel = MatchViewModel(
+            faceMatcherUseCase,
+            fingerprintMatcherUseCase,
+            saveMatchEvent,
+            timeHelper
+        )
     }
 
     @Test
@@ -82,10 +77,9 @@ internal class MatchViewModelTest {
             FaceMatchResult.Item("1", 10f),
         )
 
-        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1), capture(cb2)) } answers {
+        coEvery { faceMatcherUseCase.invoke(any(), capture(cb1)) } answers {
             cb1.captured.invoke("tag1")
-            cb2.captured.invoke("tag2")
-            responseItems
+            responseItems to responseItems.size
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
 
@@ -96,12 +90,13 @@ internal class MatchViewModelTest {
             queryForCandidates = mockk {}
         ))
 
-        assertThat(states.valueHistory()).isEqualTo(listOf(
-            MatchViewModel.MatchState.NotStarted,
-            MatchViewModel.MatchState.LoadingCandidates,
-            MatchViewModel.MatchState.Matching,
-            MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1)
-        ))
+        assertThat(states.valueHistory()).isEqualTo(
+            listOf(
+                MatchViewModel.MatchState.NotStarted,
+                MatchViewModel.MatchState.LoadingCandidates,
+                MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1)
+            )
+        )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
             FaceMatchResult(responseItems)
         )
@@ -121,10 +116,9 @@ internal class MatchViewModelTest {
             FingerprintMatchResult.Item("1", 10f),
         )
 
-        coEvery { fingerprintMatcherUseCase.invoke(any(), capture(cb1), capture(cb2)) } answers {
+        coEvery { fingerprintMatcherUseCase.invoke(any(), capture(cb1)) } answers {
             cb1.captured.invoke("tag1")
-            cb2.captured.invoke("tag2")
-            responseItems
+            responseItems to responseItems.size
         }
         coJustRun { saveMatchEvent.invoke(any(), any(), any(), any(), any(), any()) }
 
@@ -136,12 +130,13 @@ internal class MatchViewModelTest {
             queryForCandidates = mockk {}
         ))
 
-        assertThat(states.valueHistory()).isEqualTo(listOf(
-            MatchViewModel.MatchState.NotStarted,
-            MatchViewModel.MatchState.LoadingCandidates,
-            MatchViewModel.MatchState.Matching,
-            MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1)
-        ))
+        assertThat(states.valueHistory()).isEqualTo(
+            listOf(
+                MatchViewModel.MatchState.NotStarted,
+                MatchViewModel.MatchState.LoadingCandidates,
+                MatchViewModel.MatchState.Finished(7, 7, 3, 2, 1)
+            )
+        )
         assertThat(viewModel.matchResponse.getOrAwaitValue().peekContent()).isEqualTo(
             FingerprintMatchResult(responseItems)
         )
@@ -153,9 +148,14 @@ internal class MatchViewModelTest {
         MatchParams.FaceSample(UUID.randomUUID().toString(), Random.nextBytes(20))
 
     private fun getFingerprintSample(): MatchParams.FingerprintSample =
-        MatchParams.FingerprintSample(IFingerIdentifier.LEFT_3RD_FINGER, "format", Random.nextBytes(20))
+        MatchParams.FingerprintSample(
+            IFingerIdentifier.LEFT_3RD_FINGER,
+            "format",
+            Random.nextBytes(20)
+        )
 
     companion object {
+
         const val MATCHER_NAME = "any matcher"
     }
 }
