@@ -9,7 +9,6 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
-import com.simprints.feature.logincheck.usecases.*
 import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
 import com.simprints.feature.logincheck.usecases.CancelBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
@@ -45,7 +44,6 @@ class LoginCheckViewModel @Inject internal constructor(
     private val isUserSignedIn: IsUserSignedInUseCase,
     private val getProjectStatus: GetProjectStateUseCase,
     private val startBackgroundSync: StartBackgroundSyncUseCase,
-    private val cleanupDeprecatedWorkers: CleanupDeprecatedWorkersUseCase,
     private val cancelBackgroundSync: CancelBackgroundSyncUseCase,
     private val updateDatabaseCountsInCurrentSession: UpdateDatabaseCountsInCurrentSessionUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
@@ -148,7 +146,6 @@ class LoginCheckViewModel @Inject internal constructor(
             async { extractParametersForCrashReport(actionRequest) }
         )
 
-        cleanupDeprecatedWorkers()
         startBackgroundSync()
         _proceedWithAction.send(actionRequest)
     }
