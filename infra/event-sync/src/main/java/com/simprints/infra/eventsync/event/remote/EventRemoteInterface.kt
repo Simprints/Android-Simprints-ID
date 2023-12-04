@@ -26,6 +26,7 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Body events: ApiUploadEventsBody
     )
 
+    @Streaming
     @GET("projects/{projectId}/events")
     suspend fun downloadEvents(
         @Path("projectId") projectId: String,
