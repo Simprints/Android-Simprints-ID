@@ -1,13 +1,13 @@
-package com.simprints.feature.logincheck.usecases
+package com.simprints.id
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @ExcludedFromGeneratedTestCoverageReports("There is no complex business logic to test")
-internal class CleanupDeprecatedWorkersUseCase @Inject constructor(
+class CleanupDeprecatedWorkersUseCase @Inject constructor(
     @ApplicationContext private val ctx: Context,
 ) {
 
