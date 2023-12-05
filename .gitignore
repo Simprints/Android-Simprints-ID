@@ -58,7 +58,6 @@ captures/
 # Keystore files
 *.jks
 *.keystore
-!debug.keystore
 
 # Freeline
 freeline.py
