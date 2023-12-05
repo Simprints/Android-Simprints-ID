@@ -46,7 +46,7 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         firebaseAppDistribution {
                             artifactType = "APK"
                             serviceCredentialsFile =
-                                "$rootDir/id/src/main/serviceCredentialsFile.json"
+                                "$rootDir/id/src/serviceCredentialsFile.json"
                             groups = "pre-release-testers"
                         }
                     }
@@ -55,7 +55,7 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         firebaseAppDistribution {
                             artifactType = "APK"
                             serviceCredentialsFile =
-                                "$rootDir/id/src/main/serviceCredentialsFile.json"
+                                "$rootDir/id/src/serviceCredentialsFile.json"
                             groups = "pre-release-testers"
                         }
 
