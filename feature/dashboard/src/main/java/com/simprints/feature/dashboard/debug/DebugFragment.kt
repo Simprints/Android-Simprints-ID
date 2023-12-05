@@ -17,7 +17,7 @@ import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
@@ -47,7 +47,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var eventRepository: EventRepository
 
     @Inject
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @Inject
     @DispatcherIO
@@ -110,7 +110,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             binding.logs.text = ""
             runBlocking {
                 val logStringBuilder = StringBuilder()
-                logStringBuilder.append("\nSubjects ${enrolmentRecordManager.count()}")
+                logStringBuilder.append("\nSubjects ${enrolmentRecordRepository.count()}")
 
                 val events = eventRepository.loadAll().toList().groupBy { it.type }
                 events.forEach {
@@ -127,7 +127,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
                 eventSyncManager.stop()
                 eventRepository.deleteAll()
                 eventSyncManager.resetDownSyncInfo()
-                enrolmentRecordManager.deleteAll()
+                enrolmentRecordRepository.deleteAll()
                 wm.pruneWork()
             }
         }

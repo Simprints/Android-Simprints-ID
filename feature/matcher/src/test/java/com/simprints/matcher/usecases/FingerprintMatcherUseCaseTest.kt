@@ -1,27 +1,36 @@
 package com.simprints.matcher.usecases
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.matcher.MatchParams
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
-class FingerprintMatcherUseCaseTest {
+internal class FingerprintMatcherUseCaseTest {
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
     lateinit var bioSdkWrapper: BioSdkWrapper
@@ -29,20 +38,26 @@ class FingerprintMatcherUseCaseTest {
     @MockK
     lateinit var configManager: ConfigManager
 
+    @MockK
+    lateinit var createRangesUseCase: CreateRangesUseCase
+
     private lateinit var useCase: FingerprintMatcherUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = FingerprintMatcherUseCase(enrolmentRecordManager, bioSdkWrapper, configManager)
+        useCase = FingerprintMatcherUseCase(
+            enrolmentRecordRepository,
+            bioSdkWrapper,
+            configManager,
+            createRangesUseCase,
+            testCoroutineRule.testCoroutineDispatcher,
+        )
     }
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns emptyList()
-        coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
-
         useCase.invoke(
             MatchParams(
                 flowType = FlowType.VERIFY,
@@ -54,8 +69,33 @@ class FingerprintMatcherUseCaseTest {
     }
 
     @Test
+    fun `Skips matching if there are no candidates`() = runTest {
+        coEvery { enrolmentRecordRepository.count(any()) } returns 0
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any()) } returns emptyList()
+        coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
+
+        useCase.invoke(
+            MatchParams(
+                probeFingerprintSamples = listOf(
+                    MatchParams.FingerprintSample(
+                        IFingerIdentifier.LEFT_3RD_FINGER,
+                        "format",
+                        byteArrayOf(1, 2, 3)
+                    ),
+                ),
+                flowType = FlowType.VERIFY,
+                queryForCandidates = SubjectQuery()
+            ),
+        )
+
+        coVerify(exactly = 0) { bioSdkWrapper.match(any(), any(), any()) }
+    }
+
+    @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { enrolmentRecordManager.loadFingerprintIdentities(any()) } returns listOf(
+        coEvery { enrolmentRecordRepository.count(any()) } returns 100
+        coEvery { createRangesUseCase(any()) } returns listOf(0..99)
+        coEvery { enrolmentRecordRepository.loadFingerprintIdentities(any(), any()) } returns listOf(
             FingerprintIdentity(
                 "personId",
                 listOf(
@@ -75,10 +115,9 @@ class FingerprintMatcherUseCaseTest {
         coEvery { bioSdkWrapper.match(any(), any(), any()) } returns listOf()
 
         var onLoadingCalled = false
-        var onMatchingCalled = false
 
         useCase.invoke(
-            MatchParams(
+            matchParams = MatchParams(
                 probeFingerprintSamples = listOf(
                     MatchParams.FingerprintSample(
                         IFingerIdentifier.LEFT_3RD_FINGER,
@@ -89,14 +128,12 @@ class FingerprintMatcherUseCaseTest {
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery()
             ),
-            { onLoadingCalled = true },
-            { onMatchingCalled = true }
+            onLoadingCandidates = { onLoadingCalled = true },
         )
 
         coVerify { bioSdkWrapper.match(any(), any(), any()) }
 
         assertThat(onLoadingCalled).isTrue()
-        assertThat(onMatchingCalled).isTrue()
     }
 
     private fun fingerprintSample(finger: IFingerIdentifier) =

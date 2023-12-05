@@ -18,7 +18,6 @@ dependencies {
     // Simprints
     implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:events"))
-    implementation(project(":infra:enrolment-records-sync"))
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":fingerprint:infra:scanner"))
     implementation(project(":infra:config-store"))

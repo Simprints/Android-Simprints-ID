@@ -5,7 +5,7 @@ import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Creation
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction.Deletion
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordCreationEvent
@@ -77,7 +77,7 @@ class EventDownSyncTaskTest {
     private lateinit var eventDownSyncTask: EventDownSyncTask
 
     @MockK
-    private lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    private lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
     private lateinit var eventDownSyncScopeRepository: EventDownSyncScopeRepository
@@ -106,7 +106,7 @@ class EventDownSyncTaskTest {
             timeHelper = timeHelper,
         )
         eventDownSyncTask = EventDownSyncTask(
-            enrolmentRecordManager,
+            enrolmentRecordRepository,
             eventDownSyncScopeRepository,
             subjectFactory,
             configManager,
@@ -151,7 +151,7 @@ class EventDownSyncTaskTest {
         eventDownSyncTask.downSync(this, projectOp).toList()
 
         coVerify {
-            enrolmentRecordManager.performActions(
+            enrolmentRecordRepository.performActions(
                 listOf(
                     Creation(
                         subjectFactory.buildSubjectFromCreationPayload(
@@ -170,7 +170,7 @@ class EventDownSyncTaskTest {
 
         eventDownSyncTask.downSync(this, projectOp).toList()
 
-        coVerify { enrolmentRecordManager.performActions(listOf(Deletion(event.payload.subjectId))) }
+        coVerify { enrolmentRecordRepository.performActions(listOf(Deletion(event.payload.subjectId))) }
     }
 
     @Test
@@ -186,7 +186,7 @@ class EventDownSyncTaskTest {
         eventDownSyncTask.downSync(this, moduleOp).toList()
 
         coVerify {
-            enrolmentRecordManager.performActions(emptyList())
+            enrolmentRecordRepository.performActions(emptyList())
         }
     }
 
@@ -209,7 +209,7 @@ class EventDownSyncTaskTest {
             eventDownSyncTask.downSync(this, syncByModule2).toList()
 
             coVerify {
-                enrolmentRecordManager.performActions(
+                enrolmentRecordRepository.performActions(
                     listOf(
                         Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
                     )
@@ -230,7 +230,7 @@ class EventDownSyncTaskTest {
         eventDownSyncTask.downSync(this, moduleOp).toList()
 
         coVerify {
-            enrolmentRecordManager.performActions(
+            enrolmentRecordRepository.performActions(
                 listOf(
                     Deletion(eventToMoveToModule2.payload.enrolmentRecordDeletion.subjectId)
                 )
@@ -256,7 +256,7 @@ class EventDownSyncTaskTest {
         eventDownSyncTask.downSync(this, syncByModule2).toList()
 
         coVerify {
-            enrolmentRecordManager.performActions(
+            enrolmentRecordRepository.performActions(
                 listOf(
                     Creation(subjectFactory.buildSubjectFromMovePayload(eventToMoveToModule2.payload.enrolmentRecordCreation))
                 )

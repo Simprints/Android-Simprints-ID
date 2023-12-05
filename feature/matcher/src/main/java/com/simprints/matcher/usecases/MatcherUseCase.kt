@@ -8,10 +8,13 @@ internal interface MatcherUseCase {
     val crashReportTag: String
     val matcherName: String
 
+    /**
+     * Returns a list of [MatchResultItem]s sorted by confidence score in descending order
+     * and the total number of candidates that were considered.
+     */
     suspend operator fun invoke(
         matchParams: MatchParams,
         onLoadingCandidates: (tag: String) -> Unit = {},
-        onMatching: (tag: String) -> Unit = {},
-    ): List<MatchResultItem>
+    ): Pair<List<MatchResultItem>, Int>
 
 }

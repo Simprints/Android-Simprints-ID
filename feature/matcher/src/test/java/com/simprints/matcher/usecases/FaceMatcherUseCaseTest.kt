@@ -1,28 +1,40 @@
 package com.simprints.matcher.usecases
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.face.FaceSample
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.FaceIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
 import com.simprints.infra.facebiosdk.matching.FaceMatcher
 import com.simprints.matcher.MatchParams
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
-class FaceMatcherUseCaseTest {
+internal class FaceMatcherUseCaseTest {
+
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    lateinit var enrolmentRecordManager: EnrolmentRecordManager
+    lateinit var enrolmentRecordRepository: EnrolmentRecordRepository
 
     @MockK
     lateinit var faceMatcher: FaceMatcher
+
+    @MockK
+    lateinit var createRangesUseCase: CreateRangesUseCase
 
     private lateinit var useCase: FaceMatcherUseCase
 
@@ -30,17 +42,16 @@ class FaceMatcherUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = FaceMatcherUseCase(enrolmentRecordManager, faceMatcher)
+        useCase = FaceMatcherUseCase(
+            enrolmentRecordRepository,
+            faceMatcher,
+            createRangesUseCase,
+            testCoroutineRule.testCoroutineDispatcher,
+        )
     }
 
     @Test
     fun `Skips matching if there are no probes`() = runTest {
-        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns listOf(
-            FaceIdentity(
-                "subjectId",
-                listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))
-            )
-        )
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 1f
 
         useCase.invoke(
@@ -54,8 +65,28 @@ class FaceMatcherUseCaseTest {
     }
 
     @Test
+    fun `Skips matching if there are no candidates`() = runTest {
+        coEvery { enrolmentRecordRepository.count(any()) } returns 0
+
+        useCase.invoke(
+            MatchParams(
+                probeFaceSamples = listOf(
+                    MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))
+                ),
+                flowType = FlowType.VERIFY,
+                queryForCandidates = SubjectQuery()
+            ),
+        )
+
+        coVerify(exactly = 0) { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
+    }
+
+
+    @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { enrolmentRecordManager.loadFaceIdentities(any()) } returns listOf(
+        coEvery { enrolmentRecordRepository.count(any()) } returns 100
+        coEvery { createRangesUseCase(any()) } returns listOf(0..99)
+        coEvery { enrolmentRecordRepository.loadFaceIdentities(any(), any()) } returns listOf(
             FaceIdentity(
                 "subjectId",
                 listOf(FaceSample(byteArrayOf(1, 2, 3), "format", "faceTemplate"))
@@ -64,26 +95,23 @@ class FaceMatcherUseCaseTest {
         coEvery { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) } returns 42f
 
         var onLoadingCalled = false
-        var onMatchingCalled = false
 
         val results = useCase.invoke(
-            MatchParams(
+            matchParams = MatchParams(
                 probeFaceSamples = listOf(
                     MatchParams.FaceSample("faceId", byteArrayOf(1, 2, 3))
                 ),
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery()
             ),
-            { onLoadingCalled = true },
-            { onMatchingCalled = true }
+            onLoadingCandidates = { onLoadingCalled = true },
         )
 
         coVerify { faceMatcher.getHighestComparisonScoreForCandidate(any(), any()) }
 
         assertThat(onLoadingCalled).isTrue()
-        assertThat(onMatchingCalled).isTrue()
 
-        assertThat(results.first().subjectId).isEqualTo("subjectId")
-        assertThat(results.first().confidence).isEqualTo(42f)
+        assertThat(results.first.first().subjectId).isEqualTo("subjectId")
+        assertThat(results.first.first().confidence).isEqualTo(42f)
     }
 }
