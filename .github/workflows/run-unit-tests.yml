@@ -19,6 +19,9 @@ jobs:
     test-modules:
         runs-on: ubuntu-latest
 
+        env:
+            GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
+
         steps:
             -   name: Checkout
                 uses: actions/checkout@v4
@@ -45,6 +48,9 @@ jobs:
                     source ci/pipeline/setup
                     echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
                     echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
+
+            -   name: Write Google Services file
+                run: echo $GOOGLE_SERVICES_FILE > id/src/main/google-services.json
 
             -   name: Create modules array
                 id: create-modules-array
