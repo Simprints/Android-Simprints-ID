@@ -7,7 +7,7 @@ import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 /**
- * Can be removed once all the devices have been updated to 2024.1.0
+ * Can be removed once all the devices have been updated to 2023.4.0
  */
 class ProjectConfigFingerprintBioSdkMigration @Inject constructor() :
     DataMigration<ProtoProjectConfiguration> {
