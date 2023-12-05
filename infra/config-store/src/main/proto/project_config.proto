@@ -40,15 +40,15 @@ message ProtoFaceConfiguration {
 }
 
 message ProtoFingerprintConfiguration {
-    repeated ProtoFinger fingers_to_capture = 1; // TODO: remove this field after migration to 2024.1.0
-    int32 quality_threshold = 2;// TODO: remove this field after migration to 2024.1.0
-    ProtoDecisionPolicy decision_policy = 3;// TODO: remove this field after migration to 2024.1.0
-    repeated VeroGeneration allowed_vero_generations = 4;// TODO: remove this field after migration to 2024.1.0
-    FingerComparisonStrategy comparison_strategy_for_verification = 5;// TODO: remove this field after migration to 2024.1.0
+    repeated ProtoFinger fingers_to_capture = 1; // TODO: remove this field after migration to 2023.4.0
+    int32 quality_threshold = 2;// TODO: remove this field after migration to 2023.4.0
+    ProtoDecisionPolicy decision_policy = 3;// TODO: remove this field after migration to 2023.4.0
+    repeated VeroGeneration allowed_vero_generations = 4;// TODO: remove this field after migration to 2023.4.0
+    FingerComparisonStrategy comparison_strategy_for_verification = 5;// TODO: remove this field after migration to 2023.4.0
 
     bool display_hand_icons = 6;
-    optional ProtoVero2Configuration vero_2 = 7; // TODO: remove this field after migration to 2024.1.0
-    optional ProtoVero1Configuration vero_1 = 8; // TODO: remove this field after migration to 2024.1.0
+    optional ProtoVero2Configuration vero_2 = 7; // TODO: remove this field after migration to 2023.4.0
+    optional ProtoVero1Configuration vero_1 = 8; // TODO: remove this field after migration to 2023.4.0
     repeated VeroGeneration allowed_scanners = 9;
     repeated ProtoBioSdk allowed_sdks = 10;
     optional ProtoFingerprintSdkConfiguration secugen_sim_matcher = 11;
