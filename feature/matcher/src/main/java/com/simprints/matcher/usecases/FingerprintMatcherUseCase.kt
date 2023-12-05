@@ -1,5 +1,6 @@
 package com.simprints.matcher.usecases
 
+import com.simprints.core.DispatcherBG
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
@@ -8,18 +9,24 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.enrolment.records.sync.EnrolmentRecordManager
+import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
 import com.simprints.matcher.MatchResultItem
-import java.io.Serializable
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
 internal class FingerprintMatcherUseCase @Inject constructor(
-    private val enrolmentRecordManager: EnrolmentRecordManager,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val bioSdkWrapper: BioSdkWrapper,
     private val configManager: ConfigManager,
+    private val createRanges: CreateRangesUseCase,
+    @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : MatcherUseCase {
 
     override val crashReportTag = LoggingConstants.CrashReportTag.MATCHING.name
@@ -28,26 +35,37 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     override suspend operator fun invoke(
         matchParams: MatchParams,
         onLoadingCandidates: (tag: String) -> Unit,
-        onMatching: (tag: String) -> Unit,
-    ): List<MatchResultItem> {
+    ): Pair<List<MatchResultItem>, Int> = coroutineScope {
         if (matchParams.probeFingerprintSamples.isEmpty()) {
-            return emptyList()
+            return@coroutineScope Pair(emptyList(), 0)
+        }
+        val samples = mapSamples(matchParams.probeFingerprintSamples)
+        val totalCandidates = enrolmentRecordRepository.count(matchParams.queryForCandidates)
+        if (totalCandidates == 0) {
+            return@coroutineScope Pair(emptyList(), 0)
         }
 
-        val samples = mapSamples(matchParams.probeFingerprintSamples)
-
         onLoadingCandidates(crashReportTag)
-        val candidates = getCandidates(matchParams.queryForCandidates)
-
-        onMatching(crashReportTag)
-        return match(samples, candidates, matchParams.flowType)
+        createRanges(totalCandidates)
+            .map { range ->
+                async(dispatcher) {
+                    val batchCandidates = getCandidates(matchParams.queryForCandidates, range)
+                    match(samples, batchCandidates, matchParams.flowType)
+                        .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
+                            acc.add(FingerprintMatchResult.Item(item.id, item.score))
+                        }
+                }
+            }
+            .awaitAll()
+            .reduce { acc, subSet -> acc.addAll(subSet) }
+            .toList() to totalCandidates
     }
 
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
         .map { Fingerprint(it.fingerId.toMatcherDomain(), it.template, it.format) }
 
-    private suspend fun getCandidates(query: Serializable) = enrolmentRecordManager
-        .loadFingerprintIdentities(query)
+    private suspend fun getCandidates(query: SubjectQuery, range: IntRange) = enrolmentRecordRepository
+        .loadFingerprintIdentities(query, range)
         .map {
             FingerprintIdentity(
                 it.patientId,
@@ -62,17 +80,14 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         }
 
     private suspend fun match(
-      probes: List<Fingerprint>,
-      candidates: List<FingerprintIdentity>,
-      flowType: FlowType,
-    ) = bioSdkWrapper
-        .match(
-            FingerprintIdentity("", probes),
-            candidates,
-            isCrossFingerMatchingEnabled(flowType),
-        )
-        .map { FingerprintMatchResult.Item(it.id, it.score) }
-        .sortedByDescending { it.confidence }
+        probes: List<Fingerprint>,
+        candidates: List<FingerprintIdentity>,
+        flowType: FlowType,
+    ) = bioSdkWrapper.match(
+        FingerprintIdentity("", probes),
+        candidates,
+        isCrossFingerMatchingEnabled(flowType),
+    )
 
     private suspend fun isCrossFingerMatchingEnabled(flowType: FlowType): Boolean = configManager
         .takeIf { flowType == FlowType.VERIFY }

@@ -5,23 +5,24 @@ import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIden
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.infra.enrolment.records.store.exceptions.InvalidQueryToLoadRecordsException
 import com.simprints.infra.enrolment.records.store.local.models.fromDbToDomain
 import com.simprints.infra.enrolment.records.store.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.realm.RealmWrapper
+import com.simprints.infra.realm.models.DbFaceSample
+import com.simprints.infra.realm.models.DbFingerprintSample
 import com.simprints.infra.realm.models.DbSubject
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.query.RealmQuery
 import io.realm.kotlin.query.Sort
+import io.realm.kotlin.query.find
 import io.realm.kotlin.types.RealmUUID
-import java.io.Serializable
 import javax.inject.Inject
 
-internal class SubjectLocalDataSourceImpl @Inject constructor(
+internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     private val realmWrapper: RealmWrapper,
-) : SubjectLocalDataSource {
+) : EnrolmentRecordLocalDataSource {
 
     companion object {
 
@@ -39,23 +40,35 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
             .map { dbSubject -> dbSubject.fromDbToDomain() }
     }
 
-    override suspend fun loadFingerprintIdentities(query: Serializable): List<FingerprintIdentity> =
-        if (query is SubjectQuery) {
-            load(query).map { subject ->
-                FingerprintIdentity(subject.subjectId, subject.fingerprintSamples)
+    override suspend fun loadFingerprintIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+    ): List<FingerprintIdentity> = realmWrapper.readRealm { realm ->
+        realm.query(DbSubject::class)
+            .buildRealmQueryForSubject(query)
+            .find { it.subList(range.first, range.last) }
+            .map { subject ->
+                FingerprintIdentity(
+                    subject.subjectId.toString(),
+                    subject.fingerprintSamples.map(DbFingerprintSample::fromDbToDomain)
+                )
             }
-        } else {
-            throw InvalidQueryToLoadRecordsException()
-        }
+    }
 
-    override suspend fun loadFaceIdentities(query: Serializable): List<FaceIdentity> =
-        if (query is SubjectQuery) {
-            load(query).map { subject ->
-                FaceIdentity(subject.subjectId, subject.faceSamples)
+    override suspend fun loadFaceIdentities(
+        query: SubjectQuery,
+        range: IntRange,
+    ): List<FaceIdentity> = realmWrapper.readRealm { realm ->
+        realm.query(DbSubject::class)
+            .buildRealmQueryForSubject(query)
+            .find { it.subList(range.first, range.last) }
+            .map { subject ->
+                FaceIdentity(
+                    subject.subjectId.toString(),
+                    subject.faceSamples.map(DbFaceSample::fromDbToDomain)
+                )
             }
-        } else {
-            throw InvalidQueryToLoadRecordsException()
-        }
+    }
 
     override suspend fun delete(queries: List<SubjectQuery>) {
         realmWrapper.writeRealm { realm ->
@@ -140,7 +153,11 @@ internal class SubjectLocalDataSourceImpl @Inject constructor(
             )
         }
         if (query.hasUntokenizedFields != null) {
-            realmQuery = realmQuery.query("$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1", false, false)
+            realmQuery = realmQuery.query(
+                "$IS_ATTENDANT_ID_TOKENIZED_FIELD == $0 OR $IS_MODULE_ID_TOKENIZED_FIELD == $1",
+                false,
+                false
+            )
         }
         if (query.sort) {
             realmQuery = realmQuery.sort(SUBJECT_ID_FIELD, Sort.ASCENDING)
