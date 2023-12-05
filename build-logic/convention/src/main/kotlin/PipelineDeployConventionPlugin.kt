@@ -32,12 +32,7 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         storeFile = file(props["store_file"] as String)
                         storePassword = props["store_password"] as String
                     }
-                    create("stagingConfig") {
-                        keyAlias = props["staging_key_alias"] as String
-                        keyPassword = props["key_password"] as String
-                        storeFile = file(props["store_file"] as String)
-                        storePassword = props["store_password"] as String
-                    }
+
                 }
 
                 buildFeatures.buildConfig = true
@@ -46,11 +41,12 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         signingConfig = signingConfigs.getByName("config")
                     }
                     getByName("staging") {
-                        signingConfig = signingConfigs.getByName("stagingConfig")
+                        signingConfig = signingConfigs.getByName("config")
 
                         firebaseAppDistribution {
                             artifactType = "APK"
-                            serviceCredentialsFile = "$rootDir/id/src/main/serviceCredentialsFile.json"
+                            serviceCredentialsFile =
+                                "$rootDir/id/src/main/serviceCredentialsFile.json"
                             groups = "pre-release-testers"
                         }
                     }
@@ -58,7 +54,8 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         signingConfig = signingConfigs.getByName("config")
                         firebaseAppDistribution {
                             artifactType = "APK"
-                            serviceCredentialsFile = "$rootDir/id/src/main/serviceCredentialsFile.json"
+                            serviceCredentialsFile =
+                                "$rootDir/id/src/main/serviceCredentialsFile.json"
                             groups = "pre-release-testers"
                         }
 

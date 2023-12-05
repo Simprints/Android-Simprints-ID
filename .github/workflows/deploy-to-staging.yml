@@ -1,3 +1,4 @@
+name: Deploy to Staging
 on:
     # Manual trigger for workflow dispatch (e.g., when clicking "Run workflow" button)
     workflow_dispatch:
