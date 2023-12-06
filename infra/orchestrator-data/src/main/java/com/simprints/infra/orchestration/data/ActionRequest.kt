@@ -1,6 +1,7 @@
 package com.simprints.infra.orchestration.data
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
 import kotlinx.parcelize.Parcelize
 
@@ -12,6 +13,7 @@ sealed class ActionRequest(
     open val unknownExtras: List<Pair<String, Any?>>,
 ) : Parcelable {
 
+    @Keep
     @Parcelize
     data class EnrolActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
@@ -22,6 +24,7 @@ sealed class ActionRequest(
         override val unknownExtras: List<Pair<String, Any?>>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
+    @Keep
     @Parcelize
     data class IdentifyActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
@@ -32,6 +35,7 @@ sealed class ActionRequest(
         override val unknownExtras: List<Pair<String, Any?>>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
+    @Keep
     @Parcelize
     data class VerifyActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
@@ -43,6 +47,7 @@ sealed class ActionRequest(
         override val unknownExtras: List<Pair<String, Any?>>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
+    @Keep
     @Parcelize
     data class ConfirmIdentityActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
@@ -53,6 +58,7 @@ sealed class ActionRequest(
         override val unknownExtras: List<Pair<String, Any?>>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FollowUpAction
 
+    @Keep
     @Parcelize
     data class EnrolLastBiometricActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
