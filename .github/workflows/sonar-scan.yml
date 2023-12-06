@@ -6,6 +6,9 @@ on:
 jobs:
     sonarQube:
 
+        env:
+            GOOGLE_SERVICES_FILE: ${{ secrets.GOOGLE_SERVICES_FILE}}
+
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
@@ -34,6 +37,8 @@ jobs:
                     echo "GITHUB_USERNAME=${{ secrets.GH_PACKAGE_NAME }}" >>  local.properties
                     echo "GITHUB_TOKEN=${{ secrets.GH_PACKAGE_TOKEN }}" >>  local.properties
 
+            -   name: Write Google Services file
+                run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
 
             -   name: download all artifacts
                 uses: actions/download-artifact@v3
