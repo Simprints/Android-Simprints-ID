@@ -83,9 +83,16 @@ GITHUB_USERNAME=<your-github-username>
 GITHUB_TOKEN=<the-token-you-just-created>
 ```
 
-<br>
+
 For security reasons the debug.keystore and the google-services.json are not included in the repository.
-To build the app you need to add them to the project. and update the signing_properties.gradle.kts file with the correct passwords.
+To build the app you need to add them to the project and update the signing_properties.gradle.kts file with the correct passwords.
+
+
+To avoid accidentally committing changes to signing properties run
+```
+Run `git update-index --skip-worktree build-logic/signing_properties.gradle.kts
+```
+
 
 ## Full CI Workflow
 
