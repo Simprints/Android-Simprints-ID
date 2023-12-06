@@ -1,12 +1,14 @@
 package com.simprints.matcher
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.simprints.core.domain.common.FlowType
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import kotlinx.parcelize.Parcelize
 
+@Keep
 @Parcelize
 data class MatchParams(
   val probeFaceSamples: List<FaceSample> = emptyList(),
@@ -17,6 +19,7 @@ data class MatchParams(
 
     fun isFaceMatch() = probeFaceSamples.isNotEmpty()
 
+    @Keep
     @ExcludedFromGeneratedTestCoverageReports("Generated code")
     @Parcelize
     data class FaceSample(
@@ -45,6 +48,7 @@ data class MatchParams(
         }
     }
 
+    @Keep
     @ExcludedFromGeneratedTestCoverageReports("Generated code")
     @Parcelize
     data class FingerprintSample(
