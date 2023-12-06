@@ -1,12 +1,14 @@
 package com.simprints.infra.orchestration.data.responses
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.infra.config.store.models.DecisionPolicy
 import kotlinx.parcelize.Parcelize
 
+@Keep
 @Parcelize
 data class AppMatchResult(
     val guid: String,

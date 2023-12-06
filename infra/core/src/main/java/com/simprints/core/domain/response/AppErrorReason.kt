@@ -1,7 +1,9 @@
 package com.simprints.core.domain.response
 
+import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
+@Keep
 @ExcludedFromGeneratedTestCoverageReports("Enum")
 enum class AppErrorReason {
     DIFFERENT_PROJECT_ID_SIGNED_IN,
