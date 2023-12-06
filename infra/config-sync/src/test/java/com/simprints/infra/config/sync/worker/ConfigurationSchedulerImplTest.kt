@@ -32,7 +32,7 @@ class ConfigurationSchedulerImplTest {
         verify {
             workManager.enqueueUniquePeriodicWork(
                 ConfigurationSchedulerImpl.WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 any(),
             )
         }

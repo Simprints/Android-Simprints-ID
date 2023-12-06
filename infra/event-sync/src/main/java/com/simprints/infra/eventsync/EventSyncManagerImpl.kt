@@ -86,7 +86,7 @@ internal class EventSyncManagerImpl @Inject constructor(
 
         wm.enqueueUniquePeriodicWork(
             MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             buildPeriodicRequest()
         )
     }

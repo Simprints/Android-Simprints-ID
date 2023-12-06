@@ -21,7 +21,7 @@ internal class ConfigurationSchedulerImpl @Inject constructor(@ApplicationContex
     override fun scheduleSync() {
         workManager.enqueueUniquePeriodicWork(
             WORK_NAME,
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             buildPeriodicRequest()
         )
     }
