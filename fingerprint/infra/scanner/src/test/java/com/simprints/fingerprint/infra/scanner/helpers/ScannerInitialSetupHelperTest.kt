@@ -14,8 +14,8 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.CypressFirm
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.ScannerInformation
 import com.simprints.fingerprint.infra.scanner.v2.domain.root.models.UnifiedVersionInformation
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -35,9 +35,7 @@ class ScannerInitialSetupHelperTest {
     private val vero2Configuration = mockk<Vero2Configuration>()
     private val configManager = mockk<ConfigManager> {
         coEvery { getProjectConfiguration() } returns mockk {
-            every { fingerprint } returns mockk {
-                every { vero2 } returns vero2Configuration
-            }
+            every { fingerprint?.bioSdkConfiguration?.vero2 } returns vero2Configuration
         }
     }
     private val firmwareLocalDataSource = mockk<FirmwareLocalDataSource>()

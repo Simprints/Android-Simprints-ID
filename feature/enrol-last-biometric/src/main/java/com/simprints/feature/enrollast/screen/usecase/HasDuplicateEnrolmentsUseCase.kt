@@ -20,12 +20,14 @@ internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
 
         return when {
             fingerprintResponse == null && faceResponse == null -> {
-                Simber.tag(ENROLMENT.name).i("No capture response. Must be either fingerprint, face or both")
+                Simber.tag(ENROLMENT.name)
+                    .i("No capture response. Must be either fingerprint, face or both")
                 true
             }
 
             isAnyResponseWithHighConfidence(projectConfig, fingerprintResponse, faceResponse) -> {
-                Simber.tag(ENROLMENT.name).i("There is a subject with confidence score above the high confidence level")
+                Simber.tag(ENROLMENT.name)
+                    .i("There is a subject with confidence score above the high confidence level")
                 true
             }
 
@@ -34,7 +36,8 @@ internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
     }
 
     private fun getFingerprintMatchResult(steps: List<EnrolLastBiometricStepResult>) =
-        steps.filterIsInstance<EnrolLastBiometricStepResult.FingerprintMatchResult>().lastOrNull()?.results
+        steps.filterIsInstance<EnrolLastBiometricStepResult.FingerprintMatchResult>()
+            .lastOrNull()?.results
 
     private fun getFaceMatchResult(steps: List<EnrolLastBiometricStepResult>) =
         steps.filterIsInstance<EnrolLastBiometricStepResult.FaceMatchResult>().lastOrNull()?.results
@@ -45,6 +48,7 @@ internal class HasDuplicateEnrolmentsUseCase @Inject constructor() {
         faceResponse: List<MatchResult>?,
     ): Boolean {
         val fingerprintThreshold = configuration.fingerprint
+            ?.bioSdkConfiguration
             ?.decisionPolicy
             ?.high?.toFloat()
             ?: Float.MAX_VALUE

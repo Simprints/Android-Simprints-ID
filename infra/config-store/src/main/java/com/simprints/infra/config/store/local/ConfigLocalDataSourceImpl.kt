@@ -2,10 +2,10 @@ package com.simprints.infra.config.store.local
 
 import androidx.datastore.core.DataStore
 import com.simprints.core.tools.utils.LanguageHelper
+import com.simprints.infra.config.store.AbsolutePath
 import com.simprints.infra.config.store.local.models.ProtoDeviceConfiguration
 import com.simprints.infra.config.store.local.models.ProtoProject
 import com.simprints.infra.config.store.local.models.ProtoProjectConfiguration
-import com.simprints.infra.config.store.AbsolutePath
 import com.simprints.infra.config.store.local.models.toDomain
 import com.simprints.infra.config.store.local.models.toProto
 import com.simprints.infra.config.store.models.ConsentConfiguration
@@ -65,13 +65,15 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getProjectConfiguration(): ProjectConfiguration = configDataStore.data.first().toDomain()
+    override suspend fun getProjectConfiguration(): ProjectConfiguration =
+        configDataStore.data.first().toDomain()
 
     override suspend fun clearProjectConfiguration() {
         configDataStore.updateData { it.toBuilder().clear().build() }
     }
 
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration = deviceConfigDataStore.data.first().toDomain()
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
+        deviceConfigDataStore.data.first().toDomain()
 
     override suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration) {
         deviceConfigDataStore.updateData { currentData ->
@@ -111,7 +113,10 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
     }
 
     private fun fileForPrivacyNotice(projectId: String, language: String): File =
-        File(filePathForPrivacyNoticeDirectory(projectId), "$language.${ConfigLocalDataSourceImpl.Companion.FILE_TYPE}")
+        File(
+            filePathForPrivacyNoticeDirectory(projectId),
+            "$language.${ConfigLocalDataSourceImpl.Companion.FILE_TYPE}"
+        )
 
     private fun filePathForPrivacyNoticeDirectory(projectId: String): String =
         "$absolutePath${File.separator}${ConfigLocalDataSourceImpl.Companion.PRIVACY_NOTICE_FOLDER}${File.separator}$projectId"
@@ -130,20 +135,25 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
                 ),
                 face = null,
                 fingerprint = FingerprintConfiguration(
-                    fingersToCapture = listOf(
-                        Finger.LEFT_THUMB,
-                        Finger.LEFT_INDEX_FINGER
-                    ),
-                    decisionPolicy = DecisionPolicy(
-                        0,
-                        0,
-                        700
-                    ),
-                    allowedVeroGenerations = listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
-                    comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+
+                    allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_1),
                     displayHandIcons = true,
-                    vero1 = Vero1Configuration(60),
-                    vero2 = null,
+                    allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+                    secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
+                        fingersToCapture = listOf(
+                            Finger.LEFT_THUMB,
+                            Finger.LEFT_INDEX_FINGER
+                        ),
+                        decisionPolicy = DecisionPolicy(
+                            0,
+                            0,
+                            700
+                        ),
+                        comparisonStrategyForVerification = FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+                        vero1 = Vero1Configuration(60),
+                        vero2 = null,
+                    ),
+                    nec = null,
                 ),
                 consent = ConsentConfiguration(
                     programName = "this program",

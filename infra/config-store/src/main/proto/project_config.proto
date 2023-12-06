@@ -40,14 +40,19 @@ message ProtoFaceConfiguration {
 }
 
 message ProtoFingerprintConfiguration {
-    repeated ProtoFinger fingers_to_capture = 1;
-    int32 quality_threshold = 2;
-    ProtoDecisionPolicy decision_policy = 3;
-    repeated VeroGeneration allowed_vero_generations = 4;
-    FingerComparisonStrategy comparison_strategy_for_verification = 5;
+    repeated ProtoFinger fingers_to_capture = 1; // TODO: remove this field after migration to 2023.4.0
+    int32 quality_threshold = 2;// TODO: remove this field after migration to 2023.4.0
+    ProtoDecisionPolicy decision_policy = 3;// TODO: remove this field after migration to 2023.4.0
+    repeated VeroGeneration allowed_vero_generations = 4;// TODO: remove this field after migration to 2023.4.0
+    FingerComparisonStrategy comparison_strategy_for_verification = 5;// TODO: remove this field after migration to 2023.4.0
+
     bool display_hand_icons = 6;
-    optional ProtoVero2Configuration vero_2 = 7;
-    optional ProtoVero1Configuration vero_1 = 8;
+    optional ProtoVero2Configuration vero_2 = 7; // TODO: remove this field after migration to 2023.4.0
+    optional ProtoVero1Configuration vero_1 = 8; // TODO: remove this field after migration to 2023.4.0
+    repeated VeroGeneration allowed_scanners = 9;
+    repeated ProtoBioSdk allowed_sdks = 10;
+    optional ProtoFingerprintSdkConfiguration secugen_sim_matcher = 11;
+    optional ProtoFingerprintSdkConfiguration nec = 12;
 
     enum VeroGeneration {
         VERO_1 = 0;
@@ -58,8 +63,20 @@ message ProtoFingerprintConfiguration {
         SAME_FINGER = 0;
         CROSS_FINGER_USING_MEAN_OF_MAX = 1;
     }
-}
+    enum ProtoBioSdk {
+        SECUGEN_SIM_MATCHER = 0;
+        NEC = 1;
+    }
 
+    message ProtoFingerprintSdkConfiguration{
+        repeated ProtoFinger fingers_to_capture = 1;
+        ProtoDecisionPolicy decision_policy = 2;
+        FingerComparisonStrategy comparison_strategy_for_verification = 3;
+        optional ProtoVero2Configuration vero_2 = 4;
+        optional ProtoVero1Configuration vero_1 = 5;
+
+    }
+}
 message ProtoVero1Configuration {
     int32 quality_threshold = 1;
 }

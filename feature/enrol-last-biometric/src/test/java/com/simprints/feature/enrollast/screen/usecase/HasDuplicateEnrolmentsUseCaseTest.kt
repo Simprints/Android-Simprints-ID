@@ -117,7 +117,9 @@ class HasDuplicateEnrolmentsUseCaseTest {
     ): ProjectConfiguration = mockk(relaxed = true) {
         every { general.duplicateBiometricEnrolmentCheck } returns checkEnabled
         // cannot mock Int? directly due to Java inter-op issues, so mocking decision policy instead
-        every { fingerprint?.decisionPolicy } returns highConfidence?.let { DecisionPolicy(0, 0, it) }
+        every { fingerprint?.bioSdkConfiguration?.decisionPolicy } returns highConfidence?.let {
+            DecisionPolicy(0, 0, it)
+        }
         every { face?.decisionPolicy } returns highConfidence?.let { DecisionPolicy(0, 0, it) }
     }
 

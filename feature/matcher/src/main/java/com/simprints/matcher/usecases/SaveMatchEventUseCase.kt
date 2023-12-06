@@ -55,6 +55,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
 
     private suspend fun getFingerprintComparisonStrategy() = configManager.getProjectConfiguration()
         .fingerprint
+        ?.bioSdkConfiguration
         ?.comparisonStrategyForVerification
         ?.let {
             when (it) {

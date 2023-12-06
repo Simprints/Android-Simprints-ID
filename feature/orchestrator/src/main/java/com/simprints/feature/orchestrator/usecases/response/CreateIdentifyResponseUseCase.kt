@@ -1,14 +1,14 @@
 package com.simprints.feature.orchestrator.usecases.response
 
 import android.os.Parcelable
-import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
-import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
+import com.simprints.infra.orchestration.data.responses.AppMatchResult
+import com.simprints.infra.orchestration.data.responses.AppResponse
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
-import com.simprints.infra.orchestration.data.responses.AppResponse
 import javax.inject.Inject
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
@@ -25,8 +25,10 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         val faceResults = getFaceMatchResults(faceDecisionPolicy, results, projectConfiguration)
         val bestFaceConfidence = faceResults.firstOrNull()?.confidenceScore ?: 0
 
-        val fingerprintDecisionPolicy = projectConfiguration.fingerprint?.decisionPolicy
-        val fingerprintResults = getFingerprintResults(fingerprintDecisionPolicy, results, projectConfiguration)
+        val fingerprintDecisionPolicy =
+            projectConfiguration.fingerprint?.bioSdkConfiguration?.decisionPolicy
+        val fingerprintResults =
+            getFingerprintResults(fingerprintDecisionPolicy, results, projectConfiguration)
         val bestFingerprintConfidence = fingerprintResults.firstOrNull()?.confidenceScore ?: 0
 
         return AppIdentifyResponse(

@@ -16,6 +16,16 @@ class FingerprintConfigurationTest {
     }
 
     @Test
+    fun `should map correctly the old model to new model`() {
+        val proto = protoFingerprintConfiguration.toBuilder()
+            .clearNec()
+            .clearSecugenSimMatcher()
+            .addAllowedVeroGenerations(ProtoFingerprintConfiguration.VeroGeneration.VERO_2)
+            .build()
+        assertThat(proto.toDomain().allowedScanners).contains(FingerprintConfiguration.VeroGeneration.VERO_2)
+    }
+
+    @Test
     fun `should map correctly the Finger enums`() {
         val mapping = mapOf(
             ProtoFinger.LEFT_THUMB to Finger.LEFT_THUMB,

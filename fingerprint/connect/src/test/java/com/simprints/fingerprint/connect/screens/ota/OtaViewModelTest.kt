@@ -74,8 +74,12 @@ class OtaViewModelTest {
         coEvery {
             recentUserActivityManager.getRecentUserActivity()
         } returns RecentUserActivity(HARDWARE_VERSION, "", "".asTokenizableRaw(), 0, 0, 0, 0)
-        coEvery { configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions } returns mapOf(
-            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(NEW_CYPRESS_VERSION, NEW_STM_VERSION, NEW_UN20_VERSION)
+        coEvery { configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions } returns mapOf(
+            HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
+                NEW_CYPRESS_VERSION,
+                NEW_STM_VERSION,
+                NEW_UN20_VERSION
+            )
         )
 
         every { scannerOtaWrapper.performCypressOta(any()) } returns CYPRESS_OTA_STEPS.asFlow()

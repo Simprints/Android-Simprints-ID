@@ -2,6 +2,7 @@ package com.simprints.matcher.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -10,7 +11,6 @@ import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
 import com.simprints.infra.events.event.domain.models.OneToOneMatchEvent
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.MatchParams
-import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -45,7 +45,7 @@ class SaveMatchEventUseCaseTest {
         coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
 
         coEvery {
-            configManager.getProjectConfiguration().fingerprint?.comparisonStrategyForVerification
+            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.comparisonStrategyForVerification
         } returns FingerComparisonStrategy.SAME_FINGER
 
         useCase = SaveMatchEventUseCase(
