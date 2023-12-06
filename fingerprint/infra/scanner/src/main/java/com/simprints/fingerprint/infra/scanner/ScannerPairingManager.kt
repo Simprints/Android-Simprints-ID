@@ -56,7 +56,7 @@ class ScannerPairingManager @Inject internal constructor(
     }
 
     private suspend fun isScannerGenerationValidForProject(address: String): Boolean =
-        configManager.getProjectConfiguration().fingerprint?.allowedVeroGenerations?.contains(
+        configManager.getProjectConfiguration().fingerprint?.allowedScanners?.contains(
             scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(
                 serialNumberConverter.convertMacAddressToSerialNumber(address)
             )

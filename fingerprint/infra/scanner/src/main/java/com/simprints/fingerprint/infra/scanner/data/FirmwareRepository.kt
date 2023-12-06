@@ -24,7 +24,7 @@ internal class FirmwareRepository @Inject constructor(
      * first checks the local version and matches that against the remote versions, then subsequently updating the rlocal versios that need to be updated.
      */
     suspend fun updateStoredFirmwareFilesWithLatest() {
-        configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions?.keys?.forEach { hardwareVersion ->
+        configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.keys?.forEach { hardwareVersion ->
             updateStoredFirmwareFilesWithLatest(hardwareVersion)
         }
     }
@@ -81,7 +81,7 @@ internal class FirmwareRepository @Inject constructor(
         val cypressOfficialVersions = mutableSetOf<String>()
         val stmOfficialVersions = mutableSetOf<String>()
         val un20OfficialVersions = mutableSetOf<String>()
-        configManager.getProjectConfiguration().fingerprint?.vero2?.firmwareVersions?.entries?.forEach {
+        configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.entries?.forEach {
             cypressOfficialVersions.add(it.value.cypress)
             stmOfficialVersions.add(it.value.stm)
             un20OfficialVersions.add(it.value.un20)

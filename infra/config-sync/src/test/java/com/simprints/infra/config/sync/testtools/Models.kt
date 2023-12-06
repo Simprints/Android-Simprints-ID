@@ -40,13 +40,17 @@ internal val faceConfiguration =
     FaceConfiguration(2, -1, FaceConfiguration.ImageSavingStrategy.NEVER, decisionPolicy)
 
 internal val fingerprintConfiguration = FingerprintConfiguration(
-    listOf(Finger.LEFT_3RD_FINGER),
-    decisionPolicy,
-    listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
-    FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
-    true,
-    Vero1Configuration(10),
-    vero2Configuration,
+    allowedScanners = listOf(FingerprintConfiguration.VeroGeneration.VERO_2),
+    allowedSDKs = listOf(FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER),
+    displayHandIcons = true,
+    secugenSimMatcher = FingerprintConfiguration.FingerprintSdkConfiguration(
+        listOf(Finger.LEFT_3RD_FINGER),
+        decisionPolicy,
+        FingerprintConfiguration.FingerComparisonStrategy.SAME_FINGER,
+        vero1 = Vero1Configuration(10),
+        vero2 = vero2Configuration,
+    ),
+    nec = null,
 )
 
 internal val consentConfiguration = ConsentConfiguration(

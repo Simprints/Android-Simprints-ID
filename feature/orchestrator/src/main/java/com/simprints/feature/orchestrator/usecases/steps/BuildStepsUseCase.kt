@@ -138,8 +138,9 @@ internal class BuildStepsUseCase @Inject constructor(
     ) = projectConfiguration.general.modalities.map {
         when (it) {
             Modality.FINGERPRINT -> {
-                val fingersToCollect = projectConfiguration.fingerprint?.fingersToCapture.orEmpty()
-                    .map { finger -> finger.fromDomainToModuleApi() }
+                val fingersToCollect =
+                    projectConfiguration.fingerprint?.bioSdkConfiguration?.fingersToCapture.orEmpty()
+                        .map { finger -> finger.fromDomainToModuleApi() }
 
                 Step(
                     id = StepId.FINGERPRINT_CAPTURE,

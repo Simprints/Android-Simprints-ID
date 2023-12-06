@@ -89,7 +89,10 @@ class ConnectScannerViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_1, FingerprintConfiguration.VeroGeneration.VERO_2)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(
+            FingerprintConfiguration.VeroGeneration.VERO_1,
+            FingerprintConfiguration.VeroGeneration.VERO_2
+        )
         coEvery { configManager.getProjectConfiguration().fingerprint } returns fingerprintConfiguration
         coJustRun { scannerFactory.initScannerOperationWrappers(any()) }
 
@@ -221,7 +224,7 @@ class ConnectScannerViewModelTest {
     fun start_noScannersPairedWithVero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 0)
         setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
@@ -235,7 +238,7 @@ class ConnectScannerViewModelTest {
     fun start_noScannersPairedWithVero2WithNfcAvailableAndOff_sendsNfcOffIssueEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 0)
         setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = false)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
@@ -249,7 +252,7 @@ class ConnectScannerViewModelTest {
     fun start_noScannersPairedWithVero2WithNfcNotAvailable_sendsSerialEntryIssueEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 0)
         setupNfc(doesDeviceHaveNfcCapability = false)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
@@ -263,7 +266,7 @@ class ConnectScannerViewModelTest {
     fun start_noScannersPairedWithVero1WithNfcAvailableAndOn_sendsSerialEntryIssueEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 0)
         setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_1)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_1)
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
@@ -277,7 +280,10 @@ class ConnectScannerViewModelTest {
     fun start_noScannersPairedWithMixedVeroGenerationsWithNfcAvailableAndOn_sendsSerialEntryIssueEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 0)
         setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_1, FingerprintConfiguration.VeroGeneration.VERO_2)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(
+            FingerprintConfiguration.VeroGeneration.VERO_1,
+            FingerprintConfiguration.VeroGeneration.VERO_2
+        )
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
@@ -291,7 +297,7 @@ class ConnectScannerViewModelTest {
     fun start_multipleScannersPairedWithVero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() = runTest {
         setupBluetooth(numberOfPairedScanners = 2)
         setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
@@ -380,7 +386,7 @@ class ConnectScannerViewModelTest {
     @Test
     fun handleScannerDisconnectedNoClick_vero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() = runTest {
         setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
@@ -394,7 +400,7 @@ class ConnectScannerViewModelTest {
     @Test
     fun handleIncorrectScanner_vero2WithNfcAvailableAndOn_sendsNfcPairIssueEvent() = runTest {
         setupNfc(doesDeviceHaveNfcCapability = true, isEnabled = true)
-        every { fingerprintConfiguration.allowedVeroGenerations } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
+        every { fingerprintConfiguration.allowedScanners } returns listOf(FingerprintConfiguration.VeroGeneration.VERO_2)
 
         val connectScannerIssueObserver = viewModel.showScannerIssueScreen.testObserver()
 
