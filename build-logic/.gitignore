@@ -1,0 +1,2 @@
+# Ignoring changes in this file to avoid accidentally committing debug keys
+signing_properties.gradle.kts
