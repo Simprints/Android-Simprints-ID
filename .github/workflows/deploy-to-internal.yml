@@ -58,7 +58,7 @@ jobs:
                 run: echo "$GOOGLE_API_KEY_JSON" >google_api_key.json
 
             -   name: Write Google Services file
-                run: echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/release/google-services.json
+                run: echo $RELEASE_GOOGLE_SERVICES_FILE > id/src/google-services.json
 
             -   name: Set up signing properties
                 run: source ci/deployment/signing_properties_setup

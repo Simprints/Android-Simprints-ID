@@ -75,20 +75,28 @@ Following the guidelines above the end goal of SID should look roughly like:
 
 Clone with `git clone https://github.com/Simprints/Android-Simprints-ID.git`
 
-Generate a new Github token at <https://github.com/settings/tokens/new>, which generates a "Classic" token. The only scope needed is `read:packages`. Then add it to the `local.properties` file:
+Generate a new Github token at <https://github.com/settings/tokens/new>, which generates a "Classic"
+token. The only scope needed is `read:packages`. Then add it to the `local.properties` file:
 
 ```properties
 GITHUB_USERNAME=<your-github-username>
 GITHUB_TOKEN=<the-token-you-just-created>
 ```
 
+<br>
+For security reasons the debug.keystore and the google-services.json are not included in the repository.
+To build the app you need to add them to the project. and update the signing_properties.gradle.kts file with the correct passwords.
+
 ## Full CI Workflow
 
-The aim of the `ci` workflow is to run all tests in all modules, assemble production and debug builds of the APK, and report to the main CI Slack channel.
+The aim of the `ci` workflow is to run all tests in all modules, assemble production and debug
+builds of the APK, and report to the main CI Slack channel.
 When run, it immediately triggers all the other relevant workflows such that all tests are run.
-In the mean-time, the `ci` build waits for the other workflows to finish and, if they pass, continue to the assemble and deploy steps.
+In the mean-time, the `ci` build waits for the other workflows to finish and, if they pass, continue
+to the assemble and deploy steps.
 
-It is triggered upon pull requests and serves as validation of the integrity of the branch for any pull requests into `main`.
+It is triggered upon pull requests and serves as validation of the integrity of the branch for any
+pull requests into `main`.
 
 <br>
 
