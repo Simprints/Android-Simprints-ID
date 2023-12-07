@@ -194,7 +194,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 CaptureState.Skipped,
                 is CaptureState.NotDetected,
                 is CaptureState.Collected -> {
-                    if (it.isShowingConfirmDialog) stopLiveFeedback(scannerManager.scanner)
+                    if (it.isShowingConfirmDialog) stopLiveFeedback()
                     else startLiveFeedback(scannerManager.scanner)
                 }
             }
@@ -222,8 +222,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         liveFeedbackTask?.cancel()
     }
 
-    private fun stopLiveFeedback(scanner: ScannerWrapper) {
-        if (liveFeedbackState != LiveFeedbackState.STOP && shouldWeDoLiveFeedback(scanner)) {
+    private fun stopLiveFeedback() {
+        if (liveFeedbackState != null && liveFeedbackState != LiveFeedbackState.STOP) {
             Simber.tag(FINGER_CAPTURE.name).i("stopLiveFeedback")
             liveFeedbackState = LiveFeedbackState.STOP
             liveFeedbackTask?.cancel()
@@ -605,12 +605,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         // Don't try to reconnect scanner in onPause, if scanner is null,
         // reconnection of null scanner will be handled in onResume
         if (scannerManager.isScannerAvailable) {
-            scannerManager.scanner.let { scanner ->
-                viewModelScope.launch {
-                    stopLiveFeedback(scanner)
-                }
-                scanner.unregisterTriggerListener(scannerTriggerListener)
-            }
+            stopLiveFeedback()
+            scannerManager.scanner.unregisterTriggerListener(scannerTriggerListener)
         }
     }
 
