@@ -23,7 +23,7 @@ internal class CreateRangesUseCase @Inject constructor() {
             if (end > totalCount) {
                 end = totalCount
             }
-            ranges.add(start until end)
+            ranges.add(start..end)
             start = end
             end += nextBatchSize
 
