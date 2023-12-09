@@ -37,6 +37,16 @@ dependencyResolutionManagement {
             }
         }
 
+        maven {
+            name = "RocWrapperGitHubPackages"
+            url = uri("https://maven.pkg.github.com/simprints/lib-roc-wrapper")
+            credentials {
+                username =
+                    properties.getProperty("GITHUB_USERNAME", System.getenv("GITHUB_USERNAME"))
+                password = properties.getProperty("GITHUB_TOKEN", System.getenv("GITHUB_TOKEN"))
+            }
+        }
+
     }
 }
 
