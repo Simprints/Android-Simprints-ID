@@ -172,17 +172,26 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         if (captureStatusChecked) return ScannerConnectionStatus.Started
         captureStatusChecked = true
 
-        return if (scannerManager.isScannerAvailable) {
+        return if (scannerManager.isScannerConnected) {
             ScannerConnectionStatus.Connected
         } else {
             ScannerConnectionStatus.NotConnected
         }
     }
 
+    private fun launchReconnect() {
+        if (!state.isShowingConnectionScreen) {
+            updateState {
+                it.copy(isShowingConnectionScreen = true)
+            }
+            _launchReconnect.send()
+        }
+    }
+
     private fun startObserverForLiveFeedback() {
         stateLiveData.observeForever {
-            if (!scannerManager.isScannerAvailable) {
-                _launchReconnect.send()
+            if (!scannerManager.isScannerConnected) {
+                launchReconnect()
                 return@observeForever
             }
 
@@ -471,7 +480,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
             is ScannerDisconnectedException -> {
                 updateCaptureState { toNotCollected() }
-                _launchReconnect.send()
+                launchReconnect()
             }
 
             is NoFingerDetectedException -> handleNoFingerDetected()
@@ -596,7 +605,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleOnResume() {
         updateState {
             /* refresh */
-            it.copy(isShowingSplashScreen = false)
+            it.copy(
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false
+            )
         }
         runOnScannerOrReconnectScanner { registerTriggerListener(scannerTriggerListener) }
     }
@@ -604,7 +616,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleOnPause() {
         // Don't try to reconnect scanner in onPause, if scanner is null,
         // reconnection of null scanner will be handled in onResume
-        if (scannerManager.isScannerAvailable) {
+        if (scannerManager.isScannerConnected) {
             stopLiveFeedback()
             scannerManager.scanner.unregisterTriggerListener(scannerTriggerListener)
         }
@@ -625,8 +637,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun <T> runOnScannerOrReconnectScanner(block: ScannerWrapper.() -> T) {
-        if (scannerManager.isScannerAvailable) scannerManager.scanner.block()
-        else _launchReconnect.send()
+        if (scannerManager.isScannerConnected) scannerManager.scanner.block()
+        else launchReconnect()
     }
 
     private fun qualityThreshold(): Int =

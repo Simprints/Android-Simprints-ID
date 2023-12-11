@@ -17,6 +17,7 @@ interface ScannerWrapper {
 
     suspend fun connect()
     suspend fun disconnect()
+    fun isConnected(): Boolean
 
     /**
      * This method checks for available firmware updates
