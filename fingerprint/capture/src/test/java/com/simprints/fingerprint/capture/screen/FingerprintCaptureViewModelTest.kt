@@ -135,7 +135,7 @@ class FingerprintCaptureViewModelTest {
 
     @Test
     fun viewModel_start_beginsWithCorrectState() = runTest {
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
         assertThat(vm.stateLiveData.value).isEqualTo(
             CollectFingerprintsState(
@@ -155,7 +155,7 @@ class FingerprintCaptureViewModelTest {
         mockScannerSetUiIdle()
         setupCaptureFingerprintResponses(NEVER_RETURNS)
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
         // start and cancel finger scan
         vm.handleScanButtonPressed()
@@ -171,7 +171,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(NEVER_RETURNS)
         noImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.Scanning())
@@ -181,7 +181,7 @@ class FingerprintCaptureViewModelTest {
     fun `test scanner supports image transfer then isImageTransferRequired should be true`() = runTest {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns true
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         assertThat(vm.isImageTransferRequired()).isTrue()
     }
 
@@ -189,7 +189,7 @@ class FingerprintCaptureViewModelTest {
     fun `test scanner doesn't support imageTransfer then isImageTransferRequired should be false`() = runTest {
         withImageTransfer()
         every { scanner.isImageTransferSupported() } returns false
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         assertThat(vm.isImageTransferRequired()).isFalse()
     }
 
@@ -201,7 +201,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
@@ -220,7 +220,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
@@ -246,7 +246,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(OK)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
@@ -268,7 +268,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(BAD_SCAN)
         noImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
@@ -289,7 +289,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(BAD_SCAN)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
@@ -310,7 +310,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(NO_FINGER_DETECTED)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotDetected())
@@ -326,7 +326,7 @@ class FingerprintCaptureViewModelTest {
         } throws ScannerDisconnectedException()
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
@@ -341,7 +341,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(MockAcquireImageResult.DISCONNECTED)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
@@ -356,7 +356,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(OK)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
             CaptureState.Collected(
@@ -402,7 +402,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(OK)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         repeat(12) { // 3 times for each of the 4 fingers (2 original + 2 auto-added)
             vm.handleScanButtonPressed()
             advanceTimeBy(TIME_SKIP_MS)
@@ -450,7 +450,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(OK)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         repeat(2) {
             vm.handleScanButtonPressed()
             advanceTimeBy(TIME_SKIP_MS)
@@ -500,7 +500,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         repeat(2) {
             vm.handleScanButtonPressed()
             advanceTimeBy(TIME_SKIP_MS)
@@ -549,7 +549,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(GOOD_SCAN, DIFFERENT_GOOD_SCAN)
         noImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         advanceTimeBy(TIME_SKIP_MS)
         assertThat(vm.stateLiveData.value?.currentFingerIndex).isEqualTo(1)
@@ -577,7 +577,7 @@ class FingerprintCaptureViewModelTest {
     fun missingFinger_updatesStateCorrectly() = runTest {
         mockScannerSetUiIdle()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleMissingFingerButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.Skipped)
         assertThat(vm.stateLiveData.value?.isShowingSplashScreen).isTrue()
@@ -594,7 +594,7 @@ class FingerprintCaptureViewModelTest {
     fun receivesOnlyMissingFingersThenConfirm_showsToastAndResetsState() = runTest {
         mockScannerSetUiIdle()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         repeat(4) { // 2 original + 2 auto-added
             vm.handleMissingFingerButtonPressed()
             advanceTimeBy(TIME_SKIP_MS)
@@ -657,7 +657,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(OK)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
         // Finger 1
         vm.handleScanButtonPressed()
@@ -764,7 +764,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(OK)
         withImageTransfer(isEager = true)
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
         // Finger 1
         vm.handleScanButtonPressed()
@@ -859,7 +859,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(NEVER_RETURNS)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.Scanning())
         vm.handleScanButtonPressed()
@@ -874,7 +874,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
@@ -901,7 +901,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(OK)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         advanceTimeBy(TIME_SKIP_MS)
         vm.handleMissingFingerButtonPressed()
@@ -932,7 +932,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(NEVER_RETURNS)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.Scanning())
         vm.handleOnBackPressed()
@@ -943,7 +943,7 @@ class FingerprintCaptureViewModelTest {
     fun shouldLaunch_reconnectActivity_whenScanner_isNotAvailable() = runTest {
         every { scannerManager.isScannerConnected } returns false
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
         vm.launchReconnect.assertEventReceived()
@@ -958,7 +958,7 @@ class FingerprintCaptureViewModelTest {
         acquireImageResponses(MockAcquireImageResult.NEVER_RETURNS)
         withImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
             CaptureState.TransferringImage(
@@ -978,7 +978,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(GOOD_SCAN)
         noImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         vm.handleOnBackPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(
@@ -997,7 +997,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(UNKNOWN_ERROR)
         noImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
 
@@ -1006,7 +1006,7 @@ class FingerprintCaptureViewModelTest {
 
     @Test
     fun onResumeCalled_registersScannerTrigger() = runTest {
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleOnResume()
 
         verify { scanner.registerTriggerListener(any()) }
@@ -1014,7 +1014,7 @@ class FingerprintCaptureViewModelTest {
 
     @Test
     fun onPauseCalled_unregistersScannerTrigger() = runTest {
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleOnPause()
 
         verify { scanner.unregisterTriggerListener(any()) }
@@ -1024,7 +1024,7 @@ class FingerprintCaptureViewModelTest {
     fun whenStart_AndLiveFeedbackIsEnabled_liveFeedbackIsStarted() = runTest {
         setupLiveFeedbackOn()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
         coVerify { scanner.startLiveFeedback() }
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.START)
@@ -1032,7 +1032,7 @@ class FingerprintCaptureViewModelTest {
 
     @Test
     fun whenStart_AndLiveFeedbackIsNotEnabled_liveFeedbackIsNotStarted() = runTest {
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
         coVerify(exactly = 0) { scanner.startLiveFeedback() }
     }
@@ -1044,7 +1044,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(NEVER_RETURNS)
         setupLiveFeedbackOn()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         assertThat(vm.liveFeedbackState).isEqualTo(LiveFeedbackState.PAUSE)
@@ -1057,7 +1057,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(GOOD_SCAN)
         setupLiveFeedbackOn()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         coVerify { scanner.startLiveFeedback() }
@@ -1071,7 +1071,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(BAD_SCAN)
         setupLiveFeedbackOn()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
 
         coVerify { scanner.startLiveFeedback() }
@@ -1085,7 +1085,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(GOOD_SCAN, NEVER_RETURNS)
         setupLiveFeedbackOn()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         advanceTimeBy(TIME_SKIP_MS)
         vm.handleScanButtonPressed()
@@ -1110,7 +1110,7 @@ class FingerprintCaptureViewModelTest {
         mockScannerSetUiIdle()
         setupLiveFeedbackOn()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleRestart()
 
         coVerify { scanner.startLiveFeedback() }
@@ -1121,7 +1121,7 @@ class FingerprintCaptureViewModelTest {
     fun whenPause_AndLiveFeedbackIsEnabled_liveFeedbackIsStopped() = runTest {
         setupLiveFeedbackOn()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleOnPause()
 
         coVerify { scanner.stopLiveFeedback() }
@@ -1132,7 +1132,7 @@ class FingerprintCaptureViewModelTest {
     fun whenResume_AndLiveFeedbackWasStarted_liveFeedbackIsStarted() = runTest {
         setupLiveFeedbackOn()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleOnPause()
         vm.handleOnResume()
 
@@ -1159,7 +1159,7 @@ class FingerprintCaptureViewModelTest {
         mockScannerSetUiIdle()
         coEvery { scanner.setUiIdle() } throws ScannerDisconnectedException()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.updateSelectedFinger(1)
 
         assertThat(vm.stateLiveData.value?.currentCaptureState()).isEqualTo(CaptureState.NotCollected)
@@ -1173,7 +1173,7 @@ class FingerprintCaptureViewModelTest {
         setupCaptureFingerprintResponses(BAD_SCAN, BAD_SCAN, BAD_SCAN, NO_FINGER_DETECTED)
         noImageTransfer()
 
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
         vm.handleScanButtonPressed()
@@ -1201,7 +1201,7 @@ class FingerprintCaptureViewModelTest {
     @ExperimentalTime
     private fun getToEndOfWorkflow() = runTest {
         setupCaptureFingerprintResponses(GOOD_SCAN)
-        vm.start(TWO_FINGERS_IDS)
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
         repeat(2) {
             vm.handleScanButtonPressed()
             advanceTimeBy(TIME_SKIP_MS)

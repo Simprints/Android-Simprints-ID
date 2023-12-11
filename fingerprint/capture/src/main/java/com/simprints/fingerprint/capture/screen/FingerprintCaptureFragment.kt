@@ -29,7 +29,6 @@ import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
-import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel.ScannerConnectionStatus
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
@@ -83,8 +82,9 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             R.id.fingerprintCaptureFragment,
             FingerprintConnectContract.DESTINATION
         ) {
-            if (it is FingerprintConnectResult && it.isSuccess) startCollection()
-            else findNavController().finishWithResult(this, it)
+            if (it !is FingerprintConnectResult || !it.isSuccess) {
+                findNavController().finishWithResult(this, it)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -94,20 +94,14 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
-        vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver {
-            launchConnection()
-        })
+        vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
 
-        when (vm.checkScannerConnectionStatus()) {
-            ScannerConnectionStatus.NotConnected -> {}
-            ScannerConnectionStatus.Connected -> startCollection()
-            ScannerConnectionStatus.Started -> {}
-        }
+        vm.handleOnViewCreated(args.params.fingerprintsToCapture)
+
+        initUI()
     }
 
-    private fun startCollection() {
-        vm.start(args.params.fingerprintsToCapture)
-
+    private fun initUI() {
         initToolbar(args.params.flowType)
         initMissingFingerButton()
         initViewPagerManager()
