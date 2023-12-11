@@ -103,6 +103,8 @@ internal class ScannerWrapperV1(
         }
     }
 
+    override fun isConnected() = scannerV1.isConnected
+
     override suspend fun sensorWakeUp() = withContext(ioDispatcher) {
         suspendCoroutine { cont ->
             scannerV1.un20Wakeup(ScannerCallbackWrapper(

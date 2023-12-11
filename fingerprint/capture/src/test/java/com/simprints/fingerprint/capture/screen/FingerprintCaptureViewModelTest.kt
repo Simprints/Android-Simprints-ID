@@ -116,7 +116,7 @@ class FingerprintCaptureViewModelTest {
         every { scanner.isImageTransferSupported() } returns true
         every { scanner.versionInformation().generation } returns ScannerGeneration.VERO_1
         every { scannerManager.scanner } returns scanner
-        every { scannerManager.isScannerAvailable } returns true
+        every { scannerManager.isScannerConnected } returns true
 
         coJustRun { bioSdkWrapper.initialize() }
 
@@ -143,7 +143,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 0,
                 isAskingRescan = false,
                 isShowingConfirmDialog = false,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
     }
@@ -421,7 +422,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 3,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
         coVerify(exactly = 12) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -470,7 +472,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 1,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
         coVerify(exactly = 2) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -519,7 +522,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 1,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
         coVerify(exactly = 2) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -606,7 +610,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 3,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
         coVerify(exactly = 4) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -624,7 +629,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 0,
                 isAskingRescan = false,
                 isShowingConfirmDialog = false,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
     }
@@ -713,7 +719,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 3,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
         coVerify(exactly = 14) { addCaptureEventsUseCase.invoke(any(), any(), any(), any()) }
@@ -820,7 +827,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 3,
                 isAskingRescan = false,
                 isShowingConfirmDialog = true,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
 
@@ -911,7 +919,8 @@ class FingerprintCaptureViewModelTest {
                 currentFingerIndex = 0,
                 isAskingRescan = false,
                 isShowingConfirmDialog = false,
-                isShowingSplashScreen = false
+                isShowingSplashScreen = false,
+                isShowingConnectionScreen = false,
             )
         )
     }
@@ -932,7 +941,7 @@ class FingerprintCaptureViewModelTest {
 
     @Test
     fun shouldLaunch_reconnectActivity_whenScanner_isNotAvailable() = runTest {
-        every { scannerManager.isScannerAvailable } returns false
+        every { scannerManager.isScannerConnected } returns false
 
         vm.start(TWO_FINGERS_IDS)
 

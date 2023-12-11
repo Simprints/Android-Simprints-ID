@@ -91,6 +91,8 @@ internal class ScannerWrapperV2(
         }
     }
 
+    override fun isConnected() = scannerV2.isConnected()
+
     /**
      * This function turns on the Un20 sensor (fingerprint sensor), by specifying what state it
      * expects the sensor to be in, represented as a boolean value (true | false -> on | off)

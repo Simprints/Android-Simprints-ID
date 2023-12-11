@@ -94,8 +94,12 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
+        vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver {
+            launchConnection()
+        })
+
         when (vm.checkScannerConnectionStatus()) {
-            ScannerConnectionStatus.NotConnected -> launchConnection()
+            ScannerConnectionStatus.NotConnected -> {}
             ScannerConnectionStatus.Connected -> startCollection()
             ScannerConnectionStatus.Started -> {}
         }
@@ -194,7 +198,6 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 }.toArgs()
             )
         })
-        vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
         vm.finishWithFingerprints.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { fingerprints ->
             findNavController().finishWithResult(this, fingerprints)
         })

@@ -17,7 +17,7 @@ interface ScannerManager {
     val otaOperationsWrapper: ScannerOtaOperationsWrapper
     var currentScannerId: String?
     var currentMacAddress: String?
-    val isScannerAvailable: Boolean
+    val isScannerConnected: Boolean
 
     /**
      * Instantiates [scanner] based on currently paired MAC addresses. Does not connect to the
