@@ -66,8 +66,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
-    private var captureStatusChecked = false
-
     lateinit var configuration: FingerprintConfiguration
     private lateinit var bioSdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
 
@@ -150,7 +148,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
 
-    fun start(fingerprintsToCapture: List<IFingerIdentifier>) {
+    private fun start(fingerprintsToCapture: List<IFingerIdentifier>) {
         if (!hasStarted) {
             hasStarted = true
 
@@ -165,17 +163,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             originalFingerprintsToCapture = fingerprintsToCapture
             setStartingState(fingerprintsToCapture)
             startObserverForLiveFeedback()
-        }
-    }
-
-    fun checkScannerConnectionStatus(): ScannerConnectionStatus {
-        if (captureStatusChecked) return ScannerConnectionStatus.Started
-        captureStatusChecked = true
-
-        return if (scannerManager.isScannerConnected) {
-            ScannerConnectionStatus.Connected
-        } else {
-            ScannerConnectionStatus.NotConnected
         }
     }
 
@@ -602,12 +589,20 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         setStartingState(originalFingerprintsToCapture)
     }
 
+    fun handleOnViewCreated(fingerprintsToCapture: List<IFingerIdentifier>) {
+        updateState {
+            it.copy(
+                isShowingConnectionScreen = false
+            )
+        }
+        start(fingerprintsToCapture)
+    }
+
     fun handleOnResume() {
         updateState {
             /* refresh */
             it.copy(
                 isShowingSplashScreen = false,
-                isShowingConnectionScreen = false
             )
         }
         runOnScannerOrReconnectScanner { registerTriggerListener(scannerTriggerListener) }
@@ -646,11 +641,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             bioSdkConfiguration.vero1!!.qualityThreshold
         else
             bioSdkConfiguration.vero2!!.qualityThreshold
-
-
-    enum class ScannerConnectionStatus {
-        NotConnected, Connected, Started;
-    }
 
     companion object {
 
