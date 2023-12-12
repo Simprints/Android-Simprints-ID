@@ -66,7 +66,7 @@ timber_version = "5.0.1"
 
 libsimprints_version = "2023.2.2"
 simmatcher_version = "1.2.0"
-roc_wrapper_version = "1.0.0"
+roc_wrapper_version = "1.23"
 
 junit_version = "4.13.2"
 junit_ext_version = "1.1.5"
