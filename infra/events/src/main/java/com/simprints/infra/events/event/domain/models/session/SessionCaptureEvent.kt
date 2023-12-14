@@ -66,7 +66,7 @@ data class SessionCaptureEvent(
         var modalities: List<Modality>,
         val appVersionName: String,
         val libVersionName: String,
-        val language: String,
+        var language: String,
         val device: Device,
         val databaseInfo: DatabaseInfo,
         var location: Location? = null,
@@ -87,5 +87,9 @@ data class SessionCaptureEvent(
 
     fun updateModalities(modalities: List<Modality>) {
         payload.modalities = modalities
+    }
+
+    fun updateLanguage(language: String) {
+        payload.language = language
     }
 }
