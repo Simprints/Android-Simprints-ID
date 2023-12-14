@@ -13,10 +13,7 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerNotPairedE
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnavailableVero2FeatureException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.infra.scanner.helpers.ConnectionHelper
-import com.simprints.fingerprint.infra.scanner.helpers.CypressOtaHelper
 import com.simprints.fingerprint.infra.scanner.helpers.ScannerInitialSetupHelper
-import com.simprints.fingerprint.infra.scanner.helpers.StmOtaHelper
-import com.simprints.fingerprint.infra.scanner.helpers.Un20OtaHelper
 import com.simprints.fingerprint.infra.scanner.v2.exceptions.state.NotConnectedException
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
 import com.simprints.fingerprint.infra.scanner.v2.scanner.ScannerExtendedInfoReaderHelper
@@ -49,15 +46,6 @@ internal class ScannerWrapperV2Test {
 
     @MockK
     lateinit var connectionHelper: ConnectionHelper
-
-    @MockK
-    lateinit var cypressOtaHelper: CypressOtaHelper
-
-    @MockK
-    lateinit var stmOtaHelper: StmOtaHelper
-
-    @MockK
-    lateinit var un20OtaHelper: Un20OtaHelper
 
     private lateinit var scannerWrapper: ScannerWrapperV2
 
@@ -301,5 +289,12 @@ internal class ScannerWrapperV2Test {
         assertThat(scannerWrapper.isImageTransferSupported()).isTrue()
     }
 
+    @Test
+    fun `isConnected() correctly passes scanner connection status`() {
+            every { scannerV2.isConnected() } returns false
+            assertThat(scannerWrapper.isConnected()).isFalse()
 
+            every { scannerV2.isConnected() } returns true
+            assertThat(scannerWrapper.isConnected()).isTrue()
+        }
 }
