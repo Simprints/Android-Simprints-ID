@@ -246,12 +246,12 @@ class ScannerWrapperV1Test {
         scannerWrapper.sensorWakeUp()
     }
 
+    @Test
+    fun `isConnected() correctly passes scanner connection status`() {
+        every { scanner.isConnected } returns false
+        assertThat(scannerWrapper.isConnected()).isFalse()
 
-    private fun mockScannerError(scannerError: SCANNER_ERROR) {
-        every { scanner.startContinuousCapture(any(), any(), capture(captureCallback)) } answers {
-            captureCallback.captured.onFailure(scannerError)
-
-        }
+        every { scanner.isConnected } returns true
+        assertThat(scannerWrapper.isConnected()).isTrue()
     }
-
 }

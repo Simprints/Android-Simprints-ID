@@ -115,6 +115,7 @@ class ConnectScannerViewModelTest {
         scannerGeneration: FingerprintConfiguration.VeroGeneration,
         connectFailException: Throwable? = null
     ) = mockk<ScannerWrapper> {
+        every { isConnected() } returns false
         coEvery { disconnect() } answers {}
         coEvery { connect() } answers {
             if (connectFailException != null)
