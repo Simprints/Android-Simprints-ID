@@ -80,6 +80,24 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         }
     }
 
+    @Test
+    fun `Update language in current session event when project ID updates`() = runTest {
+        val language = "lang"
+        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+            every { this@mockk.language } returns language
+        }
+        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createBlankSessionEvent(OTHER_PROJECT_ID)
+        coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
+
+        useCase()
+
+        coVerify {
+            eventRepository.addOrUpdateEvent(withArg {
+                assertThat((it.payload as SessionCaptureEvent.SessionCapturePayload).language).isEqualTo(language)
+            })
+        }
+    }
+
     private fun createBlankSessionEvent(projectId: String) = SessionCaptureEvent(
         id = "eventId",
         projectId = projectId,

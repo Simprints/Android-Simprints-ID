@@ -65,4 +65,11 @@ class SessionCaptureEventTest {
         session.updateModalities(listOf(GeneralConfiguration.Modality.FACE))
         assertThat(session.payload.modalities).isEqualTo(listOf(GeneralConfiguration.Modality.FACE))
     }
+
+    @Test
+    fun `updateLanguage should update the language in the session`() {
+        val session = SessionCaptureEventSample.getEvent(eventLabels)
+        session.updateLanguage("lang")
+        assertThat(session.payload.language).isEqualTo("lang")
+    }
 }
