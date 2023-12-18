@@ -1,15 +1,13 @@
 package com.simprints.feature.login.screens.qrscanner
 
-import android.os.Parcelable
 import androidx.annotation.Keep
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 @Keep
-@Parcelize
 internal class QrScannerResult(
     val content: String?,
     val error: QrScannerError?,
-) : Parcelable {
+) : Serializable {
 
     @Keep
     enum class QrScannerError {

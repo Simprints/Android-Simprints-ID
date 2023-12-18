@@ -1,6 +1,5 @@
 package com.simprints.infra.uibase.navigation
 
-import android.os.Parcelable
 import androidx.annotation.IdRes
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -13,6 +12,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageReports
+import java.io.Serializable
 
 /**
  * Add lifecycle aware fragment result listener for a provided destination ID for the navigation host controller.
@@ -23,7 +23,7 @@ import com.simprints.infra.uibase.annotations.ExcludedFromGeneratedTestCoverageR
  * Handler will be invoked when the result is set in the calling fragment.
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Parcelable> FragmentContainerView.handleResult(
+fun <T : Serializable> FragmentContainerView.handleResult(
     lifecycleOwner: LifecycleOwner,
     @IdRes targetDestinationId: Int,
     handler: (T) -> Unit
@@ -31,7 +31,7 @@ fun <T : Parcelable> FragmentContainerView.handleResult(
     val expectedResultKey = resultName(targetDestinationId)
     getFragment<Fragment>().childFragmentManager
         .setFragmentResultListener(expectedResultKey, lifecycleOwner) { key, resultBundle ->
-            resultBundle.getParcelable<T>(key)?.let(handler)
+            (resultBundle.getSerializable(key) as? T)?.let(handler)
         }
 }
 
@@ -40,10 +40,10 @@ fun <T : Parcelable> FragmentContainerView.handleResult(
  * This function should be used only in fragment tests to verify correct results are being returned.
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Parcelable> Fragment.handleResultDirectly(@IdRes targetDestinationId: Int, handler: (T) -> Unit) {
+fun <T : Serializable> Fragment.handleResultDirectly(@IdRes targetDestinationId: Int, handler: (T) -> Unit) {
     val expectedResultKey = resultName(targetDestinationId)
     setFragmentResultListener(expectedResultKey) { key, resultBundle ->
-        resultBundle.getParcelable<T>(key)?.let(handler)
+        (resultBundle.getSerializable(key) as? T)?.let(handler)
     }
 }
 
@@ -57,7 +57,7 @@ fun <T : Parcelable> Fragment.handleResultDirectly(@IdRes targetDestinationId: I
  */
 @Suppress("UsePropertyAccessSyntax") // compiler is confused by `lifecycle` getter
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Parcelable> NavController.handleResult(
+fun <T : Serializable> NavController.handleResult(
     lifecycleOwner: LifecycleOwner,
     @IdRes currentDestinationId: Int,
     @IdRes targetDestinationId: Int,
@@ -83,7 +83,7 @@ fun <T : Parcelable> NavController.handleResult(
     })
 }
 
-private fun <T : Parcelable> handleResultFromChild(
+private fun <T : Serializable> handleResultFromChild(
     @IdRes childDestinationId: Int,
     currentEntry: NavBackStackEntry,
     handler: (T) -> Unit
@@ -99,11 +99,11 @@ private fun <T : Parcelable> handleResultFromChild(
 }
 
 /**
- * Sets the provided parcelable as a fragment result to be used both
+ * Sets the provided Serializable as a fragment result to be used both
  * within and outside of the navigation graph.
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Parcelable> NavController.setResult(fragment: Fragment, result: T) {
+fun <T : Serializable> NavController.setResult(fragment: Fragment, result: T) {
     val currentDestinationId = currentDestination?.id
     if (currentDestinationId != null) {
         val resultName = resultName(currentDestinationId)
@@ -121,7 +121,7 @@ fun <T : Parcelable> NavController.setResult(fragment: Fragment, result: T) {
  * @return true if the stack was popped at least once
  */
 @ExcludedFromGeneratedTestCoverageReports("There is no reasonable way to test this")
-fun <T : Parcelable> NavController.finishWithResult(fragment: Fragment, result: T): Boolean {
+fun <T : Serializable> NavController.finishWithResult(fragment: Fragment, result: T): Boolean {
     val currentDestinationId = currentDestination?.id
     val saveHandle = previousBackStackEntry?.savedStateHandle
 

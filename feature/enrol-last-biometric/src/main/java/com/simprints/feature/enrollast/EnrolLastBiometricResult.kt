@@ -1,11 +1,9 @@
 package com.simprints.feature.enrollast
 
-import android.os.Parcelable
 import androidx.annotation.Keep
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 @Keep
-@Parcelize
 data class EnrolLastBiometricResult(
     val newSubjectId: String?
-) : Parcelable
+) : Serializable

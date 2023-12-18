@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases
 
-import android.os.Parcelable
 import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
@@ -10,11 +9,12 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.orchestration.data.responses.AppResponse
+import java.io.Serializable
 import javax.inject.Inject
 
 internal class MapRefusalOrErrorResultUseCase @Inject constructor() {
 
-    operator fun invoke(result: Parcelable): AppResponse? = when (result) {
+    operator fun invoke(result: Serializable): AppResponse? = when (result) {
         is ExitFormResult -> AppRefusalResponse.fromResult(result)
         is FetchSubjectResult -> result.takeUnless { it.found }?.let {
             AppErrorResponse(

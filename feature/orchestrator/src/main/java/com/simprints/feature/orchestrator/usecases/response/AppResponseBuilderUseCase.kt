@@ -6,6 +6,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.orchestration.data.responses.AppResponse
+import java.io.Serializable
 import javax.inject.Inject
 
 internal class AppResponseBuilderUseCase @Inject constructor(
@@ -20,7 +21,7 @@ internal class AppResponseBuilderUseCase @Inject constructor(
     suspend operator fun invoke(
         projectConfiguration: ProjectConfiguration,
         request: ActionRequest?,
-        results: List<Parcelable>,
+        results: List<Serializable>,
     ): AppResponse = when (request) {
         is ActionRequest.EnrolActionRequest -> if (isNewEnrolment(projectConfiguration, results)) {
             handleEnrolment(request, results)

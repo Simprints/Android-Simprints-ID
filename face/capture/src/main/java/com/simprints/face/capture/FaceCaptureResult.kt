@@ -4,12 +4,12 @@ import android.os.Parcelable
 import androidx.annotation.Keep
 import com.simprints.infra.images.model.SecuredImageRef
 import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 @Keep
-@Parcelize
 data class FaceCaptureResult(
     val results: List<Item>,
-) : Parcelable {
+) : Serializable {
 
     @Keep
     @Parcelize
