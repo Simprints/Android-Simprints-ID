@@ -2,7 +2,6 @@ package com.simprints.fingerprint.capture.screen
 
 import android.graphics.Paint
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
@@ -45,6 +44,7 @@ import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.Serializable
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -77,7 +77,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
-        findNavController().handleResult<Parcelable>(
+        findNavController().handleResult<Serializable>(
             viewLifecycleOwner,
             R.id.fingerprintCaptureFragment,
             FingerprintConnectContract.DESTINATION

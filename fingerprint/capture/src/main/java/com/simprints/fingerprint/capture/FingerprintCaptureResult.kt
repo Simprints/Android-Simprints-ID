@@ -5,14 +5,15 @@ import androidx.annotation.Keep
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.infra.images.model.SecuredImageRef
 import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 @Keep
-@Parcelize
 data class FingerprintCaptureResult(
     var results: List<Item>,
-) : Parcelable {
+) : Serializable {
 
     @Keep
+    //TODO: This @Parcelize is not needed?
     @Parcelize
     data class Item(
         val identifier: IFingerIdentifier,

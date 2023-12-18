@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator
 
-import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,6 +29,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -68,7 +68,7 @@ internal class OrchestratorViewModel @Inject constructor(
         doNextStep()
     }
 
-    fun handleResult(result: Parcelable) {
+    fun handleResult(result: Serializable) {
         Simber.i(result.toString())
         val errorResponse = mapRefusalOrErrorResult(result)
         if (errorResponse != null) {
@@ -126,13 +126,14 @@ internal class OrchestratorViewModel @Inject constructor(
         _appResponse.send(OrchestratorResult(cachedActionRequest, appResponse))
     }
 
-    private fun updateMatcherStepPayload(currentStep: Step, result: Parcelable) {
+    private fun updateMatcherStepPayload(currentStep: Step, result: Serializable) {
         if (currentStep.id == StepId.FACE_CAPTURE && result is FaceCaptureResult) {
             val matchingStep = steps.firstOrNull { it.id == StepId.FACE_MATCHER }
 
             if (matchingStep != null) {
                 val faceSamples = result.results.mapNotNull { it.sample }
                     .map { MatchParams.FaceSample(it.faceId, it.template) }
+                //TODO: check
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFaceStepArgs(faceSamples)
@@ -148,6 +149,7 @@ internal class OrchestratorViewModel @Inject constructor(
             if (matchingStep != null) {
                 val fingerprintSamples = result.results.mapNotNull { it.sample }
                     .map { MatchParams.FingerprintSample(it.fingerIdentifier, it.format, it.template) }
+                //TODO: check
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFingerprintStepArgs(fingerprintSamples)
