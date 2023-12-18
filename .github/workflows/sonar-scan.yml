@@ -41,7 +41,7 @@ jobs:
                 run: echo $GOOGLE_SERVICES_FILE > id/src/google-services.json
 
             -   name: download all artifacts
-                uses: actions/download-artifact@v3
+                uses: actions/download-artifact@v4
                 with:
                     path: test-reports
             # Move all reports to the root directory
