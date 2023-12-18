@@ -64,7 +64,7 @@ protobuf_version = "3.25.1"
 circleImageView_version = "3.1.0"
 timber_version = "5.0.1"
 
-libsimprints_version = "2023.2.2"
+libsimprints_version = "2023.4.1"
 simmatcher_version = "1.2.0"
 roc_wrapper_version = "1.23"
 
