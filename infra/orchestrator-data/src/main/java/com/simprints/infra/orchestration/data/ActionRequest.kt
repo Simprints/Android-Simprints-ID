@@ -9,8 +9,7 @@ sealed class ActionRequest(
     open val actionIdentifier: ActionRequestIdentifier,
     open val projectId: String,
     open val userId: TokenizableString,
-    // Since maps are not parcelable, we use a list of pairs instead.
-    open val unknownExtras: List<Pair<String, Any?>>,
+    open val unknownExtras: Map<String, Any?>,
 ) : Serializable {
 
     @Keep
@@ -20,7 +19,7 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
         val metadata: String,
-        override val unknownExtras: List<Pair<String, Any?>>,
+        override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
     @Keep
@@ -30,7 +29,7 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         override val moduleId: TokenizableString,
         val metadata: String,
-        override val unknownExtras: List<Pair<String, Any?>>,
+        override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
     @Keep
@@ -41,7 +40,7 @@ sealed class ActionRequest(
         override val moduleId: TokenizableString,
         val metadata: String,
         val verifyGuid: String,
-        override val unknownExtras: List<Pair<String, Any?>>,
+        override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
     @Keep
@@ -51,7 +50,7 @@ sealed class ActionRequest(
         override val userId: TokenizableString,
         val sessionId: String,
         val selectedGuid: String,
-        override val unknownExtras: List<Pair<String, Any?>>,
+        override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FollowUpAction
 
     @Keep
@@ -62,7 +61,7 @@ sealed class ActionRequest(
         val moduleId: TokenizableString,
         val metadata: String,
         val sessionId: String,
-        override val unknownExtras: List<Pair<String, Any?>>,
+        override val unknownExtras: Map<String, Any?>,
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FollowUpAction
 
     interface FlowAction {
