@@ -1,20 +1,28 @@
 package com.simprints.infra.orchestration.data
 
-import android.os.Parcelable
 import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.tokenization.TokenizableString
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = ActionRequest.EnrolActionRequest::class, name = "EnrolActionRequest"),
+    JsonSubTypes.Type(value = ActionRequest.IdentifyActionRequest::class, name = "IdentifyActionRequest"),
+    JsonSubTypes.Type(value = ActionRequest.VerifyActionRequest::class, name = "VerifyActionRequest"),
+    JsonSubTypes.Type(value = ActionRequest.ConfirmIdentityActionRequest::class, name = "ConfirmIdentityActionRequest"),
+    JsonSubTypes.Type(value = ActionRequest.EnrolLastBiometricActionRequest::class, name = "EnrolLastBiometricActionRequest"),
+)
 sealed class ActionRequest(
     open val actionIdentifier: ActionRequestIdentifier,
     open val projectId: String,
     open val userId: TokenizableString,
     // Since maps are not parcelable, we use a list of pairs instead.
     open val unknownExtras: List<Pair<String, Any?>>,
-) : Parcelable {
+) : Serializable {
 
     @Keep
-    @Parcelize
     data class EnrolActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -25,7 +33,6 @@ sealed class ActionRequest(
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
     @Keep
-    @Parcelize
     data class IdentifyActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -36,7 +43,6 @@ sealed class ActionRequest(
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
     @Keep
-    @Parcelize
     data class VerifyActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -48,7 +54,6 @@ sealed class ActionRequest(
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FlowAction
 
     @Keep
-    @Parcelize
     data class ConfirmIdentityActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
@@ -59,7 +64,6 @@ sealed class ActionRequest(
     ) : ActionRequest(actionIdentifier, projectId, userId, unknownExtras), FollowUpAction
 
     @Keep
-    @Parcelize
     data class EnrolLastBiometricActionRequest(
         override val actionIdentifier: ActionRequestIdentifier,
         override val projectId: String,
