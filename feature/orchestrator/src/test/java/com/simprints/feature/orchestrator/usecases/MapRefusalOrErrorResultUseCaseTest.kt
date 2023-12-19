@@ -1,7 +1,5 @@
 package com.simprints.feature.orchestrator.usecases
 
-
-import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.configuration.FaceConfigurationResult
@@ -11,6 +9,7 @@ import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.connect.FingerprintConnectResult
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -45,7 +44,7 @@ class MapRefusalOrErrorResultUseCaseTest {
     }
 
     @Test
-    fun `Maps non-result parcelable to null`() {
-        assertThat(useCase(Bundle())).isNull()
+    fun `Maps non-result serializable to null`() {
+        assertThat(useCase(mockk())).isNull()
     }
 }

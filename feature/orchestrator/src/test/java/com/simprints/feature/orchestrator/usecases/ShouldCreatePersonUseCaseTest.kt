@@ -1,7 +1,6 @@
 package com.simprints.feature.orchestrator.usecases
 
 import android.os.Bundle
-import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.face.capture.FaceCaptureResult
@@ -14,6 +13,7 @@ import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.orchestration.data.ActionRequestIdentifier
 import org.junit.Before
 import org.junit.Test
+import java.io.Serializable
 
 class ShouldCreatePersonUseCaseTest {
 
@@ -168,7 +168,7 @@ class ShouldCreatePersonUseCaseTest {
         unknownExtras = emptyList(),
     )
 
-    private fun createStep(id: Int, result: Parcelable?) = Step(
+    private fun createStep(id: Int, result: Serializable?) = Step(
         id = id,
         navigationActionId = 1,
         destinationId = 1,
