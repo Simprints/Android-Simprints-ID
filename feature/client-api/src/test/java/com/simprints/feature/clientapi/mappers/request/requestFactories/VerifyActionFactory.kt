@@ -25,7 +25,7 @@ internal object VerifyActionFactory : RequestActionFactory() {
         userId = MOCK_USER_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         verifyGuid = MOCK_VERIFY_GUID,
-        unknownExtras = emptyList()
+        unknownExtras = emptyMap()
     )
 
     override fun getBuilder(extractor: ActionRequestExtractor): VerifyRequestBuilder =

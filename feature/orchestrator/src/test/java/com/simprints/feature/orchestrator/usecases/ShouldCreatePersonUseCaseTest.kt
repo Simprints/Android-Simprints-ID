@@ -45,7 +45,7 @@ class ShouldCreatePersonUseCaseTest {
                     userId = "".asTokenizableRaw(),
                     sessionId = "",
                     selectedGuid = "",
-                    unknownExtras = emptyList(),
+                    unknownExtras = emptyMap(),
                 ), modalities = emptySet(), results = emptyList()
             )
         ).isFalse()
@@ -165,7 +165,7 @@ class ShouldCreatePersonUseCaseTest {
         userId = "".asTokenizableRaw(),
         moduleId = "".asTokenizableRaw(),
         metadata = "",
-        unknownExtras = emptyList(),
+        unknownExtras = emptyMap(),
     )
 
     private fun createStep(id: Int, result: Serializable?) = Step(
