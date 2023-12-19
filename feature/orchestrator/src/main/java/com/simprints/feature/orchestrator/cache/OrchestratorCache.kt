@@ -1,18 +1,18 @@
 package com.simprints.feature.orchestrator.cache
 
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.core.content.edit
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameDeserializer
+import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.feature.orchestrator.steps.SerializableMixin
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.security.SecurityManager
-import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,14 +33,19 @@ internal class OrchestratorCache @Inject constructor(
                 if (value == null) {
                     remove(KEY_REQUEST)
                 } else {
-                    val requestBytes = parcelableConverter.marshall(ActionRequestWrapper(value))
-                    putString(KEY_REQUEST, encodingUtils.byteArrayToBase64(requestBytes))
+                    val json = jsonHelper.toJson(value, module = actionRequestModule)
+                    putString(KEY_REQUEST, json)
                 }
             }
         }
         get() = prefs.getString(KEY_REQUEST, null)
-            ?.let { encodingUtils.base64ToBytes(it) }
-            ?.let { parcelableConverter.unmarshall(it, ActionRequestWrapper.CREATOR).request }
+            ?.let {
+                jsonHelper.fromJson(
+                    json = it,
+                    module = actionRequestModule,
+                    type = object : TypeReference<ActionRequest>() {}
+                )
+            }
 
 
     var steps: List<Step>
@@ -73,23 +78,13 @@ internal class OrchestratorCache @Inject constructor(
         private const val KEY_REQUEST = "actionRequest"
         private const val KEY_STEPS = "steps"
 
+        val actionRequestModule = SimpleModule().apply {
+            addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
+            addDeserializer(TokenizableString::class.java, TokenizationClassNameDeserializer())
+        }
         private val stepsModule = SimpleModule().apply {
             addSerializer(Bundle::class.java, BundleSerializer())
             addDeserializer(Bundle::class.java, BundleDeserializer())
-        }
-    }
-
-    //TODO: Use JSON instead of Parcelable
-    @Parcelize
-    internal class ActionRequestWrapper(val request: ActionRequest) : Parcelable {
-        companion object {
-            val CREATOR = object : Parcelable.Creator<ActionRequestWrapper> {
-                override fun createFromParcel(source: Parcel): ActionRequestWrapper = ActionRequestWrapper(
-                    source.readParcelable(ActionRequest::class.java.classLoader)!!
-                )
-
-                override fun newArray(size: Int): Array<ActionRequestWrapper?> = arrayOfNulls(size)
-            }
         }
     }
 }

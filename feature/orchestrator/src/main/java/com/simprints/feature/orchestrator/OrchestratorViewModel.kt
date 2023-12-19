@@ -48,6 +48,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     private var modalities = emptySet<GeneralConfiguration.Modality>()
     private var steps = emptyList<Step>()
+    private var actionRequest: ActionRequest? = null
 
     val currentStep: LiveData<LiveDataEventWithContent<Step?>>
         get() = _currentStep
@@ -63,7 +64,7 @@ internal class OrchestratorViewModel @Inject constructor(
         modalities = projectConfiguration.general.modalities.toSet()
         steps = stepsBuilder.build(action, projectConfiguration)
 
-        cache.actionRequest = action
+        actionRequest = action
 
         doNextStep()
     }
@@ -74,7 +75,7 @@ internal class OrchestratorViewModel @Inject constructor(
         if (errorResponse != null) {
             // Shortcut the flow execution if any refusal or error result is found
             addCallbackEvent(errorResponse)
-            _appResponse.send(OrchestratorResult(cache.actionRequest, errorResponse))
+            _appResponse.send(OrchestratorResult(actionRequest, errorResponse))
             return
         }
 
@@ -85,7 +86,7 @@ internal class OrchestratorViewModel @Inject constructor(
             updateMatcherStepPayload(it, result)
         }
 
-        if (shouldCreatePerson(cache.actionRequest, modalities, steps)) {
+        if (shouldCreatePerson(actionRequest, modalities, steps)) {
             viewModelScope.launch { createPersonEvent(steps.mapNotNull { it.result }) }
         }
 
@@ -114,7 +115,7 @@ internal class OrchestratorViewModel @Inject constructor(
 
     private fun buildAppResponse() = viewModelScope.launch {
         val projectConfiguration = configManager.getProjectConfiguration()
-        val cachedActionRequest = cache.actionRequest
+        val cachedActionRequest = actionRequest
         val appResponse = appResponseBuilder(
             projectConfiguration,
             cachedActionRequest,
