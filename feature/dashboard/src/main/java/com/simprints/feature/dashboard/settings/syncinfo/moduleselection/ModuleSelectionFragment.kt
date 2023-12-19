@@ -109,6 +109,11 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
         updateSelectionIfPossible(module)
     }
 
+    override fun onPause() {
+        hideKeyboard()
+        super.onPause()
+    }
+
     private fun configureRecyclerView() {
         rvModules = binding.rvModules
         rvModules?.adapter = adapter
