@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases
 
-import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
@@ -14,6 +13,7 @@ import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import org.junit.Before
 import org.junit.Test
+import java.io.Serializable
 
 internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
@@ -26,7 +26,7 @@ internal class MapStepsForLastBiometricEnrolUseCaseTest {
 
     @Test
     fun `maps EnrolLastBiometricRequest correctly`() {
-        val result = useCase(listOf<Parcelable>(
+        val result = useCase(listOf(
             EnrolLastBiometricResult("subjectId")
         ))
 

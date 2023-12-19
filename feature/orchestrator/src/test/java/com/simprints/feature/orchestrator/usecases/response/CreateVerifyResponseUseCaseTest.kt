@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -11,6 +10,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
+import java.io.Serializable
 
 class CreateVerifyResponseUseCaseTest {
 
@@ -105,11 +105,11 @@ class CreateVerifyResponseUseCaseTest {
         assertThat((result as AppVerifyResponse).matchResult.confidenceScore).isEqualTo(105)
     }
 
-    private fun createFingerprintMatchResult(vararg confidences: Float): Parcelable = FingerprintMatchResult(
+    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
         confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) }
     )
 
-    private fun createFaceMatchResult(vararg confidences: Float): Parcelable = FaceMatchResult(
+    private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
         confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) }
     )
 }
