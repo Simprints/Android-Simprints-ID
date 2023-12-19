@@ -1,10 +1,10 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Bundle
 import com.google.common.truth.Truth
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
 import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -21,7 +21,7 @@ class CreateEnrolLastBiometricResponseUseCaseTest{
     fun `Converts correct results to response`() {
         Truth.assertThat(useCase(listOf(
             EnrolLastBiometricResult("1234"),
-            Bundle(),
+            mockk(),
         ))).isInstanceOf(AppEnrolResponse::class.java)
     }
 
