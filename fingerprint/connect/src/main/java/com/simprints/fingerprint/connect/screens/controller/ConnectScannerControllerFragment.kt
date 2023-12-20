@@ -43,7 +43,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
-internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_connect_scanner) {
+internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_connect_scanner_controller) {
 
     private var shouldRequestPermissions = true
 
@@ -144,7 +144,6 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
     private fun showKnownScannerDialog(scannerId: String) {
         if (knownScannedDialog == null) {
             knownScannedDialog = MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(IDR.string.fingerprint_connect_scanner_id_confirmation_message, scannerId))
                 .setPositiveButton(IDR.string.fingerprint_connect_scanner_confirmation_yes) { _, _ ->
                     viewModel.handleScannerDisconnectedYesClick()
                 }
@@ -154,7 +153,11 @@ internal class ConnectScannerControllerFragment : Fragment(R.layout.fragment_con
                 .setCancelable(false)
                 .create()
         }
-        knownScannedDialog?.takeUnless { it.isShowing }?.show()
+        //Update scannerId in case it has changed
+        knownScannedDialog?.setTitle(getString(IDR.string.fingerprint_connect_scanner_id_confirmation_message, scannerId))
+        if (internalNavController()?.currentDestination?.id == R.id.connectProgressFragment) {
+            knownScannedDialog?.takeUnless { it.isShowing }?.show()
+        }
     }
 
     override fun onResume() {
