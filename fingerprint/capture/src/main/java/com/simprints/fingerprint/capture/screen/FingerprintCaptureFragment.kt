@@ -2,7 +2,6 @@ package com.simprints.fingerprint.capture.screen
 
 import android.graphics.Paint
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
@@ -29,7 +28,6 @@ import com.simprints.fingerprint.capture.R
 import com.simprints.fingerprint.capture.databinding.FragmentFingerprintCaptureBinding
 import com.simprints.fingerprint.capture.resources.buttonBackgroundColour
 import com.simprints.fingerprint.capture.resources.buttonTextId
-import com.simprints.fingerprint.capture.screen.FingerprintCaptureViewModel.ScannerConnectionStatus
 import com.simprints.fingerprint.capture.state.CaptureState
 import com.simprints.fingerprint.capture.state.CollectFingerprintsState
 import com.simprints.fingerprint.capture.views.confirmfingerprints.ConfirmFingerprintsDialog
@@ -46,6 +44,7 @@ import com.simprints.infra.uibase.navigation.handleResult
 import com.simprints.infra.uibase.system.Vibrate
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.Serializable
 import com.simprints.infra.resources.R as IDR
 
 @AndroidEntryPoint
@@ -78,13 +77,14 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
-        findNavController().handleResult<Parcelable>(
+        findNavController().handleResult<Serializable>(
             viewLifecycleOwner,
             R.id.fingerprintCaptureFragment,
             FingerprintConnectContract.DESTINATION
         ) {
-            if (it is FingerprintConnectResult && it.isSuccess) startCollection()
-            else findNavController().finishWithResult(this, it)
+            if (it !is FingerprintConnectResult || !it.isSuccess) {
+                findNavController().finishWithResult(this, it)
+            }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -94,16 +94,14 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
             }
         }
 
-        when (vm.checkScannerConnectionStatus()) {
-            ScannerConnectionStatus.NotConnected -> launchConnection()
-            ScannerConnectionStatus.Connected -> startCollection()
-            ScannerConnectionStatus.Started -> {}
-        }
+        vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
+
+        vm.handleOnViewCreated(args.params.fingerprintsToCapture)
+
+        initUI()
     }
 
-    private fun startCollection() {
-        vm.start(args.params.fingerprintsToCapture)
-
+    private fun initUI() {
         initToolbar(args.params.flowType)
         initMissingFingerButton()
         initViewPagerManager()
@@ -194,17 +192,23 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 }.toArgs()
             )
         })
-        vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
         vm.finishWithFingerprints.observe(viewLifecycleOwner, LiveDataEventWithContentObserver { fingerprints ->
             findNavController().finishWithResult(this, fingerprints)
         })
     }
 
     private fun launchConnection() {
-        findNavController().navigate(
-            R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
-            FingerprintConnectContract.getArgs(true)
-        )
+        //If we exit from the ConnectScanner screen, we first resume the capture screen. This leads
+        //to a crash because a second navigation to ConnectScanner is attempted but by the time it's
+        // executed we are already on the exit screen.
+        try {
+            findNavController().navigate(
+                R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
+                FingerprintConnectContract.getArgs(true)
+            )
+        } catch (e: Exception) {
+            Simber.tag(FINGER_CAPTURE.name).i("Error launching scanner connection screen", e)
+        }
     }
 
     override fun onResume() {

@@ -133,7 +133,7 @@ internal class EventSyncManagerTest {
         verify(exactly = 1) {
             workManager.enqueueUniquePeriodicWork(
                 MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 match { req ->
                     assertThat(req.tags.firstOrNull { it.contains(TAG_SCHEDULED_AT) }).isNotNull()
                     assertThat(req.tags).contains(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)

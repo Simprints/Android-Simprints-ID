@@ -27,7 +27,7 @@ internal class SecurityStateScheduler @Inject constructor(
     fun scheduleSecurityStateCheck() {
         workManager.enqueueUniquePeriodicWork(
             WORK_NAME,
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             buildWork()
         )
     }

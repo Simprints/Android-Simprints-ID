@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.face.capture.FaceCaptureResult
@@ -54,7 +53,7 @@ internal class CreateEnrolResponseUseCaseTest {
         assertThat(useCase(action, listOf(
             FingerprintCaptureResult(emptyList()),
             FaceCaptureResult(emptyList()),
-            Bundle(),
+            mockk(),
         ))).isInstanceOf(AppEnrolResponse::class.java)
     }
 

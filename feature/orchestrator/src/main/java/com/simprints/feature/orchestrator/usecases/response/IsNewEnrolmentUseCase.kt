@@ -1,9 +1,9 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Parcelable
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
+import java.io.Serializable
 import javax.inject.Inject
 
 internal class IsNewEnrolmentUseCase @Inject constructor() {
@@ -14,7 +14,7 @@ internal class IsNewEnrolmentUseCase @Inject constructor() {
      */
     operator fun invoke(
         projectConfiguration: ProjectConfiguration,
-        results: List<Parcelable>,
+        results: List<Serializable>,
     ): Boolean {
         if (!projectConfiguration.general.duplicateBiometricEnrolmentCheck) {
             // Duplicate check on enrolment is disabled

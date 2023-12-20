@@ -29,7 +29,7 @@ class ScannerManagerImpl @Inject constructor(
     override val otaOperationsWrapper: ScannerOtaOperationsWrapper
         get() = _otaOperationsWrapper ?: throw NullScannerException()
 
-    override val isScannerAvailable: Boolean get() = _scanner != null
+    override val isScannerConnected: Boolean get() = _scanner?.isConnected() ?: false
     override var currentScannerId: String? = null
     override var currentMacAddress: String? = null
 

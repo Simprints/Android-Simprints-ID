@@ -66,8 +66,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
-    private var captureStatusChecked = false
-
     lateinit var configuration: FingerprintConfiguration
     private lateinit var bioSdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
 
@@ -150,7 +148,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
 
-    fun start(fingerprintsToCapture: List<IFingerIdentifier>) {
+    private fun start(fingerprintsToCapture: List<IFingerIdentifier>) {
         if (!hasStarted) {
             hasStarted = true
 
@@ -168,21 +166,19 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
-    fun checkScannerConnectionStatus(): ScannerConnectionStatus {
-        if (captureStatusChecked) return ScannerConnectionStatus.Started
-        captureStatusChecked = true
-
-        return if (scannerManager.isScannerAvailable) {
-            ScannerConnectionStatus.Connected
-        } else {
-            ScannerConnectionStatus.NotConnected
+    private fun launchReconnect() {
+        if (!state.isShowingConnectionScreen) {
+            updateState {
+                it.copy(isShowingConnectionScreen = true)
+            }
+            _launchReconnect.send()
         }
     }
 
     private fun startObserverForLiveFeedback() {
         stateLiveData.observeForever {
-            if (!scannerManager.isScannerAvailable) {
-                _launchReconnect.send()
+            if (!scannerManager.isScannerConnected) {
+                launchReconnect()
                 return@observeForever
             }
 
@@ -194,7 +190,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 CaptureState.Skipped,
                 is CaptureState.NotDetected,
                 is CaptureState.Collected -> {
-                    if (it.isShowingConfirmDialog) stopLiveFeedback(scannerManager.scanner)
+                    if (it.isShowingConfirmDialog) stopLiveFeedback()
                     else startLiveFeedback(scannerManager.scanner)
                 }
             }
@@ -222,8 +218,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         liveFeedbackTask?.cancel()
     }
 
-    private fun stopLiveFeedback(scanner: ScannerWrapper) {
-        if (liveFeedbackState != LiveFeedbackState.STOP && shouldWeDoLiveFeedback(scanner)) {
+    private fun stopLiveFeedback() {
+        if (liveFeedbackState != null && liveFeedbackState != LiveFeedbackState.STOP) {
             Simber.tag(FINGER_CAPTURE.name).i("stopLiveFeedback")
             liveFeedbackState = LiveFeedbackState.STOP
             liveFeedbackTask?.cancel()
@@ -471,7 +467,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
             is ScannerDisconnectedException -> {
                 updateCaptureState { toNotCollected() }
-                _launchReconnect.send()
+                launchReconnect()
             }
 
             is NoFingerDetectedException -> handleNoFingerDetected()
@@ -593,10 +589,21 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         setStartingState(originalFingerprintsToCapture)
     }
 
+    fun handleOnViewCreated(fingerprintsToCapture: List<IFingerIdentifier>) {
+        updateState {
+            it.copy(
+                isShowingConnectionScreen = false
+            )
+        }
+        start(fingerprintsToCapture)
+    }
+
     fun handleOnResume() {
         updateState {
             /* refresh */
-            it.copy(isShowingSplashScreen = false)
+            it.copy(
+                isShowingSplashScreen = false,
+            )
         }
         runOnScannerOrReconnectScanner { registerTriggerListener(scannerTriggerListener) }
     }
@@ -604,13 +611,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleOnPause() {
         // Don't try to reconnect scanner in onPause, if scanner is null,
         // reconnection of null scanner will be handled in onResume
-        if (scannerManager.isScannerAvailable) {
-            scannerManager.scanner.let { scanner ->
-                viewModelScope.launch {
-                    stopLiveFeedback(scanner)
-                }
-                scanner.unregisterTriggerListener(scannerTriggerListener)
-            }
+        if (scannerManager.isScannerConnected) {
+            stopLiveFeedback()
+            scannerManager.scanner.unregisterTriggerListener(scannerTriggerListener)
         }
     }
 
@@ -629,8 +632,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun <T> runOnScannerOrReconnectScanner(block: ScannerWrapper.() -> T) {
-        if (scannerManager.isScannerAvailable) scannerManager.scanner.block()
-        else _launchReconnect.send()
+        if (scannerManager.isScannerConnected) scannerManager.scanner.block()
+        else launchReconnect()
     }
 
     private fun qualityThreshold(): Int =
@@ -638,11 +641,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             bioSdkConfiguration.vero1!!.qualityThreshold
         else
             bioSdkConfiguration.vero2!!.qualityThreshold
-
-
-    enum class ScannerConnectionStatus {
-        NotConnected, Connected, Started;
-    }
 
     companion object {
 
