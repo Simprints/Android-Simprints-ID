@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.cache
 
 import android.content.SharedPreferences
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.infra.security.SecurityManager
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -50,14 +51,15 @@ class OrchestratorCacheTest {
     }
 
     @Test
-    fun `Restores steps if requested value`() {
-        every { prefs.getString(any(), any()) } returns "[]"
-        every { jsonHelper.fromJson<List<String>>(any()) } returns listOf("", "")
+    fun `Restores steps if stored`() {
+        val json = "[]"
+        every { prefs.getString(any(), any()) } returns json
+        every { jsonHelper.fromJson<List<Step>>(any(), any(), any()) } returns emptyList()
 
         val result = cache.steps
 
         verify {
-            jsonHelper.fromJson<List<String>>(any())
+            jsonHelper.fromJson<List<Step>>(any(), any(), any())
             prefs.getString(any(), any())
         }
     }

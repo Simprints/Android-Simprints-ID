@@ -35,7 +35,7 @@ internal abstract class RequestActionFactory {
         every { mockExtractor.getUserId() } returns MOCK_USER_ID
         every { mockExtractor.getModuleId() } returns MOCK_MODULE_ID
         every { mockExtractor.getMetadata() } returns MOCK_METADATA
-        every { mockExtractor.getUnknownExtras() } returns emptyList()
+        every { mockExtractor.getUnknownExtras() } returns emptyMap()
     }
 
 }
