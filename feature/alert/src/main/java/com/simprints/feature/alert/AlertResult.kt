@@ -1,16 +1,14 @@
 package com.simprints.feature.alert
 
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.annotation.Keep
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 @Keep
-@Parcelize
 data class AlertResult(
     val buttonKey: String,
     val payload: Bundle,
-) : Parcelable {
+) : Serializable {
 
     fun isBackButtonPress() = buttonKey == AlertContract.ALERT_BUTTON_PRESSED_BACK
 }

@@ -25,7 +25,7 @@ internal object EnrolLastBiometricsActionFactory : RequestActionFactory() {
         moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         sessionId = MOCK_SESSION_ID,
-        unknownExtras = emptyList()
+        unknownExtras = emptyMap()
     )
 
     override fun getValidator(extractor: ActionRequestExtractor): EnrolLastBiometricsValidator =
@@ -52,7 +52,7 @@ internal object EnrolLastBiometricsActionFactory : RequestActionFactory() {
         every { mockEnrolLastBiometricsExtractor.getModuleId() } returns MOCK_MODULE_ID
         every { mockEnrolLastBiometricsExtractor.getMetadata() } returns MOCK_METADATA
         every { mockEnrolLastBiometricsExtractor.getSessionId() } returns MOCK_SESSION_ID
-        every { mockEnrolLastBiometricsExtractor.getUnknownExtras() } returns emptyList()
+        every { mockEnrolLastBiometricsExtractor.getUnknownExtras() } returns emptyMap()
         return mockEnrolLastBiometricsExtractor
     }
 }

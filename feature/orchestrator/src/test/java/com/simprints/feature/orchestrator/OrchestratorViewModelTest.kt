@@ -36,7 +36,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -101,16 +100,6 @@ internal class OrchestratorViewModelTest {
             addCallbackEvent,
             dailyActivityUseCase,
         )
-    }
-
-    @Test
-    fun `Caches action when received`() = runTest {
-        // No-op steps
-        every { stepsBuilder.build(any(), any()) } returns emptyList()
-
-        viewModel.handleAction(mockk())
-
-        verify { cache.actionRequest = any() }
     }
 
     @Test

@@ -1,9 +1,24 @@
 package com.simprints.feature.orchestrator.steps
 
 import android.os.Bundle
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.annotation.IdRes
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.face.capture.FaceCaptureResult
+import com.simprints.face.configuration.FaceConfigurationResult
+import com.simprints.feature.alert.AlertResult
+import com.simprints.feature.consent.ConsentResult
+import com.simprints.feature.enrollast.EnrolLastBiometricResult
+import com.simprints.feature.exitform.ExitFormResult
+import com.simprints.feature.fetchsubject.FetchSubjectResult
+import com.simprints.feature.login.LoginResult
+import com.simprints.feature.selectsubject.SelectSubjectResult
+import com.simprints.feature.setup.SetupResult
+import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.fingerprint.connect.FingerprintConnectResult
+import com.simprints.matcher.FaceMatchResult
+import com.simprints.matcher.FingerprintMatchResult
+import java.io.Serializable
 
 
 internal data class Step(
@@ -12,40 +27,10 @@ internal data class Step(
     @IdRes val destinationId: Int,
     var payload: Bundle,
     var status: StepStatus = StepStatus.NOT_STARTED,
-    var result: Parcelable? = null,
-) : Parcelable {
-
-    constructor(parcel: Parcel) : this(
-        parcel.readInt(),
-        parcel.readInt(),
-        parcel.readInt(),
-        parcel.readBundle(Bundle::class.java.classLoader) ?: Bundle.EMPTY,
-        StepStatus.valueOf(parcel.readString().orEmpty()),
-        parcel.readParcelable(Parcelable::class.java.classLoader)
-    )
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeInt(id)
-        parcel.writeInt(navigationActionId)
-        parcel.writeInt(destinationId)
-        parcel.writeBundle(payload)
-        parcel.writeString(status.name)
-        parcel.writeParcelable(result, flags)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<Step> {
-        override fun createFromParcel(parcel: Parcel): Step {
-            return Step(parcel)
-        }
-
-        override fun newArray(size: Int): Array<Step?> {
-            return arrayOfNulls(size)
-        }
-    }
+    var result: Serializable? = null,
+) : Serializable {
+    val type
+        get() = this::class.java.simpleName
 }
 
 enum class StepStatus {
@@ -53,3 +38,27 @@ enum class StepStatus {
     IN_PROGRESS,
     COMPLETED,
 }
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = LoginResult::class, name = "LoginResult"),
+    JsonSubTypes.Type(value = SetupResult::class, name = "SetupResult"),
+    JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
+    JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
+    JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
+    JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
+    JsonSubTypes.Type(value = FingerprintMatchResult.Item::class, name = "FingerprintMatchResult.Item"),
+    JsonSubTypes.Type(value = FaceConfigurationResult::class, name = "FaceConfigurationResult"),
+    JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
+    JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
+    JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
+    JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
+    JsonSubTypes.Type(value = FetchSubjectResult::class, name = "FetchSubjectResult"),
+    JsonSubTypes.Type(value = SelectSubjectResult::class, name = "SelectSubjectResult"),
+    JsonSubTypes.Type(value = AlertResult::class, name = "AlertResult"),
+    JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
+)
+abstract class SerializableMixin : Serializable
+
+val Serializable.type
+    get() = this::class.java.simpleName

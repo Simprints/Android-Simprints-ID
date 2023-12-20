@@ -5,7 +5,8 @@ internal data class CollectFingerprintsState(
     val currentFingerIndex: Int,
     val isAskingRescan: Boolean,
     val isShowingConfirmDialog: Boolean,
-    val isShowingSplashScreen: Boolean
+    val isShowingSplashScreen: Boolean,
+    val isShowingConnectionScreen: Boolean,
 ) {
 
     fun currentFingerState(): FingerState = fingerStates[currentFingerIndex]
@@ -18,7 +19,8 @@ internal data class CollectFingerprintsState(
             currentFingerIndex = 0,
             isAskingRescan = false,
             isShowingConfirmDialog = false,
-            isShowingSplashScreen = false
+            isShowingSplashScreen = false,
+            isShowingConnectionScreen = false,
         )
     }
 }

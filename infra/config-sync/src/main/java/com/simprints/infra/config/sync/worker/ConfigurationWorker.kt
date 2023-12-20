@@ -6,9 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.sync.ConfigManager
-import com.simprints.infra.events.EventRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

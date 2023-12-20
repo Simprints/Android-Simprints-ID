@@ -1,7 +1,9 @@
 package com.simprints.core.domain.fingerprint
 
+import androidx.annotation.Keep
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 
+@Keep
 @ExcludedFromGeneratedTestCoverageReports("Enum")
 enum class IFingerIdentifier {
     RIGHT_5TH_FINGER,

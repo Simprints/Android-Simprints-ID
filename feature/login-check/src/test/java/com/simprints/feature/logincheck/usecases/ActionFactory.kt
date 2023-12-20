@@ -17,7 +17,7 @@ internal object ActionFactory {
         projectId = MOCK_PROJECT_ID,
         userId = MOCK_USER_ID,
         moduleId = MOCK_MODULE_ID,
-        unknownExtras = extras.toList(),
+        unknownExtras = extras,
         metadata = "",
     )
 
@@ -30,7 +30,7 @@ internal object ActionFactory {
         userId = MOCK_USER_ID,
         sessionId = "sessionId",
         selectedGuid = "selectedGuid",
-        unknownExtras = emptyList()
+        unknownExtras = emptyMap()
     )
 
     val MOCK_USER_ID = "userId".asTokenizableRaw()

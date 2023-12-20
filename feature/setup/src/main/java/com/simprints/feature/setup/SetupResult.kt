@@ -1,11 +1,9 @@
 package com.simprints.feature.setup
 
-import android.os.Parcelable
 import androidx.annotation.Keep
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 @Keep
-@Parcelize
 data class SetupResult(
-    val permissionGranted: Boolean,
-) : Parcelable
+    val permissionGranted: Boolean
+) : Serializable
