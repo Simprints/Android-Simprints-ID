@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Parcelable
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
@@ -9,6 +8,7 @@ import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.infra.orchestration.data.responses.AppResponse
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
+import java.io.Serializable
 import javax.inject.Inject
 
 internal class CreateIdentifyResponseUseCase @Inject constructor(
@@ -17,7 +17,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
 
     suspend operator fun invoke(
         projectConfiguration: ProjectConfiguration,
-        results: List<Parcelable>,
+        results: List<Serializable>,
     ): AppResponse {
         val currentSessionId = eventRepository.getCurrentCaptureSessionEvent().id
 
@@ -44,7 +44,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
 
     private fun getFingerprintResults(
         fingerprintDecisionPolicy: DecisionPolicy?,
-        results: List<Parcelable>,
+        results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
     ) = if (fingerprintDecisionPolicy != null) {
         val matches = results.filterIsInstance(FingerprintMatchResult::class.java).lastOrNull()?.results.orEmpty()
@@ -61,7 +61,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
 
     private fun getFaceMatchResults(
         faceDecisionPolicy: DecisionPolicy?,
-        results: List<Parcelable>,
+        results: List<Serializable>,
         projectConfiguration: ProjectConfiguration,
     ) = if (faceDecisionPolicy != null) {
         val matches = results.filterIsInstance(FaceMatchResult::class.java).lastOrNull()?.results.orEmpty()

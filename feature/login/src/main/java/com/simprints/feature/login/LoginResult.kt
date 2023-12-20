@@ -1,15 +1,13 @@
 package com.simprints.feature.login
 
-import android.os.Parcelable
 import androidx.annotation.Keep
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
 @Keep
-@Parcelize
 data class LoginResult(
     val isSuccess: Boolean,
     val error: LoginError? = null,
-) : Parcelable
+) : Serializable
 
 @Keep
 enum class LoginError {

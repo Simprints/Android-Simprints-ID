@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Parcelable
 import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.config.store.models.ProjectConfiguration
@@ -10,13 +9,14 @@ import com.simprints.infra.orchestration.data.responses.AppResponse
 import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
+import java.io.Serializable
 import javax.inject.Inject
 
 internal class CreateVerifyResponseUseCase @Inject constructor() {
 
     operator fun invoke(
         projectConfiguration: ProjectConfiguration,
-        results: List<Parcelable>,
+        results: List<Serializable>,
     ): AppResponse = listOfNotNull(
         getFingerprintMatchResults(
             projectConfiguration.fingerprint?.bioSdkConfiguration?.decisionPolicy,
@@ -29,7 +29,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
 
     private fun getFingerprintMatchResults(
         faceDecisionPolicy: DecisionPolicy?,
-        results: List<Parcelable>,
+        results: List<Serializable>,
     ) = if (faceDecisionPolicy != null) {
         results.filterIsInstance(FingerprintMatchResult::class.java)
             .lastOrNull()
@@ -40,7 +40,7 @@ internal class CreateVerifyResponseUseCase @Inject constructor() {
 
     private fun getFaceMatchResults(
         faceDecisionPolicy: DecisionPolicy?,
-        results: List<Parcelable>,
+        results: List<Serializable>,
     ) = if (faceDecisionPolicy != null) {
         results.filterIsInstance(FaceMatchResult::class.java)
             .lastOrNull()

@@ -17,6 +17,10 @@ object JsonHelper {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 
+    fun addMixin(target: Class<*>, mixinSource: Class<*>) {
+        jackson.addMixIn(target, mixinSource)
+    }
+
     fun toJson(any: Any): String {
         return jackson.writeValueAsString(any)
     }

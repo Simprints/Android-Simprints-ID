@@ -1,10 +1,10 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Bundle
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.feature.selectsubject.SelectSubjectResult
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -21,7 +21,7 @@ class CreateConfirmIdentityResponseUseCaseTest {
     fun `Converts correct results to response`() {
         assertThat(useCase(listOf(
             SelectSubjectResult(true),
-            Bundle(),
+            mockk(),
         ))).isInstanceOf(AppConfirmationResponse::class.java)
     }
 

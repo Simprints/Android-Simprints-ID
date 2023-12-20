@@ -1,11 +1,10 @@
 package com.simprints.infra.orchestration.data.results
 
 import android.os.Bundle
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import java.io.Serializable
 
-@Parcelize
+//TODO: Keep?
 data class AppResult(
     val resultCode: Int,
     val extras: Bundle,
-) : Parcelable
+) : Serializable

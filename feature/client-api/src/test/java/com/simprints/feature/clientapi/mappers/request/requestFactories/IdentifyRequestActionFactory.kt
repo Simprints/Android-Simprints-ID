@@ -23,7 +23,7 @@ internal object IdentifyRequestActionFactory : RequestActionFactory() {
         moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
         userId = MOCK_USER_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
-        unknownExtras = emptyList()
+        unknownExtras = emptyMap()
     )
 
     override fun getValidator(extractor: ActionRequestExtractor): IdentifyValidator =

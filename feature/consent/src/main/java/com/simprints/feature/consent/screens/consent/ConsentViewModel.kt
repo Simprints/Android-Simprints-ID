@@ -1,6 +1,5 @@
 package com.simprints.feature.consent.screens.consent
 
-import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,6 +25,7 @@ import com.simprints.infra.resources.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,9 +48,9 @@ internal class ConsentViewModel @Inject constructor(
         get() = _showExitForm
     private val _showExitForm = MutableLiveData<LiveDataEventWithContent<ExitFormConfigurationBuilder>>()
 
-    val returnConsentResult: LiveData<LiveDataEventWithContent<Parcelable>>
+    val returnConsentResult: LiveData<LiveDataEventWithContent<Serializable>>
         get() = _returnConsentResult
-    private val _returnConsentResult = MutableLiveData<LiveDataEventWithContent<Parcelable>>()
+    private val _returnConsentResult = MutableLiveData<LiveDataEventWithContent<Serializable>>()
 
     fun loadConfiguration(consentType: ConsentType) {
         viewModelScope.launch {

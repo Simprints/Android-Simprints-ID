@@ -4,7 +4,6 @@ import android.os.Parcelable
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
-import javax.annotation.processing.Generated
 
 @Parcelize
 @ExcludedFromGeneratedTestCoverageReports("Data class with generated code")

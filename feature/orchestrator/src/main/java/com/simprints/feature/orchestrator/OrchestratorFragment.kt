@@ -1,7 +1,6 @@
 package com.simprints.feature.orchestrator
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -43,6 +42,7 @@ import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.matcher.MatchContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import javax.inject.Inject
 
 /**
@@ -113,7 +113,7 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(FetchSubjectContract.DESTINATION, orchestratorVm::handleResult)
     }
 
-    private fun <T : Parcelable> handleResult(destination: Int, block: (T) -> Unit) {
+    private fun <T : Serializable> handleResult(destination: Int, block: (T) -> Unit) {
         findNavController().handleResult(viewLifecycleOwner, R.id.orchestratorRootFragment, destination, block)
     }
 
