@@ -198,10 +198,17 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     }
 
     private fun launchConnection() {
-        findNavController().navigate(
-            R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
-            FingerprintConnectContract.getArgs(true)
-        )
+        //If we exit from the ConnectScanner screen, we first resume the capture screen. This leads
+        //to a crash because a second navigation to ConnectScanner is attempted but by the time it's
+        // executed we are already on the exit screen.
+        try {
+            findNavController().navigate(
+                R.id.action_fingerprintCaptureFragment_to_graphConnectScanner,
+                FingerprintConnectContract.getArgs(true)
+            )
+        } catch (e: Exception) {
+            Simber.tag(FINGER_CAPTURE.name).i("Error launching scanner connection screen", e)
+        }
     }
 
     override fun onResume() {
