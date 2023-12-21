@@ -102,6 +102,8 @@ class Scanner(
         }
     }
 
+    fun isConnected() = state.connected
+
     private fun assertConnected() = Completable.fromAction {
         if (!state.connected) {
             throw NotConnectedException("Attempting to access functionality before calling Scanner::connect()")

@@ -19,6 +19,8 @@ internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(
             val projectConfiguration = configManager.getProjectConfiguration()
             currentSessionEvent.updateProjectId(signedProjectId)
             currentSessionEvent.updateModalities(projectConfiguration.general.modalities)
+            val deviceConfiguration = configManager.getDeviceConfiguration()
+            currentSessionEvent.updateLanguage(deviceConfiguration.language)
             eventRepository.addOrUpdateEvent(currentSessionEvent)
         }
 

@@ -1,6 +1,5 @@
 package com.simprints.matcher.screen
 
-import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,6 +17,7 @@ import com.simprints.matcher.usecases.SaveMatchEventUseCase
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import javax.inject.Inject
 
 
@@ -33,9 +33,9 @@ internal class MatchViewModel @Inject constructor(
         get() = _matchState
     private val _matchState = MutableLiveData<MatchState>(MatchState.NotStarted)
 
-    val matchResponse: LiveData<LiveDataEventWithContent<Parcelable>>
+    val matchResponse: LiveData<LiveDataEventWithContent<Serializable>>
         get() = _matchResponse
-    private val _matchResponse = MutableLiveData<LiveDataEventWithContent<Parcelable>>()
+    private val _matchResponse = MutableLiveData<LiveDataEventWithContent<Serializable>>()
 
     fun setupMatch(params: MatchParams) = viewModelScope.launch {
         val startTime = timeHelper.now()

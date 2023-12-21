@@ -26,5 +26,5 @@ internal abstract class ActionRequestExtractor(private val extras: Map<String, A
 
     protected open fun Intent.extractString(key: String): String = this.getStringExtra(key) ?: ""
 
-    open fun getUnknownExtras(): List<Pair<String, Any?>> = extras.filter { it.key.isNotBlank() && !expectedKeys.contains(it.key) }.toList()
+    open fun getUnknownExtras(): Map<String, Any?> = extras.filter { it.key.isNotBlank() && !expectedKeys.contains(it.key) }
 }

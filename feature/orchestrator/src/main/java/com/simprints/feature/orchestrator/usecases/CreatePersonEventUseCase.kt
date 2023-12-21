@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases
 
-import android.os.Parcelable
 import com.simprints.core.domain.face.FaceSample
 import com.simprints.core.domain.face.uniqueId
 import com.simprints.core.domain.fingerprint.FingerprintSample
@@ -14,6 +13,7 @@ import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import kotlinx.coroutines.flow.toList
+import java.io.Serializable
 import javax.inject.Inject
 
 internal class CreatePersonEventUseCase @Inject constructor(
@@ -22,7 +22,7 @@ internal class CreatePersonEventUseCase @Inject constructor(
     private val encodingUtils: EncodingUtils,
 ) {
 
-    suspend operator fun invoke(results: List<Parcelable>) {
+    suspend operator fun invoke(results: List<Serializable>) {
         val currentSessionId = eventRepository.getCurrentCaptureSessionEvent().id
         val sessionEvents = eventRepository.observeEventsFromSession(currentSessionId).toList()
 
@@ -47,13 +47,13 @@ internal class CreatePersonEventUseCase @Inject constructor(
         }
     }
 
-    private fun extractFaceSamples(responses: List<Parcelable>) = responses
+    private fun extractFaceSamples(responses: List<Serializable>) = responses
         .filterIsInstance<FaceCaptureResult>()
         .flatMap { it.results }
         .mapNotNull { it.sample }
         .map { FaceSample(it.template, it.format) }
 
-    private fun extractFingerprintSamples(responses: List<Parcelable>) = responses
+    private fun extractFingerprintSamples(responses: List<Serializable>) = responses
         .filterIsInstance<FingerprintCaptureResult>()
         .flatMap { it.results }
         .mapNotNull { it.sample }

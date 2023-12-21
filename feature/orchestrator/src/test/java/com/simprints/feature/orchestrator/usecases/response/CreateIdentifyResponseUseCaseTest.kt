@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases.response
 
-import android.os.Parcelable
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.models.DecisionPolicy
 import com.simprints.infra.events.EventRepository
@@ -15,6 +14,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import java.io.Serializable
 
 class CreateIdentifyResponseUseCaseTest {
 
@@ -192,11 +192,11 @@ class CreateIdentifyResponseUseCaseTest {
         assertThat(result.identifications.map { it.confidenceScore }).isEqualTo(listOf(105))
     }
 
-    private fun createFaceMatchResult(vararg confidences: Float): Parcelable = FaceMatchResult(
+    private fun createFaceMatchResult(vararg confidences: Float): Serializable = FaceMatchResult(
         confidences.map { FaceMatchResult.Item(subjectId = "1", confidence = it) }
     )
 
-    private fun createFingerprintMatchResult(vararg confidences: Float): Parcelable = FingerprintMatchResult(
+    private fun createFingerprintMatchResult(vararg confidences: Float): Serializable = FingerprintMatchResult(
         confidences.map { FingerprintMatchResult.Item(subjectId = "1", confidence = it) }
     )
 }

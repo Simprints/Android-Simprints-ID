@@ -140,7 +140,7 @@ internal class ConnectScannerViewModel @Inject constructor(
     }
 
     private suspend fun disconnectVero() {
-        if (scannerManager.isScannerAvailable) {
+        if (scannerManager.isScannerConnected) {
             _currentStep.postValue(Step.DisconnectScanner)
             scannerManager.scanner.disconnect()
             logMessageForCrashReport("ScannerManager: disconnect")

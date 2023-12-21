@@ -18,7 +18,7 @@ internal class ImageUpSyncSchedulerImpl @Inject constructor(
      override fun scheduleImageUpSync() {
         workManager.enqueueUniquePeriodicWork(
             WORK_NAME,
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             buildWork()
         )
     }

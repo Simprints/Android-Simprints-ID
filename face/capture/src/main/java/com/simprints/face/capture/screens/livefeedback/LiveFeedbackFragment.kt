@@ -61,12 +61,14 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
         //Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
-            vm.initFrameProcessor(
-                mainVm.samplesToCapture, mainVm.attemptNumber,
-                binding.captureOverlay.rectInCanvas,
-                Size(binding.captureOverlay.width, binding.captureOverlay.height),
-            )
-            setUpCamera()
+            if (getView() != null) {
+                vm.initFrameProcessor(
+                    mainVm.samplesToCapture, mainVm.attemptNumber,
+                    binding.captureOverlay.rectInCanvas,
+                    Size(binding.captureOverlay.width, binding.captureOverlay.height),
+                )
+                setUpCamera()
+            }
         }
     }
 
