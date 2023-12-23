@@ -1,5 +1,5 @@
 package com.simprints.infra.images.model
 
-import android.os.Parcelable
+import java.io.Serializable
 
-abstract class ImageRef(open val relativePath: Path) : Parcelable
+abstract class ImageRef(open val relativePath: Path) : Serializable

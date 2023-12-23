@@ -1,6 +1,7 @@
 package com.simprints.feature.orchestrator.cache
 
 import android.os.Bundle
+import androidx.annotation.Keep
 import androidx.core.content.edit
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -8,9 +9,9 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.orchestrator.steps.SerializableMixin
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.infra.security.SecurityManager
-import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
+import java.io.Serializable
 
 @Singleton
 internal class OrchestratorCache @Inject constructor(
@@ -33,7 +34,7 @@ internal class OrchestratorCache @Inject constructor(
                     jsonHelper.fromJson(
                         json = it,
                         module = stepsModule,
-                        type = object : TypeReference<List<Step>>() {}
+                        type =  StepsTypeReference
                     )
                 }
                 ?: emptyList()
@@ -54,3 +55,6 @@ internal class OrchestratorCache @Inject constructor(
         }
     }
 }
+
+@Keep
+internal object StepsTypeReference : TypeReference<List<Step>?>()
