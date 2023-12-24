@@ -34,7 +34,7 @@ internal class OrchestratorCache @Inject constructor(
                     jsonHelper.fromJson(
                         json = it,
                         module = stepsModule,
-                        type =  StepsTypeReference
+                        type =  object : TypeReference<List<Step>>() {},
                     )
                 }
                 ?: emptyList()
@@ -55,6 +55,3 @@ internal class OrchestratorCache @Inject constructor(
         }
     }
 }
-
-@Keep
-internal object StepsTypeReference : TypeReference<List<Step>?>()
