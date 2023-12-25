@@ -21,7 +21,6 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@Ignore("Jackson behaves differently in testing than in production, to be fixed later")
 @RunWith(AndroidJUnit4::class)
 class OrchestratorCacheIntegrationTest {
 

@@ -25,7 +25,7 @@ internal class OrchestratorCache @Inject constructor(
         set(value) {
             prefs.edit(commit = true) {
                 jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
-                putString(KEY_STEPS, jsonHelper.toJson(value))
+                putString(KEY_STEPS, jsonHelper.toJson(value, stepsModule))
             }
         }
         get() = prefs.getString(KEY_STEPS, null)
