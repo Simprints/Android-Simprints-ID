@@ -25,7 +25,6 @@ internal class OrchestratorCache @Inject constructor(
             jsonHelper.toJson(it, module = stepsModule)
         }.let { "[$it]" }
     }
-
     var steps: List<Step>
         set(value) {
             prefs.edit(commit = true) {
