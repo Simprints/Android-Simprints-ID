@@ -1,6 +1,6 @@
 package com.simprints.infra.images.model
 
-import kotlinx.parcelize.Parcelize
+import com.google.errorprone.annotations.Keep
 
-@Parcelize
+@Keep
 data class SecuredImageRef(override val relativePath: Path) : ImageRef(relativePath)

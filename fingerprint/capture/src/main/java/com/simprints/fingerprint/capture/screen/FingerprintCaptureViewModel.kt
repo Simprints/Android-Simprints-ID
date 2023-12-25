@@ -213,6 +213,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun pauseLiveFeedback() {
+        // if live feedback is not supported, or if it is already paused, do nothing
+        if (liveFeedbackState == null || liveFeedbackState == LiveFeedbackState.PAUSE) return
+
         Simber.tag(FINGER_CAPTURE.name).i("pauseLiveFeedback")
         liveFeedbackState = LiveFeedbackState.PAUSE
         liveFeedbackTask?.cancel()

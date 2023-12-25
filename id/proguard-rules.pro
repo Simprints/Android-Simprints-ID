@@ -116,6 +116,11 @@
 -keepnames class com.fasterxml.jackson.** { *; }
 -dontwarn com.fasterxml.jackson.databind.**
 
+#Keep all TypeReferences to preserve generic types
+-keep class * extends com.fasterxml.jackson.core.type.TypeReference {
+    public <init>(java.lang.reflect.Type);
+}
+
 #net.zetetic:android-database-sqlcipher
 -keep class net.sqlcipher.** { *; }
 
