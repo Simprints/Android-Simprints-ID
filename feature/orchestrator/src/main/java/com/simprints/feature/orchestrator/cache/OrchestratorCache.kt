@@ -1,7 +1,6 @@
 package com.simprints.feature.orchestrator.cache
 
 import android.os.Bundle
-import androidx.annotation.Keep
 import androidx.core.content.edit
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -9,9 +8,9 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.feature.orchestrator.steps.SerializableMixin
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.infra.security.SecurityManager
+import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Singleton
-import java.io.Serializable
 
 @Singleton
 internal class OrchestratorCache @Inject constructor(
@@ -20,24 +19,29 @@ internal class OrchestratorCache @Inject constructor(
 ) {
 
     private val prefs = securityManager.buildEncryptedSharedPreferences(ORCHESTRATION_CACHE)
+    private fun List<Step>.asJsonArray(jsonHelper: JsonHelper): String = with(jsonHelper) {
+        addMixin(Serializable::class.java, SerializableMixin::class.java)
+        return@with joinToString(separator = ",") {
+            jsonHelper.toJson(it, module = stepsModule)
+        }.let { "[$it]" }
+    }
 
     var steps: List<Step>
         set(value) {
             prefs.edit(commit = true) {
-                jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
-                putString(KEY_STEPS, jsonHelper.toJson(value))
+                putString(KEY_STEPS, value.asJsonArray(jsonHelper))
             }
         }
         get() = prefs.getString(KEY_STEPS, null)
-                ?.let {
-                    jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
-                    jsonHelper.fromJson(
-                        json = it,
-                        module = stepsModule,
-                        type =  object : TypeReference<List<Step>>() {},
-                    )
-                }
-                ?: emptyList()
+            ?.let { jsonArray ->
+                jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
+                jsonHelper.fromJson(
+                    json = jsonArray,
+                    module = stepsModule,
+                    type = object : TypeReference<List<Step>>() {},
+                )
+            }
+            ?: emptyList()
 
     fun clearSteps() {
         prefs.edit(commit = true) {

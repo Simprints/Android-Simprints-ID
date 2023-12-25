@@ -32,6 +32,8 @@ class BundleDeserializer : JsonDeserializer<Bundle>() {
     ): Bundle {
         val mapType = ctxt.typeFactory.constructMapType(Map::class.java, String::class.java, Any::class.java)
         val map: Map<String, Any> = ctxt.readValue(p, mapType)
-        return bundleOf(*map.toList().toTypedArray())
+        // Serializer adds a 'type' key-value pair for unmarshalling purposes. Removing this artifact.
+        val filteredMap = map.filterKeys { key -> key != "type" }
+        return bundleOf(*filteredMap.toList().toTypedArray())
     }
 }

@@ -29,11 +29,20 @@ import java.io.Serializable
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
     JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
-    JsonSubTypes.Type(value = FingerprintCaptureResult.Item::class, name = "FingerprintCaptureResult.Item"),
-    JsonSubTypes.Type(value = FingerprintCaptureResult.Sample::class, name = "FingerprintCaptureResult.Sample"),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureResult.Item::class,
+        name = "FingerprintCaptureResult.Item"
+    ),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureResult.Sample::class,
+        name = "FingerprintCaptureResult.Sample"
+    ),
 
     JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
-    JsonSubTypes.Type(value = FingerprintMatchResult.Item::class, name = "FingerprintMatchResult.Item"),
+    JsonSubTypes.Type(
+        value = FingerprintMatchResult.Item::class,
+        name = "FingerprintMatchResult.Item"
+    ),
 
     JsonSubTypes.Type(value = FaceConfigurationResult::class, name = "FaceConfigurationResult"),
     JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
@@ -48,6 +57,7 @@ import java.io.Serializable
     JsonSubTypes.Type(value = AlertResult::class, name = "AlertResult"),
     JsonSubTypes.Type(value = ExitFormResult::class, name = "ExitFormResult"),
 )
+abstract class SerializableMixin : Serializable
 
 @Keep
 internal data class Step(
@@ -58,6 +68,8 @@ internal data class Step(
     var status: StepStatus = StepStatus.NOT_STARTED,
     var result: Serializable? = null,
 ) : Serializable {
+    // Do not remove.
+    // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
     val type
         get() = this::class.java.simpleName
 }
@@ -68,8 +80,3 @@ enum class StepStatus {
     IN_PROGRESS,
     COMPLETED,
 }
-
-abstract class SerializableMixin : Serializable
-
-val Serializable.type
-    get() = this::class.java.simpleName
