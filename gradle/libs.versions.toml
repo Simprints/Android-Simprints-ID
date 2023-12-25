@@ -1,5 +1,5 @@
 [versions]
-kotlin_version = "1.9.21"
+kotlin_version = "1.9.22"
 kotlin_coroutine_version = "1.7.3"
 
 android_gradlePlugin_version = "8.2.0"
