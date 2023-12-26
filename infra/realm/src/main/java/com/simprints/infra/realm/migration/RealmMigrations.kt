@@ -71,36 +71,9 @@ internal class RealmMigrations : AutomaticSchemaMigration {
        the tables and then set ID fields as primary keys.
      */
     private fun migrateTo12(migrationContext: AutomaticSchemaMigration.MigrationContext) {
-        deleteOrphanedSamples(migrationContext)
         updateDuplicatedSampleIds(migrationContext)
     }
 
-    private fun deleteOrphanedSamples(migrationContext: AutomaticSchemaMigration.MigrationContext) {
-        val oldRealm = migrationContext.oldRealm
-        val newRealm = migrationContext.newRealm
-
-        val fingerSamplesWithParents = mutableSetOf<String>()
-        val faceSamplesWithParents = mutableSetOf<String>()
-
-        // Through the subjects table save sample IDs with parents
-        oldRealm.query(SubjectsSchemaV10.SUBJECT_TABLE).find().forEach { subject ->
-            subject.getValueList<DbFingerprintSample>(SubjectsSchemaV10.PERSON_FINGERPRINT_SAMPLES)
-                .forEach { faceSample -> fingerSamplesWithParents.add(faceSample.id) }
-
-            subject.getValueList<DbFaceSample>(SubjectsSchemaV10.PERSON_FACE_SAMPLES)
-                .forEach { faceSample -> faceSamplesWithParents.add(faceSample.id) }
-        }
-
-        // Delete all orphans (kind of mean thing to do but needed nonetheless :) )
-        val orphanFingers = oldRealm
-            .query(SubjectsSchemaV11.FINGERPRINT_TABLE, "id IN NONE $0", fingerSamplesWithParents)
-            .find()
-        newRealm.delete(orphanFingers)
-        val orphanFaces = oldRealm
-            .query(SubjectsSchemaV11.FACE_TABLE, "id IN NONE $0", faceSamplesWithParents)
-            .find()
-        newRealm.delete(orphanFaces)
-    }
 
     // In some projects there are duplicate records that are not orphans. Reason is still unclear
     // but probably two subjects point to the same sample id which is inserted twice in the table
