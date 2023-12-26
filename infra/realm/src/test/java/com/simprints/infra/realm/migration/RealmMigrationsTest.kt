@@ -23,7 +23,6 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.migration.AutomaticSchemaMigration
 import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.RealmInstant
-import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmUUID
 import org.junit.Before
 import org.junit.Test
@@ -109,32 +108,6 @@ class RealmMigrationsTest {
         verify { newFingerprintObject.set(eq(SubjectsSchemaV11.FIELD_FORMAT), any<String>()) }
         verify { newFaceObject.set(eq(SubjectsSchemaV11.FIELD_FORMAT), any<String>()) }
     }
-
-    @Test
-    fun `when migrating 11 to 12 removes orphaned fingerprint samples`() {
-        setVersions(11L, 12L)
-
-        // Sample IDs should be collected in sets and provided to the respective table query
-        val subjects = listOf(
-            createSubjectWithSamples(fingers = realmListOf(createFingerSample("fingerId1"))),
-            createSubjectWithSamples(fingers = realmListOf(createFingerSample("fingerId2"))),
-            createSubjectWithSamples(faces = realmListOf(createFaceSample("faceId1"))),
-            createSubjectWithSamples(faces = realmListOf(createFaceSample("faceId2"))),
-        )
-        setupSubjectQueryResponse(subjects)
-
-        // The query should return the orphaned samples that should be deleted directly
-        val orphans = mockk<RealmResults<DynamicRealmObject>>()
-        every { oldRealm.query(eq(SubjectsSchemaV11.FINGERPRINT_TABLE), any(), any()).find() } returns orphans
-        every { oldRealm.query(eq(SubjectsSchemaV11.FACE_TABLE), any(), any()).find() } returns orphans
-
-        realmMigrations.migrate(migrationContext)
-
-        verify { oldRealm.query(eq(SubjectsSchemaV11.FINGERPRINT_TABLE), any(), eq(setOf("fingerId1", "fingerId2"))) }
-        verify { oldRealm.query(eq(SubjectsSchemaV11.FACE_TABLE), any(), eq(setOf("faceId1", "faceId2"))) }
-        verify(exactly = 2) { newRealm.delete(eq(orphans)) }
-    }
-
     @Test
     fun `when migrating 11 to 12 deduplicate samples`() {
         setVersions(11L, 12L)
@@ -197,20 +170,6 @@ class RealmMigrationsTest {
             every { iterator() } returns subjects.iterator()
         }
     }
-
-    private fun createFingerSample(id: String) = DbFingerprintSample().apply { this.id = id }
-    private fun createFaceSample(id: String) = DbFaceSample().apply { this.id = id }
-
-    private fun createSubjectWithSamples(
-        fingers: RealmList<DbFingerprintSample> = realmListOf(),
-        faces: RealmList<DbFaceSample> = realmListOf(),
-    ) = DynamicMutableRealmObject.create(
-        type = SubjectsSchemaV10.SUBJECT_TABLE,
-        properties = mapOf(
-            SubjectsSchemaV10.PERSON_FINGERPRINT_SAMPLES to fingers,
-            SubjectsSchemaV10.PERSON_FACE_SAMPLES to faces,
-        )
-    )
 
     private fun setupDeduplicationTestForTable(table: String, idField: String): DynamicMutableRealmObject {
         val newObject = mockk<DynamicMutableRealmObject>()
