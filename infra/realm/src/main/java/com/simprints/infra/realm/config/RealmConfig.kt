@@ -31,7 +31,10 @@ class RealmConfig @Inject constructor() {
         )
         .name("$databaseName.realm")
         .schemaVersion(REALM_SCHEMA_VERSION)
-        .migration(RealmMigrations())
+        .migration(
+            migration = RealmMigrations(),
+            resolveEmbeddedObjectConstraints = true // Delete embedded objects if they are not in the schema anymore
+        )
         .let { if (BuildConfig.DB_ENCRYPTION) it.encryptionKey(key) else it }
         .build()
 
