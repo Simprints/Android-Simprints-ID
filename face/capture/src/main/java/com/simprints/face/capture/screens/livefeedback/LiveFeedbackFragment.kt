@@ -122,7 +122,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     override fun onStop() {
         // Shut down our background executor
-        cameraExecutor.shutdown()
+        if(::cameraExecutor.isInitialized) {
+            cameraExecutor.shutdown()
+        }
         super.onStop()
     }
 
