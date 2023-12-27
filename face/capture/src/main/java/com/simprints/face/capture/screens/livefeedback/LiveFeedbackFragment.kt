@@ -1,8 +1,11 @@
 package com.simprints.face.capture.screens.livefeedback
 
+import android.Manifest
 import android.os.Bundle
 import android.util.Size
 import android.view.View
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector.DEFAULT_BACK_CAMERA
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
@@ -17,13 +20,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.work.await
+import com.simprints.core.tools.extentions.hasPermission
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.face.capture.screens.FaceCaptureViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
@@ -50,8 +54,32 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private lateinit var screenSize: Size
 
+
+    private val launchPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (!granted) {
+            Simber.i("Camera Permission not granted")
+            Toast.makeText(
+                requireContext(),
+                IDR.string.face_capturing_permission_denied,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        // init fragment anyway
+        initFragment()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (requireActivity().hasPermission(Manifest.permission.CAMERA)) {
+            initFragment()
+        } else {
+            launchPermissionRequest.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    private fun initFragment() {
         screenSize = with(resources.displayMetrics) { Size(widthPixels, widthPixels) }
 
         bindViewModel()
@@ -61,7 +89,7 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
         //Wait till the views gets its final size then init frame processor and setup the camera
         binding.faceCaptureCamera.post {
-            if (getView() != null) {
+            if (view != null) {
                 vm.initFrameProcessor(
                     mainVm.samplesToCapture, mainVm.attemptNumber,
                     binding.captureOverlay.rectInCanvas,
@@ -169,7 +197,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
         binding.apply {
             captureProgress.isVisible = true
             captureTitle.text = getString(IDR.string.face_capture_capturing_title)
-            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_prep_begin_button_capturing)
+            captureFeedbackTxtTitle.text =
+                getString(IDR.string.face_capture_prep_begin_button_capturing)
         }
         toggleCaptureButtons(false)
     }
@@ -188,7 +217,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     private fun renderValidCapturingFace() {
         binding.apply {
-            captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_prep_begin_button_capturing)
+            captureFeedbackTxtTitle.text =
+                getString(IDR.string.face_capture_prep_begin_button_capturing)
             captureFeedbackTxtExplanation.text = getString(IDR.string.face_capture_hold)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(
@@ -238,7 +268,8 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
     private fun renderFaceNotStraight() {
         binding.apply {
             captureFeedbackTxtTitle.text = getString(IDR.string.face_capture_title_look_straight)
-            captureFeedbackTxtExplanation.text = getString(IDR.string.face_capture_error_look_straight)
+            captureFeedbackTxtExplanation.text =
+                getString(IDR.string.face_capture_error_look_straight)
 
             captureFeedbackTxtTitle.setCheckedWithLeftDrawable(false)
         }
