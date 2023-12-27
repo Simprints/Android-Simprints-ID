@@ -20,10 +20,10 @@ import androidx.work.await
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentLiveFeedbackBinding
 import com.simprints.face.capture.models.FaceDetection
+import com.simprints.face.capture.screens.FaceCaptureViewModel
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.view.setCheckedWithLeftDrawable
 import com.simprints.infra.uibase.viewbinding.viewBinding
-import com.simprints.face.capture.screens.FaceCaptureViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.ExecutorService
@@ -94,7 +94,9 @@ internal class LiveFeedbackFragment : Fragment(R.layout.fragment_live_feedback) 
 
     override fun onStop() {
         // Shut down our background executor
-        cameraExecutor.shutdown()
+        if(::cameraExecutor.isInitialized) {
+            cameraExecutor.shutdown()
+        }
         super.onStop()
     }
 
