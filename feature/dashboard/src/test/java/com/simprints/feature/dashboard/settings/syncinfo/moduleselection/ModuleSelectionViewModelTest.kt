@@ -11,11 +11,11 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -107,10 +107,9 @@ class ModuleSelectionViewModelTest {
     }
 
     @Test
-    fun `updateModuleSelection should throw a NoModuleSelectedException if trying to unselect the last selected module`() {
-        assertThrows<NoModuleSelectedException> {
-            viewModel.updateModuleSelection(Module("c".asTokenizableRaw(), true))
-        }
+    fun `updateModuleSelection should allow unselecting the last selected module`() {
+        viewModel.updateModuleSelection(Module("c".asTokenizableRaw(), true))
+        assertThat(viewModel.modulesList.getOrAwaitValue().none(Module::isSelected)).isTrue()
     }
 
     @Test
@@ -150,6 +149,14 @@ class ModuleSelectionViewModelTest {
         viewModel.updateModuleSelection(Module("a".asTokenizableRaw(), true))
 
         assertThat(viewModel.hasSelectionChanged()).isEqualTo(false)
+    }
+
+    @Test
+    fun `saveModules should throw NoModuleSelectedException if no modules is selected`() {
+        viewModel.updateModuleSelection(Module("c".asTokenizableRaw(), true))
+        assertThrows<NoModuleSelectedException> {
+            viewModel.saveModules()
+        }
     }
 
     @Test

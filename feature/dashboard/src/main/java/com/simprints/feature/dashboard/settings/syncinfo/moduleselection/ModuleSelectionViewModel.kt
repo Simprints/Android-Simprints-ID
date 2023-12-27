@@ -11,10 +11,10 @@ import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.excepti
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.Module
 import com.simprints.feature.dashboard.settings.syncinfo.moduleselection.repository.ModuleRepository
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -75,9 +75,6 @@ internal class ModuleSelectionViewModel @Inject constructor(
 
     fun updateModuleSelection(moduleToUpdate: Module) {
         val selectedModulesSize = getSelected().size
-        if (moduleToUpdate.isSelected && selectedModulesSize == 1)
-            throw NoModuleSelectedException()
-
         if (!moduleToUpdate.isSelected && selectedModulesSize == maxNumberOfModules)
             throw TooManyModulesSelectedException(maxNumberOfModules = maxNumberOfModules)
 
@@ -93,6 +90,10 @@ internal class ModuleSelectionViewModel @Inject constructor(
     fun hasSelectionChanged(): Boolean = modules != initialModules
 
     fun saveModules() {
+        val selectedModulesSize = getSelected().size
+        if (selectedModulesSize == 0)
+            throw NoModuleSelectedException()
+
         externalScope.launch {
             val modules = modules.map { module ->
                 val encryptedName = when (val name = module.name) {
