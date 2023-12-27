@@ -54,6 +54,7 @@ class EnrolmentRecordLocalDataSourceImplTest {
 
         val insertedSubject = slot<DbSubject>()
         every { mutableRealm.delete(any()) } answers { localSubjects.clear() }
+        every { mutableRealm.deleteAll() } answers { localSubjects.clear() }
         every { mutableRealm.copyToRealm(capture(insertedSubject), any()) } answers {
             localSubjects.add(insertedSubject.captured.fromDbToDomain())
             insertedSubject.captured
