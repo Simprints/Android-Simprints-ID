@@ -87,15 +87,16 @@
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
 
-    <plurals name="dashboard_activity_card_enrolments">
+    <!--Dashboard always excplicitly displays the number of activities, thus ignoring the ImpliedQuantity-->
+    <plurals name="dashboard_activity_card_enrolments" tools:ignore="ImpliedQuantity">
         <item quantity="one">شامل شدن</item>
         <item quantity="other">Enrolments</item>
     </plurals>
-    <plurals name="dashboard_activity_card_identifications">
+    <plurals name="dashboard_activity_card_identifications" tools:ignore="ImpliedQuantity">
         <item quantity="one">مشخص کردن</item>
         <item quantity="other">Identifications</item>
     </plurals>
-    <plurals name="dashboard_activity_card_verifications">
+    <plurals name="dashboard_activity_card_verifications" tools:ignore="ImpliedQuantity">
         <item quantity="one">تشخیص</item>
         <item quantity="other">Verifications</item>
     </plurals>
