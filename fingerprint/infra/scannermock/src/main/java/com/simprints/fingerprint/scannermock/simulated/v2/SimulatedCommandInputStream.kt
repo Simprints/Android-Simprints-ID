@@ -9,12 +9,14 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20C
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20MessageProtocol
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.CaptureFingerprintCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageDistortionConfigurationMatrixCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageQualityCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetImageQualityPreviewCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetSupportedImageFormatsCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetSupportedTemplateTypesCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetTemplateCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetUn20ExtendedAppVersionCommand
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.GetUnprocessedImageCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.commands.SetScanLedStateCommand
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.vero.VeroCommand
@@ -201,6 +203,8 @@ class SimulatedCommandInputStream {
                     Un20MessageType.GetSupportedImageFormats -> GetSupportedImageFormatsCommand.fromBytes(data)
                     is Un20MessageType.GetImage -> GetImageCommand.fromBytes(minorTypeByte, data)
                     Un20MessageType.GetImageQuality -> GetImageQualityCommand.fromBytes(data)
+                    is Un20MessageType.GetUnprocessedImage -> GetUnprocessedImageCommand.fromBytes(minorTypeByte,data)
+                    Un20MessageType.GetImageDistortionConfigurationMatrix -> GetImageDistortionConfigurationMatrixCommand.fromBytes(data)
                     Un20MessageType.StartOta,
                     Un20MessageType.WriteOtaChunk,
                     Un20MessageType.VerifyOta -> throw UnsupportedOperationException("Simulated Scanner does not support UN20 OTA")

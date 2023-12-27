@@ -2,7 +2,11 @@ package com.simprints.fingerprint.infra.scanner.capture
 
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireImageDistortionMatrixConfigurationResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireUnprocessedImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoImageDistortionConfigurationMatrixException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
@@ -22,15 +26,32 @@ internal class FingerprintCaptureWrapperV2(
     private val scannerUiHelper: ScannerUiHelper,
     private val ioDispatcher: CoroutineDispatcher,
 ) : FingerprintCaptureWrapper {
-    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse {
-        return withContext(ioDispatcher) {
+
+    override suspend fun acquireImageDistortionMatrixConfiguration(): AcquireImageDistortionMatrixConfigurationResponse =
+        withContext(ioDispatcher) {
+            scannerV2.acquireImageDistortionConfigurationMatrix()
+                .map { imageBytes ->
+                    AcquireImageDistortionMatrixConfigurationResponse(imageBytes)
+                }.switchIfEmpty(Single.error(NoImageDistortionConfigurationMatrixException()))
+                .wrapErrorsFromScanner().await()
+        }
+    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse =
+        withContext(ioDispatcher) {
             scannerV2.acquireImage(IMAGE_FORMAT).map { imageBytes ->
                 AcquireFingerprintImageResponse(imageBytes.image)
             }.switchIfEmpty(Single.error(NoFingerDetectedException())).wrapErrorsFromScanner()
                 .await()
         }
 
-    }
+
+    override suspend fun acquireUnprocessedImage(): AcquireUnprocessedImageResponse =
+        withContext(ioDispatcher) {
+            scannerV2.acquireUnprocessedImage(IMAGE_FORMAT)
+                .map { imageBytes ->
+                    AcquireUnprocessedImageResponse(RawUnprocessedImage(imageBytes.image))
+                }
+        }.switchIfEmpty(Single.error(NoFingerDetectedException())).wrapErrorsFromScanner().await()
+
 
     override suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,
