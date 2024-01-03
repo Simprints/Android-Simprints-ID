@@ -7,10 +7,13 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.simprints.core.ExternalScope
 import com.simprints.fingerprint.infra.scanner.BuildConfig
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -23,24 +26,27 @@ import javax.inject.Inject
  */
 class FirmwareFileUpdateScheduler @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val configManager: ConfigManager
+    private val configManager: ConfigManager,
+    @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
-    suspend fun scheduleOrCancelWorkIfNecessary() {
-        if (configManager.getProjectConfiguration().fingerprint?.allowedScanners?.contains(
-                FingerprintConfiguration.VeroGeneration.VERO_2
-            ) == true
-        ) {
-            scheduleWork()
-        } else {
-            cancelWork()
+    fun scheduleOrCancelWorkIfNecessary() {
+        externalScope.launch {
+            if (configManager.getProjectConfiguration().fingerprint?.allowedScanners?.contains(
+                    FingerprintConfiguration.VeroGeneration.VERO_2
+                ) == true
+            ) {
+                scheduleWork()
+            } else {
+                cancelWork()
+            }
         }
     }
 
     private fun scheduleWork() {
         WorkManager
             .getInstance(context)
-            .enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.REPLACE, buildWork())
+            .enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, buildWork())
     }
 
     private fun cancelWork() {
