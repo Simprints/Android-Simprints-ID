@@ -18,7 +18,7 @@ internal class ConfigurationWorker @AssistedInject constructor(
     private val configManager: ConfigManager
 ) : CoroutineWorker(context, params) {
 
-    private val tag = ConfigurationWorker::class.java.name
+    private val tag = "ConfigurationWorker"
 
     override suspend fun doWork(): Result = try {
         val projectId = authStore.signedInProjectId
