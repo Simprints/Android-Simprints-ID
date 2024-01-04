@@ -115,10 +115,10 @@ class CrashReportingTreeTest {
         val spyCrashReportingTree = spyk(CrashReportingTree(crashMock))
 
         Timber.plant(spyCrashReportingTree)
-        Simber.tag("Custom Tag", true).i("Test Message")
+        Simber.tag("Custom_Tag", true).i("Test Message")
 
         verify {
-            crashMock.setCustomKey("Custom Tag", "Test Message")
+            crashMock.setCustomKey("Custom_Tag", "Test Message")
         }
     }
 

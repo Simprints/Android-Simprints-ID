@@ -13,7 +13,7 @@ object LoggingConstants {
         const val PROJECT_ID = "Project_ID"
         const val MODULE_IDS = "Module_IDs"
         const val DEVICE_ID = "Device_ID"
-        const val SUBJECTS_DOWN_SYNC_TRIGGERS = "People_down_sync_triggers"
+        const val SUBJECTS_DOWN_SYNC_TRIGGERS = "Down_sync_triggers"
         const val SESSION_ID = "Session_ID"
     }
 

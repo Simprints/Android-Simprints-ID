@@ -20,6 +20,7 @@ import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -27,9 +28,13 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkObject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,6 +57,17 @@ class EventUpSyncUploaderWorkerTest {
         every { signedInProjectId } returns PROJECT_ID
     }
     private val upSyncTask = mockk<EventUpSyncTask>()
+
+    @Before
+    fun setUp() {
+        mockkObject(Simber)
+        every { Simber.i(ofType<String>()) } answers {}
+    }
+
+    @After
+    fun cleanUp() {
+        unmockkObject(Simber)
+    }
 
     @Test
     fun worker_shouldExecuteTheTask() = runTest {

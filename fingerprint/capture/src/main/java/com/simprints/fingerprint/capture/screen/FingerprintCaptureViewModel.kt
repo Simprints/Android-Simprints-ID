@@ -371,7 +371,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun handleCaptureFinished() = with(state) {
         Simber.tag(FINGER_CAPTURE.name)
-            .i("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
+            .i("Finger scanned - ${currentFingerState().id}")
         addCaptureAndBiometricEventsInSession()
         saveCurrentImageIfEager()
         if (captureHasSatisfiedTerminalCondition(currentCaptureState())) {
