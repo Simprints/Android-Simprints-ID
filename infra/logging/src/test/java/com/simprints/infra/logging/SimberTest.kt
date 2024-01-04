@@ -49,10 +49,12 @@ class SimberTest {
 
     @Test
     fun `in debug mode tag() throws an exception for tags longer than 40 characters`() {
-        val exception = kotlin.runCatching { Simber.tag("01234567890123456789012345678901234567890") }
+        val exception = kotlin.runCatching {
+            Simber.tag("01234567890123456789012345678901234567890", true)
+        }
 
         assertEquals(IllegalArgumentException::class.java, exception.exceptionOrNull()?.javaClass)
-        assertEquals("Tag must be less than 40 characters.", exception.exceptionOrNull()?.message)
+        assertEquals("String must be less than 40 characters.", exception.exceptionOrNull()?.message)
     }
 
     @Test

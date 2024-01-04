@@ -15,6 +15,7 @@ import javax.net.ssl.SSLProtocolException
 object Simber {
 
     internal const val USER_PROPERTY_TAG = "zzUserPropertyTag"
+    private const val FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH = 100
 
     /**
      * Use this when you want to go absolutely nuts with your logging. If for some reason you've
@@ -24,7 +25,9 @@ object Simber {
      * RELEASE: Is ignored
      */
     fun v(t: Throwable) = Timber.v(t)
+
     fun v(message: String, vararg args: Any?) = Timber.v(message, *args)
+
     fun v(t: Throwable, message: String, args: Any? = null) = Timber.v(t, message, args)
 
     /**
@@ -37,7 +40,9 @@ object Simber {
      */
     @JvmStatic
     fun d(t: Throwable) = Timber.d(t)
+
     fun d(message: String, vararg args: Any?) = Timber.d(message, *args)
+
     fun d(t: Throwable, message: String, args: Any? = null) = Timber.d(t, message, args)
 
     /**
@@ -49,8 +54,12 @@ object Simber {
      * RELEASE: Is sent to Firebase Analytics as an event, and Crashlytics as a breadcrumb
      */
     fun i(t: Throwable) = Timber.i(t)
-    fun i(message: String, vararg args: Any?) = Timber.i(message, *args)
-    fun i(t: Throwable, message: String, args: Any? = null) = Timber.i(t, message, args)
+
+    fun i(message: String, vararg args: Any?) =
+        Timber.i(ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+
+    fun i(t: Throwable, message: String, args: Any? = null) =
+        Timber.i(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
 
     /**
      * Use this when you suspect something shady is going on. You may not be completely in full on
@@ -71,10 +80,14 @@ object Simber {
         else Timber.w(t)
     }
 
-    fun w(message: String, vararg args: Any?) = Timber.w(message, *args)
+    fun w(message: String, vararg args: Any?) =
+        Timber.w(ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+
     fun w(t: Throwable, message: String, args: Any? = null) {
-        if (shouldSkipThrowableReporting(t)) Timber.i(t, message, args)
-        else Timber.w(t, message, args)
+        if (shouldSkipThrowableReporting(t))
+            Timber.i(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+        else
+            Timber.w(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
     }
 
     /**
@@ -92,14 +105,20 @@ object Simber {
      * RELEASE: Is sent to Firebase Crashlytics
      */
     fun e(t: Throwable) {
-        if (shouldSkipThrowableReporting(t)) Timber.i(t)
-        else Timber.e(t)
+        if (shouldSkipThrowableReporting(t))
+            Timber.i(t)
+        else
+            Timber.e(t)
     }
 
-    fun e(message: String, vararg args: Any?) = Timber.e(message, *args)
+    fun e(message: String, vararg args: Any?) =
+        Timber.e(ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+
     fun e(t: Throwable, message: String, args: Any? = null) {
-        if (shouldSkipThrowableReporting(t)) Timber.i(t, message, args)
-        else Timber.e(t, message, args)
+        if (shouldSkipThrowableReporting(t))
+            Timber.i(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+        else
+            Timber.e(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
     }
 
     /**
@@ -121,34 +140,47 @@ object Simber {
     fun tag(tag: String, isUserProperty: Boolean = false): Simber {
         var conformingTag = tag
 
+        // Firebase Analytics requires tag to be no longer than 24 characters
         var maxLength = 24
         if (isUserProperty) {
             conformingTag = USER_PROPERTY_TAG + conformingTag
+            // Firebase Analytics requires user property tag to be no longer than 40 characters
             maxLength = 40
         }
+        conformingTag = ensureMaxLength(conformingTag, maxLength)
+        conformingTag = ensureCharactersAreValid(conformingTag)
 
-        // Ensure length is not greater than allowed by Firebase Analytics
-        if (conformingTag.length > maxLength) {
-            if (BuildConfig.DEBUG) {
-                throw IllegalArgumentException("Tag must be less than 40 characters.")
-            } else {
-            conformingTag = conformingTag.substring(0, maxLength)
-            }
-        }
+        Timber.tag(conformingTag)
+        return Simber
+    }
 
-        // Check that tag complies with Firebase Analytics requirements:
-        // Name must consist of letters, digits or _ (underscores).
-        if (tag.contains(Regex("[^a-zA-Z0-9_]"))) {
+    /*
+    * Check that tag complies with Firebase Analytics requirements:
+    * Name must consist of letters, digits or _ (underscores).
+     */
+    private fun ensureCharactersAreValid(tag: String): String {
+        var validTag = tag
+        if (validTag.contains(Regex("[^a-zA-Z0-9_]"))) {
             // Throw an exception in debug but replace invalid characters in other modes
             if (BuildConfig.DEBUG) {
                 throw IllegalArgumentException("Tag must consist of letters, digits or _ (underscores).")
             } else {
-                conformingTag = tag.replace(Regex("[^a-zA-Z0-9_]"), "_")
+                validTag = validTag.replace(Regex("[^a-zA-Z0-9_]"), "_")
             }
         }
+        return validTag
+    }
 
-        Timber.tag(conformingTag)
-        return Simber
+    private fun ensureMaxLength(message: String, maxLength: Int): String {
+        if (message.length > maxLength) {
+            if (BuildConfig.DEBUG) {
+                throw IllegalArgumentException("String must be less than $maxLength characters.")
+            }
+
+            return message.substring(0, maxLength)
+        }
+
+        return message
     }
 
     // Some exception do not provide any value when logged into crashlytics,
