@@ -47,7 +47,7 @@ internal class EventUpSyncCountWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_UP] Started")
-            crashlyticsLog("Start - $upSyncScope")
+            crashlyticsLog("Start")
 
             val upCount = getUpCount(upSyncScope)
 
