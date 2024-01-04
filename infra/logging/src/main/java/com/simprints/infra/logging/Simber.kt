@@ -119,10 +119,35 @@ object Simber {
      * 1 kB in size."
      */
     fun tag(tag: String, isUserProperty: Boolean = false): Simber {
-        if (isUserProperty)
-            Timber.tag(USER_PROPERTY_TAG + tag)
-        else
-            Timber.tag(tag)
+        var conformingTag = tag
+
+        var maxLength = 24
+        if (isUserProperty) {
+            conformingTag = USER_PROPERTY_TAG + conformingTag
+            maxLength = 40
+        }
+
+        // Ensure length is not greater than allowed by Firebase Analytics
+        if (conformingTag.length > maxLength) {
+            if (BuildConfig.DEBUG) {
+                throw IllegalArgumentException("Tag must be less than 40 characters.")
+            } else {
+            conformingTag = conformingTag.substring(0, maxLength)
+            }
+        }
+
+        // Check that tag complies with Firebase Analytics requirements:
+        // Name must consist of letters, digits or _ (underscores).
+        if (tag.contains(Regex("[^a-zA-Z0-9_]"))) {
+            // Throw an exception in debug but replace invalid characters in other modes
+            if (BuildConfig.DEBUG) {
+                throw IllegalArgumentException("Tag must consist of letters, digits or _ (underscores).")
+            } else {
+                conformingTag = tag.replace(Regex("[^a-zA-Z0-9_]"), "_")
+            }
+        }
+
+        Timber.tag(conformingTag)
         return Simber
     }
 

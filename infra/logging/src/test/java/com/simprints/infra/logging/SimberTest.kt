@@ -1,9 +1,11 @@
 package com.simprints.infra.logging
 
 import com.google.firebase.FirebaseNetworkException
+import com.simprints.infra.logging.Simber.USER_PROPERTY_TAG
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
+import org.junit.Assert.assertEquals
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -23,6 +25,34 @@ class SimberTest {
     @After
     fun cleanUp() {
         unmockkObject(Timber.Forest)
+    }
+
+    @Test
+    fun `tag() sets correctly the user property tag`() {
+        Simber.tag("test", true)
+        verify(exactly = 1) { Timber.tag(USER_PROPERTY_TAG + "test") }
+    }
+
+    @Test
+    fun `tag() sets correctly the non-user property tag`() {
+        Simber.tag("test")
+        verify(exactly = 1) { Timber.tag("test") }
+    }
+
+    @Test
+    fun `in debug mode tag() throws an exception for tags containing invalid characters`() {
+        val exception = kotlin.runCatching { Simber.tag("test:tag") }
+
+        assertEquals(IllegalArgumentException::class.java, exception.exceptionOrNull()?.javaClass)
+        assertEquals("Tag must consist of letters, digits or _ (underscores).", exception.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `in debug mode tag() throws an exception for tags longer than 40 characters`() {
+        val exception = kotlin.runCatching { Simber.tag("01234567890123456789012345678901234567890") }
+
+        assertEquals(IllegalArgumentException::class.java, exception.exceptionOrNull()?.javaClass)
+        assertEquals("Tag must be less than 40 characters.", exception.exceptionOrNull()?.message)
     }
 
     @Test
