@@ -9,12 +9,12 @@ object LoggingConstants {
      * merged into a single set a keys on the next Firebase overhaul.
      */
     object CrashReportingCustomKeys {
-        const val USER_ID = "User ID"
-        const val PROJECT_ID = "Project ID"
-        const val MODULE_IDS = "Module IDs"
-        const val DEVICE_ID = "Device ID"
-        const val SUBJECTS_DOWN_SYNC_TRIGGERS = "People down sync triggers"
-        const val SESSION_ID = "Session ID"
+        const val USER_ID = "User_ID"
+        const val PROJECT_ID = "Project_ID"
+        const val MODULE_IDS = "Module_IDs"
+        const val DEVICE_ID = "Device_ID"
+        const val SUBJECTS_DOWN_SYNC_TRIGGERS = "Down_sync_triggers"
+        const val SESSION_ID = "Session_ID"
     }
 
     object AnalyticsUserProperties {

@@ -53,7 +53,7 @@ internal class Authenticator @Inject constructor(
             }
 
             extractResultFromException(t).also { signInResult ->
-                logMessageForCrashReportWithNetworkTrigger("Sign in reason - $signInResult")
+                logMessageForCrashReportWithNetworkTrigger("Sign in reason - ${signInResult.javaClass.simpleName}")
             }
         }
 

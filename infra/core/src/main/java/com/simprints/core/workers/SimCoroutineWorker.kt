@@ -20,7 +20,7 @@ abstract class SimCoroutineWorker(
     private var resultSetter = WorkerResultSetter()
 
     protected fun retry(t: Throwable? = null, message: String = t?.message ?: ""): Result {
-        crashlyticsLog("$tag - Retry] $message")
+        crashlyticsLog("[Retry] $message")
 
         logExceptionIfRequired(t)
         return resultSetter.retry()
@@ -32,7 +32,7 @@ abstract class SimCoroutineWorker(
         outputData: Data? = null
     ): Result {
 
-        crashlyticsLog("$tag - Failed] $message")
+        crashlyticsLog("[Failed] $message")
         logExceptionIfRequired(t)
         return resultSetter.failure(outputData)
 
@@ -42,7 +42,7 @@ abstract class SimCoroutineWorker(
         outputData: Data? = null,
         message: String = ""
     ): Result {
-        crashlyticsLog("$tag - Success] $message")
+        crashlyticsLog("[Success] $message")
 
         return resultSetter.success(outputData)
     }
