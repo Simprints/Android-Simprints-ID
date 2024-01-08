@@ -16,6 +16,9 @@ object Simber {
 
     internal const val USER_PROPERTY_TAG = "zzUserPropertyTag"
     private const val FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH = 100
+    private const val FIREBASE_ANALYTICS_MAX_TAG_LENGTH = 24
+    private const val FIREBASE_ANALYTICS_MAX_USER_TAG_LENGTH = 40
+    private val firebaseInvalidCharactersRegex = Regex("[^a-zA-Z0-9_]")
 
     /**
      * Use this when you want to go absolutely nuts with your logging. If for some reason you've
@@ -56,10 +59,10 @@ object Simber {
     fun i(t: Throwable) = Timber.i(t)
 
     fun i(message: String, vararg args: Any?) =
-        Timber.i(ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+        Timber.i(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
 
     fun i(t: Throwable, message: String, args: Any? = null) =
-        Timber.i(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+        Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
 
     /**
      * Use this when you suspect something shady is going on. You may not be completely in full on
@@ -81,13 +84,13 @@ object Simber {
     }
 
     fun w(message: String, vararg args: Any?) =
-        Timber.w(ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+        Timber.w(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
 
     fun w(t: Throwable, message: String, args: Any? = null) {
         if (shouldSkipThrowableReporting(t))
-            Timber.i(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
         else
-            Timber.w(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+            Timber.w(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
     }
 
     /**
@@ -112,13 +115,13 @@ object Simber {
     }
 
     fun e(message: String, vararg args: Any?) =
-        Timber.e(ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
+        Timber.e(limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), *args)
 
     fun e(t: Throwable, message: String, args: Any? = null) {
         if (shouldSkipThrowableReporting(t))
-            Timber.i(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+            Timber.i(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
         else
-            Timber.e(t, ensureMaxLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
+            Timber.e(t, limitLength(message, FIREBASE_ANALYTICS_MAX_MESSAGE_LENGTH), args)
     }
 
     /**
@@ -138,17 +141,13 @@ object Simber {
      * 1 kB in size."
      */
     fun tag(tag: String, isUserProperty: Boolean = false): Simber {
-        var conformingTag = tag
+        var conformingTag = ensureCharactersAreValid(tag)
 
-        // Firebase Analytics requires tag to be no longer than 24 characters
-        var maxLength = 24
-        if (isUserProperty) {
-            conformingTag = USER_PROPERTY_TAG + conformingTag
-            // Firebase Analytics requires user property tag to be no longer than 40 characters
-            maxLength = 40
+        conformingTag = if (isUserProperty) {
+            limitLength(USER_PROPERTY_TAG + conformingTag, FIREBASE_ANALYTICS_MAX_USER_TAG_LENGTH)
+        } else {
+            limitLength(conformingTag, FIREBASE_ANALYTICS_MAX_TAG_LENGTH)
         }
-        conformingTag = ensureMaxLength(conformingTag, maxLength)
-        conformingTag = ensureCharactersAreValid(conformingTag)
 
         Timber.tag(conformingTag)
         return Simber
@@ -159,27 +158,25 @@ object Simber {
     * Name must consist of letters, digits or _ (underscores).
      */
     private fun ensureCharactersAreValid(tag: String): String {
-        var validTag = tag
-        if (validTag.contains(Regex("[^a-zA-Z0-9_]"))) {
+        if (tag.contains(firebaseInvalidCharactersRegex)) {
             // Throw an exception in debug but replace invalid characters in other modes
             if (BuildConfig.DEBUG) {
                 throw IllegalArgumentException("Tag must consist of letters, digits or _ (underscores).")
             } else {
-                validTag = validTag.replace(Regex("[^a-zA-Z0-9_]"), "_")
+                return tag.replace(firebaseInvalidCharactersRegex, "_")
             }
         }
-        return validTag
+        return tag
     }
 
-    private fun ensureMaxLength(message: String, maxLength: Int): String {
-        if (message.length > maxLength) {
+    private fun limitLength(message: String, max: Int): String {
+        if (message.length > max) {
             if (BuildConfig.DEBUG) {
-                throw IllegalArgumentException("String must be less than $maxLength characters.")
+                throw IllegalArgumentException("String must be less than $max characters.")
             }
 
-            return message.substring(0, maxLength)
+            return message.substring(0, max)
         }
-
         return message
     }
 
