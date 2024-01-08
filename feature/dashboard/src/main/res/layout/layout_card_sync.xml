@@ -147,23 +147,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_dashboard_card_space_below_title"
                 android:text="Placeholder - Connecting"
-                app:layout_constraintEnd_toStartOf="@id/sync_card_progress_indeterminate_progress_bar"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="HardcodedText" />
-
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/sync_card_progress_indeterminate_progress_bar"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_gravity="center"
-                android:layout_marginStart="3dp"
-                android:indeterminate="true"
-                app:layout_constraintBottom_toBottomOf="@+id/sync_card_progress_message"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/sync_card_progress_message"
-                app:layout_constraintTop_toTopOf="@+id/sync_card_progress_message" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/sync_card_progress_sync_progress_bar"

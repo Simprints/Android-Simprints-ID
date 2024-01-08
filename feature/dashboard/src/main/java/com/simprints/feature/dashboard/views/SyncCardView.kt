@@ -123,7 +123,6 @@ internal class SyncCardView : MaterialCardView {
 
     private fun prepareProgressView(state: SyncCardState.SyncProgress) {
         binding.syncCardProgress.visibility = View.VISIBLE
-        binding.syncCardProgressIndeterminateProgressBar.visibility = View.GONE
 
         val percentage = if (state.total != null)
             "${calculatePercentage(state.progress, state.total)}%"
@@ -140,7 +139,6 @@ internal class SyncCardView : MaterialCardView {
 
     private fun prepareSyncConnectingView(state: SyncCardState.SyncConnecting) {
         binding.syncCardProgress.visibility = View.VISIBLE
-        binding.syncCardProgressIndeterminateProgressBar.visibility = View.VISIBLE
 
         binding.syncCardProgressMessage.text =
             resources.getString(R.string.dashboard_sync_card_connecting)
@@ -151,7 +149,6 @@ internal class SyncCardView : MaterialCardView {
 
     private fun prepareSyncCompleteView() {
         binding.syncCardProgress.visibility = View.VISIBLE
-        binding.syncCardProgressIndeterminateProgressBar.visibility = View.GONE
 
         binding.syncCardProgressMessage.text =
             resources.getString(R.string.dashboard_sync_card_complete)
