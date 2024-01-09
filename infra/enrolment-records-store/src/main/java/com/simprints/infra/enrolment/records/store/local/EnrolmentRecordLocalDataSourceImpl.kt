@@ -79,7 +79,9 @@ internal class EnrolmentRecordLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun deleteAll() {
-        delete(listOf(SubjectQuery()))
+        realmWrapper.writeRealm { realm ->
+            realm.deleteAll()
+        }
     }
 
     override suspend fun count(query: SubjectQuery): Int = realmWrapper.readRealm { realm ->

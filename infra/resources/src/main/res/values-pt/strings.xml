@@ -191,18 +191,19 @@
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">Atividade: %1$s</string>
-    <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">%d Inscrição</item>
+    <!--Dashboard always excplicitly displays the number of activities, thus ignoring the ImpliedQuantity-->
+    <plurals name="dashboard_activity_card_enrolments" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Inscrição</item>
         <item quantity="many">Inscrições</item>
         <item quantity="other">Inscrições</item>
     </plurals>
-    <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">%d Identificação</item>
+    <plurals name="dashboard_activity_card_identifications" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Identificação</item>
         <item quantity="many">Identificações</item>
         <item quantity="other">Identificações</item>
     </plurals>
-    <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">%d Verificação</item>
+    <plurals name="dashboard_activity_card_verifications" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Verificação</item>
         <item quantity="many">Verificações</item>
         <item quantity="other">Verificações</item>
     </plurals>

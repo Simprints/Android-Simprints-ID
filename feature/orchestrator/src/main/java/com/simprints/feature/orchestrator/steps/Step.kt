@@ -2,6 +2,7 @@ package com.simprints.feature.orchestrator.steps
 
 import android.os.Bundle
 import androidx.annotation.IdRes
+import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.face.capture.FaceCaptureResult
@@ -21,24 +22,6 @@ import com.simprints.matcher.FingerprintMatchResult
 import java.io.Serializable
 
 
-internal data class Step(
-    val id: Int,
-    @IdRes val navigationActionId: Int,
-    @IdRes val destinationId: Int,
-    var payload: Bundle,
-    var status: StepStatus = StepStatus.NOT_STARTED,
-    var result: Serializable? = null,
-) : Serializable {
-    val type
-        get() = this::class.java.simpleName
-}
-
-enum class StepStatus {
-    NOT_STARTED,
-    IN_PROGRESS,
-    COMPLETED,
-}
-
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = LoginResult::class, name = "LoginResult"),
@@ -46,10 +29,26 @@ enum class StepStatus {
     JsonSubTypes.Type(value = ConsentResult::class, name = "ConsentResult"),
     JsonSubTypes.Type(value = FingerprintConnectResult::class, name = "FingerprintConnectResult"),
     JsonSubTypes.Type(value = FingerprintCaptureResult::class, name = "FingerprintCaptureResult"),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureResult.Item::class,
+        name = "FingerprintCaptureResult.Item"
+    ),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureResult.Sample::class,
+        name = "FingerprintCaptureResult.Sample"
+    ),
+
     JsonSubTypes.Type(value = FingerprintMatchResult::class, name = "FingerprintMatchResult"),
-    JsonSubTypes.Type(value = FingerprintMatchResult.Item::class, name = "FingerprintMatchResult.Item"),
+    JsonSubTypes.Type(
+        value = FingerprintMatchResult.Item::class,
+        name = "FingerprintMatchResult.Item"
+    ),
+
     JsonSubTypes.Type(value = FaceConfigurationResult::class, name = "FaceConfigurationResult"),
     JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
+    JsonSubTypes.Type(value = FaceCaptureResult.Item::class, name = "FaceCaptureResult.Item"),
+    JsonSubTypes.Type(value = FaceCaptureResult.Sample::class, name = "FaceCaptureResult.Sample"),
+
     JsonSubTypes.Type(value = FaceMatchResult::class, name = "FaceMatchResult"),
     JsonSubTypes.Type(value = FaceMatchResult.Item::class, name = "FaceMatchResult.Item"),
     JsonSubTypes.Type(value = EnrolLastBiometricResult::class, name = "EnrolLastBiometricResult"),
@@ -60,5 +59,24 @@ enum class StepStatus {
 )
 abstract class SerializableMixin : Serializable
 
-val Serializable.type
-    get() = this::class.java.simpleName
+@Keep
+internal data class Step(
+    val id: Int,
+    @IdRes val navigationActionId: Int,
+    @IdRes val destinationId: Int,
+    var payload: Bundle,
+    var status: StepStatus = StepStatus.NOT_STARTED,
+    var result: Serializable? = null,
+) : Serializable {
+    // Do not remove.
+    // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
+    val type
+        get() = this::class.java.simpleName
+}
+
+@Keep
+enum class StepStatus {
+    NOT_STARTED,
+    IN_PROGRESS,
+    COMPLETED,
+}

@@ -17,11 +17,9 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.justRun
 import io.mockk.slot
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@Ignore("Jackson behaves differently in testing than in production, to be fixed later")
 @RunWith(AndroidJUnit4::class)
 class OrchestratorCacheIntegrationTest {
 

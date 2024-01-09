@@ -11,7 +11,7 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            apply(from = "${rootDir}/build-logic/signing_properties.gradle.kts")
+            apply(from = "${rootDir}/build-logic/signing_info.gradle.kts")
             val props = extra.properties
 
             with(pluginManager) {

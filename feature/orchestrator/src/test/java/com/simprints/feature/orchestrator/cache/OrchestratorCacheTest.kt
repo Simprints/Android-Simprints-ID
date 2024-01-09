@@ -40,13 +40,15 @@ class OrchestratorCacheTest {
     @Test
     fun `Stores steps if passed value`() {
         val json = "[]"
-        every { jsonHelper.toJson(any()) } returns json
+        every { jsonHelper.toJson(any(), any()) } returns json
 
-        cache.steps = listOf(mockk(), mockk())
+        val steps: List<Step> = listOf(mockk(), mockk())
+        cache.steps = steps
 
+        val stepsResultJson = steps.joinToString(separator = ",") { json }
         verify {
-            jsonHelper.toJson(any())
-            prefs.edit().putString(any(), eq(json))
+            jsonHelper.toJson(any(), any())
+            prefs.edit().putString(any(), eq("[${stepsResultJson}]"))
         }
     }
 

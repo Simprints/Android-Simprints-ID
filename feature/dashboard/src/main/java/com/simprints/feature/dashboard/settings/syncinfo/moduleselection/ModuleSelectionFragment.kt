@@ -46,6 +46,7 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private val viewModel by viewModels<ModuleSelectionViewModel>()
     private val binding by viewBinding(FragmentSyncModuleSelectionBinding::bind)
 
+    private var hasModulesSelectedInitially: Boolean? = null
     private var modulesToSelect = emptyList<Module>()
     private var rvModules: RecyclerView? = null
 
@@ -128,6 +129,9 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
 
     private fun fetchData() {
         viewModel.modulesList.observe(viewLifecycleOwner) {
+            if(hasModulesSelectedInitially == null) {
+                hasModulesSelectedInitially = it.any(Module::isSelected)
+            }
             modulesToSelect = it
             adapter.submitList(it.getUnselected())
             configureSearchView()
@@ -149,9 +153,8 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private fun updateSelectionIfPossible(lastModuleChanged: Module) {
         try {
             viewModel.updateModuleSelection(lastModuleChanged)
-        } catch (e: Exception) {
-            if (e is NoModuleSelectedException) notifyNoModulesSelected()
-            if (e is TooManyModulesSelectedException) notifyTooManyModulesSelected(e.maxNumberOfModules)
+        } catch (e: TooManyModulesSelectedException) {
+            notifyTooManyModulesSelected(e.maxNumberOfModules)
         }
     }
 
@@ -179,8 +182,12 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     }.toString()
 
     private fun handleModulesConfirmClick() {
-        viewModel.saveModules()
-        findNavController().popBackStack()
+        try {
+            viewModel.saveModules()
+            findNavController().popBackStack()
+        } catch (e: NoModuleSelectedException) {
+            notifyNoModulesSelected()
+        }
     }
 
     private fun notifyNoModulesSelected() {
@@ -194,7 +201,10 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             requireContext(),
-            String.format(getString(IDR.string.dashboard_select_modules_too_many_modules), maxAllowed),
+            String.format(
+                getString(IDR.string.dashboard_select_modules_too_many_modules),
+                maxAllowed
+            ),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -213,11 +223,11 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
         )
 
         editText?.let {
-                it.typeface = try {
-                    ResourcesCompat.getFont(requireContext(), IDR.font.muli)
-                } catch (ex: Exception) {
-                    Typeface.DEFAULT
-                }
+            it.typeface = try {
+                ResourcesCompat.getFont(requireContext(), IDR.font.muli)
+            } catch (ex: Exception) {
+                Typeface.DEFAULT
+            }
             it.observeSearchButton()
             it.observeFocus()
         }
@@ -243,10 +253,10 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     }
 
     private fun onBackPress() {
-        if (viewModel.hasSelectionChanged()) {
-            confirmModuleSelectionDialog.show()
-        } else {
-            findNavController().popBackStack()
+        when {
+            isNoModulesSelected() && hasModulesSelectedInitially == true -> notifyNoModulesSelected()
+            viewModel.hasSelectionChanged() -> confirmModuleSelectionDialog.show()
+            else -> findNavController().popBackStack()
         }
     }
 
@@ -279,10 +289,10 @@ internal class ModuleSelectionFragment : Fragment(R.layout.fragment_sync_module_
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         rvModules = null
         if (confirmModuleSelectionDialog.isShowing) {
             confirmModuleSelectionDialog.dismiss()
         }
+        super.onDestroyView()
     }
 }

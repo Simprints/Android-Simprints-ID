@@ -188,16 +188,17 @@
 
     <!-- Dashboard - Daily activity card -->
     <string name="dashboard_activity_card_activity">गतिविधि: %1$s</string>
-    <plurals name="dashboard_activity_card_enrolments">
-        <item quantity="one">%d पंजीकरण</item>
+    <!--Dashboard always excplicitly displays the number of activities, thus ignoring the ImpliedQuantity-->
+    <plurals name="dashboard_activity_card_enrolments" tools:ignore="ImpliedQuantity">
+        <item quantity="one">पंजीकरण</item>
         <item quantity="other">पंजीकरण</item>
     </plurals>
-    <plurals name="dashboard_activity_card_identifications">
-        <item quantity="one">%d विभिन्न पहचान</item>
+    <plurals name="dashboard_activity_card_identifications" tools:ignore="ImpliedQuantity">
+        <item quantity="one">विभिन्न पहचान</item>
         <item quantity="other">विभिन्न पहचान</item>
     </plurals>
-    <plurals name="dashboard_activity_card_verifications">
-        <item quantity="one">%d विभिन्न सत्यापन</item>
+    <plurals name="dashboard_activity_card_verifications" tools:ignore="ImpliedQuantity">
+        <item quantity="one">विभिन्न सत्यापन</item>
         <item quantity="other">विभिन्न सत्यापन</item>
     </plurals>
 

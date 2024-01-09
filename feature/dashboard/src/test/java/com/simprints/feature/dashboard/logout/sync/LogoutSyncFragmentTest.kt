@@ -341,9 +341,6 @@ internal class LogoutSyncFragmentTest {
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
-        onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
-            matches(not(isDisplayed()))
-        )
 
         onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
             matches(
@@ -380,9 +377,6 @@ internal class LogoutSyncFragmentTest {
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
-        onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
-            matches(isDisplayed())
-        )
 
         onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
             matches(isDisplayed())
@@ -415,9 +409,6 @@ internal class LogoutSyncFragmentTest {
         )
         onView(withId(R.id.sync_card_last_sync))
             .check(matches(withText(lastSyncText)))
-        onView(withId(R.id.sync_card_progress_indeterminate_progress_bar)).check(
-            matches(not(isDisplayed()))
-        )
 
         onView(withId(R.id.sync_card_progress_sync_progress_bar)).check(
             matches(isDisplayed())

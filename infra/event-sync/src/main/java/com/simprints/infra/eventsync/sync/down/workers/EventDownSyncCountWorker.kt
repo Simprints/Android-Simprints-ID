@@ -60,13 +60,13 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher) {
         Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
         try {
-            crashlyticsLog("Start - Params: $downSyncScope")
+            crashlyticsLog("Start")
 
             val downCount = eventDownSyncCountTask.getCount(downSyncScope)
             val output = jsonHelper.toJson(downCount)
 
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Done $downCount")
-            success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output), output)
+            success(workDataOf(OUTPUT_COUNT_WORKER_DOWN to output))
 
         } catch (t: Throwable) {
             Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Failed. ${t.message}")
@@ -76,7 +76,8 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
                     fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
                 }
                 t is BackendMaintenanceException -> fail(
-                    t, t.message,
+                    t,
+                    t.message,
                     workDataOf(
                         OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
                         OUTPUT_ESTIMATED_MAINTENANCE_TIME to t.estimatedOutage

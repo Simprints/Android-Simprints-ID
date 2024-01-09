@@ -19,24 +19,28 @@ internal class OrchestratorCache @Inject constructor(
 ) {
 
     private val prefs = securityManager.buildEncryptedSharedPreferences(ORCHESTRATION_CACHE)
-
+    private fun List<Step>.asJsonArray(jsonHelper: JsonHelper): String = with(jsonHelper) {
+        addMixin(Serializable::class.java, SerializableMixin::class.java)
+        return@with joinToString(separator = ",") {
+            jsonHelper.toJson(it, module = stepsModule)
+        }.let { "[$it]" }
+    }
     var steps: List<Step>
         set(value) {
             prefs.edit(commit = true) {
-                jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
-                putString(KEY_STEPS, jsonHelper.toJson(value))
+                putString(KEY_STEPS, value.asJsonArray(jsonHelper))
             }
         }
         get() = prefs.getString(KEY_STEPS, null)
-                ?.let {
-                    jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
-                    jsonHelper.fromJson(
-                        json = it,
-                        module = stepsModule,
-                        type = object : TypeReference<List<Step>>() {}
-                    )
-                }
-                ?: emptyList()
+            ?.let { jsonArray ->
+                jsonHelper.addMixin(Serializable::class.java, SerializableMixin::class.java)
+                jsonHelper.fromJson(
+                    json = jsonArray,
+                    module = stepsModule,
+                    type = object : TypeReference<List<Step>>() {},
+                )
+            }
+            ?: emptyList()
 
     fun clearSteps() {
         prefs.edit(commit = true) {
