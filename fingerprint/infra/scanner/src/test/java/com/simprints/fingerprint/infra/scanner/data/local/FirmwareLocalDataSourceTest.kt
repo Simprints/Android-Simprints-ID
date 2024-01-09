@@ -3,6 +3,7 @@ package com.simprints.fingerprint.infra.scanner.data.local
 import android.content.Context
 import com.google.common.truth.Truth
 import com.simprints.core.tools.utils.FileUtil
+import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSource.Companion.FIRMWARE_DIR
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion.Chip
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
@@ -25,6 +26,9 @@ internal class FirmwareLocalDataSourceTest {
     lateinit var fileUtil: FileUtil
 
     @RelaxedMockK
+    lateinit var rootDir: File
+
+    @RelaxedMockK
     lateinit var cypressDir: File
 
     @RelaxedMockK
@@ -39,16 +43,12 @@ internal class FirmwareLocalDataSourceTest {
     fun setUp() {
         MockKAnnotations.init(this)
         firmwareLocalDataSource = FirmwareLocalDataSource(context, fileUtil)
+
         every { context.filesDir } returns mockk()
-        every {
-            fileUtil.createFile(any<File>(), "${FirmwareLocalDataSource.FIRMWARE_DIR}/cypress")
-        } returns cypressDir
-        every {
-            fileUtil.createFile(any<File>(), "${FirmwareLocalDataSource.FIRMWARE_DIR}/stm")
-        } returns stmDir
-        every {
-            fileUtil.createFile(any<File>(), "${FirmwareLocalDataSource.FIRMWARE_DIR}/un20")
-        } returns un20Dir
+        every { fileUtil.createFile(any<File>(), FIRMWARE_DIR) } returns rootDir
+        every { fileUtil.createFile(any<File>(), "$FIRMWARE_DIR/cypress") } returns cypressDir
+        every { fileUtil.createFile(any<File>(), "$FIRMWARE_DIR/stm") } returns stmDir
+        every { fileUtil.createFile(any<File>(), "$FIRMWARE_DIR/un20") } returns un20Dir
     }
 
     @Test
@@ -191,7 +191,6 @@ internal class FirmwareLocalDataSourceTest {
         verify { fileUtil.writeBytes(mockkFirmwareFile, firmwareBytes) }
     }
 
-
     @Test
     fun saveUn20FirmwareBytes() {
         //Given
@@ -205,6 +204,13 @@ internal class FirmwareLocalDataSourceTest {
         firmwareLocalDataSource.saveUn20FirmwareBytes(firmwareVersion, firmwareBytes)
         //Then
         verify { fileUtil.writeBytes(mockkFirmwareFile, firmwareBytes) }
+    }
+
+    @Test
+    fun deleteAll() {
+        firmwareLocalDataSource.deleteAllFirmware()
+
+        verify { rootDir.deleteRecursively() }
     }
 
 }

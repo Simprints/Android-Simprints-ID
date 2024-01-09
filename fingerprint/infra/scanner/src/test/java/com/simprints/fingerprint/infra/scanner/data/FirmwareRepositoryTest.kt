@@ -6,11 +6,12 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVe
 import com.simprints.fingerprint.infra.scanner.domain.versions.getAvailableVersionsForDownload
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.sync.ConfigManager
+import io.mockk.MockKAnnotations
 import io.mockk.Ordering
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -18,21 +19,28 @@ import org.junit.Test
 
 class FirmwareRepositoryTest {
 
-    private val firmwareLocalDataSourceMock: FirmwareLocalDataSource = mockk(relaxUnitFun = true)
-    private val firmwareRemoteDataSourceMock: FirmwareRemoteDataSource = mockk()
-    private val vero2Configuration = mockk<Vero2Configuration>()
-    private val configManager = mockk<ConfigManager> {
-        coEvery { getProjectConfiguration() } returns mockk {
-            every { fingerprint?.bioSdkConfiguration?.vero2 } returns vero2Configuration
+    @MockK(relaxUnitFun = true)
+    private lateinit var firmwareLocalDataSourceMock: FirmwareLocalDataSource
 
-        }
-    }
+    @MockK
+    private lateinit var firmwareRemoteDataSourceMock: FirmwareRemoteDataSource
 
-    private val firmwareFileUpdater =
-        FirmwareRepository(firmwareRemoteDataSourceMock, firmwareLocalDataSourceMock, configManager)
+    @MockK
+    private lateinit var vero2Configuration: Vero2Configuration
+
+    @MockK
+    private lateinit var configManager: ConfigManager
+
+    private lateinit var firmwareRepository: FirmwareRepository
 
     @Before
     fun setup() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        coEvery {
+            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2
+        } returns vero2Configuration
+
         every { vero2Configuration.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                 CYPRESS_VERSION_HIGH,
@@ -40,10 +48,16 @@ class FirmwareRepositoryTest {
                 UN20_VERSION_HIGH
             )
         )
+
+        firmwareRepository = FirmwareRepository(
+            firmwareRemoteDataSourceMock,
+            firmwareLocalDataSourceMock,
+            configManager
+        )
     }
 
     @Test
-    fun updateStoredFirmwareFilesWithLatest_versionsAvailable_downloadsAndSavesFiles() =
+    fun `updateStoredFirmwareFilesWithLatest downloads the latest file versions when available`() =
         runTest {
             coEvery { firmwareRemoteDataSourceMock.downloadFirmware(any()) } returns CYPRESS_BIN
             every {
@@ -60,7 +74,7 @@ class FirmwareRepositoryTest {
                 )
             } returns availableForDownload
 
-            firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
+            firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
             coVerify(exactly = 3) {
                 firmwareRemoteDataSourceMock.downloadFirmware(any())
@@ -79,7 +93,7 @@ class FirmwareRepositoryTest {
         }
 
     @Test
-    fun updateStoredFirmwareFilesWithLatest_noVersionsAvailable_downloadsNoFiles() =
+    fun `updateStoredFirmwareFilesWithLatest downloads no files when no versions available`() =
         runTest {
             every {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
@@ -91,7 +105,7 @@ class FirmwareRepositoryTest {
                 )
             } returns emptyList()
 
-            firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
+            firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
             coVerify(exactly = 0) { firmwareRemoteDataSourceMock.downloadFirmware(any()) }
             coVerify(exactly = 0) {
@@ -110,7 +124,7 @@ class FirmwareRepositoryTest {
         }
 
     @Test
-    fun updateStoredFirmwareFilesWithLatest_onlyOneVersionsAvailable_downloadsOtherFiles() =
+    fun `updateStoredFirmwareFilesWithLatest downloads other files when only one versions available`() =
         runTest {
             every {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
@@ -126,7 +140,7 @@ class FirmwareRepositoryTest {
                 )
             } returns availableForDownload
 
-            firmwareFileUpdater.updateStoredFirmwareFilesWithLatest()
+            firmwareRepository.updateStoredFirmwareFilesWithLatest()
 
             coVerify(exactly = 0) { firmwareRemoteDataSourceMock.downloadFirmware(any()) }
 
@@ -139,7 +153,7 @@ class FirmwareRepositoryTest {
         }
 
     @Test
-    fun `test cleanUpOldFirmwareFiles should remove all low version firmwares`() = runTest {
+    fun `cleanUpOldFirmwareFiles should remove all low version firmwares`() = runTest {
         //Given
         every {
             firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
@@ -150,7 +164,7 @@ class FirmwareRepositoryTest {
             every { deleteUn20Firmware(any()) } returns true
         }
         // When
-        firmwareFileUpdater.cleanUpOldFirmwareFiles()
+        firmwareRepository.cleanUpOldFirmwareFiles()
         // Then
         verify {
             firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
@@ -160,7 +174,7 @@ class FirmwareRepositoryTest {
     }
 
     @Test
-    fun `test cleanUpOldFirmwareFiles should remove nothing if all firmware versions are up to date`() =
+    fun `cleanUpOldFirmwareFiles should remove nothing if all firmware versions are up to date`() =
         runTest {
             //Given
             every {
@@ -168,7 +182,7 @@ class FirmwareRepositoryTest {
             } returns SCANNER_VERSIONS_HIGH
 
             // When
-            firmwareFileUpdater.cleanUpOldFirmwareFiles()
+            firmwareRepository.cleanUpOldFirmwareFiles()
             // Then
             verify(exactly = 0) {
                 firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
@@ -177,7 +191,15 @@ class FirmwareRepositoryTest {
             }
         }
 
+    @Test
+    fun `deleteAllFirmwareFiles should delete all files`() {
+        firmwareRepository.deleteAllFirmwareFiles()
+
+        verify { firmwareLocalDataSourceMock.deleteAllFirmware() }
+    }
+
     companion object {
+
         private const val HARDWARE_VERSION = "E-1"
         private const val CYPRESS_VERSION_LOW = "1.E-1.0"
         private const val CYPRESS_VERSION_HIGH = "1.E-1.1"

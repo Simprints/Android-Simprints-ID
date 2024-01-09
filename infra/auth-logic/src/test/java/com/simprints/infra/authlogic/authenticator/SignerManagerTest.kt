@@ -1,5 +1,6 @@
 package com.simprints.infra.authlogic.authenticator
 
+import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
@@ -58,6 +59,9 @@ internal class SignerManagerTest {
     @MockK
     lateinit var mockEnrolmentRecordRepository: EnrolmentRecordRepository
 
+    @MockK
+    lateinit var scannerManager: ScannerManager
+
     private lateinit var signerManager: SignerManager
 
     private val token = Token(
@@ -82,6 +86,7 @@ internal class SignerManagerTest {
             mockImageRepository,
             mockEventRepository,
             mockEnrolmentRecordRepository,
+            scannerManager,
             UnconfinedTestDispatcher(),
         )
     }
@@ -228,6 +233,7 @@ internal class SignerManagerTest {
         coVerify { mockImageRepository.deleteStoredImages() }
         coVerify { mockEventRepository.deleteAll() }
         coVerify { mockEnrolmentRecordRepository.deleteAll() }
+        coVerify { scannerManager.deleteFiles() }
     }
 
     @Test

@@ -38,6 +38,8 @@ internal class FirmwareLocalDataSource(
 
     fun deleteUn20Firmware(chipVersion: String) = getFile(UN20_DIR, chipVersion).delete()
 
+    fun deleteAllFirmware() = fileUtil.createFile(context.filesDir, FIRMWARE_DIR).deleteRecursively()
+
     private fun loadFirmwareBytes(chipVersion: String, chipDirName: String): ByteArray {
         val file = getFile(chipDirName, chipVersion)
         if (!file.exists()) throw IllegalStateException("$chipVersion firmware file is not available in $FIRMWARE_DIR/$chipDirName/")

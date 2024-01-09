@@ -34,6 +34,8 @@ dependencies {
     implementation(project(":infra:images"))
     implementation(project(":infra:recent-user-activity"))
 
+    implementation(project(":fingerprint:infra:scanner"))
+
     implementation(libs.retrofit.core)
     implementation(libs.playServices.integrity)
     implementation(libs.workManager.work)

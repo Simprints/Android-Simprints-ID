@@ -13,7 +13,7 @@ import javax.inject.Inject
  * This class represents the firmware repository combining both local and remote data sources of
  * the firmware versions.
  */
-internal class FirmwareRepository @Inject constructor(
+class FirmwareRepository @Inject internal constructor(
     private val firmwareRemoteDataSource: FirmwareRemoteDataSource,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
     private val configManager: ConfigManager,
@@ -108,5 +108,9 @@ internal class FirmwareRepository @Inject constructor(
 
     private fun obsoleteItems(localVersions: Set<String>, officialVersions: Set<String>) =
         localVersions.filter { !officialVersions.contains(it) }
+
+    fun deleteAllFirmwareFiles() {
+        firmwareLocalDataSource.deleteAllFirmware()
+    }
 
 }

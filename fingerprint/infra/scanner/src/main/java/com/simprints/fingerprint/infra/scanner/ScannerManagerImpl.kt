@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.infra.scanner
 
 import com.simprints.fingerprint.infra.scanner.component.bluetooth.ComponentBluetoothAdapter
+import com.simprints.fingerprint.infra.scanner.data.FirmwareRepository
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.NullScannerException
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
@@ -15,7 +16,8 @@ class ScannerManagerImpl @Inject constructor(
     private val bluetoothAdapter: ComponentBluetoothAdapter,
     private val scannerFactory: ScannerFactory,
     private val pairingManager: ScannerPairingManager,
-    private val serialNumberConverter: SerialNumberConverter
+    private val serialNumberConverter: SerialNumberConverter,
+    private val firmwareRepository: FirmwareRepository,
 ) : ScannerManager {
 
     private var _scanner: ScannerWrapper? = null
@@ -49,4 +51,8 @@ class ScannerManagerImpl @Inject constructor(
     }
 
     private fun bluetoothIsEnabled() = bluetoothAdapter.isEnabled()
+
+    override fun deleteFiles() {
+        firmwareRepository.deleteAllFirmwareFiles()
+    }
 }

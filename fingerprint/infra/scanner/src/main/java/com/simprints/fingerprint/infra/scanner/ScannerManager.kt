@@ -30,4 +30,6 @@ interface ScannerManager {
 
     /** @throws BluetoothNotEnabledException */
     suspend fun checkBluetoothStatus()
+
+    fun deleteFiles()
 }
