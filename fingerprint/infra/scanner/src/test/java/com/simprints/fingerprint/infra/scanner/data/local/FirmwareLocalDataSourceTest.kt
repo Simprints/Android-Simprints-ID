@@ -5,6 +5,7 @@ import com.google.common.truth.Truth
 import com.simprints.core.tools.utils.FileUtil
 import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSource.Companion.FIRMWARE_DIR
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion.Chip
+import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.every
@@ -13,11 +14,16 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.CoroutineDispatcher
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.io.File
 
 internal class FirmwareLocalDataSourceTest {
+
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
 
     @MockK
     lateinit var context: Context
@@ -42,7 +48,8 @@ internal class FirmwareLocalDataSourceTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        firmwareLocalDataSource = FirmwareLocalDataSource(context, fileUtil)
+        firmwareLocalDataSource =
+            FirmwareLocalDataSource(context, testCoroutineRule.testCoroutineDispatcher, fileUtil)
 
         every { context.filesDir } returns mockk()
         every { fileUtil.createFile(any<File>(), FIRMWARE_DIR) } returns rootDir
