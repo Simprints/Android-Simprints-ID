@@ -109,7 +109,7 @@ class FirmwareRepository @Inject internal constructor(
     private fun obsoleteItems(localVersions: Set<String>, officialVersions: Set<String>) =
         localVersions.filter { !officialVersions.contains(it) }
 
-    fun deleteAllFirmwareFiles() {
+    suspend fun deleteAllFirmwareFiles() {
         firmwareLocalDataSource.deleteAllFirmware()
     }
 

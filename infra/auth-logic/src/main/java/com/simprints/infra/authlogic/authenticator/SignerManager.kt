@@ -80,7 +80,7 @@ internal class SignerManager @Inject constructor(
         imageRepository.deleteStoredImages()
         eventRepository.deleteAll()
         enrolmentRecordRepository.deleteAll()
-        scannerManager.deleteFiles()
+        scannerManager.deleteFirmwareFiles()
     }
 
 }

@@ -12,7 +12,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -60,7 +59,7 @@ class FirmwareRepositoryTest {
     fun `updateStoredFirmwareFilesWithLatest downloads the latest file versions when available`() =
         runTest {
             coEvery { firmwareRemoteDataSourceMock.downloadFirmware(any()) } returns CYPRESS_BIN
-            every {
+            coEvery {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW
             val availableForDownload = RESPONSE_MAP.getAvailableVersionsForDownload(
@@ -95,7 +94,7 @@ class FirmwareRepositoryTest {
     @Test
     fun `updateStoredFirmwareFilesWithLatest downloads no files when no versions available`() =
         runTest {
-            every {
+            coEvery {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW
             coEvery {
@@ -126,7 +125,7 @@ class FirmwareRepositoryTest {
     @Test
     fun `updateStoredFirmwareFilesWithLatest downloads other files when only one versions available`() =
         runTest {
-            every {
+            coEvery {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_LOW_UN20_HIGH
             val availableForDownload = RESPONSE_MAP.getAvailableVersionsForDownload(
@@ -155,18 +154,18 @@ class FirmwareRepositoryTest {
     @Test
     fun `cleanUpOldFirmwareFiles should remove all low version firmwares`() = runTest {
         //Given
-        every {
+        coEvery {
             firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
         } returns SCANNER_VERSIONS_LOW_AND_HIGH
         firmwareLocalDataSourceMock.apply {
-            every { deleteCypressFirmware(any()) } returns true
-            every { deleteStmFirmware(any()) } returns true
-            every { deleteUn20Firmware(any()) } returns true
+            coEvery { deleteCypressFirmware(any()) } returns true
+            coEvery { deleteStmFirmware(any()) } returns true
+            coEvery { deleteUn20Firmware(any()) } returns true
         }
         // When
         firmwareRepository.cleanUpOldFirmwareFiles()
         // Then
-        verify {
+        coVerify {
             firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
             firmwareLocalDataSourceMock.deleteStmFirmware(STM_VERSION_LOW)
             firmwareLocalDataSourceMock.deleteUn20Firmware(UN20_VERSION_LOW)
@@ -177,14 +176,14 @@ class FirmwareRepositoryTest {
     fun `cleanUpOldFirmwareFiles should remove nothing if all firmware versions are up to date`() =
         runTest {
             //Given
-            every {
+            coEvery {
                 firmwareLocalDataSourceMock.getAvailableScannerFirmwareVersions()
             } returns SCANNER_VERSIONS_HIGH
 
             // When
             firmwareRepository.cleanUpOldFirmwareFiles()
             // Then
-            verify(exactly = 0) {
+            coVerify(exactly = 0) {
                 firmwareLocalDataSourceMock.deleteCypressFirmware(CYPRESS_VERSION_LOW)
                 firmwareLocalDataSourceMock.deleteStmFirmware(CYPRESS_VERSION_LOW)
                 firmwareLocalDataSourceMock.deleteUn20Firmware(CYPRESS_VERSION_LOW)
@@ -192,10 +191,10 @@ class FirmwareRepositoryTest {
         }
 
     @Test
-    fun `deleteAllFirmwareFiles should delete all files`() {
+    fun `deleteAllFirmwareFiles should delete all files`() = runTest {
         firmwareRepository.deleteAllFirmwareFiles()
 
-        verify { firmwareLocalDataSourceMock.deleteAllFirmware() }
+        coVerify { firmwareLocalDataSourceMock.deleteAllFirmware() }
     }
 
     companion object {

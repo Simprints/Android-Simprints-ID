@@ -233,7 +233,7 @@ internal class SignerManagerTest {
         coVerify { mockImageRepository.deleteStoredImages() }
         coVerify { mockEventRepository.deleteAll() }
         coVerify { mockEnrolmentRecordRepository.deleteAll() }
-        coVerify { scannerManager.deleteFiles() }
+        coVerify { scannerManager.deleteFirmwareFiles() }
     }
 
     @Test

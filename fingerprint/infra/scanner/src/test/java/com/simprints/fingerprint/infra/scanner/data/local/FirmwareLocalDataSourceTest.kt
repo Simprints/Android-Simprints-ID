@@ -14,7 +14,7 @@ import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -59,7 +59,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun getAvailableScannerFirmwareVersions() {
+    fun getAvailableScannerFirmwareVersions() = runTest {
         //Given
         every { cypressDir.listFiles() } returns null
         every { stmDir.listFiles() } returns arrayOf<File>(mockk(relaxed = true))
@@ -73,7 +73,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun loadCypressFirmwareBytes() {
+    fun loadCypressFirmwareBytes() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -88,7 +88,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    fun `loadCypressFirmwareBytes file not exist throws IllegalStateException`() {
+    fun `loadCypressFirmwareBytes file not exist throws IllegalStateException`() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -102,7 +102,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun loadStmFirmwareBytes() {
+    fun loadStmFirmwareBytes() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -117,7 +117,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun loadUn20FirmwareBytes() {
+    fun loadUn20FirmwareBytes() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -133,7 +133,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun deleteCypressFirmware() {
+    fun deleteCypressFirmware() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -145,7 +145,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun deleteUn20Firmware() {
+    fun deleteUn20Firmware() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -157,7 +157,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun deleteStmFirmware() {
+    fun deleteStmFirmware() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -169,7 +169,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun saveCypressFirmwareBytes() {
+    fun saveCypressFirmwareBytes() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -184,7 +184,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun saveStmFirmwareBytes() {
+    fun saveStmFirmwareBytes() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -199,7 +199,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun saveUn20FirmwareBytes() {
+    fun saveUn20FirmwareBytes() = runTest {
         //Given
         val firmwareVersion = "123"
         val mockkFirmwareFile = mockk<File>(relaxed = true)
@@ -214,7 +214,7 @@ internal class FirmwareLocalDataSourceTest {
     }
 
     @Test
-    fun deleteAll() {
+    fun deleteAll() = runTest {
         firmwareLocalDataSource.deleteAllFirmware()
 
         verify { rootDir.deleteRecursively() }

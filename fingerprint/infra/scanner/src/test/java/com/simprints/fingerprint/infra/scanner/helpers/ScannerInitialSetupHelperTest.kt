@@ -48,7 +48,7 @@ class ScannerInitialSetupHelperTest {
 
     @Before
     fun setup() {
-        every { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns LOCAL_SCANNER_VERSION
+        coEvery { firmwareLocalDataSource.getAvailableScannerFirmwareVersions() } returns LOCAL_SCANNER_VERSION
         every { scannerMock.enterMainMode() } returns Completable.complete()
         coEvery {
             connectionHelperMock.reconnect(

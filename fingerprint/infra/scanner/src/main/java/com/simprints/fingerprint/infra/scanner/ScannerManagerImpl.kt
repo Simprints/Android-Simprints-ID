@@ -52,7 +52,7 @@ class ScannerManagerImpl @Inject constructor(
 
     private fun bluetoothIsEnabled() = bluetoothAdapter.isEnabled()
 
-    override fun deleteFiles() {
+    override suspend fun deleteFirmwareFiles() {
         firmwareRepository.deleteAllFirmwareFiles()
     }
 }
