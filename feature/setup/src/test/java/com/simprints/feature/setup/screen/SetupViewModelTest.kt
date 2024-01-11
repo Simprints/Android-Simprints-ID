@@ -27,7 +27,7 @@ class SetupViewModelTest {
     private val viewModel = SetupViewModel(locationStore, configManager)
 
     @Test
-    fun `should request location permission if collectLocation is enabled`() = runTest{
+    fun `should request location permission if collectLocation is enabled`() = runTest {
         // Given
         coEvery { configManager.getProjectConfiguration().general.collectLocation } returns true
 
@@ -40,7 +40,7 @@ class SetupViewModelTest {
     }
 
     @Test
-    fun `should finish if collectLocation is disabled`() =runTest {
+    fun `should not request location permission if collectLocation is disabled`() = runTest {
         // Given
         coEvery { configManager.getProjectConfiguration().general.collectLocation } returns false
 
@@ -48,7 +48,7 @@ class SetupViewModelTest {
         viewModel.start()
 
         // Then
-        viewModel.finish.test().assertHasValue()
+        viewModel.requestLocationPermission.test().assertNoValue()
 
     }
 
@@ -64,5 +64,40 @@ class SetupViewModelTest {
         // Then
         verify { locationStore.collectLocationInBackground() }
 
+    }
+
+    @Test
+    fun `should request notification permission if collectLocation is disabled`() = runTest {
+        // Given
+        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns false
+
+        // When
+        viewModel.start()
+
+        // Then
+        viewModel.requestNotificationPermission.test().assertHasValue()
+
+    }
+
+    @Test
+    fun `should not request notification permission yet if collectLocation is enabled`() = runTest {
+        // Given
+        coEvery { configManager.getProjectConfiguration().general.collectLocation } returns true
+
+        // When
+        viewModel.start()
+
+        // Then
+        viewModel.requestNotificationPermission.test().assertNoValue()
+
+    }
+
+    @Test
+    fun `should request notification permission on command`() = runTest {
+        // When
+        viewModel.requestNotificationsPermission()
+
+        // Then
+        viewModel.requestNotificationPermission.test().assertHasValue()
     }
 }

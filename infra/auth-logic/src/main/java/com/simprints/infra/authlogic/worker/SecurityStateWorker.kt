@@ -25,6 +25,7 @@ internal class SecurityStateWorker @AssistedInject constructor(
     override suspend fun doWork(): Result =
         withContext(dispatcher) {
             crashlyticsLog("Fetching security state")
+            showProgressNotification()
 
             try {
                 val securityState = repository.getSecurityStatusFromRemote()

@@ -59,6 +59,7 @@ internal class EventDownSyncCountWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         Simber.tag(SYNC_LOG_TAG).d("[COUNT_DOWN] Started")
+        showProgressNotification()
         try {
             crashlyticsLog("Start")
 
