@@ -32,6 +32,7 @@ internal class EventStartSyncReporterWorker @AssistedInject constructor(
             try {
                 val syncId = inputData.getString(SYNC_ID_STARTED)
                 crashlyticsLog("Start - Params: $syncId")
+                showProgressNotification()
                 success(inputData)
             } catch (t: Throwable) {
                 fail(t)

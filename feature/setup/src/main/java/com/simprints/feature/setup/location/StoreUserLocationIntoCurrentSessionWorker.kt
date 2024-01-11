@@ -34,6 +34,7 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
+            showProgressNotification()
             createLocationFlow()
                 .filterNotNull()
                 .collect { location ->
