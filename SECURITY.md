@@ -9,7 +9,7 @@
 
 ## Reporting a Vulnerability
 
-Please report any security vulnerabilities you find in Android-Simprints-ID to [our email address](securityreport@simprints). We appreciate your help in keeping Android-Simprints ID secure!
+Please report any security vulnerabilities you find in Android-Simprints-ID to [our email address](securityreport@simprints.com). We appreciate your help in keeping Android-Simprints ID secure!
 
 Here's what you can expect when you report a vulnerability:
 
