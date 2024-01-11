@@ -411,4 +411,7 @@
     <string name="error_backend_maintenance_message">The system is currently offline for maintenance. Please try again later.</string>
     <string name="error_backend_maintenance_with_time_message">The system is currently offline for maintenance. Please try again after %s</string>
 
+    <!-- Notifications -->
+    <string name="notification_sync_description">Sync in progress</string>
+
 </resources>
