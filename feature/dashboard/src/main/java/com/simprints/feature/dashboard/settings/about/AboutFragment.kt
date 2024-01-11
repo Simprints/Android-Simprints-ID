@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -17,6 +18,7 @@ import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentSettingsAboutBinding
 import com.simprints.feature.dashboard.settings.password.SettingsPasswordDialogFragment
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality.FINGERPRINT
+import com.simprints.infra.uibase.system.Clipboard
 import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
@@ -91,7 +93,18 @@ internal class AboutFragment : PreferenceFragmentCompat() {
 
     private fun initLayout() {
         getAppVersionPreference()?.summary = packageVersionName
-        getDeviceIdPreference()?.summary = deviceId
+        getDeviceIdPreference()?.let { preference ->
+            preference.summary = deviceId
+            preference.setOnPreferenceClickListener {
+                Toast.makeText(
+                    requireContext(),
+                    IDR.string.dashboard_preference_copied_to_clipboard,
+                    Toast.LENGTH_SHORT
+                ).show()
+                Clipboard.copyToClipboard(requireContext(), deviceId)
+                true
+            }
+        }
         getLogoutPreference()?.setOnPreferenceClickListener {
             activity?.runOnUiThread {
                 val password = viewModel.settingsLocked.value?.getNullablePassword()
