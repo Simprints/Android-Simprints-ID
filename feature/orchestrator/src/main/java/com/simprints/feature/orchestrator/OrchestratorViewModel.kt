@@ -70,7 +70,7 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     fun handleResult(result: Serializable) {
-        Simber.i(result.toString())
+        Simber.d(result.toString())
         val errorResponse = mapRefusalOrErrorResult(result)
         if (errorResponse != null) {
             // Shortcut the flow execution if any refusal or error result is found

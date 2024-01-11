@@ -106,7 +106,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         }
     }
 
-    private fun determineAvailableOtas(
+    private suspend fun determineAvailableOtas(
         current: ScannerFirmwareVersions,
         available: Vero2Configuration.Vero2FirmwareVersions?
     ): List<AvailableOta> {

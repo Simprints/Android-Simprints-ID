@@ -1,6 +1,7 @@
 package com.simprints.infra.authlogic.authenticator
 
 import com.simprints.core.DispatcherIO
+import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
@@ -29,6 +30,7 @@ internal class SignerManager @Inject constructor(
     private val imageRepository: ImageRepository,
     private val eventRepository: EventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val scannerManager: ScannerManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
 
@@ -78,6 +80,7 @@ internal class SignerManager @Inject constructor(
         imageRepository.deleteStoredImages()
         eventRepository.deleteAll()
         enrolmentRecordRepository.deleteAll()
+        scannerManager.deleteFirmwareFiles()
     }
 
 }
