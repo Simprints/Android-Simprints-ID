@@ -473,7 +473,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 launchReconnect()
             }
 
-            is NoFingerDetectedException -> handleNoFingerDetected()
+            is NoFingerDetectedException -> {
+                Simber.e(e)
+                handleNoFingerDetected()
+            }
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)

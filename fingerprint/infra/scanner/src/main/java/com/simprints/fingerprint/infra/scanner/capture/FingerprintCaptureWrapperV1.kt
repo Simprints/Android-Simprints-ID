@@ -87,7 +87,7 @@ internal class FingerprintCaptureWrapperV1(
         cont: Continuation<AcquireFingerprintTemplateResponse>
     ) {
         when (error) {
-            SCANNER_ERROR.UN20_SDK_ERROR -> cont.resumeWithException(NoFingerDetectedException()) // If no finger is detected on the sensor
+            SCANNER_ERROR.UN20_SDK_ERROR -> cont.resumeWithException(NoFingerDetectedException("No finger detected on the sensor"))
             SCANNER_ERROR.INVALID_STATE, SCANNER_ERROR.SCANNER_UNREACHABLE, SCANNER_ERROR.UN20_INVALID_STATE, SCANNER_ERROR.OUTDATED_SCANNER_INFO, SCANNER_ERROR.IO_ERROR -> cont.resumeWithException(
                 ScannerDisconnectedException()
             )

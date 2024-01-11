@@ -1283,7 +1283,7 @@ class FingerprintCaptureViewModelTest {
             )
 
             BAD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
-            NO_FINGER_DETECTED -> NoFingerDetectedException()
+            NO_FINGER_DETECTED -> NoFingerDetectedException("No finger detected")
             DISCONNECTED -> ScannerDisconnectedException()
             UNKNOWN_ERROR -> Error("Oops!")
             NEVER_RETURNS -> {
