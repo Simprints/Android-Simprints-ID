@@ -1,11 +1,15 @@
 package com.simprints.infra.authlogic.authenticator
 
 import com.simprints.core.DispatcherIO
+import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
+import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
@@ -23,6 +27,10 @@ internal class SignerManager @Inject constructor(
     private val recentUserActivityManager: RecentUserActivityManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
     private val simNetwork: SimNetwork,
+    private val imageRepository: ImageRepository,
+    private val eventRepository: EventRepository,
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
+    private val scannerManager: ScannerManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
 
@@ -63,7 +71,16 @@ internal class SignerManager @Inject constructor(
         configManager.clearData()
         recentUserActivityManager.clearRecentActivity()
 
+        deleteLocalData()
+
         Simber.tag(LoggingConstants.CrashReportTag.LOGOUT.name).i("Signed out")
+    }
+
+    private suspend fun deleteLocalData() {
+        imageRepository.deleteStoredImages()
+        eventRepository.deleteAll()
+        enrolmentRecordRepository.deleteAll()
+        scannerManager.deleteFirmwareFiles()
     }
 
 }

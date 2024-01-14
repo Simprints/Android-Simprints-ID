@@ -56,11 +56,12 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(dispatcher) {
         try {
             Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Started")
+            showProgressNotification()
 
             val workerId = this@EventDownSyncDownloaderWorker.id.toString()
             var count = syncCache.readProgress(workerId)
 
-            crashlyticsLog("Start - Params: $downSyncOperationInput")
+            crashlyticsLog("Start")
 
             downSyncTask.downSync(this, getDownSyncOperation()).collect {
                 count = it.progress
@@ -71,7 +72,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
             Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Done $count")
             success(
                 workDataOf(OUTPUT_DOWN_SYNC to count),
-                "Total downloaded: $0 for $downSyncOperationInput"
+                "Total downloaded: $0"
             )
         } catch (t: Throwable) {
             Simber.tag(SYNC_LOG_TAG).d("[DOWNLOADER] Failed")

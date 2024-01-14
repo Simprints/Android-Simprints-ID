@@ -7,26 +7,26 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.matcher.MatchParams
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
 import com.simprints.feature.orchestrator.model.OrchestratorResult
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
 import com.simprints.feature.orchestrator.steps.StepStatus
-import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.orchestrator.usecases.AddCallbackEventUseCase
-import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
 import com.simprints.feature.orchestrator.usecases.CreatePersonEventUseCase
 import com.simprints.feature.orchestrator.usecases.MapRefusalOrErrorResultUseCase
 import com.simprints.feature.orchestrator.usecases.ShouldCreatePersonUseCase
 import com.simprints.feature.orchestrator.usecases.UpdateDailyActivityUseCase
+import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUseCase
+import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
+import com.simprints.matcher.MatchParams
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.Serializable
@@ -70,7 +70,7 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     fun handleResult(result: Serializable) {
-        Simber.i(result.toString())
+        Simber.d(result.toString())
         val errorResponse = mapRefusalOrErrorResult(result)
         if (errorResponse != null) {
             // Shortcut the flow execution if any refusal or error result is found
@@ -94,8 +94,8 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        super.onCleared()
         cache.steps = steps
+        super.onCleared()
     }
 
     private fun doNextStep() {

@@ -55,10 +55,10 @@ class AnalyticsTreeTest {
         val spyAnalyticsTree = spyk(AnalyticsTree(faMock))
 
         Timber.plant(spyAnalyticsTree)
-        Simber.tag("Test Tag", true).i("Test Message")
+        Simber.tag("Test_Tag", true).i("Test Message")
 
         verify {
-            faMock.setUserProperty("Test Tag", "Test Message")
+            faMock.setUserProperty("Test_Tag", "Test Message")
         }
     }
 

@@ -36,6 +36,8 @@ dependencies {
     implementation(project(":feature:orchestrator"))
     implementation(project(":feature:dashboard"))
 
+    implementation(project(":fingerprint:infra:scanner"))
+
     implementation(libs.androidX.core)
     implementation(libs.androidX.appcompat)
     implementation(libs.rxJava2.core)
@@ -43,4 +45,5 @@ dependencies {
     testImplementation(libs.testing.junit)
     testImplementation(libs.testing.mockk.core)
     testImplementation(libs.testing.coroutines)
+    testImplementation(project(":infra:test-tools"))
 }

@@ -59,6 +59,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
         withContext(dispatcher) {
             try {
                 crashlyticsLog("Start")
+                showProgressNotification()
                 val configuration = configRepository.getConfiguration()
 
                 if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed()) return@withContext success(

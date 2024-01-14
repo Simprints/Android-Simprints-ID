@@ -100,7 +100,8 @@ class ConnectScannerViewModelTest {
             bluetoothAdapter,
             scannerFactory,
             pairingManager,
-            SerialNumberConverter()
+            SerialNumberConverter(),
+            mockk(relaxed = true),
         )
         viewModel = ConnectScannerViewModel(
             configManager,

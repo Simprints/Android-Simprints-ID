@@ -13,21 +13,16 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SetupViewModel @Inject constructor(
     private val locationStore: LocationStore,
-    private val configManager: ConfigManager
+    private val configManager: ConfigManager,
 ) : ViewModel() {
 
     val requestLocationPermission: LiveData<Unit>
         get() = _requestLocationPermission
     private val _requestLocationPermission = MutableLiveData<Unit>()
 
-    val finish: LiveData<Boolean>
-        get() = _finish
-    private val _finish = MutableLiveData<Boolean>()
-
-
-    fun collectLocation() {
-        locationStore.collectLocationInBackground()
-    }
+    val requestNotificationPermission: LiveData<Unit>
+        get() = _requestNotificationPermission
+    private val _requestNotificationPermission = MutableLiveData<Unit>()
 
     fun start() {
         viewModelScope.launch {
@@ -35,9 +30,18 @@ internal class SetupViewModel @Inject constructor(
                 // request location permissions
                 _requestLocationPermission.postValue(Unit)
             } else {
-                _finish.postValue(true)
+                // proceed to requesting notification permission right away
+                _requestNotificationPermission.postValue(Unit)
             }
         }
+    }
+
+    fun requestNotificationsPermission() {
+        _requestNotificationPermission.postValue(Unit)
+    }
+
+    fun collectLocation() {
+        locationStore.collectLocationInBackground()
     }
 
     private suspend fun shouldCollectLocation() =

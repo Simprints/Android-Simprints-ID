@@ -1,5 +1,6 @@
 package com.simprints.id
 
+import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
@@ -13,6 +14,7 @@ class ScheduleBackgroundSyncUseCase @Inject constructor(
     private val configManager: ConfigManager,
     private val authManager: AuthManager,
     private val authStore: AuthStore,
+    private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
 ) {
 
     operator fun invoke() {
@@ -21,6 +23,7 @@ class ScheduleBackgroundSyncUseCase @Inject constructor(
             imageUpSyncScheduler.scheduleImageUpSync()
             configManager.scheduleSyncConfiguration()
             authManager.scheduleSecurityStateCheck()
+            firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
     }
 }

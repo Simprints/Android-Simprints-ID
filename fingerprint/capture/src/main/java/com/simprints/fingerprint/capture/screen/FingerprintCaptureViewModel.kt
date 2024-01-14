@@ -213,6 +213,9 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     }
 
     private fun pauseLiveFeedback() {
+        // if live feedback is not supported, or if it is already paused, do nothing
+        if (liveFeedbackState == null || liveFeedbackState == LiveFeedbackState.PAUSE) return
+
         Simber.tag(FINGER_CAPTURE.name).i("pauseLiveFeedback")
         liveFeedbackState = LiveFeedbackState.PAUSE
         liveFeedbackTask?.cancel()
@@ -368,7 +371,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun handleCaptureFinished() = with(state) {
         Simber.tag(FINGER_CAPTURE.name)
-            .i("Finger scanned - ${currentFingerState().id} - ${currentFingerState()}")
+            .i("Finger scanned - ${currentFingerState().id}")
         addCaptureAndBiometricEventsInSession()
         saveCurrentImageIfEager()
         if (captureHasSatisfiedTerminalCondition(currentCaptureState())) {
@@ -470,7 +473,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 launchReconnect()
             }
 
-            is NoFingerDetectedException -> handleNoFingerDetected()
+            is NoFingerDetectedException -> {
+                Simber.e(e)
+                handleNoFingerDetected()
+            }
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)

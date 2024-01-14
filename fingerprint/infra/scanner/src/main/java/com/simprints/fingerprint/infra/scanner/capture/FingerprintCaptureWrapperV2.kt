@@ -38,8 +38,9 @@ internal class FingerprintCaptureWrapperV2(
     override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse =
         withContext(ioDispatcher) {
             scannerV2.acquireImage(IMAGE_FORMAT).map { imageBytes ->
-                AcquireFingerprintImageResponse(imageBytes.image)
-            }.switchIfEmpty(Single.error(NoFingerDetectedException())).wrapErrorsFromScanner()
+                AcquireFingerprintImageResponse(imageBytes.image)}
+                .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image")))
+                .wrapErrorsFromScanner()
                 .await()
         }
 
@@ -65,10 +66,10 @@ internal class FingerprintCaptureWrapperV2(
             .captureFingerprint(captureDpi)
             .ensureCaptureResultOkOrError()
             .andThen(scannerV2.getImageQualityScore())
-            .switchIfEmpty(Single.error(NoFingerDetectedException()))
+            .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image quality score")))
             .setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(qualityThreshold)
             .acquireTemplateAndAssembleResponse()
-            .switchIfEmpty(Single.error(NoFingerDetectedException()))
+            .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire template")))
             .ifNoFingerDetectedThenSetBadScanLedState()
             .wrapErrorsFromScanner()
             .await()
@@ -79,7 +80,7 @@ internal class FingerprintCaptureWrapperV2(
             when (it) {
                 CaptureFingerprintResult.OK -> Completable.complete()
                 CaptureFingerprintResult.FINGERPRINT_NOT_FOUND -> Completable.error(
-                    NoFingerDetectedException()
+                    NoFingerDetectedException("Fingerprint not found")
                 )
 
                 CaptureFingerprintResult.DPI_UNSUPPORTED -> Completable.error(
@@ -105,7 +106,7 @@ internal class FingerprintCaptureWrapperV2(
                 scannerV2.setSmileLedState(ledState)
                     .andThen(Single.just(qualityScore))
             } else {
-                Single.error(NoFingerDetectedException())
+                Single.error(NoFingerDetectedException("Image quality score below detection threshold"))
             }
         }
 

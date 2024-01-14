@@ -175,6 +175,7 @@
     <string name="face_capture_error_look_straight">Make sure the person is looking straight at the camera</string>
     <string name="face_capture_begin_button">Tap to capture</string>
     <string name="face_capture_prep_begin_button_capturing">Capturing…</string>
+    <string name="face_capturing_permission_denied">Please allow camera permission</string>
     <string name="face_capture_hold">Hold the position…</string>
     <string name="face_capture_successfully_title">Face has been successfully captured.</string>
     <string name="face_capture_confirmation_title">Confirmation</string>
@@ -355,6 +356,8 @@
     <string name="dashboard_preference_device_id_title">Device ID</string>
     <string name="dashboard_preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="dashboard_preference_summary_sync_information">Further details on sync</string>
+    <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
+
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Sync Information</string>
@@ -409,5 +412,8 @@
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">The system is currently offline for maintenance. Please try again later.</string>
     <string name="error_backend_maintenance_with_time_message">The system is currently offline for maintenance. Please try again after %s</string>
+
+    <!-- Notifications -->
+    <string name="notification_sync_description">Sync in progress</string>
 
 </resources>

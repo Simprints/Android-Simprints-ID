@@ -1,14 +1,15 @@
 package com.simprints.id
 
+import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import io.mockk.MockKAnnotations
+import io.mockk.verify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -29,6 +30,9 @@ class ScheduleBackgroundSyncUseCaseTest {
     @MockK
     lateinit var authStore: AuthStore
 
+    @MockK
+    lateinit var firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler
+
     private lateinit var useCase: ScheduleBackgroundSyncUseCase
 
     @Before
@@ -41,6 +45,7 @@ class ScheduleBackgroundSyncUseCaseTest {
             configManager,
             authManager,
             authStore,
+            firmwareFileUpdateScheduler,
         )
     }
 
@@ -55,6 +60,7 @@ class ScheduleBackgroundSyncUseCaseTest {
             imageUpSyncScheduler.scheduleImageUpSync()
             configManager.scheduleSyncConfiguration()
             authManager.scheduleSecurityStateCheck()
+            firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
     }
 
@@ -69,6 +75,7 @@ class ScheduleBackgroundSyncUseCaseTest {
             imageUpSyncScheduler.scheduleImageUpSync()
             configManager.scheduleSyncConfiguration()
             authManager.scheduleSecurityStateCheck()
+            firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
     }
 }

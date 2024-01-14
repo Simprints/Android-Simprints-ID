@@ -43,7 +43,7 @@ internal class ProjectConfigSharedPrefsMigration @Inject constructor(
         } catch (e: Exception) {
             if (e is JacksonException) {
                 // Return default value
-                Simber.i("Invalid old configuration for project ${authStore.signedInProjectId}: $e")
+                Simber.i(e, "Invalid old configuration for project ${authStore.signedInProjectId}")
                 ProtoProjectConfiguration.getDefaultInstance()
             } else {
                 Simber.e(e)
