@@ -13,20 +13,19 @@ import javax.inject.Inject
 internal class ConfigRemoteDataSourceImpl(
     private val authStore: AuthStore,
     @DispatcherIO private val dispatcherIO: CoroutineDispatcher,
-    private val urlDownloader: (String) -> String
+    private val urlDownloader: (String) -> String,
 ) : ConfigRemoteDataSource {
 
     @Inject
     constructor(
         authStore: AuthStore,
-        @DispatcherIO dispatcherIO: CoroutineDispatcher
+        @DispatcherIO dispatcherIO: CoroutineDispatcher,
     ) : this(authStore, dispatcherIO, { url -> URL(url).readText() })
 
-    override suspend fun getConfiguration(projectId: String): ProjectConfiguration =
-        getApiClient().executeCall { it.getConfiguration(projectId) }.toDomain()
-
-    override suspend fun getProject(projectId: String): Project =
-        getApiClient().executeCall { it.getProject(projectId) }.toDomain()
+    override suspend fun getProject(projectId: String): Pair<Project, ProjectConfiguration> =
+        getApiClient()
+            .executeCall { it.getProject(projectId) }
+            .let { it.toDomain() to it.configuration.toDomain() }
 
     override suspend fun getPrivacyNotice(projectId: String, fileId: String): String {
         val url = getApiClient().executeCall { it.getFileUrl(projectId, fileId) }.url

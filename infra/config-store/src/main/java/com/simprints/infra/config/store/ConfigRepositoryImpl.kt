@@ -26,6 +26,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
 ) : ConfigRepository {
 
     companion object {
+
         @VisibleForTesting
         const val PRIVACY_NOTICE_FILE = "privacy_notice"
     }
@@ -33,17 +34,20 @@ internal class ConfigRepositoryImpl @Inject constructor(
     override suspend fun getProject(projectId: String): Project = try {
         localDataSource.getProject()
     } catch (e: NoSuchElementException) {
-        refreshProject(projectId)
+        refreshProject(projectId).first
     }
 
-    override suspend fun refreshProject(projectId: String): Project = remoteDataSource
-        .getProject(projectId)
-        .also {
-            localDataSource.saveProject(it)
-            if (!it.baseUrl.isNullOrBlank()) {
-                simNetwork.setApiBaseUrl(it.baseUrl)
+    override suspend fun refreshProject(projectId: String): Pair<Project, ProjectConfiguration> =
+        remoteDataSource
+            .getProject(projectId)
+            .also { (project, configuration) ->
+                localDataSource.saveProject(project)
+                localDataSource.saveProjectConfiguration(configuration)
+
+                if (!project.baseUrl.isNullOrBlank()) {
+                    simNetwork.setApiBaseUrl(project.baseUrl)
+                }
             }
-        }
 
     override suspend fun getConfiguration(): ProjectConfiguration {
         val localConfig = localDataSource.getProjectConfiguration()
@@ -51,7 +55,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
         return if (localConfig.projectId.isEmpty()) {
             try {
                 // Try to refresh it with logged in projectId (if any)
-                refreshConfiguration(localDataSource.getProject().id)
+                refreshProject(localDataSource.getProject().id).second
             } catch (e: Exception) {
                 // If not logged in the above will fail. However we still depend on the 'default'
                 // configuration to create the session when login is attempted. Possibly in other
@@ -63,14 +67,11 @@ internal class ConfigRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshConfiguration(projectId: String): ProjectConfiguration = remoteDataSource
-        .getConfiguration(projectId)
-        .also { localDataSource.saveProjectConfiguration(it) }
-
-    override suspend fun getDeviceConfiguration(): DeviceConfiguration = localDataSource.getDeviceConfiguration()
+    override suspend fun getDeviceConfiguration(): DeviceConfiguration =
+        localDataSource.getDeviceConfiguration()
 
     override suspend fun updateDeviceConfiguration(
-        update: suspend (t: DeviceConfiguration) -> DeviceConfiguration
+        update: suspend (t: DeviceConfiguration) -> DeviceConfiguration,
     ) = localDataSource.updateDeviceConfiguration(update)
 
     override suspend fun clearData() {
@@ -82,7 +83,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
 
     override suspend fun getPrivacyNotice(
         projectId: String,
-        language: String
+        language: String,
     ): Flow<PrivacyNoticeResult> =
         flow {
             if (localDataSource.hasPrivacyNoticeFor(projectId, language)) {
@@ -96,7 +97,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
     private suspend fun downloadPrivacyNotice(
         flowCollector: FlowCollector<PrivacyNoticeResult>,
         projectId: String,
-        language: String
+        language: String,
     ) {
         flowCollector.emit(InProgress(language))
         try {

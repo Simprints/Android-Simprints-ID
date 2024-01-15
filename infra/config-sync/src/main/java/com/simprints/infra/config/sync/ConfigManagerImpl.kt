@@ -13,12 +13,11 @@ import javax.inject.Inject
 internal class ConfigManagerImpl @Inject constructor(
     private val configRepository: ConfigRepository,
     private val configurationScheduler: ConfigurationScheduler,
-    private val enrolmentRecordRepository: EnrolmentRecordRepository
-) :
-    ConfigManager {
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
+) : ConfigManager {
 
-    override suspend fun refreshProject(projectId: String): Project =
-        configRepository.refreshProject(projectId).also { project ->
+    override suspend fun refreshProject(projectId: String): Pair<Project, ProjectConfiguration> =
+        configRepository.refreshProject(projectId).also { (project, _) ->
             enrolmentRecordRepository.tokenizeExistingRecords(project)
         }
 
@@ -27,9 +26,6 @@ internal class ConfigManagerImpl @Inject constructor(
 
     override suspend fun getProjectConfiguration(): ProjectConfiguration =
         configRepository.getConfiguration()
-
-    override suspend fun refreshProjectConfiguration(projectId: String): ProjectConfiguration =
-        configRepository.refreshConfiguration(projectId)
 
     override suspend fun getDeviceConfiguration(): DeviceConfiguration =
         configRepository.getDeviceConfiguration()
@@ -48,7 +44,7 @@ internal class ConfigManagerImpl @Inject constructor(
 
     override suspend fun getPrivacyNotice(
         projectId: String,
-        language: String
+        language: String,
     ): Flow<PrivacyNoticeResult> =
         configRepository.getPrivacyNotice(projectId, language)
 }

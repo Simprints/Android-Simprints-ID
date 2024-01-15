@@ -13,14 +13,14 @@ internal data class ApiProjectConfiguration(
     val identification: ApiIdentificationConfiguration,
     val synchronization: ApiSynchronizationConfiguration,
 ) {
-    fun toDomain(): ProjectConfiguration =
-        ProjectConfiguration(
-            projectId,
-            general.toDomain(),
-            face?.toDomain(),
-            fingerprint?.toDomain(),
-            consent.toDomain(),
-            identification.toDomain(),
-            synchronization.toDomain(),
-        )
+
+    fun toDomain(): ProjectConfiguration = ProjectConfiguration(
+        projectId,
+        general.toDomain(),
+        face?.toDomain(),
+        fingerprint?.toDomain(),
+        consent.toDomain(),
+        identification.toDomain(),
+        synchronization.toDomain(),
+    )
 }

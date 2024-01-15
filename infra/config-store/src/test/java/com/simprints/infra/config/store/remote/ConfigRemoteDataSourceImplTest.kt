@@ -24,6 +24,7 @@ import org.junit.Test
 class ConfigRemoteDataSourceImplTest {
 
     companion object {
+
         private const val PROJECT_ID = "projectId"
         private const val FILE_ID = "fileId"
         private const val URL = "url"
@@ -50,64 +51,21 @@ class ConfigRemoteDataSourceImplTest {
     }
 
     @Test
-    fun `Get successful project configuration`() =
-        runTest(StandardTestDispatcher()) {
-            coEvery {
-                remoteInterface.getConfiguration(PROJECT_ID)
-            } returns apiProjectConfiguration
-
-            val receivedConfig = configRemoteDataSourceImpl.getConfiguration(PROJECT_ID)
-
-            assertThat(receivedConfig).isEqualTo(projectConfiguration)
-        }
-
-    @Test
-    fun `Get no project configuration if backend maintenance exception`() =
-        runTest(StandardTestDispatcher()) {
-            val exception = BackendMaintenanceException(estimatedOutage = 100)
-            coEvery {
-                remoteInterface.getConfiguration(PROJECT_ID)
-            } throws exception
-
-            val receivedException = assertThrows<BackendMaintenanceException> {
-                configRemoteDataSourceImpl.getConfiguration(PROJECT_ID)
-            }
-            assertThat(receivedException).isEqualTo(exception)
-        }
-
-    @Test
-    fun `Get no project configuration if sync cloud integration exception`() =
-        runTest(StandardTestDispatcher()) {
-            val exception = SyncCloudIntegrationException(cause = Exception())
-            coEvery {
-                remoteInterface.getConfiguration(PROJECT_ID)
-            } throws exception
-
-            val receivedException = assertThrows<SyncCloudIntegrationException> {
-                configRemoteDataSourceImpl.getConfiguration(PROJECT_ID)
-            }
-            assertThat(receivedException).isEqualTo(exception)
-        }
-
-    @Test
     fun `Get successful project`() =
         runTest(StandardTestDispatcher()) {
-            coEvery {
-                remoteInterface.getProject(PROJECT_ID)
-            } returns apiProject
+            coEvery { remoteInterface.getProject(PROJECT_ID) } returns apiProject
 
             val receivedProject = configRemoteDataSourceImpl.getProject(PROJECT_ID)
 
-            assertThat(receivedProject).isEqualTo(project)
+            assertThat(receivedProject.first).isEqualTo(project)
+            assertThat(receivedProject.second).isEqualTo(projectConfiguration)
         }
 
     @Test
     fun `Get no project if backend maintenance exception`() =
         runTest(StandardTestDispatcher()) {
             val exception = BackendMaintenanceException(estimatedOutage = 100)
-            coEvery {
-                remoteInterface.getProject(PROJECT_ID)
-            } throws exception
+            coEvery { remoteInterface.getProject(PROJECT_ID) } throws exception
 
             val receivedException = assertThrows<BackendMaintenanceException> {
                 configRemoteDataSourceImpl.getProject(PROJECT_ID)
@@ -119,9 +77,7 @@ class ConfigRemoteDataSourceImplTest {
     fun `Get no project if sync cloud integration exception`() =
         runTest(StandardTestDispatcher()) {
             val exception = SyncCloudIntegrationException(cause = Exception())
-            coEvery {
-                remoteInterface.getProject(PROJECT_ID)
-            } throws exception
+            coEvery { remoteInterface.getProject(PROJECT_ID) } throws exception
 
             val receivedException = assertThrows<SyncCloudIntegrationException> {
                 configRemoteDataSourceImpl.getProject(PROJECT_ID)

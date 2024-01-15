@@ -94,7 +94,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             binding.logs.append("\nGetting Configs from BFSID")
             lifecycleScope.launch {
                 try {
-                    configManager.refreshProjectConfiguration(authStore.signedInProjectId)
+                    configManager.refreshProject(authStore.signedInProjectId)
                     binding.logs.append("\nGot Configs from BFSID")
                 } catch (e: Exception) {
                     binding.logs.append("\nFailed to refresh the project configuration")

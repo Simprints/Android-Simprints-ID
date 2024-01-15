@@ -28,7 +28,6 @@ internal class ConfigurationWorker @AssistedInject constructor(
             Result.failure()
         } else {
             configManager.refreshProject(projectId)
-            configManager.refreshProjectConfiguration(projectId)
             Simber.tag(tag).i("Successfully refresh the project configuration")
             Result.success()
         }

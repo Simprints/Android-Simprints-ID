@@ -5,9 +5,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 
 internal interface ConfigRemoteDataSource {
 
-    suspend fun getConfiguration(projectId: String): ProjectConfiguration
-
-    suspend fun getProject(projectId: String): Project
+    suspend fun getProject(projectId: String): Pair<Project, ProjectConfiguration>
 
     suspend fun getPrivacyNotice(projectId: String, fileId: String): String
 }

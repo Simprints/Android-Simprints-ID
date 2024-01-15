@@ -32,10 +32,11 @@ class ConfigManagerImplTest {
 
     @Test
     fun `refreshProject should call the correct method`() = runTest {
-        coEvery { configRepository.refreshProject(PROJECT_ID) } returns project
+        coEvery { configRepository.refreshProject(PROJECT_ID) } returns (project to projectConfiguration)
 
         val refreshedProject = configManager.refreshProject(PROJECT_ID)
-        assertThat(refreshedProject).isEqualTo(project)
+        assertThat(refreshedProject.first).isEqualTo(project)
+        assertThat(refreshedProject.second).isEqualTo(projectConfiguration)
     }
 
     @Test
@@ -52,14 +53,6 @@ class ConfigManagerImplTest {
 
         val gottenProjectConfiguration = configManager.getProjectConfiguration()
         assertThat(gottenProjectConfiguration).isEqualTo(projectConfiguration)
-    }
-
-    @Test
-    fun `refreshProjectConfiguration should call the correct method`() = runTest {
-        coEvery { configRepository.refreshConfiguration(PROJECT_ID) } returns projectConfiguration
-
-        val refreshedProjectConfiguration = configManager.refreshProjectConfiguration(PROJECT_ID)
-        assertThat(refreshedProjectConfiguration).isEqualTo(projectConfiguration)
     }
 
     @Test

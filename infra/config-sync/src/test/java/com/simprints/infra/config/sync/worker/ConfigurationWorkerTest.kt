@@ -16,6 +16,7 @@ import org.junit.Test
 class ConfigurationWorkerTest {
 
     companion object {
+
         private const val PROJECT_ID = "projectId"
     }
 
@@ -39,7 +40,7 @@ class ConfigurationWorkerTest {
     @Test
     fun `should fail if the config service throws an exception`() = runTest {
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configManager.refreshProjectConfiguration(PROJECT_ID) } throws Exception()
+        coEvery { configManager.refreshProject(PROJECT_ID) } throws Exception()
 
         val result = configurationWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -48,8 +49,7 @@ class ConfigurationWorkerTest {
     @Test
     fun `should succeed if the config service doesn't throw an exception`() = runTest {
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configManager.refreshProjectConfiguration(PROJECT_ID) } returns projectConfiguration
-        coEvery { configManager.refreshProject(PROJECT_ID) } returns project
+        coEvery { configManager.refreshProject(PROJECT_ID) } returns (project to projectConfiguration)
 
         val result = configurationWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.success())

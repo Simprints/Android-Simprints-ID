@@ -4,8 +4,9 @@ import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -95,7 +96,6 @@ internal class SignerManagerTest {
     fun signIn_shouldSignInToRemoteDb() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
 
         signIn()
 
@@ -114,7 +114,6 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
 
         signIn()
 
@@ -134,7 +133,6 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
 
         signIn()
 
@@ -146,21 +144,6 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo(true)
-        mockFetchingProjectConfiguration()
-
-        assertThrows<Throwable> { signIn() }
-
-        verify { mockAuthStore.clearFirebaseToken() }
-        coVerify { mockConfigManager.clearData() }
-        verify { mockAuthStore.cleanCredentials() }
-    }
-
-    @Test
-    fun refreshProjectConfigurationFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
-        mockRemoteSignedIn()
-        mockStoreCredentialsLocally()
-        mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration(true)
 
         assertThrows<Throwable> { signIn() }
 
@@ -174,7 +157,6 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
 
         signIn()
     }
@@ -275,19 +257,12 @@ internal class SignerManagerTest {
                         "some_bucket_url",
                         "",
                         tokenizationKeys = emptyMap()
+                    ) to ProjectConfiguration(
+                        DEFAULT_PROJECT_ID, mockk(), mockk(), mockk(), mockk(), mockk(), mockk()
                     )
                 )
             } else {
                 this.throws(Exception("Failed to fetch project info"))
-            }
-        }
-
-    private fun mockFetchingProjectConfiguration(error: Boolean = false) =
-        coEvery { mockConfigManager.refreshProjectConfiguration(any()) }.apply {
-            if (!error) {
-                this.returns(mockk())
-            } else {
-                this.throws(Exception("Failed to fetch project configuration"))
             }
         }
 

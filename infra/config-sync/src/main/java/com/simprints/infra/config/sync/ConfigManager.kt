@@ -10,7 +10,7 @@ interface ConfigManager {
     /**
      * fetch the latest state of the project and save it locally
      */
-    suspend fun refreshProject(projectId: String): Project
+    suspend fun refreshProject(projectId: String): Pair<Project, ProjectConfiguration>
 
     /**
      * get the project locally or if not present fetch it remotely
@@ -21,11 +21,6 @@ interface ConfigManager {
      * get the project configuration locally
      */
     suspend fun getProjectConfiguration(): ProjectConfiguration
-
-    /**
-     * fetch the latest configuration of the project and save it locally
-     */
-    suspend fun refreshProjectConfiguration(projectId: String): ProjectConfiguration
 
     /**
      * fetch the current device configuration.
