@@ -6,7 +6,7 @@ import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.sync.ConfigurationScheduler
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
@@ -21,7 +21,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class SignerManager @Inject constructor(
-    private val configScheduler: ConfigurationScheduler,
+    private val configScheduler: ProjectConfigurationScheduler,
     private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
     private val eventSyncManager: EventSyncManager,

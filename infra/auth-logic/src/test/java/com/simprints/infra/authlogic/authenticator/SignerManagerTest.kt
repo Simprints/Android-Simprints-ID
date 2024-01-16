@@ -8,7 +8,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
-import com.simprints.infra.config.sync.ConfigurationScheduler
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -33,7 +33,7 @@ import org.junit.Test
 internal class SignerManagerTest {
 
     @MockK
-    lateinit var mockConfigScheduler: ConfigurationScheduler
+    lateinit var mockConfigScheduler: ProjectConfigurationScheduler
 
     @MockK
     lateinit var mockConfigManager: ConfigRepository

@@ -28,6 +28,7 @@ class CleanupDeprecatedWorkersUseCase @Inject constructor(
         "remote-config-work", // 2022.4.0
         "security-status-check-work", // 2023.2.0
         "image-upsync-work", // 2023.2.0
+        "project-configuration-work", // 2024.1.1
     )
 
     private fun tagsForDeprecatedWorkers() = listOf(
