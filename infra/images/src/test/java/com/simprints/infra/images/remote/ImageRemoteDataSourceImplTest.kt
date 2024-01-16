@@ -1,15 +1,21 @@
 package com.simprints.infra.images.remote
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.images.model.SecuredImageRef
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,84 +25,81 @@ import java.io.FileInputStream
 @RunWith(AndroidJUnit4::class)
 class ImageRemoteDataSourceImplTest {
 
+    @MockK
+    private lateinit var configRepo: ConfigRepository
+
+    @MockK
+    private lateinit var authStore: AuthStore
+
+    @MockK
+    private lateinit var mockImageStream: FileInputStream
+
+    @MockK
+    private lateinit var mockSecuredImageRef: SecuredImageRef
+
+    private lateinit var remoteDataSource: ImageRemoteDataSourceImpl
+
     @Before
     fun setup() {
+        MockKAnnotations.init(this, relaxed = true)
+
+        every { mockSecuredImageRef.relativePath.parts } returns arrayOf("Test1")
+
+        remoteDataSource = ImageRemoteDataSourceImpl(configRepo, authStore)
+
         // We need to mock statics and global extensions
         mockkStatic(FirebaseStorage::class)
         mockkStatic("kotlinx.coroutines.tasks.TasksKt")
     }
 
+    @After
+    fun tearDown() {
+        // Make sure static objects are unmocked
+        unmockkStatic(FirebaseStorage::class)
+        unmockkStatic("kotlinx.coroutines.tasks.TasksKt")
+    }
 
     @Test
     fun `test image upload flow`() = runTest {
+        coEvery { configRepo.getProject(any()).imageBucket } returns "gs://`simprints-dev.appspot.com"
+        every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
+        every { authStore.signedInProjectId } returns "projectId"
 
-        val imgUrlProviderMock = mockk<ConfigManager> {
-            coEvery { getProject(any()).imageBucket } returns "gs://`simprints-dev.appspot.com"
-        }
-
-        val authStoreMock = mockk<com.simprints.infra.authstore.AuthStore>(relaxed = true) {
-            every { getLegacyAppFallback() } returns mockk(relaxed = true)
-            every { getLegacyAppFallback().options.projectId } returns "projectId"
-            every { signedInProjectId } returns "projectId"
-        }
-
-        val storageMock = setupStoragemockk()
+        val storageMock = setupStorageMock()
 
         every { FirebaseStorage.getInstance(any(), any()) } returns storageMock
 
-        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, authStoreMock)
-        val imageStreamMock = mockk<FileInputStream>(relaxed = true)
+        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef)
 
-        val securedImageRefMock = mockk<SecuredImageRef>(relaxed = true) {
-            every { relativePath.parts } returns arrayOf("Test1")
-        }
-
-        val result = remoteDataSource.uploadImage(imageStreamMock, securedImageRefMock)
-
-        assert(result.isUploadSuccessful())
+        assertThat(result.isUploadSuccessful()).isTrue()
     }
 
     @Test
     fun `null project returns failed upload`() = runTest {
+        every { authStore.getLegacyAppFallback().options.projectId } returns null
 
-        val imgUrlProviderMock = mockk<ConfigManager>()
+        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef)
 
-        val authStoreMock = mockk<com.simprints.infra.authstore.AuthStore>(relaxed = true) {
-            every { getLegacyAppFallback().options.projectId } returns null
-        }
-
-        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, authStoreMock)
-        val rtn = remoteDataSource.uploadImage(mockk(), mockk())
-
-        assert(!rtn.isUploadSuccessful())
+        assertThat(result.isUploadSuccessful()).isFalse()
     }
 
     @Test
     fun `null storage bucket returns failed upload`() = runTest {
+        coEvery { configRepo.getProject(any()).imageBucket } returns ""
+        every { authStore.getLegacyAppFallback().options.projectId } returns "projectId"
 
-        val imgUrlProviderMock = mockk<ConfigManager> {
-            coEvery { getProject(any()).imageBucket } returns ""
-        }
+        val result = remoteDataSource.uploadImage(mockImageStream, mockSecuredImageRef)
 
-        val authStoreMock = mockk<com.simprints.infra.authstore.AuthStore>(relaxed = true) {
-            every { getLegacyAppFallback().options.projectId } returns "projectId"
-        }
-
-        val remoteDataSource = ImageRemoteDataSourceImpl(imgUrlProviderMock, authStoreMock)
-        val rtn = remoteDataSource.uploadImage(mockk(), mockk())
-
-        assert(!rtn.isUploadSuccessful())
+        assertThat(result.isUploadSuccessful()).isFalse()
     }
 
-    private fun setupStoragemockk() = mockk<FirebaseStorage>(relaxed = true) {
-        every { reference } returns mockk {
-            every { child(any()) } returns mockk {
-                every { path } returns "testPath"
-                every { putStream(any()) } returns mockk {
-                    coEvery { await() } returns mockk {
-                        every { task } returns mockk {
-                            every { isSuccessful } returns true
-                        }
+    private fun setupStorageMock() = mockk<FirebaseStorage>(relaxed = true) {
+        every { reference.child(any()) } returns mockk {
+            every { path } returns "testPath"
+            every { putStream(any()) } returns mockk {
+                coEvery { await() } returns mockk {
+                    every { task } returns mockk {
+                        every { isSuccessful } returns true
                     }
                 }
             }

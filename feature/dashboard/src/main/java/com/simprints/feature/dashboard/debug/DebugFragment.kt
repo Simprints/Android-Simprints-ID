@@ -11,16 +11,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.toList
@@ -35,7 +35,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var eventSyncManager: EventSyncManager
 
     @Inject
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @Inject
     lateinit var authStore: AuthStore
@@ -94,7 +94,9 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
             binding.logs.append("\nGetting Configs from BFSID")
             lifecycleScope.launch {
                 try {
-                    configManager.refreshProject(authStore.signedInProjectId)
+                    configRepository.refreshProject(authStore.signedInProjectId).also { (project, _) ->
+                        enrolmentRecordRepository.tokenizeExistingRecords(project)
+                    }
                     binding.logs.append("\nGot Configs from BFSID")
                 } catch (e: Exception) {
                     binding.logs.append("\nFailed to refresh the project configuration")

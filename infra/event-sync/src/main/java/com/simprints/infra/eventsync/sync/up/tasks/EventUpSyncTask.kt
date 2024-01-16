@@ -46,7 +46,7 @@ internal class EventUpSyncTask @Inject constructor(
             }
         }
 
-        val config = configRepository.getConfiguration()
+        val config = configRepository.getProjectConfiguration()
         var lastOperation = operation.copy()
         var count = 0
         try {

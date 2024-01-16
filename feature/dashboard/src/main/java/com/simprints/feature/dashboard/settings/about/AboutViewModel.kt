@@ -9,7 +9,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val authManager: AuthManager,
     private val authStore: AuthStore,
     private val eventSyncManager: EventSyncManager,
@@ -76,14 +76,14 @@ internal class AboutViewModel @Inject constructor(
         eventSyncManager.countEventsToUpload(projectId = projectId, type = null).first() > 0
 
     private suspend fun canSyncDataToSimprints(): Boolean =
-        configManager.getProjectConfiguration().canSyncDataToSimprints()
+        configRepository.getProjectConfiguration().canSyncDataToSimprints()
 
     private fun logout() {
         externalScope.launch { authManager.signOut() }
     }
 
     private fun load() = viewModelScope.launch {
-        val configuration = configManager.getProjectConfiguration()
+        val configuration = configRepository.getProjectConfiguration()
         val syncAndSearchConfig = SyncAndSearchConfig(
             configuration.synchronization.down.partitionType.name,
             configuration.identification.poolType.name,

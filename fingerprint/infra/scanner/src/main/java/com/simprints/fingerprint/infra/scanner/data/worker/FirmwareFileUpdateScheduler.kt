@@ -9,8 +9,8 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.core.ExternalScope
 import com.simprints.fingerprint.infra.scanner.BuildConfig
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -22,17 +22,17 @@ import javax.inject.Inject
  * firmware version, if any updates available, on the device.
  *
  * @property context  the application context used for scheduling the worker
- * @property configManager the configuration manager for checking the version of the connected Vero scanner
+ * @property configRepository the configuration manager for checking the version of the connected Vero scanner
  */
 class FirmwareFileUpdateScheduler @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
     fun scheduleOrCancelWorkIfNecessary() {
         externalScope.launch {
-            if (configManager.getProjectConfiguration().fingerprint?.allowedScanners?.contains(
+            if (configRepository.getProjectConfiguration().fingerprint?.allowedScanners?.contains(
                     FingerprintConfiguration.VeroGeneration.VERO_2
                 ) == true
             ) {
@@ -66,6 +66,7 @@ class FirmwareFileUpdateScheduler @Inject constructor(
             .build()
 
     companion object {
+
         const val WORK_NAME = "firmware-file-update-work"
         const val REPEAT_INTERVAL = BuildConfig.FIRMWARE_UPDATE_WORKER_INTERVAL_MINUTES
         val REPEAT_INTERVAL_UNIT = TimeUnit.MINUTES

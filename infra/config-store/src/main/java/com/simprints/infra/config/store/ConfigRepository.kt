@@ -11,7 +11,7 @@ interface ConfigRepository {
 
     suspend fun refreshProject(projectId: String): ProjectWithConfig
     suspend fun getProject(projectId: String): Project
-    suspend fun getConfiguration(): ProjectConfiguration
+    suspend fun getProjectConfiguration(): ProjectConfiguration
 
     suspend fun getDeviceConfiguration(): DeviceConfiguration
     suspend fun updateDeviceConfiguration(update: suspend (t: DeviceConfiguration) -> DeviceConfiguration)

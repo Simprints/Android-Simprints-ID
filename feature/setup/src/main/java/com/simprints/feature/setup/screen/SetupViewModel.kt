@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.feature.setup.LocationStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class SetupViewModel @Inject constructor(
     private val locationStore: LocationStore,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) : ViewModel() {
 
     val requestLocationPermission: LiveData<Unit>
@@ -45,5 +45,5 @@ internal class SetupViewModel @Inject constructor(
     }
 
     private suspend fun shouldCollectLocation() =
-        configManager.getProjectConfiguration().general.collectLocation
+        configRepository.getProjectConfiguration().general.collectLocation
 }
