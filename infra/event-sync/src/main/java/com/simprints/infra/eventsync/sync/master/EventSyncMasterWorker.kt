@@ -7,6 +7,8 @@ import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
@@ -30,13 +32,13 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
     private val upSyncWorkerBuilder: EventUpSyncWorkersBuilder,
     private val configRepository: ConfigRepository,
     private val eventSyncCache: EventSyncCache,
-    private val securityStateRepository: SecurityStateRepository,
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
     private val timeHelper: TimeHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
 
     companion object {
+
         const val OUTPUT_LAST_SYNC_ID = "OUTPUT_LAST_SYNC_ID"
     }
 
@@ -62,7 +64,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
                 showProgressNotification()
                 val configuration = configRepository.getProjectConfiguration()
 
-                if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed()) return@withContext success(
+                if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed(configuration)) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
                 )
 
@@ -111,13 +113,13 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
             }
         }
 
-    private suspend fun isEventDownSyncAllowed(): Boolean {
+    private suspend fun isEventDownSyncAllowed(configuration: ProjectConfiguration): Boolean {
         val isProjectPaused =
-            securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PROJECT_PAUSED
+            configRepository.getProject(configuration.projectId).state == ProjectState.PROJECT_PAUSED
+
         val isDownSyncConfigEnabled =
-            with(configRepository.getProjectConfiguration().synchronization) {
-                frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
-            }
+            configuration.synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+
         return !isProjectPaused && isDownSyncConfigEnabled
     }
 

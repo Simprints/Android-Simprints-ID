@@ -24,6 +24,7 @@ import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
@@ -32,8 +33,6 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.projectsecuritystore.SecurityStateRepository
-import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -49,7 +48,6 @@ internal class SyncViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
-    private val securityStateRepository: SecurityStateRepository,
     private val authManager: AuthManager,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
@@ -89,13 +87,16 @@ internal class SyncViewModel @Inject constructor(
         // CORE-2638
         // When project is in ENDING state and all data is synchronized, the user must be logged out
         _signOutEventLiveData.addSource(_syncCardLiveData) { cardState ->
-            val isSyncComplete = cardState is SyncComplete
-            val isProjectEnding =
-                securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PROJECT_ENDING
-            if (isSyncComplete && isProjectEnding) {
-                externalScope.launch {
-                    authManager.signOut()
-                    _signOutEventLiveData.postValue(LiveDataEvent())
+            viewModelScope.launch {
+                val isSyncComplete = cardState is SyncComplete
+                val isProjectEnding =
+                    configRepository.getProject(authStore.signedInProjectId).state == ProjectState.PROJECT_ENDING
+
+                if (isSyncComplete && isProjectEnding) {
+                    externalScope.launch {
+                        authManager.signOut()
+                        _signOutEventLiveData.postValue(LiveDataEvent())
+                    }
                 }
             }
         }

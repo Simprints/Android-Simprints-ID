@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 import com.simprints.infra.config.store.models.SynchronizationConfiguration.Frequency.PERIODICALLY
@@ -20,7 +21,6 @@ import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
-import com.simprints.infra.projectsecuritystore.SecurityStateRepository
 import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.*
@@ -33,6 +33,7 @@ import org.junit.Test
 internal class EventSyncMasterWorkerTest {
 
     companion object {
+
         private const val UNIQUE_SYNC_ID = "uniqueId"
     }
 
@@ -85,11 +86,7 @@ internal class EventSyncMasterWorkerTest {
     lateinit var configRepository: ConfigRepository
 
     @MockK
-    lateinit var securityStateRepository: SecurityStateRepository
-
-    @MockK
     lateinit var timeHelper: TimeHelper
-
 
     private lateinit var masterWorker: EventSyncMasterWorker
 
@@ -112,6 +109,7 @@ internal class EventSyncMasterWorkerTest {
         every { eventSyncSubMasterWorkersBuilder.buildEndSyncReporterWorker(any()) } returns endSyncReporterWorker
 
         every { synchronizationConfiguration.up.simprints } returns bfsidUpSynchronizationConfiguration
+        every { projectConfiguration.projectId } returns "projectId"
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
         coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
 
@@ -124,7 +122,6 @@ internal class EventSyncMasterWorkerTest {
             upSyncWorkerBuilder = upSyncWorkerBuilder,
             configRepository = configRepository,
             eventSyncCache = eventSyncCache,
-            securityStateRepository = securityStateRepository,
             eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
             timeHelper = timeHelper,
             dispatcher = testCoroutineRule.testCoroutineDispatcher
@@ -248,9 +245,8 @@ internal class EventSyncMasterWorkerTest {
 
     @Test
     fun `event down sync should be disabled when project state is paused`() = runTest {
-        val securityStatus = SecurityState.Status.PROJECT_PAUSED
         val result = getIsEventDownSyncAllowedResult(
-            securityStatus = securityStatus,
+            projectState = ProjectState.PROJECT_PAUSED,
             syncConfig = PERIODICALLY
         )
         assertThat(result).isInstanceOf(Success::class.java)
@@ -260,9 +256,8 @@ internal class EventSyncMasterWorkerTest {
     @Test
     fun `event down sync should be disabled when sync config is ONLY_PERIODICALLY_UP_SYNC`() =
         runTest {
-            val securityStatus = SecurityState.Status.RUNNING
             val result = getIsEventDownSyncAllowedResult(
-                securityStatus = securityStatus,
+                projectState = ProjectState.RUNNING,
                 syncConfig = ONLY_PERIODICALLY_UP_SYNC
             )
             assertThat(result).isInstanceOf(Success::class.java)
@@ -270,11 +265,12 @@ internal class EventSyncMasterWorkerTest {
         }
 
     private suspend fun getIsEventDownSyncAllowedResult(
-        securityStatus: SecurityState.Status,
-        syncConfig: SynchronizationConfiguration.Frequency
+        projectState: ProjectState,
+        syncConfig: SynchronizationConfiguration.Frequency,
     ): ListenableWorker.Result {
-        coEvery { securityStateRepository.getSecurityStatusFromLocal() } returns securityStatus
+        coEvery { configRepository.getProject(any()).state } returns projectState
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
+            every { projectId } returns "projectId"
             every { synchronization } returns mockk {
                 every { frequency } returns syncConfig
                 every { up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
