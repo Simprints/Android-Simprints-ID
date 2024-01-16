@@ -57,8 +57,8 @@ class ConfigRemoteDataSourceImplTest {
 
             val receivedProject = configRemoteDataSourceImpl.getProject(PROJECT_ID)
 
-            assertThat(receivedProject.first).isEqualTo(project)
-            assertThat(receivedProject.second).isEqualTo(projectConfiguration)
+            assertThat(receivedProject.project).isEqualTo(project)
+            assertThat(receivedProject.configuration).isEqualTo(projectConfiguration)
         }
 
     @Test

@@ -2,14 +2,14 @@ package com.simprints.infra.config.store
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepositoryImpl.Companion.PRIVACY_NOTICE_FILE
+import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.InProgress
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.local.ConfigLocalDataSource
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.store.testtools.deviceConfiguration
 import com.simprints.infra.config.store.testtools.project
@@ -21,7 +21,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.*
+import io.mockk.verify
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -65,7 +65,7 @@ class ConfigRepositoryImplTest {
     fun `should get the project remotely if not available locally and save it`() = runTest {
         coEvery { localDataSource.saveProject(project) } returns Unit
         coEvery { localDataSource.getProject() } throws NoSuchElementException()
-        coEvery { remoteDataSource.getProject(PROJECT_ID) } returns (project to projectConfiguration)
+        coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
         val receivedProject = configServiceImpl.getProject(PROJECT_ID)
 
@@ -93,7 +93,7 @@ class ConfigRepositoryImplTest {
     fun `refreshProject() should get the project remotely and save it and update the api base url if not empty`() =
         runTest {
             coEvery { localDataSource.saveProject(project) } returns Unit
-            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns (project to projectConfiguration)
+            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
             configServiceImpl.refreshProject(PROJECT_ID)
             coVerify(exactly = 1) { localDataSource.saveProject(project) }
@@ -115,7 +115,7 @@ class ConfigRepositoryImplTest {
                 tokenizationKeys = emptyMap()
             )
             coEvery { localDataSource.saveProject(project) } returns Unit
-            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns (project to projectConfiguration)
+            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
             configServiceImpl.refreshProject(PROJECT_ID)
             coVerify(exactly = 1) { localDataSource.saveProject(project) }

@@ -6,6 +6,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
@@ -249,16 +250,19 @@ internal class SignerManagerTest {
         coEvery { mockConfigManager.refreshProject(any()) }.apply {
             if (!error) {
                 this.returns(
-                    Project(
-                        DEFAULT_PROJECT_ID,
-                        "local",
-                        "",
-                        "",
-                        "some_bucket_url",
-                        "",
-                        tokenizationKeys = emptyMap()
-                    ) to ProjectConfiguration(
-                        DEFAULT_PROJECT_ID, mockk(), mockk(), mockk(), mockk(), mockk(), mockk()
+                    ProjectWithConfig(
+                        Project(
+                            DEFAULT_PROJECT_ID,
+                            "local",
+                            "",
+                            "",
+                            "some_bucket_url",
+                            "",
+                            tokenizationKeys = emptyMap()
+                        ),
+                        ProjectConfiguration(
+                            DEFAULT_PROJECT_ID, mockk(), mockk(), mockk(), mockk(), mockk(), mockk()
+                        )
                     )
                 )
             } else {

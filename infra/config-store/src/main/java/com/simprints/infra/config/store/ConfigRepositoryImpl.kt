@@ -10,6 +10,7 @@ import com.simprints.infra.config.store.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.local.ConfigLocalDataSource
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.remote.ConfigRemoteDataSource
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
@@ -34,10 +35,10 @@ internal class ConfigRepositoryImpl @Inject constructor(
     override suspend fun getProject(projectId: String): Project = try {
         localDataSource.getProject()
     } catch (e: NoSuchElementException) {
-        refreshProject(projectId).first
+        refreshProject(projectId).project
     }
 
-    override suspend fun refreshProject(projectId: String): Pair<Project, ProjectConfiguration> =
+    override suspend fun refreshProject(projectId: String): ProjectWithConfig =
         remoteDataSource
             .getProject(projectId)
             .also { (project, configuration) ->
@@ -55,7 +56,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
         return if (localConfig.projectId.isEmpty()) {
             try {
                 // Try to refresh it with logged in projectId (if any)
-                refreshProject(localDataSource.getProject().id).second
+                refreshProject(localDataSource.getProject().id).configuration
             } catch (e: Exception) {
                 // If not logged in the above will fail. However we still depend on the 'default'
                 // configuration to create the session when login is attempted. Possibly in other

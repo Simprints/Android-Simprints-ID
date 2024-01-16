@@ -4,6 +4,7 @@ import com.simprints.core.DispatcherIO
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.network.SimNetwork
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -22,10 +23,10 @@ internal class ConfigRemoteDataSourceImpl(
         @DispatcherIO dispatcherIO: CoroutineDispatcher,
     ) : this(authStore, dispatcherIO, { url -> URL(url).readText() })
 
-    override suspend fun getProject(projectId: String): Pair<Project, ProjectConfiguration> =
+    override suspend fun getProject(projectId: String): ProjectWithConfig =
         getApiClient()
             .executeCall { it.getProject(projectId) }
-            .let { it.toDomain() to it.configuration.toDomain() }
+            .let { ProjectWithConfig(it.toDomain(), it.configuration.toDomain()) }
 
     override suspend fun getPrivacyNotice(projectId: String, fileId: String): String {
         val url = getApiClient().executeCall { it.getFileUrl(projectId, fileId) }.url

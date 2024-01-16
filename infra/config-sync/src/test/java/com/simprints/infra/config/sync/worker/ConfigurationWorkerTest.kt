@@ -2,11 +2,11 @@ package com.simprints.infra.config.sync.worker
 
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.ProjectWithConfig
+import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.sync.testtools.project
 import com.simprints.infra.config.sync.testtools.projectConfiguration
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -49,7 +49,7 @@ class ConfigurationWorkerTest {
     @Test
     fun `should succeed if the config service doesn't throw an exception`() = runTest {
         every { authStore.signedInProjectId } returns PROJECT_ID
-        coEvery { configManager.refreshProject(PROJECT_ID) } returns (project to projectConfiguration)
+        coEvery { configManager.refreshProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
         val result = configurationWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.success())

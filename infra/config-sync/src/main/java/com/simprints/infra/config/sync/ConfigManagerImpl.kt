@@ -5,6 +5,7 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.sync.worker.ConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,7 @@ internal class ConfigManagerImpl @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) : ConfigManager {
 
-    override suspend fun refreshProject(projectId: String): Pair<Project, ProjectConfiguration> =
+    override suspend fun refreshProject(projectId: String): ProjectWithConfig =
         configRepository.refreshProject(projectId).also { (project, _) ->
             enrolmentRecordRepository.tokenizeExistingRecords(project)
         }

@@ -1,11 +1,10 @@
 package com.simprints.infra.config.store.remote
 
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectWithConfig
 
 internal interface ConfigRemoteDataSource {
 
-    suspend fun getProject(projectId: String): Pair<Project, ProjectConfiguration>
+    suspend fun getProject(projectId: String): ProjectWithConfig
 
     suspend fun getPrivacyNotice(projectId: String, fileId: String): String
 }
