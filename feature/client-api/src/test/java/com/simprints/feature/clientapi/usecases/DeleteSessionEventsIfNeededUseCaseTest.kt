@@ -1,6 +1,6 @@
 package com.simprints.feature.clientapi.usecases
 
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -21,7 +21,7 @@ class DeleteSessionEventsIfNeededUseCaseTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var eventRepository: EventRepository
@@ -33,7 +33,7 @@ class DeleteSessionEventsIfNeededUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         deleteUseCase = DeleteSessionEventsIfNeededUseCase(
-            configManager,
+            configRepository,
             eventRepository,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
@@ -41,7 +41,7 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
     @Test
     fun `deletes session events if data sync disabled`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             coEvery { synchronization.up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE
         }
 
@@ -54,7 +54,7 @@ class DeleteSessionEventsIfNeededUseCaseTest {
     @Test
     fun `does not delete session events if data sync enabled`() = runTest {
 
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             coEvery { synchronization.up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.ALL
         }
 

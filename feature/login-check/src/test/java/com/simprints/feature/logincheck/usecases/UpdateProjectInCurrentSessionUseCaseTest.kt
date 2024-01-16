@@ -2,7 +2,7 @@ package com.simprints.feature.logincheck.usecases
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
@@ -28,7 +28,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     lateinit var authStore: AuthStore
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     lateinit var useCase: UpdateProjectInCurrentSessionUseCase
 
@@ -37,11 +37,11 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
 
         every { authStore.signedInProjectId } returns SIGNED_PROJECT_ID
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns emptyList()
         }
 
-        useCase = UpdateProjectInCurrentSessionUseCase(eventRepository, authStore, configManager)
+        useCase = UpdateProjectInCurrentSessionUseCase(eventRepository, authStore, configRepository)
     }
 
     @Test
@@ -83,7 +83,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     @Test
     fun `Update language in current session event when project ID updates`() = runTest {
         val language = "lang"
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { this@mockk.language } returns language
         }
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createBlankSessionEvent(OTHER_PROJECT_ID)

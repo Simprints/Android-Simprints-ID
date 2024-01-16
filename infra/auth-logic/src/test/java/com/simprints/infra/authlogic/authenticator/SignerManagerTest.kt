@@ -4,9 +4,10 @@ import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -31,7 +32,10 @@ import org.junit.Test
 internal class SignerManagerTest {
 
     @MockK
-    lateinit var mockConfigManager: ConfigManager
+    lateinit var mockConfigScheduler: ProjectConfigurationScheduler
+
+    @MockK
+    lateinit var mockConfigManager: ConfigRepository
 
     @MockK
     lateinit var mockAuthStore: AuthStore
@@ -77,6 +81,7 @@ internal class SignerManagerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         signerManager = SignerManager(
+            mockConfigScheduler,
             mockConfigManager,
             mockAuthStore,
             mockEventSyncManager,
@@ -184,7 +189,7 @@ internal class SignerManagerTest {
 
         coVerify { mockEventSyncManager.cancelScheduledSync() }
         verify { mockImageUpSyncScheduler.cancelImageUpSync() }
-        coVerify { mockConfigManager.cancelScheduledSyncConfiguration() }
+        coVerify { mockConfigScheduler.cancelScheduledSync() }
     }
 
     @Test

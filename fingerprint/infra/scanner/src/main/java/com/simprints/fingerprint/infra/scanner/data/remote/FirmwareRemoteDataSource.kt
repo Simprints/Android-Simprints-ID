@@ -3,7 +3,7 @@ package com.simprints.fingerprint.infra.scanner.data.remote
 import com.simprints.fingerprint.infra.scanner.data.remote.network.FingerprintFileDownloader
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.domain.versions.getAvailableVersionsForDownload
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ import javax.inject.Inject
  */
 internal class FirmwareRemoteDataSource @Inject constructor(
     private val fingerprintFileDownloader: FingerprintFileDownloader,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) {
 
     /**
@@ -24,7 +24,7 @@ internal class FirmwareRemoteDataSource @Inject constructor(
         hardwareVersion: String,
         localFirmwareVersions: Map<DownloadableFirmwareVersion.Chip, Set<String>>
     ): List<DownloadableFirmwareVersion> =
-        configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.getAvailableVersionsForDownload(
+        configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.getAvailableVersionsForDownload(
             hardwareVersion,
             localFirmwareVersions
         ) ?: listOf()

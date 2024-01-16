@@ -8,7 +8,7 @@ import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.consent.screens.consent.helpers.GeneralConsentTextHelper
 import com.simprints.feature.consent.screens.consent.helpers.ParentalConsentTextHelper
 import com.simprints.feature.exitform.ExitFormResult
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
@@ -49,7 +49,7 @@ class ConsentViewModelTest {
     private lateinit var parentalConsentTextHelper: ParentalConsentTextHelper
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var projectConfig: ProjectConfiguration
@@ -65,7 +65,7 @@ class ConsentViewModelTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        coEvery { configManager.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         every { projectConfig.consent } returns mockk()
 
         every { timeHelper.now() } returns TIMESTAMP
@@ -74,7 +74,7 @@ class ConsentViewModelTest {
 
         vm = ConsentViewModel(
             timeHelper,
-            configManager,
+            configRepository,
             eventRepository,
             generalConsentTextHelper,
             parentalConsentTextHelper,
@@ -91,7 +91,7 @@ class ConsentViewModelTest {
         vm.loadConfiguration(ConsentType.ENROL)
         val state = vm.viewState.getOrAwaitValue()
 
-        coVerify { configManager.getProjectConfiguration() }
+        coVerify { configRepository.getProjectConfiguration() }
         verify { generalConsentTextHelper.assembleText(any(), eq(defaultModalityList), eq(ConsentType.ENROL)) }
         verify { parentalConsentTextHelper.assembleText(any(), eq(defaultModalityList), eq(ConsentType.ENROL)) }
 

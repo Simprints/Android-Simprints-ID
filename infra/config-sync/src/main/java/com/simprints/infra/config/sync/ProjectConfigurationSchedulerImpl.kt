@@ -1,8 +1,8 @@
-package com.simprints.infra.config.sync.worker
+package com.simprints.infra.config.sync
 
 import android.content.Context
 import androidx.work.*
-import com.simprints.infra.config.sync.BuildConfig
+import com.simprints.infra.config.sync.worker.ProjectConfigDownSyncWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

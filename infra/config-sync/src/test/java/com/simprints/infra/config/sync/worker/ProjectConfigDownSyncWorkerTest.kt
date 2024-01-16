@@ -2,11 +2,10 @@ package com.simprints.infra.config.sync.worker
 
 import androidx.work.ListenableWorker
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.sync.testtools.project
-import com.simprints.infra.config.sync.testtools.projectConfiguration
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.testtools.project
+import com.simprints.infra.config.sync.testtools.projectConfiguration
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.every

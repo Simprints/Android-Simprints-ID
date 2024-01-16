@@ -49,7 +49,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
                 }
             }
 
-    override suspend fun getConfiguration(): ProjectConfiguration {
+    override suspend fun getProjectConfiguration(): ProjectConfiguration {
         val localConfig = localDataSource.getProjectConfiguration()
         // If projectId is empty, configuration hasn't been downloaded yet
         return if (localConfig.projectId.isEmpty()) {

@@ -4,7 +4,7 @@ import com.simprints.fingerprint.infra.scanner.data.local.FirmwareLocalDataSourc
 import com.simprints.fingerprint.infra.scanner.data.remote.FirmwareRemoteDataSource
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion
 import com.simprints.fingerprint.infra.scanner.domain.ota.DownloadableFirmwareVersion.Chip
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class FirmwareRepository @Inject internal constructor(
     private val firmwareRemoteDataSource: FirmwareRemoteDataSource,
     private val firmwareLocalDataSource: FirmwareLocalDataSource,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
 ) {
 
     /**
@@ -24,7 +24,7 @@ class FirmwareRepository @Inject internal constructor(
      * first checks the local version and matches that against the remote versions, then subsequently updating the rlocal versios that need to be updated.
      */
     suspend fun updateStoredFirmwareFilesWithLatest() {
-        configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.keys?.forEach { hardwareVersion ->
+        configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.keys?.forEach { hardwareVersion ->
             updateStoredFirmwareFilesWithLatest(hardwareVersion)
         }
     }
@@ -81,7 +81,7 @@ class FirmwareRepository @Inject internal constructor(
         val cypressOfficialVersions = mutableSetOf<String>()
         val stmOfficialVersions = mutableSetOf<String>()
         val un20OfficialVersions = mutableSetOf<String>()
-        configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.entries?.forEach {
+        configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.entries?.forEach {
             cypressOfficialVersions.add(it.value.cypress)
             stmOfficialVersions.add(it.value.stm)
             un20OfficialVersions.add(it.value.un20)

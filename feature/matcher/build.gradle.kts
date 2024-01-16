@@ -14,7 +14,6 @@ dependencies {
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:events"))
     implementation(project(":infra:config-store"))
-    implementation(project(":infra:config-sync"))
 
     implementation(project(":face:infra:face-bio-sdk"))
     implementation(project(":face:infra:roc-wrapper"))

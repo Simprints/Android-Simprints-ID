@@ -1,8 +1,9 @@
-package com.simprints.infra.config.sync.worker
+package com.simprints.infra.config.sync
 
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
+import com.simprints.infra.config.sync.ProjectConfigurationSchedulerImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

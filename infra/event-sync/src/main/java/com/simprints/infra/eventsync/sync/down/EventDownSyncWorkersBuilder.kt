@@ -24,7 +24,7 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
 ) {
 
     suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<OneTimeWorkRequest> {
-        val projectConfiguration = configRepository.getConfiguration()
+        val projectConfiguration = configRepository.getProjectConfiguration()
         val deviceConfiguration = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(

@@ -3,7 +3,7 @@ package com.simprints.id
 import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import javax.inject.Inject
@@ -11,7 +11,7 @@ import javax.inject.Inject
 class ScheduleBackgroundSyncUseCase @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
-    private val configManager: ConfigManager,
+    private val configScheduler: ProjectConfigurationScheduler,
     private val authManager: AuthManager,
     private val authStore: AuthStore,
     private val firmwareFileUpdateScheduler: FirmwareFileUpdateScheduler,
@@ -21,7 +21,7 @@ class ScheduleBackgroundSyncUseCase @Inject constructor(
         if (authStore.signedInProjectId.isNotEmpty()) {
             eventSyncManager.scheduleSync()
             imageUpSyncScheduler.scheduleImageUpSync()
-            configManager.scheduleSyncConfiguration()
+            configScheduler.scheduleSync()
             authManager.scheduleSecurityStateCheck()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }

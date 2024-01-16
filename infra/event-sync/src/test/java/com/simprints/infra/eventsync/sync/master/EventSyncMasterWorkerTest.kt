@@ -113,7 +113,7 @@ internal class EventSyncMasterWorkerTest {
 
         every { synchronizationConfiguration.up.simprints } returns bfsidUpSynchronizationConfiguration
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
-        coEvery { configRepository.getConfiguration() } returns projectConfiguration
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
 
         masterWorker = EventSyncMasterWorker(
             appContext = ctx,
@@ -240,7 +240,7 @@ internal class EventSyncMasterWorkerTest {
 
     @Test
     fun `doWork should fail if there is an exception`() = runTest {
-        coEvery { configRepository.getConfiguration() } throws Throwable()
+        coEvery { configRepository.getProjectConfiguration() } throws Throwable()
         val result = masterWorker.doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -274,7 +274,7 @@ internal class EventSyncMasterWorkerTest {
         syncConfig: SynchronizationConfiguration.Frequency
     ): ListenableWorker.Result {
         coEvery { securityStateRepository.getSecurityStatusFromLocal() } returns securityStatus
-        coEvery { configRepository.getConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { synchronization } returns mockk {
                 every { frequency } returns syncConfig
                 every { up.simprints.kind } returns UpSynchronizationConfiguration.UpSynchronizationKind.NONE

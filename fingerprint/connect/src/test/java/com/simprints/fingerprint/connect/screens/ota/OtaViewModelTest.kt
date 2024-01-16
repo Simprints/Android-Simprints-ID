@@ -13,8 +13,8 @@ import com.simprints.fingerprint.infra.scanner.domain.ota.StmOtaStep
 import com.simprints.fingerprint.infra.scanner.domain.ota.Un20OtaStep
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaFailedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerOtaOperationsWrapper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Vero2Configuration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.infra.recent.user.activity.domain.RecentUserActivity
@@ -62,7 +62,7 @@ class OtaViewModelTest {
     private lateinit var recentUserActivityManager: RecentUserActivityManager
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     private lateinit var otaViewModel: OtaViewModel
 
@@ -74,7 +74,7 @@ class OtaViewModelTest {
         coEvery {
             recentUserActivityManager.getRecentUserActivity()
         } returns RecentUserActivity(HARDWARE_VERSION, "", "".asTokenizableRaw(), 0, 0, 0, 0)
-        coEvery { configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions } returns mapOf(
+        coEvery { configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions } returns mapOf(
             HARDWARE_VERSION to Vero2Configuration.Vero2FirmwareVersions(
                 NEW_CYPRESS_VERSION,
                 NEW_STM_VERSION,
@@ -92,7 +92,7 @@ class OtaViewModelTest {
             reportFirmwareUpdate,
             timeHelperMock,
             recentUserActivityManager,
-            configManager
+            configRepository
         )
     }
 
