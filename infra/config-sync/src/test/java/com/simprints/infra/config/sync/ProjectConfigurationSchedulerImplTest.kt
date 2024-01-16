@@ -10,7 +10,7 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 
-class ConfigurationSchedulerImplTest {
+class ProjectConfigurationSchedulerImplTest {
 
     private val ctx = mockk<Context>()
     private val workManager = mockk<WorkManager>(relaxed = true)

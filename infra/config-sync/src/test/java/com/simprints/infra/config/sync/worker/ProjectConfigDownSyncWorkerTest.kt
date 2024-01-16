@@ -7,9 +7,11 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.sync.testtools.project
 import com.simprints.infra.config.sync.testtools.projectConfiguration
+import com.simprints.infra.config.sync.usecase.HandleProjectStateUseCase
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
@@ -29,6 +31,9 @@ class ProjectConfigDownSyncWorkerTest {
     @MockK
     private lateinit var configRepository: ConfigRepository
 
+    @MockK
+    private lateinit var handleProjectStateUseCase: HandleProjectStateUseCase
+
     private lateinit var projectConfigDownSyncWorker: ProjectConfigDownSyncWorker
 
     @Before
@@ -40,6 +45,7 @@ class ProjectConfigDownSyncWorkerTest {
             params = mockk(relaxed = true),
             authStore = authStore,
             configRepository = configRepository,
+            handleProjectState = handleProjectStateUseCase,
             dispatcher = testCoroutineRule.testCoroutineDispatcher,
         )
     }
@@ -68,6 +74,8 @@ class ProjectConfigDownSyncWorkerTest {
 
         val result = projectConfigDownSyncWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
+
+        coVerify { handleProjectStateUseCase.invoke(any(), any()) }
     }
 
     companion object {
