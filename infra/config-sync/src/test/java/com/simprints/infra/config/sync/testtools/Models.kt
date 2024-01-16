@@ -1,23 +1,7 @@
 package com.simprints.infra.config.sync.testtools
 
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.infra.config.store.models.ConsentConfiguration
-import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.Finger
-import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.store.models.IdentificationConfiguration
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.config.store.models.Vero1Configuration
-import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.models.*
 
 internal val generalConfiguration = GeneralConfiguration(
     listOf(GeneralConfiguration.Modality.FACE),
@@ -114,6 +98,7 @@ internal val project = Project(
     id = "id",
     name = "name",
     description = "description",
+    state = ProjectState.RUNNING,
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",

@@ -9,6 +9,7 @@ import com.simprints.infra.config.store.models.PrivacyNoticeResult.FailedBecause
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.InProgress
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.store.testtools.deviceConfiguration
@@ -108,6 +109,7 @@ class ConfigRepositoryImplTest {
             val project = Project(
                 "id",
                 "name",
+                ProjectState.RUNNING,
                 "description",
                 "creator",
                 "url",
