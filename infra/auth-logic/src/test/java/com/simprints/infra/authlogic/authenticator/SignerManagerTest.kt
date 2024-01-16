@@ -1,20 +1,17 @@
 package com.simprints.infra.authlogic.authenticator
 
 import com.simprints.fingerprint.infra.scanner.ScannerManager
-import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.ProjectWithConfig
-import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -33,25 +30,13 @@ import org.junit.Test
 internal class SignerManagerTest {
 
     @MockK
-    lateinit var mockConfigScheduler: ProjectConfigurationScheduler
-
-    @MockK
-    lateinit var mockConfigManager: ConfigRepository
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var mockAuthStore: AuthStore
 
     @MockK
-    lateinit var mockEventSyncManager: EventSyncManager
-
-    @MockK
-    lateinit var mockSecurityStateScheduler: SecurityStateScheduler
-
-    @MockK
     lateinit var mockRecentUserActivityManager: RecentUserActivityManager
-
-    @MockK
-    lateinit var mockImageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
     lateinit var mockSimNetwork: SimNetwork
@@ -82,13 +67,9 @@ internal class SignerManagerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         signerManager = SignerManager(
-            mockConfigScheduler,
-            mockConfigManager,
+            configRepository,
             mockAuthStore,
-            mockEventSyncManager,
-            mockSecurityStateScheduler,
             mockRecentUserActivityManager,
-            mockImageUpSyncScheduler,
             mockSimNetwork,
             mockImageRepository,
             mockEventRepository,
@@ -142,7 +123,7 @@ internal class SignerManagerTest {
 
         signIn()
 
-        coVerify { mockConfigManager.refreshProject(DEFAULT_PROJECT_ID) }
+        coVerify { configRepository.refreshProject(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -154,7 +135,7 @@ internal class SignerManagerTest {
         assertThrows<Throwable> { signIn() }
 
         verify { mockAuthStore.clearFirebaseToken() }
-        coVerify { mockConfigManager.clearData() }
+        coVerify { configRepository.clearData() }
         verify { mockAuthStore.cleanCredentials() }
     }
 
@@ -171,26 +152,9 @@ internal class SignerManagerTest {
     fun signOut_shouldRemoveAnyState() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        verifyStoredCredentialsGotCleaned()
-        verifyRemoteManagerGotSignedOut()
-        verifyLastSyncInfoGotDeleted()
-        coVerify(exactly = 1) { mockConfigManager.clearData() }
-    }
-
-    @Test
-    fun signOut_shouldCancelPeriodicSecurityStateCheck() = runTest(UnconfinedTestDispatcher()) {
-        signerManager.signOut()
-
-        verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
-    }
-
-    @Test
-    fun signOut_backgroundSyncWorkersAreCancelled() = runTest(UnconfinedTestDispatcher()) {
-        signerManager.signOut()
-
-        coVerify { mockEventSyncManager.cancelScheduledSync() }
-        verify { mockImageUpSyncScheduler.cancelImageUpSync() }
-        coVerify { mockConfigScheduler.cancelScheduledSync() }
+        verify { mockAuthStore.cleanCredentials() }
+        verify { mockAuthStore.clearFirebaseToken() }
+        coVerify(exactly = 1) { configRepository.clearData() }
     }
 
     @Test
@@ -211,7 +175,7 @@ internal class SignerManagerTest {
     fun signOut_clearConfiguration() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        coVerify { mockConfigManager.clearData() }
+        coVerify { configRepository.clearData() }
     }
 
     @Test
@@ -252,13 +216,14 @@ internal class SignerManagerTest {
         }
 
     private fun mockFetchingProjectInfo(error: Boolean = false) =
-        coEvery { mockConfigManager.refreshProject(any()) }.apply {
+        coEvery { configRepository.refreshProject(any()) }.apply {
             if (!error) {
                 this.returns(
                     ProjectWithConfig(
                         Project(
                             DEFAULT_PROJECT_ID,
                             "local",
+                            ProjectState.RUNNING,
                             "",
                             "",
                             "some_bucket_url",
@@ -275,9 +240,4 @@ internal class SignerManagerTest {
             }
         }
 
-    private fun verifyStoredCredentialsGotCleaned() =
-        verify { mockAuthStore.cleanCredentials() }
-
-    private fun verifyRemoteManagerGotSignedOut() = verify { mockAuthStore.clearFirebaseToken() }
-    private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
 }

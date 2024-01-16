@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
@@ -47,7 +48,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class SyncViewModelTest {
+internal class SyncViewModelTest {
 
     companion object {
 
@@ -84,7 +85,7 @@ class SyncViewModelTest {
     lateinit var authStore: AuthStore
 
     @MockK
-    lateinit var authManager: AuthManager
+    lateinit var logoutUseCase: LogoutUseCase
 
     @Before
     fun setUp() {
@@ -376,7 +377,7 @@ class SyncViewModelTest {
         val signOutEvent = viewModel.signOutEventLiveData.getOrAwaitValue()
 
         assertThat(signOutEvent).isNotNull()
-        coVerify(exactly = 1) { authManager.signOut() }
+        coVerify(exactly = 1) { logoutUseCase.invoke() }
     }
 
     private fun initViewModel(): SyncViewModel = SyncViewModel(
@@ -385,7 +386,7 @@ class SyncViewModelTest {
         configRepository = configRepository,
         timeHelper = timeHelper,
         authStore = authStore,
-        authManager = authManager,
+        logoutUseCase = logoutUseCase,
         externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
     )
 }

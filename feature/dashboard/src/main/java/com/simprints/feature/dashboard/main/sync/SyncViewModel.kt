@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
@@ -48,11 +49,12 @@ internal class SyncViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
-    private val authManager: AuthManager,
+    private val logoutUseCase: LogoutUseCase,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     companion object {
+
         private const val ONE_MINUTE = 1000 * 60L
         private const val MAX_TIME_BEFORE_SYNC_AGAIN = 5 * ONE_MINUTE
     }
@@ -94,7 +96,7 @@ internal class SyncViewModel @Inject constructor(
 
                 if (isSyncComplete && isProjectEnding) {
                     externalScope.launch {
-                        authManager.signOut()
+                        logoutUseCase()
                         _signOutEventLiveData.postValue(LiveDataEvent())
                     }
                 }

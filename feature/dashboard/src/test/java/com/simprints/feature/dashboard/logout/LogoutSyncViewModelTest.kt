@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.logout
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.authlogic.AuthManager
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -22,7 +22,7 @@ import org.junit.Test
 internal class LogoutSyncViewModelTest {
 
     @MockK
-    lateinit var authManager: AuthManager
+    lateinit var logoutUseCase: LogoutUseCase
 
     @MockK
     lateinit var configRepository: ConfigRepository
@@ -42,13 +42,13 @@ internal class LogoutSyncViewModelTest {
     fun `should logout correctly`() {
         val viewModel = LogoutSyncViewModel(
             configRepository = configRepository,
-            authManager = authManager,
+            logoutUseCase = logoutUseCase,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
 
         viewModel.logout()
 
-        coVerify(exactly = 1) { authManager.signOut() }
+        coVerify(exactly = 1) { logoutUseCase.invoke() }
     }
 
     @Test
@@ -61,7 +61,7 @@ internal class LogoutSyncViewModelTest {
         }
         val viewModel = LogoutSyncViewModel(
             configRepository = configRepository,
-            authManager = authManager,
+            logoutUseCase = logoutUseCase,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
         val resultConfig = viewModel.settingsLocked.getOrAwaitValue()
