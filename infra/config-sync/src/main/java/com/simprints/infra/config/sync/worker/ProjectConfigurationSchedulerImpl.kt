@@ -7,11 +7,11 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-internal class ConfigurationSchedulerImpl @Inject constructor(@ApplicationContext context: Context) :
-    ConfigurationScheduler {
+internal class ProjectConfigurationSchedulerImpl @Inject constructor(@ApplicationContext context: Context) :
+    ProjectConfigurationScheduler {
 
     companion object {
-        const val WORK_NAME = "project-configuration-work"
+        const val WORK_NAME = "project-down-sync-work"
         private const val SYNC_REPEAT_INTERVAL = BuildConfig.SYNC_PERIODIC_WORKER_INTERVAL_MINUTES
         private val SYNC_REPEAT_UNIT = TimeUnit.MINUTES
     }
@@ -31,7 +31,7 @@ internal class ConfigurationSchedulerImpl @Inject constructor(@ApplicationContex
     }
 
     private fun buildPeriodicRequest(): PeriodicWorkRequest =
-        PeriodicWorkRequestBuilder<ConfigurationWorker>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
+        PeriodicWorkRequestBuilder<ProjectConfigDownSyncWorker>(SYNC_REPEAT_INTERVAL, SYNC_REPEAT_UNIT)
             .setConstraints(workerConstraints())
             .build()
 

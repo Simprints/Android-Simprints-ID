@@ -5,14 +5,14 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.sync.worker.ConfigurationScheduler
+import com.simprints.infra.config.sync.worker.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 internal class ConfigManagerImpl @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val configurationScheduler: ConfigurationScheduler,
+    private val configurationScheduler: ProjectConfigurationScheduler,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) : ConfigManager {
 

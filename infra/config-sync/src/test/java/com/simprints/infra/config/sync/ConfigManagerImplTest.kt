@@ -6,7 +6,7 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.sync.testtools.deviceConfiguration
 import com.simprints.infra.config.sync.testtools.project
 import com.simprints.infra.config.sync.testtools.projectConfiguration
-import com.simprints.infra.config.sync.worker.ConfigurationScheduler
+import com.simprints.infra.config.sync.worker.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -22,7 +22,7 @@ class ConfigManagerImplTest {
     }
 
     private val configRepository = mockk<ConfigRepository>(relaxed = true)
-    private val configurationScheduler = mockk<ConfigurationScheduler>(relaxed = true)
+    private val configurationScheduler = mockk<ProjectConfigurationScheduler>(relaxed = true)
     private val enrolmentRecordRepository = mockk<EnrolmentRecordRepository>(relaxed = true)
     private val configManager = ConfigManagerImpl(
         configRepository = configRepository,

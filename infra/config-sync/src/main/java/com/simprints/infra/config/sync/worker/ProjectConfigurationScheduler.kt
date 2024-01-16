@@ -1,6 +1,6 @@
 package com.simprints.infra.config.sync.worker
 
-internal interface ConfigurationScheduler {
+internal interface ProjectConfigurationScheduler {
     fun scheduleSync()
     fun cancelScheduledSync()
 }
