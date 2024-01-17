@@ -14,6 +14,7 @@ internal class CancelBackgroundSyncUseCase @Inject constructor(
     operator fun invoke() {
         eventSyncManager.cancelScheduledSync()
         imageUpSyncScheduler.cancelImageUpSync()
-        configScheduler.cancelScheduledSync()
+        configScheduler.cancelProjectSync()
+        configScheduler.cancelDeviceSync()
     }
 }

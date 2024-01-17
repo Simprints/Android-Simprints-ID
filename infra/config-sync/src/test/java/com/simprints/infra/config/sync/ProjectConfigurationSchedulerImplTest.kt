@@ -27,11 +27,11 @@ class ProjectConfigurationSchedulerImplTest {
 
     @Test
     fun `scheduleSync should schedule the worker`() {
-        configurationSchedulerImpl.scheduleSync()
+        configurationSchedulerImpl.scheduleProjectSync()
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                ProjectConfigurationSchedulerImpl.WORK_NAME,
+                ProjectConfigurationSchedulerImpl.PROJECT_SYNC_WORK_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
                 any(),
             )
@@ -40,8 +40,8 @@ class ProjectConfigurationSchedulerImplTest {
 
     @Test
     fun `cancelSync should cancel the worker`() {
-        configurationSchedulerImpl.cancelScheduledSync()
+        configurationSchedulerImpl.cancelProjectSync()
 
-        verify { workManager.cancelUniqueWork(ProjectConfigurationSchedulerImpl.WORK_NAME) }
+        verify { workManager.cancelUniqueWork(ProjectConfigurationSchedulerImpl.PROJECT_SYNC_WORK_NAME) }
     }
 }

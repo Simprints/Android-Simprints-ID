@@ -13,9 +13,9 @@ import androidx.work.WorkManager
 import com.simprints.core.DispatcherIO
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentDebugBinding
-import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.EventSyncManager
@@ -38,10 +38,10 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
     lateinit var configRepository: ConfigRepository
 
     @Inject
-    lateinit var authStore: AuthStore
+    lateinit var configScheduler: ProjectConfigurationScheduler
 
     @Inject
-    lateinit var authManager: AuthManager
+    lateinit var authStore: AuthStore
 
     @Inject
     lateinit var eventRepository: EventRepository
@@ -105,7 +105,7 @@ internal class DebugFragment : Fragment(R.layout.fragment_debug) {
         }
 
         binding.syncDevice.setOnClickListener {
-            authManager.startSecurityStateCheck()
+            configScheduler.startDeviceSync()
         }
 
         binding.printRoomDb.setOnClickListener {

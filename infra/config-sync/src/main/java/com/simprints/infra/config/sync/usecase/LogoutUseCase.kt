@@ -1,4 +1,4 @@
-package com.simprints.feature.dashboard.logout.usecase
+package com.simprints.infra.config.sync.usecase
 
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authlogic.worker.SecurityStateScheduler
@@ -16,13 +16,11 @@ internal class LogoutUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke() {
-        // Cancel all background sync
         securityStateScheduler.cancelSecurityStateCheck()
-        eventSyncManager.cancelScheduledSync()
         imageUpSyncScheduler.cancelImageUpSync()
         configScheduler.cancelProjectSync()
         configScheduler.cancelDeviceSync()
-
+        eventSyncManager.cancelScheduledSync()
         eventSyncManager.deleteSyncInfo()
         authManager.signOut()
     }
