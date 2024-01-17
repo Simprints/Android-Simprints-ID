@@ -58,8 +58,8 @@ class FingerprintTemplateProviderImplTest {
         // Given
         val settings = null
         // When
-        val result = fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
-        // Then
+        fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
+        // Then exception is thrown
 
     }
 
@@ -72,7 +72,7 @@ class FingerprintTemplateProviderImplTest {
             timeOutMs = 0
         )
         // When
-        val result = fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
+        fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
         // Then
         coVerify {
             fingerprintCaptureWrapperFactory.captureWrapper
@@ -88,11 +88,7 @@ class FingerprintTemplateProviderImplTest {
     @Test(expected = FingerprintImageQualityCheck.QualityCheckFailedException::class)
     fun `test acquireFingerprintTemplate fails if quality score is less than threshold`() = runTest {
         // Given
-        val settings = FingerprintTemplateAcquisitionSettings(
-            processingResolution = Dpi(500),
-            qualityThreshold = 30,
-            timeOutMs = 0
-        )
+
         every { necImageQualityCalculator.getQualityScore(any()) } returns 10
         coVerify {
             fingerprintCaptureWrapperFactory.captureWrapper
