@@ -2,7 +2,7 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.FlowType
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.FingerComparisonStrategy
@@ -18,7 +18,7 @@ import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerCo
 
 internal class SaveMatchEventUseCase @Inject constructor(
     private val eventRepository: EventRepository,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
 
@@ -53,7 +53,7 @@ internal class SaveMatchEventUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getFingerprintComparisonStrategy() = configManager.getProjectConfiguration()
+    private suspend fun getFingerprintComparisonStrategy() = configRepository.getProjectConfiguration()
         .fingerprint
         ?.bioSdkConfiguration
         ?.comparisonStrategyForVerification

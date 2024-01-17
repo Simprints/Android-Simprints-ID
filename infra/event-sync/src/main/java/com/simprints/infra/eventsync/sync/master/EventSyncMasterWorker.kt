@@ -60,7 +60,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
             try {
                 crashlyticsLog("Start")
                 showProgressNotification()
-                val configuration = configRepository.getConfiguration()
+                val configuration = configRepository.getProjectConfiguration()
 
                 if (!configuration.canSyncDataToSimprints() && !isEventDownSyncAllowed()) return@withContext success(
                     message = "Can't sync to SimprintsID, skip"
@@ -115,7 +115,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
         val isProjectPaused =
             securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PROJECT_PAUSED
         val isDownSyncConfigEnabled =
-            with(configRepository.getConfiguration().synchronization) {
+            with(configRepository.getProjectConfiguration().synchronization) {
                 frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
             }
         return !isProjectPaused && isDownSyncConfigEnabled

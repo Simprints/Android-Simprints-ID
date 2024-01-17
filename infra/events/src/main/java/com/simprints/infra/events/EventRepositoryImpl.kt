@@ -56,7 +56,7 @@ internal open class EventRepositoryImpl @Inject constructor(
         closeAllSessions(NEW_SESSION)
 
         return reportException {
-            val projectConfiguration = configRepository.getConfiguration()
+            val projectConfiguration = configRepository.getProjectConfiguration()
             val deviceConfiguration = configRepository.getDeviceConfiguration()
             val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
             val sessionCaptureEvent = SessionCaptureEvent(

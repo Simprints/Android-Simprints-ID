@@ -22,7 +22,7 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
@@ -46,7 +46,7 @@ import javax.inject.Inject
 internal class SyncViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val connectivityTracker: ConnectivityTracker,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
     private val securityStateRepository: SecurityStateRepository,
@@ -153,7 +153,7 @@ internal class SyncViewModel @Inject constructor(
                     )
                 }
             }
-            configManager.getProjectConfiguration().also { configuration ->
+            configRepository.getProjectConfiguration().also { configuration ->
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
             eventSyncManager
@@ -259,13 +259,13 @@ internal class SyncViewModel @Inject constructor(
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
     private suspend fun isDownSyncAllowed() =
-        configManager.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+        configRepository.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 
     private suspend fun isSelectedModulesEmpty() =
-        configManager.getDeviceConfiguration().selectedModules.isEmpty()
+        configRepository.getDeviceConfiguration().selectedModules.isEmpty()
 
     private suspend fun isModuleSync() =
-        configManager.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        configRepository.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 

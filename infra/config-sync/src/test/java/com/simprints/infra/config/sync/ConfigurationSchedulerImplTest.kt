@@ -1,4 +1,4 @@
-package com.simprints.infra.config.sync.worker
+package com.simprints.infra.config.sync
 
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy

@@ -80,7 +80,7 @@ internal class EventUpSyncTaskTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         every { projectConfiguration.synchronization } returns synchronizationConfiguration
-        coEvery { configRepository.getConfiguration() } returns projectConfiguration
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfiguration
 
         eventUpSyncTask = EventUpSyncTask(
             authStore = authStore,

@@ -1,6 +1,6 @@
 package com.simprints.feature.logincheck.usecases
 
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.ConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import io.mockk.MockKAnnotations
@@ -18,7 +18,7 @@ class CancelBackgroundSyncUseCaseTest {
     lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configScheduler: ConfigurationScheduler
 
     private lateinit var useCase: CancelBackgroundSyncUseCase
 
@@ -29,7 +29,7 @@ class CancelBackgroundSyncUseCaseTest {
         useCase = CancelBackgroundSyncUseCase(
             eventSyncManager,
             imageUpSyncScheduler,
-            configManager
+            configScheduler
         )
     }
 
@@ -40,7 +40,7 @@ class CancelBackgroundSyncUseCaseTest {
         verify {
             eventSyncManager.cancelScheduledSync()
             imageUpSyncScheduler.cancelImageUpSync()
-            configManager.cancelScheduledSyncConfiguration()
+            configScheduler.cancelScheduledSync()
         }
     }
 }

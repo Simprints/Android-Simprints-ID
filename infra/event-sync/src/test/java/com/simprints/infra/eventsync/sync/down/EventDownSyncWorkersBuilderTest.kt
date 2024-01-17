@@ -59,7 +59,7 @@ class EventDownSyncWorkersBuilderTest {
             SELECTED_MODULE,
             ""
         )
-        coEvery { configRepository.getConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns generalConfiguration
             every { synchronization } returns mockk {
                 every { down } returns downSyncConfiguration

@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.IdentificationConfiguration
@@ -56,7 +56,7 @@ class AboutViewModelTest {
     private val authStore = mockk<AuthStore> {
         every { signedInProjectId } returns PROJECT_ID
     }
-    private val configManager = mockk<ConfigManager> {
+    private val configRepository = mockk<ConfigRepository> {
         coEvery { getProjectConfiguration() } returns buildProjectConfigurationMock()
     }
 
@@ -68,7 +68,7 @@ class AboutViewModelTest {
     @Test
     fun `should initialize the live data correctly`() {
         val viewModel = AboutViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             authStore = authStore,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
@@ -185,11 +185,11 @@ class AboutViewModelTest {
         coEvery { eventSyncManager.countEventsToUpload(any(), any()) } returns flowOf(
             countEventsToUpload
         )
-        coEvery { configManager.getProjectConfiguration() } returns buildProjectConfigurationMock(
+        coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(
             upSyncKind
         )
         return AboutViewModel(
-            configManager = configManager,
+            configRepository = configRepository,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),

@@ -6,7 +6,7 @@ import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration.ImageSavingStrategy
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -31,7 +31,7 @@ class FaceCaptureViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var faceImageUseCase: SaveFaceImageUseCase
@@ -59,7 +59,7 @@ class FaceCaptureViewModelTest {
 
 
         viewModel = FaceCaptureViewModel(
-            configManager,
+            configRepository,
             faceImageUseCase,
             eventReporter,
             bitmapToByteArrayUseCase,
@@ -68,7 +68,7 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Save face detections should not be called when image saving strategy set to NEVER`() = runTest {
-        coEvery { configManager.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.NEVER
+        coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.NEVER
 
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
@@ -77,7 +77,7 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Save face detections should be called when image saving strategy set to ONLY_GOO_SCAN`() = runTest {
-        coEvery { configManager.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_GOOD_SCAN
+        coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_GOOD_SCAN
 
         viewModel.captureFinished(faceDetections)
         viewModel.flowFinished()
