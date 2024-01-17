@@ -340,3 +340,14 @@ internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
     .addAllModuleSelected(listOf("module1", "module2"))
     .setLastInstructionId("instruction")
     .build()
+
+internal val apiDeviceState = ApiDeviceState(
+    "deviceId",
+    false,
+    null
+)
+internal val deviceState = DeviceState(
+    "deviceId",
+   false,
+    null
+)

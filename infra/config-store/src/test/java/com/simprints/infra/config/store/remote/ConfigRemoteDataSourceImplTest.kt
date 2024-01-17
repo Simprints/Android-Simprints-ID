@@ -3,10 +3,11 @@ package com.simprints.infra.config.store.remote
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.remote.models.ApiFileUrl
 import com.simprints.infra.config.store.testtools.apiProject
-import com.simprints.infra.config.store.testtools.apiProjectConfiguration
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.testtools.apiDeviceState
+import com.simprints.infra.config.store.testtools.deviceState
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -27,6 +28,7 @@ class ConfigRemoteDataSourceImplTest {
 
         private const val PROJECT_ID = "projectId"
         private const val FILE_ID = "fileId"
+        private const val DEVICE_ID = "deviceId"
         private const val URL = "url"
         private const val PRIVACY_NOTICE = "privacy notice"
     }
@@ -96,4 +98,15 @@ class ConfigRemoteDataSourceImplTest {
 
             assertThat(receivedPrivacyNotice).isEqualTo(PRIVACY_NOTICE)
         }
+
+    @Test
+    fun `Get successful device state`() =
+        runTest(StandardTestDispatcher()) {
+            coEvery { remoteInterface.getDeviceState(any(), any(), any()) } returns apiDeviceState
+
+            val receivedState =
+                configRemoteDataSourceImpl.getDeviceState(PROJECT_ID, DEVICE_ID, "")
+            assertThat(receivedState).isEqualTo(deviceState)
+        }
+
 }

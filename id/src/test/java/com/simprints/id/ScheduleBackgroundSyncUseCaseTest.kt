@@ -1,7 +1,6 @@
 package com.simprints.id
 
 import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
-import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
@@ -26,9 +25,6 @@ class ScheduleBackgroundSyncUseCaseTest {
     lateinit var configScheduler: ProjectConfigurationScheduler
 
     @MockK
-    lateinit var authManager: AuthManager
-
-    @MockK
     lateinit var authStore: AuthStore
 
     @MockK
@@ -44,7 +40,6 @@ class ScheduleBackgroundSyncUseCaseTest {
             eventSyncManager,
             imageUpSyncScheduler,
             configScheduler,
-            authManager,
             authStore,
             firmwareFileUpdateScheduler,
         )
@@ -59,8 +54,8 @@ class ScheduleBackgroundSyncUseCaseTest {
         verify {
             eventSyncManager.scheduleSync()
             imageUpSyncScheduler.scheduleImageUpSync()
-            configScheduler.scheduleSync()
-            authManager.scheduleSecurityStateCheck()
+            configScheduler.scheduleProjectSync()
+            configScheduler.scheduleDeviceSync()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
     }
@@ -74,8 +69,8 @@ class ScheduleBackgroundSyncUseCaseTest {
         verify(exactly = 0) {
             eventSyncManager.scheduleSync()
             imageUpSyncScheduler.scheduleImageUpSync()
-            configScheduler.scheduleSync()
-            authManager.scheduleSecurityStateCheck()
+            configScheduler.scheduleProjectSync()
+            configScheduler.scheduleDeviceSync()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
     }

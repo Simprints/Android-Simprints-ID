@@ -107,7 +107,6 @@ include(
     ":infra:logging",
     ":infra:auth-store",
     ":infra:auth-logic",
-    ":infra:project-security-store",
     ":infra:network",
     ":infra:realm",
     ":infra:recent-user-activity",

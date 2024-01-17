@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store
 
 import androidx.annotation.VisibleForTesting
+import com.simprints.core.DeviceID
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
@@ -10,6 +11,7 @@ import com.simprints.infra.config.store.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.local.ConfigLocalDataSource
+import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.remote.ConfigRemoteDataSource
 import com.simprints.infra.logging.Simber
@@ -24,6 +26,7 @@ internal class ConfigRepositoryImpl @Inject constructor(
     private val localDataSource: ConfigLocalDataSource,
     private val remoteDataSource: ConfigRemoteDataSource,
     private val simNetwork: SimNetwork,
+    @DeviceID private val deviceId: String,
 ) : ConfigRepository {
 
     companion object {
@@ -66,6 +69,13 @@ internal class ConfigRepositoryImpl @Inject constructor(
         } else {
             localConfig
         }
+    }
+
+    override suspend fun getDeviceState(): DeviceState {
+        val projectId = localDataSource.getProject().id
+        val lastInstructionId = localDataSource.getDeviceConfiguration().lastInstructionId
+
+        return remoteDataSource.getDeviceState(projectId, deviceId, lastInstructionId)
     }
 
     override suspend fun getDeviceConfiguration(): DeviceConfiguration =

@@ -40,7 +40,8 @@ class CancelBackgroundSyncUseCaseTest {
         verify {
             eventSyncManager.cancelScheduledSync()
             imageUpSyncScheduler.cancelImageUpSync()
-            configScheduler.cancelScheduledSync()
+            configScheduler.cancelProjectSync()
+            configScheduler.cancelDeviceSync()
         }
     }
 }

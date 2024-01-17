@@ -13,6 +13,7 @@ import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.store.testtools.deviceConfiguration
+import com.simprints.infra.config.store.testtools.deviceState
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.network.SimNetwork
@@ -32,6 +33,7 @@ class ConfigRepositoryImplTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
+        private const val DEVICE_ID = "deviceId"
         private const val LANGUAGE = "fr"
         private const val PRIVACY_NOTICE = "privacy notice"
     }
@@ -48,6 +50,7 @@ class ConfigRepositoryImplTest {
             localDataSource,
             remoteDataSource,
             simNetwork,
+            DEVICE_ID
         )
     }
 
@@ -124,6 +127,16 @@ class ConfigRepositoryImplTest {
             coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
             coVerify(exactly = 0) { simNetwork.setApiBaseUrl(project.baseUrl) }
         }
+
+    @Test
+    fun `getDeviceState should call the correct method`() = runTest {
+        coEvery { localDataSource.getProject() } returns project
+        coEvery { localDataSource.getDeviceConfiguration() } returns deviceConfiguration
+        coEvery { remoteDataSource.getDeviceState(any(), any(), any()) } returns deviceState
+
+        val result = configServiceImpl.getDeviceState()
+        assertThat(result).isEqualTo(deviceState)
+    }
 
     @Test
     fun `getDeviceConfiguration should call the correct method`() = runTest {

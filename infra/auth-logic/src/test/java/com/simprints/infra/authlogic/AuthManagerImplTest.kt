@@ -3,11 +3,9 @@ package com.simprints.infra.authlogic
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authlogic.authenticator.Authenticator
 import com.simprints.infra.authlogic.authenticator.SignerManager
-import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -16,9 +14,6 @@ import org.junit.Test
 internal class AuthManagerImplTest {
     @MockK
     lateinit var authenticator: Authenticator
-
-    @MockK
-    lateinit var securityStateScheduler: SecurityStateScheduler
 
     @MockK
     lateinit var signerManager: SignerManager
@@ -31,7 +26,6 @@ internal class AuthManagerImplTest {
 
         authManager = AuthManagerImpl(
             authenticator = authenticator,
-            securityStateScheduler = securityStateScheduler,
             signerManager = signerManager
         )
     }
@@ -58,24 +52,6 @@ internal class AuthManagerImplTest {
                 )
             }
         }
-    }
-
-    @Test
-    fun `should call securityStateScheduler when scheduleSecurityStateCheck is called`() {
-        authManager.scheduleSecurityStateCheck()
-        verify(exactly = 1) { securityStateScheduler.scheduleSecurityStateCheck() }
-    }
-
-    @Test
-    fun `should call securityStateScheduler when startSecurityStateCheck is called`() {
-        authManager.startSecurityStateCheck()
-        verify(exactly = 1) { securityStateScheduler.startSecurityStateCheck() }
-    }
-
-    @Test
-    fun `should call securityStateScheduler when cancelSecurityStateCheck is called`() {
-        authManager.cancelSecurityStateCheck()
-        verify(exactly = 1) { securityStateScheduler.cancelSecurityStateCheck() }
     }
 
     @Test

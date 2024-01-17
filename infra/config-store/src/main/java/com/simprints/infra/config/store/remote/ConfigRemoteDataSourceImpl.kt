@@ -2,6 +2,7 @@ package com.simprints.infra.config.store.remote
 
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.DeviceState
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.ProjectWithConfig
@@ -32,6 +33,14 @@ internal class ConfigRemoteDataSourceImpl(
         val url = getApiClient().executeCall { it.getFileUrl(projectId, fileId) }.url
         return withContext(dispatcherIO) { urlDownloader(url) }
     }
+
+    override suspend fun getDeviceState(
+        projectId: String,
+        deviceId: String,
+        previousInstructionId: String,
+    ): DeviceState = getApiClient()
+        .executeCall { it.getDeviceState(projectId, deviceId, previousInstructionId) }
+        .toDomain()
 
     private suspend fun getApiClient(): SimNetwork.SimApiClient<ConfigRemoteInterface> =
         authStore.buildClient(ConfigRemoteInterface::class)
