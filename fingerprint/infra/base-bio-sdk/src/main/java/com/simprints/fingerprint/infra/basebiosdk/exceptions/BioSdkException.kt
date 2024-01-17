@@ -1,0 +1,35 @@
+package com.simprints.fingerprint.infra.basebiosdk.exceptions
+
+sealed class BioSdkException(
+    message: String,
+    cause: Throwable? = null
+) : RuntimeException(message, cause) {
+
+    class BioSdkInitializationException(override val cause: Throwable?) : BioSdkException("Bio SDK initialization failed")
+    class LicenseDownloadException : BioSdkException("License download failed")
+
+    class LicenseDownloadMaintenanceModeException(val estimatedOutage: String? = null) :
+        BioSdkException("License download failed due to maintenance mode")
+
+
+    class CannotAcquireFingerprintImageException(override val message: String?) :
+        BioSdkException("Cannot acquire fingerprint")
+
+    class ImageDecodingException : BioSdkException("Cannot decode WSQ image")
+
+    class ImageProcessingException(override val cause: Throwable?) :
+        BioSdkException("Cannot process image")
+
+    class ImageQualityCheckingException(override val cause: Throwable?) :
+        BioSdkException("Cannot check image quality")
+
+    class ImageQualityBelowThresholdException(val imageQualityScore: Int) :
+        BioSdkException("Image quality below threshold")
+
+    class TemplateExtractionException(override val cause: Throwable?) :
+        BioSdkException("Cannot extract template")
+
+
+    class TemplateMatchingException(override val cause: Throwable?) :
+        BioSdkException("Cannot match template")
+}

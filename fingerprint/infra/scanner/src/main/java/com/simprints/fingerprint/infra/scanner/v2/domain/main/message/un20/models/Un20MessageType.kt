@@ -51,6 +51,7 @@ sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
                     ?: when (receivedMajorByte) {
                         Un20MessageMajorType.GET_TEMPLATE.majorByte -> GetTemplate(receivedMinorByte)
                         Un20MessageMajorType.GET_IMAGE.majorByte -> GetImage(receivedMinorByte)
+                        Un20MessageMajorType.GET_UNPROCESSED_IMAGE.majorByte -> GetUnprocessedImage(receivedMinorByte)
                         else -> throw InvalidMessageException("Invalid Un20MessageType received with bytes: ${bytes.toHexString()}")
                     }
             }

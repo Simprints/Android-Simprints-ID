@@ -9,7 +9,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 interface FingerprintCaptureWrapper {
     suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse
 
-    suspend fun acquireUnprocessedImage(): AcquireUnprocessedImageResponse
+    suspend fun acquireUnprocessedImage(captureDpi: Dpi?): AcquireUnprocessedImageResponse
 
     suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,

@@ -27,6 +27,7 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
+import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -153,7 +154,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             hasStarted = true
 
             runBlocking {
-                bioSdk.initialize()
+                try {
+
+                    bioSdk.initialize()
+                } catch (e: BioSdkException) {
+                    handleBioSdkError(e)
+                }
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
                 configuration = configManager.getProjectConfiguration().fingerprint!!
@@ -164,6 +170,28 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             setStartingState(fingerprintsToCapture)
             startObserverForLiveFeedback()
         }
+    }
+
+    private fun handleBioSdkError(bioSdkException: BioSdkException) {
+        Simber.i("BioSdkException: $bioSdkException")
+
+
+        when (bioSdkException) {
+            is BioSdkException.BioSdkInitializationException,
+            is BioSdkException.ImageDecodingException ,
+            is BioSdkException.ImageProcessingException,
+            is BioSdkException.CannotAcquireFingerprintImageException,
+            is BioSdkException.ImageQualityCheckingException,
+            is BioSdkException.TemplateExtractionException,
+            is BioSdkException.TemplateMatchingException -> {
+                updateCaptureState(CaptureState::toNotCollected)
+                _launchAlert.send()
+            }
+            is BioSdkException.ImageQualityBelowThresholdException -> TODO()
+            is BioSdkException.LicenseDownloadException -> TODO()
+            is BioSdkException.LicenseDownloadMaintenanceModeException -> TODO()
+        }
+
     }
 
     private fun launchReconnect() {
@@ -321,9 +349,12 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             } catch (ex: CancellationException) {
                 // ignore cancellation exception, but log behaviour
                 Simber.d("Fingerprint scanning was cancelled")
+            } catch (bioSdkException: BioSdkException) {
+                handleBioSdkError(bioSdkException)
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
+
         }
     }
 
@@ -357,6 +388,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             try {
                 val acquiredImage = bioSdk.acquireFingerprintImage()
                 handleImageTransferSuccess(acquiredImage)
+            } catch (bioSdkException: BioSdkException) {
+                handleBioSdkError(bioSdkException)
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
@@ -477,6 +510,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 Simber.e(e)
                 handleNoFingerDetected()
             }
+
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)

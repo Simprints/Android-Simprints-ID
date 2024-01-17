@@ -5,7 +5,7 @@ import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.ImageRespon
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import javax.inject.Inject
 
-internal class FingerprintImageProviderImpl @Inject constructor(
+class FingerprintImageProviderImpl @Inject constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
 ) : FingerprintImageProvider<Unit, Unit> {
 

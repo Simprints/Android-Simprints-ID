@@ -35,24 +35,45 @@ internal class FingerprintCaptureWrapperV2(
                 }.switchIfEmpty(Single.error(NoImageDistortionConfigurationMatrixException()))
                 .wrapErrorsFromScanner().await()
         }
+
     override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse =
         withContext(ioDispatcher) {
             scannerV2.acquireImage(IMAGE_FORMAT).map { imageBytes ->
-                AcquireFingerprintImageResponse(imageBytes.image)}
+                AcquireFingerprintImageResponse(imageBytes.image)
+            }
                 .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image")))
                 .wrapErrorsFromScanner()
                 .await()
         }
 
 
-    override suspend fun acquireUnprocessedImage(): AcquireUnprocessedImageResponse =
-        withContext(ioDispatcher) {
-            scannerV2.acquireUnprocessedImage(IMAGE_FORMAT)
-                .map { imageBytes ->
-                    AcquireUnprocessedImageResponse(RawUnprocessedImage(imageBytes.image))
-                }
-        }.switchIfEmpty(Single.error(NoFingerDetectedException())).wrapErrorsFromScanner().await()
+    override suspend fun acquireUnprocessedImage(
+        captureDpi: Dpi?,
+    ): AcquireUnprocessedImageResponse =
 
+        withContext(ioDispatcher) {
+            require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
+                "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
+            }
+            // Capture fingerprint and ensure it's OK
+            scannerV2.captureFingerprint().ensureCaptureResultOkOrError().await()
+            // Todo  set the led state
+            // Transfer the unprocessed image from the scanner
+            acquireUnprocessedImage().switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire unprocessed image data")))
+                .wrapErrorsFromScanner().await()
+
+        }
+
+
+    private fun acquireUnprocessedImage() =
+        scannerV2.acquireUnprocessedImage(IMAGE_FORMAT)
+            .map { imageData ->
+                AcquireUnprocessedImageResponse(
+                    RawUnprocessedImage(
+                        imageData.image
+                    )
+                )
+            }
 
     override suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,
@@ -120,7 +141,8 @@ internal class FingerprintCaptureWrapperV2(
                 }
         }
 
-    private fun Single<AcquireFingerprintTemplateResponse>.ifNoFingerDetectedThenSetBadScanLedState() =
+
+    private fun Single<AcquireFingerprintTemplateResponse>. ifNoFingerDetectedThenSetBadScanLedState() =
         onErrorResumeNext {
             if (it is NoFingerDetectedException) {
                 scannerV2.setSmileLedState(scannerUiHelper.badScanLedState())

@@ -8,7 +8,9 @@ android {
 
 dependencies {
     implementation(project(":fingerprint:infra:scanner"))
-
+    implementation(project(":infra:config-store"))
+    implementation(project(":infra:config-sync"))
     api(project(":fingerprint:infra:base-bio-sdk"))
     implementation(project(":fingerprint:infra:simprints-bio-sdk"))
+    implementation(project(":fingerprint:infra:nec-bio-sdk"))
 }

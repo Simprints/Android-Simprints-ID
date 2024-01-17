@@ -6,7 +6,12 @@ import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 
-class FingerprintBioSdk<SdkConfig, ImageRequestSettings, ImageResponseMetadata, TemplateRequestSettings, TemplateResponseMetadata, MatcherSettings>(
+class FingerprintBioSdk<SdkConfig,
+    ImageRequestSettings,
+    ImageResponseMetadata,
+    TemplateRequestSettings,
+    TemplateResponseMetadata,
+    MatcherSettings>(
     private val sdkInitializer: SdkInitializer<SdkConfig>,
     private val fingerprintImageProvider: FingerprintImageProvider<ImageRequestSettings, ImageResponseMetadata>,
     private val fingerprintTemplateProvider: FingerprintTemplateProvider<TemplateRequestSettings, TemplateResponseMetadata>,

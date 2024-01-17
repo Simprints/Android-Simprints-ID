@@ -29,7 +29,7 @@ internal class FingerprintCaptureWrapperV1(
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
     }
 
-    override suspend fun acquireUnprocessedImage(): AcquireUnprocessedImageResponse {
+    override suspend fun acquireUnprocessedImage(captureDpi: Dpi?): AcquireUnprocessedImageResponse {
         throw UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION)
     }
 
