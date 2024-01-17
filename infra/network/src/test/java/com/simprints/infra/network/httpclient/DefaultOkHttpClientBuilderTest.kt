@@ -23,6 +23,9 @@ class DefaultOkHttpClientBuilderTest {
     @RelaxedMockK
     lateinit var ctx: Context
 
+    @RelaxedMockK
+    lateinit var networkCache: okhttp3.Cache
+
     private lateinit var okHttpBuilder: DefaultOkHttpClientBuilder
 
     @Before
@@ -31,7 +34,7 @@ class DefaultOkHttpClientBuilderTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        okHttpBuilder = DefaultOkHttpClientBuilder(ctx)
+        okHttpBuilder = DefaultOkHttpClientBuilder(ctx, networkCache)
     }
 
     @After

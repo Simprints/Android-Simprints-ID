@@ -4,6 +4,7 @@ import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.simprints.infra.network.BuildConfig
 import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 internal class DefaultOkHttpClientBuilder @Inject constructor(
     @ApplicationContext private val ctx: Context,
+    private val networkCache: Cache,
 ) {
 
     companion object {
@@ -44,6 +46,7 @@ internal class DefaultOkHttpClientBuilder @Inject constructor(
         versionName: String,
     ): OkHttpClient.Builder =
         OkHttpClient.Builder()
+            .cache(networkCache)
             .followRedirects(false)
             .followSslRedirects(false)
             .readTimeout(60, TimeUnit.SECONDS)

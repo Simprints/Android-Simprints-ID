@@ -40,7 +40,7 @@ class SimApiClientImplTest {
     fun setup() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
-        httpClientBuilder = DefaultOkHttpClientBuilder(mockk())
+        httpClientBuilder = DefaultOkHttpClientBuilder(mockk(), mockk(relaxed = true))
 
         simApiClientImpl = SimApiClientImpl(
             FakeRetrofitInterface::class,
