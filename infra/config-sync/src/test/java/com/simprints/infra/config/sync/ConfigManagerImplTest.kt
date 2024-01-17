@@ -3,6 +3,7 @@ package com.simprints.infra.config.sync
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.sync.testtools.deviceConfiguration
 import com.simprints.infra.config.sync.testtools.project
 import com.simprints.infra.config.sync.testtools.projectConfiguration
@@ -32,10 +33,11 @@ class ConfigManagerImplTest {
 
     @Test
     fun `refreshProject should call the correct method`() = runTest {
-        coEvery { configRepository.refreshProject(PROJECT_ID) } returns project
+        coEvery { configRepository.refreshProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
         val refreshedProject = configManager.refreshProject(PROJECT_ID)
-        assertThat(refreshedProject).isEqualTo(project)
+        assertThat(refreshedProject.project).isEqualTo(project)
+        assertThat(refreshedProject.configuration).isEqualTo(projectConfiguration)
     }
 
     @Test
@@ -52,14 +54,6 @@ class ConfigManagerImplTest {
 
         val gottenProjectConfiguration = configManager.getProjectConfiguration()
         assertThat(gottenProjectConfiguration).isEqualTo(projectConfiguration)
-    }
-
-    @Test
-    fun `refreshProjectConfiguration should call the correct method`() = runTest {
-        coEvery { configRepository.refreshConfiguration(PROJECT_ID) } returns projectConfiguration
-
-        val refreshedProjectConfiguration = configManager.refreshProjectConfiguration(PROJECT_ID)
-        assertThat(refreshedProjectConfiguration).isEqualTo(projectConfiguration)
     }
 
     @Test

@@ -42,7 +42,6 @@ internal class SignerManager @Inject constructor(
             // Store Firebase token so it can be used by ConfigManager
             authStore.storeFirebaseToken(token)
             configManager.refreshProject(projectId)
-            configManager.refreshProjectConfiguration(projectId)
             // Only store credentials if all other calls succeeded. This avoids the undefined state
             // where credentials are store (i.e. user is considered logged in) but project configuration
             // is missing

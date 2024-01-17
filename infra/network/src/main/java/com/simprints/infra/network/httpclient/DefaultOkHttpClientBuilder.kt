@@ -23,6 +23,15 @@ internal class DefaultOkHttpClientBuilder {
         const val DEVICE_ID_HEADER = "X-Device-ID"
         const val AUTHORIZATION_HEADER = "Authorization"
         const val USER_AGENT_HEADER = "User-Agent"
+
+        /**
+         * This header can be used to force a specific version of the API endpoint to be used.
+         * It is useful for implementing features that rely on an BE changes that affect multiple
+         * API endpoints without having to support all changes in the app.
+         *
+         * **Forced version headers should be removed once the feature is fully implemented**
+         */
+        const val FORCE_VERSION_HEADER = "X-Force-Version"
     }
 
     fun get(
@@ -73,8 +82,13 @@ internal class DefaultOkHttpClientBuilder {
     }
 
     private fun buildVersionInterceptor(versionName: String) = Interceptor { chain ->
-        val newRequest = chain.request().newBuilder()
-            .addHeader(USER_AGENT_HEADER, "SimprintsID/$versionName")
+        val originalRequest = chain.request()
+        val version = originalRequest.takeIf { BuildConfig.DEBUG }
+            ?.header(FORCE_VERSION_HEADER)
+            ?: versionName
+
+        val newRequest = originalRequest.newBuilder()
+            .addHeader(USER_AGENT_HEADER, "SimprintsID/$version")
             .build()
         return@Interceptor chain.proceed(newRequest)
     }

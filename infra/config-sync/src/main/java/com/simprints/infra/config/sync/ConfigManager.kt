@@ -4,13 +4,14 @@ import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult
 import com.simprints.infra.config.store.models.Project
 import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import kotlinx.coroutines.flow.Flow
 
 interface ConfigManager {
     /**
      * fetch the latest state of the project and save it locally
      */
-    suspend fun refreshProject(projectId: String): Project
+    suspend fun refreshProject(projectId: String): ProjectWithConfig
 
     /**
      * get the project locally or if not present fetch it remotely
@@ -21,11 +22,6 @@ interface ConfigManager {
      * get the project configuration locally
      */
     suspend fun getProjectConfiguration(): ProjectConfiguration
-
-    /**
-     * fetch the latest configuration of the project and save it locally
-     */
-    suspend fun refreshProjectConfiguration(projectId: String): ProjectConfiguration
 
     /**
      * fetch the current device configuration.

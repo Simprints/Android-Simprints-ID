@@ -28,6 +28,7 @@ import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.remote.models.*
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
@@ -309,10 +310,12 @@ internal val tokenizationKeysLocal = tokenizationKeysDomain.mapKeys {
 internal val apiProject = ApiProject(
     id = "id",
     name = "name",
+    state = ApiProjectState.RUNNING,
     description = "description",
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
+    configuration = apiProjectConfiguration,
     tokenizationKeys = tokenizationKeysLocal
 )
 internal val project = Project(
