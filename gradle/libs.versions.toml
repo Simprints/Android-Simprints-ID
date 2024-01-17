@@ -159,7 +159,6 @@ realm_base = { module = "io.realm.kotlin:library-base", version.ref = "realm_ver
 
 #Retrofit
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
-retrofit-adapter = { module = "com.squareup.retrofit2:adapter-rxjava2", version.ref = "retrofit_version" }
 retrofit-jackson = { module = "com.squareup.retrofit2:converter-jackson", version.ref = "retrofit_version" }
 retrofit-converterScalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit_version" }
 retrofit-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okttp_version" }
