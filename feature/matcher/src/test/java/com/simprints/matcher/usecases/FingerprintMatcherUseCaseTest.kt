@@ -6,7 +6,7 @@ import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.FingerprintSample
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
@@ -36,7 +36,7 @@ internal class FingerprintMatcherUseCaseTest {
     lateinit var bioSdkWrapper: BioSdkWrapper
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var createRangesUseCase: CreateRangesUseCase
@@ -50,7 +50,7 @@ internal class FingerprintMatcherUseCaseTest {
         useCase = FingerprintMatcherUseCase(
             enrolmentRecordRepository,
             bioSdkWrapper,
-            configManager,
+            configRepository,
             createRangesUseCase,
             testCoroutineRule.testCoroutineDispatcher,
         )

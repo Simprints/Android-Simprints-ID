@@ -3,6 +3,7 @@ package com.simprints.infra.config.store.models
 data class Project(
     val id: String,
     val name: String,
+    val state: ProjectState,
     val description: String,
     val creator: String,
     val imageBucket: String,

@@ -2,7 +2,7 @@ package com.simprints.feature.logincheck.usecases
 
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.logging.Simber
 import io.mockk.MockKAnnotations
@@ -21,7 +21,7 @@ import org.junit.Test
 class ExtractCrashKeysUseCaseTest {
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var authStore: AuthStore
@@ -33,7 +33,7 @@ class ExtractCrashKeysUseCaseTest {
         MockKAnnotations.init(this, relaxed = true)
         mockkObject(Simber)
 
-        useCase = ExtractCrashKeysUseCase(configManager, authStore)
+        useCase = ExtractCrashKeysUseCase(configRepository, authStore)
     }
 
     @After
@@ -43,10 +43,10 @@ class ExtractCrashKeysUseCaseTest {
 
     @Test
     fun `Sets values to Simber`() = runTest {
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { synchronization.frequency } returns SynchronizationConfiguration.Frequency.PERIODICALLY
         }
-        coEvery { configManager.getDeviceConfiguration() } returns mockk {
+        coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { selectedModules } returns listOf(
                 "module1".asTokenizableRaw(),
                 "module2".asTokenizableRaw()

@@ -9,7 +9,7 @@ import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
@@ -40,7 +40,7 @@ internal class EnrolLastBiometricViewModelTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var projectConfig: ProjectConfiguration
@@ -67,7 +67,7 @@ internal class EnrolLastBiometricViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getProjectConfiguration() } returns projectConfig
+        coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         every { projectConfig.general.modalities } returns emptyList()
 
         coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
@@ -79,7 +79,7 @@ internal class EnrolLastBiometricViewModelTest {
 
         viewModel = EnrolLastBiometricViewModel(
             timeHelper,
-            configManager,
+            configRepository,
             eventRepository,
             enrolmentRecordRepository,
             hasDuplicateEnrolments,
@@ -96,7 +96,7 @@ internal class EnrolLastBiometricViewModelTest {
             EnrolLastBiometricStepResult.EnrolLastBiometricsResult("previousSubjectId")
         )))
 
-        coVerify(exactly = 1) { configManager.getProjectConfiguration() }
+        coVerify(exactly = 1) { configRepository.getProjectConfiguration() }
     }
 
     @Test

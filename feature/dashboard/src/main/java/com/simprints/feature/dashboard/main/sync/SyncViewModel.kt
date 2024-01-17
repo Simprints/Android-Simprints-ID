@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.views.SyncCardState
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
@@ -22,8 +23,9 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.canSyncDataToSimprints
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
@@ -32,8 +34,6 @@ import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.network.ConnectivityTracker
-import com.simprints.infra.projectsecuritystore.SecurityStateRepository
-import com.simprints.infra.projectsecuritystore.securitystate.models.SecurityState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -46,15 +46,15 @@ import javax.inject.Inject
 internal class SyncViewModel @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val connectivityTracker: ConnectivityTracker,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
     private val authStore: AuthStore,
-    private val securityStateRepository: SecurityStateRepository,
-    private val authManager: AuthManager,
+    private val logoutUseCase: LogoutUseCase,
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
     companion object {
+
         private const val ONE_MINUTE = 1000 * 60L
         private const val MAX_TIME_BEFORE_SYNC_AGAIN = 5 * ONE_MINUTE
     }
@@ -89,13 +89,16 @@ internal class SyncViewModel @Inject constructor(
         // CORE-2638
         // When project is in ENDING state and all data is synchronized, the user must be logged out
         _signOutEventLiveData.addSource(_syncCardLiveData) { cardState ->
-            val isSyncComplete = cardState is SyncComplete
-            val isProjectEnding =
-                securityStateRepository.getSecurityStatusFromLocal() == SecurityState.Status.PROJECT_ENDING
-            if (isSyncComplete && isProjectEnding) {
-                externalScope.launch {
-                    authManager.signOut()
-                    _signOutEventLiveData.postValue(LiveDataEvent())
+            viewModelScope.launch {
+                val isSyncComplete = cardState is SyncComplete
+                val isProjectEnding =
+                    configRepository.getProject(authStore.signedInProjectId).state == ProjectState.PROJECT_ENDING
+
+                if (isSyncComplete && isProjectEnding) {
+                    externalScope.launch {
+                        logoutUseCase()
+                        _signOutEventLiveData.postValue(LiveDataEvent())
+                    }
                 }
             }
         }
@@ -153,7 +156,7 @@ internal class SyncViewModel @Inject constructor(
                     )
                 }
             }
-            configManager.getProjectConfiguration().also { configuration ->
+            configRepository.getProjectConfiguration().also { configuration ->
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
             eventSyncManager
@@ -259,13 +262,13 @@ internal class SyncViewModel @Inject constructor(
         isDownSyncAllowed() && isSelectedModulesEmpty() && isModuleSync()
 
     private suspend fun isDownSyncAllowed() =
-        configManager.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
+        configRepository.getProjectConfiguration().synchronization.frequency != SynchronizationConfiguration.Frequency.ONLY_PERIODICALLY_UP_SYNC
 
     private suspend fun isSelectedModulesEmpty() =
-        configManager.getDeviceConfiguration().selectedModules.isEmpty()
+        configRepository.getDeviceConfiguration().selectedModules.isEmpty()
 
     private suspend fun isModuleSync() =
-        configManager.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
+        configRepository.getProjectConfiguration().synchronization.down.partitionType == DownSynchronizationConfiguration.PartitionType.MODULE
 
     private fun isConnected() = connectivityTracker.observeIsConnected().value ?: true
 

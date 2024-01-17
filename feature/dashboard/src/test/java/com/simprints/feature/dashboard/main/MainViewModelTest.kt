@@ -2,7 +2,7 @@ package com.simprints.feature.dashboard.main
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
@@ -18,7 +18,7 @@ class MainViewModelTest {
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
-    private val configManager = mockk<ConfigManager> {
+    private val configRepository = mockk<ConfigRepository> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { consent } returns mockk {
                 every { collectConsent } returns true
@@ -28,7 +28,7 @@ class MainViewModelTest {
 
     @Test
     fun `should initialize the live data correctly`() {
-        val viewModel = MainViewModel(configManager)
+        val viewModel = MainViewModel(configRepository)
 
         assertThat(viewModel.consentRequired.value).isEqualTo(true)
     }

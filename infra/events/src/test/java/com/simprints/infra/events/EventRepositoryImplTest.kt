@@ -69,7 +69,7 @@ internal class EventRepositoryImplTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
-        coEvery { configRepository.getConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { modalities } returns listOf(Modality.FINGERPRINT, Modality.FACE)
             }

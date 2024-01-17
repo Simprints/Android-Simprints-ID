@@ -1,20 +1,20 @@
 package com.simprints.id
 
 import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
-import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import io.mockk.MockKAnnotations
-import io.mockk.verify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
 class ScheduleBackgroundSyncUseCaseTest {
+
     @MockK
     lateinit var eventSyncManager: EventSyncManager
 
@@ -22,10 +22,7 @@ class ScheduleBackgroundSyncUseCaseTest {
     lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
-    lateinit var configManager: ConfigManager
-
-    @MockK
-    lateinit var authManager: AuthManager
+    lateinit var configScheduler: ProjectConfigurationScheduler
 
     @MockK
     lateinit var authStore: AuthStore
@@ -42,8 +39,7 @@ class ScheduleBackgroundSyncUseCaseTest {
         useCase = ScheduleBackgroundSyncUseCase(
             eventSyncManager,
             imageUpSyncScheduler,
-            configManager,
-            authManager,
+            configScheduler,
             authStore,
             firmwareFileUpdateScheduler,
         )
@@ -58,8 +54,8 @@ class ScheduleBackgroundSyncUseCaseTest {
         verify {
             eventSyncManager.scheduleSync()
             imageUpSyncScheduler.scheduleImageUpSync()
-            configManager.scheduleSyncConfiguration()
-            authManager.scheduleSecurityStateCheck()
+            configScheduler.scheduleProjectSync()
+            configScheduler.scheduleDeviceSync()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
     }
@@ -73,8 +69,8 @@ class ScheduleBackgroundSyncUseCaseTest {
         verify(exactly = 0) {
             eventSyncManager.scheduleSync()
             imageUpSyncScheduler.scheduleImageUpSync()
-            configManager.scheduleSyncConfiguration()
-            authManager.scheduleSecurityStateCheck()
+            configScheduler.scheduleProjectSync()
+            configScheduler.scheduleDeviceSync()
             firmwareFileUpdateScheduler.scheduleOrCancelWorkIfNecessary()
         }
     }

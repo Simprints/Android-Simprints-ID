@@ -60,7 +60,7 @@ fuzzywuzzy_version = "1.4.0"
 rootbeer_version = "0.1.0"
 commons_io_version = "2.15.1"
 kronos_version = "0.0.1-alpha11"
-protobuf_version = "3.25.1"
+protobuf_version = "3.25.2"
 circleImageView_version = "3.1.0"
 timber_version = "5.0.1"
 
@@ -161,7 +161,6 @@ realm_base = { module = "io.realm.kotlin:library-base", version.ref = "realm_ver
 
 #Retrofit
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit_version" }
-retrofit-adapter = { module = "com.squareup.retrofit2:adapter-rxjava2", version.ref = "retrofit_version" }
 retrofit-jackson = { module = "com.squareup.retrofit2:converter-jackson", version.ref = "retrofit_version" }
 retrofit-converterScalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit_version" }
 retrofit-logging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okttp_version" }

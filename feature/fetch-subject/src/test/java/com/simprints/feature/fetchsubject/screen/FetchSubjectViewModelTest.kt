@@ -6,7 +6,7 @@ import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.feature.fetchsubject.screen.usecase.FetchSubjectUseCase
 import com.simprints.feature.fetchsubject.screen.usecase.SaveSubjectFetchEventUseCase
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -37,7 +37,7 @@ internal class FetchSubjectViewModelTest {
     lateinit var saveSubjectFetchEventUseCase: SaveSubjectFetchEventUseCase
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     private lateinit var viewModel: FetchSubjectViewModel
 
@@ -51,7 +51,7 @@ internal class FetchSubjectViewModelTest {
             timeHelper,
             fetchSubjectUseCase,
             saveSubjectFetchEventUseCase,
-            configManager,
+            configRepository,
         )
     }
 
@@ -98,7 +98,7 @@ internal class FetchSubjectViewModelTest {
 
     @Test
     fun `startExitForm returns list of modalities`() {
-        coEvery { configManager.getProjectConfiguration().general.modalities } returns listOf(
+        coEvery { configRepository.getProjectConfiguration().general.modalities } returns listOf(
             GeneralConfiguration.Modality.FACE
         )
 

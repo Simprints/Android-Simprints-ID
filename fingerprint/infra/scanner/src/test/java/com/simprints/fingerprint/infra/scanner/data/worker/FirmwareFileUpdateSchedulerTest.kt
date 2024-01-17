@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.infra.scanner.data.worker
 
 import androidx.work.WorkManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.coEvery
 import io.mockk.every
@@ -24,7 +24,7 @@ class FirmwareFileUpdateSchedulerTest {
 
     private val workManagerMock = mockk<WorkManager>()
     private val fingerprintConfiguration = mockk<FingerprintConfiguration>()
-    private val configManager = mockk<ConfigManager> {
+    private val configRepository = mockk<ConfigRepository> {
         coEvery { getProjectConfiguration() } returns mockk {
             every { fingerprint } returns fingerprintConfiguration
         }
@@ -33,7 +33,7 @@ class FirmwareFileUpdateSchedulerTest {
     private val firmwareFileUpdateScheduler =
         FirmwareFileUpdateScheduler(
             mockk(),
-            configManager,
+            configRepository,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
 

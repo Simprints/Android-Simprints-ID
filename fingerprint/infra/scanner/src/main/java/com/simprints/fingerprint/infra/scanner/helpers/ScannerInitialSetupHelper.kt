@@ -9,8 +9,8 @@ import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerVersion
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.OtaAvailableException
 import com.simprints.fingerprint.infra.scanner.tools.BatteryLevelChecker
 import com.simprints.fingerprint.infra.scanner.v2.scanner.Scanner
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Vero2Configuration
-import com.simprints.infra.config.sync.ConfigManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.rx2.await
 import javax.inject.Inject
@@ -22,12 +22,11 @@ import javax.inject.Inject
 internal class ScannerInitialSetupHelper @Inject constructor(
     private val connectionHelper: ConnectionHelper,
     private val batteryLevelChecker: BatteryLevelChecker,
-    private val configManager: ConfigManager,
-    private val firmwareLocalDataSource: FirmwareLocalDataSource
+    private val configRepository: ConfigRepository,
+    private val firmwareLocalDataSource: FirmwareLocalDataSource,
 ) {
 
     private lateinit var scannerVersion: ScannerVersion
-
 
     /**
      * This method is responsible for checking if any firmware updates are available, the current
@@ -44,7 +43,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         scanner: Scanner,
         macAddress: String,
         withScannerVersion: (ScannerVersion) -> Unit,
-        withBatteryInfo: (BatteryInfo) -> Unit
+        withBatteryInfo: (BatteryInfo) -> Unit,
     ) {
         delay(100) // Speculatively needed
         val unifiedVersionInfo = scanner.getVersionInformation().await()
@@ -68,7 +67,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
 
     private suspend fun getBatteryInfo(
         scanner: Scanner,
-        withBatteryInfo: (BatteryInfo) -> Unit
+        withBatteryInfo: (BatteryInfo) -> Unit,
     ): BatteryInfo {
         val batteryPercent = scanner.getBatteryPercentCharge().await()
         val batteryVoltage = scanner.getBatteryVoltageMilliVolts().await()
@@ -89,10 +88,10 @@ internal class ScannerInitialSetupHelper @Inject constructor(
         hardwareVersion: String,
         scanner: Scanner,
         macAddress: String,
-        batteryInfo: BatteryInfo
+        batteryInfo: BatteryInfo,
     ) {
         val availableVersions =
-            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.get(
+            configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.vero2?.firmwareVersions?.get(
                 hardwareVersion
             )
         val availableOtas = determineAvailableOtas(scannerVersion.firmware, availableVersions)
@@ -108,7 +107,7 @@ internal class ScannerInitialSetupHelper @Inject constructor(
 
     private suspend fun determineAvailableOtas(
         current: ScannerFirmwareVersions,
-        available: Vero2Configuration.Vero2FirmwareVersions?
+        available: Vero2Configuration.Vero2FirmwareVersions?,
     ): List<AvailableOta> {
         if (available == null) {
             return emptyList()

@@ -8,21 +8,23 @@ import com.simprints.infra.config.store.models.Project
 internal data class ApiProject(
     val id: String,
     val name: String,
+    val state: ApiProjectState,
     val description: String,
     val creator: String,
     val imageBucket: String,
     val baseUrl: String?,
-    val tokenizationKeys: Map<String, String>?
+    val configuration: ApiProjectConfiguration,
+    val tokenizationKeys: Map<String, String>?,
 ) {
-    fun toDomain(): Project {
-        return Project(
-            id = id,
-            name = name,
-            description = description,
-            creator = creator,
-            imageBucket = imageBucket,
-            baseUrl = baseUrl,
-            tokenizationKeys = tokenizationKeys.mapTokenizationKeysToDomain()
-        )
-    }
+
+    fun toDomain(): Project = Project(
+        id = id,
+        name = name,
+        state = state.toDomain(),
+        description = description,
+        creator = creator,
+        imageBucket = imageBucket,
+        baseUrl = baseUrl,
+        tokenizationKeys = tokenizationKeys.mapTokenizationKeysToDomain()
+    )
 }

@@ -19,6 +19,7 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("lastEventId") lastEventId: String?
     ): List<ApiEventCount>
 
+    @Headers("Content-Encoding: gzip")
     @POST("projects/{projectId}/events")
     suspend fun uploadEvents(
         @Path("projectId") projectId: String,
@@ -37,6 +38,7 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("lastEventId") lastEventId: String?
     ): ResponseBody
 
+    @Headers("Content-Encoding: gzip")
     @POST("projects/{projectId}/dump")
     suspend fun dumpInvalidEvents(
         @Path("projectId") projectId: String,

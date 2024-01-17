@@ -14,20 +14,8 @@ import com.simprints.infra.config.store.local.models.ProtoSynchronizationConfigu
 import com.simprints.infra.config.store.local.models.ProtoUpSynchronizationConfiguration
 import com.simprints.infra.config.store.local.models.ProtoVero2Configuration
 import com.simprints.infra.config.store.local.models.toProto
-import com.simprints.infra.config.store.models.ConsentConfiguration
-import com.simprints.infra.config.store.models.DecisionPolicy
-import com.simprints.infra.config.store.models.DeviceConfiguration
-import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
-import com.simprints.infra.config.store.models.FaceConfiguration
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.store.models.IdentificationConfiguration
-import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.models.SettingsPasswordConfig
-import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.models.UpSynchronizationConfiguration
-import com.simprints.infra.config.store.models.Vero2Configuration
+import com.simprints.infra.config.store.models.*
+import com.simprints.infra.config.store.remote.models.*
 import com.simprints.infra.config.store.remote.models.ApiConsentConfiguration
 import com.simprints.infra.config.store.remote.models.ApiDecisionPolicy
 import com.simprints.infra.config.store.remote.models.ApiFaceConfiguration
@@ -309,16 +297,19 @@ internal val tokenizationKeysLocal = tokenizationKeysDomain.mapKeys {
 internal val apiProject = ApiProject(
     id = "id",
     name = "name",
+    state = ApiProjectState.RUNNING,
     description = "description",
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
+    configuration = apiProjectConfiguration,
     tokenizationKeys = tokenizationKeysLocal
 )
 internal val project = Project(
     id = "id",
     name = "name",
     description = "description",
+    state = ProjectState.RUNNING,
     creator = "creator",
     imageBucket = "url",
     baseUrl = "baseUrl",
@@ -328,6 +319,7 @@ internal val protoProject = ProtoProject.newBuilder()
     .setId("id")
     .setName("name")
     .setDescription("description")
+    .setState("RUNNING")
     .setCreator("creator")
     .setImageBucket("url")
     .setBaseUrl("baseUrl")
@@ -348,3 +340,14 @@ internal val protoDeviceConfiguration = ProtoDeviceConfiguration.newBuilder()
     .addAllModuleSelected(listOf("module1", "module2"))
     .setLastInstructionId("instruction")
     .build()
+
+internal val apiDeviceState = ApiDeviceState(
+    "deviceId",
+    false,
+    null
+)
+internal val deviceState = DeviceState(
+    "deviceId",
+   false,
+    null
+)

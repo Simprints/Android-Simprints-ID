@@ -18,7 +18,6 @@ dependencies {
     implementation(project(":infra:images"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:auth-logic"))
-    implementation(project(":infra:project-security-store"))
     implementation(project(":infra:recent-user-activity"))
     implementation(project(":infra:enrolment-records-store"))
 }
