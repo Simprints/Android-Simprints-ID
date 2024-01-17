@@ -1,7 +1,6 @@
 package com.simprints.infra.config.sync.usecase
 
 import com.simprints.infra.authlogic.AuthManager
-import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
@@ -25,9 +24,6 @@ class LogoutUseCaseTest {
     private lateinit var eventSyncManager: EventSyncManager
 
     @MockK
-    private lateinit var securityStateScheduler: SecurityStateScheduler
-
-    @MockK
     private lateinit var authManager: AuthManager
 
     private lateinit var useCase: LogoutUseCase
@@ -38,7 +34,6 @@ class LogoutUseCaseTest {
 
         useCase = LogoutUseCase(
             configScheduler = configScheduler,
-            securityStateScheduler = securityStateScheduler,
             imageUpSyncScheduler = imageUpSyncScheduler,
             eventSyncManager = eventSyncManager,
             authManager = authManager,
@@ -50,7 +45,6 @@ class LogoutUseCaseTest {
         useCase.invoke()
 
         verify {
-            securityStateScheduler.cancelSecurityStateCheck()
             imageUpSyncScheduler.cancelImageUpSync()
             configScheduler.cancelProjectSync()
             configScheduler.cancelDeviceSync()
