@@ -2,6 +2,8 @@ package com.simprints.infra.config.sync
 
 import android.content.Context
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import io.mockk.every
 import io.mockk.mockk
@@ -26,7 +28,7 @@ class ProjectConfigurationSchedulerImplTest {
     }
 
     @Test
-    fun `scheduleSync should schedule the worker`() {
+    fun `scheduleProjectSync should schedule the worker`() {
         configurationSchedulerImpl.scheduleProjectSync()
 
         verify {
@@ -39,9 +41,42 @@ class ProjectConfigurationSchedulerImplTest {
     }
 
     @Test
-    fun `cancelSync should cancel the worker`() {
+    fun `cancelProjectSync should cancel the worker`() {
         configurationSchedulerImpl.cancelProjectSync()
 
         verify { workManager.cancelUniqueWork(ProjectConfigurationSchedulerImpl.PROJECT_SYNC_WORK_NAME) }
+    }
+
+    @Test
+    fun `startDeviceSync should schedule the worker`() {
+        configurationSchedulerImpl.startDeviceSync()
+
+        verify {
+            workManager.enqueueUniqueWork(
+                ProjectConfigurationSchedulerImpl.DEVICE_SYNC_WORK_NAME_ONE_TIME,
+                ExistingWorkPolicy.KEEP,
+                any<OneTimeWorkRequest>(),
+            )
+        }
+    }
+
+    @Test
+    fun `scheduleDeviceSync should schedule the worker`() {
+        configurationSchedulerImpl.scheduleDeviceSync()
+
+        verify {
+            workManager.enqueueUniquePeriodicWork(
+                ProjectConfigurationSchedulerImpl.DEVICE_SYNC_WORK_NAME,
+                ExistingPeriodicWorkPolicy.UPDATE,
+                any(),
+            )
+        }
+    }
+
+    @Test
+    fun `cancelDeviceSync should cancel the worker`() {
+        configurationSchedulerImpl.cancelDeviceSync()
+
+        verify { workManager.cancelUniqueWork(ProjectConfigurationSchedulerImpl.DEVICE_SYNC_WORK_NAME) }
     }
 }
