@@ -2,16 +2,12 @@ package com.simprints.infra.authlogic.authenticator
 
 import com.simprints.core.DispatcherIO
 import com.simprints.fingerprint.infra.scanner.ScannerManager
-import com.simprints.infra.authlogic.worker.SecurityStateScheduler
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.sync.ConfigurationScheduler
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork
@@ -21,13 +17,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 internal class SignerManager @Inject constructor(
-    private val configScheduler: ConfigurationScheduler,
     private val configRepository: ConfigRepository,
     private val authStore: AuthStore,
-    private val eventSyncManager: EventSyncManager,
-    private val securityStateScheduler: SecurityStateScheduler,
     private val recentUserActivityManager: RecentUserActivityManager,
-    private val imageUpSyncScheduler: ImageUpSyncScheduler,
     private val simNetwork: SimNetwork,
     private val imageRepository: ImageRepository,
     private val eventRepository: EventRepository,
@@ -58,30 +50,19 @@ internal class SignerManager @Inject constructor(
     }
 
     suspend fun signOut() = withContext(dispatcher) {
-        securityStateScheduler.cancelSecurityStateCheck()
         authStore.cleanCredentials()
         authStore.clearFirebaseToken()
 
-        // Cancel all background sync
-        eventSyncManager.cancelScheduledSync()
-        imageUpSyncScheduler.cancelImageUpSync()
-        configScheduler.cancelScheduledSync()
-
-        eventSyncManager.deleteSyncInfo()
         simNetwork.resetApiBaseUrl()
         configRepository.clearData()
         recentUserActivityManager.clearRecentActivity()
 
-        deleteLocalData()
-
-        Simber.tag(LoggingConstants.CrashReportTag.LOGOUT.name).i("Signed out")
-    }
-
-    private suspend fun deleteLocalData() {
         imageRepository.deleteStoredImages()
         eventRepository.deleteAll()
         enrolmentRecordRepository.deleteAll()
         scannerManager.deleteFirmwareFiles()
+
+        Simber.tag(LoggingConstants.CrashReportTag.LOGOUT.name).i("Signed out")
     }
 
 }

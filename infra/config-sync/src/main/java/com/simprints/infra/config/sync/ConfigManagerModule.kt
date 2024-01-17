@@ -10,5 +10,6 @@ import dagger.hilt.components.SingletonComponent
 abstract class ConfigManagerModule {
 
     @Binds
-    internal abstract fun provideConfigurationScheduler(configurationScheduler: ConfigurationSchedulerImpl): ConfigurationScheduler
+    internal abstract fun provideConfigurationScheduler(configurationScheduler: ProjectConfigurationSchedulerImpl): ProjectConfigurationScheduler
+
 }

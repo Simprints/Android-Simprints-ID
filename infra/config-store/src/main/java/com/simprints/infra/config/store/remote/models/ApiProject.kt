@@ -20,6 +20,7 @@ internal data class ApiProject(
     fun toDomain(): Project = Project(
         id = id,
         name = name,
+        state = state.toDomain(),
         description = description,
         creator = creator,
         imageBucket = imageBucket,

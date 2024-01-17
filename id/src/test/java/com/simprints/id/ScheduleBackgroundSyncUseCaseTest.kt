@@ -3,7 +3,7 @@ package com.simprints.id
 import com.simprints.fingerprint.infra.scanner.data.worker.FirmwareFileUpdateScheduler
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.sync.ConfigurationScheduler
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import io.mockk.MockKAnnotations
@@ -23,7 +23,7 @@ class ScheduleBackgroundSyncUseCaseTest {
     lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
-    lateinit var configScheduler: ConfigurationScheduler
+    lateinit var configScheduler: ProjectConfigurationScheduler
 
     @MockK
     lateinit var authManager: AuthManager

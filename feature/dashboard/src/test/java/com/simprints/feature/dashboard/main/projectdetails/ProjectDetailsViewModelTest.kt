@@ -7,6 +7,7 @@ import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
@@ -98,6 +99,7 @@ class ProjectDetailsViewModelTest {
         private val PROJECT = Project(
             PROJECT_ID,
             PROJECT_NAME,
+            ProjectState.RUNNING,
             "description",
             "creator",
             "bucket",

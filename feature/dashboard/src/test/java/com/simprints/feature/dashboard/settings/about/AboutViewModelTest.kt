@@ -3,7 +3,7 @@ package com.simprints.feature.dashboard.settings.about
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
-import com.simprints.infra.authlogic.AuthManager
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -60,7 +60,7 @@ class AboutViewModelTest {
         coEvery { getProjectConfiguration() } returns buildProjectConfigurationMock()
     }
 
-    private val authManager = mockk<AuthManager>(relaxed = true)
+    private val logoutUseCase = mockk<LogoutUseCase>(relaxed = true)
     private val recentUserActivityManager = mockk<RecentUserActivityManager> {
         coEvery { getRecentUserActivity() } returns recentUserActivity
     }
@@ -72,7 +72,7 @@ class AboutViewModelTest {
             authStore = authStore,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
-            authManager = authManager,
+            logoutUseCase = logoutUseCase,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
 
@@ -90,7 +90,7 @@ class AboutViewModelTest {
             buildLogoutViewModel(canSyncDataToSimprints = false, hasEventsToUpload = true)
         runTest {
             viewModel.processLogoutRequest()
-            coVerify(exactly = 1) { authManager.signOut() }
+            coVerify(exactly = 1) { logoutUseCase.invoke() }
         }
     }
 
@@ -100,7 +100,7 @@ class AboutViewModelTest {
             buildLogoutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = false)
         runTest {
             viewModel.processLogoutRequest()
-            coVerify(exactly = 1) { authManager.signOut() }
+            coVerify(exactly = 1) { logoutUseCase.invoke() }
         }
     }
 
@@ -110,7 +110,7 @@ class AboutViewModelTest {
             buildLogoutViewModel(canSyncDataToSimprints = true, hasEventsToUpload = true)
         runTest {
             viewModel.processLogoutRequest()
-            coVerify(exactly = 0) { authManager.signOut() }
+            coVerify(exactly = 0) { logoutUseCase.invoke() }
         }
     }
 
@@ -193,7 +193,7 @@ class AboutViewModelTest {
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
-            authManager = authManager,
+            logoutUseCase = logoutUseCase,
             authStore = authStore
         )
     }

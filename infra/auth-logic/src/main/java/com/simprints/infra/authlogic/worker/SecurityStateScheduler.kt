@@ -8,7 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-internal class SecurityStateScheduler @Inject constructor(
+class SecurityStateScheduler @Inject constructor(
     @ApplicationContext context: Context
 ) {
 

@@ -3,7 +3,7 @@ package com.simprints.feature.logincheck.usecases
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.sync.ConfigurationScheduler
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import javax.inject.Inject
@@ -11,7 +11,7 @@ import javax.inject.Inject
 internal class StartBackgroundSyncUseCase @Inject constructor(
     private val eventSyncManager: EventSyncManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler,
-    private val configScheduler: ConfigurationScheduler,
+    private val configScheduler: ProjectConfigurationScheduler,
     private val configRepository: ConfigRepository,
     private val authManager: AuthManager,
 ) {

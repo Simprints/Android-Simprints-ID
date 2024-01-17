@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.feature.dashboard.views.SyncCardState.SyncComplete
 import com.simprints.feature.dashboard.views.SyncCardState.SyncConnecting
 import com.simprints.feature.dashboard.views.SyncCardState.SyncDefault
@@ -21,6 +22,7 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.SimprintsUpSynchronizationConfiguration
 import com.simprints.infra.config.store.models.UpSynchronizationConfiguration.UpSynchronizationKind.ALL
@@ -46,9 +48,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class SyncViewModelTest {
+internal class SyncViewModelTest {
 
     companion object {
+
         private const val DATE = "2022-10-10"
         private val deviceConfiguration = DeviceConfiguration(
             language = "",
@@ -82,10 +85,7 @@ class SyncViewModelTest {
     lateinit var authStore: AuthStore
 
     @MockK
-    lateinit var securityStateRepository: SecurityStateRepository
-
-    @MockK
-    lateinit var authManager: AuthManager
+    lateinit var logoutUseCase: LogoutUseCase
 
     @Before
     fun setUp() {
@@ -361,7 +361,7 @@ class SyncViewModelTest {
     @Test
     fun `should logout when project is ending and sync is complete`() {
         coEvery { configRepository.getDeviceConfiguration() } returns deviceConfiguration
-        every { securityStateRepository.getSecurityStatusFromLocal() } returns SecurityState.Status.PROJECT_ENDING
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_ENDING
         isConnected.value = true
         syncState.value = EventSyncState(
             "", 0, 0, listOf(),
@@ -377,7 +377,7 @@ class SyncViewModelTest {
         val signOutEvent = viewModel.signOutEventLiveData.getOrAwaitValue()
 
         assertThat(signOutEvent).isNotNull()
-        coVerify(exactly = 1) { authManager.signOut() }
+        coVerify(exactly = 1) { logoutUseCase.invoke() }
     }
 
     private fun initViewModel(): SyncViewModel = SyncViewModel(
@@ -386,8 +386,7 @@ class SyncViewModelTest {
         configRepository = configRepository,
         timeHelper = timeHelper,
         authStore = authStore,
-        securityStateRepository = securityStateRepository,
-        authManager = authManager,
+        logoutUseCase = logoutUseCase,
         externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
     )
 }

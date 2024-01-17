@@ -10,11 +10,11 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 
-class ConfigurationSchedulerImplTest {
+class ProjectConfigurationSchedulerImplTest {
 
     private val ctx = mockk<Context>()
     private val workManager = mockk<WorkManager>(relaxed = true)
-    private lateinit var configurationSchedulerImpl: ConfigurationSchedulerImpl
+    private lateinit var configurationSchedulerImpl: ProjectConfigurationSchedulerImpl
 
     @Before
     fun setup() {
@@ -22,7 +22,7 @@ class ConfigurationSchedulerImplTest {
         every { WorkManager.getInstance(ctx) } returns workManager
 
         configurationSchedulerImpl =
-            ConfigurationSchedulerImpl(ctx)
+            ProjectConfigurationSchedulerImpl(ctx)
     }
 
     @Test
@@ -31,7 +31,7 @@ class ConfigurationSchedulerImplTest {
 
         verify {
             workManager.enqueueUniquePeriodicWork(
-                ConfigurationSchedulerImpl.WORK_NAME,
+                ProjectConfigurationSchedulerImpl.WORK_NAME,
                 ExistingPeriodicWorkPolicy.UPDATE,
                 any(),
             )
@@ -42,6 +42,6 @@ class ConfigurationSchedulerImplTest {
     fun `cancelSync should cancel the worker`() {
         configurationSchedulerImpl.cancelScheduledSync()
 
-        verify { workManager.cancelUniqueWork(ConfigurationSchedulerImpl.WORK_NAME) }
+        verify { workManager.cancelUniqueWork(ProjectConfigurationSchedulerImpl.WORK_NAME) }
     }
 }

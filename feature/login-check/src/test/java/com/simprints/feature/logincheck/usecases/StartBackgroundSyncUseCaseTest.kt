@@ -3,7 +3,7 @@ package com.simprints.feature.logincheck.usecases
 import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
-import com.simprints.infra.config.sync.ConfigurationScheduler
+import com.simprints.infra.config.sync.ProjectConfigurationScheduler
 import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageUpSyncScheduler
 import io.mockk.MockKAnnotations
@@ -23,7 +23,7 @@ class StartBackgroundSyncUseCaseTest {
     lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
-    lateinit var configScheduler: ConfigurationScheduler
+    lateinit var configScheduler: ProjectConfigurationScheduler
 
     @MockK
     lateinit var configRepository: ConfigRepository

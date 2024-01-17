@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
-import com.simprints.infra.authlogic.AuthManager
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -25,8 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val authManager: AuthManager,
     private val authStore: AuthStore,
+    private val logoutUseCase: LogoutUseCase,
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
     @ExternalScope private val externalScope: CoroutineScope,
@@ -79,7 +79,7 @@ internal class AboutViewModel @Inject constructor(
         configRepository.getProjectConfiguration().canSyncDataToSimprints()
 
     private fun logout() {
-        externalScope.launch { authManager.signOut() }
+        externalScope.launch { logoutUseCase() }
     }
 
     private fun load() = viewModelScope.launch {

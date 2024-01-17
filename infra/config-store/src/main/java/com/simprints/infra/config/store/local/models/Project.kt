@@ -1,6 +1,7 @@
 package com.simprints.infra.config.store.local.models
 
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.config.store.models.TokenKeyType
 
 internal fun Project.toProto(): ProtoProject =
@@ -9,6 +10,7 @@ internal fun Project.toProto(): ProtoProject =
         .setCreator(creator)
         .setDescription(description)
         .setName(name)
+        .setState(state.name)
         .setImageBucket(imageBucket)
         .also {
             if (baseUrl != null) it.baseUrl = baseUrl
@@ -21,6 +23,10 @@ internal fun ProtoProject.toDomain(): Project {
     return Project(
         id = id,
         name = name,
+        // We assume the project is RUNNING, otherwise it would have cleared the data
+        state = state?.ifBlank { null }
+            ?.let { ProjectState.valueOf(it) }
+            ?: ProjectState.RUNNING,
         description = description,
         creator = creator,
         imageBucket = imageBucket,

@@ -5,17 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
-import com.simprints.feature.logincheck.usecases.ActionFactory
-import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
-import com.simprints.feature.logincheck.usecases.CancelBackgroundSyncUseCase
-import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
-import com.simprints.feature.logincheck.usecases.ExtractParametersForAnalyticsUseCase
-import com.simprints.feature.logincheck.usecases.GetProjectStateUseCase
-import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase
-import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCase
-import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
-import com.simprints.feature.logincheck.usecases.UpdateDatabaseCountsInCurrentSessionUseCase
-import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
+import com.simprints.feature.logincheck.usecases.*
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -24,7 +16,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -58,7 +49,7 @@ internal class LoginCheckViewModelTest {
     lateinit var isUserSignedInUseCase: IsUserSignedInUseCase
 
     @MockK
-    lateinit var getProjectStateUseCase: GetProjectStateUseCase
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var startBackgroundSync: StartBackgroundSyncUseCase
@@ -86,7 +77,7 @@ internal class LoginCheckViewModelTest {
             extractCrashKeysUseCase,
             addAuthorizationEventUseCase,
             isUserSignedInUseCase,
-            getProjectStateUseCase,
+            configRepository,
             startBackgroundSync,
             cancelBackgroundSync,
             updateDatabaseCountsInCurrentSessionUseCase,
@@ -122,7 +113,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if mismatched project IDs`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.MISMATCHED_PROJECT_ID
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.MISMATCHED_PROJECT_ID
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
@@ -131,7 +122,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Returns error response if not signed in and followup action`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFolowUpRequest())
 
@@ -140,7 +131,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Returns error response if there are several login attempts`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
@@ -150,7 +141,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers login flow if not signed in and flow action`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
@@ -163,7 +154,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Returns error response if login attempt not complete`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.LoginNotCompleted))
@@ -173,7 +164,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if login if failed to cache request`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.handleLoginResult(LoginResult(true, null))
 
@@ -182,7 +173,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if login attempt failed with integrity error`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.IntegrityServiceError))
@@ -192,7 +183,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if login attempt failed with missing play services`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.MissingPlayServices))
@@ -202,7 +193,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if login attempt failed with outdated play services`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.OutdatedPlayServices))
@@ -212,7 +203,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if login attempt failed with missing or outdated play services`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.MissingOrOutdatedPlayServices))
@@ -222,7 +213,7 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if login attempt failed with unknown error`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.Unknown))
@@ -232,27 +223,27 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Correctly handles successful login attempt`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(true, null))
 
-        verify { getProjectStateUseCase.invoke() }
+        coVerify { configRepository.getProject(any()) }
     }
 
     @Test
     fun `Correctly handles signed in users`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        verify { getProjectStateUseCase.invoke() }
+        coVerify { configRepository.getProject(any()) }
     }
 
     @Test
     fun `Triggers alert if project is paused`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { getProjectStateUseCase.invoke() } returns com.simprints.feature.logincheck.usecases.GetProjectStateUseCase.ProjectState.PAUSED
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_PAUSED
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
@@ -261,8 +252,8 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers alert if project is ending`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { getProjectStateUseCase.invoke() } returns com.simprints.feature.logincheck.usecases.GetProjectStateUseCase.ProjectState.ENDING
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_ENDING
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
@@ -271,8 +262,8 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Triggers login attempt if project has ended`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { getProjectStateUseCase.invoke() } returns com.simprints.feature.logincheck.usecases.GetProjectStateUseCase.ProjectState.ENDED
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_ENDED
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
@@ -281,8 +272,8 @@ internal class LoginCheckViewModelTest {
 
     @Test
     fun `Correctly handles if user signed in active project`() = runTest {
-        coEvery { isUserSignedInUseCase.invoke(any()) } returns com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { getProjectStateUseCase.invoke() } returns com.simprints.feature.logincheck.usecases.GetProjectStateUseCase.ProjectState.ACTIVE
+        coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.RUNNING
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
