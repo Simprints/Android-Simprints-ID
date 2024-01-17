@@ -1,10 +1,14 @@
 package com.simprints.infra.network.apiclient
 
-import android.content.Context
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
 import com.simprints.infra.network.coroutines.retryIO
-import com.simprints.infra.network.exceptions.*
+import com.simprints.infra.network.exceptions.ApiError
+import com.simprints.infra.network.exceptions.BackendMaintenanceException
+import com.simprints.infra.network.exceptions.NetworkConnectionException
+import com.simprints.infra.network.exceptions.RetryableCloudException
+import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
+import com.simprints.infra.network.exceptions.isCausedFromBadNetworkConnection
 import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
 import com.simprints.infra.network.json.JsonHelper
 import kotlinx.coroutines.Dispatchers
@@ -21,9 +25,9 @@ import kotlin.reflect.KClass
  * android tests, which can't be accessed via DI yet. Once the testing DI is cleaned up this class
  * can be marked internal.
  */
-class SimApiClientImpl<T : SimRemoteInterface>(
+internal class SimApiClientImpl<T : SimRemoteInterface>(
     private val service: KClass<T>,
-    private val ctx: Context,
+    private val okHttpClientBuilder: DefaultOkHttpClientBuilder,
     private val url: String,
     private val deviceId: String,
     private val versionName: String,
@@ -38,8 +42,6 @@ class SimApiClientImpl<T : SimRemoteInterface>(
         private const val ATTEMPTS_FOR_NETWORK_CALLS = 5
     }
 
-    private val okHttpClientBuilder: DefaultOkHttpClientBuilder = DefaultOkHttpClientBuilder()
-
     override val api: T by lazy {
         retrofit.create(service.java)
     }
@@ -53,7 +55,7 @@ class SimApiClientImpl<T : SimRemoteInterface>(
     }
 
     private val okHttpClientConfig: OkHttpClient.Builder by lazy {
-        okHttpClientBuilder.get(ctx, authToken, deviceId, versionName)
+        okHttpClientBuilder.get(authToken, deviceId, versionName)
     }
 
     override suspend fun <V> executeCall(networkBlock: suspend (T) -> V): V =

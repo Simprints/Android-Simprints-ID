@@ -3,6 +3,7 @@ package com.simprints.infra.network.httpclient
 import android.content.Context
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.simprints.infra.network.BuildConfig
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Interceptor
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
@@ -14,9 +15,12 @@ import okio.GzipSink
 import okio.buffer
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 
-internal class DefaultOkHttpClientBuilder {
+internal class DefaultOkHttpClientBuilder @Inject constructor(
+    @ApplicationContext private val ctx: Context,
+) {
 
     companion object {
 
@@ -35,7 +39,6 @@ internal class DefaultOkHttpClientBuilder {
     }
 
     fun get(
-        ctx: Context,
         authToken: String? = null,
         deviceId: String,
         versionName: String,

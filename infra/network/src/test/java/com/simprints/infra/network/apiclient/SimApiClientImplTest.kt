@@ -4,8 +4,14 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.network.FakeRetrofitInterface
 import com.simprints.infra.network.exceptions.*
+import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
 import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.SpyK
 import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -28,13 +34,17 @@ class SimApiClientImplTest {
     private lateinit var mockWebServer: MockWebServer
     private lateinit var simApiClientImpl: SimApiClientImpl<FakeRetrofitInterface>
 
+    private lateinit var httpClientBuilder: DefaultOkHttpClientBuilder
+
     @Before
     fun setup() {
         mockWebServer = MockWebServer()
         mockWebServer.start()
+        httpClientBuilder = DefaultOkHttpClientBuilder(mockk())
+
         simApiClientImpl = SimApiClientImpl(
             FakeRetrofitInterface::class,
-            mockk(),
+            httpClientBuilder,
             mockWebServer.url("/").toString(),
             "",
             "",
@@ -49,9 +59,7 @@ class SimApiClientImplTest {
 
     @Test
     fun `should throw a backend maintenance exception without estimated outage when it's a maintenance error without header and not retry`() =
-        runTest(
-            StandardTestDispatcher()
-        ) {
+        runTest(StandardTestDispatcher()) {
             val response = MockResponse()
             response.setResponseCode(503)
             response.setBody(backendMaintenanceErrorBody)
@@ -66,9 +74,7 @@ class SimApiClientImplTest {
 
     @Test
     fun `should throw a backend maintenance exception with estimated outage when it's a maintenance error with header and not retry`() =
-        runTest(
-            StandardTestDispatcher()
-        ) {
+        runTest(StandardTestDispatcher()) {
             val estimatedOutage = 4224
             val response = MockResponse()
             response.setResponseCode(503)
@@ -87,9 +93,7 @@ class SimApiClientImplTest {
 
     @Test
     fun `should throw a sync cloud integration exception when the response code is 500 and retry`() =
-        runTest(
-            StandardTestDispatcher()
-        ) {
+        runTest(StandardTestDispatcher()) {
             val response = MockResponse()
             response.setResponseCode(500)
             mockWebServer.enqueue(response)
@@ -105,9 +109,7 @@ class SimApiClientImplTest {
 
     @Test
     fun `should throw a sync cloud integration exception when the response code is 502 and retry`() =
-        runTest(
-            StandardTestDispatcher()
-        ) {
+        runTest(StandardTestDispatcher()) {
             val response = MockResponse()
             response.setResponseCode(502)
             mockWebServer.enqueue(response)
@@ -123,9 +125,7 @@ class SimApiClientImplTest {
 
     @Test
     fun `should throw a sync cloud integration exception when the response code is 503 and retry`() =
-        runTest(
-            StandardTestDispatcher()
-        ) {
+        runTest(StandardTestDispatcher()) {
             val response = MockResponse()
             response.setResponseCode(503)
             response.setBody(jacksonObjectMapper().writeValueAsString(ApiError("001")))
@@ -142,9 +142,7 @@ class SimApiClientImplTest {
 
     @Test
     fun `should throw a sync cloud integration exception when it's 4xx error and not retry`() =
-        runTest(
-            StandardTestDispatcher()
-        ) {
+        runTest(StandardTestDispatcher()) {
 
             val response = MockResponse()
             response.setResponseCode(400)
@@ -161,9 +159,7 @@ class SimApiClientImplTest {
 
     @Test
     fun `should throw a network connection exception when no response is received and not retry`() =
-        runTest(
-            StandardTestDispatcher()
-        ) {
+        runTest(StandardTestDispatcher()) {
 
             val failedResponse = MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START)
             mockWebServer.enqueue(failedResponse)
