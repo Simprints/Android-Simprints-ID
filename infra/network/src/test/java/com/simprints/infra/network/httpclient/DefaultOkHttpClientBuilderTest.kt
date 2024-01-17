@@ -23,11 +23,18 @@ class DefaultOkHttpClientBuilderTest {
     @RelaxedMockK
     lateinit var ctx: Context
 
+    @RelaxedMockK
+    lateinit var networkCache: okhttp3.Cache
+
+    private lateinit var okHttpBuilder: DefaultOkHttpClientBuilder
+
     @Before
     fun setup() {
         MockKAnnotations.init(this)
         mockWebServer = MockWebServer()
         mockWebServer.start()
+
+        okHttpBuilder = DefaultOkHttpClientBuilder(ctx, networkCache)
     }
 
     @After
@@ -42,9 +49,8 @@ class DefaultOkHttpClientBuilderTest {
         val versionName = "cxxlvxzn.12.2049"
 
         // create okHttp client using default builder
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(ctx, "", "", versionName)
+            .get("", "", versionName)
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -66,9 +72,8 @@ class DefaultOkHttpClientBuilderTest {
 
         val deviceId = "symeAwxomedyvexeid"
 
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(ctx, "", deviceId, "")
+            .get("", deviceId, "")
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -88,10 +93,8 @@ class DefaultOkHttpClientBuilderTest {
     fun `should not include auth token in request headers, when auth token is null`() {
         mockWebServer.enqueue(MockResponse())
 
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
-
         okHttpClient = okHttpBuilder
-            .get(ctx, null, "", "")
+            .get(null, "", "")
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -113,9 +116,8 @@ class DefaultOkHttpClientBuilderTest {
 
         val authToken = "eyxSomeAwesomeAuth.TokenThatIsUsed.ForUnitTesting"
 
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(ctx, authToken, "", "")
+            .get(authToken, "", "")
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -136,9 +138,8 @@ class DefaultOkHttpClientBuilderTest {
     fun `should not compress request body if gzip header not provided`() {
         mockWebServer.enqueue(MockResponse())
 
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(ctx, null, "", "")
+            .get(null, "", "")
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -158,9 +159,8 @@ class DefaultOkHttpClientBuilderTest {
     fun `should compress request body if gzip header provided`() {
         mockWebServer.enqueue(MockResponse())
 
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(ctx, null, "", "")
+            .get(null, "", "")
             .build()
 
         val mockHttpRequest = Request.Builder()
