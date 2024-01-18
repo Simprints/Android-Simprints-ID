@@ -6,15 +6,16 @@ import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import javax.inject.Inject
 
 class FingerprintImageProviderImpl @Inject constructor(
-    private val imageCache: ImageCache
+    private val imageCache: ProcessedImageCache
 ) : FingerprintImageProvider<Unit, Unit> {
 
     /**
      * Acquire fingerprint image from the image cache
-     * return it if it is not null or throw an exception if it is null
-     * (this is the case when we have not captured any image yet)
+     * The image should be already captured by the time this method is called
+     * return the image if it is not null or throw an exception
+     *
      */
     override suspend fun acquireFingerprintImage(settings: Unit?): ImageResponse<Unit> =
-        imageCache.lastCaptureImage?.let { ImageResponse(it) }
+        imageCache.recentlyCapturedImage?.let { ImageResponse(it) }
             ?: throw BioSdkException.CannotAcquireFingerprintImageException("Last captured image is null")
 }

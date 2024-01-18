@@ -42,7 +42,7 @@ object NecSdkModule {
         )
     }
 
-    // NEC instance should be singleton because it is initialized once and used throughout the app
+    // NEC instance must be a singleton because it is initialized only once
     @Provides
     @Singleton
     internal fun provideNecInstance() = NEC()

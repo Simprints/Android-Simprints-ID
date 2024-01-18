@@ -7,14 +7,11 @@ import com.simprints.necwrapper.nec.models.NecImage
 import javax.inject.Inject
 
 class NecTemplateExtractor @Inject constructor(private val nec: NEC) {
-
-
     fun extract(
         fingerprintImage: FingerprintImage,
         qualityScore: Int
     ): TemplateResponse<FingerprintTemplateMetadata> {
         try {
-
             val template = nec.extract(
                 NecImage(
                     width = fingerprintImage.width,
@@ -33,7 +30,5 @@ class NecTemplateExtractor @Inject constructor(private val nec: NEC) {
         } catch (e: Exception) {
             throw BioSdkException.TemplateExtractionException(e)
         }
-
-
     }
 }

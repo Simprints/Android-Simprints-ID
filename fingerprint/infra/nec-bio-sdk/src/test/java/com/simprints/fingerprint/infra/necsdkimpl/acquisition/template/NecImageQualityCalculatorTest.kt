@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
 import com.google.common.truth.Truth
+import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.fingerprint.FingerprintImageQualityCheck
 import io.mockk.MockKAnnotations
@@ -37,7 +38,7 @@ class NecImageQualityCalculatorTest {
 
     }
 
-    @Test(expected = FingerprintImageQualityCheck.QualityCheckFailedException::class)
+    @Test(expected = BioSdkException.ImageQualityCheckingException::class)
     fun `test isBadScan failure should throw`() {
         every {
             nec.qualityCheck(any())

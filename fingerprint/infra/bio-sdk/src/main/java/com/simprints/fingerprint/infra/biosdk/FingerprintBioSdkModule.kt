@@ -40,8 +40,8 @@ internal object FingerprintBioSdkProvidersModule {
         configManager: ConfigRepository
     ): BioSdkWrapper = runBlocking {
         // Todo we didn't yet implement the logic to select the SDK based on the configuration
-        // so we are just using the first one
-        // See ticket SIM-81 for more details
+        // so we are just using the first allowed SDK for now
+        // See tickets in SIM-81 for more details
         when (configManager.getProjectConfiguration().fingerprint?.allowedSDKs?.first()) {
 
             FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> simprintsWrapper!!

@@ -15,20 +15,18 @@ class WSQImageDecoder @Inject constructor (private val bitmapConverter: BitmapCo
      *
      * @param imageBytes The WSQ encoded image
      *
-     * @return the row image bytes array
+     * @return the decoded raw image bytes array
      */
     fun decode(imageBytes: RawUnprocessedImage): FingerprintRawImage {
-
         if (!imageBytes.isValidFormat()) {
             throw BioSdkException.ImageDecodingException()
-        }
-
+       }
         val decodingResult = WSQDecoder.decode(imageBytes.imageData)
             ?:throw BioSdkException.ImageDecodingException()
         val decodedBitmap = decodingResult.bitmap
 
         // WSQ decoder produces rgp images, NEC only process gray scale raw images.
-
+        // So we convert the decoded bitmap to gray scale.
         val rawImageBytes =
             bitmapConverter.convert(decodingResult.bitmap, BitmapFormat.BITMAP_8_BIT_COLOR)
 
@@ -38,10 +36,9 @@ class WSQImageDecoder @Inject constructor (private val bitmapConverter: BitmapCo
             decodedBitmap.width,
             decodedBitmap.height,
             imageBytes.brightness
-
         )
-        decodingResult.bitmap.recycle() // Recycle original bitmap to avoid OutOfMemoryException
+        // Recycle the bitmap to free memory and avoid OutOfMemoryException
+        decodingResult.bitmap.recycle()
         return decodedImage
     }
-
 }

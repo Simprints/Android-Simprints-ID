@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.infra.necsdkimpl.matching
 
 import com.google.common.truth.Truth
+import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
@@ -99,7 +100,7 @@ class FingerprintMatcherImplTest {
         Truth.assertThat(result[0].score).isEqualTo(3)
     }
 
-    @Test(expected = NEC.AttemptedToRunBeforeInitializedException::class)
+    @Test(expected = BioSdkException.TemplateMatchingException::class)
     fun `test match FingerprintIdentifies before initialize NEC`() = runTest {
         // Given
         every {

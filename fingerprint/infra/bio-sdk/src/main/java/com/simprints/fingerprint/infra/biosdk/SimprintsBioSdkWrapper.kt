@@ -12,14 +12,14 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import javax.inject.Inject
 
 
-
 class SimprintsBioSdkWrapper @Inject constructor(
-    private val bioSdk: FingerprintBioSdk
-    <Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings,
+    private val bioSdk: FingerprintBioSdk<Unit,
+        Unit,
+        Unit,
+        FingerprintTemplateAcquisitionSettings,
         FingerprintTemplateMetadata,
         SimAfisMatcherSettings>
 ) : BioSdkWrapper {
-
 
     override suspend fun initialize() {
         bioSdk.initialize()

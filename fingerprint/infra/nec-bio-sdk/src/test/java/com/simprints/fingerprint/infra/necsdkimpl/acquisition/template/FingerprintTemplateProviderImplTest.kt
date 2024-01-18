@@ -1,13 +1,13 @@
 package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 
-import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ImageCache
+import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
+import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
+import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapper
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
-import com.simprints.necwrapper.nec.fingerprint.FingerprintImageQualityCheck
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -33,14 +33,16 @@ class FingerprintTemplateProviderImplTest {
     private lateinit var wsqImageDecoder: WSQImageDecoder
 
     @RelaxedMockK
-    private lateinit var imageCache: ImageCache
+    private lateinit var processedImageCache: ProcessedImageCache
 
+    @RelaxedMockK
+    private lateinit var captureWrapper: FingerprintCaptureWrapper
 
-    @MockK
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        every { fingerprintCaptureWrapperFactory.captureWrapper } returns captureWrapper
 
         fingerprintTemplateProviderImpl = FingerprintTemplateProviderImpl(
             fingerprintCaptureWrapperFactory = fingerprintCaptureWrapperFactory,
@@ -48,7 +50,7 @@ class FingerprintTemplateProviderImplTest {
             secugenImageCorrection = secugenImageCorrection,
             qualityCalculator = necImageQualityCalculator,
             necTemplateExtractor = necTemplateExtractor,
-            captureImageCache = imageCache
+            captureProcessedImageCache = processedImageCache
         )
 
     }
@@ -75,30 +77,41 @@ class FingerprintTemplateProviderImplTest {
         fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
         // Then
         coVerify {
-            fingerprintCaptureWrapperFactory.captureWrapper
+            captureWrapper
                 .acquireUnprocessedImage(any())
             wsqImageDecoder.decode(any())
-            imageCache.lastCaptureImage = any()
+            processedImageCache.recentlyCapturedImage = any()
             secugenImageCorrection.processRawImage(any(), any())
             necImageQualityCalculator.getQualityScore(any())
             necTemplateExtractor.extract(any(), any())
 
         }
     }
-    @Test(expected = FingerprintImageQualityCheck.QualityCheckFailedException::class)
-    fun `test acquireFingerprintTemplate fails if quality score is less than threshold`() = runTest {
-        // Given
 
-        every { necImageQualityCalculator.getQualityScore(any()) } returns 10
-        coVerify {
-            fingerprintCaptureWrapperFactory.captureWrapper
-                .acquireUnprocessedImage(any())
-            wsqImageDecoder.decode(any())
-            imageCache.lastCaptureImage = any()
-            secugenImageCorrection.processRawImage(any(), any())
-            necImageQualityCalculator.getQualityScore(any())
-            necTemplateExtractor.extract(any(), any())
+    @Test(expected = BioSdkException.ImageQualityBelowThresholdException::class)
+    fun `test acquireFingerprintTemplate fails if quality score is less than threshold`() =
+        runTest {
+            // Given
+            every { necImageQualityCalculator.getQualityScore(any()) } returns 10
+            val settings = FingerprintTemplateAcquisitionSettings(
+                processingResolution = Dpi(500),
+                qualityThreshold = 20,
+                timeOutMs = 0
+            )
+            // When
+            fingerprintTemplateProviderImpl.acquireFingerprintTemplate(settings)
+            // Then
+            coVerify {
+                captureWrapper
+                    .acquireUnprocessedImage(any())
+                wsqImageDecoder.decode(any())
+                processedImageCache.recentlyCapturedImage = any()
+                secugenImageCorrection.processRawImage(any(), any())
+                necImageQualityCalculator.getQualityScore(any())
+            }
+            coVerify(exactly = 0) {
+                necTemplateExtractor.extract(any(), any())
+            }
 
         }
-    }
 }

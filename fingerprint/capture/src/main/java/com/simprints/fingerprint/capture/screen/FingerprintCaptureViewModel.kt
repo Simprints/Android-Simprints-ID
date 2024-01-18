@@ -354,7 +354,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
-
         }
     }
 

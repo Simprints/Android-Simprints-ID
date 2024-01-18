@@ -25,29 +25,21 @@ class SdkInitializerImpl @Inject constructor(
     private val authStore: AuthStore
 ) : SdkInitializer<Unit> {
     override suspend fun initialize(initializationParams: Unit?) =
-        // download or get license from local storage
+    // download or get license from local storage
         // block until license is retrieved or an error occurs
         licenseRepository.getLicenseStates(
             authStore.signedInProjectId, deviceId, NEC_VENDOR
-        ).first {
-            //ignore all states except finished states
-            !(it is LicenseState.Downloading || it is LicenseState.Started)
-        }
+        ).first { !(it is LicenseState.Downloading || it is LicenseState.Started) }
             .let {
                 when (it) {
-                    is LicenseState.FinishedWithSuccess -> {
-                        log("License downloaded successfully")
+                    is LicenseState.FinishedWithSuccess ->
                         initNecSdk(it.license.encodeAndConvertToByteBuffer(), context)
-                    }
 
-                    is LicenseState.FinishedWithError -> {
-                        log("Error downloading license ${it.errorCode}")
+                    is LicenseState.FinishedWithError ->
                         throw BioSdkException.LicenseDownloadException()
-                    }
 
-                    is LicenseState.FinishedWithBackendMaintenanceError -> {
+                    is LicenseState.FinishedWithBackendMaintenanceError ->
                         throw BioSdkException.LicenseDownloadMaintenanceModeException(it.estimatedOutage?.toString())
-                    }
 
                     else -> {
                         // unreachable code as we are filtering out all other states
@@ -56,20 +48,19 @@ class SdkInitializerImpl @Inject constructor(
             }
 
 
-    private suspend fun initNecSdk(licence: ByteBuffer, context: Context) {
+    private suspend fun initNecSdk(licence: ByteBuffer, context: Context)=
         try {
             necInstance.init(licence, context)
         } catch (e: Exception) {
             log("Error initializing NEC SDK ${e.message}")
-            // if we fail to initialize the SDK we should delete the license from the local storage
-            // because it is most likely corrupted
+            // if we fail to init NEC we should delete the license from the local storage
+            // because it is most likely corrupted or expired license
             licenseRepository.deleteCachedLicense()
             throw BioSdkException.BioSdkInitializationException(e)
         }
-    }
 
     companion object {
-        val NEC_VENDOR = Vendor("NEC_FINGERPRINT")
+        private  val NEC_VENDOR = Vendor("NEC_FINGERPRINT")
     }
 }
 

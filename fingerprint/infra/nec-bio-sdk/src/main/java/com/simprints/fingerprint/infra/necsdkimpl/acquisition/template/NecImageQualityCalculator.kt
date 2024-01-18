@@ -8,8 +8,6 @@ import javax.inject.Inject
 class NecImageQualityCalculator @Inject constructor(
     private val necInstant: NEC,
 ) {
-
-
     fun getQualityScore(image: FingerprintImage): Int =
         try {
             necInstant.qualityCheck(
@@ -23,6 +21,4 @@ class NecImageQualityCalculator @Inject constructor(
         } catch (e: Exception) {
             throw BioSdkException.ImageQualityCheckingException(e)
         }
-
-
 }

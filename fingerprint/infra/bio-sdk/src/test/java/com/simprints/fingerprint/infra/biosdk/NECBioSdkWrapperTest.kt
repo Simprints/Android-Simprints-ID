@@ -12,7 +12,7 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.slot
 import kotlinx.coroutines.test.runTest
@@ -23,9 +23,13 @@ import org.junit.Test
 class NECBioSdkWrapperTest {
     private lateinit var necBioSdkWrapper: NECBioSdkWrapper
 
-    @MockK(relaxed = true)
-    private lateinit var bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings,
-        FingerprintTemplateMetadata, NecMatchingSettings>
+    @RelaxedMockK
+    private lateinit var bioSdk: FingerprintBioSdk<Unit,
+        Unit,
+        Unit,
+        FingerprintTemplateAcquisitionSettings,
+        FingerprintTemplateMetadata,
+        NecMatchingSettings>
 
     @Before
     fun setUp() {
@@ -34,7 +38,7 @@ class NECBioSdkWrapperTest {
     }
 
     @Test
-    fun `Initializes bio sdk`() = runTest {
+    fun `initializes bio sdk`() = runTest {
         //When
         necBioSdkWrapper.initialize()
         //Then
@@ -44,7 +48,7 @@ class NECBioSdkWrapperTest {
     }
 
     @Test
-    fun `Calls match on bio sdk`() = runTest {
+    fun `calls match on bio sdk`() = runTest {
         //Given
         val probe = mockk<FingerprintIdentity>()
         val candidates = listOf(mockk<FingerprintIdentity>())
@@ -58,7 +62,7 @@ class NECBioSdkWrapperTest {
     }
 
     @Test
-    fun `Calls fingerprint template acquisition from sdk`() = runTest {
+    fun `calls fingerprint template acquisition from sdk`() = runTest {
         //Given
         val captureFingerprintStrategy = 1000
         val captureTimeOutMs = 1000
@@ -93,7 +97,7 @@ class NECBioSdkWrapperTest {
     }
 
     @Test
-    fun `Fails if template does not have meta data`() = runTest {
+    fun `fails if template does not have meta data`() = runTest {
         coEvery { bioSdk.acquireFingerprintTemplate(any()) } returns TemplateResponse(
             byteArrayOf(
                 1,
@@ -108,7 +112,7 @@ class NECBioSdkWrapperTest {
     }
 
     @Test
-    fun `Calls fingerprint image acquisition from sdk`() = runTest {
+    fun `calls fingerprint image acquisition from sdk`() = runTest {
         //Given
         val imageBytes = byteArrayOf(1, 2, 3)
         val bioSdkResponse = ImageResponse<Unit>(imageBytes)

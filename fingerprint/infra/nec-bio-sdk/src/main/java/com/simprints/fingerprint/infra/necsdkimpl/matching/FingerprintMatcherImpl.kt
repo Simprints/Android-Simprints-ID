@@ -7,7 +7,6 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.NEC_TEMPLATE_FORMAT
-import com.simprints.fingerprint.infra.necsdkimpl.acquisition.template.log
 import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.models.NECTemplate
 import javax.inject.Inject
@@ -21,7 +20,6 @@ class FingerprintMatcherImpl @Inject constructor(
         candidates: List<FingerprintIdentity>,
         settings: NecMatchingSettings?
     ): List<MatchResult> {
-        log("Matching ${probe.id} with ${candidates.map { it.id }}")
         return if (settings?.crossFingerComparison == true) {
             crossFingerMatching(probe, candidates)
         } else {
@@ -64,16 +62,14 @@ class FingerprintMatcherImpl @Inject constructor(
         return MatchResult(candidate.id, getOverallScore(total, fingers))
     }
 
-    private fun verify(probe: Fingerprint, candidate: Fingerprint) = try{
+    private fun verify(probe: Fingerprint, candidate: Fingerprint) = try {
         nec.match(
             probe.toNecTemplate(),
             candidate.toNecTemplate()
         ).toDouble()
-    }catch (e: Exception){
-        log("Matching failed ${e.message}")
+    } catch (e: Exception) {
         throw BioSdkException.TemplateMatchingException(e)
     }
-
 
     private fun crossFingerMatching(
         probe: FingerprintIdentity,
@@ -84,7 +80,6 @@ class FingerprintMatcherImpl @Inject constructor(
         probe: FingerprintIdentity,
         candidate: FingerprintIdentity,
     ): MatchResult {
-
         // Number of fingers used in matching
         val fingers = probe.fingerprints.size
         // Sum of maximum matching score for each finger
@@ -103,7 +98,6 @@ class FingerprintMatcherImpl @Inject constructor(
     }
 
 }
-
 
 private fun FingerprintIdentity.templateForFinger(fingerId: FingerIdentifier) = fingerprints.find {
     it.fingerId == fingerId

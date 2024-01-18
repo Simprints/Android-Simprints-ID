@@ -111,6 +111,8 @@ jobs:
                 fingerprint:infra:simprints-bio-sdk
                 fingerprint:infra:scanner
                 fingerprint:infra:simafis-wrapper
+                fingerprint:infra:simprints-bio-sdk
+                fingerprint:infra:nec-bio-sdk
             reportsId: fingerprint
 
     sonarqube:

@@ -3,15 +3,10 @@ package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 const val DEFAULT_RESOLUTION: Short = 500
 
 /**
- * Fingerprint raw non compressed image
- *
- * @property imageBytes
- * @property width
- * @property height
- * @property resolution
- * @constructor Create empty Fingerprint raw image
+ * Fingerprint raw uncompressed image
+ * This class stores the raw image bytes and the image metadata
  */
-// Suppresses the "ArrayInDataClass" warning because there is no need to override equals for this class
+//Suppressed because there is no need to implement equals and hashcode for this data class
 @Suppress("ArrayInDataClass")
 data class FingerprintRawImage(
     val un20SerialNumber: ByteArray,

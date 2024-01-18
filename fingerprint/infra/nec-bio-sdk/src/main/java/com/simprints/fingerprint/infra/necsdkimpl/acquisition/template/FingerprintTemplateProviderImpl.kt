@@ -3,7 +3,7 @@ package com.simprints.fingerprint.infra.necsdkimpl.acquisition.template
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateResponse
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
-import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ImageCache
+import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
@@ -15,7 +15,7 @@ class FingerprintTemplateProviderImpl @Inject constructor(
     private val wsqImageDecoder: WSQImageDecoder,
     private val secugenImageCorrection: SecugenImageCorrection,
     private val qualityCalculator: NecImageQualityCalculator,
-    private val captureImageCache: ImageCache,
+    private val captureProcessedImageCache: ProcessedImageCache,
     private val necTemplateExtractor: NecTemplateExtractor
 
 
@@ -50,10 +50,10 @@ class FingerprintTemplateProviderImpl @Inject constructor(
         val unprocessedImage = captureWrapper.acquireUnprocessedImage(
             Dpi(MIN_CAPTURE_DPI)
         ).rawUnprocessedImage
+        captureProcessedImageCache.recentlyCapturedImage = unprocessedImage.imageData
         log("Unprocessed image acquired, processing it")
         val decodedImage = decodeWsqImage(unprocessedImage)
         log("Image decoded successfully ${decodedImage.resolution}")
-        captureImageCache.lastCaptureImage = decodedImage.imageBytes
         log("processing image using secugen image correction")
         val secugenProcessedImage = processImage(settings, decodedImage)
         log("quality checking image using nec sdk")
