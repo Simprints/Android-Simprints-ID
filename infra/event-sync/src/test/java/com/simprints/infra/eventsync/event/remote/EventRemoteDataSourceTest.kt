@@ -16,6 +16,7 @@ import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsExce
 import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -27,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -213,6 +215,17 @@ class EventRemoteDataSourceTest {
     @Test
     fun getEvents_shouldMakeTheRightRequest() {
         runTest {
+            coEvery {
+                eventRemoteInterface.downloadEvents(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns Response.success("".toResponseBody())
+
             val mockedScope: CoroutineScope = mockk()
             mockkStatic("kotlinx.coroutines.channels.ProduceKt")
             every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()

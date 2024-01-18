@@ -41,15 +41,16 @@ internal class EventDownSyncTask @Inject constructor(
 
     suspend fun downSync(
         scope: CoroutineScope,
-        operation: EventDownSyncOperation
+        operation: EventDownSyncOperation,
     ): Flow<EventDownSyncProgress> = flow {
         var lastOperation = operation.copy()
         var count = 0
         val batchOfEventsToProcess = mutableListOf<EnrolmentRecordEvent>()
 
         try {
-            eventRemoteDataSource.getEvents(operation.queryEvent.fromDomainToApi(), scope)
-                .consumeAsFlow()
+            val (maxCount, stream) = eventRemoteDataSource.getEvents(operation.queryEvent.fromDomainToApi(), scope)
+
+            stream.consumeAsFlow()
                 .collect {
                     batchOfEventsToProcess.add(it)
                     count++

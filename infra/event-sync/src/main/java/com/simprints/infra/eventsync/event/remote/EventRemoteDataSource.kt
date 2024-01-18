@@ -16,12 +16,15 @@ import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRec
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
+import java.io.BufferedInputStream
+import java.io.ByteArrayInputStream
 import java.io.InputStream
 import javax.inject.Inject
 
@@ -51,15 +54,21 @@ internal class EventRemoteDataSource @Inject constructor(
 
     suspend fun getEvents(
         query: ApiRemoteEventQuery,
-        scope: CoroutineScope
-    ): ReceiveChannel<EnrolmentRecordEvent> {
+        scope: CoroutineScope,
+    ): EventDownSyncResult {
         return try {
-            val streaming = takeStreaming(query)
+            val response = takeStreaming(query)
+
+            val totalCount = response.headers()[COUNT_HEADER]?.toIntOrNull() ?: 0
+            val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
             Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
 
-            scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
-                parseStreamAndEmitEvents(streaming, this)
-            }
+            EventDownSyncResult(
+                totalCount = totalCount,
+                eventStream = scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
+                    parseStreamAndEmitEvents(streaming, this)
+                }
+            )
         } catch (t: Throwable) {
             if (t is SyncCloudIntegrationException && t.httpStatusCode() == TOO_MANY_REQUEST_STATUS)
                 throw TooManyRequestsException()
@@ -70,7 +79,10 @@ internal class EventRemoteDataSource @Inject constructor(
     }
 
     @VisibleForTesting
-    suspend fun parseStreamAndEmitEvents(streaming: InputStream, channel: ProducerScope<EnrolmentRecordEvent>) {
+    suspend fun parseStreamAndEmitEvents(
+        streaming: InputStream,
+        channel: ProducerScope<EnrolmentRecordEvent>,
+    ) {
         val parser: JsonParser = JsonFactory().createParser(streaming)
         check(parser.nextToken() == START_ARRAY) { "Expected an array" }
 
@@ -78,13 +90,13 @@ internal class EventRemoteDataSource @Inject constructor(
 
         try {
             while (parser.nextToken() == START_OBJECT) {
-                val event = jsonHelper.jackson.readValue(parser, ApiEnrolmentRecordEvent::class.java)
+                val event =
+                    jsonHelper.jackson.readValue(parser, ApiEnrolmentRecordEvent::class.java)
                 channel.send(event.fromApiToDomain())
             }
 
             parser.close()
             channel.close()
-
         } catch (t: Throwable) {
             Simber.d(t)
             parser.close()
@@ -102,12 +114,12 @@ internal class EventRemoteDataSource @Inject constructor(
                 modes = query.modes,
                 lastEventId = query.lastEventId
             )
-        }.byteStream()
+        }
 
     suspend fun post(
         projectId: String,
         events: List<Event>,
-        acceptInvalidEvents: Boolean = true
+        acceptInvalidEvents: Boolean = true,
     ) {
         executeCall { remoteInterface ->
             remoteInterface.uploadEvents(
@@ -127,7 +139,10 @@ internal class EventRemoteDataSource @Inject constructor(
         authStore.buildClient(EventRemoteInterface::class)
 
     companion object {
+
         private const val CHANNEL_CAPACITY_FOR_PROPAGATION = 2000
         private const val TOO_MANY_REQUEST_STATUS = 429
+
+        private const val COUNT_HEADER = "x-event-count"
     }
 }
