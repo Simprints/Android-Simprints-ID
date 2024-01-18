@@ -1,23 +1,19 @@
 package com.simprints.infra.eventsync.event.remote
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.EventType.*
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID_2
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.*
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
 import com.simprints.infra.network.SimNetwork
@@ -52,7 +48,7 @@ class EventRemoteDataSourceTest {
     private val query = ApiRemoteEventQuery(
         projectId = DEFAULT_PROJECT_ID,
         userId = DEFAULT_USER_ID.value,
-        moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).values(),
+        moduleId = DEFAULT_MODULE_ID.value,
         subjectId = GUID1,
         lastEventId = GUID2,
         modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
@@ -92,7 +88,7 @@ class EventRemoteDataSourceTest {
             coVerify(exactly = 1) {
                 eventRemoteInterface.countEvents(
                     projectId = DEFAULT_PROJECT_ID,
-                    moduleIds = listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2).values(),
+                    moduleId = DEFAULT_MODULE_ID.value,
                     attendantId = DEFAULT_USER_ID.value,
                     subjectId = GUID1,
                     modes = listOf(ApiModes.FACE, ApiModes.FINGERPRINT),
@@ -225,7 +221,7 @@ class EventRemoteDataSourceTest {
             with(query) {
                 coVerify {
                     eventRemoteInterface.downloadEvents(
-                        projectId, moduleIds, userId, subjectId, modes, lastEventId
+                        projectId, moduleId, userId, subjectId, modes, lastEventId
                     )
                 }
             }

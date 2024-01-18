@@ -10,7 +10,7 @@ import com.simprints.infra.eventsync.event.remote.fromDomainToApi
 internal data class RemoteEventQuery(
     val projectId: String,
     val attendantId: String? = null,
-    val moduleIds: List<String>? = null,
+    val moduleId: String? = null,
     val subjectId: String? = null,
     val lastEventId: String? = null,
     val modes: List<Modes>,
@@ -19,7 +19,7 @@ internal data class RemoteEventQuery(
     internal fun fromDomainToApi() = ApiRemoteEventQuery(
         projectId = projectId,
         userId = attendantId,
-        moduleIds = moduleIds,
+        moduleId = moduleId,
         subjectId = subjectId,
         lastEventId = lastEventId,
         modes = modes.map { it.fromDomainToApi() },

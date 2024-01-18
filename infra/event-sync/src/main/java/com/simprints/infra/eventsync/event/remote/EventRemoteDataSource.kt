@@ -34,7 +34,7 @@ internal class EventRemoteDataSource @Inject constructor(
         executeCall { eventsRemoteInterface ->
             eventsRemoteInterface.countEvents(
                 projectId = query.projectId,
-                moduleIds = query.moduleIds,
+                moduleId = query.moduleId,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
                 modes = query.modes,
@@ -96,7 +96,7 @@ internal class EventRemoteDataSource @Inject constructor(
         executeCall { eventsRemoteInterface ->
             eventsRemoteInterface.downloadEvents(
                 projectId = query.projectId,
-                moduleIds = query.moduleIds,
+                moduleId = query.moduleId,
                 attendantId = query.userId,
                 subjectId = query.subjectId,
                 modes = query.modes,

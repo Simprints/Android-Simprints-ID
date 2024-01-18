@@ -134,7 +134,7 @@ internal class EventDownSyncTask @Inject constructor(
         operation: EventDownSyncOperation,
         event: EnrolmentRecordMoveEvent
     ): List<SubjectAction> {
-        val modulesIdsUnderSyncing = operation.queryEvent.moduleIds
+        val modulesIdsUnderSyncing = operation.queryEvent.moduleId
         val attendantUnderSyncing = operation.queryEvent.attendantId
         val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
         val enrolmentRecordCreation = event.payload.enrolmentRecordCreation
@@ -211,10 +211,10 @@ internal class EventDownSyncTask @Inject constructor(
 
 
     private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
+        op.queryEvent.moduleId == moduleId.value
 
     private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
+        op.queryEvent.moduleId == moduleId.value
 
     private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
         moduleId.value.partOf(configRepository.getDeviceConfiguration().selectedModules.values())

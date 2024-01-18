@@ -203,7 +203,7 @@ class EventDownSyncTaskTest {
 
             val syncByModule2 = moduleOp.copy(
                 queryEvent = moduleOp.queryEvent.copy(
-                    moduleIds = listOf(DEFAULT_MODULE_ID_2.value)
+                    moduleId = DEFAULT_MODULE_ID_2.value
                 )
             )
             eventDownSyncTask.downSync(this, syncByModule2).toList()
@@ -250,7 +250,7 @@ class EventDownSyncTaskTest {
 
         val syncByModule2 = moduleOp.copy(
             queryEvent = moduleOp.queryEvent.copy(
-                moduleIds = listOf(DEFAULT_MODULE_ID_2.value)
+                moduleId = DEFAULT_MODULE_ID_2.value
             )
         )
         eventDownSyncTask.downSync(this, syncByModule2).toList()
