@@ -2,11 +2,12 @@ package com.simprints.feature.login.tools.play
 
 import android.app.Activity
 import android.content.DialogInterface
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.common.ConnectionResult.*
 import com.google.android.gms.common.GoogleApiAvailability
 import com.simprints.feature.login.LoginError
-import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
 import com.simprints.infra.logging.Simber
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -20,6 +21,9 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
 
     @MockK
     private lateinit var activity: Activity
+
+    @MockK
+    private lateinit var checkForPlayServicesResultLauncher: ActivityResultLauncher<IntentSenderRequest>
 
     @MockK
     private lateinit var googleApiAvailability: GoogleApiAvailability
@@ -44,13 +48,13 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
         //Given
         every { googleApiAvailability.isGooglePlayServicesAvailable(activity) } returns SUCCESS
         //When
-        googlePlayServicesAvailabilityChecker.check(activity, launchCallBack)
+        googlePlayServicesAvailabilityChecker.check(activity, checkForPlayServicesResultLauncher, launchCallBack)
         //Then
 
         verify(exactly = 0) {
             googleApiAvailability.showErrorDialogFragment(
                 activity, any(),
-                GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
+                checkForPlayServicesResultLauncher, any()
             )
         }
         verify(exactly = 0) { launchCallBack(any()) }
@@ -64,13 +68,13 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
         every { googleApiAvailability.isUserResolvableError(INTERNAL_ERROR) } returns false
 
         //When
-        googlePlayServicesAvailabilityChecker.check(activity, launchCallBack)
+        googlePlayServicesAvailabilityChecker.check(activity, checkForPlayServicesResultLauncher, launchCallBack)
 
         //Then
         verify(exactly = 0) {
             googleApiAvailability.showErrorDialogFragment(
                 activity, any(),
-                GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
+                checkForPlayServicesResultLauncher, any()
             )
         }
         verify { launchCallBack(LoginError.MissingPlayServices) }
@@ -85,18 +89,18 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
         every {
             googleApiAvailability.showErrorDialogFragment(
                 activity,
-                SERVICE_VERSION_UPDATE_REQUIRED, GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
+                SERVICE_VERSION_UPDATE_REQUIRED, checkForPlayServicesResultLauncher, any()
             )
         } returns true
 
         //When
-        googlePlayServicesAvailabilityChecker.check(activity, launchCallBack)
+        googlePlayServicesAvailabilityChecker.check(activity, checkForPlayServicesResultLauncher, launchCallBack)
 
         //Then
         verify(exactly = 1) {
             googleApiAvailability.showErrorDialogFragment(
                 activity, SERVICE_VERSION_UPDATE_REQUIRED,
-                GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
+                checkForPlayServicesResultLauncher, any()
             )
         }
         verify(exactly = 0) { launchCallBack(any()) }
@@ -114,7 +118,7 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             googleApiAvailability.showErrorDialogFragment(
                 activity,
                 SERVICE_VERSION_UPDATE_REQUIRED,
-                GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE,
+                checkForPlayServicesResultLauncher,
                 capture(cancellationListenerSlot)
             )
         } answers {
@@ -122,13 +126,13 @@ internal class GooglePlayServicesAvailabilityCheckerTest {
             true
         }
         //When
-        googlePlayServicesAvailabilityChecker.check(activity, launchCallBack)
+        googlePlayServicesAvailabilityChecker.check(activity, checkForPlayServicesResultLauncher, launchCallBack)
 
         //Then
         verify(exactly = 1) {
             googleApiAvailability.showErrorDialogFragment(
                 activity, SERVICE_VERSION_UPDATE_REQUIRED,
-                GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE, any()
+                checkForPlayServicesResultLauncher, any()
             )
         }
         verify { launchCallBack(LoginError.OutdatedPlayServices) }
