@@ -155,7 +155,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
             runBlocking {
                 try {
-
                     bioSdk.initialize()
                 } catch (e: BioSdkException) {
                     handleBioSdkError(e)
@@ -178,7 +177,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
         when (bioSdkException) {
             is BioSdkException.BioSdkInitializationException,
-            is BioSdkException.ImageDecodingException ,
+            is BioSdkException.ImageDecodingException,
             is BioSdkException.ImageProcessingException,
             is BioSdkException.CannotAcquireFingerprintImageException,
             is BioSdkException.ImageQualityCheckingException,
@@ -187,6 +186,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 updateCaptureState(CaptureState::toNotCollected)
                 _launchAlert.send()
             }
+
             is BioSdkException.ImageQualityBelowThresholdException -> TODO()
             is BioSdkException.LicenseDownloadException -> TODO()
             is BioSdkException.LicenseDownloadMaintenanceModeException -> TODO()
@@ -510,7 +510,6 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 Simber.e(e)
                 handleNoFingerDetected()
             }
-
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)

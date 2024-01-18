@@ -5,6 +5,7 @@ import com.simprints.core.DeviceID
 import com.simprints.core.DispatcherIO
 import com.simprints.core.ExternalScope
 import com.simprints.core.PackageVersionName
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.core.tools.utils.StringTokenizer
@@ -60,4 +61,8 @@ object FakeCoreModule {
     @Provides
     @Singleton
     fun provideEncodingUtils(): EncodingUtils = EncodingUtilsImplForTests
+
+    @Provides
+    @Singleton
+    fun provideJsonHelper(): JsonHelper = JsonHelper
 }

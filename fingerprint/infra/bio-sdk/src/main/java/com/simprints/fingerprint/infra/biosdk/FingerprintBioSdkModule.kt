@@ -2,8 +2,8 @@ package com.simprints.fingerprint.infra.biosdk
 
 import com.simprints.fingerprint.infra.biosdkimpl.SimprintsSdk
 import com.simprints.fingerprint.infra.necsdkimpl.NecSdk
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -14,7 +14,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class FingerprintBioSdkModule {
+internal abstract class FingerprintBioSdkModule {
 
     @Binds
     @SimprintsSdk
@@ -29,7 +29,7 @@ abstract class FingerprintBioSdkModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object FingerprintBioSdkProvidersModule {
+internal object FingerprintBioSdkProvidersModule {
 
 
     @Provides
@@ -37,7 +37,7 @@ object FingerprintBioSdkProvidersModule {
     fun provideBioSdkWrapper(
         @SimprintsSdk simprintsWrapper: BioSdkWrapper?,
         @NecSdk necWrapper: BioSdkWrapper?,
-        configManager: ConfigManager
+        configManager: ConfigRepository
     ): BioSdkWrapper = runBlocking {
         // Todo we didn't yet implement the logic to select the SDK based on the configuration
         // so we are just using the first one
