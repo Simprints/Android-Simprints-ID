@@ -69,7 +69,6 @@ include(
 
 // Face modality modules
 include(
-    ":face:configuration",
     ":face:capture",
     ":face:infra:face-bio-sdk",
     ":face:infra:roc-wrapper",

@@ -1,6 +1,5 @@
 package com.simprints.feature.orchestrator.usecases
 
-import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.feature.exitform.ExitFormResult
 import com.simprints.feature.fetchsubject.FetchSubjectResult
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
@@ -23,14 +22,11 @@ internal class MapRefusalOrErrorResultUseCase @Inject constructor() {
             )
         }
 
-        is SetupResult -> result.takeUnless { it.permissionGranted }
+        is SetupResult -> result.takeUnless { it.isSuccess }
             ?.let { AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR) }
 
         is FingerprintConnectResult -> result.takeUnless { it.isSuccess }
             ?.let { AppErrorResponse(AppErrorReason.UNEXPECTED_ERROR) }
-
-        is FaceConfigurationResult -> result.takeUnless { it.isSuccess }
-            ?.let { AppErrorResponse(it.error ?: AppErrorReason.UNEXPECTED_ERROR) }
 
         else -> null
     }

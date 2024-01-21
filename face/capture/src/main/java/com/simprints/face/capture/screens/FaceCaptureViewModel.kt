@@ -1,5 +1,6 @@
 package com.simprints.face.capture.screens
 
+import android.app.Activity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,9 @@ import com.simprints.face.capture.usecases.SaveFaceImageUseCase
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FaceConfiguration
+import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
+import com.simprints.infra.license.LicenseRepository
+import com.simprints.infra.license.Vendor
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag
 import com.simprints.infra.logging.Simber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +31,8 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val saveFaceImage: SaveFaceImageUseCase,
     private val eventReporter: SimpleCaptureEventReporter,
     private val bitmapToByteArray: BitmapToByteArrayUseCase,
+    private val licenseRepository: LicenseRepository,
+    private val faceBioSdkInitializer: FaceBioSdkInitializer
 ) : ViewModel() {
 
     // Updated in live feedback screen
@@ -51,12 +57,26 @@ internal class FaceCaptureViewModel @Inject constructor(
         get() = _finishFlowEvent
     private val _finishFlowEvent = MutableLiveData<LiveDataEventWithContent<FaceCaptureResult>>()
 
+
+    val invalidLicense: LiveData<Unit>
+        get() = _invalidLicense
+    private val _invalidLicense = MutableLiveData<Unit>()
+
     init {
         Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Starting face capture flow")
     }
 
     fun setupCapture(samplesToCapture: Int) {
         this.samplesToCapture = samplesToCapture
+    }
+
+    fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
+        val license = licenseRepository.getCachedLicense(Vendor.RANK_ONE_FACE_VENDOR)
+        if (!faceBioSdkInitializer.tryInitWithLicense(activity, license)) {
+            Simber.tag(CrashReportTag.LICENSE.name).i("License is invalid")
+            licenseRepository.deleteCachedLicense(Vendor.RANK_ONE_FACE_VENDOR)
+            _invalidLicense.postValue(Unit)
+        }
     }
 
     fun getSampleDetection() = faceDetections.firstOrNull()
@@ -122,4 +142,6 @@ internal class FaceCaptureViewModel @Inject constructor(
     fun addCaptureConfirmationAction(startTime: Long, isContinue: Boolean) {
         eventReporter.addCaptureConfirmationEvent(startTime, isContinue)
     }
+
+
 }

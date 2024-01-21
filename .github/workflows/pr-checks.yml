@@ -93,7 +93,6 @@ jobs:
         secrets: inherit
         with:
             modules: |
-                face:configuration
                 face:capture
                 face:infra:face-bio-sdk
                 face:infra:roc-wrapper

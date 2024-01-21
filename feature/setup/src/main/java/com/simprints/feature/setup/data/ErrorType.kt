@@ -1,4 +1,4 @@
-package com.simprints.face.configuration.data
+package com.simprints.feature.setup.data
 
 import android.os.Bundle
 import androidx.annotation.Keep
@@ -25,21 +25,16 @@ internal enum class ErrorType(
     var customMessage: String? = null,
 ) {
 
-    LICENSE_INVALID(
-        IDR.string.face_configuration_licence_invalid_title,
-        IDR.string.face_configuration_licence_invalid_message,
-        alertType = AlertScreenEventType.FACE_LICENSE_INVALID,
-        errorReason = AppErrorReason.FACE_LICENSE_INVALID,
-    ),
+
     BACKEND_MAINTENANCE_ERROR(
-        IDR.string.face_configuration_backend_maintenance_title,
-        IDR.string.face_configuration_backend_maintenance_message,
+        IDR.string.configuration_backend_maintenance_title,
+        IDR.string.configuration_backend_maintenance_message,
         alertType = AlertScreenEventType.BACKEND_MAINTENANCE_ERROR,
         errorReason = AppErrorReason.BACKEND_MAINTENANCE_ERROR,
     ),
     CONFIGURATION_ERROR(
-        IDR.string.face_configuration_generic_error_title,
-        IDR.string.face_configuration_generic_error_message,
+        IDR.string.configuration_generic_error_title,
+        IDR.string.configuration_generic_error_message,
         alertType = AlertScreenEventType.FACE_LICENSE_MISSING,
         errorReason = AppErrorReason.FACE_CONFIGURATION_ERROR,
     ),
