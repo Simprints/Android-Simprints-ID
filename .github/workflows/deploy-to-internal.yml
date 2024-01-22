@@ -18,6 +18,7 @@ jobs:
 
         concurrency:
             group: release-internal-workflow #only one instance of this workflow can run at a time
+            cancel-in-progress: true
 
         permissions:
             contents: write # A write permission For Auto tagging the releases
