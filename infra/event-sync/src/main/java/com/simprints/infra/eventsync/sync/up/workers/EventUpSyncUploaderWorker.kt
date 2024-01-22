@@ -124,7 +124,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
         }
     }
 
-    override suspend fun reportCount(count: Int, maxCount: Int) {
+    override suspend fun reportCount(count: Int, maxCount: Int?) {
         setProgress(
             workDataOf(
                 PROGRESS_UP_SYNC to count,

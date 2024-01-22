@@ -4,6 +4,6 @@ import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEve
 import kotlinx.coroutines.channels.ReceiveChannel
 
 data class EventDownSyncResult(
-    val totalCount: Int,
+    val totalCount: Int?,
     val eventStream: ReceiveChannel<EnrolmentRecordEvent>
 )

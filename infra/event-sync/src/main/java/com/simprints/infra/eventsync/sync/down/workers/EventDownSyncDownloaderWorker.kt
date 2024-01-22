@@ -65,7 +65,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
 
             val workerId = this@EventDownSyncDownloaderWorker.id.toString()
             var count = syncCache.readProgress(workerId)
-            var max = syncCache.readMax(workerId)
+            var max: Int? = syncCache.readMax(workerId)
 
             crashlyticsLog("Start")
 
@@ -118,7 +118,7 @@ internal class EventDownSyncDownloaderWorker @AssistedInject constructor(
         else -> retry(t)
     }
 
-    override suspend fun reportCount(count: Int, maxCount: Int) {
+    override suspend fun reportCount(count: Int, maxCount: Int?) {
         setProgress(
             workDataOf(
                 PROGRESS_DOWN_SYNC to count,

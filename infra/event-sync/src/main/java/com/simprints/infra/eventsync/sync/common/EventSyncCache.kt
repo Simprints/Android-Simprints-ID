@@ -2,6 +2,7 @@ package com.simprints.infra.eventsync.sync.common
 
 import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.edit
 import com.simprints.core.DispatcherIO
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.security.SecurityManager
@@ -41,12 +42,22 @@ internal class EventSyncCache @Inject constructor(
         sharedForProgresses.edit().putInt(workerId, progress).commit()
     }
 
+    suspend fun shouldIgnoreMax(): Boolean = withContext(dispatcher) {
+        sharedForCounts.getBoolean(KEY_IGNORE_MAX, false)
+    }
+
     suspend fun readMax(workerId: String): Int = withContext(dispatcher) {
         sharedForCounts.getInt(workerId, 0)
     }
 
-    suspend fun saveMax(workerId: String, max: Int): Unit = withContext(dispatcher) {
-        sharedForCounts.edit().putInt(workerId, max).commit()
+    suspend fun saveMax(workerId: String, max: Int?): Unit = withContext(dispatcher) {
+        sharedForCounts.edit(commit = true) {
+            if (max == null) {
+                putBoolean(KEY_IGNORE_MAX, true)
+            } else {
+                putInt(workerId, max)
+            }
+        }
     }
 
     suspend fun clearProgresses(): Unit = withContext(dispatcher) {
@@ -63,8 +74,11 @@ internal class EventSyncCache @Inject constructor(
     }
 
     companion object {
+
         @VisibleForTesting
         const val PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY = "PEOPLE_SYNC_CACHE_LAST_SYNC_TIME_KEY"
+
+        const val KEY_IGNORE_MAX = "IGNORE_MAX_VALUES"
 
         const val FILENAME_FOR_PROGRESSES_SHARED_PREFS = "CACHE_PROGRESSES"
         const val FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS = "CACHE_LAST_SYNC_TIME"

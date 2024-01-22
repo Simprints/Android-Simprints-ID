@@ -113,7 +113,7 @@ class EventSyncCacheTest {
     }
 
     @Test
-    fun `readCount should read the progress for the worker`() = runTest {
+    fun `readMax should read the progress for the worker`() = runTest {
         every { sharedPrefsForCount.getInt(WORK_ID, 0) } returns 10
 
         val progress = eventSyncCache.readMax(WORK_ID)
@@ -121,12 +121,29 @@ class EventSyncCacheTest {
     }
 
     @Test
-    fun `readCount should save the progress for the worker`() = runTest {
+    fun `shouldIgnoreMax should return correct value`() = runTest {
+        every { sharedPrefsForCount.getBoolean(any(), any()) } returns true
+        assertThat(eventSyncCache.shouldIgnoreMax()).isTrue()
+    }
+
+    @Test
+    fun `saveMax should save the progress for the worker`() = runTest {
         val editor = mockk<SharedPreferences.Editor>(relaxed = true)
         every { sharedPrefsForCount.edit() } returns editor
 
         eventSyncCache.saveMax(WORK_ID, 10)
         verify(exactly = 1) { editor.putInt(WORK_ID, 10) }
+        verify(exactly = 0) { editor.putBoolean(any(), true) }
+    }
+
+    @Test
+    fun `saveMax should set ignore max flag if provided null`() = runTest {
+        val editor = mockk<SharedPreferences.Editor>(relaxed = true)
+        every { sharedPrefsForCount.edit() } returns editor
+
+        eventSyncCache.saveMax(WORK_ID, null)
+        verify(exactly = 0) { editor.putInt(WORK_ID, 10) }
+        verify(exactly = 1) { editor.putBoolean(any(), true) }
     }
 
     @Test

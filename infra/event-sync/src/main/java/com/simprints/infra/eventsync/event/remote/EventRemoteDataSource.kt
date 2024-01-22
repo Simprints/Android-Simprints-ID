@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken.START_ARRAY
 import com.fasterxml.jackson.core.JsonToken.START_OBJECT
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.event.domain.EventCount
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEvent
@@ -14,16 +15,13 @@ import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordEvent
 import com.simprints.infra.eventsync.event.remote.models.subject.fromApiToDomain
-import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
+import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.SimNetwork.SimApiClient
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ProducerScope
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import javax.inject.Inject
@@ -60,11 +58,15 @@ internal class EventRemoteDataSource @Inject constructor(
             val response = takeStreaming(query)
 
             val totalCount = response.headers()[COUNT_HEADER]?.toIntOrNull() ?: 0
+            val isTotalLowerBound = response
+                .headers()[IS_COUNT_HEADER_LOWER_BOUND]
+                ?.toBoolean() ?: false // If not present, assume it's not lower bound
+
             val streaming = response.body()?.byteStream() ?: ByteArrayInputStream(byteArrayOf())
             Simber.tag("SYNC").d("[EVENT_REMOTE_SOURCE] Stream taken")
 
             EventDownSyncResult(
-                totalCount = totalCount,
+                totalCount = totalCount.takeUnless { isTotalLowerBound },
                 eventStream = scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
                     parseStreamAndEmitEvents(streaming, this)
                 }
@@ -144,5 +146,6 @@ internal class EventRemoteDataSource @Inject constructor(
         private const val TOO_MANY_REQUEST_STATUS = 429
 
         private const val COUNT_HEADER = "x-event-count"
+        private const val IS_COUNT_HEADER_LOWER_BOUND = "x-event-count-is-lower-bound"
     }
 }

@@ -82,7 +82,7 @@ internal class EventDownSyncTask @Inject constructor(
     private suspend fun FlowCollector<EventDownSyncProgress>.emitProgress(
         lastOperation: EventDownSyncOperation,
         count: Int,
-        max: Int,
+        max: Int?,
     ) {
         eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
         this.emit(EventDownSyncProgress(lastOperation, count, max))

@@ -30,9 +30,7 @@ internal class EventSyncStateProcessor @Inject constructor(
         observerForLastSyncId().switchMap { lastSyncId ->
             observerForLastSyncIdWorkers(lastSyncId).switchMap { syncWorkers ->
                 liveData {
-                    val progress =
-                        calculateProgressForDownSync(syncWorkers) +
-                            calculateProgressForUpSync(syncWorkers)
+                    val progress = calculateProgressForSync(syncWorkers)
                     val total = calculateTotalForSync(syncWorkers)
 
                     val upSyncStates = upSyncUploadersStates(syncWorkers)
@@ -78,7 +76,21 @@ internal class EventSyncStateProcessor @Inject constructor(
     private fun completedWorkers(workInfos: List<WorkInfo>) =
         workInfos.filter { it.state == WorkInfo.State.SUCCEEDED }
 
-    private suspend fun calculateTotalForSync(workInfos: List<WorkInfo>): Int {
+    private suspend fun calculateProgressForSync(workInfos: List<WorkInfo>): Int? {
+        if (eventSyncCache.shouldIgnoreMax()) {
+            return null
+        }
+
+        val totalDown = calculateProgressForDownSync(workInfos)
+        val totalUp = calculateProgressForUpSync(workInfos)
+        return totalUp + totalDown
+    }
+
+    private suspend fun calculateTotalForSync(workInfos: List<WorkInfo>): Int? {
+        if (eventSyncCache.shouldIgnoreMax()) {
+            return null
+        }
+
         val totalDown = calculateTotalForDownSync(workInfos)
         val totalUp = calculateTotalForUpSync(workInfos)
         return totalUp + totalDown

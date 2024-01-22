@@ -68,7 +68,15 @@ fun EventSyncState.assertRunningSyncState() {
     upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
-private fun assertProgressAndTotal(syncId: String, total: Int?, progress: Int) {
+fun EventSyncState.assertRunningSyncStateWithoutProgress() {
+    assertThat(syncId).isEqualTo(UNIQUE_SYNC_ID)
+    assertThat(total).isNull()
+    assertThat(progress).isNull()
+    assertThat(downSyncWorkersInfo.count { it.state is Running }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
+}
+
+private fun assertProgressAndTotal(syncId: String, total: Int?, progress: Int?) {
     assertThat(syncId).isEqualTo(UNIQUE_SYNC_ID)
     assertThat(total).isEqualTo(TO_DOWNLOAD + TO_UPLOAD)
     assertThat(progress).isEqualTo(DOWNLOADED + UPLOADED)
