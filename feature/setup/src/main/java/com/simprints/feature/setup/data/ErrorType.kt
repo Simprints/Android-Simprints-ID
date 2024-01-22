@@ -40,6 +40,7 @@ internal enum class ErrorType(
     ),
     ;
 
+    @ExcludedFromGeneratedTestCoverageReports("Inner code of excluded file")
     fun toAlertArgs() = alertConfiguration {
         color = AlertColor.Gray
         title = this@ErrorType.customTitle
@@ -53,6 +54,7 @@ internal enum class ErrorType(
     }.toArgs()
 
 
+    @ExcludedFromGeneratedTestCoverageReports("Inner code of excluded file")
     companion object {
         private const val PAYLOAD_TYPE_KEY = "error_type"
 

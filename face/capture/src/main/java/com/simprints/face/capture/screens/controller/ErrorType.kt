@@ -29,6 +29,7 @@ internal enum class ErrorType(
     ),
     ;
 
+    @ExcludedFromGeneratedTestCoverageReports("Inner code of excluded file")
     fun toAlertArgs() = alertConfiguration {
         color = AlertColor.Gray
         titleRes = this@ErrorType.title
