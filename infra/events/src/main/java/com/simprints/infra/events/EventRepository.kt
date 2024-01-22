@@ -14,6 +14,8 @@ interface EventRepository {
 
     suspend fun createSession(): SessionCaptureEvent
 
+    suspend fun hasOpenSession(): Boolean
+
     /**
      * The reason is only used when we want to create an [ArtificialTerminationEvent].
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.

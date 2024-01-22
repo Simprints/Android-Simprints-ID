@@ -38,10 +38,11 @@ internal open class EventRepositoryImpl @Inject constructor(
     private val timeHelper: TimeHelper,
     validatorsFactory: SessionEventValidatorsFactory,
     private val sessionDataCache: SessionDataCache,
-    private val configRepository: ConfigRepository
+    private val configRepository: ConfigRepository,
 ) : EventRepository {
 
     companion object {
+
         const val PROJECT_ID_FOR_NOT_SIGNED_IN = "NOT_SIGNED_IN"
     }
 
@@ -79,6 +80,11 @@ internal open class EventRepositoryImpl @Inject constructor(
             sessionDataCache.eventCache[sessionCaptureEvent.id] = sessionCaptureEvent
             sessionCaptureEvent
         }
+    }
+
+    override suspend fun hasOpenSession(): Boolean {
+        val session = cachedCaptureSessionEvent() ?: localCaptureSessionEvent()
+        return session != null
     }
 
     override suspend fun addOrUpdateEvent(event: Event) {
