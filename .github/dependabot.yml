@@ -15,6 +15,16 @@ registries:
     commonsware:
         type: maven-repository
         url: "https://s3.amazonaws.com/repo.commonsware.com"
+    simmatcher:
+        type: maven-repository
+        url: "https://maven.pkg.github.com/simprints/lib-android-simmatcher"
+        username: ${{secrets.GH_PACKAGE_NAME}}
+        password: ${{secrets.GH_PACKAGE_TOKEN}}
+    roc-wrapper:
+        type: maven-repository
+        url: "https://maven.pkg.github.com/simprints/lib-roc-wrapper"
+        username: ${{secrets.GH_PACKAGE_NAME}}
+        password: ${{secrets.GH_PACKAGE_TOKEN}}
 updates:
     -   package-ecosystem: "gradle"
         directory: "/"
