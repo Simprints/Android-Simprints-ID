@@ -2,8 +2,6 @@ package com.simprints.infra.eventsync.status.models
 
 
 enum class EventSyncWorkerType {
-    DOWN_COUNTER,
-    UP_COUNTER,
     UPLOADER,
     DOWNLOADER,
     END_SYNC_REPORTER,

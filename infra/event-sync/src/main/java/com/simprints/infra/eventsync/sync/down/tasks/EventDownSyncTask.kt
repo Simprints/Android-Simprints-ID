@@ -56,40 +56,42 @@ internal class EventDownSyncTask @Inject constructor(
                     count++
                     //We immediately process the first event to initialise a progress
                     if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
-                        lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-                        emitProgress(lastOperation, count)
+                        lastOperation =
+                            processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+                        emitProgress(lastOperation, count, maxCount)
                         batchOfEventsToProcess.clear()
                     }
                 }
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, maxCount)
 
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, maxCount)
         } catch (t: Throwable) {
             Simber.d(t)
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, count)
 
             lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, count)
         }
     }
 
     private suspend fun FlowCollector<EventDownSyncProgress>.emitProgress(
         lastOperation: EventDownSyncOperation,
-        count: Int
+        count: Int,
+        max: Int,
     ) {
         eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
-        this.emit(EventDownSyncProgress(lastOperation, count))
+        this.emit(EventDownSyncProgress(lastOperation, count, max))
     }
 
     private suspend fun processBatchedEvents(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
-        lastOperation: EventDownSyncOperation
+        lastOperation: EventDownSyncOperation,
     ): EventDownSyncOperation {
 
         val actions = batchOfEventsToProcess.map { event ->
@@ -97,9 +99,11 @@ internal class EventDownSyncTask @Inject constructor(
                 EnrolmentRecordEventType.EnrolmentRecordCreation -> {
                     handleSubjectCreationEvent(event as EnrolmentRecordCreationEvent)
                 }
+
                 EnrolmentRecordEventType.EnrolmentRecordDeletion -> {
                     handleSubjectDeletionEvent(event as EnrolmentRecordDeletionEvent)
                 }
+
                 EnrolmentRecordEventType.EnrolmentRecordMove -> {
                     handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
                 }
@@ -133,7 +137,7 @@ internal class EventDownSyncTask @Inject constructor(
 
     private suspend fun handleSubjectMoveEvent(
         operation: EventDownSyncOperation,
-        event: EnrolmentRecordMoveEvent
+        event: EnrolmentRecordMoveEvent,
     ): List<SubjectAction> {
         val modulesIdsUnderSyncing = operation.queryEvent.moduleId
         val attendantUnderSyncing = operation.queryEvent.attendantId
@@ -174,6 +178,7 @@ internal class EventDownSyncTask @Inject constructor(
                     }
                 }
             }
+
             attendantUnderSyncing != null -> {
                 if (attendantUnderSyncing == enrolmentRecordDeletion.attendantId.value) {
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
@@ -187,6 +192,7 @@ internal class EventDownSyncTask @Inject constructor(
                     }
                 }
             }
+
             else -> {
                 actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
@@ -226,6 +232,7 @@ internal class EventDownSyncTask @Inject constructor(
         listOf(Deletion(event.payload.subjectId))
 
     companion object {
+
         const val EVENTS_BATCH_SIZE = 200
     }
 }

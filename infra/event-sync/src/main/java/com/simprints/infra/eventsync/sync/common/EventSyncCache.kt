@@ -16,6 +16,8 @@ internal class EventSyncCache @Inject constructor(
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
 ) {
 
+    private val sharedForCounts =
+        securityManager.buildEncryptedSharedPreferences(FILENAME_FOR_DOWN_COUNTS_SHARED_PREFS)
     private val sharedForProgresses =
         securityManager.buildEncryptedSharedPreferences(FILENAME_FOR_PROGRESSES_SHARED_PREFS)
     private val sharedForLastSyncTime =
@@ -39,6 +41,14 @@ internal class EventSyncCache @Inject constructor(
         sharedForProgresses.edit().putInt(workerId, progress).commit()
     }
 
+    suspend fun readMax(workerId: String): Int = withContext(dispatcher) {
+        sharedForCounts.getInt(workerId, 0)
+    }
+
+    suspend fun saveMax(workerId: String, max: Int): Unit = withContext(dispatcher) {
+        sharedForCounts.edit().putInt(workerId, max).commit()
+    }
+
     suspend fun clearProgresses(): Unit = withContext(dispatcher) {
         // calling commit after clear sometimes throw SecurityException
         // it is a reported bug in Jetpack Security and not yet resolved.
@@ -46,6 +56,7 @@ internal class EventSyncCache @Inject constructor(
         // and https://issuetracker.google.com/issues/169904974
         try {
             sharedForProgresses.edit().clear().commit()
+            sharedForCounts.edit().clear().commit()
         } catch (ex: SecurityException) {
             Simber.e(ex)
         }
@@ -57,5 +68,6 @@ internal class EventSyncCache @Inject constructor(
 
         const val FILENAME_FOR_PROGRESSES_SHARED_PREFS = "CACHE_PROGRESSES"
         const val FILENAME_FOR_LAST_SYNC_TIME_SHARED_PREFS = "CACHE_LAST_SYNC_TIME"
+        const val FILENAME_FOR_DOWN_COUNTS_SHARED_PREFS = "CACHE_DOWN_COUNTS"
     }
 }

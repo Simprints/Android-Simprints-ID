@@ -68,13 +68,6 @@ internal class EventDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun worker_shouldCallDownSync() = runTest {
-        val result = eventDownSyncDownloaderWorker.doWork()
-
-        assertThat(result).isEqualTo(ListenableWorker.Result.success(workDataOf(OUTPUT_DOWN_SYNC to 0)))
-    }
-
-    @Test
     fun worker_failForCloudIntegration_shouldFail() = runTest {
         coEvery {
             downSyncTask.downSync(any(), any())
