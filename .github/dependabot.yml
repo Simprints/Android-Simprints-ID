@@ -30,8 +30,24 @@ updates:
         directory: "/"
         schedule:
             interval: "weekly"
+        registries:
+            - google
+            - maven-central
+            - gradle-plugin-portal
+            - sonatype
+            - commonsware
+            - simmatcher
+            - roc-wrapper
 
     -   package-ecosystem: "github-actions"
         directory: "/"
         schedule:
             interval: "weekly"
+        registries:
+            - google
+            - maven-central
+            - gradle-plugin-portal
+            - sonatype
+            - commonsware
+            - simmatcher
+            - roc-wrapper
