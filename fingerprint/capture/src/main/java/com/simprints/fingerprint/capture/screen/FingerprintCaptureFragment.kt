@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.feature.alert.AlertContract
@@ -93,6 +95,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                 openRefusal()
             }
         }
+        observeBioSdkInit()
 
         vm.launchReconnect.observe(viewLifecycleOwner, LiveDataEventObserver { launchConnection() })
 
@@ -107,6 +110,23 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
         initViewPagerManager()
         initScanButton()
         observeStateChanges()
+    }
+
+    private fun observeBioSdkInit() {
+        vm.invalidLicense.observe(viewLifecycleOwner) {
+            findNavController().navigate(
+                R.id.action_fingerprintCaptureFragment_to_graphAlert,
+                alertConfiguration {
+                    color = AlertColor.Gray
+                    titleRes = IDR.string.configuration_licence_invalid_title
+                    messageRes = IDR.string.configuration_licence_invalid_message
+                    image = com.simprints.infra.resources.R.drawable.ic_exclamation
+                    leftButton = AlertButtonConfig.Close
+                    payload = bundleOf(PAYLOAD_TYPE_KEY to AppErrorReason.FACE_LICENSE_INVALID)
+                    eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.FACE_LICENSE_INVALID
+                }.toArgs()
+            )
+        }
     }
 
     private fun openRefusal() {
@@ -262,5 +282,8 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
     override fun onDestroyView() {
         confirmDialog?.dismiss()
         super.onDestroyView()
+    }
+    companion object {
+        private const val PAYLOAD_TYPE_KEY = "error_type"
     }
 }

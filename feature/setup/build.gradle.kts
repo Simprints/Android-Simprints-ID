@@ -13,7 +13,6 @@ dependencies {
     implementation(project(":infra:license"))
     implementation(project(":infra:auth-store"))
     implementation(project(":feature:alert"))
-    implementation(project(":infra:events"))
 
     implementation(libs.playServices.location)
     implementation(libs.workManager.work)

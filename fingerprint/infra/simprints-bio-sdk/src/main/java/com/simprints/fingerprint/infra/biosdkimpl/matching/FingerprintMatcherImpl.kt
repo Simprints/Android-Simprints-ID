@@ -6,7 +6,7 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIde
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import javax.inject.Inject
 
-internal class FingerprintMatcherImpl @Inject constructor(
+class FingerprintMatcherImpl @Inject constructor(
     private val simAfisMatcher: SimAfisMatcher
 ) : FingerprintMatcher<SimAfisMatcherSettings> {
 

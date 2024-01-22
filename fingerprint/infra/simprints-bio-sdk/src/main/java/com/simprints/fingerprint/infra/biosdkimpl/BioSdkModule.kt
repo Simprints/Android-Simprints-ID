@@ -18,20 +18,26 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class SimprintsSdk
+
 @Module
 @InstallIn(SingletonComponent::class)
-object BioSdkModule {
+object SimprintsBioSdkModule {
+
 
     @Provides
     @Singleton
     fun provideFingerprintBioSdk(
-        sdkInitializer: SdkInitializer<Unit>,
-        fingerprintImageProvider: FingerprintImageProvider<Unit, Unit>,
-        fingerprintTemplateProvider: FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata>,
-        fingerprintMatcher: FingerprintMatcher<SimAfisMatcherSettings>
+        sdkInitializer: SdkInitializerImpl,
+        fingerprintImageProvider: FingerprintImageProviderImpl,
+        fingerprintTemplateProvider: FingerprintTemplateProviderImpl,
+        fingerprintMatcher: FingerprintMatcherImpl
     ): FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings> {
         return FingerprintBioSdk(
             sdkInitializer,

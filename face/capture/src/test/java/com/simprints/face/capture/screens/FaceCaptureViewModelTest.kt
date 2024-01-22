@@ -12,6 +12,7 @@ import com.simprints.infra.facebiosdk.initialization.FaceBioSdkInitializer
 import com.simprints.infra.license.LicenseRepository
 import com.simprints.infra.license.Vendor
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import com.simprints.testtools.common.livedata.assertEventReceived
 import com.simprints.testtools.common.livedata.getOrAwaitValue
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -156,7 +157,7 @@ class FaceCaptureViewModelTest {
         // When
         viewModel.initFaceBioSdk(mockk())
         // Then
-        assertThat(viewModel.invalidLicense.getOrAwaitValue()).isNotNull()
+        viewModel.invalidLicense.assertEventReceived()
         coVerify { licenseRepository.deleteCachedLicense(Vendor.RANK_ONE_FACE_VENDOR) }
     }
 }

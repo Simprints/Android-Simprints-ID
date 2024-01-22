@@ -20,6 +20,7 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
+import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -1035,6 +1036,16 @@ class FingerprintCaptureViewModelTest {
         vm.handleOnViewCreated(TWO_FINGERS_IDS)
 
         coVerify(exactly = 0) { scanner.startLiveFeedback() }
+    }
+
+    @Test
+    fun `test init bioSDK success should show invalid license dialog if init fail`() = runTest {
+        coEvery {
+            bioSdkWrapper.initialize()
+        } throws  BioSdkException.BioSdkInitializationException(Exception())
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
+
+        vm.invalidLicense.assertEventReceived()
     }
 
     @Test

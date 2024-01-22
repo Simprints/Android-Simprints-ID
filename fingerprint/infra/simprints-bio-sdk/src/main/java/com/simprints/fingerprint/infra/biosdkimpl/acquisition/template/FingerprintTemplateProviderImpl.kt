@@ -5,7 +5,7 @@ import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateRes
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
 import javax.inject.Inject
 
-internal class FingerprintTemplateProviderImpl @Inject constructor(
+class FingerprintTemplateProviderImpl @Inject constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
 ) : FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
     override suspend fun acquireFingerprintTemplate(settings: FingerprintTemplateAcquisitionSettings?): TemplateResponse<FingerprintTemplateMetadata> {

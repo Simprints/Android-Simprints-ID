@@ -27,6 +27,7 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
+import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -116,6 +117,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         get() = _launchReconnect
     private val _launchReconnect = MutableLiveData<LiveDataEvent>()
 
+    val invalidLicense: LiveData<LiveDataEvent>
+        get() = _invalidLicense
+    private val _invalidLicense = MutableLiveData<LiveDataEvent>()
+
     val finishWithFingerprints: LiveData<LiveDataEventWithContent<FingerprintCaptureResult>>
         get() = _finishWithFingerprints
     private val _finishWithFingerprints =
@@ -153,7 +158,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             hasStarted = true
 
             runBlocking {
-                bioSdk.initialize()
+                initBioSdk()
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
                 configuration = configRepository.getProjectConfiguration().fingerprint!!
@@ -166,6 +171,14 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
+    private suspend fun initBioSdk() {
+        try {
+            bioSdk.initialize()
+        } catch (e: BioSdkException.BioSdkInitializationException) {
+            Simber.e(e)
+            _invalidLicense.send()
+        }
+    }
     private fun launchReconnect() {
         if (!state.isShowingConnectionScreen) {
             updateState {

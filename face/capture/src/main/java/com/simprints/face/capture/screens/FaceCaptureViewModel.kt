@@ -58,9 +58,9 @@ internal class FaceCaptureViewModel @Inject constructor(
     private val _finishFlowEvent = MutableLiveData<LiveDataEventWithContent<FaceCaptureResult>>()
 
 
-    val invalidLicense: LiveData<Unit>
+    val invalidLicense: LiveData<LiveDataEvent>
         get() = _invalidLicense
-    private val _invalidLicense = MutableLiveData<Unit>()
+    private val _invalidLicense = MutableLiveData<LiveDataEvent>()
 
     init {
         Simber.tag(CrashReportTag.FACE_CAPTURE.name).i("Starting face capture flow")
@@ -75,7 +75,7 @@ internal class FaceCaptureViewModel @Inject constructor(
         if (!faceBioSdkInitializer.tryInitWithLicense(activity, license)) {
             Simber.tag(CrashReportTag.LICENSE.name).i("License is invalid")
             licenseRepository.deleteCachedLicense(Vendor.RANK_ONE_FACE_VENDOR)
-            _invalidLicense.postValue(Unit)
+            _invalidLicense.send()
         }
     }
 
