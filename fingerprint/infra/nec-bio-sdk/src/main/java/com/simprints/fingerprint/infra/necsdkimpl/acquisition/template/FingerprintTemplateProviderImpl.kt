@@ -27,14 +27,7 @@ class FingerprintTemplateProviderImpl @Inject constructor(
 
     override suspend fun acquireFingerprintTemplate(settings: FingerprintTemplateAcquisitionSettings?): TemplateResponse<FingerprintTemplateMetadata> {
         require(settings != null) { "Settings cannot be null" }
-        // if imageDistortionConfiguration not initialized read it from the scanner
-        if (!::imageDistortionConfiguration.isInitialized) {
-            log("Reading image distortion configuration from the scanner")
-            imageDistortionConfiguration =
-                fingerprintCaptureWrapperFactory.captureWrapper.acquireImageDistortionMatrixConfiguration()
-                    .configurationBytes
-            //Todo save the configuration in the datastore for later use to avoid reading it from the scanner every time
-        }
+        readImageDistortionConfiguration()
 
         // 1- Acquire unprocessed image from the scanner
         // 2- Use secugen image processing to convert it to wsq format
@@ -59,6 +52,7 @@ class FingerprintTemplateProviderImpl @Inject constructor(
         val secugenProcessedImage = processImage(settings, decodedImage)
         log("quality checking image using nec sdk")
         val qualityScore = qualityCalculator.getQualityScore(secugenProcessedImage)
+        log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}" )
         if (qualityScore < settings.qualityThreshold)
             throw BioSdkException.ImageQualityBelowThresholdException(qualityScore)
 
@@ -66,6 +60,17 @@ class FingerprintTemplateProviderImpl @Inject constructor(
 
 
         return necTemplateExtractor.extract(secugenProcessedImage, qualityScore)
+    }
+
+    private suspend fun readImageDistortionConfiguration() {
+        // if imageDistortionConfiguration not initialized read it from the scanner
+        if (!::imageDistortionConfiguration.isInitialized) {
+            log("Reading image distortion configuration from the scanner")
+            imageDistortionConfiguration =
+                fingerprintCaptureWrapperFactory.captureWrapper.acquireImageDistortionMatrixConfiguration()
+                    .configurationBytes
+            //Todo save the configuration in the datastore for later use to avoid reading it from the scanner every time
+        }
     }
 
 

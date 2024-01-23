@@ -334,6 +334,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             } catch (ex: CancellationException) {
                 // ignore cancellation exception, but log behaviour
                 Simber.d("Fingerprint scanning was cancelled")
+            } catch (ex: BioSdkException.ImageQualityBelowThresholdException) {
+                // this exception is thrown when the image quality is below the threshold
+                // and it is thrown from NEC SDK it should be handled as a no finger detected exception not
+                // as a low quality scan issue because there is no template extracted from the image
+                handleNoFingerDetected()
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
