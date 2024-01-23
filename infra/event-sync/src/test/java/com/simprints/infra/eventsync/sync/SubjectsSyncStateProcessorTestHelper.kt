@@ -165,7 +165,7 @@ private fun createUpSyncUploaderWorker(
             OUTPUT_UP_SYNC to UPLOADED,
             OUTPUT_UP_MAX_SYNC to TO_UPLOAD,
         ),
-        createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UPLOADER)),
+        createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + setOf(tagForType(UPLOADER)),
         workDataOf(
             PROGRESS_UP_SYNC to UPLOADED,
             PROGRESS_UP_SYNC to TO_UPLOAD,
@@ -176,7 +176,7 @@ private fun createUpSyncUploaderWorker(
 fun createCommonDownSyncTags(
     uniqueMasterSyncId: String?,
     uniqueSyncId: String?,
-) = listOf(
+) = setOf(
     "$TAG_DOWN_MASTER_SYNC_ID${uniqueSyncId}",
     "$TAG_SCHEDULED_AT${Date().time}",
     TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS,
@@ -187,7 +187,7 @@ fun createCommonDownSyncTags(
 private fun createCommonUpSyncTags(
     uniqueMasterSyncId: String?,
     uniqueSyncId: String?,
-) = listOf(
+) = setOf(
     "$TAG_UP_MASTER_SYNC_ID${uniqueSyncId}",
     "$TAG_SCHEDULED_AT${Date().time}",
     TAG_SUBJECTS_UP_SYNC_ALL_WORKERS,
@@ -198,15 +198,15 @@ private fun createCommonUpSyncTags(
 fun createWorkInfo(
     state: WorkInfo.State,
     output: Data = workDataOf(),
-    tags: List<String> = emptyList(),
+    tags: Set<String> = emptySet(),
     progress: Data = workDataOf(),
     id: UUID = UUID.randomUUID(),
 ) =
     WorkInfo(
         id,
         state,
-        output,
         tags,
+        output,
         progress,
         0,
         0
