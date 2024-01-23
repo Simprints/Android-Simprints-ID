@@ -166,6 +166,7 @@ class ProjectAuthenticatorTest {
 
         coEvery { configRepository.getProjectConfiguration() } returns ProjectConfiguration(
             PROJECT_ID,
+            "",
             general = GeneralConfiguration(
                 modalities = mockk(),
                 languageOptions = listOf(LANGUAGE_1, LANGUAGE_2),

@@ -52,6 +52,7 @@ internal data class OldProjectConfig(
     fun toDomain(projectId: String): ProjectConfiguration =
         ProjectConfiguration(
             projectId = projectId,
+            updatedAt = "",
             general = generalConfiguration(),
             face = faceConfiguration(),
             fingerprint = fingerprintConfiguration(),
