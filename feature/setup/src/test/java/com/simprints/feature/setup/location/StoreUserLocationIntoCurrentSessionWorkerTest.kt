@@ -73,7 +73,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     fun `storeUserLocationIntoCurrentSession can't save events if the worker is canceled`() =
         runTest {
             every { locationManager.requestLocation(any()) } returns flowOf(TestLocationData.buildFakeLocation())
-            worker.stop()
+            worker.stop(0)
             worker.doWork()
             coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
         }

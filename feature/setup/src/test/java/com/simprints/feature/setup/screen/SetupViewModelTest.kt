@@ -157,6 +157,7 @@ class SetupViewModelTest {
         verify(exactly = 2) { licenseRepository.getLicenseStates(any(), any(), any()) }
         viewModel.overallSetupResult.test().assertValue(true)
     }
+
     @Test
     fun `should fail if any license fails`() = runTest {
         // Given

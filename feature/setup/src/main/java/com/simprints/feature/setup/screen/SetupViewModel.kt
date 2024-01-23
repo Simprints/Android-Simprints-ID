@@ -77,12 +77,11 @@ internal class SetupViewModel @Inject constructor(
                             _overallSetupResult.postValue(false)
                         }
                         // if this is the last license to download, then update the overall setup result
-                        if (licenseVendor == requiredLicenses.last()) {
-                            if (licenceState is LicenseState.FinishedWithSuccess) {
-                                _overallSetupResult.postValue(true)
-                            }
+                        if (licenseVendor == requiredLicenses.last() &&
+                            licenceState is LicenseState.FinishedWithSuccess
+                        ) {
+                            _overallSetupResult.postValue(true)
                         }
-
                     }
             }
         }

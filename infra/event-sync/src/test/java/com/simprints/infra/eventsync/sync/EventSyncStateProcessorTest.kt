@@ -209,7 +209,7 @@ internal class EventSyncStateProcessorTest {
         createWorkInfo(
             state,
             workDataOf(SYNC_ID_STARTED to uniqueMasterSyncId),
-            listOf(
+            setOf(
                 "$TAG_SCHEDULED_AT${Date().time}",
                 TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS,
                 TAG_SUBJECTS_SYNC_ALL_WORKERS,

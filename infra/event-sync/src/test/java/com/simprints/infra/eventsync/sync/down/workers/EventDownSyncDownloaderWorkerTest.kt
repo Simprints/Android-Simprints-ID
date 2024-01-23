@@ -157,8 +157,8 @@ internal class EventDownSyncDownloaderWorkerTest {
         val workInfo = WorkInfo(
             UUID.randomUUID(),
             RUNNING,
+            setOf(),
             workDataOf(),
-            listOf(),
             workDataOf(PROGRESS_DOWN_SYNC to progress),
             2,
             0
@@ -175,8 +175,8 @@ internal class EventDownSyncDownloaderWorkerTest {
         val workInfo = WorkInfo(
             UUID.randomUUID(),
             SUCCEEDED,
+            setOf(),
             workDataOf(OUTPUT_DOWN_SYNC to progress),
-            listOf(),
             workDataOf(),
             2,
             1
@@ -193,8 +193,8 @@ internal class EventDownSyncDownloaderWorkerTest {
         val workInfo = WorkInfo(
             UUID.randomUUID(),
             RUNNING,
+            setOf(),
             workDataOf(),
-            listOf(),
             workDataOf(),
             2,
             1
