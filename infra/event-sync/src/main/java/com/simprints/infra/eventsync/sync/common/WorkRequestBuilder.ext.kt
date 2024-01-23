@@ -3,9 +3,12 @@ package com.simprints.infra.eventsync.sync.common
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.*
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
-import java.util.*
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.END_SYNC_REPORTER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.START_SYNC_REPORTER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
+import java.util.Date
 
 internal const val TAG_SUBJECTS_SYNC_ALL_WORKERS = "TAG_SUBJECTS_SYNC_ALL_WORKERS"
 internal const val TAG_MASTER_SYNC_ID = "TAG_MASTER_SYNC_ID_"
@@ -45,9 +48,6 @@ internal fun WorkRequest.Builder<*, *>.addCommonTagForDownWorkers(): WorkRequest
 internal fun WorkRequest.Builder<*, *>.addCommonTagForDownloaders(): WorkRequest.Builder<*, *> =
     this.addTag(tagForType(DOWNLOADER))
 
-internal fun WorkRequest.Builder<*, *>.addCommonTagForDownCounters(): WorkRequest.Builder<*, *> =
-    this.addTag(tagForType(DOWN_COUNTER))
-
 // Up Sync Workers tags
 internal fun WorkRequest.Builder<*, *>.addTagFoUpSyncId(uniqueDownMasterSyncId: String): WorkRequest.Builder<*, *> =
     this.addTag("${TAG_UP_MASTER_SYNC_ID}${uniqueDownMasterSyncId}")
@@ -57,9 +57,6 @@ internal fun WorkRequest.Builder<*, *>.addCommonTagForUpWorkers(): WorkRequest.B
 
 internal fun WorkRequest.Builder<*, *>.addCommonTagForUploaders(): WorkRequest.Builder<*, *> =
     this.addTag(tagForType(UPLOADER))
-
-internal fun WorkRequest.Builder<*, *>.addCommonTagForUpCounters(): WorkRequest.Builder<*, *> =
-    this.addTag(tagForType(UP_COUNTER))
 
 // Last Sync Reporter Worker tags
 internal fun WorkRequest.Builder<*, *>.addTagForEndSyncReporter(): WorkRequest.Builder<*, *> =

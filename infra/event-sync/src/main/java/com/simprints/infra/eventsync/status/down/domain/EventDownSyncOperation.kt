@@ -24,7 +24,7 @@ internal data class EventDownSyncOperation(
             (projectId +
                 (attendantId ?: "") +
                 (subjectId ?: "") +
-                ((moduleIds ?: emptyList()).joinToString()) +
+                (moduleId ?: "") +
                 modes.joinToString { it.name } +
                 oldTypes
                 ).toByteArray()

@@ -37,7 +37,7 @@ class CommCareResponseMapperTest {
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelable<Registration>(CommCareConstants.REGISTRATION_GUID_KEY)).isEqualTo(Registration("guid"))
+        assertThat(extras.getString(CommCareConstants.REGISTRATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
     }
 

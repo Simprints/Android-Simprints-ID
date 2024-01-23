@@ -65,13 +65,12 @@ internal sealed class EventDownSyncScope(open var operations: List<EventDownSync
         val modes: List<Modes>
     ) : EventDownSyncScope() {
 
-        //The backend is capable to receive multiple modules, but SID is still making a request (operation) for each module
         override var operations =
             moduleIds.map {
                 EventDownSyncOperation(
                     RemoteEventQuery(
                         projectId,
-                        moduleIds = listOf(it),
+                        moduleId = it,
                         modes = modes,
                     )
                 )

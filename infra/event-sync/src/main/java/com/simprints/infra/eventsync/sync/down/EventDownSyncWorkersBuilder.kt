@@ -1,19 +1,26 @@
 package com.simprints.infra.eventsync.sync.down
 
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkRequest
+import androidx.work.workDataOf
 import com.simprints.core.domain.tokenization.values
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
-import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
 import com.simprints.infra.eventsync.sync.MIN_BACKOFF_SECS
-import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.INPUT_COUNT_WORKER_DOWN
+import com.simprints.infra.eventsync.sync.common.addCommonTagForAllSyncWorkers
+import com.simprints.infra.eventsync.sync.common.addCommonTagForDownWorkers
+import com.simprints.infra.eventsync.sync.common.addCommonTagForDownloaders
+import com.simprints.infra.eventsync.sync.common.addTagForDownSyncId
+import com.simprints.infra.eventsync.sync.common.addTagForMasterSyncId
+import com.simprints.infra.eventsync.sync.common.addTagForScheduledAtNow
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -34,9 +41,7 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
         )
 
         val uniqueDownSyncId = UUID.randomUUID().toString()
-        return downSyncScope.operations.map {
-            buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it)
-        } + buildCountWorker(uniqueSyncId, uniqueDownSyncId, downSyncScope)
+        return downSyncScope.operations.map { buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it) }
     }
 
     private fun buildDownSyncWorkers(
@@ -48,17 +53,6 @@ internal class EventDownSyncWorkersBuilder @Inject constructor(
             .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to jsonHelper.toJson(downSyncOperation)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
             .addCommonTagForDownloaders()
-            .build() as OneTimeWorkRequest
-
-    private fun buildCountWorker(
-        uniqueSyncID: String?,
-        uniqueDownSyncID: String,
-        eventDownSyncScope: EventDownSyncScope
-    ): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(EventDownSyncCountWorker::class.java)
-            .setInputData(workDataOf(INPUT_COUNT_WORKER_DOWN to jsonHelper.toJson(eventDownSyncScope)))
-            .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
-            .addCommonTagForDownCounters()
             .build() as OneTimeWorkRequest
 
     private fun getDownSyncWorkerConstraints() =

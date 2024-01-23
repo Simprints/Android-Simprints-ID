@@ -1,10 +1,12 @@
 package com.simprints.feature.login.screens.form
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -33,7 +35,6 @@ import com.simprints.feature.login.screens.form.SignInState.TechnicalFailure
 import com.simprints.feature.login.screens.form.SignInState.Unknown
 import com.simprints.feature.login.screens.qrscanner.QrScannerResult
 import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker
-import com.simprints.feature.login.tools.play.GooglePlayServicesAvailabilityChecker.Companion.GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
@@ -49,6 +50,17 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
     private val args by navArgs<LoginFormFragmentArgs>()
     private val binding by viewBinding(FragmentLoginFormBinding::bind)
     private val viewModel by viewModels<LoginFormViewModel>()
+
+    private lateinit var checkForPlayServicesResultLauncher: ActivityResultLauncher<IntentSenderRequest>
+    init {
+        checkForPlayServicesResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+                // Check again to make sure that the user did the needed actions.
+                playServicesChecker.check(requireActivity(), checkForPlayServicesResultLauncher) {
+                    finishWithError(it)
+                }
+            }
+    }
 
     @Inject
     lateinit var playServicesChecker: GooglePlayServicesAvailabilityChecker
@@ -68,14 +80,9 @@ internal class LoginFormFragment : Fragment(R.layout.fragment_login_form) {
 
         initUi()
         observeUiState()
-        playServicesChecker.check(requireActivity()) { finishWithError(it) }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == GOOGLE_PLAY_SERVICES_UPDATE_REQUEST_CODE) {
-            // Check again to make sure that the user did the need actions.
-            playServicesChecker.check(requireActivity()) { finishWithError(it) }
-        } else super.onActivityResult(requestCode, resultCode, data)
+        playServicesChecker.check(requireActivity(), checkForPlayServicesResultLauncher) {
+            finishWithError(it)
+        }
     }
 
     private fun initUi() {

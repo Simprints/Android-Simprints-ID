@@ -9,31 +9,32 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncState.SyncWorkerInfo
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Companion.fromWorkInfo
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.*
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
 import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.down.workers.extractDownSyncMaxCount
 import com.simprints.infra.eventsync.sync.down.workers.extractDownSyncProgress
-import com.simprints.infra.eventsync.sync.down.workers.getDownCountsFromOutput
 import com.simprints.infra.eventsync.sync.master.EventStartSyncReporterWorker.Companion.SYNC_ID_STARTED
+import com.simprints.infra.eventsync.sync.up.workers.extractUpSyncMaxCount
 import com.simprints.infra.eventsync.sync.up.workers.extractUpSyncProgress
-import com.simprints.infra.eventsync.sync.up.workers.getUpCountsFromOutput
 import com.simprints.infra.logging.Simber
 import javax.inject.Inject
 
 internal class EventSyncStateProcessor @Inject constructor(
     private val eventSyncCache: EventSyncCache,
-    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider
+    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider,
 ) {
 
     fun getLastSyncState(): LiveData<EventSyncState> =
         observerForLastSyncId().switchMap { lastSyncId ->
             observerForLastSyncIdWorkers(lastSyncId).switchMap { syncWorkers ->
                 liveData {
-                    val progress = calculateProgressForDownSync(syncWorkers) + calculateProgressForUpSync(syncWorkers)
+                    val progress = calculateProgressForSync(syncWorkers)
                     val total = calculateTotalForSync(syncWorkers)
 
-                    val upSyncStates = upSyncUploadersStates(syncWorkers) + upSyncCountersStates(syncWorkers)
-                    val downSyncStates = downSyncDownloadersStates(syncWorkers) + downSyncCountersStates(syncWorkers)
+                    val upSyncStates = upSyncUploadersStates(syncWorkers)
+                    val downSyncStates = downSyncDownloadersStates(syncWorkers)
 
                     val syncState = EventSyncState(
                         lastSyncId,
@@ -48,7 +49,6 @@ internal class EventSyncStateProcessor @Inject constructor(
                 }
             }
         }
-
 
     private fun observerForLastSyncId(): LiveData<String> {
         return syncWorkersLiveDataProvider.getStartSyncReportersLiveData()
@@ -76,27 +76,33 @@ internal class EventSyncStateProcessor @Inject constructor(
     private fun completedWorkers(workInfos: List<WorkInfo>) =
         workInfos.filter { it.state == WorkInfo.State.SUCCEEDED }
 
-    private fun calculateTotalForSync(workInfos: List<WorkInfo>): Int? {
+    private suspend fun calculateProgressForSync(workInfos: List<WorkInfo>): Int? {
+        if (eventSyncCache.shouldIgnoreMax()) {
+            return null
+        }
+
+        val totalDown = calculateProgressForDownSync(workInfos)
+        val totalUp = calculateProgressForUpSync(workInfos)
+        return totalUp + totalDown
+    }
+
+    private suspend fun calculateTotalForSync(workInfos: List<WorkInfo>): Int? {
+        if (eventSyncCache.shouldIgnoreMax()) {
+            return null
+        }
+
         val totalDown = calculateTotalForDownSync(workInfos)
         val totalUp = calculateTotalForUpSync(workInfos)
-        return if (totalUp != null && totalDown != null) {
-            totalUp + totalDown
-        } else {
-            null
-        }
+        return totalUp + totalDown
     }
 
-    private fun calculateTotalForDownSync(workInfos: List<WorkInfo>): Int? {
-        val countersCompleted = completedWorkers(workInfos.filterByTags(tagForType(DOWN_COUNTER)))
-        val counter = countersCompleted.firstOrNull()
-        return counter?.getDownCountsFromOutput()?.sumOf { it.count }
-    }
+    private suspend fun calculateTotalForDownSync(workInfos: List<WorkInfo>): Int = workInfos
+        .filterByTags(tagForType(DOWNLOADER))
+        .sumOf { worker -> worker.extractDownSyncMaxCount(eventSyncCache) }
 
-    private fun calculateTotalForUpSync(workInfos: List<WorkInfo>): Int? {
-        val countersCompleted = completedWorkers(workInfos.filterByTags(tagForType(UP_COUNTER)))
-        val counter = countersCompleted.firstOrNull()
-        return counter?.getUpCountsFromOutput()
-    }
+    private suspend fun calculateTotalForUpSync(workInfos: List<WorkInfo>): Int = workInfos
+        .filterByTags(tagForType(UPLOADER))
+        .sumOf { worker -> worker.extractUpSyncMaxCount(eventSyncCache) }
 
     private fun upSyncUploadersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
         workInfos.filterByTags(tagForType(UPLOADER)).map {
@@ -106,16 +112,6 @@ internal class EventSyncStateProcessor @Inject constructor(
     private fun downSyncDownloadersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
         workInfos.filterByTags(tagForType(DOWNLOADER)).map {
             SyncWorkerInfo(DOWNLOADER, it.toEventSyncWorkerState())
-        }
-
-    private fun downSyncCountersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
-        workInfos.filterByTags(tagForType(DOWN_COUNTER)).map {
-            SyncWorkerInfo(DOWN_COUNTER, it.toEventSyncWorkerState())
-        }
-
-    private fun upSyncCountersStates(workInfos: List<WorkInfo>): List<SyncWorkerInfo> =
-        workInfos.filterByTags(tagForType(UP_COUNTER)).map {
-            SyncWorkerInfo(UP_COUNTER, it.toEventSyncWorkerState())
         }
 
     private fun WorkInfo.toEventSyncWorkerState(): EventSyncWorkerState =
