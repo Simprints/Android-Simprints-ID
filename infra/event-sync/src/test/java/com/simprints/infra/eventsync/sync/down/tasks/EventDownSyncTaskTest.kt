@@ -22,6 +22,7 @@ import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.COMPLETE
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.FAILED
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation.DownSyncState.RUNNING
+import com.simprints.infra.eventsync.status.down.domain.EventDownSyncResult
 import com.simprints.infra.eventsync.sync.down.tasks.EventDownSyncTask.Companion.EVENTS_BATCH_SIZE
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.unit.EncodingUtilsImplForTests
@@ -203,7 +204,7 @@ class EventDownSyncTaskTest {
 
             val syncByModule2 = moduleOp.copy(
                 queryEvent = moduleOp.queryEvent.copy(
-                    moduleIds = listOf(DEFAULT_MODULE_ID_2.value)
+                    moduleId = DEFAULT_MODULE_ID_2.value
                 )
             )
             eventDownSyncTask.downSync(this, syncByModule2).toList()
@@ -250,7 +251,7 @@ class EventDownSyncTaskTest {
 
         val syncByModule2 = moduleOp.copy(
             queryEvent = moduleOp.queryEvent.copy(
-                moduleIds = listOf(DEFAULT_MODULE_ID_2.value)
+                moduleId = DEFAULT_MODULE_ID_2.value
             )
         )
         eventDownSyncTask.downSync(this, syncByModule2).toList()
@@ -266,7 +267,7 @@ class EventDownSyncTaskTest {
 
     private suspend fun mockProgressEmission(progressEvents: List<EnrolmentRecordEvent>) {
         downloadEventsChannel = Channel(capacity = Channel.UNLIMITED)
-        coEvery { eventRemoteDataSource.getEvents(any(), any()) } returns downloadEventsChannel
+        coEvery { eventRemoteDataSource.getEvents(any(), any()) } returns EventDownSyncResult(0, downloadEventsChannel)
 
         progressEvents.forEach {
             downloadEventsChannel.send(it)

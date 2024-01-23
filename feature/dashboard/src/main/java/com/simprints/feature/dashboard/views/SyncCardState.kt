@@ -13,13 +13,13 @@ internal sealed class SyncCardState(open val lastTimeSyncSucceed: String?) {
 
     data class SyncProgress(
         override val lastTimeSyncSucceed: String?,
-        val progress: Int,
+        val progress: Int?,
         val total: Int?
     ) : SyncCardState(lastTimeSyncSucceed)
 
     data class SyncConnecting(
         override val lastTimeSyncSucceed: String?,
-        val progress: Int,
+        val progress: Int?,
         val total: Int?
     ) : SyncCardState(lastTimeSyncSucceed)
 

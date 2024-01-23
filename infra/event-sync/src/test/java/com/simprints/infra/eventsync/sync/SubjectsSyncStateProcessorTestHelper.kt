@@ -2,10 +2,21 @@ package com.simprints.infra.eventsync.sync
 
 import androidx.work.Data
 import androidx.work.WorkInfo
-import androidx.work.WorkInfo.State.*
+import androidx.work.WorkInfo.State.ENQUEUED
+import androidx.work.WorkInfo.State.FAILED
+import androidx.work.WorkInfo.State.RUNNING
+import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import com.simprints.core.tools.json.JsonHelper
+import com.simprints.infra.eventsync.status.models.EventSyncState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Enqueued
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Failed
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Running
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.Succeeded
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.DOWNLOADER
+import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.UPLOADER
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessorTest.Companion.DOWNLOADED
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessorTest.Companion.TO_DOWNLOAD
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessorTest.Companion.TO_UPLOAD
@@ -13,21 +24,16 @@ import com.simprints.infra.eventsync.sync.EventSyncStateProcessorTest.Companion.
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessorTest.Companion.UNIQUE_SYNC_ID
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessorTest.Companion.UNIQUE_UP_SYNC_ID
 import com.simprints.infra.eventsync.sync.EventSyncStateProcessorTest.Companion.UPLOADED
-import com.simprints.infra.events.event.domain.EventCount
-import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
-import com.simprints.infra.eventsync.status.models.EventSyncState
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerState.*
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.*
-import com.simprints.infra.eventsync.status.models.EventSyncWorkerType.Companion.tagForType
 import com.simprints.infra.eventsync.sync.common.*
-import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_DOWN
+import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
+import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_MAX_SYNC
 import com.simprints.infra.eventsync.sync.down.workers.EventDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
-import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncCountWorker.Companion.OUTPUT_COUNT_WORKER_UP
+import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_MAX_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 fun EventSyncWorkerState.assertEqualToFailedState(e: Failed) {
     assertThat(this).isInstanceOf(Failed::class.java)
@@ -62,119 +68,88 @@ fun EventSyncState.assertRunningSyncState() {
     upSyncWorkersInfo.all { it.state is Succeeded }
 }
 
-private fun assertProgressAndTotal(syncId: String, total: Int?, progress: Int) {
+fun EventSyncState.assertRunningSyncStateWithoutProgress() {
+    assertThat(syncId).isEqualTo(UNIQUE_SYNC_ID)
+    assertThat(total).isNull()
+    assertThat(progress).isNull()
+    assertThat(downSyncWorkersInfo.count { it.state is Running }).isEqualTo(1)
+    upSyncWorkersInfo.all { it.state is Succeeded }
+}
+
+private fun assertProgressAndTotal(syncId: String, total: Int?, progress: Int?) {
     assertThat(syncId).isEqualTo(UNIQUE_SYNC_ID)
     assertThat(total).isEqualTo(TO_DOWNLOAD + TO_UPLOAD)
     assertThat(progress).isEqualTo(DOWNLOADED + UPLOADED)
 }
 
-fun createWorkInfosHistoryForSuccessfulSync(): List<WorkInfo> =
-    listOf(
-        createDownSyncDownloaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
-    )
+fun createWorkInfosHistoryForSuccessfulSync(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
 
-fun createWorkInfosHistoryForRunningSync(): List<WorkInfo> =
-    listOf(
-        createDownSyncDownloaderWorker(RUNNING, UNIQUE_SYNC_ID),
-        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
-    )
+fun createWorkInfosHistoryForRunningSync(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(RUNNING, UNIQUE_SYNC_ID),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
 
-fun createWorkInfosHistoryForFailingSync(): List<WorkInfo> =
-    listOf(
-        createDownSyncDownloaderWorker(FAILED, UNIQUE_SYNC_ID),
-        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
-    )
+fun createWorkInfosHistoryForFailingSync(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(FAILED, UNIQUE_SYNC_ID),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
 
-fun createWorkInfosHistoryForFailingSyncDueBackendMaintenanceError(): List<WorkInfo> =
-    listOf(
-        createDownSyncDownloaderWorker(
-            FAILED, UNIQUE_SYNC_ID, workDataOf(
-                OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
-                OUTPUT_ESTIMATED_MAINTENANCE_TIME to 6L
-            )
-        ),
-        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
-    )
+fun createWorkInfosHistoryForFailingSyncDueBackendMaintenanceError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        FAILED, UNIQUE_SYNC_ID, workDataOf(
+            OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE to true,
+            OUTPUT_ESTIMATED_MAINTENANCE_TIME to 6L
+        )
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
 
-fun createWorkInfosHistoryForFailingSyncDueTooManyRequestsError(): List<WorkInfo> =
-    listOf(
-        createDownSyncDownloaderWorker(
-            FAILED, UNIQUE_SYNC_ID, workDataOf(
-                OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true,
-            )
-        ),
-        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
-    )
+fun createWorkInfosHistoryForFailingSyncDueTooManyRequestsError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        FAILED, UNIQUE_SYNC_ID, workDataOf(
+            OUTPUT_FAILED_BECAUSE_TOO_MANY_REQUESTS to true,
+        )
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
 
-fun createWorkInfosHistoryForFailingSyncDueCloudIntegrationError(): List<WorkInfo> =
-    listOf(
-        createDownSyncDownloaderWorker(
-            FAILED, UNIQUE_SYNC_ID, workDataOf(
-                OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true,
-            )
-        ),
-        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
-    )
+fun createWorkInfosHistoryForFailingSyncDueCloudIntegrationError(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(
+        FAILED, UNIQUE_SYNC_ID, workDataOf(
+            OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true,
+        )
+    ),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
 
-fun createWorkInfosHistoryForConnectingSync(): List<WorkInfo> =
-    listOf(
-        createDownSyncDownloaderWorker(ENQUEUED, UNIQUE_SYNC_ID),
-        createDownSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
-        createUpSyncCounterWorker(SUCCEEDED, UNIQUE_SYNC_ID)
-    )
+fun createWorkInfosHistoryForConnectingSync(): List<WorkInfo> = listOf(
+    createDownSyncDownloaderWorker(ENQUEUED, UNIQUE_SYNC_ID),
+    createUpSyncUploaderWorker(SUCCEEDED, UNIQUE_SYNC_ID),
+)
 
 private fun createDownSyncDownloaderWorker(
     state: WorkInfo.State,
     uniqueMasterSyncId: String?,
     tag: Data = workDataOf(),
     uniqueSyncId: String? = UNIQUE_DOWN_SYNC_ID,
-    id: UUID = UUID.randomUUID()
+    id: UUID = UUID.randomUUID(),
 ) =
     createWorkInfo(
         state,
-        concatData(workDataOf(OUTPUT_DOWN_SYNC to DOWNLOADED), tag),
-        createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWNLOADER)),
-        workDataOf(PROGRESS_DOWN_SYNC to DOWNLOADED),
-        id
-    )
-
-private fun createDownSyncCounterWorker(
-    state: WorkInfo.State,
-    uniqueMasterSyncId: String?,
-    uniqueSyncId: String? = UNIQUE_DOWN_SYNC_ID,
-    id: UUID = UUID.randomUUID()
-) =
-    createWorkInfo(
-        state,
-        workDataOf(
-            OUTPUT_COUNT_WORKER_DOWN to JsonHelper.toJson(
-                listOf(
-                    EventCount(
-                        EnrolmentRecordEventType.EnrolmentRecordCreation,
-                        TO_DOWNLOAD
-                    )
-                )
-            )
+        concatData(
+            workDataOf(
+                OUTPUT_DOWN_SYNC to DOWNLOADED,
+                OUTPUT_DOWN_MAX_SYNC to TO_DOWNLOAD,
+            ), tag
         ),
-        createCommonDownSyncTags(
-            uniqueMasterSyncId,
-            uniqueSyncId
-        ) + listOf(tagForType(DOWN_COUNTER)),
-        workDataOf(),
+        createCommonDownSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(DOWNLOADER)),
+        workDataOf(
+            PROGRESS_DOWN_SYNC to DOWNLOADED,
+            PROGRESS_DOWN_MAX_SYNC to TO_DOWNLOAD,
+        ),
         id
     )
 
@@ -182,33 +157,25 @@ private fun createUpSyncUploaderWorker(
     state: WorkInfo.State,
     uniqueMasterSyncId: String?,
     uniqueSyncId: String? = UNIQUE_UP_SYNC_ID,
-    id: UUID = UUID.randomUUID()
+    id: UUID = UUID.randomUUID(),
 ) =
     createWorkInfo(
         state,
-        workDataOf(OUTPUT_UP_SYNC to UPLOADED),
+        workDataOf(
+            OUTPUT_UP_SYNC to UPLOADED,
+            OUTPUT_UP_MAX_SYNC to TO_UPLOAD,
+        ),
         createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UPLOADER)),
-        workDataOf(PROGRESS_UP_SYNC to UPLOADED),
-        id
-    )
-
-private fun createUpSyncCounterWorker(
-    state: WorkInfo.State,
-    uniqueMasterSyncId: String?,
-    uniqueSyncId: String? = UNIQUE_UP_SYNC_ID,
-    id: UUID = UUID.randomUUID()
-) =
-    createWorkInfo(
-        state,
-        workDataOf(OUTPUT_COUNT_WORKER_UP to TO_UPLOAD),
-        createCommonUpSyncTags(uniqueMasterSyncId, uniqueSyncId) + listOf(tagForType(UP_COUNTER)),
-        workDataOf(),
+        workDataOf(
+            PROGRESS_UP_SYNC to UPLOADED,
+            PROGRESS_UP_SYNC to TO_UPLOAD,
+        ),
         id
     )
 
 fun createCommonDownSyncTags(
     uniqueMasterSyncId: String?,
-    uniqueSyncId: String?
+    uniqueSyncId: String?,
 ) = listOf(
     "$TAG_DOWN_MASTER_SYNC_ID${uniqueSyncId}",
     "$TAG_SCHEDULED_AT${Date().time}",
@@ -219,7 +186,7 @@ fun createCommonDownSyncTags(
 
 private fun createCommonUpSyncTags(
     uniqueMasterSyncId: String?,
-    uniqueSyncId: String?
+    uniqueSyncId: String?,
 ) = listOf(
     "$TAG_UP_MASTER_SYNC_ID${uniqueSyncId}",
     "$TAG_SCHEDULED_AT${Date().time}",
@@ -233,7 +200,7 @@ fun createWorkInfo(
     output: Data = workDataOf(),
     tags: List<String> = emptyList(),
     progress: Data = workDataOf(),
-    id: UUID = UUID.randomUUID()
+    id: UUID = UUID.randomUUID(),
 ) =
     WorkInfo(
         id,

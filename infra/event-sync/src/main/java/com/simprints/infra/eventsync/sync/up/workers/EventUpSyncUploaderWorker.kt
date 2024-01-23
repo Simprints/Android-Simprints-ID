@@ -11,19 +11,28 @@ import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.simprints.core.DispatcherBG
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.workers.SimCoroutineWorker
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.eventsync.exceptions.MalformedSyncOperationException
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncScope
-import com.simprints.infra.eventsync.sync.common.*
+import com.simprints.infra.eventsync.sync.common.EventSyncCache
+import com.simprints.infra.eventsync.sync.common.OUTPUT_ESTIMATED_MAINTENANCE_TIME
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_BACKEND_MAINTENANCE
+import com.simprints.infra.eventsync.sync.common.OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION
+import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.eventsync.sync.common.WorkerProgressCountReporter
 import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
+import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_MAX_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
+import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_MAX_SYNC
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import com.simprints.infra.eventsync.sync.up.old.EventUpSyncScope as OldEventUpSyncScope
 
@@ -35,6 +44,7 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
     private val eventSyncCache: EventSyncCache,
     private val authStore: AuthStore,
     private val jsonHelper: JsonHelper,
+    private val eventRepository: EventRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
@@ -63,6 +73,9 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
 
             val workerId = this@EventUpSyncUploaderWorker.id.toString()
             var count = eventSyncCache.readProgress(workerId)
+            val max = eventRepository
+                .observeEventCount(upSyncScope.operation.projectId, null)
+                .firstOrNull() ?: 0
 
             crashlyticsLog("Start")
             upSyncTask.upSync(upSyncScope.operation).collect {
@@ -70,11 +83,17 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                 eventSyncCache.saveProgress(workerId, count)
                 Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Uploaded $count for batch : $it")
 
-                reportCount(count)
+                reportCount(count, max)
             }
 
             Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Done")
-            success(workDataOf(OUTPUT_UP_SYNC to count), "Total uploaded: $count")
+            success(
+                workDataOf(
+                    OUTPUT_UP_SYNC to count,
+                    OUTPUT_UP_MAX_SYNC to max,
+                ),
+                "Total uploaded: $count / $max"
+            )
         } catch (t: Throwable) {
             Simber.d(t)
             Simber.tag(SYNC_LOG_TAG).d("[UPLOADER] Failed ${t.message}")
@@ -94,24 +113,33 @@ internal class EventUpSyncUploaderWorker @AssistedInject constructor(
                     )
                 )
             }
+
             is SyncCloudIntegrationException -> {
                 fail(t, t.message, workDataOf(OUTPUT_FAILED_BECAUSE_CLOUD_INTEGRATION to true))
             }
+
             else -> {
                 retry(t)
             }
         }
     }
 
-    override suspend fun reportCount(count: Int) {
-        setProgress(workDataOf(PROGRESS_UP_SYNC to count))
+    override suspend fun reportCount(count: Int, maxCount: Int?) {
+        setProgress(
+            workDataOf(
+                PROGRESS_UP_SYNC to count,
+                PROGRESS_UP_MAX_SYNC to maxCount,
+            )
+        )
     }
 
     companion object {
+
         const val INPUT_UP_SYNC = "INPUT_UP_SYNC"
         const val PROGRESS_UP_SYNC = "PROGRESS_UP_SYNC"
+        const val PROGRESS_UP_MAX_SYNC = "PROGRESS_UP_MAX_SYNC"
         const val OUTPUT_UP_SYNC = "OUTPUT_UP_SYNC"
-
+        const val OUTPUT_UP_MAX_SYNC = "OUTPUT_UP_MAX_SYNC"
 
         // TODO throw this away... thank you
         fun parseUpSyncInput(input: String): EventUpSyncScope {
@@ -131,5 +159,14 @@ internal suspend fun WorkInfo.extractUpSyncProgress(eventSyncCache: EventSyncCac
 
     //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
     val cached = eventSyncCache.readProgress(id.toString())
+    return maxOf(progress, output, cached)
+}
+
+internal suspend fun WorkInfo.extractUpSyncMaxCount(eventSyncCache: EventSyncCache): Int {
+    val progress = this.progress.getInt(PROGRESS_UP_MAX_SYNC, -1)
+    val output = this.outputData.getInt(OUTPUT_UP_MAX_SYNC, -1)
+
+    //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
+    val cached = eventSyncCache.readMax(id.toString())
     return maxOf(progress, output, cached)
 }
