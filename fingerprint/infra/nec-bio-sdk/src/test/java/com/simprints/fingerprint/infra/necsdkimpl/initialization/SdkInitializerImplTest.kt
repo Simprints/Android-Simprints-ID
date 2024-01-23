@@ -40,7 +40,7 @@ class SdkInitializerImplTest {
     fun setUp() {
         MockKAnnotations.init(this)
         justRun { nec.init(any(), context) }
-        coJustRun { licenseRepository.deleteCachedLicense(Vendor.NEC_FINGERPRINT_VENDOR) }
+        coJustRun { licenseRepository.deleteCachedLicense(Vendor.NEC) }
 
         sdkInitializer =
             SdkInitializerImpl(context,  nec, licenseRepository)
@@ -50,7 +50,7 @@ class SdkInitializerImplTest {
     fun `test initialize success`() = runTest {
         //Given
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.NEC_FINGERPRINT_VENDOR)
+            licenseRepository.getCachedLicense(Vendor.NEC)
         } returns "license"
 
         // When
@@ -63,7 +63,7 @@ class SdkInitializerImplTest {
     fun `test initialize with expired license`() = runTest {
         //Given
         coEvery {
-            licenseRepository.getCachedLicense(Vendor.NEC_FINGERPRINT_VENDOR)
+            licenseRepository.getCachedLicense(Vendor.NEC)
         } returns  "license"
 
         every { nec.init(any(),context) } throws Exception()
@@ -71,7 +71,7 @@ class SdkInitializerImplTest {
         // When
         sdkInitializer.initialize(null)
         // Then
-        coVerify { licenseRepository.deleteCachedLicense(Vendor.NEC_FINGERPRINT_VENDOR) }
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.NEC) }
     }
 
 }

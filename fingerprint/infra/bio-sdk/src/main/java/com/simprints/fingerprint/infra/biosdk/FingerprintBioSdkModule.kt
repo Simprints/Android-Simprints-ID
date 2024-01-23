@@ -35,8 +35,8 @@ internal object FingerprintBioSdkProvidersModule {
     @Provides
     @Singleton
     fun provideBioSdkWrapper(
-        @SimprintsSdk simprintsWrapper: BioSdkWrapper?,
-        @NecSdk necWrapper: BioSdkWrapper?,
+        @SimprintsSdk simprintsWrapper: BioSdkWrapper,
+        @NecSdk necWrapper: BioSdkWrapper,
         configManager: ConfigRepository
     ): BioSdkWrapper = runBlocking {
         // Todo we didn't yet implement the logic to select the SDK based on the configuration
@@ -44,8 +44,8 @@ internal object FingerprintBioSdkProvidersModule {
         // See tickets in SIM-81 for more details
         when (configManager.getProjectConfiguration().fingerprint?.allowedSDKs?.first()) {
 
-            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> simprintsWrapper!!
-            FingerprintConfiguration.BioSdk.NEC -> necWrapper!!
+            FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> simprintsWrapper
+            FingerprintConfiguration.BioSdk.NEC -> necWrapper
             else -> {
                 throw IllegalStateException("Unknown fingerprint configuration")
             }

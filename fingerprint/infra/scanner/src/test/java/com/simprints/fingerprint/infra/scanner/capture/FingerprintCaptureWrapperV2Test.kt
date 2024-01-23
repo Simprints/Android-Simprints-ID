@@ -49,7 +49,6 @@ class FingerprintCaptureWrapperV2Test {
         every { scannerV2.acquireImageDistortionConfigurationMatrix() } returns Maybe.just(
             expectedResp.configurationBytes
         )
-
         val actualResponse = scannerWrapper.acquireImageDistortionMatrixConfiguration()
         assertThat(actualResponse.configurationBytes).isEqualTo(expectedResp.configurationBytes)
     }

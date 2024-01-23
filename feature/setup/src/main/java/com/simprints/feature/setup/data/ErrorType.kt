@@ -16,16 +16,13 @@ import com.simprints.infra.resources.R as IDR
 @Keep
 @ExcludedFromGeneratedTestCoverageReports("Alert screen configuration")
 internal enum class ErrorType(
-    @StringRes val title: Int,
+    @StringRes val title: Int? = null,
     @StringRes val message: Int,
     val alertType: AlertScreenEventType,
     val errorReason: AppErrorReason,
-
     var customTitle: String? = null,
     var customMessage: String? = null,
 ) {
-
-
     BACKEND_MAINTENANCE_ERROR(
         IDR.string.configuration_backend_maintenance_title,
         IDR.string.configuration_backend_maintenance_message,
@@ -33,7 +30,7 @@ internal enum class ErrorType(
         errorReason = AppErrorReason.BACKEND_MAINTENANCE_ERROR,
     ),
     CONFIGURATION_ERROR(
-        IDR.string.configuration_generic_error_title,
+        null,
         IDR.string.configuration_generic_error_message,
         alertType = AlertScreenEventType.FACE_LICENSE_MISSING,
         errorReason = AppErrorReason.FACE_CONFIGURATION_ERROR,
@@ -51,7 +48,6 @@ internal enum class ErrorType(
         payload = bundleOf(PAYLOAD_TYPE_KEY to this@ErrorType.errorReason)
         eventType = this@ErrorType.alertType
     }.toArgs()
-
 
     @ExcludedFromGeneratedTestCoverageReports("Inner code of excluded file")
     companion object {

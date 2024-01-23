@@ -120,7 +120,7 @@ internal class FingerprintCaptureFragment : Fragment(R.layout.fragment_fingerpri
                     color = AlertColor.Gray
                     titleRes = IDR.string.configuration_licence_invalid_title
                     messageRes = IDR.string.configuration_licence_invalid_message
-                    image = com.simprints.infra.resources.R.drawable.ic_exclamation
+                    image = IDR.drawable.ic_exclamation
                     leftButton = AlertButtonConfig.Close
                     payload = bundleOf(PAYLOAD_TYPE_KEY to AppErrorReason.FACE_LICENSE_INVALID)
                     eventType = AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.FACE_LICENSE_INVALID

@@ -22,7 +22,6 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -68,7 +67,6 @@ class FaceCaptureViewModelTest {
         coEvery { faceImageUseCase.invoke(any(), any()) } returns null
         every { bitmapToByteArrayUseCase.invoke(any()) } returns byteArrayOf()
 
-
         viewModel = FaceCaptureViewModel(
             configRepository,
             faceImageUseCase,
@@ -80,24 +78,22 @@ class FaceCaptureViewModelTest {
     }
 
     @Test
-    fun `Save face detections should not be called when image saving strategy set to NEVER`() =
-        runTest {
-            coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.NEVER
+    fun `Save face detections should not be called when image saving strategy set to NEVER`() {
+        coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.NEVER
 
-            viewModel.captureFinished(faceDetections)
-            viewModel.flowFinished()
-            coVerify(exactly = 0) { faceImageUseCase.invoke(any(), any()) }
-        }
+        viewModel.captureFinished(faceDetections)
+        viewModel.flowFinished()
+        coVerify(exactly = 0) { faceImageUseCase.invoke(any(), any()) }
+    }
 
     @Test
-    fun `Save face detections should be called when image saving strategy set to ONLY_GOO_SCAN`() =
-        runTest {
-            coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_GOOD_SCAN
+    fun `Save face detections should be called when image saving strategy set to ONLY_GOO_SCAN`() {
+        coEvery { configRepository.getProjectConfiguration().face?.imageSavingStrategy } returns ImageSavingStrategy.ONLY_GOOD_SCAN
 
-            viewModel.captureFinished(faceDetections)
-            viewModel.flowFinished()
-            coVerify(atLeast = 1) { faceImageUseCase.invoke(any(), any()) }
-        }
+        viewModel.captureFinished(faceDetections)
+        viewModel.flowFinished()
+        coVerify(atLeast = 1) { faceImageUseCase.invoke(any(), any()) }
+    }
 
     @Test
     fun `Recapture requests clears capture list`() {
@@ -139,25 +135,25 @@ class FaceCaptureViewModelTest {
     @Test
     fun `test initFaceBioSdk should initialize faceBioSdk`() {
         // Given
-        val license ="license"
-        coEvery { licenseRepository.getCachedLicense(Vendor.RANK_ONE_FACE_VENDOR) } returns license
+        val license = "license"
+        coEvery { licenseRepository.getCachedLicense(Vendor.RANK_ONE) } returns license
 
         // When
         viewModel.initFaceBioSdk(mockk())
         // Then
-        coVerify { faceBioSdkInitializer.tryInitWithLicense(any(),license) }
+        coVerify { faceBioSdkInitializer.tryInitWithLicense(any(), license) }
     }
 
     @Test
     fun `test initFaceBioSdk should post invalid license when faceBioSdkInitializer returns false`() {
         // Given
-        val license ="license"
-        coEvery { licenseRepository.getCachedLicense(Vendor.RANK_ONE_FACE_VENDOR) } returns license
-        coEvery { faceBioSdkInitializer.tryInitWithLicense(any(),license) } returns false
+        val license = "license"
+        coEvery { licenseRepository.getCachedLicense(Vendor.RANK_ONE) } returns license
+        coEvery { faceBioSdkInitializer.tryInitWithLicense(any(), license) } returns false
         // When
         viewModel.initFaceBioSdk(mockk())
         // Then
         viewModel.invalidLicense.assertEventReceived()
-        coVerify { licenseRepository.deleteCachedLicense(Vendor.RANK_ONE_FACE_VENDOR) }
+        coVerify { licenseRepository.deleteCachedLicense(Vendor.RANK_ONE) }
     }
 }

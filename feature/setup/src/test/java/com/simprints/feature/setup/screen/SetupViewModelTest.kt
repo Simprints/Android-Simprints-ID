@@ -173,10 +173,10 @@ class SetupViewModelTest {
             }
         }
         every {
-            licenseRepository.getLicenseStates(any(), any(), Vendor.NEC_FINGERPRINT_VENDOR)
+            licenseRepository.getLicenseStates(any(), any(), Vendor.NEC)
         } returns listOf(LicenseState.FinishedWithSuccess("")).asFlow()
         every {
-            licenseRepository.getLicenseStates(any(), any(), Vendor.RANK_ONE_FACE_VENDOR)
+            licenseRepository.getLicenseStates(any(), any(), Vendor.RANK_ONE)
         } returns listOf(LicenseState.FinishedWithError("123")).asFlow()
 
         // When

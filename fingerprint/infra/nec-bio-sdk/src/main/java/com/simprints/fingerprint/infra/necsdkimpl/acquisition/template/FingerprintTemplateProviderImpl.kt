@@ -52,14 +52,15 @@ class FingerprintTemplateProviderImpl @Inject constructor(
         val secugenProcessedImage = processImage(settings, decodedImage)
         log("quality checking image using nec sdk")
         val qualityScore = qualityCalculator.getQualityScore(secugenProcessedImage)
-        log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}" )
+        log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}")
         if (qualityScore < settings.qualityThreshold)
             throw BioSdkException.ImageQualityBelowThresholdException(qualityScore)
-
         log("extracting template using nec sdk")
-
-
         return necTemplateExtractor.extract(secugenProcessedImage, qualityScore)
+    }
+
+    private fun log(message: String) {
+        Simber.tag("NEC_SDK").d(message)
     }
 
     private suspend fun readImageDistortionConfiguration() {
@@ -73,12 +74,10 @@ class FingerprintTemplateProviderImpl @Inject constructor(
         }
     }
 
-
     private fun processImage(
         settings: FingerprintTemplateAcquisitionSettings,
         rawImage: FingerprintRawImage
     ): FingerprintImage {
-
         val scannerConfig = SecugenImageCorrection.ScannerConfig(
             imageDistortionConfiguration,
             settings.processingResolution?.value ?: DEFAULT_RESOLUTION,
@@ -101,9 +100,7 @@ class FingerprintTemplateProviderImpl @Inject constructor(
     companion object {
         private const val MIN_CAPTURE_DPI = 500.toShort()
     }
+
 }
 
 const val NEC_TEMPLATE_FORMAT = "NEC_1"
-fun log(s: String) {
-    Simber.tag("NEC_SDK").d(s)
-}

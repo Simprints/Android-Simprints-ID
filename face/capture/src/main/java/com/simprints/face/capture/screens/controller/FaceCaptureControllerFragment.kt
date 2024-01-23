@@ -49,6 +49,14 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
             }
         }
 
+        findNavController().handleResult<AlertResult>(
+            viewLifecycleOwner,
+            R.id.faceCaptureControllerFragment,
+            AlertContract.DESTINATION,
+        ) { result ->
+            findNavController().finishWithResult(this, result)
+        }
+
         viewModel.setupCapture(args.samplesToCapture)
         initFaceBioSdk()
         viewModel.recaptureEvent.observe(viewLifecycleOwner, LiveDataEventObserver {
@@ -86,13 +94,6 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
     }
 
     private fun initFaceBioSdk() {
-        findNavController().handleResult<AlertResult>(
-            viewLifecycleOwner,
-            R.id.faceCaptureControllerFragment,
-            AlertContract.DESTINATION,
-        ) { result ->
-            findNavController().finishWithResult(this, result)
-        }
         viewModel.invalidLicense.observe(viewLifecycleOwner) {
             findNavController().navigate(
                 R.id.action_global_errorFragment,

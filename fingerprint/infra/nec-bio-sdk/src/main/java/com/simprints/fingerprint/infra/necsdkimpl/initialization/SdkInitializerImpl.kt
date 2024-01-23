@@ -17,13 +17,13 @@ class SdkInitializerImpl @Inject constructor(
     private val licenseRepository: LicenseRepository,
 ) : SdkInitializer<Unit> {
     override suspend fun initialize(initializationParams: Unit?) {
-        val licence = licenseRepository.getCachedLicense(Vendor.NEC_FINGERPRINT_VENDOR)
+        val licence = licenseRepository.getCachedLicense(Vendor.NEC)
         try {
             necInstance.init(licence.encodeAndConvertToByteBuffer(), context)
         } catch (e: Exception) {
             // if we fail to init NEC we should delete the license from the local storage
             // because it is most likely corrupted or expired license
-            licenseRepository.deleteCachedLicense(Vendor.NEC_FINGERPRINT_VENDOR)
+            licenseRepository.deleteCachedLicense(Vendor.NEC)
             throw BioSdkException.BioSdkInitializationException(e)
         }
     }

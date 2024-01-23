@@ -154,7 +154,7 @@
     <string name="configuration_backend_maintenance_message">The system is currently offline for maintenance. Please try again later.</string>
     <string name="configuration_licence_invalid_title">License invalid</string>
     <string name="configuration_licence_invalid_message">License is invalid, please contact your system administrator</string>
-    <string name="configuration_generic_error_title">Configuration error</string>
+    <string name="configuration_generic_error_title">Configuration error %1$s</string>
     <string name="configuration_generic_error_message">There was an error while fetching the license, please contact your system administrator</string>
 
 

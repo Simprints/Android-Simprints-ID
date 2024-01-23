@@ -14,7 +14,6 @@ import javax.inject.Inject
 class FingerprintMatcherImpl @Inject constructor(
     private val nec: NEC
 ) : FingerprintMatcher<NecMatchingSettings> {
-
     override suspend fun match(
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>,
@@ -83,36 +82,23 @@ class FingerprintMatcherImpl @Inject constructor(
         // Number of fingers used in matching
         val fingers = probe.fingerprints.size
         // Sum of maximum matching score for each finger
-        val total = probe.fingerprints
-            .sumOf { probeTemplate ->
-                candidate.fingerprints
-                    .maxOf { candidateTemplate ->
-                        verify(
-                            probeTemplate,
-                            candidateTemplate
-                        )
-                    }
+        val total = probe.fingerprints.sumOf { probeTemplate ->
+            candidate.fingerprints.maxOf { candidateTemplate ->
+                verify(probeTemplate, candidateTemplate)
             }
+        }
         // Matching score  = total/number of fingers
         return MatchResult(candidate.id, getOverallScore(total, fingers))
     }
 
+    private fun FingerprintIdentity.templateForFinger(fingerId: FingerIdentifier) =
+        fingerprints.find { it.fingerId == fingerId }
+
+    private fun Fingerprint.toNecTemplate() = NECTemplate(template, 0) // Quality score not used
+    private fun getOverallScore(total: Double, fingers: Int) =
+        if (fingers == 0) {
+            0.toFloat()
+        } else {
+            (total / fingers).toFloat()
+        }
 }
-
-private fun FingerprintIdentity.templateForFinger(fingerId: FingerIdentifier) = fingerprints.find {
-    it.fingerId == fingerId
-}
-
-private fun Fingerprint.toNecTemplate() = NECTemplate(
-    template, 0 // Quality score not used
-)
-
-private fun getOverallScore(total: Double, fingers: Int) =
-    if (fingers == 0) {
-        0.toFloat()
-    } else {
-        (total / fingers).toFloat()
-    }
-
-@JvmInline
-value class NecMatchingSettings(val crossFingerComparison: Boolean = false)

@@ -22,6 +22,7 @@ class NecTemplateExtractorTest {
         MockKAnnotations.init(this)
         necTemplateExtractor = NecTemplateExtractor(nec)
     }
+
     @Test
     fun `test nec template extractor success`() {
         // Given
@@ -32,7 +33,7 @@ class NecTemplateExtractorTest {
             imageBytes = ByteArray(0)
         )
         // When
-       val result=necTemplateExtractor.extract(fingerprintImage, 100)
+        val result = necTemplateExtractor.extract(fingerprintImage, 100)
         // Then
         verify {
             nec.extract(
@@ -46,7 +47,8 @@ class NecTemplateExtractorTest {
         }
         Truth.assertThat(result.templateMetadata?.imageQualityScore).isEqualTo(100)
     }
-@Test(expected = BioSdkException.TemplateExtractionException::class)
+
+    @Test(expected = BioSdkException.TemplateExtractionException::class)
     fun `test nec template extractor failure`() {
         // Given
         val fingerprintImage = FingerprintImage(

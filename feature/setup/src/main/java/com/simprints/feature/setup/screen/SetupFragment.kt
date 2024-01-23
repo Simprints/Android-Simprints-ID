@@ -21,7 +21,7 @@ import com.simprints.infra.license.LicenseState.FinishedWithBackendMaintenanceEr
 import com.simprints.infra.license.LicenseState.FinishedWithError
 import com.simprints.infra.license.LicenseState.FinishedWithSuccess
 import com.simprints.infra.license.LicenseState.Started
-import com.simprints.infra.logging.LoggingConstants
+import com.simprints.infra.logging.LoggingConstants.CrashReportTag.LICENSE
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
@@ -62,8 +62,10 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
             R.id.setupFragment,
             AlertContract.DESTINATION,
         ) { result ->
-            findNavController().finishWithResult(this,
-                SetupResult(false, ErrorType.reasonFromPayload(result.payload)))
+            findNavController().finishWithResult(
+                this,
+                SetupResult(false, ErrorType.reasonFromPayload(result.payload))
+            )
         }
         // Request location permission
         viewModel.requestLocationPermission.observe(viewLifecycleOwner) {
@@ -97,7 +99,6 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
             }
         }
 
-
     private fun observeDownloadLicenseState() =
         viewModel.downloadLicenseState.observe(viewLifecycleOwner) { licenseState ->
             when (licenseState) {
@@ -122,11 +123,10 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         binding.configurationTxt.setText(IDR.string.configuration_downloading)
     }
 
-
     private fun renderFinishedWithError(errorCode: String) {
         val errorTitle =
-            "${getString(IDR.string.configuration_generic_error_title)} ($errorCode)"
-        Simber.tag(LoggingConstants.CrashReportTag.LICENSE.name)
+            getString(IDR.string.configuration_generic_error_title, errorCode)
+        Simber.tag(LICENSE.name)
             .i("Error with configuration download. Error = $errorTitle")
         findNavController().navigate(
             R.id.action_global_errorFragment,
@@ -144,7 +144,7 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
             getString(IDR.string.error_backend_maintenance_message)
         }
 
-        Simber.tag(LoggingConstants.CrashReportTag.LICENSE.name)
+        Simber.tag(LICENSE.name)
             .i("Error with configuration download. The backend is under maintenance")
         findNavController().navigate(
             R.id.action_global_errorFragment,
@@ -152,5 +152,4 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
                 .toAlertArgs()
         )
     }
-
 }

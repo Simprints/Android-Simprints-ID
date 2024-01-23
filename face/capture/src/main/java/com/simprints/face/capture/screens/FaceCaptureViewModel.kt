@@ -71,10 +71,10 @@ internal class FaceCaptureViewModel @Inject constructor(
     }
 
     fun initFaceBioSdk(activity: Activity) = viewModelScope.launch {
-        val license = licenseRepository.getCachedLicense(Vendor.RANK_ONE_FACE_VENDOR)
+        val license = licenseRepository.getCachedLicense(Vendor.RANK_ONE)
         if (!faceBioSdkInitializer.tryInitWithLicense(activity, license)) {
             Simber.tag(CrashReportTag.LICENSE.name).i("License is invalid")
-            licenseRepository.deleteCachedLicense(Vendor.RANK_ONE_FACE_VENDOR)
+            licenseRepository.deleteCachedLicense(Vendor.RANK_ONE)
             _invalidLicense.send()
         }
     }

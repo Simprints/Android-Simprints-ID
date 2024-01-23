@@ -30,9 +30,8 @@ internal class FingerprintCaptureWrapperV2(
     override suspend fun acquireImageDistortionMatrixConfiguration(): AcquireImageDistortionMatrixConfigurationResponse =
         withContext(ioDispatcher) {
             scannerV2.acquireImageDistortionConfigurationMatrix()
-                .map { imageBytes ->
-                    AcquireImageDistortionMatrixConfigurationResponse(imageBytes)
-                }.switchIfEmpty(Single.error(NoImageDistortionConfigurationMatrixException()))
+                .map { AcquireImageDistortionMatrixConfigurationResponse(it) }
+                .switchIfEmpty(Single.error(NoImageDistortionConfigurationMatrixException()))
                 .wrapErrorsFromScanner().await()
         }
 
@@ -141,7 +140,7 @@ internal class FingerprintCaptureWrapperV2(
         }
 
 
-    private fun Single<AcquireFingerprintTemplateResponse>. ifNoFingerDetectedThenSetBadScanLedState() =
+    private fun Single<AcquireFingerprintTemplateResponse>.ifNoFingerDetectedThenSetBadScanLedState() =
         onErrorResumeNext {
             if (it is NoFingerDetectedException) {
                 scannerV2.setSmileLedState(scannerUiHelper.badScanLedState())
