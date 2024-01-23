@@ -96,7 +96,7 @@ internal class FaceCaptureControllerFragment : Fragment(R.layout.fragment_face_c
         viewModel.invalidLicense.observe(viewLifecycleOwner) {
             findNavController().navigate(
                 R.id.action_global_errorFragment,
-                ErrorType.LICENSE_INVALID.toAlertArgs()
+                InvalidFaceLicenseAlert.toAlertArgs()
             )
         }
         viewModel.initFaceBioSdk(requireActivity())

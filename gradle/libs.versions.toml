@@ -83,7 +83,6 @@ uiAutomator_version = "2.2.0"
 jacoco_version = "0.8.11"
 
 sonar_plugin_version = "4.2.1.3168"
-deps_analysis_version = "1.20.0"
 retry_version = "1.5.6"
 realm_version = "1.13.0"
 protobuf_plugin_version = "0.9.4"
