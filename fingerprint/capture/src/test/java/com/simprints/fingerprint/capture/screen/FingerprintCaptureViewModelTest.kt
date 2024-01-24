@@ -21,6 +21,7 @@ import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
+import com.simprints.fingerprint.infra.biosdk.BioSdkResolverUseCase
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -85,6 +86,9 @@ class FingerprintCaptureViewModelTest {
     private lateinit var bioSdkWrapper: BioSdkWrapper
 
     @MockK
+    private lateinit var bioSdkResolverUseCase: BioSdkResolverUseCase
+
+    @MockK
     private lateinit var timeHelper: TimeHelper
 
     @MockK
@@ -102,6 +106,7 @@ class FingerprintCaptureViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
+        coEvery {bioSdkResolverUseCase()} returns bioSdkWrapper
         every { vero2Configuration.qualityThreshold } returns 60
         every { vero2Configuration.displayLiveFeedback } returns false
         every { vero2Configuration.captureStrategy } returns Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI
@@ -125,7 +130,7 @@ class FingerprintCaptureViewModelTest {
             scannerManager,
             configRepository,
             timeHelper,
-            bioSdkWrapper,
+            bioSdkResolverUseCase,
             saveImageUseCase,
             getNextFingerToAddUseCase,
             getStartStateUseCase,

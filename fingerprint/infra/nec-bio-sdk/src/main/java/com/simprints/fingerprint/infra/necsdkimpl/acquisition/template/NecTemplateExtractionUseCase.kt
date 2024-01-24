@@ -6,8 +6,8 @@ import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.models.NecImage
 import javax.inject.Inject
 
-class NecTemplateExtractor @Inject constructor(private val nec: NEC) {
-    fun extract(
+class NecTemplateExtractionUseCase @Inject constructor(private val nec: NEC) {
+    operator fun invoke(
         fingerprintImage: FingerprintImage,
         qualityScore: Int
     ): TemplateResponse<FingerprintTemplateMetadata> {

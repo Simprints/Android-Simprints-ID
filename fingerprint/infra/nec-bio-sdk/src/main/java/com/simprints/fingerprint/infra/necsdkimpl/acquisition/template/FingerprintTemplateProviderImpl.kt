@@ -5,7 +5,6 @@ import com.simprints.fingerprint.infra.basebiosdk.acquisition.domain.TemplateRes
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.necsdkimpl.acquisition.image.ProcessedImageCache
 import com.simprints.fingerprint.infra.scanner.capture.FingerprintCaptureWrapperFactory
-import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Dpi
 import com.simprints.infra.logging.Simber
 import com.simprints.sgimagecorrection.SecugenImageCorrection
@@ -13,13 +12,11 @@ import javax.inject.Inject
 
 internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
-    private val wsqImageDecoder: WSQImageDecoder,
+    private val wsqImageDecoderUseCase: WSQImageDecoderUseCase,
     private val secugenImageCorrection: SecugenImageCorrection,
-    private val qualityCalculator: NecImageQualityCalculator,
+    private val imageQualityCalculatorUseCase: NecImageQualityCalculatorUseCase,
     private val captureProcessedImageCache: ProcessedImageCache,
-    private val necTemplateExtractor: NecTemplateExtractor
-
-
+    private val templateExtractionUseCase: NecTemplateExtractionUseCase
 ) :
     FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
 
@@ -46,17 +43,17 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
         ).rawUnprocessedImage
         captureProcessedImageCache.recentlyCapturedImage = unprocessedImage.imageData
         log("Unprocessed image acquired, processing it")
-        val decodedImage = decodeWsqImage(unprocessedImage)
+        val decodedImage = wsqImageDecoderUseCase(unprocessedImage)
         log("Image decoded successfully ${decodedImage.resolution}")
         log("processing image using secugen image correction")
         val secugenProcessedImage = processImage(settings, decodedImage)
         log("quality checking image using nec sdk")
-        val qualityScore = qualityCalculator.getQualityScore(secugenProcessedImage)
+        val qualityScore = imageQualityCalculatorUseCase(secugenProcessedImage)
         log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}")
         if (qualityScore < settings.qualityThreshold)
             throw BioSdkException.ImageQualityBelowThresholdException(qualityScore)
         log("extracting template using nec sdk")
-        return necTemplateExtractor.extract(secugenProcessedImage, qualityScore)
+        return templateExtractionUseCase(secugenProcessedImage, qualityScore)
     }
 
     private fun log(message: String) {
@@ -94,8 +91,6 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
         )
     }
 
-    private fun decodeWsqImage(unprocessedImage: RawUnprocessedImage): FingerprintRawImage =
-        wsqImageDecoder.decode(unprocessedImage)
 
     companion object {
         private const val MIN_CAPTURE_DPI = 500.toShort()

@@ -5,10 +5,10 @@ import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.models.NecImage
 import javax.inject.Inject
 
-class NecImageQualityCalculator @Inject constructor(
+class NecImageQualityCalculatorUseCase @Inject constructor(
     private val necInstant: NEC,
 ) {
-    fun getQualityScore(image: FingerprintImage): Int =
+    operator fun invoke(image: FingerprintImage): Int =
         try {
             necInstant.qualityCheck(
                 NecImage(

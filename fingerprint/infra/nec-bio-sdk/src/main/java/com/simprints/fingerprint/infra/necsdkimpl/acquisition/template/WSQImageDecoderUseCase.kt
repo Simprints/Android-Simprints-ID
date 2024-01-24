@@ -8,7 +8,7 @@ import com.ygoular.bitmapconverter.BitmapFormat
 import javax.inject.Inject
 
 
-class WSQImageDecoder @Inject constructor (private val bitmapConverter: BitmapConverter) {
+class WSQImageDecoderUseCase @Inject constructor (private val bitmapConverter: BitmapConverter) {
 
     /**
      * Decode WSQ images
@@ -17,7 +17,7 @@ class WSQImageDecoder @Inject constructor (private val bitmapConverter: BitmapCo
      *
      * @return the decoded raw image bytes array
      */
-    fun decode(imageBytes: RawUnprocessedImage): FingerprintRawImage {
+    operator fun invoke(imageBytes: RawUnprocessedImage): FingerprintRawImage {
         if (!imageBytes.isValidFormat()) {
             throw BioSdkException.ImageDecodingException()
        }

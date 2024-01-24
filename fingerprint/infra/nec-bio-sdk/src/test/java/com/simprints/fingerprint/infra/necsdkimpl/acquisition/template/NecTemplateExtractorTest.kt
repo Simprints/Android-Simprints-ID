@@ -15,12 +15,12 @@ class NecTemplateExtractorTest {
 
     @RelaxedMockK
     private lateinit var nec: NEC
-    private lateinit var necTemplateExtractor: NecTemplateExtractor
+    private lateinit var necTemplateExtractionUseCase: NecTemplateExtractionUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        necTemplateExtractor = NecTemplateExtractor(nec)
+        necTemplateExtractionUseCase = NecTemplateExtractionUseCase(nec)
     }
 
     @Test
@@ -33,7 +33,7 @@ class NecTemplateExtractorTest {
             imageBytes = ByteArray(0)
         )
         // When
-        val result = necTemplateExtractor.extract(fingerprintImage, 100)
+        val result = necTemplateExtractionUseCase(fingerprintImage, 100)
         // Then
         verify {
             nec.extract(
@@ -59,7 +59,7 @@ class NecTemplateExtractorTest {
         )
         every { nec.extract(any()) } throws Exception()
         // When
-        necTemplateExtractor.extract(fingerprintImage, 100)
+        necTemplateExtractionUseCase(fingerprintImage, 100)
         // Then throw exception
     }
 

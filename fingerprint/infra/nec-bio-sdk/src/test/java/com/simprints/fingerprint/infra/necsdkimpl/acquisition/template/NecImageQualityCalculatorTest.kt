@@ -18,12 +18,12 @@ class NecImageQualityCalculatorTest {
     @MockK
     private lateinit var nec: NEC
     private val testImage = FingerprintImage(byteArrayOf(), 1, 1, 1)
-    private lateinit var imageQualityChecker: NecImageQualityCalculator
+    private lateinit var imageQualityChecker: NecImageQualityCalculatorUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        imageQualityChecker = NecImageQualityCalculator(nec)
+        imageQualityChecker = NecImageQualityCalculatorUseCase(nec)
     }
 
     @Test
@@ -32,7 +32,7 @@ class NecImageQualityCalculatorTest {
         every { nec.qualityCheck(any()) } returns DEFAULT_GOOD_IMAGE_QUALITY
 
         // When
-        val result = imageQualityChecker.getQualityScore(testImage)
+        val result = imageQualityChecker(testImage)
         // Then
         Truth.assertThat(result).isEqualTo(DEFAULT_GOOD_IMAGE_QUALITY)
 
@@ -44,7 +44,7 @@ class NecImageQualityCalculatorTest {
             nec.qualityCheck(any())
         } throws FingerprintImageQualityCheck.QualityCheckFailedException(-1)
         // When
-        imageQualityChecker.getQualityScore(testImage)
+        imageQualityChecker(testImage)
     }
 
 

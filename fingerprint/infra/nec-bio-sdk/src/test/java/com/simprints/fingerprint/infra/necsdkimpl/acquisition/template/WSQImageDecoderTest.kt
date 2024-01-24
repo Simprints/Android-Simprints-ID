@@ -28,7 +28,7 @@ class WSQImageDecoderTest {
     @MockK(relaxed = true)
     lateinit var bitmap: Bitmap
 
-    private lateinit var wsqImageDecoder: WSQImageDecoder
+    private lateinit var wsqImageDecoderUseCase: WSQImageDecoderUseCase
 
     companion object {
         private val UNPROCESSED_IMAGE = RawUnprocessedImage(
@@ -44,7 +44,7 @@ class WSQImageDecoderTest {
     fun setup() {
         MockKAnnotations.init(this)
         mockkStatic(WSQDecoder::class)
-        wsqImageDecoder = WSQImageDecoder(bitmapConverter)
+        wsqImageDecoderUseCase = WSQImageDecoderUseCase(bitmapConverter)
         buildDecodedImage()
     }
 
@@ -60,7 +60,7 @@ class WSQImageDecoderTest {
         every { WSQDecoder.decode(any<ByteArray>()) } returns mockedDecodeResult
 
         // When
-        val result = wsqImageDecoder.decode(UNPROCESSED_IMAGE)
+        val result = wsqImageDecoderUseCase(UNPROCESSED_IMAGE)
 
         // Then
         Truth.assertThat(result.imageBytes).isEqualTo(convertedImageBytesMock)
@@ -72,7 +72,7 @@ class WSQImageDecoderTest {
         every { WSQDecoder.decode(any<ByteArray>()) } returns null
 
         // When
-        wsqImageDecoder.decode(UNPROCESSED_IMAGE)
+        wsqImageDecoderUseCase(UNPROCESSED_IMAGE)
         // Then the exception is thrown
 
     }
@@ -83,7 +83,7 @@ class WSQImageDecoderTest {
         every { WSQDecoder.decode(any<ByteArray>()) } returns mockedDecodeResult
 
         // When
-        wsqImageDecoder.decode(RawUnprocessedImage(byteArrayOf(0)))
+        wsqImageDecoderUseCase(RawUnprocessedImage(byteArrayOf(0)))
         // Then the exception is thrown
 
     }

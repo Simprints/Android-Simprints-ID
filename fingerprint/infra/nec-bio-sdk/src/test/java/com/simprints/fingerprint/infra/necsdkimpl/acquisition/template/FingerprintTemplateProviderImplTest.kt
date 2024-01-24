@@ -19,7 +19,7 @@ class FingerprintTemplateProviderImplTest {
     private lateinit var fingerprintTemplateProviderImpl: FingerprintTemplateProviderImpl
 
     @RelaxedMockK
-    private lateinit var necImageQualityCalculator: NecImageQualityCalculator
+    private lateinit var necImageQualityCalculatorUseCase: NecImageQualityCalculatorUseCase
 
     @RelaxedMockK
     private lateinit var secugenImageCorrection: SecugenImageCorrection
@@ -28,10 +28,10 @@ class FingerprintTemplateProviderImplTest {
     private lateinit var fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory
 
     @RelaxedMockK
-    private lateinit var necTemplateExtractor: NecTemplateExtractor
+    private lateinit var necTemplateExtractionUseCase: NecTemplateExtractionUseCase
 
     @RelaxedMockK
-    private lateinit var wsqImageDecoder: WSQImageDecoder
+    private lateinit var wsqImageDecoderUseCase: WSQImageDecoderUseCase
 
     @RelaxedMockK
     private lateinit var processedImageCache: ProcessedImageCache
@@ -47,10 +47,10 @@ class FingerprintTemplateProviderImplTest {
 
         fingerprintTemplateProviderImpl = FingerprintTemplateProviderImpl(
             fingerprintCaptureWrapperFactory = fingerprintCaptureWrapperFactory,
-            wsqImageDecoder = wsqImageDecoder,
+            wsqImageDecoderUseCase = wsqImageDecoderUseCase,
             secugenImageCorrection = secugenImageCorrection,
-            qualityCalculator = necImageQualityCalculator,
-            necTemplateExtractor = necTemplateExtractor,
+            imageQualityCalculatorUseCase = necImageQualityCalculatorUseCase,
+            templateExtractionUseCase = necTemplateExtractionUseCase,
             captureProcessedImageCache = processedImageCache
         )
 
@@ -80,11 +80,11 @@ class FingerprintTemplateProviderImplTest {
         coVerify {
             captureWrapper
                 .acquireUnprocessedImage(any())
-            wsqImageDecoder.decode(any())
+            wsqImageDecoderUseCase.invoke(any())
             processedImageCache.recentlyCapturedImage = any()
             secugenImageCorrection.processRawImage(any(), any())
-            necImageQualityCalculator.getQualityScore(any())
-            necTemplateExtractor.extract(any(), any())
+            necImageQualityCalculatorUseCase.invoke(any())
+            necTemplateExtractionUseCase.invoke(any(), any())
 
         }
     }
@@ -93,7 +93,7 @@ class FingerprintTemplateProviderImplTest {
     fun `test acquireFingerprintTemplate fails if quality score is less than threshold`() =
         runTest {
             // Given
-            every { necImageQualityCalculator.getQualityScore(any()) } returns 10
+            every { necImageQualityCalculatorUseCase.invoke(any()) } returns 10
             val settings = FingerprintTemplateAcquisitionSettings(
                 processingResolution = Dpi(500),
                 qualityThreshold = 20,
@@ -105,13 +105,13 @@ class FingerprintTemplateProviderImplTest {
             coVerify {
                 captureWrapper
                     .acquireUnprocessedImage(any())
-                wsqImageDecoder.decode(any())
+                wsqImageDecoderUseCase.invoke(any())
                 processedImageCache.recentlyCapturedImage = any()
                 secugenImageCorrection.processRawImage(any(), any())
-                necImageQualityCalculator.getQualityScore(any())
+                necImageQualityCalculatorUseCase.invoke(any())
             }
             coVerify(exactly = 0) {
-                necTemplateExtractor.extract(any(), any())
+                necTemplateExtractionUseCase.invoke(any(), any())
             }
 
         }
