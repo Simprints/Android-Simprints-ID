@@ -13,12 +13,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.model
 import javax.inject.Inject
 
 class NECBioSdkWrapper @Inject constructor(
-    private val bioSdk: FingerprintBioSdk<Unit,
-        Unit,
-        Unit,
-        FingerprintTemplateAcquisitionSettings,
-        FingerprintTemplateMetadata,
-        NecMatchingSettings>
+    private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, NecMatchingSettings>
 ) : BioSdkWrapper {
     override suspend fun initialize() = bioSdk.initialize()
 

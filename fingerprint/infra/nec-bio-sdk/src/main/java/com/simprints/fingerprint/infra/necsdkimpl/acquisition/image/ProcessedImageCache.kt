@@ -9,7 +9,7 @@ import javax.inject.Singleton
  *
  */
 @Singleton
-class ProcessedImageCache @Inject constructor() {
+internal class ProcessedImageCache @Inject constructor() {
     var recentlyCapturedImage: ByteArray? = null
 
 }

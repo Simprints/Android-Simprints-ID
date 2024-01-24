@@ -13,12 +13,7 @@ import javax.inject.Inject
 
 
 class SimprintsBioSdkWrapper @Inject constructor(
-    private val bioSdk: FingerprintBioSdk<Unit,
-        Unit,
-        Unit,
-        FingerprintTemplateAcquisitionSettings,
-        FingerprintTemplateMetadata,
-        SimAfisMatcherSettings>
+    private val bioSdk: FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings>
 ) : BioSdkWrapper {
 
     override suspend fun initialize() {
