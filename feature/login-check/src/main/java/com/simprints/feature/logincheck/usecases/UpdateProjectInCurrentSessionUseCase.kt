@@ -12,19 +12,22 @@ internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke() {
-        val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-
+        val sessionScope = eventRepository.getCurrentSessionScope()
         val signedProjectId = authStore.signedInProjectId
-        if (signedProjectId != currentSessionEvent.payload.projectId) {
-            val projectConfiguration = configRepository.getProjectConfiguration()
-            currentSessionEvent.updateProjectId(signedProjectId)
-            currentSessionEvent.updateModalities(projectConfiguration.general.modalities)
-            val deviceConfiguration = configRepository.getDeviceConfiguration()
-            currentSessionEvent.updateLanguage(deviceConfiguration.language)
-            eventRepository.addOrUpdateEvent(currentSessionEvent)
+
+        if (signedProjectId != sessionScope.projectId) {
+            val updatedSessionScope = sessionScope.copy(
+                projectId = signedProjectId,
+                payload = sessionScope.payload.copy(
+                    modalities = configRepository.getProjectConfiguration().general.modalities,
+                    language = configRepository.getDeviceConfiguration().language,
+                )
+            )
+
+            eventRepository.saveSessionScope(updatedSessionScope)
         }
 
-        val associatedEvents = eventRepository.observeEventsFromSession(currentSessionEvent.id)
+        val associatedEvents = eventRepository.observeEventsFromSession(sessionScope.id)
         associatedEvents.collect {
             it.labels = it.labels.copy(projectId = signedProjectId)
             eventRepository.addOrUpdateEvent(it)

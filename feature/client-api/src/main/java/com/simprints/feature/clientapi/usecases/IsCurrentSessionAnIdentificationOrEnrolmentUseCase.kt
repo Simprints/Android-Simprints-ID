@@ -11,7 +11,7 @@ internal class IsCurrentSessionAnIdentificationOrEnrolmentUseCase @Inject constr
 ) {
 
     suspend operator fun invoke(): Boolean = eventRepository
-        .getCurrentCaptureSessionEvent()
+        .getCurrentSessionScope()
         .let { eventRepository.observeEventsFromSession(it.id) }
         .toList()
         .any { it is IdentificationCalloutEvent || it is EnrolmentCalloutEvent }

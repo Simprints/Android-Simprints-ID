@@ -6,14 +6,12 @@ import javax.inject.Inject
 
 internal class UpdateDatabaseCountsInCurrentSessionUseCase @Inject constructor(
     private val eventRepository: EventRepository,
-    private val enrolmentRecordRepository: EnrolmentRecordRepository
+    private val enrolmentRecordRepository: EnrolmentRecordRepository,
 ) {
+
     suspend operator fun invoke() {
-        val currentSessionEvent = eventRepository.getCurrentCaptureSessionEvent()
-
-        val payload = currentSessionEvent.payload
-        payload.databaseInfo.recordCount = enrolmentRecordRepository.count()
-
-        eventRepository.addOrUpdateEvent(currentSessionEvent)
+        val sessionScope = eventRepository.getCurrentSessionScope()
+        sessionScope.payload.databaseInfo.recordCount = enrolmentRecordRepository.count()
+        eventRepository.saveSessionScope(sessionScope)
     }
 }

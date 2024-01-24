@@ -6,25 +6,24 @@ import com.simprints.core.DeviceID
 import com.simprints.core.LibSimprintsVersionName
 import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.event.domain.models.*
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
+import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
+import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
-import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
+import com.simprints.infra.events.event.domain.models.session.SessionEndCause
+import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -53,37 +52,41 @@ internal open class EventRepositoryImpl @Inject constructor(
             PROJECT_ID_FOR_NOT_SIGNED_IN
         }
 
-    override suspend fun createSession(): SessionCaptureEvent {
-        closeAllSessions(NEW_SESSION)
+    override suspend fun createSession(): SessionScope {
+        closeAllSessions(SessionEndCause.NEW_SESSION)
 
         return reportException {
             val projectConfiguration = configRepository.getProjectConfiguration()
             val deviceConfiguration = configRepository.getDeviceConfiguration()
-            val sessionCount = eventLocalDataSource.count(type = SESSION_CAPTURE)
-            val sessionCaptureEvent = SessionCaptureEvent(
+            val sessionCount = eventLocalDataSource.countSessions()
+
+            val sessionScope = SessionScope(
                 id = UUID.randomUUID().toString(),
                 projectId = currentProject,
                 createdAt = timeHelper.now(),
-                modalities = projectConfiguration.general.modalities,
-                appVersionName = appVersionName,
-                libVersionName = libSimprintsVersionName,
-                language = deviceConfiguration.language,
-                device = Device(
-                    VERSION.SDK_INT.toString(),
-                    Build.MANUFACTURER + "_" + Build.MODEL,
-                    deviceId
-                ),
-                databaseInfo = DatabaseInfo(sessionCount)
+                endedAt = null,
+                payload = SessionScopePayload(
+                    sidVersion = appVersionName,
+                    language = deviceConfiguration.language,
+                    modalities = projectConfiguration.general.modalities,
+                    device = Device(
+                        VERSION.SDK_INT.toString(),
+                        Build.MANUFACTURER + "_" + Build.MODEL,
+                        deviceId
+                    ),
+                    databaseInfo = DatabaseInfo(sessionCount),
+                    projectConfigurationUpdatedAt = projectConfiguration.updatedAt,
+                )
             )
 
-            saveEvent(sessionCaptureEvent, sessionCaptureEvent)
-            sessionDataCache.eventCache[sessionCaptureEvent.id] = sessionCaptureEvent
-            sessionCaptureEvent
+            sessionDataCache.sessionScope = sessionScope
+            eventLocalDataSource.saveSessionScope(sessionScope)
+            sessionScope
         }
     }
 
     override suspend fun hasOpenSession(): Boolean {
-        val session = cachedCaptureSessionEvent() ?: localCaptureSessionEvent()
+        val session = cachedSessionScope() ?: localSessionScopes()
         return session != null
     }
 
@@ -91,7 +94,7 @@ internal open class EventRepositoryImpl @Inject constructor(
         val startTime = System.currentTimeMillis()
 
         reportException {
-            val session = getCurrentCaptureSessionEvent()
+            val session = getCurrentSessionScope()
 
             val currentEvents = sessionDataCache.eventCache.values.toList()
             validators.forEach {
@@ -107,15 +110,15 @@ internal open class EventRepositoryImpl @Inject constructor(
         Simber.v("Save event: ${event.type} = ${endTime - startTime}ms")
     }
 
-    private suspend fun saveEvent(event: Event, session: SessionCaptureEvent) {
+    private suspend fun saveEvent(event: Event, session: SessionScope) {
         checkAndUpdateLabels(event, session)
         eventLocalDataSource.insertOrUpdate(event)
     }
 
-    private fun checkAndUpdateLabels(event: Event, session: SessionCaptureEvent) {
+    private fun checkAndUpdateLabels(event: Event, session: SessionScope) {
         event.labels = event.labels.copy(
             sessionId = session.id,
-            projectId = session.payload.projectId,
+            projectId = session.projectId,
             deviceId = deviceId,
         )
     }
@@ -124,23 +127,25 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
     }
 
-    override suspend fun getCurrentCaptureSessionEvent(): SessionCaptureEvent = reportException {
-        cachedCaptureSessionEvent()
-            ?: localCaptureSessionEvent()
+    override suspend fun getCurrentSessionScope(): SessionScope = reportException {
+        cachedSessionScope()
+            ?: localSessionScopes()
             ?: createSession()
     }
 
-    private fun cachedCaptureSessionEvent() =
-        sessionDataCache.eventCache.values.toList().filterIsInstance<SessionCaptureEvent>()
-            .maxByOrNull {
-                it.payload.createdAt
-            }
+    private fun cachedSessionScope() = sessionDataCache.sessionScope
 
-    private suspend fun localCaptureSessionEvent() =
+    private suspend fun localSessionScopes() =
         loadOpenedSessions().firstOrNull()?.also { session ->
             loadEventsIntoCache(session.id)
         }
 
+    override suspend fun saveSessionScope(sessionScope: SessionScope) {
+        if (sessionScope.id == sessionDataCache.sessionScope?.id) {
+            sessionDataCache.sessionScope = sessionScope
+        }
+        eventLocalDataSource.saveSessionScope(sessionScope)
+    }
 
     override suspend fun observeEventsFromSession(sessionId: String): Flow<Event> =
         reportException {
@@ -170,13 +175,13 @@ internal open class EventRepositoryImpl @Inject constructor(
      * The reason is only used when we want to create an [ArtificialTerminationEvent].
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
-    private suspend fun closeAllSessions(reason: Reason) {
+    private suspend fun closeAllSessions(reason: SessionEndCause?) {
         sessionDataCache.eventCache.clear()
-        loadOpenedSessions().collect { closeSession(it, reason) }
+        loadOpenedSessions().forEach { closeSession(it, reason) }
     }
 
-    override suspend fun closeCurrentSession(reason: Reason?) {
-        closeSession(getCurrentCaptureSessionEvent(), reason)
+    override suspend fun closeCurrentSession(reason: SessionEndCause?) {
+        closeSession(getCurrentSessionScope(), reason)
         sessionDataCache.eventCache.clear()
     }
 
@@ -184,20 +189,18 @@ internal open class EventRepositoryImpl @Inject constructor(
      * The reason is only used when we want to create an [ArtificialTerminationEvent].
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
-    private suspend fun closeSession(sessionCaptureEvent: SessionCaptureEvent, reason: Reason?) {
-        if (reason != null) {
-            saveEvent(ArtificialTerminationEvent(timeHelper.now(), reason), sessionCaptureEvent)
-        }
-
-        sessionCaptureEvent.payload.endedAt = timeHelper.now()
-        sessionCaptureEvent.payload.sessionIsClosed = true
-
-        saveEvent(sessionCaptureEvent, sessionCaptureEvent)
+    private suspend fun closeSession(sessionScope: SessionScope, reason: SessionEndCause?) {
+        val updatedSessionScope = sessionScope.copy(
+            endedAt = timeHelper.now(),
+            payload = sessionScope.payload.copy(
+                endCause = reason ?: SessionEndCause.NEW_SESSION
+            )
+        )
+        saveSessionScope(updatedSessionScope)
     }
 
-    private suspend fun loadOpenedSessions(): Flow<SessionCaptureEvent> {
-        return eventLocalDataSource.loadOpenedSessions().map { it as SessionCaptureEvent }
-    }
+    private suspend fun loadOpenedSessions(): List<SessionScope> =
+        eventLocalDataSource.loadOpenedSessions()
 
     private suspend fun loadEventsIntoCache(sessionId: String) {
         eventLocalDataSource.loadAllFromSession(sessionId).forEach {
@@ -217,10 +220,12 @@ internal open class EventRepositoryImpl @Inject constructor(
         }
 
     override suspend fun removeLocationDataFromCurrentSession() {
-        val currentCaptureSession = getCurrentCaptureSessionEvent()
-        if (currentCaptureSession.payload.location != null) {
-            currentCaptureSession.payload.location = null
-            addOrUpdateEvent(currentCaptureSession)
+        val sessionScope = getCurrentSessionScope()
+        if (sessionScope.payload.location != null) {
+            val updatedSessionScope = sessionScope.copy(
+                payload = sessionScope.payload.copy(location = null)
+            )
+            saveSessionScope(updatedSessionScope)
         }
     }
 

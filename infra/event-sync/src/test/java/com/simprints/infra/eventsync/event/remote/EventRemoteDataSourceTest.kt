@@ -12,6 +12,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
+import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
@@ -282,7 +283,7 @@ class EventRemoteDataSourceTest {
     fun postEvent_shouldUploadEvents() = runTest {
         coEvery { eventRemoteInterface.uploadEvents(any(), any(), any()) } returns mockk()
 
-        val events = listOf(com.simprints.infra.events.sampledata.createSessionCaptureEvent())
+        val events = listOf(createSessionCaptureEvent())
         eventRemoteDataSource.post(DEFAULT_PROJECT_ID, events)
 
         coVerify(exactly = 1) {
@@ -311,7 +312,7 @@ class EventRemoteDataSourceTest {
             assertThrows<Throwable> {
                 eventRemoteDataSource.post(
                     DEFAULT_PROJECT_ID,
-                    listOf(com.simprints.infra.events.sampledata.createSessionCaptureEvent())
+                    listOf(createSessionCaptureEvent())
                 )
             }
         }

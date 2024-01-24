@@ -92,7 +92,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private suspend fun registerEvent(subject: Subject) {
         Simber.tag(ENROLMENT.name).d("Register events for enrolments")
 
-        val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
+        val currentSession = eventRepository.getCurrentSessionScope().id
         val personCreationEvent = eventRepository.observeEventsFromSession(currentSession)
             .filterIsInstance<PersonCreationEvent>().first()
 

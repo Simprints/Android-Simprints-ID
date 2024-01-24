@@ -48,21 +48,27 @@ internal class StoreUserLocationIntoCurrentSessionWorker @AssistedInject constru
     }
 
     private fun createLocationFlow(): Flow<android.location.Location?> {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, DEFAULT_INTERVAL).build()
+        val locationRequest =
+            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, DEFAULT_INTERVAL).build()
         return locationManager.requestLocation(locationRequest).take(1)
     }
 
     private suspend fun saveUserLocation(lastLocation: android.location.Location) {
         if (!isStopped) {
             // Only store location if SID didn't yet sent the response to the calling app
-            val currentSession = eventRepository.getCurrentCaptureSessionEvent()
-            currentSession.payload.location = Location(lastLocation.latitude, lastLocation.longitude)
-            eventRepository.addOrUpdateEvent(currentSession)
+            val sessionScope = eventRepository.getCurrentSessionScope()
+            val updatesSessionScope = sessionScope.copy(
+                payload = sessionScope.payload.copy(
+                    location = Location(lastLocation.latitude, lastLocation.longitude)
+                )
+            )
+            eventRepository.saveSessionScope(updatesSessionScope)
             Simber.d("Saving user's location into the current session")
         }
     }
 
     companion object {
+
         // Based on the default value of minUpdateIntervalMillis in LocationRequest
         private const val DEFAULT_INTERVAL = 10 * 60 * 1000L
     }

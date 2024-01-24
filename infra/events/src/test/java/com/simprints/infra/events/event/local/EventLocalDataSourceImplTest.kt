@@ -7,11 +7,13 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.local.*
 import com.simprints.infra.events.event.local.models.DbEvent
+import com.simprints.infra.events.event.local.models.DbSessionScope
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.events.local.*
@@ -40,6 +42,7 @@ internal class EventLocalDataSourceImplTest {
 
     private lateinit var db: EventRoomDatabase
     private lateinit var eventDao: EventRoomDao
+    private lateinit var scopeDao: SessionScopeRoomDao
     private lateinit var eventLocalDataSource: EventLocalDataSource
 
     @RelaxedMockK
@@ -54,8 +57,17 @@ internal class EventLocalDataSourceImplTest {
             .allowMainThreadQueries().build()
 
         eventDao = db.eventDao
+        scopeDao = db.scopeDao
+
         every { eventDatabaseFactory.build() } returns db
         mockDaoLoadToMakeNothing()
+
+        eventLocalDataSource = EventLocalDataSourceImpl(
+            eventDatabaseFactory,
+            JsonHelper,
+            UnconfinedTestDispatcher(),
+            UnconfinedTestDispatcher()
+        )
     }
 
     @Test
@@ -335,17 +347,31 @@ internal class EventLocalDataSourceImplTest {
     }
 
     @Test
+    fun countSessions() = runTest {
+        eventLocalDataSource.countSessions()
+
+        coVerify { scopeDao.count() }
+    }
+
+    @Test
+    fun saveSessionScope() = runTest {
+        mockkStatic("com.simprints.infra.events.event.local.models.DbSessionScopeKt")
+        eventLocalDataSource.saveSessionScope(mockk())
+
+        coVerify { scopeDao.insertOrUpdate(any()) }
+    }
+
+    @Test
     fun loadOpenedSessions() = runTest {
-        mockkStatic("com.simprints.infra.events.event.local.models.DbEventKt")
-        val dbSessionCaptureEvent = mockk<DbEvent> {
-            every { type } returns SESSION_CAPTURE
-            every { fromDbToDomain() } returns mockk()
+        mockkStatic("com.simprints.infra.events.event.local.models.DbSessionScopeKt")
+        val dbSessionCaptureEvent = mockk<DbSessionScope> {
+            every { fromDbToDomain(any()) } returns mockk()
         }
-        coEvery { eventDao.loadOpenedSessions() } returns listOf(dbSessionCaptureEvent)
+        coEvery { scopeDao.loadOpen() } returns listOf(dbSessionCaptureEvent)
         eventLocalDataSource.loadOpenedSessions()
 
-        coVerify { eventDao.loadOpenedSessions() }
-        verify { dbSessionCaptureEvent.fromDbToDomain() }
+        coVerify { scopeDao.loadOpen() }
+        verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
     }
 
     @Test
@@ -449,6 +475,7 @@ internal class EventLocalDataSourceImplTest {
     private fun mockDaoLoadToMakeNothing() {
         db = mockk(relaxed = true)
         eventDao = mockk(relaxed = true)
+        scopeDao = mockk(relaxed = true)
         eventDatabaseFactory = mockk(relaxed = true)
         coEvery { eventDao.loadAll() } returns emptyList()
         coEvery { eventDao.loadFromProject(any()) } returns emptyList()
@@ -456,13 +483,12 @@ internal class EventLocalDataSourceImplTest {
         coEvery { eventDao.countFromProject(any()) } returns 0
         coEvery { eventDao.countFromType(any()) } returns 0
         coEvery { eventDao.countFromProjectByType(any(), any()) } returns 0
+        coEvery { scopeDao.loadAll() } returns emptyList()
+        coEvery { scopeDao.loadOpen() } returns emptyList()
+        coEvery { scopeDao.count() } returns 0
         every { db.eventDao } returns eventDao
+        every { db.scopeDao } returns scopeDao
         every { eventDatabaseFactory.build() } returns db
-        eventLocalDataSource = EventLocalDataSourceImpl(
-            eventDatabaseFactory,
-            UnconfinedTestDispatcher(),
-            UnconfinedTestDispatcher()
-        )
     }
 
     @After

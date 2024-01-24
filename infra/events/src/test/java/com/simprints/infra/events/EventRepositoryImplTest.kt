@@ -3,25 +3,26 @@ package com.simprints.infra.events
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
+import com.simprints.infra.events.sampledata.createSessionScope
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import com.simprints.infra.config.store.ConfigRepository
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -68,6 +69,7 @@ internal class EventRepositoryImplTest {
         every { timeHelper.now() } returns NOW
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
+        every { sessionDataCache.sessionScope } returns null
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
@@ -95,12 +97,12 @@ internal class EventRepositoryImplTest {
     fun `create session should have the right session count`() {
         runTest {
             mockDbToHaveOneOpenSession()
-            coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
+            coEvery { eventLocalDataSource.countSessions() } returns N_SESSIONS_DB
 
             eventRepo.createSession()
 
             coVerify {
-                eventLocalDataSource.insertOrUpdate(match<SessionCaptureEvent> {
+                eventLocalDataSource.saveSessionScope(match {
                     it.payload.databaseInfo.sessionCount == N_SESSIONS_DB
                 })
             }
@@ -115,7 +117,7 @@ internal class EventRepositoryImplTest {
 
             val session = eventRepo.createSession()
 
-            assertThat(session.payload.projectId).isEqualTo(PROJECT_ID_FOR_NOT_SIGNED_IN)
+            assertThat(session.projectId).isEqualTo(PROJECT_ID_FOR_NOT_SIGNED_IN)
 
         }
     }
@@ -123,9 +125,9 @@ internal class EventRepositoryImplTest {
     @Test(expected = DuplicateGuidSelectEventValidatorException::class)
     fun `create session report duplicate GUID select EventValidatorExceptionException`() {
         runTest {
-            coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
+            coEvery { eventLocalDataSource.countSessions() } returns N_SESSIONS_DB
             coEvery {
-                eventLocalDataSource.insertOrUpdate(any())
+                eventLocalDataSource.saveSessionScope(any())
             } throws DuplicateGuidSelectEventValidatorException("oops...")
             eventRepo.createSession()
         }
@@ -134,19 +136,13 @@ internal class EventRepositoryImplTest {
     @Test
     fun `create session should close open session events`() {
         runTest {
-            val openSession = mockDbToHaveOneOpenSession()
+            mockDbToHaveOneOpenSession()
 
             eventRepo.createSession()
 
             coVerify {
-                eventLocalDataSource.insertOrUpdate(match {
-                    assertThatArtificialTerminationEventWasAdded(it, openSession.id)
-                })
-            }
-
-            coVerify {
-                eventLocalDataSource.insertOrUpdate(match {
-                    assertThatSessionCaptureEventWasClosed(it)
+                eventLocalDataSource.saveSessionScope(match {
+                    assertThatSessionScopeClosed(it)
                 })
             }
         }
@@ -160,11 +156,30 @@ internal class EventRepositoryImplTest {
             eventRepo.createSession()
 
             coVerify {
-                eventLocalDataSource.insertOrUpdate(match {
-                    assertANewSessionCaptureWasAdded(it)
-                })
+                eventLocalDataSource.saveSessionScope(match { assertANewSessionCaptureWasAdded(it) })
             }
         }
+    }
+
+    @Test
+    fun `returns true if there is open session in cache`() = runTest {
+        every { sessionDataCache.sessionScope } returns createSessionScope()
+        assertThat(eventRepo.hasOpenSession()).isTrue()
+    }
+
+    @Test
+    fun `returns true if there is open session in local store`() = runTest {
+        every { sessionDataCache.sessionScope } returns null
+        mockDbToHaveOneOpenSession()
+        assertThat(eventRepo.hasOpenSession()).isTrue()
+    }
+
+    @Test
+    fun `returns false if there is no session in cache or local store`() = runTest {
+        every { sessionDataCache.sessionScope } returns null
+        coEvery { eventLocalDataSource.loadOpenedSessions() } returns emptyList()
+
+        assertThat(eventRepo.hasOpenSession()).isFalse()
     }
 
     @Test
@@ -235,72 +250,34 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
-    fun `createSession should add artificial termination event to the previous one`() {
-        runTest {
-            mockDbToHaveOneOpenSession(GUID1)
+    fun `test getCurrentSessionScope from db`() = runTest {
 
-            eventRepo.createSession()
-
-            coVerify { eventLocalDataSource.loadOpenedSessions() }
-            verifyArtificialEventWasAdded(GUID1, NEW_SESSION)
+        val oldSessionScope = mockk<SessionScope> {
+            every { endedAt } returns 2
+            every { createdAt } returns 1
         }
-    }
-
-    @Test
-    fun `test getCurrentCaptureSessionEvent from cached events`() = runTest {
-        //Given
-        val closedSessionCaptureEvent = mockk<SessionCaptureEvent> {
-            every { payload.sessionIsClosed } returns true
+        val recentSessionScope = mockk<SessionScope> {
+            every { endedAt } returns null
+            every { createdAt } returns 2
         }
-        val oldOpenedSessionCaptureEvent = mockk<SessionCaptureEvent> {
-            every { payload.sessionIsClosed } returns false
-            every { payload.createdAt } returns 1
-        }
-        val recentOpenedSessionCaptureEvent = mockk<SessionCaptureEvent> {
-            every { payload.sessionIsClosed } returns false
-            every { payload.createdAt } returns 2
-        }
-        every { sessionDataCache.eventCache } returns mutableMapOf(
-            "SessionCaptureEvent1" to closedSessionCaptureEvent,
-            "SessionCaptureEvent2" to oldOpenedSessionCaptureEvent,
-            "SessionCaptureEvent3" to recentOpenedSessionCaptureEvent
+        coEvery { eventLocalDataSource.loadOpenedSessions() } returns listOf(
+            recentSessionScope,
+            oldSessionScope
         )
-        //When
-        val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
-        //Then
-        assertThat(loadedSession).isEqualTo(recentOpenedSessionCaptureEvent)
+        val loadedSession = eventRepo.getCurrentSessionScope()
+        assertThat(loadedSession).isEqualTo(recentSessionScope)
     }
 
     @Test
-    fun `test getCurrentCaptureSessionEvent from db`() = runTest {
-
-        val oldOpenedSessionCaptureEvent = mockk<SessionCaptureEvent> {
-            every { payload.sessionIsClosed } returns false
-            every { payload.createdAt } returns 1
-        }
-        val recentOpenedSessionCaptureEvent = mockk<SessionCaptureEvent> {
-            every { payload.sessionIsClosed } returns false
-            every { payload.createdAt } returns 2
-        }
-        coEvery { eventLocalDataSource.loadOpenedSessions() } returns flowOf(
-            recentOpenedSessionCaptureEvent,
-            oldOpenedSessionCaptureEvent
-        )
-        val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
-        assertThat(loadedSession).isEqualTo(recentOpenedSessionCaptureEvent)
-    }
-
-
-    @Test
-    fun `test getCurrentCaptureSessionEvent should create new CaptureSessionEvent is not exist`() =
+    fun `test getCurrentSessionScope should create new CaptureSessionEvent is not exist`() =
         runTest {
             //Given
-            coEvery { eventLocalDataSource.count(SESSION_CAPTURE) } returns N_SESSIONS_DB
+            coEvery { eventLocalDataSource.countSessions() } returns N_SESSIONS_DB
             every { authStore.signedInProjectId } returns "projectId"
             //When
-            val loadedSession = eventRepo.getCurrentCaptureSessionEvent()
+            val loadedSession = eventRepo.getCurrentSessionScope()
             //Then
-            assertThat(loadedSession.labels.projectId).isEqualTo("projectId")
+            assertThat(loadedSession.projectId).isEqualTo("projectId")
         }
 
     @Test
@@ -341,10 +318,9 @@ internal class EventRepositoryImplTest {
     fun `insert event into current open session should invoke validators`() {
         runTest {
             mockSignedId()
-            val session = mockDbToHaveOneOpenSession(GUID1)
+            val sessionScope = mockDbToHaveOneOpenSession(GUID1)
             val eventInSession = createAlertScreenEvent().removeLabels()
-            coEvery { eventLocalDataSource.loadAllFromSession(sessionId = session.id) } returns listOf(
-                session,
+            coEvery { eventLocalDataSource.loadAllFromSession(sessionId = sessionScope.id) } returns listOf(
                 eventInSession
             )
             val newEvent = createAlertScreenEvent().removeLabels()
@@ -357,10 +333,10 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `should close current session correctly`() = runTest(StandardTestDispatcher()) {
-        val session = mockDbToHaveOneOpenSession(GUID1)
+        val sessionScope = mockDbToHaveOneOpenSession(GUID1)
         eventRepo.closeCurrentSession(null)
 
-        assertThatSessionCaptureEventWasClosed(session)
+        assertThatSessionScopeClosed(sessionScope)
         coVerify(exactly = 0) {
             eventLocalDataSource.insertOrUpdate(match { it.type == EventType.ARTIFICIAL_TERMINATION })
         }
@@ -382,14 +358,14 @@ internal class EventRepositoryImplTest {
     @Test
     fun `test removeLocationDataFromCurrentSession remove location if location exist`() = runTest {
         // Given
-        val sessionCaptureEvent = mockk<SessionCaptureEvent> {
-            every { payload.location } returns mockk()
-        }
-        every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
+        val sessionScope = createSessionScope()
+        every { sessionDataCache.sessionScope } returns sessionScope
         //When
         eventRepo.removeLocationDataFromCurrentSession()
         //Then
-        coVerify { eventLocalDataSource.insertOrUpdate(sessionCaptureEvent) }
+        coVerify {
+            eventLocalDataSource.saveSessionScope(match { it.payload.location == null })
+        }
     }
 
     @Test
@@ -476,6 +452,7 @@ internal class EventRepositoryImplTest {
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
 
     companion object {
+
         const val DEVICE_ID = "DEVICE_ID"
         const val APP_VERSION_NAME = "APP_VERSION_NAME"
         const val LIB_VERSION_NAME = "LIB_VERSION_NAME"

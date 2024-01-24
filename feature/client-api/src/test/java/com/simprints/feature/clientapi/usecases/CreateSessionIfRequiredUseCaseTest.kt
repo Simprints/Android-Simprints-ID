@@ -31,7 +31,7 @@ internal class CreateSessionIfRequiredUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { coreEventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { coreEventRepository.getCurrentSessionScope() } returns mockk {
             coEvery { id } returns SESSION_ID
         }
 

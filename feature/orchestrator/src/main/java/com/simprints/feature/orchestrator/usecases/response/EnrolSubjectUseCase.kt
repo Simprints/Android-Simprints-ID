@@ -18,7 +18,7 @@ internal class EnrolSubjectUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(subject: Subject) {
-        val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
+        val currentSession = eventRepository.getCurrentSessionScope().id
         val personCreationEvent = eventRepository.observeEventsFromSession(currentSession)
             .filterIsInstance<PersonCreationEvent>().first()
 

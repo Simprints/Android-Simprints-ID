@@ -9,7 +9,7 @@ data class SessionScope(
     val projectId: String,
 
     val createdAt: Long,
-    val endedAt: Long?,
+    var endedAt: Long?,
 
     val payload: SessionScopePayload,
 )

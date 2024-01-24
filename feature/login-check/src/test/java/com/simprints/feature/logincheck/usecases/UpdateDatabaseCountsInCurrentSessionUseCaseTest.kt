@@ -6,6 +6,8 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -28,33 +30,39 @@ internal class UpdateDatabaseCountsInCurrentSessionUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        useCase = UpdateDatabaseCountsInCurrentSessionUseCase(eventRepository, enrolmentRecordRepository)
+        useCase =
+            UpdateDatabaseCountsInCurrentSessionUseCase(eventRepository, enrolmentRecordRepository)
     }
 
     @Test
     fun `Updates current event with data from enrolments`() = runTest {
         coEvery { enrolmentRecordRepository.count() } returns 42
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createBlankSessionEvent()
+        coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope()
 
         useCase()
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat((it.payload as SessionCaptureEvent.SessionCapturePayload).databaseInfo.recordCount).isEqualTo(42)
+            eventRepository.saveSessionScope(withArg {
+                assertThat(it.payload.databaseInfo.recordCount).isEqualTo(42)
             })
         }
     }
 
-    private fun createBlankSessionEvent() = SessionCaptureEvent(
+    private fun createBlankSessionScope() = SessionScope(
         id = "eventId",
         projectId = "projectId",
         createdAt = 0,
-        modalities = emptyList(),
-        appVersionName = "appVersionName",
-        libVersionName = "libVersionName",
-        language = "language",
-        device = Device("deviceId", "deviceModel", "deviceManufacturer"),
-        databaseInfo = DatabaseInfo(0, 0),
+        endedAt = null,
+        payload = SessionScopePayload(
+            endCause = null,
+            modalities = emptyList(),
+            sidVersion = "appVersionName",
+            language = "language",
+            device = Device("deviceId", "deviceModel", "deviceManufacturer"),
+            databaseInfo = DatabaseInfo(0, 0),
+            projectConfigurationUpdatedAt = "",
+            location = null,
+        ),
     )
 }

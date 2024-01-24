@@ -4,8 +4,10 @@ import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.database.sqlite.SQLiteException
 import com.simprints.core.DispatcherIO
 import com.simprints.core.NonCancellableIO
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
@@ -24,6 +26,7 @@ import kotlin.coroutines.CoroutineContext
 
 internal open class EventLocalDataSourceImpl @Inject constructor(
     private val eventDatabaseFactory: EventDatabaseFactory,
+    private val jsonHelper: JsonHelper,
     @DispatcherIO private val readingDispatcher: CoroutineDispatcher,
     @NonCancellableIO private val writingContext: CoroutineContext,
 ) : EventLocalDataSource {
@@ -89,6 +92,18 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         scopeDao = eventDatabaseFactory.build().scopeDao
     }
 
+    override suspend fun countSessions(): Int = useRoom(readingDispatcher) {
+        scopeDao.count()
+    }
+
+    override suspend fun saveSessionScope(scope: SessionScope) = useRoom(writingContext) {
+        scopeDao.insertOrUpdate(scope.fromDomainToDb(jsonHelper))
+    }
+
+    override suspend fun loadOpenedSessions(): List<SessionScope> = useRoom(readingDispatcher) {
+        scopeDao.loadOpen().map { it.fromDbToDomain(jsonHelper) }
+    }
+
     override suspend fun loadAll(): Flow<Event> =
         useRoom(readingDispatcher) {
             eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
@@ -107,11 +122,6 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
     override suspend fun loadAllFromProject(projectId: String): List<Event> =
         useRoom(readingDispatcher) {
             eventDao.loadFromProject(projectId).map(DbEvent::fromDbToDomain)
-        }
-
-    override suspend fun loadOpenedSessions(): Flow<Event> =
-        useRoom(readingDispatcher) {
-            eventDao.loadOpenedSessions().map { it.fromDbToDomain() }.asFlow()
         }
 
     override suspend fun loadAllClosedSessionIds(projectId: String): List<String> =

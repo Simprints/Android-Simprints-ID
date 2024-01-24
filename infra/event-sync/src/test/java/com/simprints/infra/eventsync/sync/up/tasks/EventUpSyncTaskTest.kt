@@ -11,13 +11,6 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
-import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import com.simprints.infra.events.sampledata.createAuthenticationEvent
-import com.simprints.infra.events.sampledata.createEnrolmentEventV2
-import com.simprints.infra.events.sampledata.createFaceCaptureBiometricsEvent
-import com.simprints.infra.events.sampledata.createFingerprintCaptureBiometricsEvent
-import com.simprints.infra.events.sampledata.createPersonCreationEvent
-import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.eventsync.SampleSyncScopes
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
@@ -26,6 +19,7 @@ import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.events.sampledata.*
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
