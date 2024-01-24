@@ -11,16 +11,15 @@ import io.mockk.verify
 import org.junit.Before
 import org.junit.Test
 
-class NecTemplateExtractorTest {
-
+class ExtractNecTemplateUseCaseTest {
     @RelaxedMockK
     private lateinit var nec: NEC
-    private lateinit var necTemplateExtractionUseCase: NecTemplateExtractionUseCase
+    private lateinit var extractNecTemplateUseCase: ExtractNecTemplateUseCase
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        necTemplateExtractionUseCase = NecTemplateExtractionUseCase(nec)
+        extractNecTemplateUseCase = ExtractNecTemplateUseCase(nec)
     }
 
     @Test
@@ -33,7 +32,7 @@ class NecTemplateExtractorTest {
             imageBytes = ByteArray(0)
         )
         // When
-        val result = necTemplateExtractionUseCase(fingerprintImage, 100)
+        val result = extractNecTemplateUseCase(fingerprintImage, 100)
         // Then
         verify {
             nec.extract(
@@ -59,7 +58,7 @@ class NecTemplateExtractorTest {
         )
         every { nec.extract(any()) } throws Exception()
         // When
-        necTemplateExtractionUseCase(fingerprintImage, 100)
+        extractNecTemplateUseCase(fingerprintImage, 100)
         // Then throw exception
     }
 

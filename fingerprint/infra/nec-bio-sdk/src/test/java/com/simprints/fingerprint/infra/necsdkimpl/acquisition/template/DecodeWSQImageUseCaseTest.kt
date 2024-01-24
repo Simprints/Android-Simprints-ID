@@ -14,8 +14,7 @@ import io.mockk.mockkStatic
 import org.junit.Before
 import org.junit.Test
 
-class WSQImageDecoderTest {
-
+class DecodeWSQImageUseCaseTest {
 
     private val  convertedImageBytesMock: ByteArray= emptyArray<Byte>().toByteArray()
 
@@ -28,7 +27,7 @@ class WSQImageDecoderTest {
     @MockK(relaxed = true)
     lateinit var bitmap: Bitmap
 
-    private lateinit var wsqImageDecoderUseCase: WSQImageDecoderUseCase
+    private lateinit var decodeWsqImageUseCase: DecodeWSQImageUseCase
 
     companion object {
         private val UNPROCESSED_IMAGE = RawUnprocessedImage(
@@ -44,7 +43,7 @@ class WSQImageDecoderTest {
     fun setup() {
         MockKAnnotations.init(this)
         mockkStatic(WSQDecoder::class)
-        wsqImageDecoderUseCase = WSQImageDecoderUseCase(bitmapConverter)
+        decodeWsqImageUseCase = DecodeWSQImageUseCase(bitmapConverter)
         buildDecodedImage()
     }
 
@@ -60,7 +59,7 @@ class WSQImageDecoderTest {
         every { WSQDecoder.decode(any<ByteArray>()) } returns mockedDecodeResult
 
         // When
-        val result = wsqImageDecoderUseCase(UNPROCESSED_IMAGE)
+        val result = decodeWsqImageUseCase(UNPROCESSED_IMAGE)
 
         // Then
         Truth.assertThat(result.imageBytes).isEqualTo(convertedImageBytesMock)
@@ -72,9 +71,8 @@ class WSQImageDecoderTest {
         every { WSQDecoder.decode(any<ByteArray>()) } returns null
 
         // When
-        wsqImageDecoderUseCase(UNPROCESSED_IMAGE)
+        decodeWsqImageUseCase(UNPROCESSED_IMAGE)
         // Then the exception is thrown
-
     }
 
     @Test(expected = BioSdkException.ImageDecodingException::class)
@@ -83,7 +81,7 @@ class WSQImageDecoderTest {
         every { WSQDecoder.decode(any<ByteArray>()) } returns mockedDecodeResult
 
         // When
-        wsqImageDecoderUseCase(RawUnprocessedImage(byteArrayOf(0)))
+        decodeWsqImageUseCase(RawUnprocessedImage(byteArrayOf(0)))
         // Then the exception is thrown
 
     }

@@ -28,7 +28,8 @@ import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
 import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
-import com.simprints.fingerprint.infra.biosdk.BioSdkResolverUseCase
+import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.ScannerTriggerListener
@@ -59,7 +60,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
     private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
-    private val bioSdkResolverUseCase: BioSdkResolverUseCase,
+    private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
     private val saveImage: SaveImageUseCase,
     private val getNextFingerToAdd: GetNextFingerToAddUseCase,
     private val getStartState: GetStartStateUseCase,
@@ -70,6 +71,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     lateinit var configuration: FingerprintConfiguration
     private lateinit var bioSdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
 
+    private lateinit var bioSdkWrapper: BioSdkWrapper
     private var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
         private set(value) {
             field = value
@@ -173,7 +175,8 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private suspend fun initBioSdk() {
         try {
-            bioSdkResolverUseCase().initialize()
+            bioSdkWrapper= resolveBioSdkWrapperUseCase()
+            bioSdkWrapper.initialize()
         } catch (e: BioSdkException.BioSdkInitializationException) {
             Simber.e(e)
             _invalidLicense.send()
@@ -324,7 +327,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         scanningTask = viewModelScope.launch {
             try {
                 scannerManager.scanner.setUiIdle()
-                val capturedFingerprint = bioSdkResolverUseCase().acquireFingerprintTemplate(
+                val capturedFingerprint = bioSdkWrapper.acquireFingerprintTemplate(
                     bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
                     scanningTimeoutMs.toInt(),
                     qualityThreshold()
@@ -373,7 +376,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
         imageTransferTask = viewModelScope.launch {
             try {
-                val acquiredImage = bioSdkResolverUseCase().acquireFingerprintImage()
+                val acquiredImage = bioSdkWrapper.acquireFingerprintImage()
                 handleImageTransferSuccess(acquiredImage)
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)

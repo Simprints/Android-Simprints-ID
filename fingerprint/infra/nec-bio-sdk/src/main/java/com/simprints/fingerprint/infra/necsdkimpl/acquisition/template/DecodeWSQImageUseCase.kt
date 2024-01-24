@@ -8,7 +8,7 @@ import com.ygoular.bitmapconverter.BitmapFormat
 import javax.inject.Inject
 
 
-class WSQImageDecoderUseCase @Inject constructor (private val bitmapConverter: BitmapConverter) {
+class DecodeWSQImageUseCase @Inject constructor (private val bitmapConverter: BitmapConverter) {
 
     /**
      * Decode WSQ images

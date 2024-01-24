@@ -5,7 +5,7 @@ import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.models.NecImage
 import javax.inject.Inject
 
-class NecImageQualityCalculatorUseCase @Inject constructor(
+class CalculateNecImageQualityUseCase @Inject constructor(
     private val necInstant: NEC,
 ) {
     operator fun invoke(image: FingerprintImage): Int =

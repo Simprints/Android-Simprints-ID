@@ -6,7 +6,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
-import com.simprints.fingerprint.infra.biosdk.BioSdkResolverUseCase
+import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 internal class FingerprintMatcherUseCase @Inject constructor(
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
-    private val bioSdkResolverUseCase: BioSdkResolverUseCase,
+    private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
     private val configRepository: ConfigRepository,
     private val createRanges: CreateRangesUseCase,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
@@ -83,7 +83,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         probes: List<Fingerprint>,
         candidates: List<FingerprintIdentity>,
         flowType: FlowType,
-    ) = bioSdkResolverUseCase().match(
+    ) = resolveBioSdkWrapperUseCase().match(
         FingerprintIdentity("", probes),
         candidates,
         isCrossFingerMatchingEnabled(flowType),

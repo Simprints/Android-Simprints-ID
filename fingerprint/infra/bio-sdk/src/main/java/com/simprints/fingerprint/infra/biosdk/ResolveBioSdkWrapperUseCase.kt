@@ -6,7 +6,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import javax.inject.Inject
 
-class BioSdkResolverUseCase @Inject constructor(
+class ResolveBioSdkWrapperUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     @SimprintsSdk private val simprintsWrapper: BioSdkWrapper,
     @NecSdk private val necWrapper: BioSdkWrapper,
@@ -16,7 +16,6 @@ class BioSdkResolverUseCase @Inject constructor(
     suspend operator fun invoke(): BioSdkWrapper {
         if (::bioSdkWrapper.isInitialized) return bioSdkWrapper
 
-
         // Todo we didn't yet implement the logic to select the SDK based on the configuration
         // so we are just using the first allowed SDK for now
         // See tickets in SIM-81 for more details
@@ -24,7 +23,7 @@ class BioSdkResolverUseCase @Inject constructor(
             when (configRepository.getProjectConfiguration().fingerprint?.allowedSDKs?.first()) {
                 FingerprintConfiguration.BioSdk.SECUGEN_SIM_MATCHER -> simprintsWrapper
                 FingerprintConfiguration.BioSdk.NEC -> necWrapper
-                else -> throw IllegalStateException("Unknown fingerprint configuration")
+                else -> error("Unknown fingerprint configuration")
             }
 
         return bioSdkWrapper

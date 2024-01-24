@@ -12,11 +12,11 @@ import javax.inject.Inject
 
 internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
-    private val wsqImageDecoderUseCase: WSQImageDecoderUseCase,
+    private val decodeWSQImageUseCase: DecodeWSQImageUseCase,
     private val secugenImageCorrection: SecugenImageCorrection,
-    private val imageQualityCalculatorUseCase: NecImageQualityCalculatorUseCase,
+    private val calculateNecImageQualityUseCase: CalculateNecImageQualityUseCase,
     private val captureProcessedImageCache: ProcessedImageCache,
-    private val templateExtractionUseCase: NecTemplateExtractionUseCase
+    private val extractNecTemplateUseCase: ExtractNecTemplateUseCase
 ) :
     FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata> {
 
@@ -43,17 +43,17 @@ internal class FingerprintTemplateProviderImpl @Inject constructor(
         ).rawUnprocessedImage
         captureProcessedImageCache.recentlyCapturedImage = unprocessedImage.imageData
         log("Unprocessed image acquired, processing it")
-        val decodedImage = wsqImageDecoderUseCase(unprocessedImage)
+        val decodedImage = decodeWSQImageUseCase(unprocessedImage)
         log("Image decoded successfully ${decodedImage.resolution}")
         log("processing image using secugen image correction")
         val secugenProcessedImage = processImage(settings, decodedImage)
         log("quality checking image using nec sdk")
-        val qualityScore = imageQualityCalculatorUseCase(secugenProcessedImage)
+        val qualityScore = calculateNecImageQualityUseCase(secugenProcessedImage)
         log("quality score is $qualityScore the threshold is ${settings.qualityThreshold}")
         if (qualityScore < settings.qualityThreshold)
             throw BioSdkException.ImageQualityBelowThresholdException(qualityScore)
         log("extracting template using nec sdk")
-        return templateExtractionUseCase(secugenProcessedImage, qualityScore)
+        return extractNecTemplateUseCase(secugenProcessedImage, qualityScore)
     }
 
     private fun log(message: String) {

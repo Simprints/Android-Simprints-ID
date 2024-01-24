@@ -13,9 +13,9 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
-class BioSdkResolverUseCaseTest {
+class ResolveBioSdkWrapperUseCaseTest {
 
-    private lateinit var bioSdkResolverUseCase: BioSdkResolverUseCase
+    private lateinit var bioSdkResolverUseCase: ResolveBioSdkWrapperUseCase
 
     @MockK
     private lateinit var necBioSdkWrapper: BioSdkWrapper
@@ -36,7 +36,7 @@ class BioSdkResolverUseCaseTest {
             every { fingerprint } returns fingerprintConfiguration
         }
         bioSdkResolverUseCase =
-            BioSdkResolverUseCase(configRepository, simprintsBioSdkWrapper, necBioSdkWrapper)
+            ResolveBioSdkWrapperUseCase(configRepository, simprintsBioSdkWrapper, necBioSdkWrapper)
     }
 
     @Test
