@@ -11,7 +11,7 @@ import com.simprints.necwrapper.nec.NEC
 import com.simprints.necwrapper.nec.models.NECTemplate
 import javax.inject.Inject
 
-class FingerprintMatcherImpl @Inject constructor(
+internal class FingerprintMatcherImpl @Inject constructor(
     private val nec: NEC
 ) : FingerprintMatcher<NecMatchingSettings> {
     override suspend fun match(

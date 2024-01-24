@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.google.common.truth.Truth
-import com.simprints.fingerprint.infra.basebiosdk.matching.SimAfisMatcher
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
 import io.mockk.every

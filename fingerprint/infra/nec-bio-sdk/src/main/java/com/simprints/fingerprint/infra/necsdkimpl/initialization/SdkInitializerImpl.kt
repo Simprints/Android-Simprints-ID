@@ -11,7 +11,7 @@ import com.simprints.necwrapper.nec.tools.toByteBuffer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class SdkInitializerImpl @Inject constructor(
+internal class SdkInitializerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val necInstance: NEC,
     private val licenseRepository: LicenseRepository,

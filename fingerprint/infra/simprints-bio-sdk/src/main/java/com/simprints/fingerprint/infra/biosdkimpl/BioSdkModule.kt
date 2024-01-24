@@ -5,7 +5,7 @@ import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintImagePr
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
 import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
-import com.simprints.fingerprint.infra.basebiosdk.matching.SimAfisMatcher
+import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcher
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.image.FingerprintImageProviderImpl
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateMetadata
@@ -33,7 +33,7 @@ object SimprintsBioSdkModule {
 
     @Provides
     @Singleton
-    fun provideFingerprintBioSdk(
+    internal fun provideFingerprintBioSdk(
         sdkInitializer: SdkInitializerImpl,
         fingerprintImageProvider: FingerprintImageProviderImpl,
         fingerprintTemplateProvider: FingerprintTemplateProviderImpl,

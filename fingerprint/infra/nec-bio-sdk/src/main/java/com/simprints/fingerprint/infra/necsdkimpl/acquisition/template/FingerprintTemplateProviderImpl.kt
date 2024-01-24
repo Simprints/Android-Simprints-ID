@@ -11,7 +11,7 @@ import com.simprints.infra.logging.Simber
 import com.simprints.sgimagecorrection.SecugenImageCorrection
 import javax.inject.Inject
 
-class FingerprintTemplateProviderImpl @Inject constructor(
+internal class FingerprintTemplateProviderImpl @Inject constructor(
     private val fingerprintCaptureWrapperFactory: FingerprintCaptureWrapperFactory,
     private val wsqImageDecoder: WSQImageDecoder,
     private val secugenImageCorrection: SecugenImageCorrection,

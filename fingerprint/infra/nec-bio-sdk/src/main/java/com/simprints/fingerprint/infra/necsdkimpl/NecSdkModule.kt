@@ -28,7 +28,7 @@ object NecSdkModule {
 
     @Provides
     @Singleton
-    fun provideFingerprintBioSdk(
+    internal fun provideFingerprintBioSdk(
         sdkInitializer: SdkInitializerImpl,
         fingerprintImageProvider: FingerprintImageProviderImpl,
         fingerprintTemplateProvider: FingerprintTemplateProviderImpl,
