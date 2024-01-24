@@ -29,6 +29,9 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
 ) : EventLocalDataSource {
 
     private var eventDao: EventRoomDao = eventDatabaseFactory.build().eventDao
+
+    private var scopeDao: SessionScopeRoomDao = eventDatabaseFactory.build().scopeDao
+
     private val mutex = Mutex()
 
     private suspend fun <R> useRoom(context: CoroutineContext, block: suspend () -> R): R =
@@ -83,6 +86,7 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         Simber.tag(DB_CORRUPTION.name).e(ex)
         //4. Rebuild database
         eventDao = eventDatabaseFactory.build().eventDao
+        scopeDao = eventDatabaseFactory.build().scopeDao
     }
 
     override suspend fun loadAll(): Flow<Event> =
