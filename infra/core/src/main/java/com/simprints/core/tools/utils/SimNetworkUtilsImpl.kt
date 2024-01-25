@@ -30,9 +30,25 @@ open class SimNetworkUtilsImpl(val ctx: Context) : SimNetworkUtils {
         Connection(ConnectionType.MOBILE, networkStatus(NetworkCapabilities.TRANSPORT_CELLULAR))
 
     private fun networkStatus(transportType: Int): SimNetworkUtils.ConnectionState =
-        if (networkCapabilities?.hasTransport(transportType) == true) {
-            SimNetworkUtils.ConnectionState.CONNECTED
-        } else {
-            SimNetworkUtils.ConnectionState.DISCONNECTED
+        when {
+            networkCapabilities == null -> {
+                SimNetworkUtils.ConnectionState.DISCONNECTED
+            }
+
+            !networkCapabilities.hasTransport(transportType) -> {
+                SimNetworkUtils.ConnectionState.DISCONNECTED
+            }
+
+            !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) -> {
+                SimNetworkUtils.ConnectionState.DISCONNECTED
+            }
+
+            !networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) -> {
+                SimNetworkUtils.ConnectionState.DISCONNECTED
+            }
+
+            else -> {
+                SimNetworkUtils.ConnectionState.CONNECTED
+            }
         }
 }
