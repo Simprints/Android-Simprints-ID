@@ -96,6 +96,7 @@ internal class EventRepositoryImplTest {
     fun `create session should have the right session count`() {
         runTest {
             mockDbToHaveOneOpenSession()
+            coEvery { eventLocalDataSource.loadEventsInSession(any()) } returns emptyList()
             coEvery { eventLocalDataSource.countSessions() } returns N_SESSIONS_DB
 
             eventRepo.createSession()
@@ -134,6 +135,7 @@ internal class EventRepositoryImplTest {
     fun `create session should close open session events`() {
         runTest {
             mockDbToHaveOneOpenSession()
+            coEvery { eventLocalDataSource.loadEventsInSession(any()) } returns emptyList()
 
             eventRepo.createSession()
 
@@ -330,12 +332,22 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `should close current session correctly`() = runTest(StandardTestDispatcher()) {
-        val sessionScope = mockDbToHaveOneOpenSession(GUID1)
+        mockDbToHaveOneOpenSession(GUID1)
+        val event = createAlertScreenEvent()
+
+        coEvery { eventLocalDataSource.loadEventsInSession(any()) } returns listOf(
+            event.copy(payload = event.payload.copy(endedAt = 5)),
+            event.copy(payload = event.payload.copy(endedAt = 3)),
+            event.copy(payload = event.payload.copy(endedAt = 1)),
+        )
         eventRepo.closeCurrentSession(null)
 
-        assertThatSessionScopeClosed(sessionScope)
-        coVerify(exactly = 0) {
-            eventLocalDataSource.saveEvent(match { it.type == EventType.ARTIFICIAL_TERMINATION })
+        coVerify {
+            eventLocalDataSource.saveSessionScope(match {
+                assertThatSessionScopeClosed(it)
+                assertThat(it.endedAt).isEqualTo(5L)
+                true
+            })
         }
     }
 

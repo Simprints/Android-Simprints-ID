@@ -9,7 +9,6 @@ import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
@@ -86,7 +85,6 @@ internal open class EventRepositoryImpl @Inject constructor(
     }
 
     /**
-     * The reason is only used when we want to create an [ArtificialTerminationEvent].
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
     private suspend fun closeAllSessions(reason: SessionEndCause?) {
@@ -215,15 +213,20 @@ internal open class EventRepositoryImpl @Inject constructor(
             .firstOrNull()
             ?.also { session -> loadEventsIntoCache(session.id) }
 
-    /**
-     * The reason is only used when we want to create an [ArtificialTerminationEvent].
-     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
-     */
     private suspend fun closeSession(sessionScope: SessionScope, reason: SessionEndCause?) {
+        val maxTimestamp = eventLocalDataSource.loadEventsInSession(sessionScope.id)
+            .takeIf { it.isNotEmpty() }
+            ?.maxOf { event ->
+                event.payload.let { payload ->
+                    payload.endedAt.takeIf { it > 0 } ?: payload.createdAt
+                }
+            }
+            ?: timeHelper.now()
+
         val updatedSessionScope = sessionScope.copy(
-            endedAt = timeHelper.now(),
+            endedAt = maxTimestamp,
             payload = sessionScope.payload.copy(
-                endCause = reason ?: SessionEndCause.NEW_SESSION
+                endCause = reason ?: SessionEndCause.WORKFLOW_ENDED
             )
         )
         saveSessionScope(updatedSessionScope)
