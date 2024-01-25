@@ -257,7 +257,7 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation).toList()
 
-        coVerify(exactly = 0) { eventRepo.delete(any()) }
+        coVerify(exactly = 0) { eventRepo.deleteSession(any()) }
     }
 
     @Test
@@ -275,7 +275,7 @@ internal class EventUpSyncTaskTest {
 
         eventUpSyncTask.upSync(operation).toList()
 
-        coVerify(exactly = 0) { eventRepo.delete(any()) }
+        coVerify(exactly = 0) { eventRepo.deleteSession(any()) }
     }
 
     @Test
@@ -290,7 +290,7 @@ internal class EventUpSyncTaskTest {
         coVerify(exactly = 0) {
             eventRemoteDataSource.post(any(), any())
             eventRemoteDataSource.dumpInvalidEvents(any(), any())
-            eventRepo.deleteSessionEvents(GUID1)
+            eventRepo.deleteSession(GUID1)
         }
     }
 

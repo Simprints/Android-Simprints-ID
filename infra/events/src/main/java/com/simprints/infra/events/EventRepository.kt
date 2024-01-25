@@ -49,10 +49,6 @@ interface EventRepository {
 
     suspend fun deleteSession(sessionId: String)
 
-    suspend fun deleteSessionEvents(sessionId: String)
-
-    suspend fun delete(eventIds: List<String>)
-
     suspend fun deleteAll()
 
 }

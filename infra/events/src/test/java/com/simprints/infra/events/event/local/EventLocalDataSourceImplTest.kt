@@ -10,7 +10,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
-import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.local.*
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.DbSessionScope
@@ -78,7 +77,7 @@ internal class EventLocalDataSourceImplTest {
                 .throws(SQLiteDatabaseCorruptException())
                 .andThen(emptyList())
             //
-            eventLocalDataSource.loadAll()
+            eventLocalDataSource.loadAllEvents()
             // Then
             verify {
                 eventDatabaseFactory.deleteDatabase()
@@ -96,7 +95,7 @@ internal class EventLocalDataSourceImplTest {
                 .throws(SQLiteException("file is not a database"))
                 .andThen(emptyList())
             // When
-            eventLocalDataSource.loadAll()
+            eventLocalDataSource.loadAllEvents()
             // Then
             verify {
                 eventDatabaseFactory.deleteDatabase()
@@ -112,7 +111,7 @@ internal class EventLocalDataSourceImplTest {
             //Given
             coEvery { eventDao.loadAll() } throws SQLiteException()
             // When
-            assertThrows<SQLiteException> { eventLocalDataSource.loadAll() }
+            assertThrows<SQLiteException> { eventLocalDataSource.loadAllEvents() }
             // Then
             verify(exactly = 0) {
                 eventDatabaseFactory.deleteDatabase()
@@ -126,7 +125,7 @@ internal class EventLocalDataSourceImplTest {
             //Given
             coEvery { eventDao.loadAll() } throws Exception()
             // When
-            assertThrows<Exception> { eventLocalDataSource.loadAll() }
+            assertThrows<Exception> { eventLocalDataSource.loadAllEvents() }
             // Then
             verify(exactly = 0) {
                 eventDatabaseFactory.deleteDatabase()
@@ -142,7 +141,7 @@ internal class EventLocalDataSourceImplTest {
                 .throws(SQLiteDatabaseCorruptException())
                 .andThen(flowOf(1))
             // When
-            eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             // Then
             verify {
                 eventDatabaseFactory.deleteDatabase()
@@ -159,7 +158,7 @@ internal class EventLocalDataSourceImplTest {
             coEvery { eventDao.observeCount(any()) } throws SQLiteException()
             // When
             assertThrows<SQLiteException> {
-                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+                eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             }
             // Then
             verify(exactly = 0) {
@@ -176,7 +175,7 @@ internal class EventLocalDataSourceImplTest {
                 .throws(SQLiteException("file is not a database"))
                 .andThen(flowOf(1))
             // When
-            eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             // Then
             verify {
                 eventDatabaseFactory.deleteDatabase()
@@ -193,7 +192,7 @@ internal class EventLocalDataSourceImplTest {
             coEvery { eventDao.observeCount(any()) } throws Exception()
             // When
             assertThrows<Exception> {
-                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+                eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             }
             // Then
             verify(exactly = 0) {
@@ -210,7 +209,7 @@ internal class EventLocalDataSourceImplTest {
                 .throws(SQLiteException("file is not a database"))
                 .andThen(flowOf(1, 2, 3))
             // When
-            val count = eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            val count = eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             // Then
             verify {
                 eventDatabaseFactory.deleteDatabase()
@@ -229,7 +228,7 @@ internal class EventLocalDataSourceImplTest {
                 .returns(flow { throw SQLiteDatabaseCorruptException() })
                 .andThen(flowOf(1))
             // When
-            eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             // Then
             verify {
                 eventDatabaseFactory.deleteDatabase()
@@ -246,7 +245,7 @@ internal class EventLocalDataSourceImplTest {
             coEvery { eventDao.observeCount(any()) }.returns(flow { throw SQLiteException() })
             // When
             assertThrows<SQLiteException> {
-                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+                eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             }
             // Then
             verify(exactly = 0) { eventDatabaseFactory.deleteDatabase() }
@@ -261,7 +260,7 @@ internal class EventLocalDataSourceImplTest {
                 .returns(flow { throw SQLiteException("file is not a database") })
                 .andThen(flowOf(1))
             // When
-            eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             // Then
             verify {
                 eventDatabaseFactory.deleteDatabase()
@@ -278,7 +277,7 @@ internal class EventLocalDataSourceImplTest {
             coEvery { eventDao.observeCount(any()) }.returns(flow { throw Exception() })
             // When
             assertThrows<Exception> {
-                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+                eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             }
             // Then
             verify(exactly = 0) { eventDatabaseFactory.deleteDatabase() }
@@ -293,7 +292,7 @@ internal class EventLocalDataSourceImplTest {
                 .returns(flow { throw SQLiteDatabaseCorruptException() })
                 .andThen(flowOf(1, 2, 3))
             // When
-            val count = eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+            val count = eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             // Then
             verify {
                 eventDatabaseFactory.deleteDatabase()
@@ -312,7 +311,7 @@ internal class EventLocalDataSourceImplTest {
                 .returns(flow { throw SQLiteDatabaseCorruptException() })
             // When
             assertThrows<SQLiteDatabaseCorruptException> {
-                eventLocalDataSource.observeCount(DEFAULT_PROJECT_ID).toList()
+                eventLocalDataSource.observeEventCount(DEFAULT_PROJECT_ID).toList()
             }
             // Then
             verify {
@@ -325,7 +324,7 @@ internal class EventLocalDataSourceImplTest {
 
     @Test
     fun loadAll() = runTest {
-        eventLocalDataSource.loadAll()
+        eventLocalDataSource.loadAllEvents()
 
         coVerify { eventDao.loadAll() }
     }
@@ -333,7 +332,7 @@ internal class EventLocalDataSourceImplTest {
     @Test
     fun loadAllEventJsonFromSession() = runTest {
         val sessionId = GUID1
-        eventLocalDataSource.loadAllEventJsonFromSession(sessionId)
+        eventLocalDataSource.loadEventJsonInSession(sessionId)
 
         coVerify { eventDao.loadEventJsonFromSession(sessionId) }
     }
@@ -341,7 +340,7 @@ internal class EventLocalDataSourceImplTest {
     @Test
     fun loadAllFromSession() = runTest {
         val sessionId = GUID1
-        eventLocalDataSource.loadAllFromSession(sessionId)
+        eventLocalDataSource.loadEventsInSession(sessionId)
 
         coVerify { eventDao.loadFromSession(sessionId) }
     }
@@ -395,53 +394,24 @@ internal class EventLocalDataSourceImplTest {
     }
 
     @Test
-    fun deleteSessions() = runTest {
-        eventLocalDataSource.deleteSessions(listOf(GUID1, GUID1))
-
-        coVerify { scopeDao.delete(listOf(GUID1, GUID1)) }
-    }
-
-    @Test
-    fun loadAllClosedSessionIds() = runTest {
-        val sessionId = GUID1
-        eventLocalDataSource.loadAllClosedSessionIds(sessionId)
-
-        coVerify { eventDao.loadAllClosedSessionIds(sessionId) }
-    }
-
-    @Test
-    fun countWithEventType() = runTest {
-        eventLocalDataSource.count(type = SESSION_CAPTURE)
-
-        coVerify { eventDao.countFromType(type = SESSION_CAPTURE) }
-    }
-
-    @Test
-    fun countWithAProjectIdQuery() = runTest {
-        eventLocalDataSource.count(projectId = "PROJECT_ID")
-
-        coVerify { eventDao.countFromProject(projectId = "PROJECT_ID") }
-    }
-
-    @Test
     fun observeCountWithAProjectIdQueryReturns() = runTest {
         coEvery { eventDao.observeCount(any()) } returns flowOf(1, 2, 3)
 
-        val count = eventLocalDataSource.observeCount(projectId = "PROJECT_ID").toList()
+        val count = eventLocalDataSource.observeEventCount(projectId = "PROJECT_ID").toList()
 
         assertThat(count).isEqualTo(listOf(1, 2, 3))
     }
 
     @Test
     fun observeCountWithAProjectIdQuery() = runTest {
-        eventLocalDataSource.observeCount(projectId = "PROJECT_ID").toList()
+        eventLocalDataSource.observeEventCount(projectId = "PROJECT_ID").toList()
 
         coVerify { eventDao.observeCount(projectId = "PROJECT_ID") }
     }
 
     @Test
     fun observeCountWithAProjectIdAndTypeQuery() = runTest {
-        eventLocalDataSource.observeCount(
+        eventLocalDataSource.observeEventCount(
             projectId = "PROJECT_ID",
             type = CALLBACK_ENROLMENT,
         ).toList()
@@ -462,22 +432,15 @@ internal class EventLocalDataSourceImplTest {
             val event = mockk<Event> {
                 every { fromDomainToDb() } returns dbEvent
             }
-            eventLocalDataSource.insertOrUpdate(event)
+            eventLocalDataSource.saveEvent(event)
 
             coVerify { eventDao.insertOrUpdate(dbEvent) }
         }
     }
 
     @Test
-    fun delete() = runTest {
-        eventLocalDataSource.delete(listOf("1", "2"))
-
-        coVerify { eventDao.delete(listOf("1", "2")) }
-    }
-
-    @Test
     fun deleteAllFromSession() = runTest {
-        eventLocalDataSource.deleteAllFromSession(GUID1)
+        eventLocalDataSource.deleteEventsInSession(GUID1)
 
         coVerify { eventDao.deleteAllFromSession(GUID1) }
     }
@@ -486,18 +449,11 @@ internal class EventLocalDataSourceImplTest {
     fun deleteAll() = runTest {
         eventLocalDataSource.deleteAll()
 
-        coVerify { eventDao.deleteAll() }
-    }
-
-    @Test
-    fun `when loadAllFromProject is called, then events are loaded from the local storage`() =
-        runTest {
-            val projectId = "projectId"
-            coEvery { eventDao.loadFromProject(projectId) } returns mockk()
-            eventLocalDataSource.loadAllFromProject(projectId)
-
-            coVerify { eventDao.loadFromProject(projectId) }
+        coVerify {
+            eventDao.deleteAll()
+            scopeDao.deleteAll()
         }
+    }
 
     private fun mockDaoLoadToMakeNothing() {
         db = mockk(relaxed = true)
@@ -505,12 +461,7 @@ internal class EventLocalDataSourceImplTest {
         scopeDao = mockk(relaxed = true)
         eventDatabaseFactory = mockk(relaxed = true)
         coEvery { eventDao.loadAll() } returns emptyList()
-        coEvery { eventDao.loadFromProject(any()) } returns emptyList()
         coEvery { eventDao.loadFromSession(any()) } returns emptyList()
-        coEvery { eventDao.countFromProject(any()) } returns 0
-        coEvery { eventDao.countFromType(any()) } returns 0
-        coEvery { eventDao.countFromProjectByType(any(), any()) } returns 0
-        coEvery { scopeDao.loadAll() } returns emptyList()
         coEvery { scopeDao.loadOpen() } returns emptyList()
         coEvery { scopeDao.count() } returns 0
         every { db.eventDao } returns eventDao

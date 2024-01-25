@@ -16,7 +16,7 @@ internal class DeleteSessionEventsIfNeededUseCase @Inject constructor(
 
     suspend operator fun invoke(sessionId: String) = externalScope.launch {
         if (!configRepository.getProjectConfiguration().canSyncDataToSimprints()) {
-            eventRepository.deleteSessionEvents(sessionId)
+            eventRepository.deleteSession(sessionId)
         }
     }
 }

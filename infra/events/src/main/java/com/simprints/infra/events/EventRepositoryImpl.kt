@@ -85,10 +85,80 @@ internal open class EventRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * The reason is only used when we want to create an [ArtificialTerminationEvent].
+     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
+     */
+    private suspend fun closeAllSessions(reason: SessionEndCause?) {
+        sessionDataCache.eventCache.clear()
+        eventLocalDataSource.loadOpenedSessions().forEach { closeSession(it, reason) }
+    }
+
+    private suspend fun <T> reportException(block: suspend () -> T): T =
+        try {
+            block()
+        } catch (t: Throwable) {
+            // prevent crashlytics logging of duplicate guid-selection
+            if (t is DuplicateGuidSelectEventValidatorException) Simber.d(t)
+            else Simber.e(t)
+
+            throw t
+        }
+
     override suspend fun hasOpenSession(): Boolean {
         val session = cachedSessionScope() ?: localSessionScopes()
         return session != null
     }
+
+    override suspend fun closeCurrentSession(reason: SessionEndCause?) {
+        closeSession(getCurrentSessionScope(), reason)
+        sessionDataCache.eventCache.clear()
+    }
+
+    override suspend fun getCurrentSessionScope(): SessionScope = reportException {
+        cachedSessionScope()
+            ?: localSessionScopes()
+            ?: createSession()
+    }
+
+    override suspend fun getAllClosedSessions(projectId: String): List<SessionScope> =
+        eventLocalDataSource.loadClosedSessions(projectId)
+
+    override suspend fun saveSessionScope(sessionScope: SessionScope) {
+        if (sessionScope.id == sessionDataCache.sessionScope?.id) {
+            sessionDataCache.sessionScope = sessionScope
+        }
+        eventLocalDataSource.saveSessionScope(sessionScope)
+    }
+
+    override suspend fun observeEventsFromSession(sessionId: String): Flow<Event> =
+        reportException {
+            if (sessionDataCache.eventCache.isEmpty()) {
+                loadEventsIntoCache(sessionId)
+            }
+
+            return@reportException flow {
+                sessionDataCache.eventCache.values.toList().forEach { emit(it) }
+            }
+        }
+
+    private suspend fun loadEventsIntoCache(sessionId: String) {
+        eventLocalDataSource.loadEventsInSession(sessionId).forEach {
+            sessionDataCache.eventCache[it.id] = it
+        }
+    }
+
+    override suspend fun getEventsFromSession(sessionId: String): List<Event> =
+        eventLocalDataSource.loadEventsInSession(sessionId)
+
+    override suspend fun getEventsJsonFromSession(sessionId: String): List<String> =
+        eventLocalDataSource.loadEventJsonInSession(sessionId)
+
+    override suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int> =
+        if (type != null) eventLocalDataSource.observeEventCount(projectId, type)
+        else eventLocalDataSource.observeEventCount(projectId)
+
+    override suspend fun loadAll(): Flow<Event> = eventLocalDataSource.loadAllEvents()
 
     override suspend fun addOrUpdateEvent(event: Event) {
         val startTime = System.currentTimeMillis()
@@ -112,7 +182,7 @@ internal open class EventRepositoryImpl @Inject constructor(
 
     private suspend fun saveEvent(event: Event, session: SessionScope) {
         checkAndUpdateLabels(event, session)
-        eventLocalDataSource.insertOrUpdate(event)
+        eventLocalDataSource.saveEvent(event)
     }
 
     private fun checkAndUpdateLabels(event: Event, session: SessionScope) {
@@ -123,72 +193,27 @@ internal open class EventRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun removeLocationDataFromCurrentSession() {
+        val sessionScope = getCurrentSessionScope()
+        if (sessionScope.payload.location != null) {
+            val updatedSessionScope = sessionScope.copy(
+                payload = sessionScope.payload.copy(location = null)
+            )
+            saveSessionScope(updatedSessionScope)
+        }
+    }
+
     override suspend fun deleteSession(sessionId: String) = reportException {
         eventLocalDataSource.deleteSession(sessionId = sessionId)
-        eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
-    }
-
-    override suspend fun deleteSessionEvents(sessionId: String) = reportException {
-        eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
-    }
-
-    override suspend fun getCurrentSessionScope(): SessionScope = reportException {
-        cachedSessionScope()
-            ?: localSessionScopes()
-            ?: createSession()
+        eventLocalDataSource.deleteEventsInSession(sessionId = sessionId)
     }
 
     private fun cachedSessionScope() = sessionDataCache.sessionScope
 
     private suspend fun localSessionScopes() =
-        loadOpenedSessions().firstOrNull()?.also { session ->
-            loadEventsIntoCache(session.id)
-        }
-
-    override suspend fun saveSessionScope(sessionScope: SessionScope) {
-        if (sessionScope.id == sessionDataCache.sessionScope?.id) {
-            sessionDataCache.sessionScope = sessionScope
-        }
-        eventLocalDataSource.saveSessionScope(sessionScope)
-    }
-
-    override suspend fun observeEventsFromSession(sessionId: String): Flow<Event> =
-        reportException {
-            if (sessionDataCache.eventCache.isEmpty()) {
-                loadEventsIntoCache(sessionId)
-            }
-
-            return@reportException flow {
-                sessionDataCache.eventCache.values.toList().forEach { emit(it) }
-            }
-        }
-
-    override suspend fun getAllClosedSessions(projectId: String): List<SessionScope> =
-        eventLocalDataSource.loadClosedSessions(projectId)
-
-    override suspend fun getEventsFromSession(sessionId: String): List<Event> =
-        eventLocalDataSource.loadAllFromSession(sessionId)
-
-    override suspend fun getEventsJsonFromSession(sessionId: String): List<String> =
-        eventLocalDataSource.loadAllEventJsonFromSession(sessionId)
-
-    override suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int> =
-        if (type != null) eventLocalDataSource.observeCount(projectId, type)
-        else eventLocalDataSource.observeCount(projectId)
-
-    /**
-     * The reason is only used when we want to create an [ArtificialTerminationEvent].
-     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
-     */
-    private suspend fun closeAllSessions(reason: SessionEndCause?) {
-        sessionDataCache.eventCache.clear()
-        loadOpenedSessions().forEach { closeSession(it, reason) }
-    }
-
-    override suspend fun closeCurrentSession(reason: SessionEndCause?) {
-        closeSession(getCurrentSessionScope(), reason)
-        sessionDataCache.eventCache.clear()
-    }
+        eventLocalDataSource.loadOpenedSessions()
+            .firstOrNull()
+            ?.also { session -> loadEventsIntoCache(session.id) }
 
     /**
      * The reason is only used when we want to create an [ArtificialTerminationEvent].
@@ -203,41 +228,6 @@ internal open class EventRepositoryImpl @Inject constructor(
         )
         saveSessionScope(updatedSessionScope)
     }
-
-    private suspend fun loadOpenedSessions(): List<SessionScope> =
-        eventLocalDataSource.loadOpenedSessions()
-
-    private suspend fun loadEventsIntoCache(sessionId: String) {
-        eventLocalDataSource.loadAllFromSession(sessionId).forEach {
-            sessionDataCache.eventCache[it.id] = it
-        }
-    }
-
-    private suspend fun <T> reportException(block: suspend () -> T): T =
-        try {
-            block()
-        } catch (t: Throwable) {
-            // prevent crashlytics logging of duplicate guid-selection
-            if (t is DuplicateGuidSelectEventValidatorException) Simber.d(t)
-            else Simber.e(t)
-
-            throw t
-        }
-
-    override suspend fun removeLocationDataFromCurrentSession() {
-        val sessionScope = getCurrentSessionScope()
-        if (sessionScope.payload.location != null) {
-            val updatedSessionScope = sessionScope.copy(
-                payload = sessionScope.payload.copy(location = null)
-            )
-            saveSessionScope(updatedSessionScope)
-        }
-    }
-
-    override suspend fun loadAll(): Flow<Event> = eventLocalDataSource.loadAll()
-
-    override suspend fun delete(eventIds: List<String>) =
-        eventLocalDataSource.delete(eventIds)
 
     override suspend fun deleteAll() = eventLocalDataSource.deleteAll()
 }

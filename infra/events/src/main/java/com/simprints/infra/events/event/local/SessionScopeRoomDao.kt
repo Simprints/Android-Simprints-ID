@@ -9,9 +9,6 @@ import com.simprints.infra.events.event.local.models.DbSessionScope
 @Dao
 internal interface SessionScopeRoomDao {
 
-    @Query("select * from DbSessionScope order by createdAt desc")
-    suspend fun loadAll(): List<DbSessionScope>
-
     @Query("select * from DbSessionScope where endedAt IS NULL order by createdAt desc")
     suspend fun loadOpen(): List<DbSessionScope>
 

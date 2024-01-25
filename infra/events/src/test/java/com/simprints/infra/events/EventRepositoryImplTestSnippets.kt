@@ -6,11 +6,8 @@ import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
-import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.ARTIFICIAL_TERMINATION
-import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
@@ -57,8 +54,8 @@ fun assertThatSessionScopeClosed(scope: SessionScope): Boolean = scope.endedAt !
 
 internal fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
     val session = createSessionCaptureEvent(id).openSession()
-    coEvery { eventLocalDataSource.loadAllFromSession(sessionId = id) } returns listOf(session)
-    coEvery { eventLocalDataSource.loadAll() } returns flowOf(session)
+    coEvery { eventLocalDataSource.loadEventsInSession(sessionId = id) } returns listOf(session)
+    coEvery { eventLocalDataSource.loadAllEvents() } returns flowOf(session)
 }
 
 internal fun EventRepositoryImplTest.verifyArtificialEventWasAdded(
@@ -66,7 +63,7 @@ internal fun EventRepositoryImplTest.verifyArtificialEventWasAdded(
     reason: ArtificialTerminationPayload.Reason,
 ) {
     coVerify {
-        eventLocalDataSource.insertOrUpdate(match {
+        eventLocalDataSource.saveEvent(match {
             it.type == ARTIFICIAL_TERMINATION &&
                 it.labels.sessionId == id &&
                 (it as ArtificialTerminationEvent).payload.reason == reason
