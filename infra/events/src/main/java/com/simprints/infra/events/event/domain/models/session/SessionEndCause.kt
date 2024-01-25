@@ -6,5 +6,5 @@ import androidx.annotation.Keep
 enum class SessionEndCause {
 
     WORKFLOW_ENDED,
-    NEW_SESSION,
+    NEW_SESSION,;
 }

@@ -20,12 +20,15 @@ internal interface EventRemoteInterface : SimRemoteInterface {
         @Query("lastEventId") lastEventId: String?
     ): List<ApiEventCount>
 
-    @Headers("Content-Encoding: gzip")
+    @Headers(
+        "Content-Encoding: gzip",
+        "X-Force-Version: 2024.1.1"
+    )
     @POST("projects/{projectId}/events")
     suspend fun uploadEvents(
         @Path("projectId") projectId: String,
         @Query("acceptInvalidEvents") acceptInvalidEvents: Boolean = true,
-        @Body events: ApiUploadEventsBody
+        @Body body: ApiUploadEventsBody
     )
 
     @Streaming

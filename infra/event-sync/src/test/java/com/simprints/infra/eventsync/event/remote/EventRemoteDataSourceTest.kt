@@ -13,9 +13,11 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
+import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
+import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionScope
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -142,7 +144,7 @@ class EventRemoteDataSourceTest {
         val channel = mockk<ProducerScope<EnrolmentRecordEvent>>(relaxed = true)
         excludeRecords { channel.isClosedForSend }
 
-        (eventRemoteDataSource as EventRemoteDataSource).parseStreamAndEmitEvents(
+        eventRemoteDataSource.parseStreamAndEmitEvents(
             responseStreamWith6Events,
             channel
         )
@@ -284,14 +286,17 @@ class EventRemoteDataSourceTest {
         coEvery { eventRemoteInterface.uploadEvents(any(), any(), any()) } returns mockk()
 
         val events = listOf(createSessionCaptureEvent())
-        eventRemoteDataSource.post(DEFAULT_PROJECT_ID, events)
+        val scope = createSessionScope()
+        eventRemoteDataSource.post(DEFAULT_PROJECT_ID, mapOf(scope to events))
 
         coVerify(exactly = 1) {
             eventRemoteInterface.uploadEvents(
                 DEFAULT_PROJECT_ID,
                 true,
                 match { body ->
-                    assertThat(body.events).containsExactlyElementsIn(events.map { it.fromDomainToApi() })
+                    assertThat(body.sessions).hasSize(1)
+                    assertThat(body.sessions.firstOrNull())
+                        .isEqualTo(ApiSessionScope.fromDomain(scope, events))
                     true
                 }
             )
@@ -312,7 +317,7 @@ class EventRemoteDataSourceTest {
             assertThrows<Throwable> {
                 eventRemoteDataSource.post(
                     DEFAULT_PROJECT_ID,
-                    listOf(createSessionCaptureEvent())
+                    mapOf(createSessionScope() to listOf(createSessionCaptureEvent()))
                 )
             }
         }

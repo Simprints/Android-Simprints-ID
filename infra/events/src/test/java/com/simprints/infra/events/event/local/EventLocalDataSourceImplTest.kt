@@ -375,6 +375,33 @@ internal class EventLocalDataSourceImplTest {
     }
 
     @Test
+    fun loadClosedSessions() = runTest {
+        mockkStatic("com.simprints.infra.events.event.local.models.DbSessionScopeKt")
+        val dbSessionCaptureEvent = mockk<DbSessionScope> {
+            every { fromDbToDomain(any()) } returns mockk()
+        }
+        coEvery { scopeDao.loadClosed(any()) } returns listOf(dbSessionCaptureEvent)
+        eventLocalDataSource.loadClosedSessions("test")
+
+        coVerify { scopeDao.loadClosed(any()) }
+        verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
+    }
+
+    @Test
+    fun deleteSession() = runTest {
+        eventLocalDataSource.deleteSession(GUID1)
+
+        coVerify { scopeDao.delete(listOf(GUID1)) }
+    }
+
+    @Test
+    fun deleteSessions() = runTest {
+        eventLocalDataSource.deleteSessions(listOf(GUID1, GUID1))
+
+        coVerify { scopeDao.delete(listOf(GUID1, GUID1)) }
+    }
+
+    @Test
     fun loadAllClosedSessionIds() = runTest {
         val sessionId = GUID1
         eventLocalDataSource.loadAllClosedSessionIds(sessionId)

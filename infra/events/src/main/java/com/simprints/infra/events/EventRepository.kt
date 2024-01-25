@@ -1,10 +1,8 @@
 package com.simprints.infra.events
 
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionEndCause
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import kotlinx.coroutines.flow.Flow
@@ -31,11 +29,11 @@ interface EventRepository {
      */
     suspend fun getCurrentSessionScope(): SessionScope
 
+    suspend fun getAllClosedSessions(projectId: String): List<SessionScope>
+
     suspend fun saveSessionScope(sessionScope: SessionScope)
 
     suspend fun observeEventsFromSession(sessionId: String): Flow<Event>
-
-    suspend fun getAllClosedSessionIds(projectId: String): List<String>
 
     suspend fun getEventsFromSession(sessionId: String): List<Event>
 
@@ -48,6 +46,8 @@ interface EventRepository {
     suspend fun addOrUpdateEvent(event: Event)
 
     suspend fun removeLocationDataFromCurrentSession()
+
+    suspend fun deleteSession(sessionId: String)
 
     suspend fun deleteSessionEvents(sessionId: String)
 

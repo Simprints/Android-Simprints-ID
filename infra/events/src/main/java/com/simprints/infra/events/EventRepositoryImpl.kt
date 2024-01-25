@@ -123,6 +123,11 @@ internal open class EventRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun deleteSession(sessionId: String) = reportException {
+        eventLocalDataSource.deleteSession(sessionId = sessionId)
+        eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
+    }
+
     override suspend fun deleteSessionEvents(sessionId: String) = reportException {
         eventLocalDataSource.deleteAllFromSession(sessionId = sessionId)
     }
@@ -158,8 +163,8 @@ internal open class EventRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getAllClosedSessionIds(projectId: String): List<String> =
-        eventLocalDataSource.loadAllClosedSessionIds(projectId)
+    override suspend fun getAllClosedSessions(projectId: String): List<SessionScope> =
+        eventLocalDataSource.loadClosedSessions(projectId)
 
     override suspend fun getEventsFromSession(sessionId: String): List<Event> =
         eventLocalDataSource.loadAllFromSession(sessionId)

@@ -10,6 +10,9 @@ internal interface EventLocalDataSource {
     suspend fun countSessions(): Int
     suspend fun saveSessionScope(scope: SessionScope)
     suspend fun loadOpenedSessions(): List<SessionScope>
+    suspend fun loadClosedSessions(projectId: String): List<SessionScope>
+    suspend fun deleteSession(sessionId: String)
+    suspend fun deleteSessions(sessionIds: List<String>)
 
     // TODO clean up unused methods
 

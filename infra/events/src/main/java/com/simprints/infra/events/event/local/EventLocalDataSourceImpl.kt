@@ -104,6 +104,18 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         scopeDao.loadOpen().map { it.fromDbToDomain(jsonHelper) }
     }
 
+    override suspend fun loadClosedSessions(projectId: String): List<SessionScope> = useRoom(readingDispatcher) {
+        scopeDao.loadClosed(projectId).map { it.fromDbToDomain(jsonHelper) }
+    }
+
+    override suspend fun deleteSession(sessionId: String) = useRoom(writingContext) {
+        scopeDao.delete(listOf(sessionId))
+    }
+
+    override suspend fun deleteSessions(sessionIds: List<String>) = useRoom(writingContext) {
+        scopeDao.delete(sessionIds)
+    }
+
     override suspend fun loadAll(): Flow<Event> =
         useRoom(readingDispatcher) {
             eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()

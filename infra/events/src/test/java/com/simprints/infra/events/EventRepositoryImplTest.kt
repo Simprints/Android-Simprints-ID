@@ -392,6 +392,14 @@ internal class EventRepositoryImplTest {
     }
 
     @Test
+    fun `deleteSession should call local store`() = runTest {
+        eventRepo.deleteSession("test")
+
+        coVerify { eventLocalDataSource.deleteSession(eq("test")) }
+        coVerify { eventLocalDataSource.deleteAllFromSession(eq("test")) }
+    }
+
+    @Test
     fun `deleteSessionEvents should call local store`() = runTest {
         eventRepo.deleteSessionEvents("test")
 
@@ -400,11 +408,11 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `getAllClosedSessionIds should call local store`() = runTest {
-        coEvery { eventLocalDataSource.loadAllClosedSessionIds(any()) } returns emptyList()
+        coEvery { eventLocalDataSource.loadClosedSessions(any()) } returns emptyList()
 
-        eventRepo.getAllClosedSessionIds("test")
+        eventRepo.getAllClosedSessions("test")
 
-        coVerify { eventLocalDataSource.loadAllClosedSessionIds(eq("test")) }
+        coVerify { eventLocalDataSource.loadClosedSessions(eq("test")) }
     }
 
     @Test
