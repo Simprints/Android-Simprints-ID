@@ -35,7 +35,6 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
         super.onViewCreated(view, savedInstanceState)
 
         val config = args.alertConfiguration
-        Simber.tag(ALERT.name).i("Payload:  ${config.color.name} - ${getPayloadContent(config.payload)}")
 
         binding.root.setBackgroundColor(ResourcesCompat.getColor(
             resources,
@@ -67,13 +66,9 @@ internal class AlertFragment : Fragment(R.layout.fragment_alert) {
             findNavController().popBackStack()
         }
         config.eventType?.let { vm.saveAlertEvent(it) }
-    }
 
-    // Since we do not care about type of the stored value
-    // using deprecated `get(): Any?` method should fine
-    @Suppress("DEPRECATION")
-    private fun getPayloadContent(payload: Bundle) =
-        payload.keySet().joinToString { payload.get(it).toString() }
+        Simber.tag(ALERT.name).i("${binding.alertTitle.text}")
+    }
 
     private fun TextView.setupButton(config: AlertButtonConfig, payload: Bundle) {
         setTextWithFallbacks(config.text, config.textRes)
