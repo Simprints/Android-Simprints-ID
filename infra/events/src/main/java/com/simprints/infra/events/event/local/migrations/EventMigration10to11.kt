@@ -76,6 +76,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
                 // that all previous sessions ended with new session termination cause
                 endCause = if (endedAt != null) SessionEndCause.NEW_SESSION else null,
                 sidVersion = event.payload.appVersionName,
+                libSimprintsVersion = event.payload.libVersionName,
                 language = event.payload.language,
                 projectConfigurationUpdatedAt = "",
                 modalities = event.payload.modalities,

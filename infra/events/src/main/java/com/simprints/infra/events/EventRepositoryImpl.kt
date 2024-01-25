@@ -66,6 +66,7 @@ internal open class EventRepositoryImpl @Inject constructor(
                 endedAt = null,
                 payload = SessionScopePayload(
                     sidVersion = appVersionName,
+                    libSimprintsVersion = libSimprintsVersionName,
                     language = deviceConfiguration.language,
                     modalities = projectConfiguration.general.modalities,
                     device = Device(

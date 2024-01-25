@@ -67,6 +67,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
             endCause = null,
             modalities = emptyList(),
             sidVersion = "appVersionName",
+            libSimprintsVersion = "libVersionName",
             language = "language",
             device = Device("deviceId", "deviceModel", "deviceManufacturer"),
             databaseInfo = DatabaseInfo(0, 0),

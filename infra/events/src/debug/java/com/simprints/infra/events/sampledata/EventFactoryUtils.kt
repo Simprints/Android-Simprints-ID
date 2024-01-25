@@ -70,6 +70,7 @@ fun createSessionScope(
 ): SessionScope {
 
     val appVersionNameArg = "appVersionName"
+    val libSimprintsVersionNameArg = "libSimprintsVersionName"
     val languageArg = "language"
     val deviceArg = Device(
         Build.VERSION.SDK_INT.toString(),
@@ -87,6 +88,7 @@ fun createSessionScope(
         endedAt = ENDED_AT.takeIf { isClosed },
         payload = SessionScopePayload(
             sidVersion = appVersionNameArg,
+            libSimprintsVersion = libSimprintsVersionNameArg,
             language = languageArg,
             modalities = listOf(Modality.FINGERPRINT, Modality.FACE),
             device = deviceArg,

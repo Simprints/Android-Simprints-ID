@@ -19,6 +19,7 @@ data class SessionScopePayload(
     val endCause: SessionEndCause? = null,
 
     val sidVersion: String,
+    val libSimprintsVersion: String,
     val language: String,
     val projectConfigurationUpdatedAt: String,
 

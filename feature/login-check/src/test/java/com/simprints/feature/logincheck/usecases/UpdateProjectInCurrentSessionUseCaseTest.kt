@@ -113,6 +113,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
             endCause = null,
             modalities = emptyList(),
             sidVersion = "appVersionName",
+            libSimprintsVersion = "libVersionName",
             language = "language",
             projectConfigurationUpdatedAt = "projectConfigurationUpdatedAt",
             device = Device("deviceId", "deviceModel", "deviceManufacturer"),
