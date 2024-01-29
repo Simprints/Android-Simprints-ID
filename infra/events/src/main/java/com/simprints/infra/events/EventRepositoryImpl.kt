@@ -6,6 +6,7 @@ import com.simprints.core.DeviceID
 import com.simprints.core.LibSimprintsVersionName
 import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
@@ -62,7 +63,7 @@ internal open class EventRepositoryImpl @Inject constructor(
             val sessionScope = SessionScope(
                 id = UUID.randomUUID().toString(),
                 projectId = currentProject,
-                createdAt = timeHelper.now(),
+                createdAt = timeHelper.nowTimestamp(),
                 endedAt = null,
                 payload = SessionScopePayload(
                     sidVersion = appVersionName,
@@ -222,7 +223,8 @@ internal open class EventRepositoryImpl @Inject constructor(
                     payload.endedAt.takeIf { it > 0 } ?: payload.createdAt
                 }
             }
-            ?: timeHelper.now()
+            ?.let { Timestamp.fromLong(it) }
+            ?: timeHelper.nowTimestamp()
 
         val updatedSessionScope = sessionScope.copy(
             endedAt = maxTimestamp,

@@ -2,6 +2,7 @@ package com.simprints.infra.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
@@ -64,7 +65,7 @@ internal class EventRepositoryImplTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelper.now() } returns NOW
+        every { timeHelper.nowTimestamp() } returns NOW
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionDataCache.sessionScope } returns null
@@ -251,12 +252,12 @@ internal class EventRepositoryImplTest {
     fun `test getCurrentSessionScope from db`() = runTest {
 
         val oldSessionScope = mockk<SessionScope> {
-            every { endedAt } returns 2
-            every { createdAt } returns 1
+            every { endedAt } returns Timestamp.fromLong(2)
+            every { createdAt } returns Timestamp.fromLong(1)
         }
         val recentSessionScope = mockk<SessionScope> {
             every { endedAt } returns null
-            every { createdAt } returns 2
+            every { createdAt } returns Timestamp.fromLong(2)
         }
         coEvery { eventLocalDataSource.loadOpenedSessions() } returns listOf(
             recentSessionScope,
@@ -344,7 +345,7 @@ internal class EventRepositoryImplTest {
         coVerify {
             eventLocalDataSource.saveSessionScope(match {
                 assertThatSessionScopeClosed(it)
-                assertThat(it.endedAt).isEqualTo(5L)
+                assertThat(it.endedAt).isEqualTo(Timestamp.fromLong(5L))
                 true
             })
         }
@@ -461,6 +462,6 @@ internal class EventRepositoryImplTest {
         const val LANGUAGE = "en"
 
         const val N_SESSIONS_DB = 3
-        const val NOW = 1000L
+        val NOW = Timestamp.fromLong(1000L)
     }
 }

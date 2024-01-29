@@ -1,6 +1,7 @@
 package com.simprints.feature.logincheck.usecases
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
@@ -107,7 +108,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     private fun createBlankSessionScope(projectId: String) = SessionScope(
         id = "eventId",
         projectId = projectId,
-        createdAt = 0,
+        createdAt = Timestamp.fromLong(0L),
         endedAt = null,
         payload = SessionScopePayload(
             endCause = null,

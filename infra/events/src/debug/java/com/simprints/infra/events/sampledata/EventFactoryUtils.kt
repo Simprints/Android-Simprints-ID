@@ -4,6 +4,7 @@ import android.os.Build
 import com.simprints.core.domain.fingerprint.IFingerIdentifier.LEFT_THUMB
 import com.simprints.core.domain.response.AppMatchConfidence.MEDIUM
 import com.simprints.core.domain.response.AppResponseTier.TIER_1
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
@@ -84,8 +85,8 @@ fun createSessionScope(
     return SessionScope(
         id = id,
         projectId = projectId,
-        createdAt = createdAt,
-        endedAt = ENDED_AT.takeIf { isClosed },
+        createdAt = Timestamp.fromLong(createdAt),
+        endedAt = Timestamp.fromLong(ENDED_AT).takeIf { isClosed },
         payload = SessionScopePayload(
             sidVersion = appVersionNameArg,
             libSimprintsVersion = libSimprintsVersionNameArg,

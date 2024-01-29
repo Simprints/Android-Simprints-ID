@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
 
@@ -25,15 +26,15 @@ internal data class DbSessionScope(
 internal fun SessionScope.fromDomainToDb(jsonHelper: JsonHelper): DbSessionScope = DbSessionScope(
     id = id,
     projectId = projectId,
-    createdAt = DbTimestamp(createdAt, false, null), // TODO
-    endedAt = endedAt?.let { DbTimestamp(it, false, null) }, // TODO
+    createdAt = createdAt.fromDomainToDb(),
+    endedAt = endedAt?.fromDomainToDb(),
     payloadJson = jsonHelper.toJson(payload)
 )
 
 internal fun DbSessionScope.fromDbToDomain(jsonHelper: JsonHelper): SessionScope = SessionScope(
     id = id,
     projectId = projectId,
-    createdAt = createdAt.unixMs, // TODO
-    endedAt = endedAt?.unixMs, // TODO
+    createdAt = createdAt.fromDbToDomain(),
+    endedAt = endedAt?.fromDbToDomain(),
     payload = jsonHelper.fromJson(payloadJson, object : TypeReference<SessionScopePayload>() {})
 )

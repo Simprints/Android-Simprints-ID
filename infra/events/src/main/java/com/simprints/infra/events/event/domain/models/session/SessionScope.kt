@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.domain.models.session
 
 import androidx.annotation.Keep
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.GeneralConfiguration
 
 @Keep
@@ -8,8 +9,8 @@ data class SessionScope(
     val id: String,
     val projectId: String,
 
-    val createdAt: Long,
-    var endedAt: Long?,
+    val createdAt: Timestamp,
+    var endedAt: Timestamp?,
 
     val payload: SessionScopePayload,
 )

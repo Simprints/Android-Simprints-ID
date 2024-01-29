@@ -6,6 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionEndCause
 import com.simprints.infra.events.event.domain.models.session.SessionScope
@@ -64,12 +65,12 @@ internal class EventMigration10to11 : Migration(10, 11) {
         val event = fromJsonToDomain(jsonData)
         val sessionId = event.labels.sessionId ?: return null
 
-        val endedAt = event.payload.endedAt.takeIf { it > 0 }
+        val endedAt = event.payload.endedAt.takeIf { it > 0 }?.let { Timestamp.fromLong(it) }
 
         return SessionScope(
             id = sessionId,
             projectId = event.payload.projectId,
-            createdAt = event.payload.createdAt,
+            createdAt = Timestamp.fromLong(event.payload.createdAt),
             endedAt = endedAt,
             payload = SessionScopePayload(
                 // Other end causes have not been used for a long time so it is save to assume
@@ -103,9 +104,9 @@ internal class EventMigration10to11 : Migration(10, 11) {
         ).use {
             it.bindString(1, scope.id)
             it.bindString(2, scope.projectId)
-            it.bindLong(3, scope.createdAt)
+            it.bindLong(3, scope.createdAt.ms)
             if (scope.endedAt != null) {
-                it.bindLong(4, scope.endedAt!!)
+                it.bindLong(4, scope.endedAt!!.ms)
             } else {
                 it.bindNull(4)
             }

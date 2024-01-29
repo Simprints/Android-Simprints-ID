@@ -39,6 +39,7 @@ class EventMigration4to5Test {
         EventMigration8to9(),
         EventMigration9to10(),
         EventMigration10to11(),
+        EventMigration11to12(),
     )
 
     @get:Rule
