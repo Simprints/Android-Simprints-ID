@@ -2,13 +2,14 @@ package com.simprints.core.tools.time
 
 import com.google.common.truth.Truth.assertThat
 import com.lyft.kronos.KronosClock
+import com.lyft.kronos.KronosTime
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 class KronosTimeHelperImplTest {
 
@@ -25,25 +26,32 @@ class KronosTimeHelperImplTest {
     }
 
     @Test
-    fun testNow() {
-        every { kronosClock.getCurrentTimeMs() } returns 1000L
+    fun ensureTrustworthiness() {
+        timeHelperImpl.ensureTrustworthiness()
 
-        assertThat(timeHelperImpl.now()).isEqualTo(1000L)
+        verify { kronosClock.sync() }
     }
 
     @Test
-    fun testNowMinus() {
-        every { kronosClock.getCurrentTimeMs() } returns 2000L
+    fun testNowTrustworthy() {
+        every { kronosClock.getCurrentTime() } returns KronosTime(1000L, 1L)
+        every { kronosClock.getElapsedTimeMs() } returns 3L
 
-        val result = timeHelperImpl.nowMinus(1L, TimeUnit.SECONDS)
+        assertThat(timeHelperImpl.nowTimestamp()).isEqualTo(Timestamp(1000L, true, 3L))
+    }
 
-        // 2000ms - 1s = 1000ms
-        assertThat(result).isEqualTo(1000L)
+    @Test
+    fun testNowIsNotTrustworthy() {
+        every { kronosClock.getCurrentTime() } returns KronosTime(1000L, null)
+        every { kronosClock.getElapsedTimeMs() } returns 3L
+
+        assertThat(timeHelperImpl.nowTimestamp()).isEqualTo(Timestamp(1000L, false, 3L))
     }
 
     @Test
     fun testMsBetweenNowAndTime() {
-        every { kronosClock.getCurrentTimeMs() } returns 3000L
+        every { kronosClock.getCurrentTime() } returns KronosTime(3000L, 0L)
+        every { kronosClock.getElapsedTimeMs() } returns 3L
 
         val result = timeHelperImpl.msBetweenNowAndTime(1000L)
 
@@ -53,7 +61,8 @@ class KronosTimeHelperImplTest {
     @Ignore("This test is failing in pipeline tests for unknown reasons")
     @Test
     fun testTodayInMillis() {
-        every { kronosClock.getCurrentTimeMs() } returns TIMESTAMP
+        every { kronosClock.getCurrentTime() } returns KronosTime(TIMESTAMP, 0L)
+        every { kronosClock.getElapsedTimeMs() } returns 3L
 
         val result = timeHelperImpl.todayInMillis()
 
@@ -63,7 +72,8 @@ class KronosTimeHelperImplTest {
     @Ignore("This test is failing in pipeline tests for unknown reasons")
     @Test
     fun testTomorrowInMillis() {
-        every { kronosClock.getCurrentTimeMs() } returns TIMESTAMP
+        every { kronosClock.getCurrentTime() } returns KronosTime(TIMESTAMP, 0L)
+        every { kronosClock.getElapsedTimeMs() } returns 3L
 
         val result = timeHelperImpl.tomorrowInMillis()
 
