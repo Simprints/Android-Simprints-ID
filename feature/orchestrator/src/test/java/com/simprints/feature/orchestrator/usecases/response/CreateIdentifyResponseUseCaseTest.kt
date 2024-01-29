@@ -27,7 +27,7 @@ class CreateIdentifyResponseUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent().id } returns "sessionId"
+        coEvery { eventRepository.getCurrentSessionScope().id } returns "sessionId"
 
         useCase = CreateIdentifyResponseUseCase(eventRepository)
     }

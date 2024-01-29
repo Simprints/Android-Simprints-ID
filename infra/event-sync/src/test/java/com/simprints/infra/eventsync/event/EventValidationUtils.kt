@@ -15,16 +15,10 @@ private val fingerIdentifiers = listOf("LEFT_THUMB", "LEFT_INDEX_FINGER", "LEFT_
 
 fun validateCommonParams(json: JSONObject, type: String) {
     assertThat(json.getString("id")).isNotNull()
-    with(json.getJSONObject("labels")) {
-        assertThat(this.getJSONArray("sessionId").length()).isEqualTo(1)
-        assertThat(this.getJSONArray("deviceId").length()).isEqualTo(1)
-        assertThat(this.getJSONArray("projectId").length()).isEqualTo(1)
-        assertThat(this.length()).isEqualTo(3)
-    }
     with(json.getJSONObject("payload")) {
         assertThat(getString("type")).isEqualTo(type)
     }
-    assertThat(json.length()).isEqualTo(4)
+    assertThat(json.length()).isEqualTo(3)
 }
 
 fun validateCallbackV1EventApiModel(json: JSONObject) {
@@ -559,9 +553,6 @@ fun validateRefusalEventApiModel(json: JSONObject) {
 
 fun validateSessionCaptureApiModel(json: JSONObject) {
     validateCommonParams(json, "SessionCapture")
-    with(json.getJSONObject("labels")) {
-        assertThat(getJSONArray("sessionId").get(0).toString()).isEqualTo(json.getString("id"))
-    }
 
     with(json.getJSONObject("payload")) {
         assertThat(getInt("version")).isEqualTo(1)

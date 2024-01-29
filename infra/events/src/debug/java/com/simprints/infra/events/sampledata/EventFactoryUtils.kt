@@ -51,6 +51,8 @@ import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.Location
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -59,6 +61,43 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
+
+fun createSessionScope(
+    id: String = GUID1,
+    createdAt: Long = CREATED_AT,
+    projectId: String = DEFAULT_PROJECT_ID,
+    isClosed: Boolean = false,
+): SessionScope {
+
+    val appVersionNameArg = "appVersionName"
+    val libSimprintsVersionNameArg = "libSimprintsVersionName"
+    val languageArg = "language"
+    val deviceArg = Device(
+        Build.VERSION.SDK_INT.toString(),
+        Build.MANUFACTURER + "_" + Build.MODEL,
+        GUID1
+    )
+
+    val databaseInfoArg = DatabaseInfo(2, 2)
+    val locationArg = Location(0.0, 0.0)
+
+    return SessionScope(
+        id = id,
+        projectId = projectId,
+        createdAt = createdAt,
+        endedAt = ENDED_AT.takeIf { isClosed },
+        payload = SessionScopePayload(
+            sidVersion = appVersionNameArg,
+            libSimprintsVersion = libSimprintsVersionNameArg,
+            language = languageArg,
+            modalities = listOf(Modality.FINGERPRINT, Modality.FACE),
+            device = deviceArg,
+            databaseInfo = databaseInfoArg,
+            location = locationArg,
+            projectConfigurationUpdatedAt = "projectConfigurationUpdatedAt"
+        )
+    )
+}
 
 const val FACE_TEMPLATE_FORMAT = "RANK_ONE_1_23"
 val eventLabels = EventLabels(sessionId = GUID1, deviceId = GUID1, projectId = DEFAULT_PROJECT_ID)
@@ -74,7 +113,12 @@ fun createIdentificationCallbackEventV1(): IdentificationCallbackEvent {
     val comparisonScore = CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)
     return IdentificationCallbackEvent(
         GUID1, eventLabels,
-        IdentificationCallbackEvent.IdentificationCallbackPayload(CREATED_AT, 1, GUID1, listOf(comparisonScore)),
+        IdentificationCallbackEvent.IdentificationCallbackPayload(
+            CREATED_AT,
+            1,
+            GUID1,
+            listOf(comparisonScore)
+        ),
         EventType.CALLBACK_IDENTIFICATION
     )
 }
@@ -185,7 +229,7 @@ fun createSessionCaptureEvent(
     id: String = GUID1,
     createdAt: Long = CREATED_AT,
     projectId: String = DEFAULT_PROJECT_ID,
-    isClosed: Boolean = false
+    isClosed: Boolean = false,
 ): SessionCaptureEvent {
 
     val appVersionNameArg = "appVersionName"

@@ -70,7 +70,7 @@ internal class EnrolLastBiometricViewModelTest {
         coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         every { projectConfig.general.modalities } returns emptyList()
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             every { id } returns SESSION_ID
         }
         coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(

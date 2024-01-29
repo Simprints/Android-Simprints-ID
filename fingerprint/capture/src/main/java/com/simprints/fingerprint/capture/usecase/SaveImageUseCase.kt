@@ -37,8 +37,8 @@ internal class SaveImageUseCase @Inject constructor(
         fileExtension: String,
     ): SecuredImageRef? = determinePath(captureEventId, fileExtension)?.let { path ->
         Simber.d("Saving fingerprint image ${path}")
-        val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
-        val projectId = currentSession.payload.projectId
+        val currentSession = coreEventRepository.getCurrentSessionScope()
+        val projectId = currentSession.projectId
 
         val securedImageRef = coreImageRepository.storeImageSecurely(imageBytes, projectId, Path(path.parts))
 
@@ -52,8 +52,7 @@ internal class SaveImageUseCase @Inject constructor(
 
     private suspend fun determinePath(captureEventId: String, fileExtension: String): Path? =
         try {
-            val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
-            val sessionId = currentSession.id
+            val sessionId = coreEventRepository.getCurrentSessionScope().id
             Path(
                 arrayOf(
                     SESSIONS_PATH,

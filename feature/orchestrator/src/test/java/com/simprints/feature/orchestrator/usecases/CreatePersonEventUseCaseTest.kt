@@ -48,7 +48,7 @@ internal class CreatePersonEventUseCaseTest {
         every { timeHelper.now() } returns 0L
         every { encodingUtils.byteArrayToBase64(any()) } returns TEMPLATE
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             every { id } returns "sessionId"
         }
         coEvery { eventRepository.observeEventsFromSession(any()) }

@@ -47,7 +47,7 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
         deleteUseCase("sessionId")
 
-        coVerify { eventRepository.deleteSessionEvents("sessionId") }
+        coVerify { eventRepository.deleteSession("sessionId") }
     }
 
 
@@ -60,6 +60,6 @@ class DeleteSessionEventsIfNeededUseCaseTest {
 
         deleteUseCase("sessionId")
 
-        coVerify(exactly = 0) { eventRepository.deleteSessionEvents("sessionId") }
+        coVerify(exactly = 0) { eventRepository.deleteSession("sessionId") }
     }
 }

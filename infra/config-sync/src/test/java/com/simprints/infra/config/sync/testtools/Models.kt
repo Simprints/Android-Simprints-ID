@@ -81,6 +81,7 @@ internal val identificationConfiguration =
 
 internal val projectConfiguration = ProjectConfiguration(
     "projectId",
+    "updatedAt",
     generalConfiguration,
     faceConfiguration,
     fingerprintConfiguration,

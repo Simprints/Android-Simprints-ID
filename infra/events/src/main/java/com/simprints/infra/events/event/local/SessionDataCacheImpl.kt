@@ -1,12 +1,18 @@
 package com.simprints.infra.events.event.local
 
 import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.session.SessionScope
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 internal class SessionDataCacheImpl @Inject constructor() : SessionDataCache {
+
+    private val scopeLock = Any()
+    override var sessionScope: SessionScope? = null
+        get() = synchronized(scopeLock) { field }
+        set(value) = synchronized(scopeLock) { field = value }
 
     // If multiple threads access a linked hash map concurrently,
     // and at least one of the threads modifies the map structurally,

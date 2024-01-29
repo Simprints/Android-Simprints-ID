@@ -19,7 +19,7 @@ import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInS
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
 import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCase
 import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
-import com.simprints.feature.logincheck.usecases.UpdateDatabaseCountsInCurrentSessionUseCase
+import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
@@ -45,7 +45,7 @@ class LoginCheckViewModel @Inject internal constructor(
     private val configRepository: ConfigRepository,
     private val startBackgroundSync: StartBackgroundSyncUseCase,
     private val cancelBackgroundSync: CancelBackgroundSyncUseCase,
-    private val updateDatabaseCountsInCurrentSession: UpdateDatabaseCountsInCurrentSessionUseCase,
+    private val updateDatabaseCountsInCurrentSession: UpdateSessionScopePayloadUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
 ) : ViewModel() {
 

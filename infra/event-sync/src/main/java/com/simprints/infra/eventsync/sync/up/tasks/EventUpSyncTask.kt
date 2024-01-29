@@ -2,7 +2,11 @@ package com.simprints.infra.eventsync.sync.up.tasks
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.canSyncAllDataToSimprints
 import com.simprints.infra.config.store.models.canSyncAnalyticsDataToSimprints
 import com.simprints.infra.config.store.models.canSyncBiometricDataToSimprints
@@ -12,17 +16,16 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
 import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation
-import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.*
-import com.simprints.infra.eventsync.sync.common.SYNC_LOG_TAG
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.COMPLETE
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.FAILED
+import com.simprints.infra.eventsync.status.up.domain.EventUpSyncOperation.UpSyncState.RUNNING
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.network.exceptions.NetworkConnectionException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
@@ -36,7 +39,8 @@ internal class EventUpSyncTask @Inject constructor(
     private val eventRepository: EventRepository,
     private val eventRemoteDataSource: EventRemoteDataSource,
     private val timeHelper: TimeHelper,
-    private val configRepository: ConfigRepository
+    private val configRepository: ConfigRepository,
+    private val jsonHelper: JsonHelper,
 ) {
 
     fun upSync(operation: EventUpSyncOperation): Flow<EventUpSyncProgress> = flow {
@@ -49,20 +53,20 @@ internal class EventUpSyncTask @Inject constructor(
         val config = configRepository.getProjectConfiguration()
         var lastOperation = operation.copy()
         var count = 0
+
         try {
-            uploadEvents(
-                projectId = operation.projectId,
-                canSyncAllDataToSimprints = config.canSyncAllDataToSimprints(),
-                canSyncBiometricDataToSimprints = config.canSyncBiometricDataToSimprints(),
-                canSyncAnalyticsDataToSimprints = config.canSyncAnalyticsDataToSimprints()
-            ).collect {
-                Simber.tag(SYNC_LOG_TAG).d("[UP_SYNC_HELPER] Uploading $it events")
+            lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now())
+
+            uploadEvents(projectId = operation.projectId, config).collect {
                 count = it
-                lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now())
+                lastOperation =
+                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now())
                 emitProgress(lastOperation, count)
             }
 
-            lastOperation = lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now())
+            lastOperation =
+                lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now())
+
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
             Simber.e(t)
@@ -74,115 +78,104 @@ internal class EventUpSyncTask @Inject constructor(
 
     private suspend fun FlowCollector<EventUpSyncProgress>.emitProgress(
         lastOperation: EventUpSyncOperation,
-        count: Int
+        count: Int,
     ) {
         eventUpSyncScopeRepo.insertOrUpdate(lastOperation)
         this.emit(EventUpSyncProgress(lastOperation, count))
     }
 
-    /**
-     * Note that only the IDs of the SessionCapture events of closed sessions are all held in
-     * memory at once. Events are loaded in memory and uploaded session by session, ensuring the
-     * memory usage stays low. It means that we do not exploit connectivity as aggressively as
-     * possible (we could have a more complex system that always pre-fetches the next batch of
-     * events while we upload the current one), but given the relatively small amount of data to
-     * upload, and how critical this system is, we are happy to trade off speed for reliability
-     * (through simplicity and low resource usage)
-     */
     private fun uploadEvents(
         projectId: String,
-        canSyncAllDataToSimprints: Boolean,
-        canSyncBiometricDataToSimprints: Boolean,
-        canSyncAnalyticsDataToSimprints: Boolean
-    ): Flow<Int> = flow {
+        config: ProjectConfiguration,
+    ) = flow {
         Simber.d("[EVENT_REPO] Uploading")
-
-        eventRepository.getAllClosedSessionIds(projectId).forEach { sessionId ->
-            // The events will include the SessionCaptureEvent event
-            Simber.d("[EVENT_REPO] Uploading session $sessionId")
-            try {
-                eventRepository.getEventsFromSession(sessionId).let {
-                    attemptEventUpload(
-                        it, projectId,
-                        canSyncAllDataToSimprints,
-                        canSyncBiometricDataToSimprints,
-                        canSyncAnalyticsDataToSimprints
-                    )
-                    this.emit(it.size)
-                }
-            } catch (ex: Exception) {
-                if (ex is JsonParseException || ex is JsonMappingException) {
-                    attemptInvalidEventUpload(projectId, sessionId)?.let { this.emit(it) }
-                } else {
-                    Simber.i("Failed to un-marshal events for $sessionId")
+        try {
+            val sessionScopes = eventRepository.getAllClosedSessions(projectId).associateWith {
+                try {
+                    eventRepository.getEventsFromSession(it.id)
+                        .also { listOfEvents -> emit(listOfEvents.size) }
+                } catch (ex: JsonParseException) {
+                    Simber.i("Failed to un-marshal events")
                     Simber.e(ex)
+                    null
                 }
             }
-        }
-    }
 
-    private suspend fun attemptEventUpload(
-        events: List<Event>, projectId: String,
-        canSyncAllDataToSimprints: Boolean,
-        canSyncBiometricDataToSimprints: Boolean,
-        canSyncAnalyticsDataToSimprints: Boolean
-    ) {
-        try {
-            val filteredEvents = when {
-                canSyncAllDataToSimprints -> {
-                    events
+            val corruptedScopes = sessionScopes.filterValues { it == null }.keys
+
+            // Re-emitting the number of uploaded corrupted events
+            attemptInvalidEventUpload(projectId, corruptedScopes).collect { emit(it) }
+
+            val scopesToUpload = sessionScopes
+                .filterValues { it != null }
+                .mapValues { (_, events) ->
+                    events?.let { filterEventsToUpSync(events, config) }.orEmpty()
                 }
-                canSyncBiometricDataToSimprints -> {
-                    events.filter {
-                        it is EnrolmentEventV2 || it is PersonCreationEvent || it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
-                    }
+            if (scopesToUpload.isNotEmpty()) {
+                eventRemoteDataSource.post(projectId, scopesToUpload)
+            }
+
+            Simber.d("[EVENT_REPO] Deleting ${scopesToUpload.size} session scopes")
+            scopesToUpload.keys.forEach { eventRepository.deleteSession(it.id) }
+        } catch (ex: Exception) {
+            when (ex) {
+                is JsonParseException, is JsonMappingException -> {
+                    Simber.i("Failed to un-marshal events")
+                    Simber.i(ex)
                 }
-                canSyncAnalyticsDataToSimprints -> {
-                    events.filterNot {
-                        it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
-                    }
-                }
+
+                // We don't need to report http exceptions as cloud logs all of them.
+                is NetworkConnectionException, is HttpException -> Simber.i(ex)
                 else -> {
-                    emptyList()
+                    Simber.e(ex)
+                    // Propagate other exceptions to report failure to the caller.
+                    throw ex
                 }
             }
-            uploadEvents(filteredEvents, projectId)
-            deleteEventsFromDb(events.map { it.id })
-        } catch (t: Throwable) {
-            handleUploadException(t)
         }
     }
 
-    private suspend fun attemptInvalidEventUpload(projectId: String, sessionId: String): Int? =
-        try {
-            Simber.i("Uploading invalid events for session $sessionId")
-            eventRepository.getEventsJsonFromSession(sessionId).let {
-                eventRemoteDataSource.dumpInvalidEvents(projectId, events = it)
-                eventRepository.deleteSessionEvents(sessionId)
-                it.size
+    private fun filterEventsToUpSync(
+        events: List<Event>,
+        config: ProjectConfiguration,
+    ) = when {
+        config.canSyncAllDataToSimprints() -> events
+
+        config.canSyncBiometricDataToSimprints() -> events.filter {
+            it is EnrolmentEventV2 ||
+                it is PersonCreationEvent ||
+                it is FingerprintCaptureBiometricsEvent ||
+                it is FaceCaptureBiometricsEvent
+        }
+
+        config.canSyncAnalyticsDataToSimprints() -> events.filterNot {
+            it is FingerprintCaptureBiometricsEvent || it is FaceCaptureBiometricsEvent
+        }
+
+        else -> emptyList()
+    }
+
+    private suspend fun attemptInvalidEventUpload(
+        projectId: String,
+        corruptedScopes: Set<SessionScope>,
+    ) = flow {
+        corruptedScopes.forEach { scope ->
+            try {
+                Simber.i("Uploading invalid events for session ${scope.id}")
+                val scopeString = jsonHelper.toJson(scope)
+                val eventJsons = eventRepository.getEventsJsonFromSession(scope.id)
+                emit(eventJsons.size)
+
+                eventRemoteDataSource.dumpInvalidEvents(projectId, listOf(scopeString) + eventJsons)
+                eventRepository.deleteSession(scope.id)
+            } catch (t: Throwable) {
+                when (t) {
+                    // We don't need to report http exceptions as cloud logs all of them.
+                    is NetworkConnectionException, is HttpException -> Simber.i(t)
+                    else -> Simber.e(t)
+                }
             }
-        } catch (t: Throwable) {
-            handleUploadException(t)
-            null
-        }
-
-    private fun handleUploadException(t: Throwable) {
-        when (t) {
-            is NetworkConnectionException -> Simber.i(t)
-            // We don't need to report http exceptions as cloud logs all of them.
-            is HttpException -> Simber.i(t)
-            else -> Simber.e(t)
         }
     }
 
-    private suspend fun deleteEventsFromDb(eventsIds: List<String>) {
-        Simber.d("[EVENT_REPO] Deleting ${eventsIds.count()} events")
-        eventRepository.delete(eventsIds)
-    }
-
-    private suspend fun uploadEvents(events: List<Event>, projectId: String) {
-        events.filterIsInstance<SessionCaptureEvent>()
-            .forEach { it.payload.uploadedAt = timeHelper.now() }
-        eventRemoteDataSource.post(projectId, events)
-    }
 }

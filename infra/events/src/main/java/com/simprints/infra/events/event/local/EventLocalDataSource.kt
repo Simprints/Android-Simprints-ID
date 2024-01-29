@@ -2,22 +2,24 @@ package com.simprints.infra.events.event.local
 
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.session.SessionScope
 import kotlinx.coroutines.flow.Flow
 
 internal interface EventLocalDataSource {
 
-    suspend fun count(projectId: String): Int
-    suspend fun count(type: EventType): Int
-    suspend fun observeCount(projectId: String): Flow<Int>
-    suspend fun observeCount(projectId: String, type: EventType): Flow<Int>
-    suspend fun loadAll(): Flow<Event>
-    suspend fun loadAllEventJsonFromSession(sessionId: String): List<String>
-    suspend fun loadAllFromSession(sessionId: String): List<Event>
-    suspend fun loadAllFromProject(projectId: String): List<Event>
-    suspend fun loadOpenedSessions(): Flow<Event>
-    suspend fun loadAllClosedSessionIds(projectId: String): List<String>
-    suspend fun delete(ids: List<String>)
-    suspend fun deleteAllFromSession(sessionId: String)
+    suspend fun saveSessionScope(scope: SessionScope)
+    suspend fun countSessions(): Int
+    suspend fun loadOpenedSessions(): List<SessionScope>
+    suspend fun loadClosedSessions(projectId: String): List<SessionScope>
+    suspend fun deleteSession(sessionId: String)
+
+    suspend fun saveEvent(event: Event)
+    suspend fun observeEventCount(projectId: String): Flow<Int>
+    suspend fun observeEventCount(projectId: String, type: EventType): Flow<Int>
+    suspend fun loadAllEvents(): Flow<Event>
+    suspend fun loadEventJsonInSession(sessionId: String): List<String>
+    suspend fun loadEventsInSession(sessionId: String): List<Event>
+    suspend fun deleteEventsInSession(sessionId: String)
+
     suspend fun deleteAll()
-    suspend fun insertOrUpdate(event: Event)
 }

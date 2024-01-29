@@ -23,7 +23,7 @@ internal class CreatePersonEventUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(results: List<Serializable>) {
-        val currentSessionId = eventRepository.getCurrentCaptureSessionEvent().id
+        val currentSessionId = eventRepository.getCurrentSessionScope().id
         val sessionEvents = eventRepository.observeEventsFromSession(currentSessionId).toList()
 
         // If a personCreationEvent is already in the current session,
