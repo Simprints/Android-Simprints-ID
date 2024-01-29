@@ -21,7 +21,6 @@ import com.simprints.feature.dashboard.views.SyncCardState.SyncPendingUpload
 import com.simprints.feature.dashboard.views.SyncCardState.SyncProgress
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTooManyRequests
 import com.simprints.feature.dashboard.views.SyncCardState.SyncTryAgain
-import com.simprints.infra.authlogic.AuthManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
@@ -160,7 +159,7 @@ internal class SyncViewModel @Inject constructor(
                 _syncToBFSIDAllowed.postValue(configuration.canSyncDataToSimprints() || configuration.isEventDownSyncAllowed())
             }
             eventSyncManager
-                .countEventsToUpload(authStore.signedInProjectId, EventType.ENROLMENT_V2)
+                .countEventsToUpload(EventType.ENROLMENT_V2)
                 .collect { upSyncCountLiveData.postValue(it) }
         }
 

@@ -20,11 +20,11 @@ internal interface EventRoomDao {
     @Query("select eventJson from DbEvent where sessionId = :sessionId order by createdAt desc")
     suspend fun loadEventJsonFromSession(sessionId: String): List<String>
 
-    @Query("select count(*) from DbEvent where projectId = :projectId")
-    fun observeCount(projectId: String): Flow<Int>
+    @Query("select count(*) from DbEvent")
+    fun observeCount(): Flow<Int>
 
-    @Query("select count(*) from DbEvent where projectId = :projectId and type = :type")
-    fun observeCountFromType(projectId: String, type: EventType): Flow<Int>
+    @Query("select count(*) from DbEvent where type = :type")
+    fun observeCountFromType(type: EventType): Flow<Int>
 
     @Query("delete from DbEvent where sessionId = :sessionId")
     suspend fun deleteAllFromSession(sessionId: String)

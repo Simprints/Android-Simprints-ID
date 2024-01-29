@@ -37,7 +37,7 @@ internal class ProjectConfigDownSyncWorker @AssistedInject constructor(
                 fail(IllegalStateException("User is not signed in"))
             } else {
                 val (project, _) = configRepository.refreshProject(projectId)
-                handleProjectState(projectId, project.state)
+                handleProjectState(project.state)
 
                 crashlyticsLog("Successfully refresh the project configuration")
                 success()

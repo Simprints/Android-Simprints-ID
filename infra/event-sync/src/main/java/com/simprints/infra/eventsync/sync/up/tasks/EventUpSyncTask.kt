@@ -90,7 +90,7 @@ internal class EventUpSyncTask @Inject constructor(
     ) = flow {
         Simber.d("[EVENT_REPO] Uploading")
         try {
-            val sessionScopes = eventRepository.getAllClosedSessions(projectId).associateWith {
+            val sessionScopes = eventRepository.getAllClosedSessions().associateWith {
                 try {
                     eventRepository.getEventsFromSession(it.id)
                         .also { listOfEvents -> emit(listOfEvents.size) }

@@ -120,8 +120,8 @@ internal open class EventRepositoryImpl @Inject constructor(
             ?: createSession()
     }
 
-    override suspend fun getAllClosedSessions(projectId: String): List<SessionScope> =
-        eventLocalDataSource.loadClosedSessions(projectId)
+    override suspend fun getAllClosedSessions(): List<SessionScope> =
+        eventLocalDataSource.loadClosedSessions()
 
     override suspend fun saveSessionScope(sessionScope: SessionScope) {
         if (sessionScope.id == sessionDataCache.sessionScope?.id) {
@@ -153,9 +153,9 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun getEventsJsonFromSession(sessionId: String): List<String> =
         eventLocalDataSource.loadEventJsonInSession(sessionId)
 
-    override suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int> =
-        if (type != null) eventLocalDataSource.observeEventCount(projectId, type)
-        else eventLocalDataSource.observeEventCount(projectId)
+    override suspend fun observeEventCount(type: EventType?): Flow<Int> =
+        if (type != null) eventLocalDataSource.observeEventCount(type)
+        else eventLocalDataSource.observeEventCount()
 
     override suspend fun loadAll(): Flow<Event> = eventLocalDataSource.loadAllEvents()
 

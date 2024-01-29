@@ -129,7 +129,7 @@ class SyncInfoViewModelTest {
     fun `should initialize the recordsToUpSync live data correctly`() = runTest {
         val number = 10
         coEvery {
-            eventSyncManager.countEventsToUpload(PROJECT_ID, EventType.ENROLMENT_V2)
+            eventSyncManager.countEventsToUpload(EventType.ENROLMENT_V2)
         } returns flowOf(number)
 
         viewModel.refreshInformation()

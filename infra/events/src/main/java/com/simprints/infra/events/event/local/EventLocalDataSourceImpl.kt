@@ -8,7 +8,6 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
@@ -104,10 +103,9 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         scopeDao.loadOpen().map { it.fromDbToDomain(jsonHelper) }
     }
 
-    override suspend fun loadClosedSessions(projectId: String): List<SessionScope> =
-        useRoom(readingDispatcher) {
-            scopeDao.loadClosed(projectId).map { it.fromDbToDomain(jsonHelper) }
-        }
+    override suspend fun loadClosedSessions(): List<SessionScope> = useRoom(readingDispatcher) {
+        scopeDao.loadClosed().map { it.fromDbToDomain(jsonHelper) }
+    }
 
     override suspend fun deleteSession(sessionId: String) = useRoom(writingContext) {
         scopeDao.delete(listOf(sessionId))
@@ -117,14 +115,13 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         eventDao.insertOrUpdate(event.fromDomainToDb())
     }
 
-    override suspend fun observeEventCount(projectId: String): Flow<Int> =
-        useRoomFlow(readingDispatcher) {
-            eventDao.observeCount(projectId = projectId)
-        }
+    override suspend fun observeEventCount(): Flow<Int> = useRoomFlow(readingDispatcher) {
+        eventDao.observeCount()
+    }
 
-    override suspend fun observeEventCount(projectId: String, type: EventType): Flow<Int> =
+    override suspend fun observeEventCount(type: EventType): Flow<Int> =
         useRoomFlow(readingDispatcher) {
-            eventDao.observeCountFromType(projectId = projectId, type = type)
+            eventDao.observeCountFromType(type = type)
         }
 
     override suspend fun loadAllEvents(): Flow<Event> = useRoom(readingDispatcher) {

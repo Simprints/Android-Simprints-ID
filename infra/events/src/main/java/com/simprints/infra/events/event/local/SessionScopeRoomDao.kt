@@ -12,8 +12,8 @@ internal interface SessionScopeRoomDao {
     @Query("select * from DbSessionScope where endedAt IS NULL order by createdAt desc")
     suspend fun loadOpen(): List<DbSessionScope>
 
-    @Query("select * from DbSessionScope where projectId = :projectId AND endedAt IS NOT NULL order by createdAt desc")
-    suspend fun loadClosed(projectId: String): List<DbSessionScope>
+    @Query("select * from DbSessionScope where endedAt IS NOT NULL order by createdAt desc")
+    suspend fun loadClosed(): List<DbSessionScope>
 
     @Query("select count(*) from DbSessionScope")
     suspend fun count(): Int

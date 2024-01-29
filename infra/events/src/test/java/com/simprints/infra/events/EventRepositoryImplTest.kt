@@ -9,7 +9,6 @@ import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_N
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
 import com.simprints.infra.events.event.domain.models.EventLabels
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionScope
@@ -379,25 +378,25 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `when observeEventCount called with null type return all events`() = runTest {
-        coEvery { eventLocalDataSource.observeEventCount(any()) } returns flowOf(7)
+        coEvery { eventLocalDataSource.observeEventCount() } returns flowOf(7)
 
-        assertThat(eventRepo.observeEventCount("test", null).firstOrNull()).isEqualTo(7)
+        assertThat(eventRepo.observeEventCount(null).firstOrNull()).isEqualTo(7)
 
-        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount(any()) }
-        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount(any(), any()) }
+        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount() }
+        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount(any()) }
     }
 
     @Test
     fun `when observeEventCount called with type return events of type`() = runTest {
-        coEvery { eventLocalDataSource.observeEventCount(any(), any()) } returns flowOf(7)
+        coEvery { eventLocalDataSource.observeEventCount(any()) } returns flowOf(7)
 
         assertThat(
-            eventRepo.observeEventCount("test", CALLBACK_ENROLMENT)
+            eventRepo.observeEventCount(CALLBACK_ENROLMENT)
                 .firstOrNull()
         ).isEqualTo(7)
 
-        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount(any()) }
-        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount(any(), any()) }
+        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount() }
+        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount(any()) }
     }
 
     @Test
@@ -410,11 +409,11 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `getAllClosedSessionIds should call local store`() = runTest {
-        coEvery { eventLocalDataSource.loadClosedSessions(any()) } returns emptyList()
+        coEvery { eventLocalDataSource.loadClosedSessions() } returns emptyList()
 
-        eventRepo.getAllClosedSessions("test")
+        eventRepo.getAllClosedSessions()
 
-        coVerify { eventLocalDataSource.loadClosedSessions(eq("test")) }
+        coVerify { eventLocalDataSource.loadClosedSessions() }
     }
 
     @Test

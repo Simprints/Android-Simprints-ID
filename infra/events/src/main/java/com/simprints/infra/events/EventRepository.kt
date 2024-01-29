@@ -29,7 +29,7 @@ interface EventRepository {
      */
     suspend fun getCurrentSessionScope(): SessionScope
 
-    suspend fun getAllClosedSessions(projectId: String): List<SessionScope>
+    suspend fun getAllClosedSessions(): List<SessionScope>
 
     suspend fun saveSessionScope(sessionScope: SessionScope)
 
@@ -39,7 +39,7 @@ interface EventRepository {
 
     suspend fun getEventsJsonFromSession(sessionId: String): List<String>
 
-    suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int>
+    suspend fun observeEventCount(type: EventType?): Flow<Int>
 
     suspend fun loadAll(): Flow<Event>
 

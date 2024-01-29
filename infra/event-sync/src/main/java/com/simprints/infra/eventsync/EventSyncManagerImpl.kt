@@ -129,8 +129,8 @@ internal class EventSyncManagerImpl @Inject constructor(
         wm.pruneWork()
     }
 
-    override suspend fun countEventsToUpload(projectId: String, type: EventType?): Flow<Int> =
-        eventRepository.observeEventCount(projectId, type)
+    override suspend fun countEventsToUpload(type: EventType?): Flow<Int> =
+        eventRepository.observeEventCount(type)
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
         val projectConfig = configRepository.getProjectConfiguration()

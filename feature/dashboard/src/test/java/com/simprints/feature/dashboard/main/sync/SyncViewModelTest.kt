@@ -213,7 +213,7 @@ internal class SyncViewModelTest {
     @Test
     fun `should post a SyncPendingUpload card state if there are records to upload`() {
         coEvery { configRepository.getDeviceConfiguration() } returns deviceConfiguration
-        coEvery { eventSyncManager.countEventsToUpload(any(), any()) }.returns(flowOf(2))
+        coEvery { eventSyncManager.countEventsToUpload(any()) }.returns(flowOf(2))
 
         isConnected.value = true
         syncState.value = EventSyncState(
