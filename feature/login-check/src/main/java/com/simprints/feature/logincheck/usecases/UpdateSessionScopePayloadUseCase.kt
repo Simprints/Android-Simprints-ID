@@ -15,7 +15,6 @@ internal class UpdateSessionScopePayloadUseCase @Inject constructor(
         val configUpdatedAt = configRepository.getProjectConfiguration().updatedAt
         val recordCount = enrolmentRecordRepository.count()
         val sessionScope = eventRepository.getCurrentSessionScope()
-
         val updatedScope = sessionScope.copy(
             payload = sessionScope.payload.copy(
                 projectConfigurationUpdatedAt = configUpdatedAt,
@@ -24,7 +23,6 @@ internal class UpdateSessionScopePayloadUseCase @Inject constructor(
                 )
             )
         )
-
         eventRepository.saveSessionScope(updatedScope)
     }
 }

@@ -16,7 +16,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.flow.emptyFlow
@@ -35,9 +34,6 @@ class ProjectAuthenticatorTest {
     private lateinit var secureDataManager: SecurityManager
 
     @MockK
-    private lateinit var projectSecretManager: ProjectSecretManager
-
-    @MockK
     private lateinit var signerManager: SignerManager
 
     @MockK
@@ -54,7 +50,6 @@ class ProjectAuthenticatorTest {
         mockManagers()
 
         authenticator = ProjectAuthenticator(
-            projectSecretManager,
             secureDataManager,
             configRepository,
             signerManager,
@@ -154,7 +149,6 @@ class ProjectAuthenticatorTest {
     }
 
     private fun mockManagers() {
-        every { projectSecretManager.encryptProjectSecret(any(), any()) } returns PROJECT_SECRET
 
         coEvery {
             authenticationRemoteDataSource.requestAuthenticationData(any(), any())

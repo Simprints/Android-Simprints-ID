@@ -5,7 +5,6 @@ import com.simprints.infra.authlogic.integrity.IntegrityTokenRequester
 import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authstore.domain.models.AuthRequest
-import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
 import com.simprints.infra.config.store.ConfigRepository
@@ -17,7 +16,6 @@ import java.io.IOException
 import javax.inject.Inject
 
 internal class ProjectAuthenticator @Inject constructor(
-    private val projectSecretManager: ProjectSecretManager,
     private val secureDataManager: SecurityManager,
     private val configRepository: ConfigRepository,
     private val signerManager: SignerManager,
@@ -59,18 +57,12 @@ internal class ProjectAuthenticator @Inject constructor(
             nonceScope.deviceId,
         )
         return buildAuthRequest(
-            getEncryptedProjectSecret(projectSecret, authenticationData),
+            projectSecret,
             integrityTokenRequester.getToken(authenticationData.nonce),
         )
     }
 
-    private fun getEncryptedProjectSecret(
-        projectSecret: String,
-        authenticationData: AuthenticationData,
-    ): String = projectSecretManager.encryptProjectSecret(
-        projectSecret,
-        authenticationData.publicKey
-    )
+
 
     private fun buildAuthRequest(
         encryptedProjectSecret: String,

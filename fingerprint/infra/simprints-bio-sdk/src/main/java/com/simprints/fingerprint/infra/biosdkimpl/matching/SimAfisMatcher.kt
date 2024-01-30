@@ -53,7 +53,13 @@ class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         probe: FingerprintIdentity,
         candidates: List<FingerprintIdentity>
     ): List<MatchResult> {
-        val simAfisCandidates = candidates.map { it.toSimAfisPerson() }
+        val simAfisCandidates = candidates.mapNotNull {
+            if (it.fingerprints.any { it.format != SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT }) {
+                println("Skipping candidate ${it.id} because it has a template format that is not supported by SimAfisMatcher")
+                return@mapNotNull null
+            }
+            it.toSimAfisPerson()
+        }
 
         println("Matching ${simAfisCandidates.size} candidates using all ${jniLibAfis.getNbCores()} cores")
 
@@ -72,9 +78,9 @@ class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         SimAfisPerson(id, fingerprints.map { it.toSimAfisFingerprint() })
 
     private fun Fingerprint.toSimAfisFingerprint(): SimAfisFingerprint {
-        require(format == SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT) {
-            "Attempting to use $format template format for SimAfisMatcher which only accepts $SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT"
-        }
+//        require(format == SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT) {
+//            "Attempting to use $format template format for SimAfisMatcher which only accepts $SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT"
+//        }
         return SimAfisFingerprint(fingerId.toSimAfisFingerIdentifier(), template)
     }
 
