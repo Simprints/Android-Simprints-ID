@@ -10,6 +10,7 @@ import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy.CROSS_FINGER_USING_MEAN_OF_MAX
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.logging.LoggingConstants
 import com.simprints.matcher.FingerprintMatchResult
@@ -45,7 +46,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
             matchParams.queryForCandidates.copy(
                 fingerprintSampleFormat = resolveBioSdkWrapper().supportedTemplateFormat
             )
-        val totalCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat)
+        val totalCandidates = enrolmentRecordRepository.count(queryWithSupportedFormat, dataSource = matchParams.biometricDataSource)
         if (totalCandidates == 0) {
             return@coroutineScope Pair(emptyList(), 0)
         }
@@ -54,7 +55,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         createRanges(totalCandidates)
             .map { range ->
                 async(dispatcher) {
-                    val batchCandidates = getCandidates(queryWithSupportedFormat, range)
+                    val batchCandidates = getCandidates(queryWithSupportedFormat, range, matchParams.biometricDataSource)
                     match(samples, batchCandidates, matchParams.flowType)
                         .fold(MatchResultSet<FingerprintMatchResult.Item>()) { acc, item ->
                             acc.add(FingerprintMatchResult.Item(item.id, item.score))
@@ -69,8 +70,12 @@ internal class FingerprintMatcherUseCase @Inject constructor(
     private fun mapSamples(probes: List<MatchParams.FingerprintSample>) = probes
         .map { Fingerprint(it.fingerId.toMatcherDomain(), it.template, it.format) }
 
-    private suspend fun getCandidates(query: SubjectQuery, range: IntRange) = enrolmentRecordRepository
-        .loadFingerprintIdentities(query, range)
+    private suspend fun getCandidates(
+        query: SubjectQuery,
+        range: IntRange,
+        dataSource: BiometricDataSource = BiometricDataSource.SIMPRINTS,
+    ) = enrolmentRecordRepository
+        .loadFingerprintIdentities(query, range, dataSource)
         .map {
             FingerprintIdentity(
                 it.patientId,

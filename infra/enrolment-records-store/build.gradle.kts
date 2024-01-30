@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":infra:config-store"))
     implementation(project(":infra:auth-store"))
     implementation(project(":infra:realm"))
+    implementation(project(":infra:events"))
 
     implementation(libs.retrofit.core)
     implementation(libs.jackson.core)

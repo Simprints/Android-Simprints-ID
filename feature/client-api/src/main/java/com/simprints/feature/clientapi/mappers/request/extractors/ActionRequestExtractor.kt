@@ -21,6 +21,8 @@ internal abstract class ActionRequestExtractor(private val extras: Map<String, A
     open fun getUserId(): String = extras.extractString(Constants.SIMPRINTS_USER_ID)
 
     open fun getModuleId(): String = extras.extractString(Constants.SIMPRINTS_MODULE_ID)
+    
+    open fun getBiometricDataSource(): String = extras.extractString(Constants.SIMPRINTS_BIOMETRIC_DATA_SOURCE)
 
     open fun getMetadata(): String = extras.extractString(Constants.SIMPRINTS_METADATA)
 
