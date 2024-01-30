@@ -255,7 +255,6 @@ class EventMigration10to11Test {
         private const val OLD_ARTIFICIAL_TERMINATION_EVENT_KEY = "ARTIFICIAL_TERMINATION"
 
         private const val PROJECT_ID = "aProjectID"
-        private const val SESSION_ID = "aSessionID"
         private const val DEVICE_ID = "aDeviceID"
         private const val CREATED_AT = 123
         private const val ENDED_AT = 123

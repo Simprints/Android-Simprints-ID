@@ -1,17 +1,22 @@
 package com.simprints.infra.events.event.local.migrations
 
+import android.content.ContentValues
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
+import androidx.annotation.Keep
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.Timestamp
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.config.store.models.GeneralConfiguration
+import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.session.Device
+import com.simprints.infra.events.event.domain.models.session.Location
 import com.simprints.infra.events.event.domain.models.session.SessionEndCause
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
-import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration10to11 : Migration(10, 11) {
@@ -88,31 +93,22 @@ internal class EventMigration10to11 : Migration(10, 11) {
         )
     }
 
-    private fun fromJsonToDomain(eventJson: String): SessionCaptureEvent = JsonHelper.fromJson(
+    private fun fromJsonToDomain(eventJson: String): OldSessionCaptureEvent = JsonHelper.fromJson(
         json = eventJson,
-        module = DbEvent.dbSerializationModule,
-        type = object : TypeReference<SessionCaptureEvent>() {}
+        type = object : TypeReference<OldSessionCaptureEvent>() {}
     )
 
     private fun writeSessionScopeToDatabase(database: SupportSQLiteDatabase, scope: SessionScope) {
         val payloadJson = JsonHelper.toJson(scope.payload)
-        database.compileStatement(
-            """
-                INSERT INTO $SCOPE_TABLE_NAME (id, projectId, createdAt, endedAt, payloadJson) 
-                VALUES (?, ?, ?, ?, ?)
-            """.trimIndent()
-        ).use {
-            it.bindString(1, scope.id)
-            it.bindString(2, scope.projectId)
-            it.bindLong(3, scope.createdAt.ms)
+        database.insert(SCOPE_TABLE_NAME, SQLiteDatabase.CONFLICT_NONE, ContentValues().apply {
+            put("id", scope.id)
+            put("projectId", scope.projectId)
+            put("createdAt", scope.createdAt.ms)
             if (scope.endedAt != null) {
-                it.bindLong(4, scope.endedAt!!.ms)
-            } else {
-                it.bindNull(4)
+                put("endedAt", scope.endedAt!!.ms)
             }
-            it.bindString(5, payloadJson)
-            it.executeInsert()
-        }
+            put("payloadJson", payloadJson)
+        })
     }
 
     private fun deleteSessionCaptureEvents(database: SupportSQLiteDatabase) {
@@ -139,5 +135,35 @@ internal class EventMigration10to11 : Migration(10, 11) {
         private const val KEY_EVENT_TYPE_TERMINATION = "ARTIFICIAL_TERMINATION"
 
     }
+
+    // Snapshot of the session capture event structure at the moment when this migration was
+    // introduced. This is needed to be able to parse the old events from the database.
+    @Keep
+    internal data class OldSessionCaptureEvent(
+        val id: String,
+        var labels: EventLabels,
+        val payload: SessionCapturePayload,
+    ) {
+
+        @Keep
+        data class EventLabels(
+            val sessionId: String? = null,
+        )
+
+        @Keep
+        data class SessionCapturePayload(
+            var projectId: String,
+            val createdAt: Long,
+            var modalities: List<GeneralConfiguration.Modality>,
+            val appVersionName: String,
+            val libVersionName: String,
+            var language: String,
+            val device: Device,
+            val databaseInfo: DatabaseInfo,
+            var location: Location? = null,
+            var endedAt: Long = 0,
+        )
+    }
+
 }
 
