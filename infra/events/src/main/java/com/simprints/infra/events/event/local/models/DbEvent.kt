@@ -18,16 +18,15 @@ import com.simprints.infra.events.event.local.models.DbEvent.Companion.dbSeriali
 @Entity
 internal data class DbEvent(
     @PrimaryKey var id: String,
-
-    @Embedded var labels: EventLabels,
-    val type: EventType?,
+    @Embedded("createdAt_") val createdAt: DbTimestamp,
+    val type: EventType,
+    val projectId: String? = null,
+    val sessionId: String? = null,
     var eventJson: String,
-    val createdAt: Long,
-    val endedAt: Long,
-    val sessionIsClosed: Boolean,
 ) {
 
     companion object {
+
         const val DEFAULT_EVENT_VERSION = 0
         val dbSerializationModule = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
@@ -37,18 +36,13 @@ internal data class DbEvent(
 }
 
 internal fun Event.fromDomainToDb(): DbEvent {
-    val sessionIsClosed =
-        if (this is SessionCaptureEvent) this.payload.sessionIsClosed
-        else false
-
     return DbEvent(
         id = id,
-        labels = labels,
+        sessionId = labels.sessionId,
+        projectId = labels.projectId,
         type = payload.type,
         eventJson = JsonHelper.toJson(this, module = dbSerializationModule),
-        createdAt = payload.createdAt,
-        endedAt = payload.endedAt,
-        sessionIsClosed = sessionIsClosed
+        createdAt = DbTimestamp(payload.createdAt),
     )
 }
 

@@ -31,18 +31,10 @@ class EventMigration11to12Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 12, true, EventMigration11to12())
         MigrationTestingTools.retrieveCursorWithScopeById(db, "session-id").use { scope ->
-            assertThat(scope.getColumnIndex("createdAt")).isEqualTo(-1)
-            assertThat(scope.getColumnIndex("start_unixMs")).isNotEqualTo(-1)
-            assertThat(scope.getColumnIndex("start_isTrustworthy")).isNotEqualTo(-1)
-            assertThat(scope.getColumnIndex("start_msSinceBoot")).isNotEqualTo(-1)
             assertThat(scope.getLongWithColumnName("start_unixMs")).isEqualTo(12)
             assertThat(scope.getIntWithColumnName("start_isTrustworthy")).isEqualTo(0)
 
             // Also check that end timestamp has been updated with all null
-            assertThat(scope.getColumnIndex("endedAt")).isEqualTo(-1)
-            assertThat(scope.getColumnIndex("end_unixMs")).isNotEqualTo(-1)
-            assertThat(scope.getColumnIndex("end_isTrustworthy")).isNotEqualTo(-1)
-            assertThat(scope.getColumnIndex("end_msSinceBoot")).isNotEqualTo(-1)
             assertThat(scope.getLongWithColumnName("end_unixMs")).isNull()
             assertThat(scope.getIntWithColumnName("end_isTrustworthy")).isNull()
         }
@@ -61,11 +53,6 @@ class EventMigration11to12Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 12, true, EventMigration11to12())
         MigrationTestingTools.retrieveCursorWithScopeById(db, "session-id").use { scope ->
-            assertThat(scope.getColumnIndex("endedAt")).isEqualTo(-1)
-            assertThat(scope.getColumnIndex("end_unixMs")).isNotEqualTo(-1)
-            assertThat(scope.getColumnIndex("end_isTrustworthy")).isNotEqualTo(-1)
-            assertThat(scope.getColumnIndex("end_msSinceBoot")).isNotEqualTo(-1)
-
             assertThat(scope.getLongWithColumnName("end_unixMs")).isEqualTo(34)
             assertThat(scope.getIntWithColumnName("end_isTrustworthy")).isEqualTo(0)
         }

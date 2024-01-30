@@ -19,7 +19,7 @@ import net.sqlcipher.database.SupportFactory
         DbEvent::class,
         DbSessionScope::class,
     ],
-    version = 12,
+    version = 13,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -49,6 +49,7 @@ internal abstract class EventRoomDatabase : RoomDatabase() {
                 .addMigrations(EventMigration9to10())
                 .addMigrations(EventMigration10to11())
                 .addMigrations(EventMigration11to12())
+                .addMigrations(EventMigration12to13())
 
             if (BuildConfig.DB_ENCRYPTION)
                 builder.openHelperFactory(factory)

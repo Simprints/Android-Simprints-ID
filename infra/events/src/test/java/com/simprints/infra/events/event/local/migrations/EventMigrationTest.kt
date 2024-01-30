@@ -112,6 +112,9 @@ class EventMigrationTest {
             EventMigration7to8(),
             EventMigration8to9(),
             EventMigration9to10(),
+            EventMigration10to11(),
+            EventMigration11to12(),
+            EventMigration12to13(),
         )
         val tokenizeSerializationModule = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())
