@@ -93,6 +93,23 @@ internal class EventDownSyncScopeRepositoryTest {
     }
 
     @Test
+    fun buildProjectDownSyncScopeWhenUserIsMissing() {
+        runTest(UnconfinedTestDispatcher()) {
+            coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
+                every { lastUserUsed } returns "".asTokenizableEncrypted()
+            }
+
+            val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+                listOf(Modes.FINGERPRINT),
+                DEFAULT_MODULES.toList(),
+                GROUP.GLOBAL
+            )
+
+            assertProjectSyncScope(syncScope)
+        }
+    }
+
+    @Test
     fun buildUserDownSyncScope() {
         runTest(UnconfinedTestDispatcher()) {
 
@@ -120,6 +137,23 @@ internal class EventDownSyncScopeRepositoryTest {
     }
 
     @Test
+    fun buildModuleDownSyncScopeWhenUserIsMissing() {
+        runTest(UnconfinedTestDispatcher()) {
+            coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
+                every { lastUserUsed } returns "".asTokenizableEncrypted()
+            }
+
+            val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+                listOf(Modes.FINGERPRINT),
+                DEFAULT_MODULES.toList(),
+                GROUP.MODULE
+            )
+
+            assertModuleSyncScope(syncScope)
+        }
+    }
+
+    @Test
     fun throwWhenProjectIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
             every { authStore.signedInProjectId } returns ""
@@ -135,7 +169,7 @@ internal class EventDownSyncScopeRepositoryTest {
     }
 
     @Test
-    fun throwWhenUserIsMissing() {
+    fun throwWhenUserDownSyncAndUserIsMissing() {
         runTest(UnconfinedTestDispatcher()) {
             coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
                 every { lastUserUsed } returns "".asTokenizableEncrypted()
@@ -145,7 +179,7 @@ internal class EventDownSyncScopeRepositoryTest {
                 eventDownSyncScopeRepository.getDownSyncScope(
                     listOf(Modes.FINGERPRINT),
                     DEFAULT_MODULES.toList(),
-                    GROUP.GLOBAL
+                    GROUP.USER
                 )
             }
         }

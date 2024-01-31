@@ -26,11 +26,10 @@ internal class EventDownSyncScopeRepository @Inject constructor(
         syncGroup: GROUP
     ): EventDownSyncScope {
         val projectId = getProjectId()
-        val possibleUserId = getUserId()
 
         val syncScope = when (syncGroup) {
             GROUP.GLOBAL -> SubjectProjectScope(projectId, modes)
-            GROUP.USER -> SubjectUserScope(projectId, possibleUserId, modes)
+            GROUP.USER -> SubjectUserScope(projectId, getUserId(), modes)
             GROUP.MODULE -> SubjectModuleScope(projectId, selectedModuleIDs, modes)
         }
 
