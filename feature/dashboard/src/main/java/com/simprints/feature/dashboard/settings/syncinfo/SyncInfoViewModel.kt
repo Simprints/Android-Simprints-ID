@@ -7,10 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
+import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
+import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.models.isEventDownSyncAllowed
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
+import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.eventsync.EventSyncManager
@@ -19,12 +24,9 @@ import com.simprints.infra.eventsync.status.models.EventSyncState
 import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
-import com.simprints.infra.authstore.AuthStore
-import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.config.store.tokenization.TokenizationProcessor
-import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.network.ConnectivityTracker
+import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.exceptions.RootedDeviceException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -34,6 +36,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncInfoViewModel @Inject constructor(
+    private val rootManager: SecurityManager,
     private val configRepository: ConfigRepository,
     connectivityTracker: ConnectivityTracker,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
@@ -146,6 +149,12 @@ internal class SyncInfoViewModel @Inject constructor(
     }
 
     private fun load() = viewModelScope.launch {
+        // if device is not safe stop all sync operations
+        // users can root the device after login and we need to stop sync operations
+        if (isDeviceSafe().not()) {
+            return@launch
+        }
+
         val projectId = authStore.signedInProjectId
 
         awaitAll(
@@ -163,13 +172,21 @@ internal class SyncInfoViewModel @Inject constructor(
         )
     }
 
+    fun isDeviceSafe(): Boolean = try {
+        rootManager.checkIfDeviceIsRooted()
+        true
+    } catch (e: RootedDeviceException) {
+        Simber.e(e)
+        false
+    }
+
     private fun emitSyncAvailable(
         isSyncRunning: Boolean?,
         isConnected: Boolean?,
         syncConfiguration: SynchronizationConfiguration? = configuration.value?.synchronization,
     ) = isConnected == true
-            && isSyncRunning == false
-            && syncConfiguration?.let {
+        && isSyncRunning == false
+        && syncConfiguration?.let {
         !isModuleSync(it.down) || isModuleSyncAndModuleIdOptionsNotEmpty(
             it
         )

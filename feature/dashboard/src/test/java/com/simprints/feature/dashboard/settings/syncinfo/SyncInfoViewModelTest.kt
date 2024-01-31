@@ -39,6 +39,8 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.exceptions.RootedDeviceException
 
 class SyncInfoViewModelTest {
 
@@ -75,6 +77,9 @@ class SyncInfoViewModelTest {
     private lateinit var project: Project
 
     @MockK(relaxed = true)
+    private lateinit var rootManager: SecurityManager
+
+    @MockK(relaxed = true)
     private lateinit var tokenizationProcessor: TokenizationProcessor
 
     private lateinit var connectionLiveData: MutableLiveData<Boolean>
@@ -95,6 +100,7 @@ class SyncInfoViewModelTest {
         every { eventSyncManager.getLastSyncState() } returns stateLiveData
         coEvery { configRepo.getProject(PROJECT_ID) } returns project
         viewModel = SyncInfoViewModel(
+            rootManager = rootManager,
             configRepository = configRepo,
             connectivityTracker = connectivityTracker,
             enrolmentRecordRepository = enrolmentRecordRepository,
@@ -105,6 +111,20 @@ class SyncInfoViewModelTest {
         )
     }
 
+
+    @Test
+    fun `should not load anything if the device is rooted`() = runTest {
+        every { rootManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
+
+        viewModel.refreshInformation()
+
+        assertThat(viewModel.recordsInLocal.getOrAwaitValue()).isNull()
+        assertThat(viewModel.recordsToUpSync.getOrAwaitValue()).isNull()
+        assertThat(viewModel.imagesToUpload.getOrAwaitValue()).isNull()
+        assertThat(viewModel.recordsToDownSync.getOrAwaitValue()).isNull()
+        assertThat(viewModel.recordsToDelete.getOrAwaitValue()).isNull()
+        assertThat(viewModel.moduleCounts.getOrAwaitValue()).isEmpty()
+    }
     @Test
     fun `should initialize the configuration live data correctly`() = runTest {
         val configuration = mockk<ProjectConfiguration>(relaxed = true)
