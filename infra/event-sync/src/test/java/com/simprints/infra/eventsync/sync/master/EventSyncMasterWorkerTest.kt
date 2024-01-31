@@ -26,12 +26,15 @@ import com.simprints.infra.eventsync.sync.common.TAG_MASTER_SYNC_ID
 import com.simprints.infra.eventsync.sync.common.TAG_SUBJECTS_SYNC_ALL_WORKERS
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
+import com.simprints.infra.security.SecurityManager
+import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.verify
@@ -98,6 +101,9 @@ internal class EventSyncMasterWorkerTest {
     @MockK
     lateinit var timeHelper: TimeHelper
 
+    @RelaxedMockK
+    private lateinit var securityManager: SecurityManager
+
     private lateinit var masterWorker: EventSyncMasterWorker
 
     @Before
@@ -134,8 +140,16 @@ internal class EventSyncMasterWorkerTest {
             eventSyncCache = eventSyncCache,
             eventSyncSubMasterWorkersBuilder = eventSyncSubMasterWorkersBuilder,
             timeHelper = timeHelper,
-            dispatcher = testCoroutineRule.testCoroutineDispatcher
+            dispatcher = testCoroutineRule.testCoroutineDispatcher,
+            securityManager = securityManager
         )
+    }
+
+    @Test
+    fun `doWork should fail if device is rooted`() = runTest {
+        coEvery { securityManager.checkIfDeviceIsRooted() } throws RootedDeviceException()
+        val result = masterWorker.doWork()
+        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 
     @Test
