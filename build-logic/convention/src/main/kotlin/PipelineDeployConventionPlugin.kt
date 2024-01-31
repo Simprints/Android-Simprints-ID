@@ -11,7 +11,7 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
         with(target) {
-            apply(from = "${rootDir}/build-logic/signing_properties.gradle.kts")
+            apply(from = "${rootDir}/build-logic/signing_info.gradle.kts")
             val props = extra.properties
 
             with(pluginManager) {
@@ -32,12 +32,7 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         storeFile = file(props["store_file"] as String)
                         storePassword = props["store_password"] as String
                     }
-                    create("stagingConfig") {
-                        keyAlias = props["staging_key_alias"] as String
-                        keyPassword = props["key_password"] as String
-                        storeFile = file(props["store_file"] as String)
-                        storePassword = props["store_password"] as String
-                    }
+
                 }
 
                 buildFeatures.buildConfig = true
@@ -46,18 +41,24 @@ class PipelineDeployConventionPlugin : Plugin<Project> {
                         signingConfig = signingConfigs.getByName("config")
                     }
                     getByName("staging") {
-                        signingConfig = signingConfigs.getByName("stagingConfig")
+                        signingConfig = signingConfigs.getByName("config")
 
                         firebaseAppDistribution {
-                            appId = "1:423867324644:android:7c4e84b7f391800f44b4f1"
                             artifactType = "APK"
-                            artifactPath = "$rootDir/id/build/outputs/apk_from_bundle/staging/id-staging-universal.apk"
-                            serviceCredentialsFile = "id/src/staging/serviceCredentialsFile.json"
+                            serviceCredentialsFile =
+                                "$rootDir/id/src/serviceCredentialsFile.json"
                             groups = "pre-release-testers"
                         }
                     }
                     getByName("debug") {
                         signingConfig = signingConfigs.getByName("config")
+                        firebaseAppDistribution {
+                            artifactType = "APK"
+                            serviceCredentialsFile =
+                                "$rootDir/id/src/serviceCredentialsFile.json"
+                            groups = "pre-release-testers"
+                        }
+
                     }
                 }
             }
