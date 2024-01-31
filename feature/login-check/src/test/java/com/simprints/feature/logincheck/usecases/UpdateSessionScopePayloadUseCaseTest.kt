@@ -62,7 +62,7 @@ internal class UpdateSessionScopePayloadUseCaseTest {
     private fun createBlankSessionScope() = SessionScope(
         id = "eventId",
         projectId = "projectId",
-        createdAt = Timestamp.fromLong(0L),
+        createdAt = Timestamp(0L),
         endedAt = null,
         payload = SessionScopePayload(
             endCause = null,

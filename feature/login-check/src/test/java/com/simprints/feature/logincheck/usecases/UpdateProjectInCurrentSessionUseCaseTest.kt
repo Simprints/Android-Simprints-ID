@@ -80,9 +80,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
 
         coVerify(exactly = 1) {
             eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it.labels.projectId).isEqualTo(
-                    SIGNED_PROJECT_ID
-                )
+                assertThat(it.projectId).isEqualTo(SIGNED_PROJECT_ID)
             })
         }
     }
@@ -108,7 +106,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     private fun createBlankSessionScope(projectId: String) = SessionScope(
         id = "eventId",
         projectId = projectId,
-        createdAt = Timestamp.fromLong(0L),
+        createdAt = Timestamp(0L),
         endedAt = null,
         payload = SessionScopePayload(
             endCause = null,
@@ -125,7 +123,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     private fun createBlankSessionEvent(projectId: String) = SessionCaptureEvent(
         id = "eventId",
         projectId = projectId,
-        createdAt = 0,
+        createdAt = Timestamp(0L),
         modalities = emptyList(),
         appVersionName = "appVersionName",
         libVersionName = "libVersionName",

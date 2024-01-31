@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
@@ -88,6 +89,6 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
 abstract class EventPayload {
     abstract val type: EventType
     abstract val eventVersion: Int
-    abstract val createdAt: Long
-    abstract val endedAt: Long
+    abstract val createdAt: Timestamp
+    abstract val endedAt: Timestamp?
 }

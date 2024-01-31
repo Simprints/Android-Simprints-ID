@@ -7,27 +7,29 @@ import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCapture
+import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiFace
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
+import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiFaceCapturePayload(
     val id: String,
-    override val startTime: Long,
-    val endTime: Long,
+    override val startTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     override val version: Int,
     val attemptNb: Int,
     val qualityThreshold: Float,
     val result: ApiResult,
     val isFallback: Boolean,
-    val face: ApiFace?
+    val face: ApiFace?,
 ) : ApiEventPayload(FaceCapture, version, startTime) {
 
     constructor(domainPayload: FaceCapturePayload) : this(
         domainPayload.id,
-        domainPayload.createdAt,
-        domainPayload.endedAt,
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.eventVersion,
         domainPayload.attemptNb,
         domainPayload.qualityThreshold,
@@ -41,11 +43,12 @@ internal data class ApiFaceCapturePayload(
         val yaw: Float,
         var roll: Float,
         val quality: Float,
-        val format: String
+        val format: String,
     )
 
     @Keep
     enum class ApiResult {
+
         VALID,
         INVALID,
         OFF_YAW,

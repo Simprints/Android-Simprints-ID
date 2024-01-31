@@ -3,6 +3,7 @@ package com.simprints.feature.consent.screens.consent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.consent.ConsentType
 import com.simprints.feature.consent.screens.consent.helpers.GeneralConsentTextHelper
@@ -68,7 +69,7 @@ class ConsentViewModelTest {
         coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         every { projectConfig.consent } returns mockk()
 
-        every { timeHelper.now() } returns TIMESTAMP
+        every { timeHelper.nowTimestamp() } returns TIMESTAMP
         every { generalConsentTextHelper.assembleText(any(), any(), any()) } returns GENERAL_CONSENT
         every { parentalConsentTextHelper.assembleText(any(), any(), any()) } returns PARENTAL_CONSENT
 
@@ -195,7 +196,7 @@ class ConsentViewModelTest {
     }
 
     companion object {
-        private const val TIMESTAMP = 1L
+        private val TIMESTAMP = Timestamp(1L)
         private const val GENERAL_CONSENT = "General consent"
         private const val PARENTAL_CONSENT = "Parental consent"
     }

@@ -19,7 +19,7 @@ internal class AlertViewModel @Inject constructor(
 
     fun saveAlertEvent(type: AlertScreenEvent.AlertScreenPayload.AlertScreenEventType) {
         ioScope.launch {
-            eventRepository.addOrUpdateEvent(AlertScreenEvent(timeHelper.now(), type))
+            eventRepository.addOrUpdateEvent(AlertScreenEvent(timeHelper.nowTimestamp(), type))
         }
     }
 }

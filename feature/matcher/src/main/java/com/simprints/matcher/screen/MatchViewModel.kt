@@ -38,7 +38,7 @@ internal class MatchViewModel @Inject constructor(
     private val _matchResponse = MutableLiveData<LiveDataEventWithContent<Serializable>>()
 
     fun setupMatch(params: MatchParams) = viewModelScope.launch {
-        val startTime = timeHelper.now()
+        val startTime = timeHelper.nowTimestamp()
 
         val isFaceMatch = params.isFaceMatch()
         val matcherUseCase = when {
@@ -54,7 +54,7 @@ internal class MatchViewModel @Inject constructor(
             },
         )
 
-        val endTime = timeHelper.now()
+        val endTime = timeHelper.nowTimestamp()
 
         saveMatchEvent(
             startTime,

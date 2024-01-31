@@ -28,7 +28,7 @@ internal class CreateSessionIfRequiredUseCase @Inject constructor(
 
         coreEventRepository.createSession()
             .also { Simber.tag(LoggingConstants.CrashReportingCustomKeys.SESSION_ID, true).i(it.id) }
-        coreEventRepository.addOrUpdateEvent(IntentParsingEvent(timeHelper.now(), integrationInfo))
+        coreEventRepository.addOrUpdateEvent(IntentParsingEvent(timeHelper.nowTimestamp(), integrationInfo))
         return true
     }
 }

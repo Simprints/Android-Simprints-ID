@@ -3,11 +3,6 @@ package com.simprints.infra.events
 import android.os.Build
 import android.os.Build.VERSION
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
-import com.simprints.infra.events.event.domain.models.AlertScreenEvent
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
-import com.simprints.infra.events.event.domain.models.EventLabels
-import com.simprints.infra.events.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
@@ -17,7 +12,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createSessionCaptureEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import io.mockk.coEvery
-import io.mockk.coVerify
 import kotlinx.coroutines.flow.flowOf
 
 internal fun EventRepositoryImplTest.mockDbToHaveOneOpenSession(id: String = GUID1): SessionScope {
@@ -58,21 +52,5 @@ internal fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
     coEvery { eventLocalDataSource.loadAllEvents() } returns flowOf(session)
 }
 
-internal fun EventRepositoryImplTest.verifyArtificialEventWasAdded(
-    id: String,
-    reason: ArtificialTerminationPayload.Reason,
-) {
-    coVerify {
-        eventLocalDataSource.saveEvent(match {
-            it.type == ARTIFICIAL_TERMINATION &&
-                it.labels.sessionId == id &&
-                (it as ArtificialTerminationEvent).payload.reason == reason
-        })
-    }
-}
-
 fun SessionCaptureEvent.openSession(): SessionCaptureEvent =
     this.copy(payload = this.payload.copy(sessionIsClosed = false))
-
-fun AlertScreenEvent.removeLabels(): AlertScreenEvent =
-    this.copy(id = GUID1, labels = EventLabels())

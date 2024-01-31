@@ -6,13 +6,8 @@ import com.simprints.core.tools.time.Timestamp
 @Keep
 internal data class ApiTimestamp(
     val unixMs: Long,
-    val isUnixMsTrustworthy: Boolean,
-    val elapsedSinceBoot: Long?,
-) {
+    val isUnixMsTrustworthy: Boolean = false,
+    val elapsedSinceBoot: Long? = null,
+)
 
-    constructor(timestamp: Timestamp) : this(
-        timestamp.ms,
-        timestamp.isTrustworthy,
-        timestamp.msSinceBoot
-    )
-}
+internal fun Timestamp.fromDomainToApi() = ApiTimestamp(ms, isTrustworthy, msSinceBoot)

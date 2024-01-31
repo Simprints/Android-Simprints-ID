@@ -70,12 +70,12 @@ internal class EventMigration10to11 : Migration(10, 11) {
         val event = fromJsonToDomain(jsonData)
         val sessionId = event.labels.sessionId ?: return null
 
-        val endedAt = event.payload.endedAt.takeIf { it > 0 }?.let { Timestamp.fromLong(it) }
+        val endedAt = event.payload.endedAt.takeIf { it > 0 }?.let { Timestamp(it) }
 
         return SessionScope(
             id = sessionId,
             projectId = event.payload.projectId,
-            createdAt = Timestamp.fromLong(event.payload.createdAt),
+            createdAt = Timestamp(event.payload.createdAt),
             endedAt = endedAt,
             payload = SessionScopePayload(
                 // Other end causes have not been used for a long time so it is save to assume

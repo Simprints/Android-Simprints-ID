@@ -2,11 +2,9 @@ package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_LAST_BIOMETRICS
 import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiometricsCalloutEvent.Companion.EVENT_VERSION
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
@@ -16,9 +14,9 @@ import org.junit.Test
 
 @Keep
 class EnrolmentLastBiometricsCalloutEventTest {
+
     @Test
     fun create_EnrolmentLastBiometricsCalloutEvent() {
-        val labels = EventLabels(sessionId = GUID1)
         val event = EnrolmentLastBiometricsCalloutEvent(
             createdAt = CREATED_AT,
             projectId = DEFAULT_PROJECT_ID,
@@ -26,14 +24,12 @@ class EnrolmentLastBiometricsCalloutEventTest {
             moduleId = DEFAULT_MODULE_ID,
             metadata = DEFAULT_METADATA,
             sessionId = GUID1,
-            labels = labels
         )
+
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLOUT_LAST_BIOMETRICS)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)
             assertThat(type).isEqualTo(CALLOUT_LAST_BIOMETRICS)
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)

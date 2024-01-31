@@ -8,6 +8,7 @@ import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.exitform.config.ExitFormOption
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.RefusalEvent
@@ -24,7 +25,7 @@ internal class ExitFormViewModel @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope
 ) : ViewModel() {
 
-    private val exitFormStart: Long = timeHelper.now()
+    private val exitFormStart: Timestamp = timeHelper.nowTimestamp()
 
     private var selectedOption: ExitFormOption? = null
     private var providedReason: String? = null
@@ -85,6 +86,6 @@ internal class ExitFormViewModel @Inject constructor(
     }
 
     private fun logRefusalEvent(option: ExitFormOption, reasonText: String) = externalScope.launch {
-        eventRepository.addOrUpdateEvent(RefusalEvent(exitFormStart, timeHelper.now(), option.answer, reasonText))
+        eventRepository.addOrUpdateEvent(RefusalEvent(exitFormStart, timeHelper.nowTimestamp(), option.answer, reasonText))
     }
 }

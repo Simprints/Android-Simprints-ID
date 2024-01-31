@@ -11,17 +11,19 @@ import com.simprints.infra.events.event.domain.models.callout.IdentificationCall
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callout
+import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
+import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiCalloutPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
     val callout: ApiCallout,
 ) : ApiEventPayload(Callout, version, startTime) {
 
     constructor(domainPayload: EnrolmentCalloutPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
         ApiEnrolmentCallout(
             domainPayload.projectId,
@@ -30,7 +32,7 @@ internal data class ApiCalloutPayload(
             domainPayload.metadata))
 
     constructor(domainPayload: IdentificationCalloutPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
         ApiIdentificationCallout(
             domainPayload.projectId,
@@ -39,7 +41,7 @@ internal data class ApiCalloutPayload(
             domainPayload.metadata))
 
     constructor(domainPayload: VerificationCalloutPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
         ApiVerificationCallout(
             domainPayload.projectId,
@@ -49,14 +51,14 @@ internal data class ApiCalloutPayload(
             domainPayload.verifyGuid))
 
     constructor(domainPayload: ConfirmationCalloutPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
         ApiConfirmationCallout(
             domainPayload.selectedGuid,
             domainPayload.sessionId))
 
     constructor(domainPayload: EnrolmentLastBiometricsCalloutPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
         ApiEnrolmentLastBiometricsCallout(
             domainPayload.projectId,

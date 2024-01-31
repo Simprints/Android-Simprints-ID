@@ -40,17 +40,17 @@ internal class ReportActionRequestEventsUseCase @Inject constructor(
     private fun reportUnknownExtras(actionRequest: ActionRequest) {
         if (actionRequest.unknownExtras.isNotEmpty()) {
             externalScope.launch {
-                coreEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.now(), actionRequest.unknownExtras))
+                coreEventRepository.addOrUpdateEvent(SuspiciousIntentEvent(timeHelper.nowTimestamp(), actionRequest.unknownExtras))
             }
         }
     }
 
     private suspend fun addConnectivityStateEvent() {
-        coreEventRepository.addOrUpdateEvent(ConnectivitySnapshotEvent(timeHelper.now(), simNetworkUtils.connectionsStates))
+        coreEventRepository.addOrUpdateEvent(ConnectivitySnapshotEvent(timeHelper.nowTimestamp(), simNetworkUtils.connectionsStates))
     }
 
     private suspend fun addRequestActionEvent(request: ActionRequest) {
-        val startTime = timeHelper.now()
+        val startTime = timeHelper.nowTimestamp()
         val event = with(request) {
             when (this) {
                 is ActionRequest.EnrolActionRequest -> EnrolmentCalloutEvent(startTime, projectId, userId, moduleId, metadata)

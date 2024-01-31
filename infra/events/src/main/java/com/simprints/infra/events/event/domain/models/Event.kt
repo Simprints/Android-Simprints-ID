@@ -95,7 +95,10 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
         name = FACE_CAPTURE_CONFIRMATION_KEY
     ),
     JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FaceCaptureBiometricsEvent::class, name = FACE_CAPTURE_BIOMETRICS_KEY),
+    JsonSubTypes.Type(
+        value = FaceCaptureBiometricsEvent::class,
+        name = FACE_CAPTURE_BIOMETRICS_KEY
+    ),
     JsonSubTypes.Type(value = FaceFallbackCaptureEvent::class, name = FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FaceOnboardingCompleteEvent::class,
@@ -113,7 +116,10 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
     JsonSubTypes.Type(value = EnrolmentEventV1::class, name = ENROLMENT_V1_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV2::class, name = ENROLMENT_V2_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FingerprintCaptureBiometricsEvent::class, name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureBiometricsEvent::class,
+        name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY
+    ),
     JsonSubTypes.Type(value = GuidSelectionEvent::class, name = GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingEvent::class, name = INTENT_PARSING_KEY),
     JsonSubTypes.Type(value = InvalidIntentEvent::class, name = INVALID_INTENT_KEY),
@@ -130,10 +136,13 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
     JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY)
 )
 abstract class Event {
-    abstract val type: EventType
+
     abstract val id: String
-    abstract var labels: EventLabels
+    abstract val type: EventType
     abstract val payload: EventPayload
+
+    abstract var sessionId: String?
+    abstract var projectId: String?
 
     @JsonIgnore
     abstract fun getTokenizedFields(): Map<TokenKeyType, TokenizableString>

@@ -4,6 +4,7 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import java.util.UUID
@@ -11,19 +12,18 @@ import java.util.UUID
 @Keep
 data class Vero2InfoSnapshotEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: Vero2InfoSnapshotPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         version: Vero2Version.Vero2NewApiVersion,
         battery: BatteryInfo,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi(
             createdAt = createdAt,
             eventVersion = NEW_EVENT_VERSION,
@@ -56,17 +56,17 @@ data class Vero2InfoSnapshotEvent(
     )
     @Keep
     sealed class Vero2InfoSnapshotPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         open val battery: BatteryInfo,
         open val version: Vero2Version,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = VERO_2_INFO_SNAPSHOT,
-        override val endedAt: Long = 0
     ) : EventPayload() {
 
         @Keep
         data class Vero2InfoSnapshotPayloadForNewApi(
-            override val createdAt: Long,
+            override val createdAt: Timestamp,
             override val eventVersion: Int,
             override val battery: BatteryInfo,
             override val version: Vero2Version.Vero2NewApiVersion
@@ -81,7 +81,7 @@ data class Vero2InfoSnapshotEvent(
         @Deprecated(message = "Only used for backwards compatibility")
         @Keep
         data class Vero2InfoSnapshotPayloadForOldApi(
-            override val createdAt: Long,
+            override val createdAt: Timestamp,
             override val eventVersion: Int,
             override val battery: BatteryInfo,
             override val version: Vero2Version.Vero2OldApiVersion
@@ -127,8 +127,8 @@ data class Vero2InfoSnapshotEvent(
     )
 
     companion object {
-        const val NEW_EVENT_VERSION = 2
-        const val OLD_EVENT_VERSION = 1
+        const val NEW_EVENT_VERSION = 3
+        const val OLD_EVENT_VERSION = 2
     }
 }
 

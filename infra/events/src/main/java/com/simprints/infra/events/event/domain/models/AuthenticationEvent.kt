@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
@@ -11,20 +12,19 @@ import java.util.UUID
 @Keep
 data class AuthenticationEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: AuthenticationPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
-        endTime: Long,
+        createdAt: Timestamp,
+        endTime: Timestamp,
         userInfo: UserInfo,
         result: Result,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         AuthenticationPayload(createdAt, EVENT_VERSION, endTime, userInfo, result),
         AUTHENTICATION
     )
@@ -40,15 +40,14 @@ data class AuthenticationEvent(
         )
     )
 
-
     @Keep
     data class AuthenticationPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
-        override var endedAt: Long,
+        override val endedAt: Timestamp?,
         val userInfo: UserInfo,
         val result: Result,
-        override val type: EventType = AUTHENTICATION
+        override val type: EventType = AUTHENTICATION,
     ) : EventPayload() {
 
         @Keep
@@ -56,6 +55,7 @@ data class AuthenticationEvent(
 
         @Keep
         enum class Result {
+
             AUTHENTICATED,
             BAD_CREDENTIALS,
             OFFLINE,
@@ -69,6 +69,7 @@ data class AuthenticationEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+
+        const val EVENT_VERSION = 2
     }
 }

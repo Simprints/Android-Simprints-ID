@@ -14,9 +14,9 @@ import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Can
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiCandidateReadPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
-    val endTime: Long,
+    val endTime: ApiTimestamp?,
     val candidateId: String,
     val localResult: ApiLocalResult,
     val remoteResult: ApiRemoteResult?,
@@ -24,21 +24,24 @@ internal data class ApiCandidateReadPayload(
 
     @Keep
     enum class ApiLocalResult {
+
         FOUND, NOT_FOUND;
     }
 
     @Keep
     enum class ApiRemoteResult {
+
         FOUND, NOT_FOUND;
     }
 
-    constructor(domainPayload: CandidateReadPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.endedAt,
-            domainPayload.candidateId,
-            domainPayload.localResult.fromDomainToApi(),
-            domainPayload.remoteResult?.fromDomainToApi())
+    constructor(domainPayload: CandidateReadPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.eventVersion,
+        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.candidateId,
+        domainPayload.localResult.fromDomainToApi(),
+        domainPayload.remoteResult?.fromDomainToApi()
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

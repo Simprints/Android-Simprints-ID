@@ -38,7 +38,7 @@ internal class ConsentViewModel @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope,
 ) : ViewModel() {
 
-    private val startConsentEventTime = timeHelper.now()
+    private val startConsentEventTime = timeHelper.nowTimestamp()
 
     val viewState: LiveData<ConsentViewState>
         get() = _viewState
@@ -103,7 +103,7 @@ internal class ConsentViewModel @Inject constructor(
     ) = externalScope.launch {
         eventRepository.addOrUpdateEvent(ConsentEvent(
             startConsentEventTime,
-            timeHelper.now(),
+            timeHelper.nowTimestamp(),
             currentConsentTab.asEventPayload(),
             result
         ))

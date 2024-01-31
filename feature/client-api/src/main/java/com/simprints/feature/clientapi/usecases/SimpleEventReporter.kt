@@ -18,13 +18,13 @@ internal class SimpleEventReporter @Inject constructor(
 
     fun addInvalidIntentEvent(action: String, extras: Map<String, Any>) {
         externalScope.launch {
-            coreEventRepository.addOrUpdateEvent(InvalidIntentEvent(timeHelper.now(), action, extras))
+            coreEventRepository.addOrUpdateEvent(InvalidIntentEvent(timeHelper.nowTimestamp(), action, extras))
         }
     }
 
     fun addCompletionCheckEvent(flowCompleted: Boolean) {
         externalScope.launch {
-            coreEventRepository.addOrUpdateEvent(CompletionCheckEvent(timeHelper.now(), flowCompleted))
+            coreEventRepository.addOrUpdateEvent(CompletionCheckEvent(timeHelper.nowTimestamp(), flowCompleted))
         }
     }
 

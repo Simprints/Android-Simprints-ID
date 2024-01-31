@@ -6,15 +6,16 @@ import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSel
 
 @Keep
 internal data class ApiGuidSelectionPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
     val selectedId: String,
 ) : ApiEventPayload(ApiEventPayloadType.GuidSelection, version, startTime) {
 
-    constructor(domainPayload: GuidSelectionPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.selectedId)
+    constructor(domainPayload: GuidSelectionPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.eventVersion,
+        domainPayload.selectedId,
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

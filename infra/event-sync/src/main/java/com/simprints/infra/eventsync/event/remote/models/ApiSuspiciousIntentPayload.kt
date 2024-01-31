@@ -9,15 +9,16 @@ import com.simprints.infra.events.event.domain.models.SuspiciousIntentEvent.Susp
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiSuspiciousIntentPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
     val unexpectedExtras: Map<String, Any?>,
 ) : ApiEventPayload(ApiEventPayloadType.SuspiciousIntent, version, startTime) {
 
-    constructor(domainPayload: SuspiciousIntentPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.unexpectedExtras)
+    constructor(domainPayload: SuspiciousIntentPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.eventVersion,
+        domainPayload.unexpectedExtras,
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

@@ -13,49 +13,57 @@ import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEv
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callback
+import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.callback.*
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackType.*
 import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
+import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiCallbackPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
-    val callback: ApiCallback
+    val callback: ApiCallback,
 ) : ApiEventPayload(Callback, version, startTime) {
 
     constructor(domainPayload: EnrolmentCallbackPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
         ApiEnrolmentCallback(domainPayload.guid)
     )
 
     constructor(domainPayload: IdentificationCallbackPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
-        ApiIdentificationCallback(domainPayload.sessionId, domainPayload.scores.map { it.fromDomainToApi(domainPayload.eventVersion) })
+        ApiIdentificationCallback(
+            domainPayload.sessionId,
+            domainPayload.scores.map { it.fromDomainToApi(domainPayload.eventVersion) })
     )
 
     constructor(domainPayload: VerificationCallbackPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
-        ApiVerificationCallback(domainPayload.score.fromDomainToApi(domainPayload.eventVersion)))
+        ApiVerificationCallback(domainPayload.score.fromDomainToApi(domainPayload.eventVersion))
+    )
 
     constructor(domainPayload: ConfirmationCallbackPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
-        ApiConfirmationCallback(domainPayload.identificationOutcome))
+        ApiConfirmationCallback(domainPayload.identificationOutcome)
+    )
 
     constructor(domainPayload: ErrorCallbackPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
-        ApiErrorCallback(domainPayload.reason.fromDomainToApi()))
+        ApiErrorCallback(domainPayload.reason.fromDomainToApi())
+    )
 
     constructor(domainPayload: RefusalCallbackPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
-        ApiRefusalCallback(domainPayload.reason, domainPayload.extra))
+        ApiRefusalCallback(domainPayload.reason, domainPayload.extra)
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

@@ -1,16 +1,12 @@
-package com.simprints.infra.events.sampledata
+package com.simprints.infra.events.event.domain.models
 
-import com.simprints.infra.events.event.domain.models.EventLabels
-import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.BatteryInfo
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Vero2Version
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 
-object Vero2InfoSnapshotEventSample : SampleEvent() {
-    override fun getEvent(
-        labels: EventLabels,
-        isClosed: Boolean
-    ): Vero2InfoSnapshotEvent {
+object Vero2InfoSnapshotEventSample {
+
+    fun getEvent(): Vero2InfoSnapshotEvent {
         val versionArg = Vero2Version.Vero2NewApiVersion(
             "E-1",
             "cypressApp",
@@ -18,18 +14,16 @@ object Vero2InfoSnapshotEventSample : SampleEvent() {
             "un20App"
         )
         val batteryArg = BatteryInfo(0, 1, 2, 3)
-        return Vero2InfoSnapshotEvent(CREATED_AT, versionArg, batteryArg, labels)
+        return Vero2InfoSnapshotEvent(CREATED_AT, versionArg, batteryArg)
     }
 
     val newApiJsonEventString = """
         {
             "id": "5bc59283-a448-4911-a21a-5d39b0e346a7",
-            "labels": {
-                "sessionId": "af4eca90-c599-4323-97c7-c70e490c5568"
-            },
+            "sessionId": "af4eca90-c599-4323-97c7-c70e490c5568",
             "payload": {
-                "createdAt": 1234,
-                "eventVersion": 2,
+                "createdAt": {"ms": 1234},
+                "eventVersion": 3,
                 "version": {
                     "hardwareRevision": "E-1",
                     "cypressApp": "1.1",
@@ -44,22 +38,19 @@ object Vero2InfoSnapshotEventSample : SampleEvent() {
                     "temperature": 3
                 },
                 "type": "VERO_2_INFO_SNAPSHOT",
-                "endedAt": 0
+                "endedAt": null
             },
             "type": "VERO_2_INFO_SNAPSHOT"
         }
     """.trimIndent()
 
-
     val oldApiJsonEventString = """
         {
             "id": "3afb1b9e-b263-4073-b773-6e1dac20d72f",
-            "labels": {
-                "sessionId": "6dcb3810-4789-4149-8fea-473ffb520958"
-            },
+            "sessionId": "6dcb3810-4789-4149-8fea-473ffb520958",
             "payload": {
-                "createdAt": 1234,
-                "eventVersion": 1,
+                "createdAt": {"ms": 1234},
+                "eventVersion": 2,
                 "version": {
                     "master": 10129,
                     "cypressApp": "1.1",
@@ -67,8 +58,7 @@ object Vero2InfoSnapshotEventSample : SampleEvent() {
                     "stmApp": "1.0",
                     "stmApi": "1.0",
                     "un20App": "1.2",
-                    "un20Api": "1.2",
-                    "eventVersion": 1
+                    "un20Api": "1.2"
                 },
                 "battery": {
                     "charge": 0,
@@ -77,7 +67,7 @@ object Vero2InfoSnapshotEventSample : SampleEvent() {
                     "temperature": 3
                 },
                 "type": "VERO_2_INFO_SNAPSHOT",
-                "endedAt": 0
+                "endedAt": null
             },
             "type": "VERO_2_INFO_SNAPSHOT"
         }

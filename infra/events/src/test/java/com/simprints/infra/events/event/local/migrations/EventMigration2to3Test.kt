@@ -4,36 +4,25 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.simprints.core.tools.extentions.getIntWithColumnName
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.migrations.MigrationTestingTools.retrieveCursorWithEventById
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigration2to3Test {
 
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        EventRoomDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        EventRoomDatabase::class.java,
     )
 
     @Test
@@ -65,22 +54,37 @@ class EventMigration2to3Test {
     private fun createSessionCaptureEvent(id: String, endedAt: Long) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "SESSION_CAPTURE")
-        val session = SessionCaptureEvent(
-            id = id,
-            projectId = "TEST6Oai41ps1pBNrzBL",
-            createdAt = 1611584017198,
-            modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
-            appVersionName = "appVersionName",
-            libVersionName = "libSimprintsVersionName",
-            language = "en",
-            device = Device(
-                "30",
-                "Google_Pixel 4a",
-                "deviceId"
-            ),
-            databaseInfo = DatabaseInfo(1)
+        this.put(
+            "eventJson", """
+            {
+                "id": "$id",
+                "type": "SESSION_CAPTURE",
+                "labels" {
+                    "projectId": "TEST6Oai41ps1pBNrzBL",
+                   "sessionId": "$id"
+                },
+                "createdAt": 1611584017198,
+                "endedAt": $endedAt,
+                "payload": {
+                    "eventVersion": 1,
+                    "createdAt": 1611584017198,
+                    "endedAt": $endedAt,
+                    "modalities": ["FINGERPRINT"],
+                    "appVersionName": "appVersionName",
+                    "libVersionName": "libSimprintsVersionName",
+                    "language": "enm",
+                    "device": {
+                        "sdkVersion": "30",
+                        "model": "Google_Pixel 4a",
+                        "deviceId": "deviceId"
+                    },
+                    "databaseInfo": {
+                        "sessionCount": 0
+                    }
+                }
+            }
+        """.trimIndent()
         )
-        this.put("eventJson", JsonHelper.toJson(session))
         this.put("createdAt", 1611584017198)
         this.put("endedAt", endedAt)
     }
@@ -101,6 +105,7 @@ class EventMigration2to3Test {
     }
 
     companion object {
+
         private const val TEST_DB = "test"
     }
 

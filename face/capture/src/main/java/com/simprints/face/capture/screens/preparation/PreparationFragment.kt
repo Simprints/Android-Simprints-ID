@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentPreparationBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -25,10 +26,10 @@ internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
 
     @Inject
     lateinit var faceTimeHelper: TimeHelper
-    private var startTime: Long = 0
+    private var startTime: Timestamp = Timestamp(0)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        startTime = faceTimeHelper.now()
+        startTime = faceTimeHelper.nowTimestamp()
 
         binding.detectionOnboardingFrame.setOnClickListener {
             mainVm.addOnboardingComplete(startTime)

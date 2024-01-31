@@ -132,7 +132,7 @@ import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionCaptu
 internal abstract class ApiEventPayload(
     val type: ApiEventPayloadType,
     open val version: Int,
-    open val startTime: Long
+    open val startTime: ApiTimestamp,
 ) {
 
     abstract fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String?

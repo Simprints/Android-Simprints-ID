@@ -1,6 +1,7 @@
 package com.simprints.infra.events.event.local.models
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.infra.events.sampledata.*
 import org.junit.Test
@@ -158,7 +159,6 @@ class DbEventTest {
         with(original) {
             assertThat(id).isEqualTo(transformed.id)
             assertThat(type).isEqualTo(transformed.type)
-            assertThat(labels).isEqualTo(transformed.labels)
         }
 
         with(transformed) {

@@ -38,11 +38,11 @@ internal data class DbEvent(
 internal fun Event.fromDomainToDb(): DbEvent {
     return DbEvent(
         id = id,
-        sessionId = labels.sessionId,
-        projectId = labels.projectId,
+        sessionId = sessionId,
+        projectId = projectId,
         type = payload.type,
         eventJson = JsonHelper.toJson(this, module = dbSerializationModule),
-        createdAt = DbTimestamp(payload.createdAt),
+        createdAt = payload.createdAt.fromDomainToDb(),
     )
 }
 

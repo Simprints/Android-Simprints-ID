@@ -2,6 +2,7 @@ package com.simprints.matcher.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
@@ -23,8 +24,8 @@ internal class SaveMatchEventUseCase @Inject constructor(
 ) {
 
     operator fun invoke(
-        startTime: Long,
-        endTime: Long,
+        startTime: Timestamp,
+        endTime: Timestamp,
         matchParams: MatchParams,
         candidatesCount: Int,
         matcherName: String,
@@ -65,8 +66,8 @@ internal class SaveMatchEventUseCase @Inject constructor(
         }
 
     private fun getOneToOneEvent(
-        startTime: Long,
-        endTime: Long,
+        startTime: Timestamp,
+        endTime: Timestamp,
         matcherName: String,
         queryForCandidates: SubjectQuery,
         matchEntry: MatchEntry?,
@@ -81,8 +82,8 @@ internal class SaveMatchEventUseCase @Inject constructor(
     )
 
     private fun getOneToManyEvent(
-        startTime: Long,
-        endTime: Long,
+        startTime: Timestamp,
+        endTime: Timestamp,
         matcherName: String,
         queryForCandidates: SubjectQuery,
         candidatesCount: Int,

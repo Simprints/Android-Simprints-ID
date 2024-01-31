@@ -7,17 +7,23 @@ import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.TIMED_OUT
 
 @Keep
+@Deprecated("Should be removed")
 internal data class ApiArtificialTerminationPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
     val reason: ApiReason,
 ) : ApiEventPayload(ApiEventPayloadType.ArtificialTermination, version, startTime) {
 
-    constructor(domainPayload: ArtificialTerminationPayload) :
-        this(domainPayload.createdAt, domainPayload.eventVersion, domainPayload.reason.fromDomainToApi())
+    constructor(domainPayload: ArtificialTerminationPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.eventVersion,
+        domainPayload.reason.fromDomainToApi()
+    )
 
     @Keep
+    @Deprecated("Should be removed")
     enum class ApiReason {
+
         TIMED_OUT, NEW_SESSION
     }
 

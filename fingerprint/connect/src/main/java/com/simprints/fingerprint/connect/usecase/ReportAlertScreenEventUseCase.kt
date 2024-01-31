@@ -17,7 +17,7 @@ internal class ReportAlertScreenEventUseCase @Inject constructor(
 
     operator fun invoke(eventType: AlertScreenEventType) {
         externalScope.launch {
-            eventRepository.addOrUpdateEvent(AlertScreenEvent(timeHelper.now(), eventType))
+            eventRepository.addOrUpdateEvent(AlertScreenEvent(timeHelper.nowTimestamp(), eventType))
         }
     }
 

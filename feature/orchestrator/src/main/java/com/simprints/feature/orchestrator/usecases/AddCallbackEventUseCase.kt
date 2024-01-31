@@ -4,7 +4,6 @@ import com.simprints.core.ExternalScope
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
@@ -13,13 +12,7 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
-import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
-import com.simprints.infra.orchestration.data.responses.AppErrorResponse
-import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
-import com.simprints.infra.orchestration.data.responses.AppMatchResult
-import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
-import com.simprints.infra.orchestration.data.responses.AppResponse
+import com.simprints.infra.orchestration.data.responses.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,26 +33,24 @@ internal class AddCallbackEventUseCase @Inject constructor(
             is AppErrorResponse -> buildErrorCallbackEvent(result)
         }
 
-        if (callbackEvent != null) {
-            externalScope.launch { eventRepository.addOrUpdateEvent(callbackEvent) }
-        }
+        externalScope.launch { eventRepository.addOrUpdateEvent(callbackEvent) }
     }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) = EnrolmentCallbackEvent(
-        timeHelper.now(),
+        timeHelper.nowTimestamp(),
         appResponse.guid
     )
 
     private fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
         IdentificationCallbackEvent(
-            timeHelper.now(),
+            timeHelper.nowTimestamp(),
             appResponse.sessionId,
             appResponse.identifications.map { buildComparisonScore(it) },
         )
 
     private fun buildVerificationCallbackEvent(appResponse: AppVerifyResponse) =
         VerificationCallbackEvent(
-            timeHelper.now(),
+            timeHelper.nowTimestamp(),
             buildComparisonScore(appResponse.matchResult),
         )
 
@@ -71,13 +62,13 @@ internal class AddCallbackEventUseCase @Inject constructor(
     )
 
     private fun buildRefusalCallbackEvent(appResponse: AppRefusalResponse) = RefusalCallbackEvent(
-        timeHelper.now(),
+        timeHelper.nowTimestamp(),
         appResponse.reason,
         appResponse.extra,
     )
 
     private fun buildErrorCallbackEvent(appResponse: AppErrorResponse) = ErrorCallbackEvent(
-        timeHelper.now(),
+        timeHelper.nowTimestamp(),
         ErrorCallbackEvent.ErrorCallbackPayload.Reason.fromAppResponseErrorReasonToEventReason(
             appResponse.reason
         ),
@@ -85,7 +76,7 @@ internal class AddCallbackEventUseCase @Inject constructor(
 
     private fun buildConfirmIdentityCallbackEvent(appResponse: AppConfirmationResponse) =
         ConfirmationCallbackEvent(
-            timeHelper.now(),
+            timeHelper.nowTimestamp(),
             appResponse.identificationOutcome,
         )
 }

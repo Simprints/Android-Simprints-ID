@@ -34,8 +34,8 @@ internal data class ApiSessionScope(
         ) = ApiSessionScope(
             id = scope.id,
             projectId = scope.projectId,
-            startTime = ApiTimestamp(scope.createdAt),
-            endTime = scope.endedAt?.let { ApiTimestamp(it) },
+            startTime = scope.createdAt.fromDomainToApi(),
+            endTime = scope.endedAt?.fromDomainToApi(),
             endCause = scope.payload.endCause.fromDomainToApi(),
             modalities = scope.payload.modalities.map { it.fromDomainToApi() },
             sidVersion = scope.payload.sidVersion,

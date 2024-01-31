@@ -3,6 +3,7 @@ package com.simprints.feature.alert.screen
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
@@ -46,7 +47,7 @@ internal class AlertViewModelTest {
 
     @Test
     fun saveAlertEvent() = runTest {
-        every { timeHelper.now() } returns 42
+        every { timeHelper.nowTimestamp() } returns Timestamp(42)
 
         alertViewModel.saveAlertEvent(AlertScreenEventType.DISCONNECTED)
 
@@ -54,7 +55,7 @@ internal class AlertViewModelTest {
             eventRepository.addOrUpdateEvent(withArg {
                 val payload = it.payload as AlertScreenEvent.AlertScreenPayload
 
-                assertThat(payload.createdAt).isEqualTo(42)
+                assertThat(payload.createdAt.ms).isEqualTo(42)
                 assertThat(payload.type).isEqualTo(EventType.ALERT_SCREEN)
                 assertThat(payload.alertType).isEqualTo(AlertScreenEventType.DISCONNECTED)
             })

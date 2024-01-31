@@ -41,7 +41,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         SymmetricTarget(VALID_ROLL_DELTA),
         0.25f..0.5f
     )
-    private val fallbackCaptureEventStartTime = timeHelper.now()
+    private val fallbackCaptureEventStartTime = timeHelper.nowTimestamp()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
     private lateinit var fallbackCapture: FaceDetection
 
@@ -56,13 +56,13 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      * @param image is the camera frame
      */
     fun process(image: ImageProxy) {
-        val captureStartTime = timeHelper.now()
+        val captureStartTime = timeHelper.nowTimestamp()
         val croppedBitmap = frameProcessor.cropRotateFrame(image)
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
         val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
-        faceDetection.detectionEndTime = timeHelper.now()
+        faceDetection.detectionEndTime = timeHelper.nowTimestamp()
 
         currentDetection.postValue(faceDetection)
 
@@ -119,7 +119,13 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     ): FaceDetection {
         return if (potentialFace == null) {
             bitmap.recycle()
-            FaceDetection(bitmap, null, FaceDetection.Status.NOFACE)
+            FaceDetection(
+                bitmap = bitmap,
+                face = null,
+                status = FaceDetection.Status.NOFACE,
+                detectionStartTime = timeHelper.nowTimestamp(),
+                detectionEndTime = timeHelper.nowTimestamp()
+            )
         } else {
             getFaceDetection(bitmap, potentialFace)
         }
@@ -129,29 +135,39 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         val areaOccupied = potentialFace.relativeBoundingBox.area()
         return when {
             areaOccupied < faceTarget.areaRange.start -> FaceDetection(
-                bitmap,
-                potentialFace,
-                FaceDetection.Status.TOOFAR
+                bitmap = bitmap,
+                face = potentialFace,
+                status = FaceDetection.Status.TOOFAR,
+                detectionStartTime = timeHelper.nowTimestamp(),
+                detectionEndTime = timeHelper.nowTimestamp(),
             )
 
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.TOOCLOSE
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.TOOCLOSE,
+                detectionStartTime = timeHelper.nowTimestamp(),
+                detectionEndTime = timeHelper.nowTimestamp(),
             )
 
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.OFFYAW
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.OFFYAW,
+                detectionStartTime = timeHelper.nowTimestamp(),
+                detectionEndTime = timeHelper.nowTimestamp(),
             )
 
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.OFFROLL
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.OFFROLL,
+                detectionStartTime = timeHelper.nowTimestamp(),
+                detectionEndTime = timeHelper.nowTimestamp(),
             )
 
             else -> FaceDetection(
-                bitmap, potentialFace,
-                if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
+                bitmap = bitmap, face = potentialFace,
+                status = if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID,
+                detectionStartTime = timeHelper.nowTimestamp(),
+                detectionEndTime = timeHelper.nowTimestamp(),
             )
         }
     }
@@ -172,7 +188,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      */
     private fun createFirstFallbackCaptureEvent(faceDetection: FaceDetection) {
         if (shouldSendFallbackCaptureEvent.getAndSet(false)) {
-            eventReporter.addFallbackCaptureEvent(fallbackCaptureEventStartTime, faceDetection.detectionEndTime)
+            eventReporter.addFallbackCaptureEvent(
+                fallbackCaptureEventStartTime,
+                faceDetection.detectionEndTime
+            )
         }
     }
 
@@ -195,6 +214,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
 
     companion object {
+
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
     }

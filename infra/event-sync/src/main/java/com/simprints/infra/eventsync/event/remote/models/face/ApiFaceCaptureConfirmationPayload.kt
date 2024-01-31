@@ -9,22 +9,25 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmati
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.RECAPTURE
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureConfirmation
+import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConfirmationPayload.ApiResult
+import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiFaceCaptureConfirmationPayload(
-    override val startTime: Long, //Not added on API yet
-    val endTime: Long,
+    override val startTime: ApiTimestamp, //Not added on API yet
+    val endTime: ApiTimestamp?,
     override val version: Int,
     val result: ApiResult,
 ) : ApiEventPayload(FaceCaptureConfirmation, version, startTime) {
 
     constructor(domainPayload: FaceCaptureConfirmationPayload) : this(
-        domainPayload.createdAt,
-        domainPayload.endedAt,
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.endedAt?.fromDomainToApi(),
         domainPayload.eventVersion,
-        domainPayload.result.fromDomainToApi())
+        domainPayload.result.fromDomainToApi()
+    )
 
     enum class ApiResult {
         CONTINUE,

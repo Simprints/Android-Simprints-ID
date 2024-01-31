@@ -9,17 +9,18 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
 import com.simprints.infra.eventsync.event.remote.models.ApiModality
+import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 import java.util.*
 
+@Deprecated("Should be deleted")
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiSessionCapturePayload(
     override val version: Int,
     val id: String = UUID.randomUUID().toString(),
     val projectId: String,
-    override val startTime: Long,
-    val endTime: Long,
+    override val startTime: ApiTimestamp,
     var uploadTime: Long,
     val modalities: List<ApiModality>,
     val appVersionName: String,
@@ -34,8 +35,7 @@ internal data class ApiSessionCapturePayload(
         domainPayload.eventVersion,
         domainPayload.id,
         domainPayload.projectId,
-        domainPayload.createdAt,
-        domainPayload.endedAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.uploadedAt,
         domainPayload.modalities.map { it.fromDomainToApi() },
         domainPayload.appVersionName,

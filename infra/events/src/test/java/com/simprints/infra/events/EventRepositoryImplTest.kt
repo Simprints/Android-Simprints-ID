@@ -9,17 +9,16 @@ import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
+import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
+import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
+import com.simprints.infra.events.sampledata.createAlertScreenEvent
+import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.createAlertScreenEvent
-import com.simprints.infra.events.sampledata.createSessionScope
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -191,13 +190,10 @@ internal class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.saveEvent(
-                    newEvent.copy(
-                        labels = EventLabels(
-                            sessionId = GUID1,
-                            deviceId = DEVICE_ID,
-                            projectId = DEFAULT_PROJECT_ID
-                        )
-                    )
+                    withArg { event ->
+                        assertThat(event.sessionId).isEqualTo(GUID1)
+                        assertThat(event.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                    }
                 )
             }
         }
@@ -208,19 +204,15 @@ internal class EventRepositoryImplTest {
         runTest {
             mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
-            newEvent.labels = EventLabels()
 
             eventRepo.addOrUpdateEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.saveEvent(
-                    newEvent.copy(
-                        labels = EventLabels(
-                            deviceId = DEVICE_ID,
-                            projectId = DEFAULT_PROJECT_ID,
-                            sessionId = GUID1
-                        )
-                    )
+                    withArg { event ->
+                        assertThat(event.sessionId).isEqualTo(GUID1)
+                        assertThat(event.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                    }
                 )
             }
         }
@@ -236,13 +228,10 @@ internal class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.saveEvent(
-                    newEvent.copy(
-                        labels = EventLabels(
-                            sessionId = GUID1,
-                            deviceId = DEVICE_ID,
-                            projectId = DEFAULT_PROJECT_ID
-                        )
-                    )
+                    withArg { event ->
+                        assertThat(event.sessionId).isEqualTo(GUID1)
+                        assertThat(event.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                    }
                 )
             }
         }
@@ -252,12 +241,12 @@ internal class EventRepositoryImplTest {
     fun `test getCurrentSessionScope from db`() = runTest {
 
         val oldSessionScope = mockk<SessionScope> {
-            every { endedAt } returns Timestamp.fromLong(2)
-            every { createdAt } returns Timestamp.fromLong(1)
+            every { endedAt } returns Timestamp(2)
+            every { createdAt } returns Timestamp(1)
         }
         val recentSessionScope = mockk<SessionScope> {
             every { endedAt } returns null
-            every { createdAt } returns Timestamp.fromLong(2)
+            every { createdAt } returns Timestamp(2)
         }
         coEvery { eventLocalDataSource.loadOpenedSessions() } returns listOf(
             recentSessionScope,
@@ -294,20 +283,17 @@ internal class EventRepositoryImplTest {
         runTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
-            val eventInSession = createAlertScreenEvent().removeLabels()
+            val eventInSession = createAlertScreenEvent()
 
             eventRepo.addOrUpdateEvent(eventInSession)
 
             coVerify { eventLocalDataSource.loadOpenedSessions() }
             coVerify {
                 eventLocalDataSource.saveEvent(
-                    eventInSession.copy(
-                        labels = EventLabels(
-                            deviceId = DEVICE_ID,
-                            sessionId = session.id,
-                            projectId = DEFAULT_PROJECT_ID
-                        )
-                    )
+                    withArg { event ->
+                        assertThat(event.sessionId).isEqualTo(session.id)
+                        assertThat(event.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                    }
                 )
             }
         }
@@ -318,11 +304,11 @@ internal class EventRepositoryImplTest {
         runTest {
             mockSignedId()
             val sessionScope = mockDbToHaveOneOpenSession(GUID1)
-            val eventInSession = createAlertScreenEvent().removeLabels()
+            val eventInSession = createAlertScreenEvent()
             coEvery { eventLocalDataSource.loadEventsInSession(sessionId = sessionScope.id) } returns listOf(
                 eventInSession
             )
-            val newEvent = createAlertScreenEvent().removeLabels()
+            val newEvent = createAlertScreenEvent()
 
             eventRepo.addOrUpdateEvent(newEvent)
 
@@ -336,16 +322,16 @@ internal class EventRepositoryImplTest {
         val event = createAlertScreenEvent()
 
         coEvery { eventLocalDataSource.loadEventsInSession(any()) } returns listOf(
-            event.copy(payload = event.payload.copy(endedAt = 5)),
-            event.copy(payload = event.payload.copy(endedAt = 3)),
-            event.copy(payload = event.payload.copy(endedAt = 1)),
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(3))),
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(1))),
         )
         eventRepo.closeCurrentSession(null)
 
         coVerify {
             eventLocalDataSource.saveSessionScope(match {
                 assertThatSessionScopeClosed(it)
-                assertThat(it.endedAt).isEqualTo(Timestamp.fromLong(5L))
+                assertThat(it.endedAt).isEqualTo(Timestamp(5L))
                 true
             })
         }
@@ -462,6 +448,6 @@ internal class EventRepositoryImplTest {
         const val LANGUAGE = "en"
 
         const val N_SESSIONS_DB = 3
-        val NOW = Timestamp.fromLong(1000L)
+        val NOW = Timestamp(1000L)
     }
 }

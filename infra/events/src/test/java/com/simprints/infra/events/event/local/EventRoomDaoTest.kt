@@ -6,13 +6,11 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.local.models.DbEvent
-import com.simprints.infra.events.event.local.models.DbTimestamp
+import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID2
 import io.mockk.MockKAnnotations
@@ -29,7 +27,7 @@ internal class EventRoomDaoTest {
     private val eventJson = """{"id": "anID", "payload": "a payload"}"""
     val event = DbEvent(
         GUID1,
-        DbTimestamp(CREATED_AT),
+        CREATED_AT.fromDomainToDb(),
         SESSION_CAPTURE,
         DEFAULT_PROJECT_ID,
         GUID1,

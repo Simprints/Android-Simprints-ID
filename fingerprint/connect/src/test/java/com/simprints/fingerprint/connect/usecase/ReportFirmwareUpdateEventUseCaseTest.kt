@@ -3,6 +3,7 @@ package com.simprints.fingerprint.connect.usecase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.ScannerFirmwareUpdateEvent
@@ -48,7 +49,7 @@ class ReportFirmwareUpdateEventUseCaseTest {
 
     @Test
     fun `Correctly maps cypress chip name`() = runTest {
-        useCase(0L, AvailableOta.CYPRESS, "v1")
+        useCase(Timestamp(0L), AvailableOta.CYPRESS, "v1")
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<ScannerFirmwareUpdateEvent> {
@@ -60,7 +61,7 @@ class ReportFirmwareUpdateEventUseCaseTest {
 
     @Test
     fun `Correctly maps stm chip name`() = runTest {
-        useCase(0L, AvailableOta.STM, "v1")
+        useCase(Timestamp(0L), AvailableOta.STM, "v1")
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<ScannerFirmwareUpdateEvent> {
@@ -71,7 +72,7 @@ class ReportFirmwareUpdateEventUseCaseTest {
 
     @Test
     fun `Correctly maps UN20 chip name`() = runTest {
-        useCase(0L, AvailableOta.UN20, "v1")
+        useCase(Timestamp(0L), AvailableOta.UN20, "v1")
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<ScannerFirmwareUpdateEvent> {
@@ -82,7 +83,7 @@ class ReportFirmwareUpdateEventUseCaseTest {
 
     @Test
     fun `Correctly maps exception`() = runTest {
-        useCase(0L, AvailableOta.UN20, "v1", RuntimeException("message"))
+        useCase(Timestamp(0L), AvailableOta.UN20, "v1", RuntimeException("message"))
 
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<ScannerFirmwareUpdateEvent> {

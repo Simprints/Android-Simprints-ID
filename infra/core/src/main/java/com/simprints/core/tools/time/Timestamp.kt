@@ -2,12 +2,9 @@ package com.simprints.core.tools.time
 
 data class Timestamp(
     val ms: Long,
-    val isTrustworthy: Boolean,
-    val msSinceBoot: Long?,
-) {
+    val isTrustworthy: Boolean = false,
+    val msSinceBoot: Long? = null,
+) : Comparable<Timestamp> {
 
-    companion object {
-
-        fun fromLong(longTimestamp: Long) = Timestamp(longTimestamp, false, null)
-    }
+    override fun compareTo(other: Timestamp): Int = ms.compareTo(other.ms)
 }

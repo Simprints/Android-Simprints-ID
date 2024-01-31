@@ -181,16 +181,10 @@ internal open class EventRepositoryImpl @Inject constructor(
     }
 
     private suspend fun saveEvent(event: Event, session: SessionScope) {
-        checkAndUpdateLabels(event, session)
-        eventLocalDataSource.saveEvent(event)
-    }
+        event.sessionId = session.id
+        event.projectId = session.projectId
 
-    private fun checkAndUpdateLabels(event: Event, session: SessionScope) {
-        event.labels = event.labels.copy(
-            sessionId = session.id,
-            projectId = session.projectId,
-            deviceId = deviceId,
-        )
+        eventLocalDataSource.saveEvent(event)
     }
 
     override suspend fun removeLocationDataFromCurrentSession() {
@@ -219,11 +213,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         val maxTimestamp = eventLocalDataSource.loadEventsInSession(sessionScope.id)
             .takeIf { it.isNotEmpty() }
             ?.maxOf { event ->
-                event.payload.let { payload ->
-                    payload.endedAt.takeIf { it > 0 } ?: payload.createdAt
-                }
+                event.payload.let { payload -> payload.endedAt ?: payload.createdAt }
             }
-            ?.let { Timestamp.fromLong(it) }
             ?: timeHelper.nowTimestamp()
 
         val updatedSessionScope = sessionScope.copy(

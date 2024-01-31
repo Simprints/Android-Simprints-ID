@@ -23,7 +23,7 @@ internal class EnrolSubjectUseCase @Inject constructor(
             .filterIsInstance<PersonCreationEvent>().first()
 
         eventRepository.addOrUpdateEvent(EnrolmentEventV2(
-            timeHelper.now(),
+            timeHelper.nowTimestamp(),
             subject.subjectId,
             subject.projectId,
             subject.moduleId,

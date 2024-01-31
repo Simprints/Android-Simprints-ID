@@ -1,6 +1,5 @@
 package com.simprints.infra.events.event.domain.validators
 
-import com.simprints.infra.events.domain.validators.EnrolmentEventValidator
 import com.simprints.infra.events.exceptions.validator.EnrolmentEventValidatorException
 import com.simprints.infra.events.sampledata.createEnrolmentEventV2
 import com.simprints.infra.events.sampledata.createFaceCaptureEvent

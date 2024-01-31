@@ -2,6 +2,7 @@ package com.simprints.face.capture.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.infra.events.EventRepository
@@ -22,19 +23,19 @@ internal class SimpleCaptureEventReporter @Inject constructor(
     private val encodingUtils: EncodingUtils,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
-    fun addOnboardingCompleteEvent(startTime: Long) = externalScope.launch {
-        eventRepository.addOrUpdateEvent(FaceOnboardingCompleteEvent(startTime, timeHelper.now()))
+    fun addOnboardingCompleteEvent(startTime: Timestamp) = externalScope.launch {
+        eventRepository.addOrUpdateEvent(FaceOnboardingCompleteEvent(startTime, timeHelper.nowTimestamp()))
     }
 
-    fun addCaptureConfirmationEvent(startTime: Long, isContinue: Boolean) = externalScope.launch {
+    fun addCaptureConfirmationEvent(startTime: Timestamp, isContinue: Boolean) = externalScope.launch {
         eventRepository.addOrUpdateEvent(FaceCaptureConfirmationEvent(
             startTime,
-            timeHelper.now(),
+            timeHelper.nowTimestamp(),
             if (isContinue) Result.CONTINUE else Result.RECAPTURE
         ))
     }
 
-    fun addFallbackCaptureEvent(startTime: Long, endTime: Long) = externalScope.launch {
+    fun addFallbackCaptureEvent(startTime: Timestamp, endTime: Timestamp) = externalScope.launch {
         eventRepository.addOrUpdateEvent(FaceFallbackCaptureEvent(startTime, endTime))
     }
 

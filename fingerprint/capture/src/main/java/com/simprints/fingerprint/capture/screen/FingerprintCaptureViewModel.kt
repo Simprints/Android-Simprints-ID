@@ -12,6 +12,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.capture.extensions.isEager
 import com.simprints.fingerprint.capture.extensions.isImageTransferRequired
@@ -131,7 +132,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private lateinit var originalFingerprintsToCapture: List<IFingerIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
     private val imageRefs: MutableMap<CaptureId, SecuredImageRef?> = mutableMapOf()
-    private var lastCaptureStartedAt: Long = 0
+    private var lastCaptureStartedAt: Timestamp = Timestamp(0L)
     private var hasStarted: Boolean = false
 
     @VisibleForTesting
@@ -321,7 +322,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun startScanning() {
         updateCaptureState(CaptureState::toScanning)
-        lastCaptureStartedAt = timeHelper.now()
+        lastCaptureStartedAt = timeHelper.nowTimestamp()
         scanningTask?.cancel()
 
         scanningTask = viewModelScope.launch {
@@ -515,7 +516,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleMissingFingerButtonPressed() {
         if (state.isShowingSplashScreen.not()) {
             updateCaptureState(CaptureState::toSkipped)
-            lastCaptureStartedAt = timeHelper.now()
+            lastCaptureStartedAt = timeHelper.nowTimestamp()
             addCaptureAndBiometricEventsInSession()
             resolveFingerTerminalConditionTriggered()
         }

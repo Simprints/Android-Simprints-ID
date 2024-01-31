@@ -8,7 +8,7 @@ import com.simprints.core.domain.fingerprint.IFingerIdentifier
 @Keep
 internal data class ApiFingerprintCaptureBiometricsPayload(
     override val version: Int,
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     val fingerprint: Fingerprint,
     val id: String,
 ) : ApiEventPayload(ApiEventPayloadType.FingerprintCaptureBiometrics, version, startTime) {
@@ -18,8 +18,9 @@ internal data class ApiFingerprintCaptureBiometricsPayload(
         val finger: IFingerIdentifier,
         val template: String,
         val quality: Int,
-        val format: String
+        val format: String,
     ) {
+
         constructor(finger: FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint) : this(
             finger.finger,
             finger.template,
@@ -30,7 +31,7 @@ internal data class ApiFingerprintCaptureBiometricsPayload(
 
     constructor(domainPayload: FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload) : this(
         domainPayload.eventVersion,
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         Fingerprint(domainPayload.fingerprint),
         domainPayload.id
     )
