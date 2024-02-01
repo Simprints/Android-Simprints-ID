@@ -8,15 +8,9 @@ class ApiAuthenticationDataTest {
 
     @Test
     fun `should map the model correctly`() {
-        val apiAuthenticationData = ApiAuthenticationData(
-                publicKey = "publicKey",
-                nonce = "nonce"
-        )
+        val apiAuthenticationData = ApiAuthenticationData(nonce = "nonce")
 
-        val authenticationData = AuthenticationData(
-            publicKey = "publicKey",
-            nonce = "nonce"
-        )
+        val authenticationData = AuthenticationData(nonce = "nonce")
         assertThat(apiAuthenticationData.toDomain()).isEqualTo(authenticationData)
     }
 }
