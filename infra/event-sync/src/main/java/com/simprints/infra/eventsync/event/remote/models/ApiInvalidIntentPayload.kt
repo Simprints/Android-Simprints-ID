@@ -13,7 +13,7 @@ internal data class ApiInvalidIntentPayload(
     override val version: Int,
     val action: String,
     val extras: Map<String, Any?>,
-) : ApiEventPayload(ApiEventPayloadType.InvalidIntent, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: InvalidIntentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

@@ -13,7 +13,7 @@ internal data class ApiPersonCreationPayload(
     val fingerprintReferenceId: String?,
     val faceCaptureIds: List<String>?,
     val faceReferenceId: String?,
-) : ApiEventPayload(ApiEventPayloadType.PersonCreation, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: PersonCreationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

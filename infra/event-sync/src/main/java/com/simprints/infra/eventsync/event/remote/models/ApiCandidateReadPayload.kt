@@ -9,7 +9,6 @@ import com.simprints.infra.events.event.domain.models.CandidateReadEvent.Candida
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload.RemoteResult
 import com.simprints.infra.eventsync.event.remote.models.ApiCandidateReadPayload.ApiLocalResult
 import com.simprints.infra.eventsync.event.remote.models.ApiCandidateReadPayload.ApiRemoteResult
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.CandidateRead
 
 @Keep
 @JsonInclude(Include.NON_NULL)
@@ -20,7 +19,7 @@ internal data class ApiCandidateReadPayload(
     val candidateId: String,
     val localResult: ApiLocalResult,
     val remoteResult: ApiRemoteResult?,
-) : ApiEventPayload(CandidateRead, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     enum class ApiLocalResult {

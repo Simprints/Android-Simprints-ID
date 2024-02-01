@@ -8,7 +8,6 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmati
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.CONTINUE
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureConfirmationEvent.FaceCaptureConfirmationPayload.Result.RECAPTURE
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCaptureConfirmation
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConfirmationPayload.ApiResult
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
@@ -20,7 +19,7 @@ internal data class ApiFaceCaptureConfirmationPayload(
     val endTime: ApiTimestamp?,
     override val version: Int,
     val result: ApiResult,
-) : ApiEventPayload(FaceCaptureConfirmation, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: FaceCaptureConfirmationPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

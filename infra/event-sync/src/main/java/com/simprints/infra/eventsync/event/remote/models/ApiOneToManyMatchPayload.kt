@@ -13,7 +13,7 @@ internal data class ApiOneToManyMatchPayload(
     val pool: ApiMatchPool,
     val matcher: String,
     val result: List<ApiMatchEntry>?,
-) : ApiEventPayload(ApiEventPayloadType.OneToManyMatch, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     data class ApiMatchPool(val type: ApiMatchPoolType, val count: Int) {

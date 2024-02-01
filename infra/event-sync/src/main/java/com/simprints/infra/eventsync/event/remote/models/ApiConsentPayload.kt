@@ -18,7 +18,7 @@ internal data class ApiConsentPayload(
     var endTime: ApiTimestamp?,
     val consentType: ApiType,
     var result: ApiResult,
-) : ApiEventPayload(ApiEventPayloadType.Consent, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     enum class ApiType {

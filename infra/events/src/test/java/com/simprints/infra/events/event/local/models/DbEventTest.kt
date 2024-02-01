@@ -32,7 +32,7 @@ class DbEventTest {
 
     @Test
     fun convert_IdentificationCallbackEvent() {
-        val original = createIdentificationCallbackEventV2()
+        val original = createIdentificationCallbackEvent()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)

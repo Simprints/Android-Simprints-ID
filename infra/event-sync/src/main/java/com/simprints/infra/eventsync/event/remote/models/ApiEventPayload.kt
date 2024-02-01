@@ -123,7 +123,6 @@ import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceOnboardingC
 )
 @Keep
 internal abstract class ApiEventPayload(
-    val type: ApiEventPayloadType,
     open val version: Int,
     open val startTime: ApiTimestamp,
 ) {

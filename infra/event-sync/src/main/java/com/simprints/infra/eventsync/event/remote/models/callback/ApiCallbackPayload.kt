@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.config.store.models.TokenKeyType
-import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent.ConfirmationCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.EnrolmentCallbackEvent.EnrolmentCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload
@@ -12,11 +11,9 @@ import com.simprints.infra.events.event.domain.models.callback.IdentificationCal
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent.RefusalCallbackPayload
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent.VerificationCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callback
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.callback.*
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackType.*
-import com.simprints.infra.eventsync.event.remote.models.fromApiToDomain
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
@@ -25,7 +22,7 @@ internal data class ApiCallbackPayload(
     override val startTime: ApiTimestamp,
     override val version: Int,
     val callback: ApiCallback,
-) : ApiEventPayload(Callback, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: EnrolmentCallbackPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

@@ -11,7 +11,7 @@ internal data class ApiConnectivitySnapshotPayload(
     override val startTime: ApiTimestamp,
     override val version: Int,
     val connections: List<ApiConnection>,
-) : ApiEventPayload(ApiEventPayloadType.ConnectivitySnapshot, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     class ApiConnection(val type: String, val state: String) {

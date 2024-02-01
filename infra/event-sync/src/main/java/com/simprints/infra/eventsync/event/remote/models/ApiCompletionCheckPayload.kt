@@ -9,7 +9,7 @@ internal data class ApiCompletionCheckPayload(
     override val startTime: ApiTimestamp,
     override val version: Int,
     val completed: Boolean,
-) : ApiEventPayload(ApiEventPayloadType.CompletionCheck, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: CompletionCheckPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

@@ -20,7 +20,7 @@ internal data class ApiRefusalPayload(
     val endTime: ApiTimestamp?,
     val reason: ApiAnswer,
     val otherText: String,
-) : ApiEventPayload(ApiEventPayloadType.Refusal, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     enum class ApiAnswer {

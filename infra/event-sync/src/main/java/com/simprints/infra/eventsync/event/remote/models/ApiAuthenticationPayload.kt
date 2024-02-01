@@ -21,7 +21,7 @@ internal data class ApiAuthenticationPayload(
     val endTime: ApiTimestamp?,
     val userInfo: ApiUserInfo,
     val result: ApiResult,
-) : ApiEventPayload(ApiEventPayloadType.Authentication, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     data class ApiUserInfo(val projectId: String, val userId: String) {

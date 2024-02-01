@@ -18,7 +18,7 @@ internal data class ApiAuthorizationPayload(
     override val version: Int,
     val result: ApiResult,
     val userInfo: ApiUserInfo?,
-) : ApiEventPayload(ApiEventPayloadType.Authorization, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     data class ApiUserInfo(val projectId: String, val userId: String) {

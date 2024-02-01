@@ -11,7 +11,7 @@ internal data class ApiFingerprintCaptureBiometricsPayload(
     override val startTime: ApiTimestamp,
     val fingerprint: Fingerprint,
     val id: String,
-) : ApiEventPayload(ApiEventPayloadType.FingerprintCaptureBiometrics, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     data class Fingerprint(

@@ -125,13 +125,7 @@ fun createErrorCallbackEvent() = ErrorCallbackEvent(
     DIFFERENT_PROJECT_ID_SIGNED_IN
 )
 
-fun createIdentificationCallbackEventV1() = IdentificationCallbackEvent(
-    CREATED_AT,
-    GUID1,
-    listOf(CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM)),
-)
-
-fun createIdentificationCallbackEventV2() = IdentificationCallbackEvent(
+fun createIdentificationCallbackEvent() = IdentificationCallbackEvent(
     CREATED_AT,
     GUID1,
     listOf(CallbackComparisonScore(GUID1, 1, TIER_1, MEDIUM))

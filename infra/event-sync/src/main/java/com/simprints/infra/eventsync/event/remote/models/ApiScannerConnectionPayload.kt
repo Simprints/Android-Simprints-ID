@@ -16,7 +16,7 @@ internal data class ApiScannerConnectionPayload(
     override val startTime: ApiTimestamp,
     override val version: Int,
     val scannerInfo: ApiScannerInfo,
-) : ApiEventPayload(ApiEventPayloadType.ScannerConnection, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     @JsonInclude(Include.NON_NULL)

@@ -131,11 +131,10 @@ internal enum class ApiEventPayloadType {
 internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     AUTHENTICATION -> ApiEventPayloadType.Authentication
     CONSENT -> ApiEventPayloadType.Consent
-    ENROLMENT_V1 -> ApiEventPayloadType.Enrolment
-    ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
+    ENROLMENT_V1, ENROLMENT_V2 -> ApiEventPayloadType.Enrolment
     AUTHORIZATION -> ApiEventPayloadType.Authorization
     FINGERPRINT_CAPTURE -> ApiEventPayloadType.FingerprintCapture
-    ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToManyMatch
+    ONE_TO_ONE_MATCH -> ApiEventPayloadType.OneToOneMatch
     ONE_TO_MANY_MATCH -> ApiEventPayloadType.OneToManyMatch
     PERSON_CREATION -> ApiEventPayloadType.PersonCreation
     ALERT_SCREEN -> ApiEventPayloadType.AlertScreen
@@ -151,13 +150,17 @@ internal fun EventType.fromDomainToApi(): ApiEventPayloadType = when (this) {
     CALLOUT_IDENTIFICATION,
     CALLOUT_ENROLMENT,
     CALLOUT_VERIFICATION,
-    CALLOUT_LAST_BIOMETRICS -> ApiEventPayloadType.Callout
+    CALLOUT_LAST_BIOMETRICS,
+    -> ApiEventPayloadType.Callout
+
     CALLBACK_IDENTIFICATION,
     CALLBACK_ENROLMENT,
     CALLBACK_REFUSAL,
     CALLBACK_VERIFICATION,
     CALLBACK_CONFIRMATION,
-    CALLBACK_ERROR -> ApiEventPayloadType.Callback
+    CALLBACK_ERROR,
+    -> ApiEventPayloadType.Callback
+
     SUSPICIOUS_INTENT -> ApiEventPayloadType.SuspiciousIntent
     INTENT_PARSING -> ApiEventPayloadType.IntentParsing
     COMPLETION_CHECK -> ApiEventPayloadType.CompletionCheck

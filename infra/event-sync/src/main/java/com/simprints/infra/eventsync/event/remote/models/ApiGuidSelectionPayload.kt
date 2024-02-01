@@ -9,7 +9,7 @@ internal data class ApiGuidSelectionPayload(
     override val startTime: ApiTimestamp,
     override val version: Int,
     val selectedId: String,
-) : ApiEventPayload(ApiEventPayloadType.GuidSelection, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: GuidSelectionPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

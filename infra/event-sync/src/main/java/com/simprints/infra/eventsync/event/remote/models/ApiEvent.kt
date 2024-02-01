@@ -8,6 +8,7 @@ import com.simprints.infra.events.event.domain.models.Event
 @Keep
 internal data class ApiEvent(
     val id: String,
+    val type: ApiEventPayloadType,
     val payload: ApiEventPayload,
     val tokenizedFields: List<String>,
 )
@@ -20,6 +21,7 @@ internal fun Event.fromDomainToApi(): ApiEvent {
 
     return ApiEvent(
         id = id,
+        type = type.fromDomainToApi(),
         payload = payload,
         tokenizedFields = tokenizedFields
     )

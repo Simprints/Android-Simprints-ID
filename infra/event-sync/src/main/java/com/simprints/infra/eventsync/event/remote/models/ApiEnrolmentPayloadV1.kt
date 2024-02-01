@@ -9,7 +9,7 @@ internal data class ApiEnrolmentPayloadV1(
     override val startTime: ApiTimestamp,
     override val version: Int,
     val personId: String,
-) : ApiEventPayload(ApiEventPayloadType.Enrolment, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: EnrolmentEventV1.EnrolmentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

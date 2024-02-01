@@ -10,7 +10,6 @@ import com.simprints.infra.events.event.domain.models.callout.EnrolmentLastBiome
 import com.simprints.infra.events.event.domain.models.callout.IdentificationCalloutEvent.IdentificationCalloutPayload
 import com.simprints.infra.events.event.domain.models.callout.VerificationCalloutEvent.VerificationCalloutPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Callout
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
@@ -20,7 +19,7 @@ internal data class ApiCalloutPayload(
     override val startTime: ApiTimestamp,
     override val version: Int,
     val callout: ApiCallout,
-) : ApiEventPayload(Callout, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: EnrolmentCalloutPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

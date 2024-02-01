@@ -20,7 +20,7 @@ internal data class ApiFingerprintCapturePayload(
     val finger: IFingerIdentifier,
     val result: ApiResult,
     val fingerprint: ApiFingerprint?,
-) : ApiEventPayload(ApiEventPayloadType.FingerprintCapture, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     data class ApiFingerprint(

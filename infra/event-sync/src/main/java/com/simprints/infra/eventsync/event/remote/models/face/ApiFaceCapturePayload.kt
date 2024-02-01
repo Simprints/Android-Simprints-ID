@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent.FaceCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.FaceCapture
 import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiFace
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload.ApiResult.*
@@ -24,7 +23,7 @@ internal data class ApiFaceCapturePayload(
     val result: ApiResult,
     val isFallback: Boolean,
     val face: ApiFace?,
-) : ApiEventPayload(FaceCapture, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: FaceCapturePayload) : this(
         domainPayload.id,

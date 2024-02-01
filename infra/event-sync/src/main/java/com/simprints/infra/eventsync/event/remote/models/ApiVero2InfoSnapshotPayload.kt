@@ -31,7 +31,7 @@ internal sealed class ApiVero2InfoSnapshotPayload(
     override val version: Int,
     open val scannerVersion: ApiVero2Version,
     open val battery: ApiBatteryInfo
-): ApiEventPayload(ApiEventPayloadType.Vero2InfoSnapshot, version, startTime) {
+): ApiEventPayload(version, startTime) {
 
     data class ApiVero2InfoSnapshotPayloadForNewApi(
         override val startTime: ApiTimestamp,

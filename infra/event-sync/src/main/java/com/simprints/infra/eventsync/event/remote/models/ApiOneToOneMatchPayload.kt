@@ -16,7 +16,7 @@ internal data class ApiOneToOneMatchPayload(
     val matcher: String,
     val result: ApiMatchEntry?,
     val fingerComparisonStrategy: ApiFingerComparisonStrategy?,
-) : ApiEventPayload(ApiEventPayloadType.OneToOneMatch, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: OneToOneMatchPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),

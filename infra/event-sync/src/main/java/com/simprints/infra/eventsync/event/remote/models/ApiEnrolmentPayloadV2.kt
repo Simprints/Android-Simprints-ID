@@ -13,7 +13,7 @@ internal data class ApiEnrolmentPayloadV2(
     val moduleId: String,
     val attendantId: String,
     val personCreationEventId: String,
-) : ApiEventPayload(ApiEventPayloadType.Enrolment, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     constructor(domainPayload: EnrolmentEventV2.EnrolmentPayload) : this(
         domainPayload.createdAt.fromDomainToApi(),
