@@ -65,7 +65,7 @@ internal class CreatePersonEventUseCase @Inject constructor(
         faceSamplesForPersonCreation: List<FaceSample>?,
         fingerprintSamplesForPersonCreation: List<FingerprintSample>?
     ) = PersonCreationEvent(
-        startTime = timeHelper.nowTimestamp(),
+        startTime = timeHelper.now(),
         fingerprintCaptureIds = extractFingerprintCaptureEventIdsBasedOnPersonTemplate(
             fingerprintCaptureBiometricsEvents,
             fingerprintSamplesForPersonCreation?.map { encodingUtils.byteArrayToBase64(it.template) }

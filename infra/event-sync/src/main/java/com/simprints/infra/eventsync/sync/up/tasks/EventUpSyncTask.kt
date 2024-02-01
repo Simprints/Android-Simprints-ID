@@ -55,22 +55,22 @@ internal class EventUpSyncTask @Inject constructor(
         var count = 0
 
         try {
-            lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now())
+            lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
 
             uploadEvents(projectId = operation.projectId, config).collect {
                 count = it
                 lastOperation =
-                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now())
+                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
                 emitProgress(lastOperation, count)
             }
 
             lastOperation =
-                lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now())
+                lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now().ms)
 
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
             Simber.e(t)
-            lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now())
+            lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now().ms)
 
             emitProgress(lastOperation, count)
         }

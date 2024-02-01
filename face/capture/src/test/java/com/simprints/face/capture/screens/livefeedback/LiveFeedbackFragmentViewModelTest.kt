@@ -69,7 +69,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         coEvery { configRepository.getProjectConfiguration().face?.qualityThreshold } returns QUALITY_THRESHOLD
-        every { timeHelper.nowTimestamp() } returnsMany (0..100L).map { Timestamp(it) }
+        every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { frameProcessor.init(any(), any()) }
         justRun { frame.close() }
         justRun { previewFrame.recycle() }
@@ -154,7 +154,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         val validFace: Face = getFace()
         every { frameProcessor.cropRotateFrame(frame) } returns previewFrame
         every { faceDetector.analyze(previewFrame) } returns validFace
-        every { timeHelper.nowTimestamp() } returnsMany (0..100L).map { Timestamp(it) }
+        every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()

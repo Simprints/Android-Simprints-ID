@@ -322,7 +322,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
     private fun startScanning() {
         updateCaptureState(CaptureState::toScanning)
-        lastCaptureStartedAt = timeHelper.nowTimestamp()
+        lastCaptureStartedAt = timeHelper.now()
         scanningTask?.cancel()
 
         scanningTask = viewModelScope.launch {
@@ -516,7 +516,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     fun handleMissingFingerButtonPressed() {
         if (state.isShowingSplashScreen.not()) {
             updateCaptureState(CaptureState::toSkipped)
-            lastCaptureStartedAt = timeHelper.nowTimestamp()
+            lastCaptureStartedAt = timeHelper.now()
             addCaptureAndBiometricEventsInSession()
             resolveFingerTerminalConditionTriggered()
         }

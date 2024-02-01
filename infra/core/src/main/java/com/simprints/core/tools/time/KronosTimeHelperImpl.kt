@@ -20,7 +20,7 @@ class KronosTimeHelperImpl @Inject constructor(private val clock: KronosClock) :
         clock.sync()
     }
 
-    override fun nowTimestamp(): Timestamp = clock.getCurrentTime().let {
+    override fun now(): Timestamp = clock.getCurrentTime().let {
         Timestamp(
             ms = it.posixTimeMs,
             isTrustworthy = it.timeSinceLastNtpSyncMs != null,
@@ -28,21 +28,18 @@ class KronosTimeHelperImpl @Inject constructor(private val clock: KronosClock) :
         )
     }
 
-    @Deprecated("Use nowTimestamp() instead")
-    override fun now(): Long = clock.getCurrentTimeMs()
-
-    override fun msBetweenNowAndTime(time: Long): Long = nowTimestamp().ms - time
+    override fun msBetweenNowAndTime(time: Long): Long = now().ms - time
 
     override fun readableBetweenNowAndTime(date: Date): String =
-        getRelativeTimeSpanString(date.time, nowTimestamp().ms, MINUTE_IN_MILLIS, FORMAT_SHOW_DATE).toString()
+        getRelativeTimeSpanString(date.time, now().ms, MINUTE_IN_MILLIS, FORMAT_SHOW_DATE).toString()
 
     override fun getCurrentDateAsString(): String {
         val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault())
-        return dateFormat.format(Date(nowTimestamp().ms))
+        return dateFormat.format(Date(now().ms))
     }
 
     override fun todayInMillis(): Long = Calendar.getInstance().run {
-        timeInMillis = nowTimestamp().ms
+        timeInMillis = now().ms
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
@@ -52,7 +49,7 @@ class KronosTimeHelperImpl @Inject constructor(private val clock: KronosClock) :
     }
 
     override fun tomorrowInMillis(): Long = Calendar.getInstance().run {
-        timeInMillis = nowTimestamp().ms
+        timeInMillis = now().ms
         add(Calendar.DATE, 1)
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)

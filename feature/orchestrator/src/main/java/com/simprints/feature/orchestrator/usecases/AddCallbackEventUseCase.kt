@@ -37,20 +37,20 @@ internal class AddCallbackEventUseCase @Inject constructor(
     }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) = EnrolmentCallbackEvent(
-        timeHelper.nowTimestamp(),
+        timeHelper.now(),
         appResponse.guid
     )
 
     private fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
         IdentificationCallbackEvent(
-            timeHelper.nowTimestamp(),
+            timeHelper.now(),
             appResponse.sessionId,
             appResponse.identifications.map { buildComparisonScore(it) },
         )
 
     private fun buildVerificationCallbackEvent(appResponse: AppVerifyResponse) =
         VerificationCallbackEvent(
-            timeHelper.nowTimestamp(),
+            timeHelper.now(),
             buildComparisonScore(appResponse.matchResult),
         )
 
@@ -62,13 +62,13 @@ internal class AddCallbackEventUseCase @Inject constructor(
     )
 
     private fun buildRefusalCallbackEvent(appResponse: AppRefusalResponse) = RefusalCallbackEvent(
-        timeHelper.nowTimestamp(),
+        timeHelper.now(),
         appResponse.reason,
         appResponse.extra,
     )
 
     private fun buildErrorCallbackEvent(appResponse: AppErrorResponse) = ErrorCallbackEvent(
-        timeHelper.nowTimestamp(),
+        timeHelper.now(),
         ErrorCallbackEvent.ErrorCallbackPayload.Reason.fromAppResponseErrorReasonToEventReason(
             appResponse.reason
         ),
@@ -76,7 +76,7 @@ internal class AddCallbackEventUseCase @Inject constructor(
 
     private fun buildConfirmIdentityCallbackEvent(appResponse: AppConfirmationResponse) =
         ConfirmationCallbackEvent(
-            timeHelper.nowTimestamp(),
+            timeHelper.now(),
             appResponse.identificationOutcome,
         )
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
@@ -356,6 +357,6 @@ internal class EventUpSyncTaskTest {
 
     companion object {
 
-        private const val NOW = 1000L
+        private val NOW = Timestamp(1000L)
     }
 }

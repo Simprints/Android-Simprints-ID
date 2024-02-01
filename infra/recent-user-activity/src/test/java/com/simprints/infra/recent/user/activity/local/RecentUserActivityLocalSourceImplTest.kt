@@ -7,6 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -33,7 +34,7 @@ class RecentUserActivityLocalSourceImplTest {
     @Test
     fun `should clear the old activity before returning the recent user activity`() = runTest {
         val user = "user".asTokenizableEncrypted()
-        every { timeHelper.now() } returns 20000
+        every { timeHelper.now() } returns Timestamp(20000L)
         recentUserActivityLocalSourceImpl.updateRecentUserActivity {
             it.apply {
                 it.lastUserUsed = user
@@ -50,7 +51,7 @@ class RecentUserActivityLocalSourceImplTest {
     @Test
     fun `should clear the old activity before updating the recent user activity`() = runTest {
         val user = "user".asTokenizableEncrypted()
-        every { timeHelper.now() } returnsMany listOf(0, 11000)
+        every { timeHelper.now() } returnsMany listOf(Timestamp(0L), Timestamp(11000L))
         every { timeHelper.tomorrowInMillis() } returns 20000
         recentUserActivityLocalSourceImpl.updateRecentUserActivity {
             it.apply {

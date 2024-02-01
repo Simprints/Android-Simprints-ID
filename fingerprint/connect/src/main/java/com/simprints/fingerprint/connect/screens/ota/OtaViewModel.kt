@@ -102,7 +102,7 @@ internal class OtaViewModel @Inject constructor(
     }
 
     private suspend fun AvailableOta.toFlowOfSteps(): Flow<OtaStep> {
-        val otaStartedTime = timeHelper.nowTimestamp()
+        val otaStartedTime = timeHelper.now()
         val targetVersions = targetVersions(this)
 
         return when (this) {

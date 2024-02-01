@@ -47,7 +47,7 @@ internal class AlertViewModelTest {
 
     @Test
     fun saveAlertEvent() = runTest {
-        every { timeHelper.nowTimestamp() } returns Timestamp(42)
+        every { timeHelper.now() } returns Timestamp(42)
 
         alertViewModel.saveAlertEvent(AlertScreenEventType.DISCONNECTED)
 

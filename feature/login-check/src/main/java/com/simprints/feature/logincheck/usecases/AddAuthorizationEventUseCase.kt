@@ -17,6 +17,6 @@ internal class AddAuthorizationEventUseCase @Inject constructor(
             ?.let { AuthorizationEvent.AuthorizationPayload.UserInfo(it.projectId, it.userId) }
         val result = if (authorized) AuthorizationEvent.AuthorizationPayload.AuthorizationResult.AUTHORIZED else AuthorizationEvent.AuthorizationPayload.AuthorizationResult.NOT_AUTHORIZED
 
-        coreEventRepository.addOrUpdateEvent(AuthorizationEvent(timeHelper.nowTimestamp(), result, userInfo))
+        coreEventRepository.addOrUpdateEvent(AuthorizationEvent(timeHelper.now(), result, userInfo))
     }
 }

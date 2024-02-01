@@ -37,7 +37,7 @@ class KronosTimeHelperImplTest {
         every { kronosClock.getCurrentTime() } returns KronosTime(1000L, 1L)
         every { kronosClock.getElapsedTimeMs() } returns 3L
 
-        assertThat(timeHelperImpl.nowTimestamp()).isEqualTo(Timestamp(1000L, true, 3L))
+        assertThat(timeHelperImpl.now()).isEqualTo(Timestamp(1000L, true, 3L))
     }
 
     @Test
@@ -45,7 +45,7 @@ class KronosTimeHelperImplTest {
         every { kronosClock.getCurrentTime() } returns KronosTime(1000L, null)
         every { kronosClock.getElapsedTimeMs() } returns 3L
 
-        assertThat(timeHelperImpl.nowTimestamp()).isEqualTo(Timestamp(1000L, false, 3L))
+        assertThat(timeHelperImpl.now()).isEqualTo(Timestamp(1000L, false, 3L))
     }
 
     @Test

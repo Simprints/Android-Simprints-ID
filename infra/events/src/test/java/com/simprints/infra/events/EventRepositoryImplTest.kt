@@ -64,7 +64,7 @@ internal class EventRepositoryImplTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelper.nowTimestamp() } returns NOW
+        every { timeHelper.now() } returns NOW
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
         every { sessionDataCache.sessionScope } returns null

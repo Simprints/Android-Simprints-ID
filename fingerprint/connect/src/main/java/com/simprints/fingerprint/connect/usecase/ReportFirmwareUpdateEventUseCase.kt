@@ -33,7 +33,7 @@ internal class ReportFirmwareUpdateEventUseCase @Inject constructor(
             eventRepository.addOrUpdateEvent(
                 ScannerFirmwareUpdateEvent(
                     startTime,
-                    timeHelper.nowTimestamp(),
+                    timeHelper.now(),
                     chipName,
                     targetVersions,
                     failureReason,

@@ -24,13 +24,13 @@ internal class SimpleCaptureEventReporter @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
     fun addOnboardingCompleteEvent(startTime: Timestamp) = externalScope.launch {
-        eventRepository.addOrUpdateEvent(FaceOnboardingCompleteEvent(startTime, timeHelper.nowTimestamp()))
+        eventRepository.addOrUpdateEvent(FaceOnboardingCompleteEvent(startTime, timeHelper.now()))
     }
 
     fun addCaptureConfirmationEvent(startTime: Timestamp, isContinue: Boolean) = externalScope.launch {
         eventRepository.addOrUpdateEvent(FaceCaptureConfirmationEvent(
             startTime,
-            timeHelper.nowTimestamp(),
+            timeHelper.now(),
             if (isContinue) Result.CONTINUE else Result.RECAPTURE
         ))
     }

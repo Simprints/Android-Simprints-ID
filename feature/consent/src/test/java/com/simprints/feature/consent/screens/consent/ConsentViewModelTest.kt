@@ -69,7 +69,7 @@ class ConsentViewModelTest {
         coEvery { configRepository.getProjectConfiguration() } returns projectConfig
         every { projectConfig.consent } returns mockk()
 
-        every { timeHelper.nowTimestamp() } returns TIMESTAMP
+        every { timeHelper.now() } returns TIMESTAMP
         every { generalConsentTextHelper.assembleText(any(), any(), any()) } returns GENERAL_CONSENT
         every { parentalConsentTextHelper.assembleText(any(), any(), any()) } returns PARENTAL_CONSENT
 

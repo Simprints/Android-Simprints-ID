@@ -28,7 +28,7 @@ internal class Authenticator @Inject constructor(
     private val eventRepository: EventRepository,
 ) {
 
-    private var loginStartTime = timeHelper.nowTimestamp()
+    private var loginStartTime = timeHelper.now()
 
     suspend fun authenticate(
         userId: TokenizableString.Raw,
@@ -40,7 +40,7 @@ internal class Authenticator @Inject constructor(
             logMessageForCrashReportWithNetworkTrigger("Making authentication request")
             authStore.cleanCredentials()
 
-            loginStartTime = timeHelper.nowTimestamp()
+            loginStartTime = timeHelper.now()
             val nonceScope = NonceScope(projectId, deviceId)
             projectAuthenticator.authenticate(nonceScope, projectSecret)
 
@@ -90,7 +90,7 @@ internal class Authenticator @Inject constructor(
     ) {
         val event = AuthenticationEvent(
             loginStartTime,
-            timeHelper.nowTimestamp(),
+            timeHelper.now(),
             UserInfo(projectId, userId),
             result
         )

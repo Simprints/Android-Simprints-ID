@@ -25,7 +25,7 @@ internal class ExitFormViewModel @Inject constructor(
     @ExternalScope private val externalScope: CoroutineScope
 ) : ViewModel() {
 
-    private val exitFormStart: Timestamp = timeHelper.nowTimestamp()
+    private val exitFormStart: Timestamp = timeHelper.now()
 
     private var selectedOption: ExitFormOption? = null
     private var providedReason: String? = null
@@ -86,6 +86,6 @@ internal class ExitFormViewModel @Inject constructor(
     }
 
     private fun logRefusalEvent(option: ExitFormOption, reasonText: String) = externalScope.launch {
-        eventRepository.addOrUpdateEvent(RefusalEvent(exitFormStart, timeHelper.nowTimestamp(), option.answer, reasonText))
+        eventRepository.addOrUpdateEvent(RefusalEvent(exitFormStart, timeHelper.now(), option.answer, reasonText))
     }
 }

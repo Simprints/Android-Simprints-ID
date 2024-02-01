@@ -46,7 +46,7 @@ internal class FetchSubjectViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelper.nowTimestamp() } returns TIMESTAMP
+        every { timeHelper.now() } returns TIMESTAMP
 
         viewModel = FetchSubjectViewModel(
             timeHelper,

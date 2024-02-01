@@ -2,7 +2,6 @@ package com.simprints.feature.clientapi.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent
@@ -18,13 +17,13 @@ internal class SimpleEventReporter @Inject constructor(
 
     fun addInvalidIntentEvent(action: String, extras: Map<String, Any>) {
         externalScope.launch {
-            coreEventRepository.addOrUpdateEvent(InvalidIntentEvent(timeHelper.nowTimestamp(), action, extras))
+            coreEventRepository.addOrUpdateEvent(InvalidIntentEvent(timeHelper.now(), action, extras))
         }
     }
 
     fun addCompletionCheckEvent(flowCompleted: Boolean) {
         externalScope.launch {
-            coreEventRepository.addOrUpdateEvent(CompletionCheckEvent(timeHelper.nowTimestamp(), flowCompleted))
+            coreEventRepository.addOrUpdateEvent(CompletionCheckEvent(timeHelper.now(), flowCompleted))
         }
     }
 

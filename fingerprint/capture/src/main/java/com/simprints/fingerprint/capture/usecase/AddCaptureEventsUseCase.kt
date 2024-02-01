@@ -31,7 +31,7 @@ internal class AddCaptureEventsUseCase @Inject constructor(
 
         val captureEvent = FingerprintCaptureEvent(
             createdAt = lastCaptureStartedAt,
-            endTime = timeHelper.nowTimestamp(),
+            endTime = timeHelper.now(),
             finger = fingerState.id,
             qualityThreshold = qualityThreshold,
             result = mapCaptureStateToResult(captureState),

@@ -38,7 +38,7 @@ class ReportFirmwareUpdateEventUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelper.now() } returns 1L
+        every { timeHelper.now() } returns Timestamp(1L)
 
         useCase = ReportFirmwareUpdateEventUseCase(
             timeHelper,

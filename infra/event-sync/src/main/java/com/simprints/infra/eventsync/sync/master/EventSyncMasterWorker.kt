@@ -70,9 +70,8 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
                     message = "Can't sync to SimprintsID, skip"
                 )
 
-                //Requests timestamp now as device is surely ONLINE,
-                //so if needed, the NTP has a chance to get refreshed.
-                timeHelper.now()
+                // Requests NTP sync now as device is surely ONLINE,
+                timeHelper.ensureTrustworthiness()
 
                 if (!isSyncRunning()) {
                     val startSyncReporterWorker =

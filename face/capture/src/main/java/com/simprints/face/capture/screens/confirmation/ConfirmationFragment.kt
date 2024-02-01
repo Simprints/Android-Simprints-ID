@@ -31,7 +31,7 @@ internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
     private var startTime = Timestamp(0L)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        startTime = faceTimeHelper.nowTimestamp()
+        startTime = faceTimeHelper.now()
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply(::setImageBitmapAndButtonClickListener)

@@ -29,7 +29,7 @@ internal class PreparationFragment : Fragment(R.layout.fragment_preparation) {
     private var startTime: Timestamp = Timestamp(0)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        startTime = faceTimeHelper.nowTimestamp()
+        startTime = faceTimeHelper.now()
 
         binding.detectionOnboardingFrame.setOnClickListener {
             mainVm.addOnboardingComplete(startTime)

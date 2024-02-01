@@ -39,7 +39,7 @@ internal class SelectSubjectViewModel @Inject constructor(
 
     private fun saveSelectionEvent(subjectId: String) = externalScope.launch {
         try {
-            val event = GuidSelectionEvent(timeHelper.nowTimestamp(), subjectId)
+            val event = GuidSelectionEvent(timeHelper.now(), subjectId)
             eventRepository.addOrUpdateEvent(event)
 
             Simber.tag(SESSION.name).i("Added Guid Selection Event")

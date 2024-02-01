@@ -39,7 +39,7 @@ internal class ExitFormViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelper.nowTimestamp() } returns Timestamp(1L)
+        every { timeHelper.now() } returns Timestamp(1L)
 
         exitFormViewModel = ExitFormViewModel(
             timeHelper,

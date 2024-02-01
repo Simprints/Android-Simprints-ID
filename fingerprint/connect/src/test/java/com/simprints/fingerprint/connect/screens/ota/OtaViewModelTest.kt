@@ -71,7 +71,7 @@ class OtaViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelperMock.nowTimestamp() } returns Timestamp(1L)
+        every { timeHelperMock.now() } returns Timestamp(1L)
         coEvery {
             recentUserActivityManager.getRecentUserActivity()
         } returns RecentUserActivity(HARDWARE_VERSION, "", "".asTokenizableRaw(), 0, 0, 0, 0)

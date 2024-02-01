@@ -41,7 +41,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         SymmetricTarget(VALID_ROLL_DELTA),
         0.25f..0.5f
     )
-    private val fallbackCaptureEventStartTime = timeHelper.nowTimestamp()
+    private val fallbackCaptureEventStartTime = timeHelper.now()
     private var shouldSendFallbackCaptureEvent: AtomicBoolean = AtomicBoolean(true)
     private lateinit var fallbackCapture: FaceDetection
 
@@ -56,13 +56,13 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      * @param image is the camera frame
      */
     fun process(image: ImageProxy) {
-        val captureStartTime = timeHelper.nowTimestamp()
+        val captureStartTime = timeHelper.now()
         val croppedBitmap = frameProcessor.cropRotateFrame(image)
         val potentialFace = faceDetector.analyze(croppedBitmap)
 
         val faceDetection = getFaceDetectionFromPotentialFace(croppedBitmap, potentialFace)
         faceDetection.detectionStartTime = captureStartTime
-        faceDetection.detectionEndTime = timeHelper.nowTimestamp()
+        faceDetection.detectionEndTime = timeHelper.now()
 
         currentDetection.postValue(faceDetection)
 
@@ -123,8 +123,8 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
                 bitmap = bitmap,
                 face = null,
                 status = FaceDetection.Status.NOFACE,
-                detectionStartTime = timeHelper.nowTimestamp(),
-                detectionEndTime = timeHelper.nowTimestamp()
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now()
             )
         } else {
             getFaceDetection(bitmap, potentialFace)
@@ -138,36 +138,36 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
                 bitmap = bitmap,
                 face = potentialFace,
                 status = FaceDetection.Status.TOOFAR,
-                detectionStartTime = timeHelper.nowTimestamp(),
-                detectionEndTime = timeHelper.nowTimestamp(),
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
                 bitmap = bitmap, face = potentialFace,
                 status = FaceDetection.Status.TOOCLOSE,
-                detectionStartTime = timeHelper.nowTimestamp(),
-                detectionEndTime = timeHelper.nowTimestamp(),
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
                 bitmap = bitmap, face = potentialFace,
                 status = FaceDetection.Status.OFFYAW,
-                detectionStartTime = timeHelper.nowTimestamp(),
-                detectionEndTime = timeHelper.nowTimestamp(),
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
                 bitmap = bitmap, face = potentialFace,
                 status = FaceDetection.Status.OFFROLL,
-                detectionStartTime = timeHelper.nowTimestamp(),
-                detectionEndTime = timeHelper.nowTimestamp(),
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             else -> FaceDetection(
                 bitmap = bitmap, face = potentialFace,
                 status = if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID,
-                detectionStartTime = timeHelper.nowTimestamp(),
-                detectionEndTime = timeHelper.nowTimestamp(),
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
         }
     }
