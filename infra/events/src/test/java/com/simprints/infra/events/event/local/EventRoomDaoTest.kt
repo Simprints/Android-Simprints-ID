@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
+import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.local.models.DbEvent
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
@@ -28,7 +28,7 @@ internal class EventRoomDaoTest {
     val event = DbEvent(
         GUID1,
         CREATED_AT.fromDomainToDb(),
-        SESSION_CAPTURE,
+        EventType.INTENT_PARSING,
         DEFAULT_PROJECT_ID,
         GUID1,
         eventJson,

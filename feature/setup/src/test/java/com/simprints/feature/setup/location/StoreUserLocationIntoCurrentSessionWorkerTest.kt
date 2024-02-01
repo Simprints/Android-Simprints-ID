@@ -1,7 +1,6 @@
 package com.simprints.feature.setup.location
 
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -55,7 +54,6 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
         every { locationManager.requestLocation(any()) } throws Exception("Location collect exception")
         worker.doWork()
         coVerify(exactly = 0) { eventRepository.getCurrentSessionScope() }
-        coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
     }
 
     @Test(expected = Test.None::class)
@@ -66,7 +64,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
                 eventRepository.getCurrentSessionScope()
             } throws Exception("No session capture event found")
             worker.doWork()
-            coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
+            coVerify(exactly = 0) { eventRepository.saveSessionScope(any()) }
         }
 
     @Test
@@ -75,7 +73,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
             every { locationManager.requestLocation(any()) } returns flowOf(TestLocationData.buildFakeLocation())
             worker.stop(0)
             worker.doWork()
-            coVerify(exactly = 0) { eventRepository.addOrUpdateEvent(any<SessionCaptureEvent>()) }
+            coVerify(exactly = 0) { eventRepository.saveSessionScope(any()) }
         }
 
 }

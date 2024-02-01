@@ -14,7 +14,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
@@ -270,7 +269,8 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `events loaded to cache on request from session`() = runTest {
-        mockDbToLoadOpenSession(GUID1)
+
+        mockDbToHaveEvents(GUID1)
 
         eventRepo.observeEventsFromSession(GUID1).toList()
 
@@ -340,14 +340,12 @@ internal class EventRepositoryImplTest {
     @Test
     fun `test removeLocationDataFromCurrentSession does nothing if location is null`() = runTest {
         // Given
-        val sessionCaptureEvent = mockk<SessionCaptureEvent> {
-            every { payload.location } returns null
-        }
-        every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
+        val scope = createSessionScope()
+        every { sessionDataCache.sessionScope } returns scope.copy(payload = scope.payload.copy(location = null))
         //When
         eventRepo.removeLocationDataFromCurrentSession()
         //Then
-        coVerify(exactly = 0) { eventLocalDataSource.saveEvent(sessionCaptureEvent) }
+        coVerify(exactly = 0) { eventLocalDataSource.saveSessionScope(any()) }
     }
 
     @Test

@@ -5,11 +5,10 @@ import android.os.Build.VERSION
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
-import com.simprints.infra.events.sampledata.createSessionCaptureEvent
+import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import io.mockk.coEvery
 import kotlinx.coroutines.flow.flowOf
@@ -46,11 +45,8 @@ fun assertANewSessionCaptureWasAdded(scope: SessionScope): Boolean =
 
 fun assertThatSessionScopeClosed(scope: SessionScope): Boolean = scope.endedAt != null
 
-internal fun EventRepositoryImplTest.mockDbToLoadOpenSession(id: String) {
-    val session = createSessionCaptureEvent(id).openSession()
-    coEvery { eventLocalDataSource.loadEventsInSession(sessionId = id) } returns listOf(session)
-    coEvery { eventLocalDataSource.loadAllEvents() } returns flowOf(session)
+internal fun EventRepositoryImplTest.mockDbToHaveEvents(id: String) {
+    val event = createAlertScreenEvent()
+    coEvery { eventLocalDataSource.loadEventsInSession(sessionId = id) } returns listOf(event)
+    coEvery { eventLocalDataSource.loadAllEvents() } returns flowOf(event)
 }
-
-fun SessionCaptureEvent.openSession(): SessionCaptureEvent =
-    this.copy(payload = this.payload.copy(sessionIsClosed = false))

@@ -12,3 +12,6 @@ internal data class ApiLocation(
     constructor(location: Location) :
         this(location.latitude, location.longitude)
 }
+
+internal fun Location?.fromDomainToApi() =
+    this?.let { ApiLocation(latitude, longitude) }

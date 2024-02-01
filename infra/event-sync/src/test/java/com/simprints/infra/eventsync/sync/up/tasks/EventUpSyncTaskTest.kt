@@ -99,10 +99,10 @@ internal class EventUpSyncTaskTest {
         )
         coEvery {
             eventRepo.getEventsFromSession(GUID1)
-        } returns listOf(createSessionCaptureEvent(GUID1))
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
         coEvery {
             eventRepo.getEventsFromSession(GUID2)
-        } returns listOf(createSessionCaptureEvent(GUID2))
+        } returns listOf(createEventWithSessionId(GUID2, GUID2))
 
         eventUpSyncTask.upSync(operation).toList()
 
@@ -209,10 +209,10 @@ internal class EventUpSyncTaskTest {
         )
         coEvery {
             eventRepo.getEventsFromSession(GUID1)
-        } returns listOf(createSessionCaptureEvent(GUID1))
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
         coEvery {
             eventRepo.getEventsFromSession(GUID2)
-        } returns listOf(createSessionCaptureEvent(GUID2))
+        } returns listOf(createEventWithSessionId(GUID2, GUID2))
 
         eventUpSyncTask.upSync(operation).toList()
 
@@ -231,7 +231,7 @@ internal class EventUpSyncTaskTest {
             createSessionScope(GUID2)
         )
         coEvery { eventRepo.getEventsFromSession(GUID1) } returns listOf(
-            createSessionCaptureEvent(GUID1),
+            createEventWithSessionId(GUID1, GUID1),
         )
         coEvery { eventRepo.getEventsFromSession(GUID2) } returns listOf(
             createEnrolmentEventV2(),
@@ -252,7 +252,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
         coEvery {
             eventRepo.getEventsFromSession(GUID1)
-        } returns listOf(createSessionCaptureEvent(GUID1))
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
 
         coEvery { eventRemoteDataSource.post(any(), any()) } throws Throwable("")
 
@@ -268,7 +268,7 @@ internal class EventUpSyncTaskTest {
         coEvery { eventRepo.getAllClosedSessions() } returns listOf(createSessionScope(GUID1))
         coEvery {
             eventRepo.getEventsFromSession(GUID1)
-        } returns listOf(createSessionCaptureEvent(GUID1))
+        } returns listOf(createEventWithSessionId(GUID1, GUID1))
 
         coEvery { eventRemoteDataSource.post(any(), any()) } throws NetworkConnectionException(
             cause = Exception()

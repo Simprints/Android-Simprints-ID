@@ -3,12 +3,10 @@ package com.simprints.infra.eventsync.event
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.utils.isValidGuid
 import com.simprints.infra.eventsync.event.remote.models.ApiAlertScreenPayload.ApiAlertScreenEventType
-import com.simprints.infra.eventsync.event.remote.models.ApiArtificialTerminationPayload.ApiReason
 import com.simprints.infra.eventsync.event.remote.models.ApiAuthenticationPayload
 import com.simprints.infra.eventsync.event.remote.models.ApiRefusalPayload
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackType
 import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutType
-import org.json.JSONArray
 import org.json.JSONObject
 
 private val fingerIdentifiers = listOf(
@@ -201,16 +199,6 @@ fun validateAlertScreenEventApiModel(json: JSONObject) {
         assertThat(getInt("version")).isEqualTo(2)
         validateTimestamp(getJSONObject("startTime"))
         assertThat(getString("alertType")).isIn(ApiAlertScreenEventType.values().valuesAsStrings())
-        assertThat(length()).isEqualTo(4)
-    }
-}
-
-fun validateArtificialTerminationEventApiModel(json: JSONObject) {
-    validateCommonParams(json, "ArtificialTermination")
-    with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(2)
-        validateTimestamp(getJSONObject("startTime"))
-        assertThat(getString("reason")).isIn(ApiReason.values().valuesAsStrings())
         assertThat(length()).isEqualTo(4)
     }
 }
@@ -458,27 +446,6 @@ fun validateRefusalEventApiModel(json: JSONObject) {
         assertThat(getString("reason")).isIn(ApiRefusalPayload.ApiAnswer.values().valuesAsStrings())
         assertThat(getString("otherText")).isNotNull()
         assertThat(length()).isEqualTo(6)
-    }
-}
-
-fun validateSessionCaptureApiModel(json: JSONObject) {
-    validateCommonParams(json, "SessionCapture")
-
-    with(json.getJSONObject("payload")) {
-        assertThat(getInt("version")).isEqualTo(2)
-        assertThat(getString("id")).isNotNull()
-        assertThat(getString("projectId")).isNotNull()
-        validateTimestamp(getJSONObject("startTime"))
-        assertThat(getLong("uploadTime")).isNotNull()
-        assertThat(getJSONArray("modalities").length()).isEqualTo(2)
-        assertThat(getString("appVersionName")).isNotNull()
-        assertThat(getString("libVersionName")).isNotNull()
-        assertThat(getString("language")).isNotNull()
-        validateDeviceApiModel(getJSONObject("device"))
-        validateDatabaseInfoApiModel(getJSONObject("databaseInfo"))
-        validateLocationApiModel(getJSONObject("location"))
-
-        assertThat(length()).isEqualTo(13)
     }
 }
 

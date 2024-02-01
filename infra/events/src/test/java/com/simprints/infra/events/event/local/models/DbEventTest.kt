@@ -1,7 +1,6 @@
 package com.simprints.infra.events.event.local.models
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.infra.events.sampledata.*
 import org.junit.Test
@@ -128,24 +127,8 @@ class DbEventTest {
     }
 
     @Test
-    fun convert_SessionCaptureEvent() {
-        val original = createSessionCaptureEvent()
-        val transformed = (original.fromDomainToDb().fromDbToDomain())
-
-        assertThat(original).isEqualTo(transformed)
-    }
-
-    @Test
     fun convert_AlertScreenEvent() {
         val original = createAlertScreenEvent()
-        val transformed = original.fromDomainToDb().fromDbToDomain()
-
-        assertThat(original).isEqualTo(transformed)
-    }
-
-    @Test
-    fun convert_ArtificialTerminationEvent() {
-        val original = createArtificialTerminationEvent()
         val transformed = original.fromDomainToDb().fromDbToDomain()
 
         assertThat(original).isEqualTo(transformed)

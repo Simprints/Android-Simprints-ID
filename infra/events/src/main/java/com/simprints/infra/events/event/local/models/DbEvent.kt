@@ -10,9 +10,7 @@ import com.simprints.core.domain.tokenization.serialization.TokenizationClassNam
 import com.simprints.core.domain.tokenization.serialization.TokenizationClassNameSerializer
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.local.models.DbEvent.Companion.dbSerializationModule
 
 @Entity

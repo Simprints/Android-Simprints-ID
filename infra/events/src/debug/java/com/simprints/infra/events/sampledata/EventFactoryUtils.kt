@@ -10,7 +10,6 @@ import com.simprints.core.tools.utils.SimNetworkUtils.Connection
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.event.domain.models.*
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.BLUETOOTH_NOT_ENABLED
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload.Reason.NEW_SESSION
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.Result.AUTHENTICATED
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload.UserInfo
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
@@ -51,7 +50,6 @@ import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCap
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.Location
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
@@ -99,6 +97,16 @@ fun createSessionScope(
         )
     )
 }
+
+fun createEventWithSessionId(eventId: String, sessionId: String): Event = AlertScreenEvent(
+    id = eventId,
+    payload = AlertScreenEvent.AlertScreenPayload(
+        CREATED_AT, AlertScreenEvent.EVENT_VERSION,
+        AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
+    ),
+    type = EventType.ALERT_SCREEN,
+    sessionId = sessionId,
+)
 
 const val FACE_TEMPLATE_FORMAT = "RANK_ONE_1_23"
 
@@ -224,47 +232,10 @@ fun createFaceOnboardingCompleteEvent() = FaceOnboardingCompleteEvent(
     ENDED_AT
 )
 
-@Deprecated("Should be removed")
-fun createSessionCaptureEvent(
-    id: String = GUID1,
-    createdAt: Timestamp = CREATED_AT,
-    projectId: String = DEFAULT_PROJECT_ID,
-): SessionCaptureEvent {
-
-    val appVersionNameArg = "appVersionName"
-    val libSimprintsVersionNameArg = "libSimprintsVersionName"
-    val languageArg = "language"
-    val deviceArg = Device(
-        Build.VERSION.SDK_INT.toString(),
-        Build.MANUFACTURER + "_" + Build.MODEL,
-        GUID1
-    )
-
-    val databaseInfoArg = DatabaseInfo(2, 2)
-    val locationArg = Location(0.0, 0.0)
-
-    return SessionCaptureEvent(
-        id,
-        projectId,
-        createdAt,
-        listOf(Modality.FINGERPRINT, Modality.FACE),
-        appVersionNameArg,
-        libSimprintsVersionNameArg,
-        languageArg,
-        deviceArg,
-        databaseInfoArg,
-        locationArg
-    )
-}
-
 fun createAlertScreenEvent() = AlertScreenEvent(
     CREATED_AT,
     BLUETOOTH_NOT_ENABLED
 )
-
-@Deprecated("Should be removed")
-fun createArtificialTerminationEvent() =
-    ArtificialTerminationEvent(CREATED_AT, NEW_SESSION)
 
 fun createAuthenticationEvent() = AuthenticationEvent(
     CREATED_AT,

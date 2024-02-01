@@ -8,7 +8,6 @@ import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.Sca
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_2
-import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
 import com.simprints.infra.eventsync.event.remote.models.ApiScannerConnectionPayload.ApiScannerGeneration
 
 @Keep

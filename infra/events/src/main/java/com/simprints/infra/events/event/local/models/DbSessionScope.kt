@@ -6,7 +6,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
 

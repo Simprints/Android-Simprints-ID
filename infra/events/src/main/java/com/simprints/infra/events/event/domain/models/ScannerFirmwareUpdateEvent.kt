@@ -45,7 +45,7 @@ data class ScannerFirmwareUpdateEvent(
     data class ScannerFirmwareUpdatePayload(
         override val createdAt: Timestamp,
         override val eventVersion: Int,
-        override var endedAt: Timestamp,
+        override var endedAt: Timestamp?,
         val chip: String,
         val targetAppVersion: String,
         var failureReason: String? = null,

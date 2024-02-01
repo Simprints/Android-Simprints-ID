@@ -117,14 +117,14 @@ class EventMigration1to2Test {
         closedId: String,
     ) {
         retrieveCursorWithEventById(db, openId).use {
-            assertThat(it.getStringWithColumnName("type")).isEqualTo(EventType.SESSION_CAPTURE.toString())
+            assertThat(it.getStringWithColumnName("type")).isEqualTo("SESSION_CAPTURE")
 
             val eventJson = JSONObject(it.getStringWithColumnName("eventJson")!!)
             assertThat(eventJson.getJSONObject("payload").optBoolean("sessionIsClosed")).isFalse()
         }
 
         retrieveCursorWithEventById(db, closedId).use {
-            assertThat(it.getStringWithColumnName("type")).isEqualTo(EventType.SESSION_CAPTURE.toString())
+            assertThat(it.getStringWithColumnName("type")).isEqualTo("SESSION_CAPTURE")
 
             val eventJson = JSONObject(it.getStringWithColumnName("eventJson")!!)
             assertThat(eventJson.getJSONObject("payload").optBoolean("sessionIsClosed")).isTrue()
