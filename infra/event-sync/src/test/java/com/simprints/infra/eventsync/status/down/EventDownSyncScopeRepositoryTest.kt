@@ -145,7 +145,7 @@ internal class EventDownSyncScopeRepositoryTest {
                 eventDownSyncScopeRepository.getDownSyncScope(
                     listOf(Modes.FINGERPRINT),
                     DEFAULT_MODULES.toList(),
-                    Partitioning.GLOBAL
+                    Partitioning.USER
                 )
             }
         }
