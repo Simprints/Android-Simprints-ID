@@ -26,11 +26,10 @@ internal class EventDownSyncScopeRepository @Inject constructor(
         syncPartitioning: Partitioning
     ): EventDownSyncScope {
         val projectId = getProjectId()
-        val possibleUserId = getUserId()
 
         val syncScope = when (syncPartitioning) {
             Partitioning.GLOBAL -> SubjectProjectScope(projectId, modes)
-            Partitioning.USER -> SubjectUserScope(projectId, possibleUserId, modes)
+            Partitioning.USER -> SubjectUserScope(projectId,  getUserId(), modes)
             Partitioning.MODULE -> SubjectModuleScope(projectId, selectedModuleIDs, modes)
         }
 
