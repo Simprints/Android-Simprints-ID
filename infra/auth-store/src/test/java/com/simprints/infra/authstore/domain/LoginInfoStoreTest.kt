@@ -39,7 +39,7 @@ class LoginInfoStoreTest {
     fun `setting the raw signed in user id should set in the shared preferences`() {
         loginInfoStoreImpl.signedInUserId = "user".asTokenizableRaw()
 
-        verify(exactly = 1) { editor.putString("USER_ID_VALUE", "user") }
+        verify(exactly = 1) { editor.putString("USER_ID", "user") }
         verify(exactly = 1) { editor.putBoolean("USER_ID_TOKENIZED", false) }
     }
 
@@ -47,7 +47,7 @@ class LoginInfoStoreTest {
     fun `setting the tokenized signed in user id should set in the shared preferences`() {
         loginInfoStoreImpl.signedInUserId = "user".asTokenizableEncrypted()
 
-        verify(exactly = 1) { editor.putString("USER_ID_VALUE", "user") }
+        verify(exactly = 1) { editor.putString("USER_ID", "user") }
         verify(exactly = 1) { editor.putBoolean("USER_ID_TOKENIZED", true) }
     }
 
@@ -188,7 +188,7 @@ class LoginInfoStoreTest {
     fun `cleanCredentials should reset all the credentials`() {
         loginInfoStoreImpl.cleanCredentials()
 
-        verify(exactly = 1) { editor.remove("USER_ID_VALUE") }
+        verify(exactly = 1) { editor.remove("USER_ID") }
         verify(exactly = 1) { editor.remove("USER_ID_TOKENIZED") }
         verify(exactly = 1) { editor.putString("PROJECT_ID", "") }
         verify(exactly = 1) { editor.putString("ENCRYPTED_PROJECT_SECRET", "") }

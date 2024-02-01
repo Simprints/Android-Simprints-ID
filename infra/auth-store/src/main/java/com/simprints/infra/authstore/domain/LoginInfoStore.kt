@@ -17,7 +17,7 @@ internal class LoginInfoStore @Inject constructor(
         private const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
         private const val PREF_MODE = Context.MODE_PRIVATE
         private const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
-        private const val USER_ID_VALUE: String = "USER_ID_VALUE"
+        private const val USER_ID_VALUE: String = "USER_ID"
         private const val USER_ID_TOKENIZED: String = "USER_ID_TOKENIZED"
         private const val PROJECT_ID: String = "PROJECT_ID"
         private const val PROJECT_ID_CLAIM: String = "PROJECT_ID_CLAIM"

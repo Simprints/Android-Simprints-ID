@@ -48,7 +48,7 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     }
 
     private suspend fun getUserId(): String {
-        // After we are certain that all users have user IDs cached (introduced in 2024.1.0), the fallback can be removed
+        // After we are certain that all users have user IDs cached (no-one uses 2023.3 for a while), the fallback can be removed
         val possibleUserId: String = authStore.signedInUserId?.value
             ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed.value
 
