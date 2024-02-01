@@ -16,6 +16,7 @@ import com.simprints.infra.eventsync.sync.common.*
 import com.simprints.infra.eventsync.sync.down.EventDownSyncWorkersBuilder
 import com.simprints.infra.eventsync.sync.up.EventUpSyncWorkersBuilder
 import com.simprints.infra.logging.Simber
+import com.simprints.infra.security.SecurityManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,6 +34,7 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
     private val eventSyncSubMasterWorkersBuilder: EventSyncSubMasterWorkersBuilder,
     private val timeHelper: TimeHelper,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
+    private val securityManager: SecurityManager,
 ) : SimCoroutineWorker(appContext, params) {
 
     companion object {
@@ -58,6 +60,8 @@ internal class EventSyncMasterWorker @AssistedInject constructor(
     override suspend fun doWork(): Result =
         withContext(dispatcher) {
             try {
+                // check if device is rooted before starting the sync
+                securityManager.checkIfDeviceIsRooted()
                 crashlyticsLog("Start")
                 showProgressNotification()
                 val configuration = configRepository.getProjectConfiguration()
