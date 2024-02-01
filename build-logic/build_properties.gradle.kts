@@ -15,9 +15,8 @@ extra.apply {
      *
      * Dev version >= 2023.4.1 is required for receiving encryption Tokens from BFSID [CORE-2502]
      * Dev version >= 2023.4.0 is required for receiving new fingerprint configurations  [CORE-3033]
-     * Dev version >= 2024.1.0 is required for sending unencrypted project secrets to BFSID [MS-12]
      */
-    set("VERSION_NAME", "2024.1.0")
+    set("VERSION_NAME", "2023.4.0")
 
     /**
      * Build type. The version code describes which build type was used for the build.
