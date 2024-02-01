@@ -3,6 +3,8 @@ package com.simprints.infra.eventsync.status.down
 import com.simprints.core.domain.common.Partitioning
 import com.simprints.core.domain.modality.Modes
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.models.TokenKeyType
+import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.eventsync.exceptions.MissingArgumentForDownSyncScopeException
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncOperation
 import com.simprints.infra.eventsync.status.down.domain.EventDownSyncScope
@@ -23,14 +25,13 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     suspend fun getDownSyncScope(
         modes: List<Modes>,
         selectedModuleIDs: List<String>,
-        syncPartitioning: Partitioning
+        syncPartitioning: Partitioning,
     ): EventDownSyncScope {
         val projectId = getProjectId()
-        val possibleUserId = getUserId()
 
         val syncScope = when (syncPartitioning) {
             Partitioning.GLOBAL -> SubjectProjectScope(projectId, modes)
-            Partitioning.USER -> SubjectUserScope(projectId, possibleUserId, modes)
+            Partitioning.USER -> SubjectUserScope(projectId, getUserId(), modes)
             Partitioning.MODULE -> SubjectModuleScope(projectId, selectedModuleIDs, modes)
         }
 
@@ -47,7 +48,10 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     }
 
     private suspend fun getUserId(): String {
-        val possibleUserId: String = recentUserActivityManager.getRecentUserActivity().lastUserUsed.value
+        // After we are certain that all users have user IDs cached (introduced in 2024.1.0), the fallback can be removed
+        val possibleUserId: String = authStore.signedInUserId?.value
+            ?: recentUserActivityManager.getRecentUserActivity().lastUserUsed.value
+
         if (possibleUserId.isBlank()) {
             throw MissingArgumentForDownSyncScopeException("UserId required")
         }
@@ -55,7 +59,9 @@ internal class EventDownSyncScopeRepository @Inject constructor(
     }
 
     suspend fun insertOrUpdate(syncScopeOperation: EventDownSyncOperation) {
-        downSyncOperationOperationDao.insertOrUpdate(buildFromEventsDownSyncOperationState(syncScopeOperation))
+        downSyncOperationOperationDao.insertOrUpdate(
+            buildFromEventsDownSyncOperationState(syncScopeOperation)
+        )
     }
 
     suspend fun refreshState(syncScopeOperation: EventDownSyncOperation): EventDownSyncOperation {
