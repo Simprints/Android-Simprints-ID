@@ -3,6 +3,8 @@ package com.simprints.infra.authstore.domain
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.domain.tokenization.asTokenizableEncrypted
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -23,6 +25,30 @@ class LoginInfoStoreTest {
         every { sharedPreferences.edit() } returns editor
         every { editor.putString(any(), any()) } returns editor
         loginInfoStoreImpl = LoginInfoStore(ctx)
+    }
+
+    @Test
+    fun `getting the signed in user id should returns it`() {
+        every { sharedPreferences.getString(any(), any()) } returns "user"
+        every { sharedPreferences.getBoolean(any(), any()) } returns true
+
+        assertThat(loginInfoStoreImpl.signedInUserId).isEqualTo("user".asTokenizableRaw())
+    }
+
+    @Test
+    fun `setting the raw signed in user id should set in the shared preferences`() {
+        loginInfoStoreImpl.signedInUserId = "user".asTokenizableRaw()
+
+        verify(exactly = 1) { editor.putString("USER_ID", "user") }
+        verify(exactly = 1) { editor.putBoolean("USER_ID_TOKENIZED", false) }
+    }
+
+    @Test
+    fun `setting the tokenized signed in user id should set in the shared preferences`() {
+        loginInfoStoreImpl.signedInUserId = "user".asTokenizableEncrypted()
+
+        verify(exactly = 1) { editor.putString("USER_ID", "user") }
+        verify(exactly = 1) { editor.putBoolean("USER_ID_TOKENIZED", true) }
     }
 
     @Test
@@ -162,13 +188,15 @@ class LoginInfoStoreTest {
     fun `cleanCredentials should reset all the credentials`() {
         loginInfoStoreImpl.cleanCredentials()
 
+        verify(exactly = 1) { editor.remove("USER_ID") }
+        verify(exactly = 1) { editor.remove("USER_ID_TOKENIZED") }
         verify(exactly = 1) { editor.putString("PROJECT_ID", "") }
         verify(exactly = 1) { editor.putString("ENCRYPTED_PROJECT_SECRET", "") }
         verify(exactly = 1) { editor.putString("PROJECT_ID_CLAIM", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_PROJECT_ID", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_APPLICATION_ID", "") }
         verify(exactly = 1) { editor.putString("CORE_FIREBASE_API_KEY", "") }
-        verify(exactly = 6) { editor.apply() }
+        verify(exactly = 7) { editor.apply() }
     }
 
     @Test
