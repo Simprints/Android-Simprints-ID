@@ -1,6 +1,7 @@
 package com.simprints.infra.authstore
 
 import com.google.firebase.FirebaseApp
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.SimRemoteInterface
@@ -8,6 +9,7 @@ import kotlin.reflect.KClass
 
 interface AuthStore {
 
+    var signedInUserId: TokenizableString?
     var signedInProjectId: String
 
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean

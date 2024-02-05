@@ -63,6 +63,9 @@ internal class LoginCheckViewModelTest {
     @MockK
     lateinit var updateProjectStateUseCase: UpdateProjectInCurrentSessionUseCase
 
+    @MockK
+    lateinit var updateStoredUserIdUseCase: UpdateStoredUserIdUseCase
+
     private lateinit var viewModel: LoginCheckViewModel
 
 
@@ -82,6 +85,7 @@ internal class LoginCheckViewModelTest {
             cancelBackgroundSync,
             updateSessionScopePayloadUseCase,
             updateProjectStateUseCase,
+            updateStoredUserIdUseCase,
         )
     }
 
@@ -279,6 +283,7 @@ internal class LoginCheckViewModelTest {
 
         coVerify {
             updateProjectStateUseCase.invoke()
+            updateStoredUserIdUseCase.invoke(any())
             updateSessionScopePayloadUseCase.invoke()
             addAuthorizationEventUseCase.invoke(any(), eq(true))
             extractCrashKeysUseCase.invoke(any())
