@@ -160,6 +160,4 @@ class EventSyncCacheTest {
         }
     }
 
-    // TODO: Add more tests
-
 }
