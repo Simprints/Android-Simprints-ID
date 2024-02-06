@@ -78,7 +78,7 @@ internal class FingerprintMatcherUseCase @Inject constructor(
         .loadFingerprintIdentities(query, range, dataSource)
         .map {
             FingerprintIdentity(
-                it.patientId,
+                it.subjectId,
                 it.fingerprints.map { finger ->
                     Fingerprint(
                         finger.fingerIdentifier.toMatcherDomain(),

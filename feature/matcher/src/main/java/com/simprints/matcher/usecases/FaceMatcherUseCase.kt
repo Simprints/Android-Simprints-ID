@@ -64,7 +64,7 @@ internal class FaceMatcherUseCase @Inject constructor(
         .loadFaceIdentities(query, range, dataSource)
         .map {
             FaceIdentity(
-                it.personId,
+                it.subjectId,
                 it.faces.map { face -> FaceSample(face.id, face.template) }
             )
         }
@@ -75,7 +75,7 @@ internal class FaceMatcherUseCase @Inject constructor(
     ) = batchCandidates.fold(MatchResultSet<FaceMatchResult.Item>()) { acc, item ->
         acc.add(
             FaceMatchResult.Item(
-                item.faceId,
+                item.subjectId,
                 faceMatcher.getHighestComparisonScoreForCandidate(samples, item)
             )
         )

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     include = JsonTypeInfo.As.PROPERTY,
     property = "type"
 )
-//TODO(milen): get names from enum?
 @JsonSubTypes(
     JsonSubTypes.Type(value = EnrolmentRecordCreationEvent::class, name = "EnrolmentRecordCreation"),
     JsonSubTypes.Type(value = EnrolmentRecordMoveEvent::class, name = "EnrolmentRecordMove"),
