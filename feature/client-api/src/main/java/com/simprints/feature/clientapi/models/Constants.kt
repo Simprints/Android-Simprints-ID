@@ -56,8 +56,6 @@ internal object CommCareConstants {
     const val EXIT_REASON = "exitReason"
     const val EXIT_EXTRA = "exitExtra"
     const val SIMPRINTS_SESSION_ID = "sessionId"
-    const val SIMPRINTS_EVENTS = "events"
-    const val SIMPRINTS_SUBJECT_ACTIONS = "subjectActions"
 
     const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"
     const val COMMCARE_DATA_KEY = "odk_intent_data"
