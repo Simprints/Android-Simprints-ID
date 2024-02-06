@@ -104,13 +104,13 @@ internal class SignerManagerTest {
 
         signIn()
 
-        verify { mockAuthStore.storeCredentials(DEFAULT_PROJECT_ID) }
+        verify { mockAuthStore.signedInProjectId = DEFAULT_PROJECT_ID }
     }
 
     @Test
     fun storeCredentialsFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
-        mockStoreCredentialsLocally(true)
+        every { mockAuthStore.signedInProjectId = any() } throws Throwable("Failed to store credentials")
 
         assertThrows<Throwable> { signIn() }
     }
@@ -197,14 +197,8 @@ internal class SignerManagerTest {
 
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, token)
 
-    private fun mockStoreCredentialsLocally(error: Boolean = false) =
-        every { mockAuthStore.storeCredentials(DEFAULT_PROJECT_ID) }.apply {
-            if (!error) {
-                this.returns(Unit)
-            } else {
-                this.throws(Throwable("Failed to store credentials"))
-            }
-        }
+    private fun mockStoreCredentialsLocally() =
+        every { mockAuthStore.signedInProjectId } returns (DEFAULT_PROJECT_ID)
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
         coEvery { mockAuthStore.storeFirebaseToken(token) }.apply {

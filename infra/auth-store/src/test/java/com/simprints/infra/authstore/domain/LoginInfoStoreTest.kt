@@ -273,14 +273,4 @@ class LoginInfoStoreTest {
 
         verify(exactly = 4) { secureEditor.remove(any()) }
     }
-
-    @Test
-    fun `storeCredentials should set the credentials`() {
-        loginInfoStoreImpl.storeCredentials("project")
-
-        verify(exactly = 1) {
-            secureEditor.putString("PROJECT_ID", "project")
-            secureEditor.apply()
-        }
-    }
 }

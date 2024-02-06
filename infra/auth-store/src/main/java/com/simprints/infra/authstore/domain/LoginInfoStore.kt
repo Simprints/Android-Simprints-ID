@@ -129,8 +129,4 @@ internal class LoginInfoStore @Inject constructor(
             remove(CORE_FIREBASE_API_KEY)
         }
     }
-
-    fun storeCredentials(projectId: String) {
-        signedInProjectId = projectId
-    }
 }

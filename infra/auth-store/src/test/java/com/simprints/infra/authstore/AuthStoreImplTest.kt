@@ -85,13 +85,6 @@ class AuthStoreImplTest {
     }
 
     @Test
-    fun `storeCredentials should call the correct method`() {
-        loginManagerManagerImpl.storeCredentials(PROJECT_ID)
-
-        verify(exactly = 1) { loginInfoStore.storeCredentials(PROJECT_ID) }
-    }
-
-    @Test
     fun `signIn should call the correct method`() = runTest(UnconfinedTestDispatcher()) {
         loginManagerManagerImpl.storeFirebaseToken(TOKEN)
 
