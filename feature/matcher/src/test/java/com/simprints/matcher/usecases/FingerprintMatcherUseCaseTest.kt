@@ -10,6 +10,7 @@ import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
+import com.simprints.infra.enrolment.records.store.domain.models.BiometricDataSource
 import com.simprints.infra.enrolment.records.store.domain.models.FingerprintIdentity
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.matcher.MatchParams
@@ -79,7 +80,8 @@ internal class FingerprintMatcherUseCaseTest {
         useCase.invoke(
             MatchParams(
                 flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery()
+                queryForCandidates = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
         )
 
@@ -102,7 +104,8 @@ internal class FingerprintMatcherUseCaseTest {
                     ),
                 ),
                 flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery()
+                queryForCandidates = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
         )
 
@@ -111,12 +114,13 @@ internal class FingerprintMatcherUseCaseTest {
 
     @Test
     fun `Correctly calls SDK matcher`() = runTest {
-        coEvery { enrolmentRecordRepository.count(any()) } returns 100
+        coEvery { enrolmentRecordRepository.count(any(), any()) } returns 100
         coEvery { createRangesUseCase(any()) } returns listOf(0..99)
         coEvery {
             enrolmentRecordRepository.loadFingerprintIdentities(
                 any(),
-                any()
+                any(),
+                any(),
             )
         } returns listOf(
             FingerprintIdentity(
@@ -149,7 +153,8 @@ internal class FingerprintMatcherUseCaseTest {
                     ),
                 ),
                 flowType = FlowType.VERIFY,
-                queryForCandidates = SubjectQuery()
+                queryForCandidates = SubjectQuery(),
+                biometricDataSource = BiometricDataSource.SIMPRINTS,
             ),
             onLoadingCandidates = { onLoadingCalled = true },
         )

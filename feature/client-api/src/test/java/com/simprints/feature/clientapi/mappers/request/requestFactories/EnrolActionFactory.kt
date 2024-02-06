@@ -23,6 +23,7 @@ internal object EnrolActionFactory : RequestActionFactory() {
         userId = MOCK_USER_ID.asTokenizableRaw(),
         metadata = MOCK_METADATA,
         moduleId = MOCK_MODULE_ID.asTokenizableRaw(),
+        biometricDataSource = MOCK_BIOMETRIC_DATA_SOURCE,
         unknownExtras = emptyMap()
     )
 

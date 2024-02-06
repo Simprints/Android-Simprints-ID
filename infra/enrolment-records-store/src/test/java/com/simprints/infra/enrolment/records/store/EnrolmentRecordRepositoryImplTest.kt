@@ -50,6 +50,7 @@ class EnrolmentRecordRepositoryImplTest {
 
     private val tokenizationProcessor = mockk<TokenizationProcessor>()
     private val localDataSource = mockk<EnrolmentRecordLocalDataSource>(relaxed = true)
+    private val commCareDataSource = mockk<IdentityDataSource>(relaxed = true)
     private val remoteDataSource = mockk<EnrolmentRecordRemoteDataSource>(relaxed = true)
     private val prefsEditor = mockk<SharedPreferences.Editor>(relaxed = true)
     private val prefs = mockk<SharedPreferences> {
@@ -69,6 +70,7 @@ class EnrolmentRecordRepositoryImplTest {
             context = ctx,
             remoteDataSource = remoteDataSource,
             localDataSource = localDataSource,
+            commCareDataSource = commCareDataSource,
             tokenizationProcessor = tokenizationProcessor,
             dispatcher = UnconfinedTestDispatcher(),
             batchSize = BATCH_SIZE,

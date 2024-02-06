@@ -14,7 +14,6 @@ import kotlinx.parcelize.Parcelize
  * Use [Raw] for the unencrypted values
  */
 
-//TODO(milen): will TokenizableString cause backward compatibility issues?
 @Keep
 sealed class TokenizableString : Parcelable {
     abstract val value: String
