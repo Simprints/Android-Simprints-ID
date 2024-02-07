@@ -33,7 +33,7 @@ class SimpleEventReporterTest {
     fun setup() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { coreEventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { coreEventRepository.getCurrentSessionScope() } returns mockk {
             coEvery { id } returns SESSION_ID
         }
 

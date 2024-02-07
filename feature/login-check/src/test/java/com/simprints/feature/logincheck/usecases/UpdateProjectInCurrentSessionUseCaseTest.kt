@@ -7,6 +7,8 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
 import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
+import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -46,7 +48,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
 
     @Test
     fun `Does not update session project ID when same as signed in project ID`() = runTest {
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createBlankSessionEvent(SIGNED_PROJECT_ID)
+        coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope(SIGNED_PROJECT_ID)
         coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
 
         useCase()
@@ -56,27 +58,31 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
 
     @Test
     fun `Update session project ID when same as signed in project ID`() = runTest {
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createBlankSessionEvent(OTHER_PROJECT_ID)
+        coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope(OTHER_PROJECT_ID)
         coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
 
         useCase()
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat((it.payload as SessionCaptureEvent.SessionCapturePayload).projectId).isEqualTo(SIGNED_PROJECT_ID)
+            eventRepository.saveSessionScope(withArg {
+                assertThat(it.projectId).isEqualTo(SIGNED_PROJECT_ID)
             })
         }
     }
 
     @Test
     fun `Update session project ID in all session events`() = runTest {
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createBlankSessionEvent(SIGNED_PROJECT_ID)
+        coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope(SIGNED_PROJECT_ID)
         coEvery { eventRepository.observeEventsFromSession(any()) } returns flowOf(createBlankSessionEvent(OTHER_PROJECT_ID))
 
         useCase()
 
         coVerify(exactly = 1) {
-            eventRepository.addOrUpdateEvent(withArg { assertThat(it.labels.projectId).isEqualTo(SIGNED_PROJECT_ID) })
+            eventRepository.addOrUpdateEvent(withArg {
+                assertThat(it.labels.projectId).isEqualTo(
+                    SIGNED_PROJECT_ID
+                )
+            })
         }
     }
 
@@ -86,17 +92,34 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         coEvery { configRepository.getDeviceConfiguration() } returns mockk {
             every { this@mockk.language } returns language
         }
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns createBlankSessionEvent(OTHER_PROJECT_ID)
+        coEvery { eventRepository.getCurrentSessionScope() } returns createBlankSessionScope(OTHER_PROJECT_ID)
         coEvery { eventRepository.observeEventsFromSession(any()) } returns emptyFlow()
 
         useCase()
 
         coVerify {
-            eventRepository.addOrUpdateEvent(withArg {
-                assertThat((it.payload as SessionCaptureEvent.SessionCapturePayload).language).isEqualTo(language)
+            eventRepository.saveSessionScope(withArg {
+                assertThat(it.payload.language).isEqualTo(language)
             })
         }
     }
+
+    private fun createBlankSessionScope(projectId: String) = SessionScope(
+        id = "eventId",
+        projectId = projectId,
+        createdAt = 0,
+        endedAt = null,
+        payload = SessionScopePayload(
+            endCause = null,
+            modalities = emptyList(),
+            sidVersion = "appVersionName",
+            libSimprintsVersion = "libVersionName",
+            language = "language",
+            projectConfigurationUpdatedAt = "projectConfigurationUpdatedAt",
+            device = Device("deviceId", "deviceModel", "deviceManufacturer"),
+            databaseInfo = DatabaseInfo(0, 0),
+        )
+    )
 
     private fun createBlankSessionEvent(projectId: String) = SessionCaptureEvent(
         id = "eventId",
@@ -111,6 +134,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     )
 
     companion object {
+
         private const val SIGNED_PROJECT_ID = "projectId"
         private const val OTHER_PROJECT_ID = "otherProjectId"
     }

@@ -6,10 +6,10 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.feature.dashboard.BuildConfig
 import com.simprints.feature.dashboard.R
 import com.simprints.feature.dashboard.databinding.FragmentMainBinding
+import com.simprints.infra.uibase.viewbinding.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,6 +28,9 @@ internal class MainFragment : Fragment(R.layout.fragment_main) {
         }
         viewModel.consentRequired.observe(viewLifecycleOwner) {
             binding.dashboardToolbar.menu.findItem(R.id.menuPrivacyNotice).isVisible = it
+        }
+        viewModel.rootedDeviceDetected.observe(viewLifecycleOwner) {
+            binding.rootedDeviceError.visibility = View.VISIBLE
         }
     }
 

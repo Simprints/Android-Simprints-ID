@@ -6,6 +6,7 @@ import com.simprints.infra.config.store.models.ProjectConfiguration
 @Keep
 internal data class ApiProjectConfiguration(
     val projectId: String,
+    val updatedAt: String,
     val general: ApiGeneralConfiguration,
     val face: ApiFaceConfiguration?,
     val fingerprint: ApiFingerprintConfiguration?,
@@ -16,6 +17,7 @@ internal data class ApiProjectConfiguration(
 
     fun toDomain(): ProjectConfiguration = ProjectConfiguration(
         projectId,
+        updatedAt,
         general.toDomain(),
         face?.toDomain(),
         fingerprint?.toDomain(),

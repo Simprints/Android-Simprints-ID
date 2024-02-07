@@ -257,6 +257,7 @@ internal val protoSynchronizationConfiguration = ProtoSynchronizationConfigurati
 
 internal val apiProjectConfiguration = ApiProjectConfiguration(
     "projectId",
+    "updatedAt",
     apiGeneralConfiguration,
     apiFaceConfiguration,
     apiFingerprintConfiguration,
@@ -267,6 +268,7 @@ internal val apiProjectConfiguration = ApiProjectConfiguration(
 
 internal val projectConfiguration = ProjectConfiguration(
     "projectId",
+    "updatedAt",
     generalConfiguration,
     faceConfiguration,
     fingerprintConfiguration,
@@ -277,6 +279,7 @@ internal val projectConfiguration = ProjectConfiguration(
 
 internal val protoProjectConfiguration = ProtoProjectConfiguration.newBuilder()
     .setProjectId("projectId")
+    .setUpdatedAt("updatedAt")
     .setGeneral(protoGeneralConfiguration)
     .setFace(protoFaceConfiguration)
     .setFingerprint(protoFingerprintConfiguration)

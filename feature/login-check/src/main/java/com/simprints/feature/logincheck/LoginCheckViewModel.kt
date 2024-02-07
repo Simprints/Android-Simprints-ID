@@ -9,6 +9,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
+import com.simprints.feature.logincheck.usecases.*
 import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
 import com.simprints.feature.logincheck.usecases.CancelBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
@@ -19,8 +20,8 @@ import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInS
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
 import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCase
 import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
-import com.simprints.feature.logincheck.usecases.UpdateDatabaseCountsInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
+import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.logging.Simber
@@ -45,8 +46,9 @@ class LoginCheckViewModel @Inject internal constructor(
     private val configRepository: ConfigRepository,
     private val startBackgroundSync: StartBackgroundSyncUseCase,
     private val cancelBackgroundSync: CancelBackgroundSyncUseCase,
-    private val updateDatabaseCountsInCurrentSession: UpdateDatabaseCountsInCurrentSessionUseCase,
+    private val updateDatabaseCountsInCurrentSession: UpdateSessionScopePayloadUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
+    private val updateStoredUserId: UpdateStoredUserIdUseCase,
 ) : ViewModel() {
 
     private var cachedRequest: ActionRequest? = null
@@ -59,7 +61,6 @@ class LoginCheckViewModel @Inject internal constructor(
     val showLoginFlow: LiveData<LiveDataEventWithContent<ActionRequest>>
         get() = _showLoginFlow
     private val _showLoginFlow = MutableLiveData<LiveDataEventWithContent<ActionRequest>>()
-
 
     val proceedWithAction: LiveData<LiveDataEventWithContent<ActionRequest>>
         get() = _proceedWithAction
@@ -140,6 +141,7 @@ class LoginCheckViewModel @Inject internal constructor(
 
     private suspend fun proceedWithAction(actionRequest: ActionRequest) = viewModelScope.launch {
         updateProjectInCurrentSession()
+        updateStoredUserId(actionRequest.userId)
         awaitAll(
             async { updateDatabaseCountsInCurrentSession() },
             async { addAuthorizationEvent(actionRequest, true) },

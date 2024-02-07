@@ -29,7 +29,7 @@ class IsCurrentSessionAnIdentificationOrEnrolmentUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             coEvery { id } returns "sessionId"
         }
 

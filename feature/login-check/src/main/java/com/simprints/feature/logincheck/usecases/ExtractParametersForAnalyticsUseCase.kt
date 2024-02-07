@@ -20,7 +20,7 @@ internal class ExtractParametersForAnalyticsUseCase @Inject constructor(
                 Simber.tag(AnalyticsUserProperties.MODULE_ID).i(moduleId.toString())
                 Simber.tag(AnalyticsUserProperties.DEVICE_ID).i(deviceId)
             }
-            Simber.i(eventRepository.getCurrentCaptureSessionEvent().id)
+            Simber.i(eventRepository.getCurrentSessionScope().id)
         }
     }
 }
