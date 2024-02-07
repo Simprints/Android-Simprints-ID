@@ -8,7 +8,6 @@ import com.simprints.core.ExternalScope
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
@@ -25,7 +24,6 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AboutViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
-    private val authStore: AuthStore,
     private val logoutUseCase: LogoutUseCase,
     private val eventSyncManager: EventSyncManager,
     private val recentUserActivityManager: RecentUserActivityManager,
@@ -59,9 +57,8 @@ internal class AboutViewModel @Inject constructor(
 
     fun processLogoutRequest() {
         viewModelScope.launch {
-            val projectId = authStore.signedInProjectId
             val logoutDestination =
-                when (canSyncDataToSimprints() && hasEventsToUpload(projectId)) {
+                when (canSyncDataToSimprints() && hasEventsToUpload()) {
                     true -> LogoutDestination.LogoutDataSyncScreen
                     false -> {
                         logout()
@@ -72,8 +69,8 @@ internal class AboutViewModel @Inject constructor(
         }
     }
 
-    private suspend fun hasEventsToUpload(projectId: String): Boolean =
-        eventSyncManager.countEventsToUpload(projectId = projectId, type = null).first() > 0
+    private suspend fun hasEventsToUpload(): Boolean =
+        eventSyncManager.countEventsToUpload(type = null).first() > 0
 
     private suspend fun canSyncDataToSimprints(): Boolean =
         configRepository.getProjectConfiguration().canSyncDataToSimprints()

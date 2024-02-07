@@ -66,7 +66,7 @@ internal class EventDownSyncTask @Inject constructor(
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
             emitProgress(lastOperation, count, maxCount)
 
-            lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
+            lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, maxCount)
         } catch (t: Throwable) {
             Simber.d(t)
@@ -74,7 +74,7 @@ internal class EventDownSyncTask @Inject constructor(
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
             emitProgress(lastOperation, count, count)
 
-            lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
+            lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now().ms)
             emitProgress(lastOperation, count, count)
         }
     }
@@ -118,10 +118,10 @@ internal class EventDownSyncTask @Inject constructor(
             lastOperation.copy(
                 state = RUNNING,
                 lastEventId = batchOfEventsToProcess.last().id,
-                lastSyncTime = timeHelper.now()
+                lastSyncTime = timeHelper.now().ms,
             )
         } else {
-            lastOperation.copy(state = RUNNING, lastSyncTime = timeHelper.now())
+            lastOperation.copy(state = RUNNING, lastSyncTime = timeHelper.now().ms)
         }
     }
 

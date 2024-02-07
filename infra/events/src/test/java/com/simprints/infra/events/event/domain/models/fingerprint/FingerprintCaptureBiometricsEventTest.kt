@@ -2,7 +2,6 @@ package com.simprints.infra.events.event.domain.models.fingerprint
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.sampledata.SampleDefaults
 import org.junit.Test
@@ -11,7 +10,6 @@ class FingerprintCaptureBiometricsEventTest {
 
     @Test
     fun create_FingerprintCaptureBiometricsEvent() {
-        val labels = EventLabels(sessionId = SampleDefaults.GUID1)
         val fingerArg =
             FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
                 IFingerIdentifier.LEFT_3RD_FINGER,
@@ -23,18 +21,15 @@ class FingerprintCaptureBiometricsEventTest {
             createdAt = SampleDefaults.CREATED_AT,
             fingerprint = fingerArg,
             id = "someId",
-            labels = labels
         )
 
         assertThat(event.id).isEqualTo("someId")
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(EventType.FINGERPRINT_CAPTURE_BIOMETRICS)
-
         with(event.payload) {
             assertThat(id).isNotNull()
             assertThat(type).isEqualTo(EventType.FINGERPRINT_CAPTURE_BIOMETRICS)
             assertThat(fingerprint).isEqualTo(fingerArg)
-            assertThat(eventVersion).isEqualTo(0)
+            assertThat(eventVersion).isEqualTo(FingerprintCaptureBiometricsEvent.EVENT_VERSION)
         }
     }
 }

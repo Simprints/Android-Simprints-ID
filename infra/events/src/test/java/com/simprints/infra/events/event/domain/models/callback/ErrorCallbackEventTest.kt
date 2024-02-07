@@ -2,12 +2,9 @@ package com.simprints.infra.events.event.domain.models.callback
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.response.AppErrorReason
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ERROR
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason.Companion.fromAppResponseErrorReasonToEventReason
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_ENDED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEvent.ErrorCallbackPayload.Reason as ErrorReason
 
@@ -15,14 +12,12 @@ class ErrorCallbackEventTest {
 
     @Test
     fun create_ErrorCallbackEvent() {
-        val labels = EventLabels(sessionId = GUID1)
-        val event = ErrorCallbackEvent(CREATED_AT, ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN, labels)
+        val event = ErrorCallbackEvent(CREATED_AT, ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN)
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLBACK_ERROR)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
+            assertThat(endedAt).isNull()
             assertThat(eventVersion).isEqualTo(ErrorCallbackEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_ERROR)
             assertThat(reason).isEqualTo(ErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN)
@@ -31,14 +26,12 @@ class ErrorCallbackEventTest {
 
     @Test
     fun create_BackendErrorCallbackEvent() {
-        val labels = EventLabels(sessionId = GUID1)
-        val event = ErrorCallbackEvent(CREATED_AT, ErrorReason.BACKEND_MAINTENANCE_ERROR, labels)
+        val event = ErrorCallbackEvent(CREATED_AT, ErrorReason.BACKEND_MAINTENANCE_ERROR)
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CALLBACK_ERROR)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
-            assertThat(endedAt).isEqualTo(DEFAULT_ENDED_AT)
+            assertThat(endedAt).isNull()
             assertThat(eventVersion).isEqualTo(ErrorCallbackEvent.EVENT_VERSION)
             assertThat(type).isEqualTo(CALLBACK_ERROR)
             assertThat(reason).isEqualTo(ErrorReason.BACKEND_MAINTENANCE_ERROR)

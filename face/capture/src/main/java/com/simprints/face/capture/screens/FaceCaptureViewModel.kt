@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.simprints.core.livedata.LiveDataEvent
 import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
@@ -135,11 +136,11 @@ internal class FaceCaptureViewModel @Inject constructor(
         _unexpectedErrorEvent.send()
     }
 
-    fun addOnboardingComplete(startTime: Long) {
+    fun addOnboardingComplete(startTime: Timestamp) {
         eventReporter.addOnboardingCompleteEvent(startTime)
     }
 
-    fun addCaptureConfirmationAction(startTime: Long, isContinue: Boolean) {
+    fun addCaptureConfirmationAction(startTime: Timestamp, isContinue: Boolean) {
         eventReporter.addCaptureConfirmationEvent(startTime, isContinue)
     }
 

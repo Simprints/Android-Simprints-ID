@@ -2,9 +2,9 @@ package com.simprints.infra.events.event.domain.models.callout
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLOUT_IDENTIFICATION
@@ -13,21 +13,20 @@ import java.util.UUID
 @Keep
 data class IdentificationCalloutEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: IdentificationCalloutPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         projectId: String,
         userId: TokenizableString,
         moduleId: TokenizableString,
         metadata: String?,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         IdentificationCalloutPayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
@@ -51,20 +50,20 @@ data class IdentificationCalloutEvent(
         )
     )
 
-
     @Keep
     data class IdentificationCalloutPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val projectId: String,
         val userId: TokenizableString,
         val moduleId: TokenizableString,
         val metadata: String?,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = CALLOUT_IDENTIFICATION,
-        override val endedAt: Long = 0
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 1
+
+        const val EVENT_VERSION = 2
     }
 }

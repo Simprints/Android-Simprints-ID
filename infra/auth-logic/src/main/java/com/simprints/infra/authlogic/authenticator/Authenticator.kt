@@ -28,7 +28,7 @@ internal class Authenticator @Inject constructor(
     private val eventRepository: EventRepository,
 ) {
 
-    private var loginStartTime = 0L
+    private var loginStartTime = timeHelper.now()
 
     suspend fun authenticate(
         userId: TokenizableString.Raw,

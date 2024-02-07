@@ -2,24 +2,22 @@ package com.simprints.infra.events
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
 import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
-import com.simprints.infra.events.event.domain.models.EventLabels
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.local.EventLocalDataSource
-import com.simprints.infra.events.event.local.SessionDataCache
-import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
+import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.local.EventLocalDataSource
+import com.simprints.infra.events.event.local.SessionDataCache
+import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -191,13 +189,10 @@ internal class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.saveEvent(
-                    newEvent.copy(
-                        labels = EventLabels(
-                            sessionId = GUID1,
-                            deviceId = DEVICE_ID,
-                            projectId = DEFAULT_PROJECT_ID
-                        )
-                    )
+                    withArg { event ->
+                        assertThat(event.sessionId).isEqualTo(GUID1)
+                        assertThat(event.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                    }
                 )
             }
         }
@@ -208,19 +203,15 @@ internal class EventRepositoryImplTest {
         runTest {
             mockDbToHaveOneOpenSession()
             val newEvent = createAlertScreenEvent()
-            newEvent.labels = EventLabels()
 
             eventRepo.addOrUpdateEvent(newEvent)
 
             coVerify {
                 eventLocalDataSource.saveEvent(
-                    newEvent.copy(
-                        labels = EventLabels(
-                            deviceId = DEVICE_ID,
-                            projectId = DEFAULT_PROJECT_ID,
-                            sessionId = GUID1
-                        )
-                    )
+                    withArg { event ->
+                        assertThat(event.sessionId).isEqualTo(GUID1)
+                        assertThat(event.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                    }
                 )
             }
         }
@@ -236,13 +227,10 @@ internal class EventRepositoryImplTest {
 
             coVerify {
                 eventLocalDataSource.saveEvent(
-                    newEvent.copy(
-                        labels = EventLabels(
-                            sessionId = GUID1,
-                            deviceId = DEVICE_ID,
-                            projectId = DEFAULT_PROJECT_ID
-                        )
-                    )
+                    withArg { event ->
+                        assertThat(event.sessionId).isEqualTo(GUID1)
+                        assertThat(event.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                    }
                 )
             }
         }
@@ -252,12 +240,12 @@ internal class EventRepositoryImplTest {
     fun `test getCurrentSessionScope from db`() = runTest {
 
         val oldSessionScope = mockk<SessionScope> {
-            every { endedAt } returns 2
-            every { createdAt } returns 1
+            every { endedAt } returns Timestamp(2)
+            every { createdAt } returns Timestamp(1)
         }
         val recentSessionScope = mockk<SessionScope> {
             every { endedAt } returns null
-            every { createdAt } returns 2
+            every { createdAt } returns Timestamp(2)
         }
         coEvery { eventLocalDataSource.loadOpenedSessions() } returns listOf(
             recentSessionScope,
@@ -281,7 +269,8 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `events loaded to cache on request from session`() = runTest {
-        mockDbToLoadOpenSession(GUID1)
+
+        mockDbToHaveEvents(GUID1)
 
         eventRepo.observeEventsFromSession(GUID1).toList()
 
@@ -294,20 +283,17 @@ internal class EventRepositoryImplTest {
         runTest {
             mockSignedId()
             val session = mockDbToHaveOneOpenSession(GUID1)
-            val eventInSession = createAlertScreenEvent().removeLabels()
+            val eventInSession = createAlertScreenEvent()
 
             eventRepo.addOrUpdateEvent(eventInSession)
 
             coVerify { eventLocalDataSource.loadOpenedSessions() }
             coVerify {
                 eventLocalDataSource.saveEvent(
-                    eventInSession.copy(
-                        labels = EventLabels(
-                            deviceId = DEVICE_ID,
-                            sessionId = session.id,
-                            projectId = DEFAULT_PROJECT_ID
-                        )
-                    )
+                    withArg { event ->
+                        assertThat(event.sessionId).isEqualTo(session.id)
+                        assertThat(event.projectId).isEqualTo(DEFAULT_PROJECT_ID)
+                    }
                 )
             }
         }
@@ -318,11 +304,11 @@ internal class EventRepositoryImplTest {
         runTest {
             mockSignedId()
             val sessionScope = mockDbToHaveOneOpenSession(GUID1)
-            val eventInSession = createAlertScreenEvent().removeLabels()
+            val eventInSession = createAlertScreenEvent()
             coEvery { eventLocalDataSource.loadEventsInSession(sessionId = sessionScope.id) } returns listOf(
                 eventInSession
             )
-            val newEvent = createAlertScreenEvent().removeLabels()
+            val newEvent = createAlertScreenEvent()
 
             eventRepo.addOrUpdateEvent(newEvent)
 
@@ -336,16 +322,16 @@ internal class EventRepositoryImplTest {
         val event = createAlertScreenEvent()
 
         coEvery { eventLocalDataSource.loadEventsInSession(any()) } returns listOf(
-            event.copy(payload = event.payload.copy(endedAt = 5)),
-            event.copy(payload = event.payload.copy(endedAt = 3)),
-            event.copy(payload = event.payload.copy(endedAt = 1)),
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(5))),
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(3))),
+            event.copy(payload = event.payload.copy(endedAt = Timestamp(1))),
         )
         eventRepo.closeCurrentSession(null)
 
         coVerify {
             eventLocalDataSource.saveSessionScope(match {
                 assertThatSessionScopeClosed(it)
-                assertThat(it.endedAt).isEqualTo(5L)
+                assertThat(it.endedAt).isEqualTo(Timestamp(5L))
                 true
             })
         }
@@ -354,14 +340,12 @@ internal class EventRepositoryImplTest {
     @Test
     fun `test removeLocationDataFromCurrentSession does nothing if location is null`() = runTest {
         // Given
-        val sessionCaptureEvent = mockk<SessionCaptureEvent> {
-            every { payload.location } returns null
-        }
-        every { sessionDataCache.eventCache } returns mutableMapOf(("SessionCaptureEvent" to sessionCaptureEvent))
+        val scope = createSessionScope()
+        every { sessionDataCache.sessionScope } returns scope.copy(payload = scope.payload.copy(location = null))
         //When
         eventRepo.removeLocationDataFromCurrentSession()
         //Then
-        coVerify(exactly = 0) { eventLocalDataSource.saveEvent(sessionCaptureEvent) }
+        coVerify(exactly = 0) { eventLocalDataSource.saveSessionScope(any()) }
     }
 
     @Test
@@ -379,25 +363,25 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `when observeEventCount called with null type return all events`() = runTest {
-        coEvery { eventLocalDataSource.observeEventCount(any()) } returns flowOf(7)
+        coEvery { eventLocalDataSource.observeEventCount() } returns flowOf(7)
 
-        assertThat(eventRepo.observeEventCount("test", null).firstOrNull()).isEqualTo(7)
+        assertThat(eventRepo.observeEventCount(null).firstOrNull()).isEqualTo(7)
 
-        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount(any()) }
-        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount(any(), any()) }
+        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount() }
+        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount(any()) }
     }
 
     @Test
     fun `when observeEventCount called with type return events of type`() = runTest {
-        coEvery { eventLocalDataSource.observeEventCount(any(), any()) } returns flowOf(7)
+        coEvery { eventLocalDataSource.observeEventCount(any()) } returns flowOf(7)
 
         assertThat(
-            eventRepo.observeEventCount("test", CALLBACK_ENROLMENT)
+            eventRepo.observeEventCount(CALLBACK_ENROLMENT)
                 .firstOrNull()
         ).isEqualTo(7)
 
-        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount(any()) }
-        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount(any(), any()) }
+        coVerify(exactly = 0) { eventLocalDataSource.observeEventCount() }
+        coVerify(exactly = 1) { eventLocalDataSource.observeEventCount(any()) }
     }
 
     @Test
@@ -410,11 +394,11 @@ internal class EventRepositoryImplTest {
 
     @Test
     fun `getAllClosedSessionIds should call local store`() = runTest {
-        coEvery { eventLocalDataSource.loadClosedSessions(any()) } returns emptyList()
+        coEvery { eventLocalDataSource.loadClosedSessions() } returns emptyList()
 
-        eventRepo.getAllClosedSessions("test")
+        eventRepo.getAllClosedSessions()
 
-        coVerify { eventLocalDataSource.loadClosedSessions(eq("test")) }
+        coVerify { eventLocalDataSource.loadClosedSessions() }
     }
 
     @Test
@@ -462,6 +446,6 @@ internal class EventRepositoryImplTest {
         const val LANGUAGE = "en"
 
         const val N_SESSIONS_DB = 3
-        const val NOW = 1000L
+        val NOW = Timestamp(1000L)
     }
 }

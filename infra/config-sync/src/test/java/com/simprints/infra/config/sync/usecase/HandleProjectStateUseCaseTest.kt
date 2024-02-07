@@ -33,43 +33,38 @@ internal class HandleProjectStateUseCaseTest {
 
     @Test
     fun `Fully logs out when project has ended`() = runTest {
-        coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, null) } returns flowOf(0)
+        coEvery { eventSyncManager.countEventsToUpload(null) } returns flowOf(0)
 
-        useCase(PROJECT_ID, ProjectState.PROJECT_ENDED)
+        useCase(ProjectState.PROJECT_ENDED)
 
         coVerify { logoutUseCase.invoke() }
     }
 
     @Test
     fun `Logs out when project has ending and no items to upload`() = runTest {
-        coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, null) } returns flowOf(0)
+        coEvery { eventSyncManager.countEventsToUpload(null) } returns flowOf(0)
 
-        useCase(PROJECT_ID, ProjectState.PROJECT_ENDING)
+        useCase(ProjectState.PROJECT_ENDING)
 
         coVerify { logoutUseCase.invoke() }
     }
 
     @Test
     fun `Does not logs out when project has ending and has items to upload`() = runTest {
-        coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, null) } returns flowOf(5)
+        coEvery { eventSyncManager.countEventsToUpload(null) } returns flowOf(5)
 
-        useCase(PROJECT_ID, ProjectState.PROJECT_ENDING)
+        useCase(ProjectState.PROJECT_ENDING)
 
         coVerify(exactly = 0) { logoutUseCase.invoke() }
     }
 
     @Test
     fun `Does not logs out when project is running`() = runTest {
-        coEvery { eventSyncManager.countEventsToUpload(PROJECT_ID, null) } returns flowOf(0)
+        coEvery { eventSyncManager.countEventsToUpload(null) } returns flowOf(0)
 
-        useCase(PROJECT_ID, ProjectState.RUNNING)
+        useCase(ProjectState.RUNNING)
 
         coVerify(exactly = 0) { logoutUseCase.invoke() }
-    }
-
-    companion object {
-
-        private const val PROJECT_ID = "project_id"
     }
 
 }

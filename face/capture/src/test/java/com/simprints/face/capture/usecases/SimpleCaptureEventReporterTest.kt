@@ -3,6 +3,7 @@ package com.simprints.face.capture.usecases
 import android.graphics.Rect
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.EncodingUtils
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.infra.events.EventRepository
@@ -44,7 +45,7 @@ class SimpleCaptureEventReporterTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelper.now() } returns 1L
+        every { timeHelper.now() } returns Timestamp(1L)
 
         reporter = SimpleCaptureEventReporter(
             timeHelper,
@@ -56,7 +57,7 @@ class SimpleCaptureEventReporterTest {
 
     @Test
     fun `Adds face onboarding event`() = runTest {
-        reporter.addOnboardingCompleteEvent(1L)
+        reporter.addOnboardingCompleteEvent(Timestamp(1L))
         coVerify {
             eventRepository.addOrUpdateEvent(withArg {
                 assertThat(it).isInstanceOf(FaceOnboardingCompleteEvent::class.java)
@@ -66,7 +67,7 @@ class SimpleCaptureEventReporterTest {
 
     @Test
     fun `Adds capture confirmation continued event`() = runTest {
-        reporter.addCaptureConfirmationEvent(1L, true)
+        reporter.addCaptureConfirmationEvent(Timestamp(1L), true)
         coVerify {
             eventRepository.addOrUpdateEvent(withArg {
                 assertThat(it).isInstanceOf(FaceCaptureConfirmationEvent::class.java)
@@ -78,7 +79,7 @@ class SimpleCaptureEventReporterTest {
 
     @Test
     fun `Adds capture confirmation restarted event`() = runTest {
-        reporter.addCaptureConfirmationEvent(1L, false)
+        reporter.addCaptureConfirmationEvent(Timestamp(1L), false)
         coVerify {
             eventRepository.addOrUpdateEvent(withArg {
                 assertThat(it).isInstanceOf(FaceCaptureConfirmationEvent::class.java)
@@ -90,7 +91,7 @@ class SimpleCaptureEventReporterTest {
 
     @Test
     fun `Adds fallback capture event`() = runTest {
-        reporter.addFallbackCaptureEvent(1L, 1L)
+        reporter.addFallbackCaptureEvent(Timestamp(1L), Timestamp(1L))
         coVerify {
             eventRepository.addOrUpdateEvent(withArg {
                 assertThat(it).isInstanceOf(FaceFallbackCaptureEvent::class.java)
@@ -146,7 +147,8 @@ class SimpleCaptureEventReporterTest {
         }
     }
 
-    private fun getDetection(status: FaceDetection.Status) = FaceDetection(mockk(), getFace(), status)
+    private fun getDetection(status: FaceDetection.Status) =
+        FaceDetection(mockk(), getFace(), status, mockk(), Timestamp(1L), false, "id", Timestamp(1L))
 
     private fun getFace() = Face(
         100, 100, Rect(0, 0, 0, 0),

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.Companion.ALERT_SCREEN_KEY
-import com.simprints.infra.events.event.domain.models.EventType.Companion.ARTIFICIAL_TERMINATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHENTICATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.AUTHORIZATION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.CALLBACK_CONFIRMATION_KEY
@@ -42,7 +41,6 @@ import com.simprints.infra.events.event.domain.models.EventType.Companion.PERSON
 import com.simprints.infra.events.event.domain.models.EventType.Companion.REFUSAL_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNER_CONNECTION_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SCANNER_FIRMWARE_UPDATE_KEY
-import com.simprints.infra.events.event.domain.models.EventType.Companion.SESSION_CAPTURE_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.SUSPICIOUS_INTENT_KEY
 import com.simprints.infra.events.event.domain.models.EventType.Companion.VERO_2_INFO_SNAPSHOT_KEY
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
@@ -63,7 +61,6 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 
 
 @JsonTypeInfo(
@@ -95,15 +92,16 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
         name = FACE_CAPTURE_CONFIRMATION_KEY
     ),
     JsonSubTypes.Type(value = FaceCaptureEvent::class, name = FACE_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FaceCaptureBiometricsEvent::class, name = FACE_CAPTURE_BIOMETRICS_KEY),
+    JsonSubTypes.Type(
+        value = FaceCaptureBiometricsEvent::class,
+        name = FACE_CAPTURE_BIOMETRICS_KEY
+    ),
     JsonSubTypes.Type(value = FaceFallbackCaptureEvent::class, name = FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(
         value = FaceOnboardingCompleteEvent::class,
         name = FACE_ONBOARDING_COMPLETE_KEY
     ),
-    JsonSubTypes.Type(value = SessionCaptureEvent::class, name = SESSION_CAPTURE_KEY),
     JsonSubTypes.Type(value = AlertScreenEvent::class, name = ALERT_SCREEN_KEY),
-    JsonSubTypes.Type(value = ArtificialTerminationEvent::class, name = ARTIFICIAL_TERMINATION_KEY),
     JsonSubTypes.Type(value = AuthenticationEvent::class, name = AUTHENTICATION_KEY),
     JsonSubTypes.Type(value = AuthorizationEvent::class, name = AUTHORIZATION_KEY),
     JsonSubTypes.Type(value = CandidateReadEvent::class, name = CANDIDATE_READ_KEY),
@@ -113,7 +111,10 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
     JsonSubTypes.Type(value = EnrolmentEventV1::class, name = ENROLMENT_V1_KEY),
     JsonSubTypes.Type(value = EnrolmentEventV2::class, name = ENROLMENT_V2_KEY),
     JsonSubTypes.Type(value = FingerprintCaptureEvent::class, name = FINGERPRINT_CAPTURE_KEY),
-    JsonSubTypes.Type(value = FingerprintCaptureBiometricsEvent::class, name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY),
+    JsonSubTypes.Type(
+        value = FingerprintCaptureBiometricsEvent::class,
+        name = FINGERPRINT_CAPTURE_BIOMETRICS_KEY
+    ),
     JsonSubTypes.Type(value = GuidSelectionEvent::class, name = GUID_SELECTION_KEY),
     JsonSubTypes.Type(value = IntentParsingEvent::class, name = INTENT_PARSING_KEY),
     JsonSubTypes.Type(value = InvalidIntentEvent::class, name = INVALID_INTENT_KEY),
@@ -130,10 +131,13 @@ import com.simprints.infra.events.event.domain.models.session.SessionCaptureEven
     JsonSubTypes.Type(value = Vero2InfoSnapshotEvent::class, name = VERO_2_INFO_SNAPSHOT_KEY)
 )
 abstract class Event {
-    abstract val type: EventType
+
     abstract val id: String
-    abstract var labels: EventLabels
+    abstract val type: EventType
     abstract val payload: EventPayload
+
+    abstract var sessionId: String?
+    abstract var projectId: String?
 
     @JsonIgnore
     abstract fun getTokenizedFields(): Map<TokenKeyType, TokenizableString>

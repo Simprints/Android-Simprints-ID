@@ -13,28 +13,32 @@ import com.simprints.infra.eventsync.event.remote.models.ApiConsentPayload.ApiTy
 
 @Keep
 internal data class ApiConsentPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
-    var endTime: Long,
+    var endTime: ApiTimestamp?,
     val consentType: ApiType,
     var result: ApiResult,
-) : ApiEventPayload(ApiEventPayloadType.Consent, version, startTime) {
+) : ApiEventPayload(version, startTime) {
+
     @Keep
     enum class ApiType {
+
         INDIVIDUAL, PARENTAL
     }
 
     @Keep
     enum class ApiResult {
+
         ACCEPTED, DECLINED, NO_RESPONSE
     }
 
-    constructor(domainPayload: ConsentPayload) :
-        this(domainPayload.createdAt,
-            domainPayload.eventVersion,
-            domainPayload.endedAt,
-            domainPayload.consentType.fromDomainToApi(),
-            domainPayload.result.fromDomainToApi())
+    constructor(domainPayload: ConsentPayload) : this(
+        domainPayload.createdAt.fromDomainToApi(),
+        domainPayload.eventVersion,
+        domainPayload.endedAt?.fromDomainToApi(),
+        domainPayload.consentType.fromDomainToApi(),
+        domainPayload.result.fromDomainToApi()
+    )
 
     override fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String? =
         null // this payload doesn't have tokenizable fields

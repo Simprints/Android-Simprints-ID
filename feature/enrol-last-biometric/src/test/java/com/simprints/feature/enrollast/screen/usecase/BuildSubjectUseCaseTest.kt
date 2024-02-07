@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.enrollast.EnrolLastBiometricParams
 import com.simprints.feature.enrollast.EnrolLastBiometricStepResult
 import com.simprints.feature.enrollast.FaceTemplateCaptureResult
@@ -29,7 +30,7 @@ class BuildSubjectUseCaseTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        every { timeHelper.now() }.returns(1L)
+        every { timeHelper.now() }.returns(Timestamp(1L))
         subjectFactory = SubjectFactory(
             encodingUtils = EncodingUtilsImplForTests,
             timeHelper = timeHelper,

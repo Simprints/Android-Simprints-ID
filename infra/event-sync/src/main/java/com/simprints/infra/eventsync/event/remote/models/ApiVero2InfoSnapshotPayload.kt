@@ -27,14 +27,14 @@ import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent.Ver
 )
 @Keep
 internal sealed class ApiVero2InfoSnapshotPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
     open val scannerVersion: ApiVero2Version,
     open val battery: ApiBatteryInfo
-): ApiEventPayload(ApiEventPayloadType.Vero2InfoSnapshot, version, startTime) {
+): ApiEventPayload(version, startTime) {
 
     data class ApiVero2InfoSnapshotPayloadForNewApi(
-        override val startTime: Long,
+        override val startTime: ApiTimestamp,
         override val version: Int,
         override val scannerVersion: ApiVero2Version,
         override val battery: ApiBatteryInfo
@@ -50,7 +50,7 @@ internal sealed class ApiVero2InfoSnapshotPayload(
 
     @Deprecated(message = "used only for backwards compatibility")
     data class ApiVero2InfoSnapshotPayloadForOldApi(
-        override val startTime: Long,
+        override val startTime: ApiTimestamp,
         override val version: Int,
         override val scannerVersion: ApiVero2Version,
         override val battery: ApiBatteryInfo
@@ -139,7 +139,7 @@ internal fun toApiVero2InfoSnapshotPayload(domainPayload: Vero2InfoSnapshotPaylo
     when (domainPayload) {
         is Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForNewApi -> {
             ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForNewApi(
-                domainPayload.createdAt,
+                domainPayload.createdAt.fromDomainToApi(),
                 domainPayload.eventVersion,
                 domainPayload.version.toApiVero2Version(),
                 ApiVero2InfoSnapshotPayload.ApiBatteryInfo(domainPayload.battery)
@@ -147,7 +147,7 @@ internal fun toApiVero2InfoSnapshotPayload(domainPayload: Vero2InfoSnapshotPaylo
         }
         is Vero2InfoSnapshotPayload.Vero2InfoSnapshotPayloadForOldApi -> {
             ApiVero2InfoSnapshotPayload.ApiVero2InfoSnapshotPayloadForOldApi(
-                domainPayload.createdAt,
+                domainPayload.createdAt.fromDomainToApi(),
                 domainPayload.eventVersion,
                 domainPayload.version.toApiVero2Version(),
                 ApiVero2InfoSnapshotPayload.ApiBatteryInfo(domainPayload.battery)

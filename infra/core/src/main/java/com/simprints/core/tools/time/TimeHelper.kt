@@ -2,13 +2,14 @@ package com.simprints.core.tools.time
 
 import androidx.annotation.Keep
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 @Keep
 interface TimeHelper {
 
-    fun now(): Long
-    fun nowMinus(duration: Long, unit: TimeUnit = TimeUnit.MILLISECONDS): Long
+    fun ensureTrustworthiness()
+
+    fun now(): Timestamp
+
     fun msBetweenNowAndTime(time: Long): Long
     fun readableBetweenNowAndTime(date: Date): String
     fun getCurrentDateAsString(): String

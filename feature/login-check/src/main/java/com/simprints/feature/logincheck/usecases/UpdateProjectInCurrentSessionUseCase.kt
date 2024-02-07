@@ -29,7 +29,7 @@ internal class UpdateProjectInCurrentSessionUseCase @Inject constructor(
 
         val associatedEvents = eventRepository.observeEventsFromSession(sessionScope.id)
         associatedEvents.collect {
-            it.labels = it.labels.copy(projectId = signedProjectId)
+            it.projectId = signedProjectId
             eventRepository.addOrUpdateEvent(it)
         }
     }

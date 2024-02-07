@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.connect.usecase.ReportFirmwareUpdateEventUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ota.AvailableOta
@@ -70,7 +71,7 @@ class OtaViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelperMock.now() } returns 1L
+        every { timeHelperMock.now() } returns Timestamp(1L)
         coEvery {
             recentUserActivityManager.getRecentUserActivity()
         } returns RecentUserActivity(HARDWARE_VERSION, "", "".asTokenizableRaw(), 0, 0, 0, 0)

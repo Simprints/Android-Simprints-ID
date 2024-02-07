@@ -75,7 +75,7 @@ class ProjectConfigDownSyncWorkerTest {
         val result = projectConfigDownSyncWorker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
 
-        coVerify { handleProjectStateUseCase.invoke(any(), any()) }
+        coVerify { handleProjectStateUseCase.invoke(any()) }
     }
 
     companion object {

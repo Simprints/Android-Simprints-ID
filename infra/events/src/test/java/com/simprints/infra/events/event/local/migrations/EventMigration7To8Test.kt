@@ -1,27 +1,20 @@
 package com.simprints.infra.events.event.local.migrations
 
 import android.content.ContentValues
+import android.database.Cursor
 import android.database.CursorIndexOutOfBoundsException
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.fasterxml.jackson.core.type.TypeReference
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.EventLabels
-import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.testtools.common.syntax.assertThrows
+import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,71 +33,15 @@ class EventMigration7To8Test {
         val eventId = randomUUID()
 
         setupV7DbWithEvents(events = listOf(createFingerprintCaptureEvent(eventId)))
-
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val fingerprintCaptureEventJson =
-            MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-                .getStringWithColumnName("eventJson")!!
+        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .use { validateFingerprintCapture(it, eventId, "GOOD_SCAN", true) }
 
-        val fingerprintCaptureEvent =
-            JsonHelper.fromJson(fingerprintCaptureEventJson, object : TypeReference<Event>() {})
+        MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
+            .use { validateFingerprintBiometricCapture(it, eventId) }
 
-        val expectedFingerprintCaptureEvent = FingerprintCaptureEvent(
-            id = eventId,
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FingerprintCaptureEvent.FingerprintCapturePayload(
-                CREATED_AT,
-                3,
-                ENDED_AT,
-                FINGER,
-                QUALITY_THRESHOLD,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Result.GOOD_SCAN,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
-                    FINGER, QUALITY, FORMAT
-                ),
-                eventId
-            ),
-            type = EventType.FINGERPRINT_CAPTURE,
-        )
-
-        assertThat(fingerprintCaptureEvent).isEqualTo(expectedFingerprintCaptureEvent)
-
-        val fingerprintCaptureBiometricsEventJson =
-            MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
-                .getStringWithColumnName("eventJson")!!
-
-
-        val fingerprintCaptureBiometricsEvent = JsonHelper.fromJson(
-            fingerprintCaptureBiometricsEventJson,
-            object : TypeReference<Event>() {})
-
-        val expectedFingerprintCaptureBiometricsEvent = FingerprintCaptureBiometricsEvent(
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload(
-                CREATED_AT,
-                0,
-                FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-                    FINGER, TEMPLATE, QUALITY, FORMAT
-                ),
-                eventId
-            ),
-            type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
-        )
-
-        assertThat(fingerprintCaptureBiometricsEvent.labels).isEqualTo(
-            expectedFingerprintCaptureBiometricsEvent.labels
-        )
-        assertThat(fingerprintCaptureBiometricsEvent.payload).isEqualTo(
-            expectedFingerprintCaptureBiometricsEvent.payload
-        )
-        assertThat(fingerprintCaptureBiometricsEvent.type).isEqualTo(
-            expectedFingerprintCaptureBiometricsEvent.type
-        )
+        helper.closeWhenFinished(db)
     }
 
     @Test
@@ -117,75 +54,15 @@ class EventMigration7To8Test {
                 createPersonCreationEvent(eventId)
             )
         )
-
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val fingerprintCaptureEventJson =
-            MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-                .getStringWithColumnName("eventJson")!!
+        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .use { validateFingerprintCapture(it, eventId, "BAD_QUALITY", true) }
 
-        val fingerprintCaptureEvent =
-            JsonHelper.fromJson(fingerprintCaptureEventJson, object : TypeReference<Event>() {})
+        MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
+            .use { validateFingerprintBiometricCapture(it, eventId) }
 
-        val expectedFingerprintCaptureEvent = FingerprintCaptureEvent(
-            id = eventId,
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FingerprintCaptureEvent.FingerprintCapturePayload(
-                CREATED_AT,
-                3,
-                ENDED_AT,
-                FINGER,
-                QUALITY_THRESHOLD,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
-                    FINGER, QUALITY, FORMAT
-                ),
-                eventId
-            ),
-            type = EventType.FINGERPRINT_CAPTURE,
-        )
-
-        assertThat(fingerprintCaptureEvent).isEqualTo(expectedFingerprintCaptureEvent)
-
-        val fingerprintCaptureBiometricsEventJson =
-            MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
-                .getStringWithColumnName("eventJson")!!
-
-
-        val fingerprintCaptureBiometricsEvent = JsonHelper.fromJson(
-            fingerprintCaptureBiometricsEventJson,
-            object : TypeReference<Event>() {})
-
-        val expectedFingerprintCaptureBiometricsEvent = FingerprintCaptureBiometricsEvent(
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload(
-                CREATED_AT,
-                0,
-                FingerprintCaptureBiometricsEvent.FingerprintCaptureBiometricsPayload.Fingerprint(
-                    FINGER,
-                    TEMPLATE,
-                    QUALITY,
-                    FORMAT,
-                ),
-                eventId
-            ),
-            type = EventType.FINGERPRINT_CAPTURE_BIOMETRICS,
-        )
-
-        assertThat(fingerprintCaptureBiometricsEvent.labels).isEqualTo(
-            expectedFingerprintCaptureBiometricsEvent.labels
-        )
-        assertThat(fingerprintCaptureBiometricsEvent.payload).isEqualTo(
-            expectedFingerprintCaptureBiometricsEvent.payload
-        )
-        assertThat(fingerprintCaptureBiometricsEvent.type).isEqualTo(
-            expectedFingerprintCaptureBiometricsEvent.type
-        )
-        db.close()
+        helper.closeWhenFinished(db)
     }
 
     @Test
@@ -198,43 +75,16 @@ class EventMigration7To8Test {
                 createPersonCreationEvent("someId")
             )
         )
-
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val fingerprintCaptureEventJson =
-            MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-                .getStringWithColumnName("eventJson")!!
-
-        val fingerprintCaptureEvent =
-            JsonHelper.fromJson(fingerprintCaptureEventJson, object : TypeReference<Event>() {})
-
-        val expectedFingerprintCaptureEvent = FingerprintCaptureEvent(
-            id = eventId,
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FingerprintCaptureEvent.FingerprintCapturePayload(
-                CREATED_AT,
-                3,
-                ENDED_AT,
-                FINGER,
-                QUALITY_THRESHOLD,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Result.BAD_QUALITY,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Fingerprint(
-                    FINGER, QUALITY, FORMAT
-                ),
-                eventId
-            ),
-            type = EventType.FINGERPRINT_CAPTURE,
-        )
-
-        assertThat(fingerprintCaptureEvent).isEqualTo(expectedFingerprintCaptureEvent)
+        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .use { validateFingerprintCapture(it, eventId, "BAD_QUALITY", true) }
 
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
-        db.close()
+        helper.closeWhenFinished(db)
     }
 
     @Test
@@ -248,41 +98,16 @@ class EventMigration7To8Test {
                 )
             )
         )
-
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val fingerprintCaptureEventJson =
-            MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-                .getStringWithColumnName("eventJson")!!
-
-        val fingerprintCaptureEvent =
-            JsonHelper.fromJson(fingerprintCaptureEventJson, object : TypeReference<Event>() {})
-
-        val expectedFingerprintCaptureEvent = FingerprintCaptureEvent(
-            id = eventId,
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FingerprintCaptureEvent.FingerprintCapturePayload(
-                CREATED_AT,
-                3,
-                ENDED_AT,
-                FINGER,
-                QUALITY_THRESHOLD,
-                FingerprintCaptureEvent.FingerprintCapturePayload.Result.SKIPPED,
-                null,
-                eventId
-            ),
-            type = EventType.FINGERPRINT_CAPTURE,
-        )
-
-        assertThat(fingerprintCaptureEvent).isEqualTo(expectedFingerprintCaptureEvent)
+        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .use { validateFingerprintCapture(it, eventId, "SKIPPED", false) }
 
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools.retrieveCursorWithEventByType(db, FINGERPRINT_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
-        db.close()
+        helper.closeWhenFinished(db)
     }
 
     @Test
@@ -290,63 +115,15 @@ class EventMigration7To8Test {
         val eventId = randomUUID()
 
         setupV7DbWithEvents(events = listOf(createFaceCaptureEvent(eventId)))
-
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val faceCaptureEventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
+        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .use { validateFaceCapture(it, eventId, "VALID", true) }
 
-        val faceCaptureEvent =
-            JsonHelper.fromJson(faceCaptureEventJson, object : TypeReference<Event>() {})
+        MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
+            .use { validateFaceBiometricCapture(it, eventId) }
 
-        val expectedFaceCaptureEvent = FaceCaptureEvent(
-            id = eventId,
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FaceCaptureEvent.FaceCapturePayload(
-                eventId,
-                CREATED_AT,
-                ENDED_AT,
-                3,
-                0,
-                QUALITY_THRESHOLD.toFloat(),
-                FaceCaptureEvent.FaceCapturePayload.Result.VALID,
-                false,
-                FaceCaptureEvent.FaceCapturePayload.Face(YAW, ROLL, QUALITY.toFloat(), FORMAT),
-            ),
-            type = EventType.FACE_CAPTURE,
-        )
-
-        assertThat(faceCaptureEvent).isEqualTo(expectedFaceCaptureEvent)
-
-        val faceCaptureBiometricsEventJson =
-            MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
-                .getStringWithColumnName("eventJson")!!
-
-        val faceCaptureBiometricsEvent =
-            JsonHelper.fromJson(faceCaptureBiometricsEventJson, object : TypeReference<Event>() {})
-
-        val expectedFaceCaptureBiometricsEvent = FaceCaptureBiometricsEvent(
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload(
-                eventId,
-                CREATED_AT,
-                0,
-                FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face(
-                    YAW, ROLL, TEMPLATE, QUALITY.toFloat(), FORMAT
-                ),
-                0,
-            ),
-            type = EventType.FACE_CAPTURE_BIOMETRICS,
-        )
-
-        assertThat(faceCaptureBiometricsEvent.labels).isEqualTo(expectedFaceCaptureBiometricsEvent.labels)
-        assertThat(faceCaptureBiometricsEvent.payload).isEqualTo(expectedFaceCaptureBiometricsEvent.payload)
-        assertThat(faceCaptureBiometricsEvent.type).isEqualTo(expectedFaceCaptureBiometricsEvent.type)
-        db.close()
+        helper.closeWhenFinished(db)
     }
 
     @Test
@@ -354,41 +131,17 @@ class EventMigration7To8Test {
         val eventId = randomUUID()
 
         setupV7DbWithEvents(events = listOf(createFaceCaptureEvent(eventId, "INVALID")))
-
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val faceCaptureEventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
-
-        val faceCaptureEvent =
-            JsonHelper.fromJson(faceCaptureEventJson, object : TypeReference<Event>() {})
-
-        val expectedFaceCaptureEvent = FaceCaptureEvent(
-            id = eventId,
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FaceCaptureEvent.FaceCapturePayload(
-                eventId,
-                CREATED_AT,
-                ENDED_AT,
-                3,
-                0,
-                QUALITY_THRESHOLD.toFloat(),
-                FaceCaptureEvent.FaceCapturePayload.Result.INVALID,
-                false,
-                FaceCaptureEvent.FaceCapturePayload.Face(YAW, ROLL, QUALITY.toFloat(), FORMAT),
-            ),
-            type = EventType.FACE_CAPTURE,
-        )
-
-        assertThat(faceCaptureEvent).isEqualTo(expectedFaceCaptureEvent)
+        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .use { validateFaceCapture(it, eventId, "INVALID", true) }
 
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
-        db.close()
+
+        helper.closeWhenFinished(db)
     }
 
     @Test
@@ -399,42 +152,20 @@ class EventMigration7To8Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 8, true, EventMigration7to8())
 
-        val faceCaptureEventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-            .getStringWithColumnName("eventJson")!!
 
-        val faceCaptureEvent =
-            JsonHelper.fromJson(faceCaptureEventJson, object : TypeReference<Event>() {})
-
-        val expectedFaceCaptureEvent = FaceCaptureEvent(
-            id = eventId,
-            labels = EventLabels(
-                projectId = PROJECT_ID, sessionId = SESSION_ID, deviceId = DEVICE_ID
-            ),
-            payload = FaceCaptureEvent.FaceCapturePayload(
-                eventId,
-                CREATED_AT,
-                ENDED_AT,
-                3,
-                0,
-                QUALITY_THRESHOLD.toFloat(),
-                FaceCaptureEvent.FaceCapturePayload.Result.INVALID,
-                false,
-                null,
-            ),
-            type = EventType.FACE_CAPTURE,
-        )
-
-        assertThat(faceCaptureEvent).isEqualTo(expectedFaceCaptureEvent)
+        MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .use { validateFaceCapture(it, eventId, "INVALID", false) }
 
         assertThrows<CursorIndexOutOfBoundsException> {
             MigrationTestingTools.retrieveCursorWithEventByType(db, FACE_CAPTURE_BIOMETRICS)
                 .getStringWithColumnName("eventJson")!!
         }
-        db.close()
+
+        helper.closeWhenFinished(db)
     }
 
     private fun setupV7DbWithEvents(
-        close: Boolean = true, events: List<ContentValues>
+        close: Boolean = true, events: List<ContentValues>,
     ): SupportSQLiteDatabase = helper.createDatabase(TEST_DB, 7).apply {
 
         events.forEach { event ->
@@ -445,13 +176,24 @@ class EventMigration7To8Test {
     }
 
     private fun createFingerprintCaptureEvent(
-        id: String, result: String = "GOOD_SCAN", withFingerprint: Boolean = true
+        id: String,
+        result: String = "GOOD_SCAN",
+        withFingerprint: Boolean = true,
     ) = ContentValues().apply {
         this.put("id", id)
         this.put("type", OLD_FINGERPRINT_CAPTURE_EVENT)
 
+        val fingerprintBlock = if (withFingerprint) """
+            ,"fingerprint":{
+                "finger":"${FINGER.name}",
+                "quality":$QUALITY,
+                "template":"$TEMPLATE",
+                "format":"ISO_19794_2"
+            },""".trimIndent()
+        else ","
+
         val event = """
-                {
+            {
                 "id":"$id",
                 "labels":{
                     "projectId":"$PROJECT_ID",
@@ -459,27 +201,19 @@ class EventMigration7To8Test {
                     "deviceId": "$DEVICE_ID"
                 },
                 "payload":{
+                    "id":"$id",
                     "createdAt":$CREATED_AT,
                     "eventVersion":2,
                     "endedAt":$ENDED_AT,
                     "finger":"${FINGER.name}",
                     "qualityThreshold":$QUALITY_THRESHOLD,
                     "result":"$result"
-                    """ + withFingerprint.let {
-            if (it) """
-                            ,"fingerprint":{
-                                "finger":"${FINGER.name}",
-                                "quality":$QUALITY,
-                                "template":"$TEMPLATE",
-                                "format":"ISO_19794_2"
-                            },"""
-            else ","
-        } + """
-                "id":"$id",
+                    $fingerprintBlock
+                    "type":"FINGERPRINT_CAPTURE"
+                    },
                 "type":"FINGERPRINT_CAPTURE"
-                        },
-                "type":"FINGERPRINT_CAPTURE"}
-                """.trimIndent()
+            }
+            """.trimIndent()
 
         this.put("eventJson", event)
         this.put("createdAt", CREATED_AT)
@@ -491,7 +225,7 @@ class EventMigration7To8Test {
         put("id", randomUUID())
         put("type", PERSON_CREATION_EVENT)
         val event = """
-                {
+            {
                 "id":"cd088b0e-bd15-4b81-a7eb-161e565e1687",
                 "labels":{
                     "projectId":"$PROJECT_ID",
@@ -509,7 +243,8 @@ class EventMigration7To8Test {
                     "faceReferenceId":"someFaceReferenceId"
                 },
                 "type":"PERSON_CREATION"
-                }""".trimIndent()
+            }
+        """.trimIndent()
 
         put("eventJson", event)
         put("createdAt", CREATED_AT)
@@ -519,13 +254,25 @@ class EventMigration7To8Test {
     }
 
     private fun createFaceCaptureEvent(
-        id: String, result: String = "VALID", withFace: Boolean = true
+        id: String,
+        result: String = "VALID",
+        withFace: Boolean = true,
     ) = ContentValues().apply {
         put("id", id)
         put("type", OLD_FACE_CAPTURE_EVENT)
 
+        val faceBlock = if (withFace) """
+            ,"face":{
+                "yaw":$YAW,
+                "roll":$ROLL,
+                "quality":$QUALITY,
+                "template":"$TEMPLATE",
+                "format":"$FORMAT"
+            },"""
+        else ","
+
         val event = """
-                {
+            {
                 "id":"$id",
                 "labels":{
                     "projectId":"$PROJECT_ID",
@@ -534,28 +281,19 @@ class EventMigration7To8Test {
                 },
                 "payload":{
                     "id":"$id",
-                    "createdAt":1611584017198,
+                    "createdAt":$CREATED_AT,
                     "endedAt":$ENDED_AT,
                     "eventVersion":2,
                     "attemptNb":0,
                     "qualityThreshold":$QUALITY_THRESHOLD,
                     "result":"$result",
                     "isFallback":false
-                    """ + withFace.let {
-            if (it) """
-                        ,"face":{
-                            "yaw":$YAW,
-                            "roll":$ROLL,
-                            "quality":$QUALITY,
-                            "template":"$TEMPLATE",
-                            "format":"$FORMAT"
-                        },"""
-            else ","
-        } + """
+                    $faceBlock
                     "type":"FACE_CAPTURE"
                 },
                 "type":"FACE_CAPTURE"
-                }""".trimIndent()
+            }
+        """.trimIndent()
 
         put("eventJson", event)
         put("createdAt", 1611584017198)
@@ -563,7 +301,135 @@ class EventMigration7To8Test {
         put("sessionIsClosed", 0)
     }
 
+    private fun createExpectedFingerprintEventJson(
+        eventId: String,
+        result: String,
+        withFingerprint: Boolean,
+    ): JSONObject {
+        val fingerprintBlock = if (withFingerprint) """
+                ,"fingerprint":{
+                    "finger":"${FINGER.name}",
+                    "quality":$QUALITY,
+                    "format":"ISO_19794_2"
+                },""".trimIndent()
+        else ","
+
+        return JSONObject(
+            """
+                {
+                    "id":"$eventId",
+                    "labels":{
+                        "projectId":"$PROJECT_ID",
+                        "sessionId": "$SESSION_ID",
+                        "deviceId": "$DEVICE_ID"
+                    },
+                    "payload":{
+                        "id":"$eventId",
+                        "createdAt":$CREATED_AT,
+                        "eventVersion":3,
+                        "endedAt":$ENDED_AT,
+                        "finger":"${FINGER.name}",
+                        "qualityThreshold":$QUALITY_THRESHOLD,
+                        "result":"$result"
+                        $fingerprintBlock
+                        "type":"FINGERPRINT_CAPTURE"
+                    },
+                    "type":"FINGERPRINT_CAPTURE"
+                }
+            """.trimIndent()
+        )
+    }
+
+    private fun validateFingerprintCapture(
+        cursor: Cursor,
+        eventId: String,
+        result: String,
+        withFingerprint: Boolean,
+    ) {
+        val eventJson = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
+        val expectedJson = createExpectedFingerprintEventJson(eventId, result, withFingerprint)
+
+        assertThat(eventJson.toString()).isEqualTo(expectedJson.toString())
+    }
+
+    private fun validateFingerprintBiometricCapture(it: Cursor, eventId: String) {
+        val eventJsonPayload = JSONObject(it.getStringWithColumnName("eventJson")!!)
+            .getJSONObject("payload")
+
+        assertThat(eventJsonPayload.getString("id")).isEqualTo(eventId)
+        assertThat(eventJsonPayload.getString("type")).isEqualTo("FINGERPRINT_CAPTURE_BIOMETRICS")
+        assertThat(
+            eventJsonPayload.getJSONObject("fingerprint").getString("template")
+        ).isEqualTo(TEMPLATE)
+    }
+
+    private fun createExpectedFaceCaptureEventJson(
+        eventId: String,
+        result: String = "VALID",
+        withFace: Boolean,
+    ): JSONObject {
+        val faceBlock = if (withFace) """
+            ,"face":{
+                "yaw":$YAW,
+                "roll":$ROLL,
+                "quality":$QUALITY,
+                "format":"$FORMAT"
+            },""".trimIndent()
+        else ","
+
+        return JSONObject(
+            """
+            {
+                "id":"$eventId",
+                "labels":{
+                    "projectId":"$PROJECT_ID",
+                    "sessionId": "$SESSION_ID",
+                    "deviceId": "$DEVICE_ID"
+                },
+                "payload":{
+                    "id":"$eventId",
+                    "createdAt":$CREATED_AT,
+                    "endedAt":$ENDED_AT,
+                    "eventVersion":3,
+                    "attemptNb":0,
+                    "qualityThreshold":$QUALITY_THRESHOLD,
+                    "result":"$result",
+                    "isFallback":false
+                    $faceBlock
+                    "type":"FACE_CAPTURE"
+                },
+                "type":"FACE_CAPTURE"
+            }
+        """.trimIndent()
+        )
+    }
+
+
+    private fun validateFaceCapture(
+        cursor: Cursor,
+        eventId: String,
+        result: String,
+        withFace: Boolean,
+    ) {
+        val eventJson = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
+        val expectedJson = createExpectedFaceCaptureEventJson(eventId, result, withFace)
+
+        assertThat(eventJson.toString()).isEqualTo(expectedJson.toString())
+    }
+
+    private fun validateFaceBiometricCapture(cursor: Cursor, eventId: String) {
+        val eventJsonPayload = JSONObject(cursor.getStringWithColumnName("eventJson")!!)
+            .getJSONObject("payload")
+
+        assertThat(eventJsonPayload.getString("id")).isEqualTo(eventId)
+        assertThat(eventJsonPayload.getString("type")).isEqualTo("FACE_CAPTURE_BIOMETRICS")
+        assertThat(eventJsonPayload.getJSONObject("face").getString("template"))
+            .isEqualTo(TEMPLATE)
+    }
+
+
     companion object {
+
         private const val TEST_DB = "some_db"
         private const val OLD_FACE_CAPTURE_EVENT = "FACE_CAPTURE"
         private const val OLD_FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"
@@ -575,8 +441,8 @@ class EventMigration7To8Test {
         private const val DEVICE_ID = "aDeviceID"
         private const val TEMPLATE = "template"
         private val FINGER = IFingerIdentifier.LEFT_3RD_FINGER
-        private const val CREATED_AT = 1611584017198
-        private const val ENDED_AT = 1621588617198
+        private val CREATED_AT = 1611584017198
+        private val ENDED_AT = 1621588617198
         private const val QUALITY = 85
         private const val QUALITY_THRESHOLD = 60
         private const val YAW = 1.2f

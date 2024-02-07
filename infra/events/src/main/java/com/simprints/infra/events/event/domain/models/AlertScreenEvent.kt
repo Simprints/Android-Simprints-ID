@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
 import java.util.UUID
@@ -10,18 +11,17 @@ import java.util.UUID
 @Keep
 data class AlertScreenEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: AlertScreenPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         alertType: AlertScreenPayload.AlertScreenEventType,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         AlertScreenPayload(createdAt, EVENT_VERSION, alertType),
         ALERT_SCREEN
     )
@@ -32,11 +32,11 @@ data class AlertScreenEvent(
 
     @Keep
     data class AlertScreenPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val alertType: AlertScreenEventType,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = ALERT_SCREEN,
-        override val endedAt: Long = 0
     ) : EventPayload() {
 
         enum class AlertScreenEventType {
@@ -81,6 +81,6 @@ data class AlertScreenEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

@@ -5,14 +5,15 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.eventsync.event.remote.models.ApiEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiModality
+import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
 import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
 internal data class ApiSessionScope(
     val id: String,
     val projectId: String,
-    val startTime: Long,
-    val endTime: Long,
+    val startTime: ApiTimestamp,
+    val endTime: ApiTimestamp?,
     val endCause: ApiSessionEndCause,
     val modalities: List<ApiModality>,
     val sidVersion: String,
@@ -33,8 +34,8 @@ internal data class ApiSessionScope(
         ) = ApiSessionScope(
             id = scope.id,
             projectId = scope.projectId,
-            startTime = scope.createdAt,
-            endTime = scope.endedAt ?: 0,
+            startTime = scope.createdAt.fromDomainToApi(),
+            endTime = scope.endedAt?.fromDomainToApi(),
             endCause = scope.payload.endCause.fromDomainToApi(),
             modalities = scope.payload.modalities.map { it.fromDomainToApi() },
             sidVersion = scope.payload.sidVersion,

@@ -119,7 +119,13 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     ): FaceDetection {
         return if (potentialFace == null) {
             bitmap.recycle()
-            FaceDetection(bitmap, null, FaceDetection.Status.NOFACE)
+            FaceDetection(
+                bitmap = bitmap,
+                face = null,
+                status = FaceDetection.Status.NOFACE,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now()
+            )
         } else {
             getFaceDetection(bitmap, potentialFace)
         }
@@ -129,29 +135,39 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
         val areaOccupied = potentialFace.relativeBoundingBox.area()
         return when {
             areaOccupied < faceTarget.areaRange.start -> FaceDetection(
-                bitmap,
-                potentialFace,
-                FaceDetection.Status.TOOFAR
+                bitmap = bitmap,
+                face = potentialFace,
+                status = FaceDetection.Status.TOOFAR,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             areaOccupied > faceTarget.areaRange.endInclusive -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.TOOCLOSE
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.TOOCLOSE,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             potentialFace.yaw !in faceTarget.yawTarget -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.OFFYAW
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.OFFYAW,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             potentialFace.roll !in faceTarget.rollTarget -> FaceDetection(
-                bitmap, potentialFace,
-                FaceDetection.Status.OFFROLL
+                bitmap = bitmap, face = potentialFace,
+                status = FaceDetection.Status.OFFROLL,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
 
             else -> FaceDetection(
-                bitmap, potentialFace,
-                if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID
+                bitmap = bitmap, face = potentialFace,
+                status = if (capturingState.value == CapturingState.CAPTURING) FaceDetection.Status.VALID_CAPTURING else FaceDetection.Status.VALID,
+                detectionStartTime = timeHelper.now(),
+                detectionEndTime = timeHelper.now(),
             )
         }
     }
@@ -172,7 +188,10 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
      */
     private fun createFirstFallbackCaptureEvent(faceDetection: FaceDetection) {
         if (shouldSendFallbackCaptureEvent.getAndSet(false)) {
-            eventReporter.addFallbackCaptureEvent(fallbackCaptureEventStartTime, faceDetection.detectionEndTime)
+            eventReporter.addFallbackCaptureEvent(
+                fallbackCaptureEventStartTime,
+                faceDetection.detectionEndTime
+            )
         }
     }
 
@@ -195,6 +214,7 @@ internal class LiveFeedbackFragmentViewModel @Inject constructor(
     enum class CapturingState { NOT_STARTED, CAPTURING, FINISHED }
 
     companion object {
+
         private const val VALID_ROLL_DELTA = 15f
         private const val VALID_YAW_DELTA = 30f
     }

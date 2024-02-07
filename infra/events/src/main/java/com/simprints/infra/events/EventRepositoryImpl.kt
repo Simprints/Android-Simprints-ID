@@ -120,8 +120,8 @@ internal open class EventRepositoryImpl @Inject constructor(
             ?: createSession()
     }
 
-    override suspend fun getAllClosedSessions(projectId: String): List<SessionScope> =
-        eventLocalDataSource.loadClosedSessions(projectId)
+    override suspend fun getAllClosedSessions(): List<SessionScope> =
+        eventLocalDataSource.loadClosedSessions()
 
     override suspend fun saveSessionScope(sessionScope: SessionScope) {
         if (sessionScope.id == sessionDataCache.sessionScope?.id) {
@@ -153,9 +153,9 @@ internal open class EventRepositoryImpl @Inject constructor(
     override suspend fun getEventsJsonFromSession(sessionId: String): List<String> =
         eventLocalDataSource.loadEventJsonInSession(sessionId)
 
-    override suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int> =
-        if (type != null) eventLocalDataSource.observeEventCount(projectId, type)
-        else eventLocalDataSource.observeEventCount(projectId)
+    override suspend fun observeEventCount(type: EventType?): Flow<Int> =
+        if (type != null) eventLocalDataSource.observeEventCount(type)
+        else eventLocalDataSource.observeEventCount()
 
     override suspend fun loadAll(): Flow<Event> = eventLocalDataSource.loadAllEvents()
 
@@ -180,16 +180,10 @@ internal open class EventRepositoryImpl @Inject constructor(
     }
 
     private suspend fun saveEvent(event: Event, session: SessionScope) {
-        checkAndUpdateLabels(event, session)
-        eventLocalDataSource.saveEvent(event)
-    }
+        event.sessionId = session.id
+        event.projectId = session.projectId
 
-    private fun checkAndUpdateLabels(event: Event, session: SessionScope) {
-        event.labels = event.labels.copy(
-            sessionId = session.id,
-            projectId = session.projectId,
-            deviceId = deviceId,
-        )
+        eventLocalDataSource.saveEvent(event)
     }
 
     override suspend fun removeLocationDataFromCurrentSession() {
@@ -218,9 +212,7 @@ internal open class EventRepositoryImpl @Inject constructor(
         val maxTimestamp = eventLocalDataSource.loadEventsInSession(sessionScope.id)
             .takeIf { it.isNotEmpty() }
             ?.maxOf { event ->
-                event.payload.let { payload ->
-                    payload.endedAt.takeIf { it > 0 } ?: payload.createdAt
-                }
+                event.payload.let { payload -> payload.endedAt ?: payload.createdAt }
             }
             ?: timeHelper.now()
 

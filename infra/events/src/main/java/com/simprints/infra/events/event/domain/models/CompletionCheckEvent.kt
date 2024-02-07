@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.COMPLETION_CHECK
 import java.util.UUID
@@ -9,36 +10,37 @@ import java.util.UUID
 @Keep
 data class CompletionCheckEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: CompletionCheckPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         completed: Boolean,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         CompletionCheckPayload(createdAt, EVENT_VERSION, completed),
         COMPLETION_CHECK
     )
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
+        this // No tokenized fields
 
     @Keep
     data class CompletionCheckPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val completed: Boolean,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = COMPLETION_CHECK,
-        override val endedAt: Long = 0
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 1
+
+        const val EVENT_VERSION = 2
     }
 }

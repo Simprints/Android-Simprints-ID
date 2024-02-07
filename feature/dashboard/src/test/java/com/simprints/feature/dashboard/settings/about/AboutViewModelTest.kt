@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.tokenization.asTokenizableEncrypted
 import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
-import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
@@ -33,7 +32,6 @@ class AboutViewModelTest {
         private val MODALITIES = listOf(GeneralConfiguration.Modality.FINGERPRINT)
         private val POOL_TYPE = IdentificationConfiguration.PoolType.MODULE
         private val PARTITION_TYPE = DownSynchronizationConfiguration.PartitionType.PROJECT
-        private const val PROJECT_ID = "projectId"
     }
 
     @get:Rule
@@ -53,9 +51,6 @@ class AboutViewModelTest {
     )
     private val eventSyncManager = mockk<EventSyncManager>()
 
-    private val authStore = mockk<AuthStore> {
-        every { signedInProjectId } returns PROJECT_ID
-    }
     private val configRepository = mockk<ConfigRepository> {
         coEvery { getProjectConfiguration() } returns buildProjectConfigurationMock()
     }
@@ -69,7 +64,6 @@ class AboutViewModelTest {
     fun `should initialize the live data correctly`() {
         val viewModel = AboutViewModel(
             configRepository = configRepository,
-            authStore = authStore,
             eventSyncManager = eventSyncManager,
             recentUserActivityManager = recentUserActivityManager,
             logoutUseCase = logoutUseCase,
@@ -182,7 +176,7 @@ class AboutViewModelTest {
             true -> 1
             false -> 0
         }
-        coEvery { eventSyncManager.countEventsToUpload(any(), any()) } returns flowOf(
+        coEvery { eventSyncManager.countEventsToUpload(any()) } returns flowOf(
             countEventsToUpload
         )
         coEvery { configRepository.getProjectConfiguration() } returns buildProjectConfigurationMock(
@@ -194,7 +188,6 @@ class AboutViewModelTest {
             recentUserActivityManager = recentUserActivityManager,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
             logoutUseCase = logoutUseCase,
-            authStore = authStore
         )
     }
 }

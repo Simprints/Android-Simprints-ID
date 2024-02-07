@@ -17,21 +17,21 @@ internal class UpdateDailyActivityUseCase @Inject constructor(
             is AppEnrolResponse -> recentUserActivityManager.updateRecentUserActivity { activity ->
                 activity.also {
                     it.enrolmentsToday++
-                    it.lastActivityTime = timeHelper.now()
+                    it.lastActivityTime = timeHelper.now().ms
                 }
             }
 
             is AppIdentifyResponse -> recentUserActivityManager.updateRecentUserActivity { activity ->
                 activity.also {
                     it.identificationsToday++
-                    it.lastActivityTime = timeHelper.now()
+                    it.lastActivityTime = timeHelper.now().ms
                 }
             }
 
             is AppVerifyResponse -> recentUserActivityManager.updateRecentUserActivity { activity ->
                 activity.also {
                     it.verificationsToday++
-                    it.lastActivityTime = timeHelper.now()
+                    it.lastActivityTime = timeHelper.now().ms
                 }
             }
 

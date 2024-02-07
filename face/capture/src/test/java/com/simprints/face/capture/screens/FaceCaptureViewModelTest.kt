@@ -2,6 +2,7 @@ package com.simprints.face.capture.screens
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.BitmapToByteArrayUseCase
 import com.simprints.face.capture.usecases.SaveFaceImageUseCase
@@ -120,14 +121,14 @@ class FaceCaptureViewModelTest {
 
     @Test
     fun `Saves event on complete onboarding`() {
-        viewModel.addOnboardingComplete(0L)
+        viewModel.addOnboardingComplete(Timestamp(0L))
 
         verify { eventReporter.addOnboardingCompleteEvent(any()) }
     }
 
     @Test
     fun `Saves event on capture confirmation`() {
-        viewModel.addCaptureConfirmationAction(0L, true)
+        viewModel.addCaptureConfirmationAction(Timestamp(0L), true)
 
         verify { eventReporter.addCaptureConfirmationEvent(any(), any()) }
     }

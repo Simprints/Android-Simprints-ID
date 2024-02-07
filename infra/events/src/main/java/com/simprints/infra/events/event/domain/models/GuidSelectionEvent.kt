@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.GUID_SELECTION
 import java.util.UUID
@@ -9,18 +10,17 @@ import java.util.UUID
 @Keep
 data class GuidSelectionEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: GuidSelectionPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         selectedId: String,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         GuidSelectionPayload(createdAt, EVENT_VERSION, selectedId),
         GUID_SELECTION
     )
@@ -31,14 +31,14 @@ data class GuidSelectionEvent(
 
     @Keep
     data class GuidSelectionPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val selectedId: String,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = GUID_SELECTION,
-        override val endedAt: Long = 0
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

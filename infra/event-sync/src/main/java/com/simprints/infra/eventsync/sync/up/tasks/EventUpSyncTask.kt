@@ -55,22 +55,22 @@ internal class EventUpSyncTask @Inject constructor(
         var count = 0
 
         try {
-            lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now())
+            lastOperation = lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
 
             uploadEvents(projectId = operation.projectId, config).collect {
                 count = it
                 lastOperation =
-                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now())
+                    lastOperation.copy(lastState = RUNNING, lastSyncTime = timeHelper.now().ms)
                 emitProgress(lastOperation, count)
             }
 
             lastOperation =
-                lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now())
+                lastOperation.copy(lastState = COMPLETE, lastSyncTime = timeHelper.now().ms)
 
             emitProgress(lastOperation, count)
         } catch (t: Throwable) {
             Simber.e(t)
-            lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now())
+            lastOperation = lastOperation.copy(lastState = FAILED, lastSyncTime = timeHelper.now().ms)
 
             emitProgress(lastOperation, count)
         }
@@ -90,7 +90,7 @@ internal class EventUpSyncTask @Inject constructor(
     ) = flow {
         Simber.d("[EVENT_REPO] Uploading")
         try {
-            val sessionScopes = eventRepository.getAllClosedSessions(projectId).associateWith {
+            val sessionScopes = eventRepository.getAllClosedSessions().associateWith {
                 try {
                     eventRepository.getEventsFromSession(it.id)
                         .also { listOfEvents -> emit(listOfEvents.size) }

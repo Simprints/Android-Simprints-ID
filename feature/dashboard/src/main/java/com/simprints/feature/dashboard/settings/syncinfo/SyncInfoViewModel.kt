@@ -151,7 +151,7 @@ internal class SyncInfoViewModel @Inject constructor(
         awaitAll(
             async { _configuration.postValue(configRepository.getProjectConfiguration()) },
             async { _recordsInLocal.postValue(getRecordsInLocal(projectId)) },
-            async { _recordsToUpSync.postValue(getRecordsToUpSync(projectId)) },
+            async { _recordsToUpSync.postValue(getRecordsToUpSync()) },
             async {
                 fetchRecordsToCreateAndDeleteCount().let {
                     _recordsToDownSync.postValue(it.toCreate)
@@ -184,8 +184,8 @@ internal class SyncInfoViewModel @Inject constructor(
     private suspend fun getRecordsInLocal(projectId: String): Int =
         enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
 
-    private suspend fun getRecordsToUpSync(projectId: String): Int =
-        eventSyncManager.countEventsToUpload(projectId, EventType.ENROLMENT_V2)
+    private suspend fun getRecordsToUpSync(): Int =
+        eventSyncManager.countEventsToUpload(EventType.ENROLMENT_V2)
             .firstOrNull()
             ?: 0
 

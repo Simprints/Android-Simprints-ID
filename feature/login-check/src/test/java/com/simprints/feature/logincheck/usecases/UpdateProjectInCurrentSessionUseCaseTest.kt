@@ -1,12 +1,15 @@
 package com.simprints.feature.logincheck.usecases
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.Event
+import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.IntentParsingEvent
 import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent
 import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
 import io.mockk.MockKAnnotations
@@ -79,9 +82,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
 
         coVerify(exactly = 1) {
             eventRepository.addOrUpdateEvent(withArg {
-                assertThat(it.labels.projectId).isEqualTo(
-                    SIGNED_PROJECT_ID
-                )
+                assertThat(it.projectId).isEqualTo(SIGNED_PROJECT_ID)
             })
         }
     }
@@ -107,7 +108,7 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
     private fun createBlankSessionScope(projectId: String) = SessionScope(
         id = "eventId",
         projectId = projectId,
-        createdAt = 0,
+        createdAt = Timestamp(0L),
         endedAt = null,
         payload = SessionScopePayload(
             endCause = null,
@@ -121,16 +122,15 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         )
     )
 
-    private fun createBlankSessionEvent(projectId: String) = SessionCaptureEvent(
+    private fun createBlankSessionEvent(projectId: String): Event = IntentParsingEvent(
         id = "eventId",
+        payload = IntentParsingEvent.IntentParsingPayload(
+            createdAt = Timestamp(0L),
+            eventVersion = 0,
+            integration = IntentParsingEvent.IntentParsingPayload.IntegrationInfo.ODK,
+        ),
+        type = EventType.INTENT_PARSING,
         projectId = projectId,
-        createdAt = 0,
-        modalities = emptyList(),
-        appVersionName = "appVersionName",
-        libVersionName = "libVersionName",
-        language = "language",
-        device = Device("deviceId", "deviceModel", "deviceManufacturer"),
-        databaseInfo = DatabaseInfo(0, 0),
     )
 
     companion object {

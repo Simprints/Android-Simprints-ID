@@ -11,20 +11,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 internal interface EventRoomDao {
 
-    @Query("select * from DbEvent order by createdAt desc")
+    @Query("select * from DbEvent order by createdAt_unixMs desc")
     suspend fun loadAll(): List<DbEvent>
 
-    @Query("select * from DbEvent where sessionId = :sessionId order by createdAt desc")
+    @Query("select * from DbEvent where sessionId = :sessionId order by createdAt_unixMs desc")
     suspend fun loadFromSession(sessionId: String): List<DbEvent>
 
-    @Query("select eventJson from DbEvent where sessionId = :sessionId order by createdAt desc")
+    @Query("select eventJson from DbEvent where sessionId = :sessionId order by createdAt_unixMs desc")
     suspend fun loadEventJsonFromSession(sessionId: String): List<String>
 
-    @Query("select count(*) from DbEvent where projectId = :projectId")
-    fun observeCount(projectId: String): Flow<Int>
+    @Query("select count(*) from DbEvent")
+    fun observeCount(): Flow<Int>
 
-    @Query("select count(*) from DbEvent where projectId = :projectId and type = :type")
-    fun observeCountFromType(projectId: String, type: EventType): Flow<Int>
+    @Query("select count(*) from DbEvent where type = :type")
+    fun observeCountFromType(type: EventType): Flow<Int>
 
     @Query("delete from DbEvent where sessionId = :sessionId")
     suspend fun deleteAllFromSession(sessionId: String)

@@ -1,6 +1,5 @@
 package com.simprints.infra.events
 
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.session.SessionEndCause
@@ -17,7 +16,6 @@ interface EventRepository {
     suspend fun hasOpenSession(): Boolean
 
     /**
-     * The reason is only used when we want to create an [ArtificialTerminationEvent].
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
     suspend fun closeCurrentSession(reason: SessionEndCause? = null)
@@ -29,7 +27,7 @@ interface EventRepository {
      */
     suspend fun getCurrentSessionScope(): SessionScope
 
-    suspend fun getAllClosedSessions(projectId: String): List<SessionScope>
+    suspend fun getAllClosedSessions(): List<SessionScope>
 
     suspend fun saveSessionScope(sessionScope: SessionScope)
 
@@ -39,7 +37,7 @@ interface EventRepository {
 
     suspend fun getEventsJsonFromSession(sessionId: String): List<String>
 
-    suspend fun observeEventCount(projectId: String, type: EventType?): Flow<Int>
+    suspend fun observeEventCount(type: EventType?): Flow<Int>
 
     suspend fun loadAll(): Flow<Event>
 

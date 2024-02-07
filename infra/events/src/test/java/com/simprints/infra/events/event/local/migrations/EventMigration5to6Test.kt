@@ -8,24 +8,15 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.fasterxml.jackson.core.type.TypeReference
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getStringWithColumnName
-import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.utils.SimNetworkUtils.Connection
-import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionState.CONNECTED
-import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionState.DISCONNECTED
-import com.simprints.core.tools.utils.SimNetworkUtils.ConnectionType
 import com.simprints.core.tools.utils.randomUUID
-import com.simprints.infra.events.event.domain.models.ConnectivitySnapshotEvent
-import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.EventLabels
-import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.spyk
 import io.mockk.verify
+import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,15 +24,14 @@ import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigration5to6Test {
 
     @get:Rule
-    val helper: MigrationTestHelper = MigrationTestHelper(
+    val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        EventRoomDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        EventRoomDatabase::class.java,
     )
+
 
     @Test
     @Throws(IOException::class)
@@ -52,13 +42,11 @@ class EventMigration5to6Test {
 
         val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, EventMigration5to6())
 
-        val eventJson =
-            MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
-                .getStringWithColumnName("eventJson")!!
-        val event = JsonHelper.fromJson(eventJson, object : TypeReference<Event>() {})
+        val eventJson = MigrationTestingTools.retrieveCursorWithEventById(db, eventId)
+            .getStringWithColumnName("eventJson")!!
+            .let { JSONObject(it) }
 
-        Truth.assertThat(event).isInstanceOf(ConnectivitySnapshotEvent::class.java)
-        assert(event.payload.eventVersion == 2)
+        assertThat(eventJson.getJSONObject("payload").getInt("eventVersion")).isEqualTo(2)
         db.close()
     }
 
@@ -112,24 +100,26 @@ class EventMigration5to6Test {
     private fun createEvent(id: String) = ContentValues().apply {
         this.put("id", id)
         this.put("type", "CONNECTIVITY_SNAPSHOT")
-        val event = ConnectivitySnapshotEvent(
-            id = id,
-            labels = EventLabels(
-                projectId = "TEST6Oai41ps1pBNrzBL"
-            ),
-            ConnectivitySnapshotEvent.ConnectivitySnapshotPayload(
-                1611584017198,
-                2,
-                listOf(
-                    Connection(ConnectionType.WIFI, CONNECTED),
-                    Connection(ConnectionType.MOBILE, DISCONNECTED)
-                ),
-                EventType.CONNECTIVITY_SNAPSHOT,
-                0
-            ),
-            EventType.CONNECTIVITY_SNAPSHOT
+        this.put(
+            "eventJson", """
+            {
+                "id":"$id",
+                "labels":{
+                    "projectId":"TEST6Oai41ps1pBNrzBL"
+                },
+                "payload": {
+                    "createdAt":1611584017198,
+                    "eventVersion":2,
+                    "connections":[
+                        {"type": "WIFI","state": "CONNECTED"},
+                        {"type": "MOBILE","state": "DISCONNECTED"}
+                    ],
+                    "type": "CONNECTIVITY_SNAPSHOT"
+                },
+                "type": "CONNECTIVITY_SNAPSHOT"
+            }
+        """.trimIndent()
         )
-        this.put("eventJson", JsonHelper.toJson(event))
         this.put("createdAt", 1611584017198)
         this.put("endedAt", 0)
         this.put("sessionIsClosed", 0)
@@ -137,7 +127,7 @@ class EventMigration5to6Test {
 
     private fun setupV5DbWithEvent(
         vararg eventId: String,
-        close: Boolean = true
+        close: Boolean = true,
     ): SupportSQLiteDatabase =
         helper.createDatabase(TEST_DB, 5).apply {
             eventId.forEach {
@@ -149,6 +139,7 @@ class EventMigration5to6Test {
         }
 
     companion object {
+
         private const val TEST_DB = "test"
     }
 

@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.AuthorizationResult
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload.UserInfo
@@ -11,19 +12,18 @@ import java.util.UUID
 @Keep
 data class AuthorizationEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: AuthorizationPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
+        createdAt: Timestamp,
         result: AuthorizationResult,
         userInfo: UserInfo?,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         AuthorizationPayload(createdAt, EVENT_VERSION, result, userInfo),
         AUTHORIZATION
     )
@@ -42,12 +42,12 @@ data class AuthorizationEvent(
 
     @Keep
     data class AuthorizationPayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val result: AuthorizationResult,
         val userInfo: UserInfo?,
+        override val endedAt: Timestamp? = null,
         override val type: EventType = AUTHORIZATION,
-        override val endedAt: Long = 0
     ) : EventPayload() {
 
         @Keep
@@ -60,6 +60,6 @@ data class AuthorizationEvent(
     }
 
     companion object {
-        const val EVENT_VERSION = 1
+        const val EVENT_VERSION = 2
     }
 }

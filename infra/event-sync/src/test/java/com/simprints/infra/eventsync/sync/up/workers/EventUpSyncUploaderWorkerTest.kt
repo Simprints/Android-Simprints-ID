@@ -59,7 +59,7 @@ class EventUpSyncUploaderWorkerTest {
     }
     private val upSyncTask = mockk<EventUpSyncTask>()
     private val eventRepository = mockk<EventRepository> {
-        coEvery { observeEventCount(any(), any()) } returns flowOf(12)
+        coEvery { observeEventCount(any()) } returns flowOf(12)
     }
 
     @Before
