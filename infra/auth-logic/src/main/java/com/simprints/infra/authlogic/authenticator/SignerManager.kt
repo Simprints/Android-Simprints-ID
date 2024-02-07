@@ -39,7 +39,7 @@ internal class SignerManager @Inject constructor(
             // Only store credentials if all other calls succeeded. This avoids the undefined state
             // where credentials are store (i.e. user is considered logged in) but project configuration
             // is missing
-            authStore.storeCredentials(projectId)
+            authStore.signedInProjectId = projectId
         } catch (e: Exception) {
             authStore.clearFirebaseToken()
             configRepository.clearData()

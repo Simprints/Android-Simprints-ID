@@ -14,7 +14,6 @@ interface AuthStore {
 
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
     fun cleanCredentials()
-    fun storeCredentials(projectId: String)
 
     suspend fun storeFirebaseToken(token: Token)
     fun clearFirebaseToken()

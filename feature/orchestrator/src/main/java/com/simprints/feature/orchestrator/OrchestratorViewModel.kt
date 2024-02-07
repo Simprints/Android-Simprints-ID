@@ -134,7 +134,6 @@ internal class OrchestratorViewModel @Inject constructor(
             if (matchingStep != null) {
                 val faceSamples = result.results.mapNotNull { it.sample }
                     .map { MatchParams.FaceSample(it.faceId, it.template) }
-                //TODO: check
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFaceStepArgs(faceSamples)
@@ -150,7 +149,6 @@ internal class OrchestratorViewModel @Inject constructor(
             if (matchingStep != null) {
                 val fingerprintSamples = result.results.mapNotNull { it.sample }
                     .map { MatchParams.FingerprintSample(it.fingerIdentifier, it.format, it.template) }
-                //TODO: check
                 val newPayload = matchingStep.payload
                     .getParcelable<MatchStepStubPayload>(MatchStepStubPayload.STUB_KEY)
                     ?.toFingerprintStepArgs(fingerprintSamples)

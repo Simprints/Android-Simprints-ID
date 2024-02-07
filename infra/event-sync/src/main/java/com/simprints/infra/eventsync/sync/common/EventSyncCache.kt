@@ -10,8 +10,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @SuppressLint("ApplySharedPref")
+@Singleton
 internal class EventSyncCache @Inject constructor(
     securityManager: SecurityManager,
     @DispatcherIO private val dispatcher: CoroutineDispatcher,
