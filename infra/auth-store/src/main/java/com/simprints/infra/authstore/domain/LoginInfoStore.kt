@@ -8,7 +8,9 @@ import com.simprints.core.domain.tokenization.isTokenized
 import com.simprints.infra.security.SecurityManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class LoginInfoStore @Inject constructor(
     @ApplicationContext ctx: Context,
     securityManager: SecurityManager,
