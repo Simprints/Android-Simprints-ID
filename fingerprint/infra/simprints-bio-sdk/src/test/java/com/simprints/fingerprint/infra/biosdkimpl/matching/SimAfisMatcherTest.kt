@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.google.common.truth.Truth
-import com.simprints.fingerprint.infra.basebiosdk.matching.SimAfisMatcher
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
@@ -68,12 +67,13 @@ class SimAfisMatcherTest {
             )
         )
         //When
-        val result = simAfisMatcher.match(candidate, listOf(candidate), false).last()
+        simAfisMatcher.match(candidate, listOf(candidate), false).last()
         //Then throws IllegalArgumentException
     }
+
     @Test
     fun `test cross finger match`() = runTest {
-        mockkStatic("com.simprints.fingerprint.infra.biosdkimpl.matching.CrossMatchingKt")
+        mockkStatic("com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcherKt")
 
         val probe = mockk<FingerprintIdentity>()
         val candidate1 = mockk<FingerprintIdentity>()
@@ -127,9 +127,9 @@ class SimAfisMatcherTest {
             )
         )
         //When
-        val result = crossFingerMatching(probe, candidate, jniLibAfis).score
+        val result = simAfisMatcher.match(probe, listOf(candidate), true)
         //Then
         verify(exactly = 0) { jniLibAfis.verify(any(), any()) }
-        Truth.assertThat(result).isEqualTo(0)
+        Truth.assertThat(result[0].score).isEqualTo(0)
     }
 }

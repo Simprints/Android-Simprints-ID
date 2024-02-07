@@ -21,7 +21,6 @@ dependencies {
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:matcher"))
 
-    implementation(project(":face:configuration"))
     implementation(project(":face:capture"))
 
     implementation(project(":fingerprint:connect"))

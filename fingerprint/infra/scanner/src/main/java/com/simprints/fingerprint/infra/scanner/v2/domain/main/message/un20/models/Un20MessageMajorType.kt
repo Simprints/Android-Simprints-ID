@@ -19,5 +19,18 @@ enum class Un20MessageMajorType(val majorByte: Byte) {
     // 0x4_ : Image commands
     GET_SUPPORTED_IMAGE_FORMATS(0x40),
     GET_IMAGE(0x41),
-    GET_IMAGE_QUALITY(0x42)
+    GET_IMAGE_QUALITY(0x42),
+
+    /**
+     * Get Unprocessed Image
+     *
+     * Returns the raw image data from the sensor.
+     */
+    GET_UNPROCESSED_IMAGE(0x43),
+    /**
+     *
+     * Returns the UN20 calibration file (sgdevun20a.cfg) which can be used by Secugen Android library
+     * to correct for the optical distortion of raw image.
+     */
+    GET_IMAGE_DISTORTION_CONFIGURATION_MATRIX(0x44)
 }

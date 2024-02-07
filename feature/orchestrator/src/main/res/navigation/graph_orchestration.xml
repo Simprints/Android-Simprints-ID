@@ -54,11 +54,6 @@
         android:id="@+id/action_orchestratorFragment_to_fetchSubject"
         app:destination="@id/graph_fetch_subject" />
 
-    <include app:graph="@navigation/graph_face_configuration" />
-    <action
-        android:id="@+id/action_orchestratorFragment_to_faceConfiguration"
-        app:destination="@id/graph_face_configuration" />
-
     <include app:graph="@navigation/graph_face_capture" />
     <action
         android:id="@+id/action_orchestratorFragment_to_faceCapture"

@@ -11,7 +11,6 @@ import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.core.livedata.LiveDataEventObserver
 import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.face.capture.FaceCaptureContract
-import com.simprints.face.configuration.FaceConfigurationContract
 import com.simprints.feature.alert.AlertContract
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.alert.toArgs
@@ -25,8 +24,6 @@ import com.simprints.feature.login.LoginContract
 import com.simprints.feature.login.LoginResult
 import com.simprints.feature.logincheck.LoginCheckViewModel
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
-import com.simprints.feature.orchestrator.databinding.FragmentOrchestratorBinding
-import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.feature.selectsubject.SelectSubjectContract
 import com.simprints.feature.setup.SetupContract
 import com.simprints.fingerprint.capture.FingerprintCaptureContract
@@ -35,10 +32,10 @@ import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
 import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
 import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
+import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.orchestration.data.results.AppResult
 import com.simprints.infra.uibase.navigation.finishWithResult
 import com.simprints.infra.uibase.navigation.handleResult
-import com.simprints.infra.uibase.viewbinding.viewBinding
 import com.simprints.matcher.MatchContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -79,7 +76,6 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
     private val clientApiVm by viewModels<ClientApiViewModel>()
     private val orchestratorVm by viewModels<OrchestratorViewModel>()
 
-    private val binding by viewBinding(FragmentOrchestratorBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -106,7 +102,6 @@ internal class OrchestratorFragment : Fragment(R.layout.fragment_orchestrator) {
         handleResult(SelectSubjectContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(EnrolLastBiometricContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(ExitFormContract.DESTINATION, orchestratorVm::handleResult)
-        handleResult(FaceConfigurationContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(MatchContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(FaceCaptureContract.DESTINATION, orchestratorVm::handleResult)
         handleResult(FingerprintCaptureContract.DESTINATION, orchestratorVm::handleResult)

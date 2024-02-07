@@ -68,6 +68,10 @@ timber_version = "5.0.1"
 libsimprints_version = "2023.4.1"
 simmatcher_version = "1.2.0"
 roc_wrapper_version = "1.23"
+nec_version = "1.5.0"
+secugen_version = "1.0.0"
+wsq_version = "1.2"
+bitmapConverter_version = "0.2.0"
 
 junit_version = "4.13.2"
 junit_ext_version = "1.1.5"
@@ -82,7 +86,6 @@ uiAutomator_version = "2.2.0"
 jacoco_version = "0.8.11"
 
 sonar_plugin_version = "4.4.1.3373"
-deps_analysis_version = "1.20.0"
 retry_version = "1.5.8"
 realm_version = "1.13.0"
 protobuf_plugin_version = "0.9.4"
@@ -199,8 +202,19 @@ libsimprints = { module = "com.simprints:libsimprints", version.ref = "libsimpri
 #simmatcher
 simmatcher = { module = "com.simprints:libsimmatcher", version.ref = "simmatcher_version" }
 
-# roc sdk
+# roc sdk hosted in https://github.com/Simprints/lib-roc-wrapper
 roc = { module = "com.simprints:rocwrapper", version.ref = "roc_wrapper_version" }
+# nec sdk hosted in https://github.com/Simprints/NEC-wrapper/
+nec-wrapper = { module = " com.simprints:necwrapper", version.ref = "nec_version" }
+nec-lib = { module = "com.nec:lib", version.ref = "nec_version" }
+# secugen sdk hosted in https://github.com/Simprints/secugen-wrapper
+secugen = { module = "com.simprints:secugenwrapper", version.ref = "secugen_version" }
+
+#WSQ
+wsqDecoder = { module = "com.gemalto.wsq:wsq-android", version.ref = "wsq_version" }
+# BitmapConverter
+bitmapConverter= {module= "com.github.yoanngoular:bitmapconverter", version.ref = "bitmapConverter_version"}
+
 
 #hilt
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt_version" }

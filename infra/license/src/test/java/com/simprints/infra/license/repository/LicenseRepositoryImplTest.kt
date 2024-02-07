@@ -146,6 +146,26 @@ class LicenseRepositoryImplTest {
         }
     }
 
+    @Test
+    fun ` test getCachedLicense success`() = runTest {
+        // Given
+        coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns license
+        // When
+        val cachedLicense = licenseRepositoryImpl.getCachedLicense(RANK_ONE_FACE)
+        // Then
+        assertThat(cachedLicense).isEqualTo(license)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun ` test getCachedLicense failure`() = runTest {
+        // Given
+        coEvery { licenseLocalDataSource.getLicense(RANK_ONE_FACE) } returns null
+        // When
+        licenseRepositoryImpl.getCachedLicense(RANK_ONE_FACE)
+        // Then throw exception
+
+    }
+
     companion object {
         private val RANK_ONE_FACE = Vendor("RANK_ONE_FACE")
 

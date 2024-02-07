@@ -24,6 +24,8 @@ dependencies {
     implementation(project(":infra:images"))
     implementation(project(":infra:resources"))
     implementation(project(":feature:exit-form"))
+    implementation(project(":infra:license"))
+    implementation(project(":feature:alert"))
 
     //BIO SDK
     implementation(project(":face:infra:face-bio-sdk"))

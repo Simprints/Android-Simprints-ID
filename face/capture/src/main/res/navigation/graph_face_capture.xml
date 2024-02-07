@@ -13,6 +13,15 @@
             app:argType="integer" />
     </fragment>
 
+    <include app:graph="@navigation/graph_alert" />
+    <action
+        android:id="@+id/action_global_errorFragment"
+        app:destination="@id/graph_alert"
+        app:popUpTo="@id/faceCaptureControllerFragment"
+        app:popUpToInclusive="true"
+       />
+
+
     <include app:graph="@navigation/graph_exit_form" />
     <action
         android:id="@+id/action_global_refusalFragment"
