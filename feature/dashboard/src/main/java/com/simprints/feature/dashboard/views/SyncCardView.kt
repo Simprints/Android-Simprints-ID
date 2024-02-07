@@ -124,7 +124,7 @@ internal class SyncCardView : MaterialCardView {
     private fun prepareProgressView(state: SyncCardState.SyncProgress) {
         binding.syncCardProgress.visibility = View.VISIBLE
 
-        val percentage = if (state.total != null)
+        val percentage = if (state.progress != null && state.total != null)
             "${calculatePercentage(state.progress, state.total)}%"
         else
             ""
@@ -169,9 +169,9 @@ internal class SyncCardView : MaterialCardView {
         }
     }
 
-    private fun setProgress(progress: Int, total: Int?, color: Int) {
+    private fun setProgress(progress: Int?, total: Int?, color: Int) {
         with(binding.syncCardProgressSyncProgressBar) {
-            if (total != null) {
+            if (progress != null && total != null) {
                 setProgressBarIndeterminate(this, false)
                 this.progress = calculatePercentage(progress, total)
             } else {
@@ -205,7 +205,6 @@ internal class SyncCardView : MaterialCardView {
 
     private fun calculatePercentage(progressValue: Int, totalValue: Int) =
         min((100 * (progressValue.toFloat() / totalValue.toFloat())).toInt(), 100)
-
 
     // I couldn't find a way to get from Android SDK the default text color (in line with the theme).
     // So I change a color for a TextView, then I can't set back to the default.

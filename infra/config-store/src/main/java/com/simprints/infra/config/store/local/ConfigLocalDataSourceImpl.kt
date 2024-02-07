@@ -125,6 +125,7 @@ internal class ConfigLocalDataSourceImpl @Inject constructor(
         val defaultProjectConfiguration: ProtoProjectConfiguration =
             ProjectConfiguration(
                 projectId = "",
+                updatedAt = "",
                 general = GeneralConfiguration(
                     modalities = listOf(GeneralConfiguration.Modality.FINGERPRINT),
                     languageOptions = listOf(),

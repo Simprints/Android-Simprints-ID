@@ -30,6 +30,7 @@ import java.util.*
 internal class EventSyncStateProcessorTest {
 
     companion object {
+
         const val UNIQUE_SYNC_ID = "UNIQUE_SYNC_ID"
         const val UNIQUE_DOWN_SYNC_ID = "UNIQUE_DOWN_SYNC_ID"
         const val UNIQUE_UP_SYNC_ID = "UNIQUE_UP_SYNC_ID"
@@ -51,7 +52,6 @@ internal class EventSyncStateProcessorTest {
 
     private val failedMasterWorkers: List<WorkInfo> =
         listOf(createWorkInfo(FAILED))
-
 
     private var startSyncReporterWorker = MutableLiveData<List<WorkInfo>>()
     private var syncWorkersLiveData = MutableLiveData<List<WorkInfo>>()
@@ -121,6 +121,18 @@ internal class EventSyncStateProcessorTest {
         }
 
     @Test
+    fun processor_oneWorkerRunning_shouldIgnoreCount() =
+        runTest(UnconfinedTestDispatcher()) {
+            coEvery { eventSyncCache.shouldIgnoreMax() } returns true
+
+            startSyncReporterWorker.value = successfulMasterWorkers
+            syncWorkersLiveData.value = createWorkInfosHistoryForRunningSync()
+
+            val syncStates = eventSyncStateProcessor.getLastSyncState().getOrAwaitValue()
+            syncStates.assertRunningSyncStateWithoutProgress()
+        }
+
+    @Test
     fun processor_oneWorkerFailed_shouldSyncStateBeFail() = runTest(UnconfinedTestDispatcher()) {
         startSyncReporterWorker.value = successfulMasterWorkers
         syncWorkersLiveData.value = createWorkInfosHistoryForFailingSync()
@@ -141,7 +153,6 @@ internal class EventSyncStateProcessorTest {
 
             syncStates.assertConnectingSyncState()
         }
-
 
     @Test
     fun getLastSyncState_shouldMapCorrectlyTheBackendMaintenanceFailed() =
@@ -193,12 +204,12 @@ internal class EventSyncStateProcessorTest {
 
     private fun createStartSyncReporterWorker(
         state: WorkInfo.State = SUCCEEDED,
-        uniqueMasterSyncId: String
+        uniqueMasterSyncId: String,
     ) =
         createWorkInfo(
             state,
             workDataOf(SYNC_ID_STARTED to uniqueMasterSyncId),
-            listOf(
+            setOf(
                 "$TAG_SCHEDULED_AT${Date().time}",
                 TAG_SUBJECTS_DOWN_SYNC_ALL_WORKERS,
                 TAG_SUBJECTS_SYNC_ALL_WORKERS,

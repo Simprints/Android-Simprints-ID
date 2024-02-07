@@ -32,7 +32,7 @@ class GetCurrentSessionIdUseCaseTest {
 
     @Test
     fun `Return current session id`() = runTest {
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             coEvery { id } returns "sessionId"
         }
 

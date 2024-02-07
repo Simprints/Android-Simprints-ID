@@ -9,7 +9,7 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.MultiplePossibleS
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.infra.scanner.tools.ScannerGenerationDeterminer
 import com.simprints.fingerprint.infra.scanner.tools.SerialNumberConverter
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import javax.inject.Inject
 
@@ -21,7 +21,7 @@ class ScannerPairingManager @Inject internal constructor(
     private val recentUserActivityManager: RecentUserActivityManager,
     private val scannerGenerationDeterminer: ScannerGenerationDeterminer,
     private val serialNumberConverter: SerialNumberConverter,
-    private val configManager: ConfigManager
+    private val configRepository: ConfigRepository
 ) {
 
     /**
@@ -56,7 +56,7 @@ class ScannerPairingManager @Inject internal constructor(
     }
 
     private suspend fun isScannerGenerationValidForProject(address: String): Boolean =
-        configManager.getProjectConfiguration().fingerprint?.allowedScanners?.contains(
+        configRepository.getProjectConfiguration().fingerprint?.allowedScanners?.contains(
             scannerGenerationDeterminer.determineScannerGenerationFromSerialNumber(
                 serialNumberConverter.convertMacAddressToSerialNumber(address)
             )

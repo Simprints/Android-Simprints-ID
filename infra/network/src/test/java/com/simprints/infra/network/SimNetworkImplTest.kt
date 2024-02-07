@@ -1,18 +1,31 @@
 package com.simprints.infra.network
 
 import com.simprints.infra.network.apiclient.SimApiClientImpl
+import com.simprints.infra.network.httpclient.DefaultOkHttpClientBuilder
 import com.simprints.infra.network.url.BaseUrlProvider
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.spyk
 import io.mockk.verify
+import org.junit.Before
 import org.junit.Test
 
 class SimNetworkImplTest {
 
+    @MockK
+    private lateinit var baseUrlProvider: BaseUrlProvider
+
+    @MockK
+    private lateinit var okHttpClientBuilder: DefaultOkHttpClientBuilder
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxed = true)
+    }
+
     @Test
     fun `calling get base url should call the url provider`() {
-        val baseUrlProvider: BaseUrlProvider = spyk()
-        val network = SimNetworkImpl(baseUrlProvider)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         network.getApiBaseUrl()
 
@@ -21,8 +34,7 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling reset base url should call the url provider`() {
-        val baseUrlProvider: BaseUrlProvider = spyk()
-        val network = SimNetworkImpl(baseUrlProvider)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         network.resetApiBaseUrl()
 
@@ -31,8 +43,7 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling set base url should call the url provider`() {
-        val baseUrlProvider: BaseUrlProvider = spyk()
-        val network = SimNetworkImpl(baseUrlProvider)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         val baseUrl = "FAKE_BASE_URL"
 
@@ -43,13 +54,10 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling get api client should return the api client`() {
-        val baseUrlProvider: BaseUrlProvider = spyk()
-        val network = SimNetworkImpl(baseUrlProvider)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         val clientApi = network.getSimApiClient<SimRemoteInterface>(
             mockk(),
-            mockk(),
-            "testUrl",
             "testDeviceID",
             "testVersion",
             "testAuthToken"
@@ -60,18 +68,15 @@ class SimNetworkImplTest {
 
     @Test
     fun `calling get api client with no token should return the api client`() {
-        val baseUrlProvider: BaseUrlProvider = spyk()
-        val network = SimNetworkImpl(baseUrlProvider)
+        val network = SimNetworkImpl(baseUrlProvider, okHttpClientBuilder)
 
         val clientApi = network.getSimApiClient<SimRemoteInterface>(
             mockk(),
-            mockk(),
-            "testUrl",
             "testDeviceID",
             "testVersion",
             null
         )
-        
+
         assert(clientApi is SimApiClientImpl<SimRemoteInterface>)
     }
 

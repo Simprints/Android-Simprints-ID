@@ -22,8 +22,8 @@ import com.simprints.feature.orchestrator.usecases.response.AppResponseBuilderUs
 import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.matcher.MatchParams
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class OrchestratorViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val cache: OrchestratorCache,
     private val locationStore: LocationStore,
     private val stepsBuilder: BuildStepsUseCase,
@@ -59,7 +59,7 @@ internal class OrchestratorViewModel @Inject constructor(
     private val _appResponse = MutableLiveData<LiveDataEventWithContent<OrchestratorResult>>()
 
     fun handleAction(action: ActionRequest) = viewModelScope.launch {
-        val projectConfiguration = configManager.getProjectConfiguration()
+        val projectConfiguration = configRepository.getProjectConfiguration()
 
         modalities = projectConfiguration.general.modalities.toSet()
         steps = stepsBuilder.build(action, projectConfiguration)
@@ -70,7 +70,7 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     fun handleResult(result: Serializable) {
-        Simber.i(result.toString())
+        Simber.d(result.toString())
         val errorResponse = mapRefusalOrErrorResult(result)
         if (errorResponse != null) {
             // Shortcut the flow execution if any refusal or error result is found
@@ -114,7 +114,7 @@ internal class OrchestratorViewModel @Inject constructor(
     }
 
     private fun buildAppResponse() = viewModelScope.launch {
-        val projectConfiguration = configManager.getProjectConfiguration()
+        val projectConfiguration = configRepository.getProjectConfiguration()
         val cachedActionRequest = actionRequest
         val appResponse = appResponseBuilder(
             projectConfiguration,

@@ -164,6 +164,7 @@ class ConfigLocalDataSourceImplTest {
         runTest(UnconfinedTestDispatcher()) {
             val projectConfigurationToSave = ProjectConfiguration(
                 "projectId",
+                "updatedAt",
                 generalConfiguration,
                 faceConfiguration,
                 null,

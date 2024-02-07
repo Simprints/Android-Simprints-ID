@@ -133,7 +133,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         eventRepository.observeEventCount(projectId, type)
 
     override suspend fun countEventsToDownload(): DownSyncCounts {
-        val projectConfig = configRepository.getConfiguration()
+        val projectConfig = configRepository.getProjectConfiguration()
         val deviceConfig = configRepository.getDeviceConfiguration()
 
         val downSyncScope = downSyncScopeRepository.getDownSyncScope(
@@ -166,7 +166,7 @@ internal class EventSyncManagerImpl @Inject constructor(
         val op = EventDownSyncOperation(RemoteEventQuery(
             projectId = projectId,
             subjectId = subjectId,
-            modes = getProjectModes(configRepository.getConfiguration()),
+            modes = getProjectModes(configRepository.getProjectConfiguration()),
         ))
         downSyncTask.downSync(this, op).toList()
     }
@@ -177,7 +177,7 @@ internal class EventSyncManagerImpl @Inject constructor(
     override suspend fun deleteModules(unselectedModules: List<String>) {
         downSyncScopeRepository.deleteOperations(
             unselectedModules,
-            modes = getProjectModes(configRepository.getConfiguration()),
+            modes = getProjectModes(configRepository.getProjectConfiguration()),
         )
     }
 

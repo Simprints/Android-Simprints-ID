@@ -2,14 +2,14 @@ package com.simprints.feature.dashboard.settings
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
+import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.impl.annotations.MockK
 import io.mockk.slot
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -17,10 +17,6 @@ import org.junit.Rule
 import org.junit.Test
 
 class SettingsViewModelTest {
-
-    companion object {
-        private const val LANGUAGE = "fr"
-    }
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -36,20 +32,20 @@ class SettingsViewModelTest {
         duplicateBiometricEnrolmentCheck = true,
         settingsPassword = SettingsPasswordConfig.Locked("1234"),
     )
-    private val configManager = mockk<ConfigManager> {
-        coEvery { getProjectConfiguration() } returns mockk {
-            every { general } returns generalConfiguration
-        }
-        coEvery { getDeviceConfiguration() } returns mockk {
-            every { language } returns LANGUAGE
-        }
-    }
+
+    @MockK
+    private lateinit var configRepository: ConfigRepository
 
     private lateinit var viewModel: SettingsViewModel
 
     @Before
     fun setup() {
-        viewModel = SettingsViewModel(configManager)
+        MockKAnnotations.init(this, relaxed = true)
+
+        coEvery { configRepository.getProjectConfiguration().general } returns generalConfiguration
+        coEvery { configRepository.getDeviceConfiguration().language } returns LANGUAGE
+
+        viewModel = SettingsViewModel(configRepository)
     }
 
     @Test
@@ -63,7 +59,7 @@ class SettingsViewModelTest {
     fun `updateLanguagePreference should update the language`() = runTest {
         val updatedLanguage = "en"
         val updateConfigFn = slot<suspend (DeviceConfiguration) -> DeviceConfiguration>()
-        coEvery { configManager.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
+        coEvery { configRepository.updateDeviceConfiguration(capture(updateConfigFn)) } returns Unit
 
         viewModel.updateLanguagePreference(updatedLanguage)
 
@@ -81,4 +77,10 @@ class SettingsViewModelTest {
 
         assertThat(viewModel.settingsLocked.value).isEqualTo(SettingsPasswordConfig.Unlocked)
     }
+
+    companion object {
+
+        private const val LANGUAGE = "fr"
+    }
+
 }

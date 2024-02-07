@@ -4,10 +4,7 @@ on:
     workflow_dispatch:
         branches:
             - 'release/*'
-    # Triggered when a push occurs on branches starting with 'release/'
-    push:
-        branches:
-            - 'release/*'
+
 jobs:
     deploy-to-staging:
 

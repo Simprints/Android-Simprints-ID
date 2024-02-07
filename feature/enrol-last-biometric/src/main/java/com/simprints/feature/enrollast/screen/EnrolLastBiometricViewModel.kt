@@ -13,7 +13,7 @@ import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.DUPLICATE
 import com.simprints.feature.enrollast.screen.EnrolLastState.ErrorType.GENERAL_ERROR
 import com.simprints.feature.enrollast.screen.usecase.BuildSubjectUseCase
 import com.simprints.feature.enrollast.screen.usecase.HasDuplicateEnrolmentsUseCase
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.enrolment.records.store.domain.models.Subject
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectAction
@@ -31,7 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class EnrolLastBiometricViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val eventRepository: EventRepository,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val hasDuplicateEnrolments: HasDuplicateEnrolmentsUseCase,
@@ -53,7 +53,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     fun enrolBiometric(params: EnrolLastBiometricParams) = viewModelScope.launch {
         enrolWasAttempted = true
 
-        val projectConfig = configManager.getProjectConfiguration()
+        val projectConfig = configRepository.getProjectConfiguration()
         val modalities = projectConfig.general.modalities
 
         val previousLastEnrolmentResult = getPreviousEnrolmentResult(params.steps)
@@ -92,7 +92,7 @@ internal class EnrolLastBiometricViewModel @Inject constructor(
     private suspend fun registerEvent(subject: Subject) {
         Simber.tag(ENROLMENT.name).d("Register events for enrolments")
 
-        val currentSession = eventRepository.getCurrentCaptureSessionEvent().id
+        val currentSession = eventRepository.getCurrentSessionScope().id
         val personCreationEvent = eventRepository.observeEventsFromSession(currentSession)
             .filterIsInstance<PersonCreationEvent>().first()
 

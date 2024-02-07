@@ -31,6 +31,7 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
             try {
                 val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
                 crashlyticsLog("Start - Params: $syncId")
+                showProgressNotification()
 
                 if (!syncId.isNullOrEmpty()) {
                     syncCache.storeLastSuccessfulSyncTime(Date())

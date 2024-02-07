@@ -30,7 +30,6 @@ jobs:
             modules: |
                 infra:orchestrator-data
                 infra:realm
-                infra:project-security-store
                 infra:recent-user-activity
                 infra:config-store
                 infra:config-sync

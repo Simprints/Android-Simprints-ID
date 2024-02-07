@@ -5,10 +5,9 @@ import com.simprints.infra.authlogic.integrity.IntegrityTokenRequester
 import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTokenException
 import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authstore.domain.models.AuthRequest
-import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
 import com.simprints.infra.authstore.exceptions.AuthRequestInvalidCredentialsException
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
 import com.simprints.infra.security.SecurityManager
@@ -17,9 +16,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 internal class ProjectAuthenticator @Inject constructor(
-    private val projectSecretManager: ProjectSecretManager,
     private val secureDataManager: SecurityManager,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val signerManager: SignerManager,
     private val authenticationRemoteDataSource: AuthenticationRemoteDataSource,
     private val integrityTokenRequester: IntegrityTokenRequester,
@@ -41,7 +39,7 @@ internal class ProjectAuthenticator @Inject constructor(
         makeAuthRequest(prepareAuthRequestParameters(nonceScope, projectSecret), nonceScope)
             .signIn(nonceScope.projectId)
 
-        val config = configManager.getProjectConfiguration()
+        val config = configRepository.getProjectConfiguration()
         fetchProjectLongConsentTexts(config.general.languageOptions, config.projectId)
     }
 
@@ -59,23 +57,15 @@ internal class ProjectAuthenticator @Inject constructor(
             nonceScope.deviceId,
         )
         return buildAuthRequest(
-            getEncryptedProjectSecret(projectSecret, authenticationData),
+            projectSecret,
             integrityTokenRequester.getToken(authenticationData.nonce),
         )
     }
 
-    private fun getEncryptedProjectSecret(
-        projectSecret: String,
-        authenticationData: AuthenticationData
-    ): String = projectSecretManager.encryptProjectSecret(
-        projectSecret,
-        authenticationData.publicKey
-    )
-
     private fun buildAuthRequest(
-        encryptedProjectSecret: String,
+        projectSecret: String,
         integrityToken: String,
-    ): AuthRequest = AuthRequest(encryptedProjectSecret, integrityToken)
+    ): AuthRequest = AuthRequest(projectSecret, integrityToken)
 
 
     private suspend fun makeAuthRequest(authRequest: AuthRequest, nonceScope: NonceScope): Token =
@@ -95,7 +85,7 @@ internal class ProjectAuthenticator @Inject constructor(
 
     private suspend fun fetchProjectLongConsentTexts(languages: List<String>, projectId: String) {
         languages.forEach { language ->
-            configManager.getPrivacyNotice(projectId, language).collect()
+            configRepository.getPrivacyNotice(projectId, language).collect()
         }
     }
 }

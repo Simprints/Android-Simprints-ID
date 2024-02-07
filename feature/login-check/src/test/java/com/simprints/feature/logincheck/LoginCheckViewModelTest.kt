@@ -5,18 +5,19 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
-import com.simprints.feature.logincheck.usecases.*
 import com.simprints.feature.logincheck.usecases.ActionFactory
 import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
 import com.simprints.feature.logincheck.usecases.CancelBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
 import com.simprints.feature.logincheck.usecases.ExtractParametersForAnalyticsUseCase
-import com.simprints.feature.logincheck.usecases.GetProjectStateUseCase
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase
 import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCase
 import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
-import com.simprints.feature.logincheck.usecases.UpdateDatabaseCountsInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
+import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
+import com.simprints.feature.logincheck.usecases.UpdateStoredUserIdUseCase
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.security.SecurityManager
 import com.simprints.infra.security.exceptions.RootedDeviceException
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -25,7 +26,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -59,7 +59,7 @@ internal class LoginCheckViewModelTest {
     lateinit var isUserSignedInUseCase: IsUserSignedInUseCase
 
     @MockK
-    lateinit var getProjectStateUseCase: GetProjectStateUseCase
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var startBackgroundSync: StartBackgroundSyncUseCase
@@ -68,7 +68,7 @@ internal class LoginCheckViewModelTest {
     lateinit var cancelBackgroundSync: CancelBackgroundSyncUseCase
 
     @MockK
-    lateinit var updateDatabaseCountsInCurrentSessionUseCase: UpdateDatabaseCountsInCurrentSessionUseCase
+    lateinit var updateSessionScopePayloadUseCase: UpdateSessionScopePayloadUseCase
 
     @MockK
     lateinit var updateProjectStateUseCase: UpdateProjectInCurrentSessionUseCase
@@ -89,10 +89,10 @@ internal class LoginCheckViewModelTest {
             extractCrashKeysUseCase,
             addAuthorizationEventUseCase,
             isUserSignedInUseCase,
-            getProjectStateUseCase,
+            configRepository,
             startBackgroundSync,
             cancelBackgroundSync,
-            updateDatabaseCountsInCurrentSessionUseCase,
+            updateSessionScopePayloadUseCase,
             updateProjectStateUseCase,
             updateStoredUserIdUseCase,
         )
@@ -130,7 +130,8 @@ internal class LoginCheckViewModelTest {
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.DIFFERENT_PROJECT_ID }
+        viewModel.showAlert.test()
+            .assertValue { it.peekContent() == LoginCheckError.DIFFERENT_PROJECT_ID }
     }
 
     @Test
@@ -162,7 +163,8 @@ internal class LoginCheckViewModelTest {
             addAuthorizationEventUseCase.invoke(any(), eq(false))
             cancelBackgroundSync.invoke()
         }
-        viewModel.showLoginFlow.test().assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
+        viewModel.showLoginFlow.test()
+            .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
     }
 
     @Test
@@ -181,7 +183,8 @@ internal class LoginCheckViewModelTest {
 
         viewModel.handleLoginResult(LoginResult(true, null))
 
-        viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.UNEXPECTED_LOGIN_ERROR }
+        viewModel.showAlert.test()
+            .assertValue { it.peekContent() == LoginCheckError.UNEXPECTED_LOGIN_ERROR }
     }
 
     @Test
@@ -191,7 +194,8 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.IntegrityServiceError))
 
-        viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.INTEGRITY_SERVICE_ERROR }
+        viewModel.showAlert.test()
+            .assertValue { it.peekContent() == LoginCheckError.INTEGRITY_SERVICE_ERROR }
     }
 
     @Test
@@ -201,7 +205,8 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.MissingPlayServices))
 
-        viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES }
+        viewModel.showAlert.test()
+            .assertValue { it.peekContent() == LoginCheckError.MISSING_GOOGLE_PLAY_SERVICES }
     }
 
     @Test
@@ -211,7 +216,8 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.OutdatedPlayServices))
 
-        viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED }
+        viewModel.showAlert.test()
+            .assertValue { it.peekContent() == LoginCheckError.GOOGLE_PLAY_SERVICES_OUTDATED }
     }
 
     @Test
@@ -227,7 +233,8 @@ internal class LoginCheckViewModelTest {
                 )
             )
 
-            viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP }
+            viewModel.showAlert.test()
+                .assertValue { it.peekContent() == LoginCheckError.MISSING_OR_OUTDATED_GOOGLE_PLAY_STORE_APP }
         }
 
     @Test
@@ -237,7 +244,8 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(false, LoginError.Unknown))
 
-        viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.UNEXPECTED_LOGIN_ERROR }
+        viewModel.showAlert.test()
+            .assertValue { it.peekContent() == LoginCheckError.UNEXPECTED_LOGIN_ERROR }
     }
 
     @Test
@@ -247,7 +255,7 @@ internal class LoginCheckViewModelTest {
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
         viewModel.handleLoginResult(LoginResult(true, null))
 
-        verify { getProjectStateUseCase.invoke() }
+        coVerify { configRepository.getProject(any()) }
     }
 
     @Test
@@ -256,56 +264,61 @@ internal class LoginCheckViewModelTest {
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        verify { getProjectStateUseCase.invoke() }
+        coVerify { configRepository.getProject(any()) }
     }
 
     @Test
     fun `Triggers alert if project is paused`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { getProjectStateUseCase.invoke() } returns GetProjectStateUseCase.ProjectState.PAUSED
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_PAUSED
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.PROJECT_PAUSED }
+        viewModel.showAlert.test()
+            .assertValue { it.peekContent() == LoginCheckError.PROJECT_PAUSED }
     }
 
     @Test
     fun `Triggers alert if project is ending`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { getProjectStateUseCase.invoke() } returns GetProjectStateUseCase.ProjectState.ENDING
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_ENDING
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        viewModel.showAlert.test().assertValue { it.peekContent() == LoginCheckError.PROJECT_ENDING }
+        viewModel.showAlert.test()
+            .assertValue { it.peekContent() == LoginCheckError.PROJECT_ENDING }
     }
 
     @Test
     fun `Triggers login attempt if project has ended`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { getProjectStateUseCase.invoke() } returns GetProjectStateUseCase.ProjectState.ENDED
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.PROJECT_ENDED
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
-        viewModel.showLoginFlow.test().assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
+        viewModel.showLoginFlow.test()
+            .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
     }
 
     @Test
     fun `Correctly handles if user signed in active project`() = runTest {
         coEvery { isUserSignedInUseCase.invoke(any()) } returns IsUserSignedInUseCase.SignedInState.SIGNED_IN
-        coEvery { getProjectStateUseCase.invoke() } returns GetProjectStateUseCase.ProjectState.ACTIVE
+        coEvery { configRepository.getProject(any()).state } returns ProjectState.RUNNING
 
         viewModel.validateSignInAndProceed(ActionFactory.getFlowRequest())
 
         coVerify {
             updateProjectStateUseCase.invoke()
-            updateDatabaseCountsInCurrentSessionUseCase.invoke()
+            updateStoredUserIdUseCase.invoke(any())
+            updateSessionScopePayloadUseCase.invoke()
             updateStoredUserIdUseCase.invoke(any())
             addAuthorizationEventUseCase.invoke(any(), eq(true))
             extractCrashKeysUseCase.invoke(any())
             startBackgroundSync.invoke()
         }
 
-        viewModel.proceedWithAction.test().assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
+        viewModel.proceedWithAction.test()
+            .assertValue { it.peekContent() == ActionFactory.getFlowRequest() }
     }
 
 }

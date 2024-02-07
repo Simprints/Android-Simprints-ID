@@ -41,54 +41,57 @@ internal class EventDownSyncTask @Inject constructor(
 
     suspend fun downSync(
         scope: CoroutineScope,
-        operation: EventDownSyncOperation
+        operation: EventDownSyncOperation,
     ): Flow<EventDownSyncProgress> = flow {
         var lastOperation = operation.copy()
         var count = 0
         val batchOfEventsToProcess = mutableListOf<EnrolmentRecordEvent>()
 
         try {
-            eventRemoteDataSource.getEvents(operation.queryEvent.fromDomainToApi(), scope)
-                .consumeAsFlow()
+            val (maxCount, stream) = eventRemoteDataSource.getEvents(operation.queryEvent.fromDomainToApi(), scope)
+
+            stream.consumeAsFlow()
                 .collect {
                     batchOfEventsToProcess.add(it)
                     count++
                     //We immediately process the first event to initialise a progress
                     if (batchOfEventsToProcess.size > EVENTS_BATCH_SIZE || count == 1) {
-                        lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-                        emitProgress(lastOperation, count)
+                        lastOperation =
+                            processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
+                        emitProgress(lastOperation, count, maxCount)
                         batchOfEventsToProcess.clear()
                     }
                 }
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, maxCount)
 
             lastOperation = lastOperation.copy(state = COMPLETE, lastSyncTime = timeHelper.now())
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, maxCount)
         } catch (t: Throwable) {
             Simber.d(t)
 
             lastOperation = processBatchedEvents(operation, batchOfEventsToProcess, lastOperation)
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, count)
 
             lastOperation = lastOperation.copy(state = FAILED, lastSyncTime = timeHelper.now())
-            emitProgress(lastOperation, count)
+            emitProgress(lastOperation, count, count)
         }
     }
 
     private suspend fun FlowCollector<EventDownSyncProgress>.emitProgress(
         lastOperation: EventDownSyncOperation,
-        count: Int
+        count: Int,
+        max: Int?,
     ) {
         eventDownSyncScopeRepository.insertOrUpdate(lastOperation)
-        this.emit(EventDownSyncProgress(lastOperation, count))
+        this.emit(EventDownSyncProgress(lastOperation, count, max))
     }
 
     private suspend fun processBatchedEvents(
         operation: EventDownSyncOperation,
         batchOfEventsToProcess: MutableList<EnrolmentRecordEvent>,
-        lastOperation: EventDownSyncOperation
+        lastOperation: EventDownSyncOperation,
     ): EventDownSyncOperation {
 
         val actions = batchOfEventsToProcess.map { event ->
@@ -96,9 +99,11 @@ internal class EventDownSyncTask @Inject constructor(
                 EnrolmentRecordEventType.EnrolmentRecordCreation -> {
                     handleSubjectCreationEvent(event as EnrolmentRecordCreationEvent)
                 }
+
                 EnrolmentRecordEventType.EnrolmentRecordDeletion -> {
                     handleSubjectDeletionEvent(event as EnrolmentRecordDeletionEvent)
                 }
+
                 EnrolmentRecordEventType.EnrolmentRecordMove -> {
                     handleSubjectMoveEvent(operation, event as EnrolmentRecordMoveEvent)
                 }
@@ -132,9 +137,9 @@ internal class EventDownSyncTask @Inject constructor(
 
     private suspend fun handleSubjectMoveEvent(
         operation: EventDownSyncOperation,
-        event: EnrolmentRecordMoveEvent
+        event: EnrolmentRecordMoveEvent,
     ): List<SubjectAction> {
-        val modulesIdsUnderSyncing = operation.queryEvent.moduleIds
+        val modulesIdsUnderSyncing = operation.queryEvent.moduleId
         val attendantUnderSyncing = operation.queryEvent.attendantId
         val enrolmentRecordDeletion = event.payload.enrolmentRecordDeletion
         val enrolmentRecordCreation = event.payload.enrolmentRecordCreation
@@ -173,6 +178,7 @@ internal class EventDownSyncTask @Inject constructor(
                     }
                 }
             }
+
             attendantUnderSyncing != null -> {
                 if (attendantUnderSyncing == enrolmentRecordDeletion.attendantId.value) {
                     actions.add(Deletion(enrolmentRecordDeletion.subjectId))
@@ -186,6 +192,7 @@ internal class EventDownSyncTask @Inject constructor(
                     }
                 }
             }
+
             else -> {
                 actions.add(Deletion(enrolmentRecordDeletion.subjectId))
                 createASubjectActionFromRecordCreation(enrolmentRecordCreation)?.let {
@@ -211,10 +218,10 @@ internal class EventDownSyncTask @Inject constructor(
 
 
     private fun EnrolmentRecordDeletionInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
+        op.queryEvent.moduleId == moduleId.value
 
     private fun EnrolmentRecordCreationInMove.isUnderSyncingByCurrentDownSyncOperation(op: EventDownSyncOperation) =
-        op.queryEvent.moduleIds?.let { moduleId.value.partOf(it) } ?: false
+        op.queryEvent.moduleId == moduleId.value
 
     private suspend fun EnrolmentRecordCreationInMove.isUnderOverallSyncing() =
         moduleId.value.partOf(configRepository.getDeviceConfiguration().selectedModules.values())
@@ -225,6 +232,7 @@ internal class EventDownSyncTask @Inject constructor(
         listOf(Deletion(event.payload.subjectId))
 
     companion object {
+
         const val EVENTS_BATCH_SIZE = 200
     }
 }

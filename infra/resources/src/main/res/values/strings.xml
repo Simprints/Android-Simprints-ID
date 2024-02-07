@@ -356,6 +356,8 @@
     <string name="dashboard_preference_device_id_title">Device ID</string>
     <string name="dashboard_preference_summary_settings_fingers">View the fingers that will be scanned</string>
     <string name="dashboard_preference_summary_sync_information">Further details on sync</string>
+    <string name="dashboard_preference_copied_to_clipboard">Copied to clipboard</string>
+
 
     <!-- Dashboard - Sync info -->
     <string name="dashboard_sync_info_title">Sync Information</string>
@@ -410,5 +412,8 @@
     <!-- Maintenance mode errors -->
     <string name="error_backend_maintenance_message">The system is currently offline for maintenance. Please try again later.</string>
     <string name="error_backend_maintenance_with_time_message">The system is currently offline for maintenance. Please try again after %s</string>
+
+    <!-- Notifications -->
+    <string name="notification_sync_description">Sync in progress</string>
 
 </resources>

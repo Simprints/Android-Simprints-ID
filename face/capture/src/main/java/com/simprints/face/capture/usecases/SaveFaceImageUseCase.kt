@@ -15,8 +15,8 @@ internal class SaveFaceImageUseCase @Inject constructor(
     suspend operator fun invoke(imageBytes: ByteArray, captureEventId: String): SecuredImageRef? =
         determinePath(captureEventId)?.let { path ->
             Simber.d("Saving face image ${path.compose()}")
-            val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
-            val projectId = currentSession.payload.projectId
+            val sessionScope = coreEventRepository.getCurrentSessionScope()
+            val projectId = sessionScope.projectId
             val securedImageRef =
                 coreImageRepository.storeImageSecurely(imageBytes, projectId, path)
 
@@ -29,8 +29,8 @@ internal class SaveFaceImageUseCase @Inject constructor(
         }
 
     private suspend fun determinePath(captureEventId: String): Path? = try {
-        val currentSession = coreEventRepository.getCurrentCaptureSessionEvent()
-        val sessionId = currentSession.id
+        val sessionScope = coreEventRepository.getCurrentSessionScope()
+        val sessionId = sessionScope.id
         Path(
             arrayOf(
                 SESSIONS_PATH,

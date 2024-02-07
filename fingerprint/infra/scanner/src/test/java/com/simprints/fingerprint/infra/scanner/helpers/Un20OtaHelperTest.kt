@@ -44,7 +44,7 @@ class Un20OtaHelperTest {
         every { scannerMock.setVersionInformation(any()) } returns Completable.complete()
         every { scannerMock.getUn20AppVersion() } returns Single.just(NEW_UN20_VERSION)
 
-        every { firmwareFileManagerMock.loadUn20FirmwareBytes(NEW_UN20_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        coEvery { firmwareFileManagerMock.loadUn20FirmwareBytes(NEW_UN20_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test

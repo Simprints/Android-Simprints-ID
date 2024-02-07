@@ -1,6 +1,7 @@
 package com.simprints.feature.setup.screen
 
 import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,12 +21,17 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
 
     private val launchLocationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
-    ) { granted ->
-        if (granted) {
+    ) { isLocationPermissionGranted ->
+        if (isLocationPermissionGranted) {
             viewModel.collectLocation()
         }
-        // Always finish with true result, even if permission is not granted
-        finishWithResult(true)
+        viewModel.requestNotificationsPermission()
+    }
+
+    private val launchNotificationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { _ ->
+        finishWithResult() // Notifications permission is best-effort
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,18 +40,27 @@ internal class SetupFragment : Fragment(R.layout.fragment_setup) {
         viewModel.requestLocationPermission.observe(viewLifecycleOwner) {
             if (requireActivity().hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
                 viewModel.collectLocation()
-                finishWithResult(true)
+                viewModel.requestNotificationsPermission()
             } else {
                 launchLocationPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
 
-        viewModel.finish.observe(viewLifecycleOwner, ::finishWithResult)
+        viewModel.requestNotificationPermission.observe(viewLifecycleOwner) {
+            if (requireActivity().hasPermission(Manifest.permission.POST_NOTIFICATIONS)) {
+                finishWithResult()
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                launchNotificationPermissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                finishWithResult()
+            }
+        }
 
         viewModel.start()
     }
 
-    private fun finishWithResult(hasPermission: Boolean) {
-        findNavController().finishWithResult(this, SetupResult(hasPermission))
+    private fun finishWithResult() {
+        // Always finish with true result, even if permissions are not granted
+        findNavController().finishWithResult(this, SetupResult(permissionGranted = true))
     }
 }
