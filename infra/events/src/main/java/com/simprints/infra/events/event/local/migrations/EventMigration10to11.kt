@@ -11,12 +11,12 @@ import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.GeneralConfiguration
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.Location
-import com.simprints.infra.events.event.domain.models.session.SessionEndCause
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.Location
+import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
+import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration10to11 : Migration(10, 11) {
@@ -65,19 +65,19 @@ internal class EventMigration10to11 : Migration(10, 11) {
         }
     }
 
-    private fun getScopeFromCursor(it: Cursor): SessionScope? {
+    private fun getScopeFromCursor(it: Cursor): EventScope? {
         val jsonData = it.getStringWithColumnName("eventJson") ?: return null
         val event = fromJsonToDomain(jsonData)
         val sessionId = event.labels.sessionId ?: return null
 
         val endedAt = event.payload.endedAt.takeIf { it > 0 }?.let { Timestamp(it) }
 
-        return SessionScope(
+        return EventScope(
             id = sessionId,
             projectId = event.payload.projectId,
             createdAt = Timestamp(event.payload.createdAt),
             endedAt = endedAt,
-            payload = SessionScopePayload(
+            payload = EventScopePayload(
                 // Other end causes have not been used for a long time so it is save to assume
                 // that all previous sessions ended with new session termination cause
                 endCause = if (endedAt != null) SessionEndCause.NEW_SESSION else null,
@@ -98,7 +98,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
         type = object : TypeReference<OldSessionCaptureEvent>() {}
     )
 
-    private fun writeSessionScopeToDatabase(database: SupportSQLiteDatabase, scope: SessionScope) {
+    private fun writeSessionScopeToDatabase(database: SupportSQLiteDatabase, scope: EventScope) {
         val payloadJson = JsonHelper.toJson(scope.payload)
         database.insert(SCOPE_TABLE_NAME, SQLiteDatabase.CONFLICT_NONE, ContentValues().apply {
             put("id", scope.id)

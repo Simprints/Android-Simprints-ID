@@ -1,7 +1,7 @@
 package com.simprints.infra.eventsync.event.remote.models.session
 
 import androidx.annotation.Keep
-import com.simprints.infra.events.event.domain.models.session.SessionEndCause
+import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
 
 @Keep
 internal enum class ApiSessionEndCause {

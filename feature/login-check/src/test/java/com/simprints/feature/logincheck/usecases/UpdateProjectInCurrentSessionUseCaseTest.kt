@@ -8,10 +8,10 @@ import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.IntentParsingEvent
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -105,12 +105,12 @@ internal class UpdateProjectInCurrentSessionUseCaseTest {
         }
     }
 
-    private fun createBlankSessionScope(projectId: String) = SessionScope(
+    private fun createBlankSessionScope(projectId: String) = EventScope(
         id = "eventId",
         projectId = projectId,
         createdAt = Timestamp(0L),
         endedAt = null,
-        payload = SessionScopePayload(
+        payload = EventScopePayload(
             endCause = null,
             modalities = emptyList(),
             sidVersion = "appVersionName",

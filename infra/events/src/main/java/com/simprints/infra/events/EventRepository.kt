@@ -2,8 +2,8 @@ package com.simprints.infra.events
 
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.session.SessionEndCause
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import kotlinx.coroutines.flow.Flow
 
 
@@ -11,7 +11,7 @@ interface EventRepository {
 
     val libSimprintsVersionName: String
 
-    suspend fun createSession(): SessionScope
+    suspend fun createSession(): EventScope
 
     suspend fun hasOpenSession(): Boolean
 
@@ -25,11 +25,11 @@ interface EventRepository {
      * or create a new event if needed
      * @return SessionCaptureEvent
      */
-    suspend fun getCurrentSessionScope(): SessionScope
+    suspend fun getCurrentSessionScope(): EventScope
 
-    suspend fun getAllClosedSessions(): List<SessionScope>
+    suspend fun getAllClosedSessions(): List<EventScope>
 
-    suspend fun saveSessionScope(sessionScope: SessionScope)
+    suspend fun saveSessionScope(eventScope: EventScope)
 
     suspend fun observeEventsFromSession(sessionId: String): Flow<Event>
 

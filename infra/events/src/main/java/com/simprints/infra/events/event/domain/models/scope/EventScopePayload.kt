@@ -1,22 +1,10 @@
-package com.simprints.infra.events.event.domain.models.session
+package com.simprints.infra.events.event.domain.models.scope
 
 import androidx.annotation.Keep
-import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.GeneralConfiguration
 
 @Keep
-data class SessionScope(
-    val id: String,
-    val projectId: String,
-
-    val createdAt: Timestamp,
-    var endedAt: Timestamp?,
-
-    val payload: SessionScopePayload,
-)
-
-@Keep
-data class SessionScopePayload(
+data class EventScopePayload(
     val endCause: SessionEndCause? = null,
 
     val sidVersion: String,

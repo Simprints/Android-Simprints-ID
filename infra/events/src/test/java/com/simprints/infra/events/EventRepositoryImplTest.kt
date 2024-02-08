@@ -14,7 +14,7 @@ import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
@@ -66,7 +66,7 @@ internal class EventRepositoryImplTest {
         every { timeHelper.now() } returns NOW
         every { authStore.signedInProjectId } returns DEFAULT_PROJECT_ID
         every { sessionDataCache.eventCache } returns mutableMapOf()
-        every { sessionDataCache.sessionScope } returns null
+        every { sessionDataCache.eventScope } returns null
         every { sessionEventValidatorsFactory.build() } returns arrayOf(eventValidator)
         coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
@@ -95,12 +95,12 @@ internal class EventRepositoryImplTest {
         runTest {
             mockDbToHaveOneOpenSession()
             coEvery { eventLocalDataSource.loadEventsInSession(any()) } returns emptyList()
-            coEvery { eventLocalDataSource.countSessions() } returns N_SESSIONS_DB
+            coEvery { eventLocalDataSource.countEventScopes() } returns N_SESSIONS_DB
 
             eventRepo.createSession()
 
             coVerify {
-                eventLocalDataSource.saveSessionScope(match {
+                eventLocalDataSource.saveEventScope(match {
                     it.payload.databaseInfo.sessionCount == N_SESSIONS_DB
                 })
             }
@@ -121,9 +121,9 @@ internal class EventRepositoryImplTest {
     @Test(expected = DuplicateGuidSelectEventValidatorException::class)
     fun `create session report duplicate GUID select EventValidatorExceptionException`() {
         runTest {
-            coEvery { eventLocalDataSource.countSessions() } returns N_SESSIONS_DB
+            coEvery { eventLocalDataSource.countEventScopes() } returns N_SESSIONS_DB
             coEvery {
-                eventLocalDataSource.saveSessionScope(any())
+                eventLocalDataSource.saveEventScope(any())
             } throws DuplicateGuidSelectEventValidatorException("oops...")
             eventRepo.createSession()
         }
@@ -138,7 +138,7 @@ internal class EventRepositoryImplTest {
             eventRepo.createSession()
 
             coVerify {
-                eventLocalDataSource.saveSessionScope(match {
+                eventLocalDataSource.saveEventScope(match {
                     assertThatSessionScopeClosed(it)
                 })
             }
@@ -153,28 +153,28 @@ internal class EventRepositoryImplTest {
             eventRepo.createSession()
 
             coVerify {
-                eventLocalDataSource.saveSessionScope(match { assertANewSessionCaptureWasAdded(it) })
+                eventLocalDataSource.saveEventScope(match { assertANewSessionCaptureWasAdded(it) })
             }
         }
     }
 
     @Test
     fun `returns true if there is open session in cache`() = runTest {
-        every { sessionDataCache.sessionScope } returns createSessionScope()
+        every { sessionDataCache.eventScope } returns createSessionScope()
         assertThat(eventRepo.hasOpenSession()).isTrue()
     }
 
     @Test
     fun `returns true if there is open session in local store`() = runTest {
-        every { sessionDataCache.sessionScope } returns null
+        every { sessionDataCache.eventScope } returns null
         mockDbToHaveOneOpenSession()
         assertThat(eventRepo.hasOpenSession()).isTrue()
     }
 
     @Test
     fun `returns false if there is no session in cache or local store`() = runTest {
-        every { sessionDataCache.sessionScope } returns null
-        coEvery { eventLocalDataSource.loadOpenedSessions() } returns emptyList()
+        every { sessionDataCache.eventScope } returns null
+        coEvery { eventLocalDataSource.loadOpenedScopes() } returns emptyList()
 
         assertThat(eventRepo.hasOpenSession()).isFalse()
     }
@@ -239,27 +239,27 @@ internal class EventRepositoryImplTest {
     @Test
     fun `test getCurrentSessionScope from db`() = runTest {
 
-        val oldSessionScope = mockk<SessionScope> {
+        val oldEventScope = mockk<EventScope> {
             every { endedAt } returns Timestamp(2)
             every { createdAt } returns Timestamp(1)
         }
-        val recentSessionScope = mockk<SessionScope> {
+        val recentEventScope = mockk<EventScope> {
             every { endedAt } returns null
             every { createdAt } returns Timestamp(2)
         }
-        coEvery { eventLocalDataSource.loadOpenedSessions() } returns listOf(
-            recentSessionScope,
-            oldSessionScope
+        coEvery { eventLocalDataSource.loadOpenedScopes() } returns listOf(
+            recentEventScope,
+            oldEventScope
         )
         val loadedSession = eventRepo.getCurrentSessionScope()
-        assertThat(loadedSession).isEqualTo(recentSessionScope)
+        assertThat(loadedSession).isEqualTo(recentEventScope)
     }
 
     @Test
     fun `test getCurrentSessionScope should create new CaptureSessionEvent is not exist`() =
         runTest {
             //Given
-            coEvery { eventLocalDataSource.countSessions() } returns N_SESSIONS_DB
+            coEvery { eventLocalDataSource.countEventScopes() } returns N_SESSIONS_DB
             every { authStore.signedInProjectId } returns "projectId"
             //When
             val loadedSession = eventRepo.getCurrentSessionScope()
@@ -287,7 +287,7 @@ internal class EventRepositoryImplTest {
 
             eventRepo.addOrUpdateEvent(eventInSession)
 
-            coVerify { eventLocalDataSource.loadOpenedSessions() }
+            coVerify { eventLocalDataSource.loadOpenedScopes() }
             coVerify {
                 eventLocalDataSource.saveEvent(
                     withArg { event ->
@@ -329,7 +329,7 @@ internal class EventRepositoryImplTest {
         eventRepo.closeCurrentSession(null)
 
         coVerify {
-            eventLocalDataSource.saveSessionScope(match {
+            eventLocalDataSource.saveEventScope(match {
                 assertThatSessionScopeClosed(it)
                 assertThat(it.endedAt).isEqualTo(Timestamp(5L))
                 true
@@ -341,23 +341,23 @@ internal class EventRepositoryImplTest {
     fun `test removeLocationDataFromCurrentSession does nothing if location is null`() = runTest {
         // Given
         val scope = createSessionScope()
-        every { sessionDataCache.sessionScope } returns scope.copy(payload = scope.payload.copy(location = null))
+        every { sessionDataCache.eventScope } returns scope.copy(payload = scope.payload.copy(location = null))
         //When
         eventRepo.removeLocationDataFromCurrentSession()
         //Then
-        coVerify(exactly = 0) { eventLocalDataSource.saveSessionScope(any()) }
+        coVerify(exactly = 0) { eventLocalDataSource.saveEventScope(any()) }
     }
 
     @Test
     fun `test removeLocationDataFromCurrentSession remove location if location exist`() = runTest {
         // Given
         val sessionScope = createSessionScope()
-        every { sessionDataCache.sessionScope } returns sessionScope
+        every { sessionDataCache.eventScope } returns sessionScope
         //When
         eventRepo.removeLocationDataFromCurrentSession()
         //Then
         coVerify {
-            eventLocalDataSource.saveSessionScope(match { it.payload.location == null })
+            eventLocalDataSource.saveEventScope(match { it.payload.location == null })
         }
     }
 
@@ -388,17 +388,17 @@ internal class EventRepositoryImplTest {
     fun `deleteSession should call local store`() = runTest {
         eventRepo.deleteSession("test")
 
-        coVerify { eventLocalDataSource.deleteSession(eq("test")) }
+        coVerify { eventLocalDataSource.deleteEventScope(eq("test")) }
         coVerify { eventLocalDataSource.deleteEventsInSession(eq("test")) }
     }
 
     @Test
     fun `getAllClosedSessionIds should call local store`() = runTest {
-        coEvery { eventLocalDataSource.loadClosedSessions() } returns emptyList()
+        coEvery { eventLocalDataSource.loadClosedScopes() } returns emptyList()
 
         eventRepo.getAllClosedSessions()
 
-        coVerify { eventLocalDataSource.loadClosedSessions() }
+        coVerify { eventLocalDataSource.loadClosedScopes() }
     }
 
     @Test

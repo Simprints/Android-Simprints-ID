@@ -1,7 +1,7 @@
 package com.simprints.infra.events.event.local
 
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -10,7 +10,7 @@ import javax.inject.Singleton
 internal class SessionDataCacheImpl @Inject constructor() : SessionDataCache {
 
     private val scopeLock = Any()
-    override var sessionScope: SessionScope? = null
+    override var eventScope: EventScope? = null
         get() = synchronized(scopeLock) { field }
         set(value) = synchronized(scopeLock) { field = value }
 

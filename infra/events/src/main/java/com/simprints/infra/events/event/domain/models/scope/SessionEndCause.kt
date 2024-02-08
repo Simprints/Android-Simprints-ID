@@ -1,4 +1,4 @@
-package com.simprints.infra.events.event.domain.models.session
+package com.simprints.infra.events.event.domain.models.scope
 
 import androidx.annotation.Keep
 
@@ -6,5 +6,6 @@ import androidx.annotation.Keep
 enum class SessionEndCause {
 
     WORKFLOW_ENDED,
-    NEW_SESSION,;
+    NEW_SESSION,
+    ;
 }

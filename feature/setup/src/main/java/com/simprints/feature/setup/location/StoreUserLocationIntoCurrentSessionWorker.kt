@@ -8,7 +8,7 @@ import com.google.android.gms.location.Priority
 import com.simprints.core.DispatcherMain
 import com.simprints.core.workers.SimCoroutineWorker
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.session.Location
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.Simber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject

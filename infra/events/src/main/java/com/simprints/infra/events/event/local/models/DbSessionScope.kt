@@ -6,8 +6,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.event.domain.models.session.EventScope
+import com.simprints.infra.events.event.domain.models.session.EventScopePayload
 
 @Keep
 @Entity
@@ -22,7 +22,7 @@ internal data class DbSessionScope(
     val payloadJson: String,
 )
 
-internal fun SessionScope.fromDomainToDb(jsonHelper: JsonHelper): DbSessionScope = DbSessionScope(
+internal fun EventScope.fromDomainToDb(jsonHelper: JsonHelper): DbSessionScope = DbSessionScope(
     id = id,
     projectId = projectId,
     createdAt = createdAt.fromDomainToDb(),
@@ -30,10 +30,10 @@ internal fun SessionScope.fromDomainToDb(jsonHelper: JsonHelper): DbSessionScope
     payloadJson = jsonHelper.toJson(payload)
 )
 
-internal fun DbSessionScope.fromDbToDomain(jsonHelper: JsonHelper): SessionScope = SessionScope(
+internal fun DbSessionScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = EventScope(
     id = id,
     projectId = projectId,
     createdAt = createdAt.fromDbToDomain(),
     endedAt = endedAt?.fromDbToDomain(),
-    payload = jsonHelper.fromJson(payloadJson, object : TypeReference<SessionScopePayload>() {})
+    payload = jsonHelper.fromJson(payloadJson, object : TypeReference<EventScopePayload>() {})
 )

@@ -11,11 +11,11 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.session.DatabaseInfo
-import com.simprints.infra.events.event.domain.models.session.Device
-import com.simprints.infra.events.event.domain.models.session.SessionEndCause
-import com.simprints.infra.events.event.domain.models.session.SessionScope
-import com.simprints.infra.events.event.domain.models.session.SessionScopePayload
+import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
+import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
+import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
@@ -51,20 +51,20 @@ internal open class EventRepositoryImpl @Inject constructor(
             PROJECT_ID_FOR_NOT_SIGNED_IN
         }
 
-    override suspend fun createSession(): SessionScope {
+    override suspend fun createSession(): EventScope {
         closeAllSessions(SessionEndCause.NEW_SESSION)
 
         return reportException {
             val projectConfiguration = configRepository.getProjectConfiguration()
             val deviceConfiguration = configRepository.getDeviceConfiguration()
-            val sessionCount = eventLocalDataSource.countSessions()
+            val sessionCount = eventLocalDataSource.countEventScopes()
 
-            val sessionScope = SessionScope(
+            val eventScope = EventScope(
                 id = UUID.randomUUID().toString(),
                 projectId = currentProject,
                 createdAt = timeHelper.now(),
                 endedAt = null,
-                payload = SessionScopePayload(
+                payload = EventScopePayload(
                     sidVersion = appVersionName,
                     libSimprintsVersion = libSimprintsVersionName,
                     language = deviceConfiguration.language,
@@ -79,9 +79,9 @@ internal open class EventRepositoryImpl @Inject constructor(
                 )
             )
 
-            sessionDataCache.sessionScope = sessionScope
-            eventLocalDataSource.saveSessionScope(sessionScope)
-            sessionScope
+            sessionDataCache.eventScope = eventScope
+            eventLocalDataSource.saveEventScope(eventScope)
+            eventScope
         }
     }
 
@@ -90,7 +90,7 @@ internal open class EventRepositoryImpl @Inject constructor(
      */
     private suspend fun closeAllSessions(reason: SessionEndCause?) {
         sessionDataCache.eventCache.clear()
-        eventLocalDataSource.loadOpenedSessions().forEach { closeSession(it, reason) }
+        eventLocalDataSource.loadOpenedScopes().forEach { closeSession(it, reason) }
     }
 
     private suspend fun <T> reportException(block: suspend () -> T): T =
@@ -114,20 +114,20 @@ internal open class EventRepositoryImpl @Inject constructor(
         sessionDataCache.eventCache.clear()
     }
 
-    override suspend fun getCurrentSessionScope(): SessionScope = reportException {
+    override suspend fun getCurrentSessionScope(): EventScope = reportException {
         cachedSessionScope()
             ?: localSessionScopes()
             ?: createSession()
     }
 
-    override suspend fun getAllClosedSessions(): List<SessionScope> =
-        eventLocalDataSource.loadClosedSessions()
+    override suspend fun getAllClosedSessions(): List<EventScope> =
+        eventLocalDataSource.loadClosedScopes()
 
-    override suspend fun saveSessionScope(sessionScope: SessionScope) {
-        if (sessionScope.id == sessionDataCache.sessionScope?.id) {
-            sessionDataCache.sessionScope = sessionScope
+    override suspend fun saveSessionScope(eventScope: EventScope) {
+        if (eventScope.id == sessionDataCache.eventScope?.id) {
+            sessionDataCache.eventScope = eventScope
         }
-        eventLocalDataSource.saveSessionScope(sessionScope)
+        eventLocalDataSource.saveEventScope(eventScope)
     }
 
     override suspend fun observeEventsFromSession(sessionId: String): Flow<Event> =
@@ -179,7 +179,7 @@ internal open class EventRepositoryImpl @Inject constructor(
         Simber.v("Save event: ${event.type} = ${endTime - startTime}ms")
     }
 
-    private suspend fun saveEvent(event: Event, session: SessionScope) {
+    private suspend fun saveEvent(event: Event, session: EventScope) {
         event.sessionId = session.id
         event.projectId = session.projectId
 
@@ -197,28 +197,28 @@ internal open class EventRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteSession(sessionId: String) = reportException {
-        eventLocalDataSource.deleteSession(sessionId = sessionId)
+        eventLocalDataSource.deleteEventScope(sessionId = sessionId)
         eventLocalDataSource.deleteEventsInSession(sessionId = sessionId)
     }
 
-    private fun cachedSessionScope() = sessionDataCache.sessionScope
+    private fun cachedSessionScope() = sessionDataCache.eventScope
 
     private suspend fun localSessionScopes() =
-        eventLocalDataSource.loadOpenedSessions()
+        eventLocalDataSource.loadOpenedScopes()
             .firstOrNull()
             ?.also { session -> loadEventsIntoCache(session.id) }
 
-    private suspend fun closeSession(sessionScope: SessionScope, reason: SessionEndCause?) {
-        val maxTimestamp = eventLocalDataSource.loadEventsInSession(sessionScope.id)
+    private suspend fun closeSession(eventScope: EventScope, reason: SessionEndCause?) {
+        val maxTimestamp = eventLocalDataSource.loadEventsInSession(eventScope.id)
             .takeIf { it.isNotEmpty() }
             ?.maxOf { event ->
                 event.payload.let { payload -> payload.endedAt ?: payload.createdAt }
             }
             ?: timeHelper.now()
 
-        val updatedSessionScope = sessionScope.copy(
+        val updatedSessionScope = eventScope.copy(
             endedAt = maxTimestamp,
-            payload = sessionScope.payload.copy(
+            payload = eventScope.payload.copy(
                 endCause = reason ?: SessionEndCause.WORKFLOW_ENDED
             )
         )

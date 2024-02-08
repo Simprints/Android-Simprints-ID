@@ -16,7 +16,7 @@ import com.simprints.infra.events.sampledata.createAlertScreenEvent
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.infra.eventsync.event.remote.exceptions.TooManyRequestsException
 import com.simprints.infra.eventsync.event.remote.models.ApiEventCount
-import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionScope
+import com.simprints.infra.eventsync.event.remote.models.session.ApiEventScope
 import com.simprints.infra.eventsync.event.remote.models.subject.ApiEnrolmentRecordPayloadType
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -295,7 +295,7 @@ class EventRemoteDataSourceTest {
                 match { body ->
                     assertThat(body.sessions).hasSize(1)
                     assertThat(body.sessions.firstOrNull())
-                        .isEqualTo(ApiSessionScope.fromDomain(scope, events))
+                        .isEqualTo(ApiEventScope.fromDomain(scope, events))
                     true
                 }
             )

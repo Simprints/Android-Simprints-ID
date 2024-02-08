@@ -16,7 +16,7 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
@@ -157,7 +157,7 @@ internal class EventUpSyncTask @Inject constructor(
 
     private suspend fun attemptInvalidEventUpload(
         projectId: String,
-        corruptedScopes: Set<SessionScope>,
+        corruptedScopes: Set<EventScope>,
     ) = flow {
         corruptedScopes.forEach { scope ->
             try {

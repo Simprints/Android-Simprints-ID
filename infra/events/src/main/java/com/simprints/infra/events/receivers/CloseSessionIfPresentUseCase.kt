@@ -2,7 +2,7 @@ package com.simprints.infra.events.receivers
 
 import com.simprints.core.ExternalScope
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.session.SessionEndCause
+import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject

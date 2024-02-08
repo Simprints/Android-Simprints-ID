@@ -346,7 +346,7 @@ internal class EventLocalDataSourceImplTest {
 
     @Test
     fun countSessions() = runTest {
-        eventLocalDataSource.countSessions()
+        eventLocalDataSource.countEventScopes()
 
         coVerify { scopeDao.count() }
     }
@@ -354,7 +354,7 @@ internal class EventLocalDataSourceImplTest {
     @Test
     fun saveSessionScope() = runTest {
         mockkStatic("com.simprints.infra.events.event.local.models.DbSessionScopeKt")
-        eventLocalDataSource.saveSessionScope(mockk())
+        eventLocalDataSource.saveEventScope(mockk())
 
         coVerify { scopeDao.insertOrUpdate(any()) }
     }
@@ -366,7 +366,7 @@ internal class EventLocalDataSourceImplTest {
             every { fromDbToDomain(any()) } returns mockk()
         }
         coEvery { scopeDao.loadOpen() } returns listOf(dbSessionCaptureEvent)
-        eventLocalDataSource.loadOpenedSessions()
+        eventLocalDataSource.loadOpenedScopes()
 
         coVerify { scopeDao.loadOpen() }
         verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
@@ -379,7 +379,7 @@ internal class EventLocalDataSourceImplTest {
             every { fromDbToDomain(any()) } returns mockk()
         }
         coEvery { scopeDao.loadClosed() } returns listOf(dbSessionCaptureEvent)
-        eventLocalDataSource.loadClosedSessions()
+        eventLocalDataSource.loadClosedScopes()
 
         coVerify { scopeDao.loadClosed() }
         verify { dbSessionCaptureEvent.fromDbToDomain(any()) }
@@ -387,7 +387,7 @@ internal class EventLocalDataSourceImplTest {
 
     @Test
     fun deleteSession() = runTest {
-        eventLocalDataSource.deleteSession(GUID1)
+        eventLocalDataSource.deleteEventScope(GUID1)
 
         coVerify { scopeDao.delete(listOf(GUID1)) }
     }

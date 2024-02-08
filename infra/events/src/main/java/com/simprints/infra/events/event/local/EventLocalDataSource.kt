@@ -2,16 +2,16 @@ package com.simprints.infra.events.event.local
 
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import kotlinx.coroutines.flow.Flow
 
 internal interface EventLocalDataSource {
 
-    suspend fun saveSessionScope(scope: SessionScope)
-    suspend fun countSessions(): Int
-    suspend fun loadOpenedSessions(): List<SessionScope>
-    suspend fun loadClosedSessions(): List<SessionScope>
-    suspend fun deleteSession(sessionId: String)
+    suspend fun saveEventScope(scope: EventScope)
+    suspend fun countEventScopes(): Int
+    suspend fun loadOpenedScopes(): List<EventScope>
+    suspend fun loadClosedScopes(): List<EventScope>
+    suspend fun deleteEventScope(sessionId: String)
 
     suspend fun saveEvent(event: Event)
     suspend fun observeEventCount(): Flow<Int>

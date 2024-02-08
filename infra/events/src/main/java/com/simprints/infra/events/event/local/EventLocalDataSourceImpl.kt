@@ -7,7 +7,7 @@ import com.simprints.core.NonCancellableIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.session.SessionScope
+import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
@@ -91,23 +91,23 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         scopeDao = eventDatabaseFactory.build().scopeDao
     }
 
-    override suspend fun saveSessionScope(scope: SessionScope) = useRoom(writingContext) {
+    override suspend fun saveEventScope(scope: EventScope) = useRoom(writingContext) {
         scopeDao.insertOrUpdate(scope.fromDomainToDb(jsonHelper))
     }
 
-    override suspend fun countSessions(): Int = useRoom(readingDispatcher) {
+    override suspend fun countEventScopes(): Int = useRoom(readingDispatcher) {
         scopeDao.count()
     }
 
-    override suspend fun loadOpenedSessions(): List<SessionScope> = useRoom(readingDispatcher) {
+    override suspend fun loadOpenedScopes(): List<EventScope> = useRoom(readingDispatcher) {
         scopeDao.loadOpen().map { it.fromDbToDomain(jsonHelper) }
     }
 
-    override suspend fun loadClosedSessions(): List<SessionScope> = useRoom(readingDispatcher) {
+    override suspend fun loadClosedScopes(): List<EventScope> = useRoom(readingDispatcher) {
         scopeDao.loadClosed().map { it.fromDbToDomain(jsonHelper) }
     }
 
-    override suspend fun deleteSession(sessionId: String) = useRoom(writingContext) {
+    override suspend fun deleteEventScope(sessionId: String) = useRoom(writingContext) {
         scopeDao.delete(listOf(sessionId))
     }
 
