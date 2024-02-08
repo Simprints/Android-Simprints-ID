@@ -52,6 +52,7 @@ import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_METADATA
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_MODULE_ID
@@ -84,6 +85,7 @@ fun createSessionScope(
         id = id,
         projectId = projectId,
         createdAt = createdAt,
+        type = EventScopeType.SESSION,
         endedAt = ENDED_AT.takeIf { isClosed },
         payload = EventScopePayload(
             sidVersion = appVersionNameArg,

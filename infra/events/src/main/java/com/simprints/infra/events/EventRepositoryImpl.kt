@@ -16,6 +16,7 @@ import com.simprints.infra.events.event.domain.models.scope.Device
 import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.local.EventLocalDataSource
 import com.simprints.infra.events.event.local.SessionDataCache
 import com.simprints.infra.events.exceptions.validator.DuplicateGuidSelectEventValidatorException
@@ -62,6 +63,7 @@ internal open class EventRepositoryImpl @Inject constructor(
             val eventScope = EventScope(
                 id = UUID.randomUUID().toString(),
                 projectId = currentProject,
+                type = EventScopeType.SESSION,
                 createdAt = timeHelper.now(),
                 endedAt = null,
                 payload = EventScopePayload(

@@ -8,13 +8,15 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.extentions.getIntWithColumnName
 import com.simprints.core.tools.extentions.getLongWithColumnName
+import com.simprints.core.tools.extentions.getStringWithColumnName
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class EventMigration11to12Test {
+class EventMigration13to14Test {
 
     @get:Rule
     val helper = MigrationTestHelper(
@@ -23,46 +25,32 @@ class EventMigration11to12Test {
     )
 
     @Test
-    fun `Should replace createdAt with timestamp structs in session scope`() {
-        helper.createDatabase(TEST_DB, 11).apply {
+    fun `Should rename the session scope table to event scope table`() {
+        helper.createDatabase(TEST_DB, 13).apply {
             insert("DbSessionScope", SQLiteDatabase.CONFLICT_NONE, createSessionScope("session-id"))
             close()
         }
+        val db = helper.runMigrationsAndValidate(TEST_DB, 14, true, EventMigration13to14())
 
-        val db = helper.runMigrationsAndValidate(TEST_DB, 12, true, EventMigration11to12())
-        MigrationTestingTools.retrieveCursorWithSessionScopeById(db, "session-id").use { scope ->
+        MigrationTestingTools.retrieveCursorWithEventScopeById(db, "session-id").use { scope ->
+            assertThat(scope.getStringWithColumnName("type")).isEqualTo(EventScopeType.SESSION.name)
             assertThat(scope.getLongWithColumnName("start_unixMs")).isEqualTo(12)
             assertThat(scope.getIntWithColumnName("start_isTrustworthy")).isEqualTo(0)
-
-            // Also check that end timestamp has been updated with all null
-            assertThat(scope.getLongWithColumnName("end_unixMs")).isNull()
-            assertThat(scope.getIntWithColumnName("end_isTrustworthy")).isNull()
-        }
-    }
-
-    @Test
-    fun `Should replace ended with timestamp structs in session scope`() {
-        helper.createDatabase(TEST_DB, 11).apply {
-            insert(
-                "DbSessionScope",
-                SQLiteDatabase.CONFLICT_NONE,
-                createSessionScope("session-id", 34)
-            )
-            close()
-        }
-
-        val db = helper.runMigrationsAndValidate(TEST_DB, 12, true, EventMigration11to12())
-        MigrationTestingTools.retrieveCursorWithSessionScopeById(db, "session-id").use { scope ->
             assertThat(scope.getLongWithColumnName("end_unixMs")).isEqualTo(34)
-            assertThat(scope.getIntWithColumnName("end_isTrustworthy")).isEqualTo(0)
+            assertThat(scope.getIntWithColumnName("end_isTrustworthy")).isEqualTo(1)
+            assertThat(scope.getLongWithColumnName("end_msSinceBoot")).isEqualTo(56)
         }
+        helper.closeWhenFinished(db)
     }
-
 
     private fun createSessionScope(id: String, ended: Long? = null) = ContentValues().apply {
         put("id", id)
         put("projectId", "some-project-id")
-        put("createdAt", 12)
+        put("start_unixMs", 12)
+        put("start_isTrustworthy", 0)
+        put("end_unixMs", 34)
+        put("end_isTrustworthy", 1)
+        put("end_msSinceBoot", 56)
         ended?.let { put("endedAt", it) }
         put("payloadJson", "{}")
     }

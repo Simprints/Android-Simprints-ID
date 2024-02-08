@@ -50,7 +50,7 @@ class EventMigrationTest {
             }
             close()
         }
-        val db = helper.runMigrationsAndValidate(TEST_DB, 13, true, *ALL_MIGRATIONS)
+        val db = helper.runMigrationsAndValidate(TEST_DB, 14, true, *ALL_MIGRATIONS)
         db.query("SELECT * FROM $TABLE_NAME").use { cursor ->
             while (cursor.moveToNext()) {
                 val eventJson = cursor.getStringWithColumnName("eventJson")!!
@@ -113,6 +113,7 @@ class EventMigrationTest {
             EventMigration10to11(),
             EventMigration11to12(),
             EventMigration12to13(),
+            EventMigration13to14(),
         )
         val tokenizeSerializationModule = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())

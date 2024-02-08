@@ -6,14 +6,16 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.infra.events.event.domain.models.session.EventScope
-import com.simprints.infra.events.event.domain.models.session.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 
 @Keep
 @Entity
-internal data class DbSessionScope(
+internal data class DbEventScope(
     @PrimaryKey val id: String,
     val projectId: String,
+    val type: EventScopeType,
     @Embedded("start_") val createdAt: DbTimestamp,
     @Embedded("end_") val endedAt: DbTimestamp?,
 
@@ -22,17 +24,19 @@ internal data class DbSessionScope(
     val payloadJson: String,
 )
 
-internal fun EventScope.fromDomainToDb(jsonHelper: JsonHelper): DbSessionScope = DbSessionScope(
+internal fun EventScope.fromDomainToDb(jsonHelper: JsonHelper): DbEventScope = DbEventScope(
     id = id,
     projectId = projectId,
+    type = type,
     createdAt = createdAt.fromDomainToDb(),
     endedAt = endedAt?.fromDomainToDb(),
     payloadJson = jsonHelper.toJson(payload)
 )
 
-internal fun DbSessionScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = EventScope(
+internal fun DbEventScope.fromDbToDomain(jsonHelper: JsonHelper): EventScope = EventScope(
     id = id,
     projectId = projectId,
+    type = type,
     createdAt = createdAt.fromDbToDomain(),
     endedAt = endedAt?.fromDbToDomain(),
     payload = jsonHelper.fromJson(payloadJson, object : TypeReference<EventScopePayload>() {})

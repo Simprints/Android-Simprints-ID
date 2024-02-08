@@ -12,7 +12,7 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.event.local.*
 import com.simprints.infra.events.event.local.models.DbEvent
-import com.simprints.infra.events.event.local.models.DbSessionScope
+import com.simprints.infra.events.event.local.models.DbEventScope
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.events.local.*
@@ -353,7 +353,7 @@ internal class EventLocalDataSourceImplTest {
 
     @Test
     fun saveSessionScope() = runTest {
-        mockkStatic("com.simprints.infra.events.event.local.models.DbSessionScopeKt")
+        mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
         eventLocalDataSource.saveEventScope(mockk())
 
         coVerify { scopeDao.insertOrUpdate(any()) }
@@ -361,8 +361,8 @@ internal class EventLocalDataSourceImplTest {
 
     @Test
     fun loadOpenedSessions() = runTest {
-        mockkStatic("com.simprints.infra.events.event.local.models.DbSessionScopeKt")
-        val dbSessionCaptureEvent = mockk<DbSessionScope> {
+        mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
+        val dbSessionCaptureEvent = mockk<DbEventScope> {
             every { fromDbToDomain(any()) } returns mockk()
         }
         coEvery { scopeDao.loadOpen() } returns listOf(dbSessionCaptureEvent)
@@ -374,8 +374,8 @@ internal class EventLocalDataSourceImplTest {
 
     @Test
     fun loadClosedSessions() = runTest {
-        mockkStatic("com.simprints.infra.events.event.local.models.DbSessionScopeKt")
-        val dbSessionCaptureEvent = mockk<DbSessionScope> {
+        mockkStatic("com.simprints.infra.events.event.local.models.DbEventScopeKt")
+        val dbSessionCaptureEvent = mockk<DbEventScope> {
             every { fromDbToDomain(any()) } returns mockk()
         }
         coEvery { scopeDao.loadClosed() } returns listOf(dbSessionCaptureEvent)

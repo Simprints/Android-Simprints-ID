@@ -7,6 +7,7 @@ import com.simprints.core.tools.time.Timestamp
 data class EventScope(
     val id: String,
     val projectId: String,
+    val type: EventScopeType,
 
     val createdAt: Timestamp,
     var endedAt: Timestamp?,
