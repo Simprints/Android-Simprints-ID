@@ -87,7 +87,7 @@ internal class EventRepositoryImplTest {
     @Test
     fun `create event scope should have the right session count`() = runTest {
         coEvery { eventLocalDataSource.loadEventsInScope(any()) } returns emptyList()
-        coEvery { eventLocalDataSource.countEventScopes() } returns N_SESSIONS_DB
+        coEvery { eventLocalDataSource.countEventScopes(any()) } returns N_SESSIONS_DB
 
         eventRepo.createEventScope(EventScopeType.SESSION)
 
@@ -110,7 +110,7 @@ internal class EventRepositoryImplTest {
     @Test(expected = DuplicateGuidSelectEventValidatorException::class)
     fun `create event scope report duplicate GUID select EventValidatorExceptionException`() =
         runTest {
-            coEvery { eventLocalDataSource.countEventScopes() } returns N_SESSIONS_DB
+            coEvery { eventLocalDataSource.countEventScopes(any()) } returns N_SESSIONS_DB
             coEvery {
                 eventLocalDataSource.saveEventScope(any())
             } throws DuplicateGuidSelectEventValidatorException("oops...")

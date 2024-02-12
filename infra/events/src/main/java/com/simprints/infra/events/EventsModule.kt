@@ -14,12 +14,6 @@ import dagger.hilt.components.SingletonComponent
 abstract class EventsModule {
 
     @Binds
-    internal abstract fun bindEventDatabaseFactory(impl: DbEventDatabaseFactoryImpl): EventDatabaseFactory
-
-    @Binds
-    internal abstract fun bindEventLocalDataSource(impl: EventLocalDataSourceImpl): EventLocalDataSource
-
-    @Binds
     internal abstract fun bindEventRepositoryImpl(impl: EventRepositoryImpl): EventRepository
 
     @Binds

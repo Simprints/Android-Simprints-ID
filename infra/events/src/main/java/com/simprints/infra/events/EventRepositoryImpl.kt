@@ -54,7 +54,7 @@ internal open class EventRepositoryImpl @Inject constructor(
         val eventScope = reportException {
             val projectConfiguration = configRepository.getProjectConfiguration()
             val deviceConfiguration = configRepository.getDeviceConfiguration()
-            val sessionCount = eventLocalDataSource.countEventScopes()
+            val sessionCount = eventLocalDataSource.countEventScopes(EventScopeType.SESSION)
 
             EventScope(
                 id = UUID.randomUUID().toString(),
