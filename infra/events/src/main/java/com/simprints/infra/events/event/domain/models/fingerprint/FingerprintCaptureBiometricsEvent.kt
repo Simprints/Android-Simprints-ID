@@ -15,7 +15,7 @@ data class FingerprintCaptureBiometricsEvent(
     override val id: String = randomUUID(),
     override val payload: FingerprintCaptureBiometricsPayload,
     override val type: EventType,
-    override var sessionId: String? = null,
+    override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
 

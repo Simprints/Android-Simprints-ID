@@ -178,12 +178,12 @@ internal class SessionEventRepositoryImplTest {
         val event = createEventWithSessionId("eventId", "mockId")
         sessionDataCache.eventCache[event.id] = event
         coEvery { eventRepository.addOrUpdateEvent(any(), any(), any()) } returns event.apply {
-            this.sessionId = "updatedEventScopeId"
+            this.scopeId = "updatedEventScopeId"
         }
 
         sessionEventRepository.addOrUpdateEvent(event)
 
-        assertThat(sessionDataCache.eventCache["eventId"]?.sessionId).isEqualTo("updatedEventScopeId")
+        assertThat(sessionDataCache.eventCache["eventId"]?.scopeId).isEqualTo("updatedEventScopeId")
     }
 
     @Test

@@ -132,16 +132,16 @@ internal open class EventLocalDataSource @Inject constructor(
 
     suspend fun loadEventJsonInScope(scopeId: String): List<String> =
         useRoom(readingDispatcher) {
-            eventDao.loadEventJsonFromSession(scopeId)
+            eventDao.loadEventJsonFromScope(scopeId)
         }
 
     suspend fun loadEventsInScope(scopeId: String): List<Event> =
         useRoom(readingDispatcher) {
-            eventDao.loadFromSession(sessionId = scopeId).map { it.fromDbToDomain() }
+            eventDao.loadFromScope(scopeId = scopeId).map { it.fromDbToDomain() }
         }
 
     suspend fun deleteEventsInScope(scopeId: String) = useRoom(writingContext) {
-        eventDao.deleteAllFromSession(sessionId = scopeId)
+        eventDao.deleteAllFromScope(scopeId = scopeId)
     }
 
     suspend fun deleteAll() = useRoom(writingContext) {

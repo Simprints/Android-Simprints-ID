@@ -15,7 +15,7 @@ data class ConfirmationCalloutEvent(
     override val id: String = UUID.randomUUID().toString(),
     override val payload: ConfirmationCalloutPayload,
     override val type: EventType,
-    override var sessionId: String? = null,
+    override var scopeId: String? = null,
     override var projectId: String? = null,
 ) : Event() {
 

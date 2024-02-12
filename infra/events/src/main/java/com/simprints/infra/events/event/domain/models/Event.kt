@@ -136,7 +136,7 @@ abstract class Event {
     abstract val type: EventType
     abstract val payload: EventPayload
 
-    abstract var sessionId: String?
+    abstract var scopeId: String?
     abstract var projectId: String?
 
     @JsonIgnore

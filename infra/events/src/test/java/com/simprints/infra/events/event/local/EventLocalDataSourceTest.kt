@@ -334,7 +334,7 @@ internal class EventLocalDataSourceTest {
         val sessionId = GUID1
         eventLocalDataSource.loadEventJsonInScope(sessionId)
 
-        coVerify { eventDao.loadEventJsonFromSession(sessionId) }
+        coVerify { eventDao.loadEventJsonFromScope(sessionId) }
     }
 
     @Test
@@ -342,7 +342,7 @@ internal class EventLocalDataSourceTest {
         val sessionId = GUID1
         eventLocalDataSource.loadEventsInScope(sessionId)
 
-        coVerify { eventDao.loadFromSession(sessionId) }
+        coVerify { eventDao.loadFromScope(sessionId) }
     }
 
     @Test
@@ -438,7 +438,7 @@ internal class EventLocalDataSourceTest {
     fun deleteAllFromSession() = runTest {
         eventLocalDataSource.deleteEventsInScope(GUID1)
 
-        coVerify { eventDao.deleteAllFromSession(GUID1) }
+        coVerify { eventDao.deleteAllFromScope(GUID1) }
     }
 
     @Test
@@ -457,7 +457,7 @@ internal class EventLocalDataSourceTest {
         scopeDao = mockk(relaxed = true)
         eventDatabaseFactory = mockk(relaxed = true)
         coEvery { eventDao.loadAll() } returns emptyList()
-        coEvery { eventDao.loadFromSession(any()) } returns emptyList()
+        coEvery { eventDao.loadFromScope(any()) } returns emptyList()
         coEvery { scopeDao.loadOpen(any()) } returns emptyList()
         coEvery { scopeDao.loadClosed(any()) } returns emptyList()
         coEvery { scopeDao.count(any()) } returns 0

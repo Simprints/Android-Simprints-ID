@@ -143,7 +143,7 @@ internal open class EventRepositoryImpl @Inject constructor(
                     it.validate(currentEvents, event)
                 }
 
-                event.sessionId = scope.id
+                event.scopeId = scope.id
                 event.projectId = scope.projectId
 
                 eventLocalDataSource.saveEvent(event)

@@ -246,12 +246,12 @@ internal class EventRepositoryImplTest {
         coVerify {
             eventLocalDataSource.saveEvent(
                 withArg {
-                    assertThat(it.sessionId).isEqualTo(scope.id)
+                    assertThat(it.scopeId).isEqualTo(scope.id)
                     assertThat(it.projectId).isEqualTo(DEFAULT_PROJECT_ID)
                 }
             )
         }
-        assertThat(updatedEvent.sessionId).isEqualTo(scope.id)
+        assertThat(updatedEvent.scopeId).isEqualTo(scope.id)
     }
 
     @Test
@@ -261,7 +261,7 @@ internal class EventRepositoryImplTest {
         val updatedEvent = eventRepo.addOrUpdateEvent(scope, event, emptyList())
 
         coVerify { eventLocalDataSource.saveEvent(any()) }
-        assertThat(updatedEvent.sessionId).isEqualTo(scope.id)
+        assertThat(updatedEvent.scopeId).isEqualTo(scope.id)
         assertThat(updatedEvent.projectId).isEqualTo(DEFAULT_PROJECT_ID)
     }
 
@@ -274,7 +274,7 @@ internal class EventRepositoryImplTest {
         val updatedEvent = eventRepo.addOrUpdateEvent(scope, event, null)
 
         coVerify { eventLocalDataSource.saveEvent(any()) }
-        assertThat(updatedEvent.sessionId).isEqualTo(scope.id)
+        assertThat(updatedEvent.scopeId).isEqualTo(scope.id)
         assertThat(updatedEvent.projectId).isEqualTo(DEFAULT_PROJECT_ID)
     }
 

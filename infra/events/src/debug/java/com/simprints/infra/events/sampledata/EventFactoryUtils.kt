@@ -107,7 +107,7 @@ fun createEventWithSessionId(eventId: String, sessionId: String): Event = AlertS
         AlertScreenEvent.AlertScreenPayload.AlertScreenEventType.UNEXPECTED_ERROR
     ),
     type = EventType.ALERT_SCREEN,
-    sessionId = sessionId,
+    scopeId = sessionId,
 )
 
 const val FACE_TEMPLATE_FORMAT = "RANK_ONE_1_23"

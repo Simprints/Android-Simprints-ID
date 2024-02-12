@@ -20,7 +20,7 @@ object Vero2InfoSnapshotEventSample {
     val newApiJsonEventString = """
         {
             "id": "5bc59283-a448-4911-a21a-5d39b0e346a7",
-            "sessionId": "af4eca90-c599-4323-97c7-c70e490c5568",
+            "scopeId": "af4eca90-c599-4323-97c7-c70e490c5568",
             "payload": {
                 "createdAt": {"ms": 1234},
                 "eventVersion": 3,
@@ -47,7 +47,7 @@ object Vero2InfoSnapshotEventSample {
     val oldApiJsonEventString = """
         {
             "id": "3afb1b9e-b263-4073-b773-6e1dac20d72f",
-            "sessionId": "6dcb3810-4789-4149-8fea-473ffb520958",
+            "scopeId": "6dcb3810-4789-4149-8fea-473ffb520958",
             "payload": {
                 "createdAt": {"ms": 1234},
                 "eventVersion": 2,
