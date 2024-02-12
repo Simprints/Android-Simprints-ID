@@ -63,6 +63,11 @@ internal class SetupViewModel @Inject constructor(
     fun downloadRequiredLicenses() {
         viewModelScope.launch {
             requiredLicenses = configRepository.getProjectConfiguration().requiredLicenses
+            // if there are no required licenses, then the setup is complete
+            if (requiredLicenses.isEmpty()) {
+                _overallSetupResult.postValue(true)
+                return@launch
+            }
             requiredLicenses.forEach { licenseVendor ->
                 licenseRepository.getLicenseStates(
                     authStore.signedInProjectId,
