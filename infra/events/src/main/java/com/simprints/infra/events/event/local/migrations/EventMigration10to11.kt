@@ -9,15 +9,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.fasterxml.jackson.core.type.TypeReference
 import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
-import com.simprints.infra.events.event.domain.models.scope.Location
-import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
-import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
-import com.simprints.infra.events.event.domain.models.scope.EventScopeType
+import com.simprints.infra.events.event.domain.models.scope.Location
 import com.simprints.infra.logging.Simber
 
 internal class EventMigration10to11 : Migration(10, 11) {
@@ -77,7 +74,7 @@ internal class EventMigration10to11 : Migration(10, 11) {
             EventScopePayload(
                 // Other end causes have not been used for a long time so it is save to assume
                 // that all previous sessions ended with new session termination cause
-                endCause = if (endedAt != null) SessionEndCause.NEW_SESSION else null,
+                endCause = if (endedAt != null) EventScopeEndCause.NEW_SESSION else null,
                 sidVersion = event.payload.appVersionName,
                 libSimprintsVersion = event.payload.libVersionName,
                 language = event.payload.language,

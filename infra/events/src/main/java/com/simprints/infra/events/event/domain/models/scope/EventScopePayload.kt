@@ -5,7 +5,7 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 
 @Keep
 data class EventScopePayload(
-    val endCause: SessionEndCause? = null,
+    val endCause: EventScopeEndCause? = null,
 
     val sidVersion: String,
     val libSimprintsVersion: String,

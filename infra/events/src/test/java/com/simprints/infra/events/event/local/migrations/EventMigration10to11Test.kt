@@ -17,8 +17,8 @@ import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.Location
-import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.local.EventRoomDatabase
 
@@ -240,7 +240,7 @@ class EventMigration10to11Test {
 
         if (shouldHaveEnded) {
             assertThat(scopeCursor.getLongWithColumnName("endedAt")).isEqualTo(ENDED_AT)
-            assertThat(scopePayload.endCause).isEqualTo(SessionEndCause.NEW_SESSION)
+            assertThat(scopePayload.endCause).isEqualTo(EventScopeEndCause.NEW_SESSION)
         } else {
             assertThat(scopeCursor.getLongWithColumnName("endedAt")).isNull()
             assertThat(scopePayload.endCause).isNull()

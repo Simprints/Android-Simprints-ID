@@ -13,8 +13,8 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
 import com.simprints.infra.events.event.domain.models.scope.Device
-import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScopePayload
 import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.local.EventLocalDataSource
@@ -90,9 +90,9 @@ internal open class EventRepositoryImpl @Inject constructor(
     /**
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
-    private suspend fun closeAllSessions(reason: SessionEndCause?) {
+    private suspend fun closeAllSessions(reason: EventScopeEndCause?) {
         sessionDataCache.eventCache.clear()
-        eventLocalDataSource.loadOpenedScopes().forEach { closeSession(it, reason) }
+        eventLocalDataSource.loadOpenedScopes().forEach { closeEventScope(it, reason) }
     }
 
     private suspend fun <T> reportException(block: suspend () -> T): T =
@@ -111,8 +111,8 @@ internal open class EventRepositoryImpl @Inject constructor(
         return session != null
     }
 
-    override suspend fun closeCurrentSession(reason: SessionEndCause?) {
-        closeSession(getCurrentSessionScope(), reason)
+    override suspend fun closeCurrentSession(reason: EventScopeEndCause?) {
+        closeEventScope(getCurrentSessionScope(), reason)
         sessionDataCache.eventCache.clear()
     }
 
@@ -130,6 +130,23 @@ internal open class EventRepositoryImpl @Inject constructor(
             sessionDataCache.eventScope = eventScope
         }
         eventLocalDataSource.saveEventScope(eventScope)
+    }
+
+    override suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?) {
+        val maxTimestamp = eventLocalDataSource.loadEventsInSession(eventScope.id)
+            .takeIf { it.isNotEmpty() }
+            ?.maxOf { event ->
+                event.payload.let { payload -> payload.endedAt ?: payload.createdAt }
+            }
+            ?: timeHelper.now()
+
+        val updatedSessionScope = eventScope.copy(
+            endedAt = maxTimestamp,
+            payload = eventScope.payload.copy(
+                endCause = reason ?: EventScopeEndCause.WORKFLOW_ENDED
+            )
+        )
+        saveSessionScope(updatedSessionScope)
     }
 
     override suspend fun observeEventsFromSession(sessionId: String): Flow<Event> =
@@ -209,23 +226,6 @@ internal open class EventRepositoryImpl @Inject constructor(
         eventLocalDataSource.loadOpenedScopes()
             .firstOrNull()
             ?.also { session -> loadEventsIntoCache(session.id) }
-
-    private suspend fun closeSession(eventScope: EventScope, reason: SessionEndCause?) {
-        val maxTimestamp = eventLocalDataSource.loadEventsInSession(eventScope.id)
-            .takeIf { it.isNotEmpty() }
-            ?.maxOf { event ->
-                event.payload.let { payload -> payload.endedAt ?: payload.createdAt }
-            }
-            ?: timeHelper.now()
-
-        val updatedSessionScope = eventScope.copy(
-            endedAt = maxTimestamp,
-            payload = eventScope.payload.copy(
-                endCause = reason ?: SessionEndCause.WORKFLOW_ENDED
-            )
-        )
-        saveSessionScope(updatedSessionScope)
-    }
 
     override suspend fun deleteAll() = eventLocalDataSource.deleteAll()
 }

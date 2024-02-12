@@ -2,7 +2,7 @@ package com.simprints.infra.events.receivers
 
 import com.simprints.core.ExternalScope
 import com.simprints.infra.events.EventRepository
-import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,7 +14,7 @@ internal class CloseSessionIfPresentUseCase @Inject constructor(
 
     operator fun invoke() = externalScope.launch {
         if (eventRepository.hasOpenSession()) {
-            eventRepository.closeCurrentSession(SessionEndCause.WORKFLOW_ENDED)
+            eventRepository.closeCurrentSession(EventScopeEndCause.WORKFLOW_ENDED)
         }
     }
 }

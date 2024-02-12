@@ -2,8 +2,8 @@ package com.simprints.infra.events
 
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.domain.models.scope.SessionEndCause
 import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import kotlinx.coroutines.flow.Flow
 
 
@@ -18,7 +18,7 @@ interface EventRepository {
     /**
      * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
      */
-    suspend fun closeCurrentSession(reason: SessionEndCause? = null)
+    suspend fun closeCurrentSession(reason: EventScopeEndCause? = null)
 
     /**
      * Get current capture session event from event cache or from room db.
@@ -30,6 +30,8 @@ interface EventRepository {
     suspend fun getAllClosedSessions(): List<EventScope>
 
     suspend fun saveSessionScope(eventScope: EventScope)
+
+    suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?)
 
     suspend fun observeEventsFromSession(sessionId: String): Flow<Event>
 

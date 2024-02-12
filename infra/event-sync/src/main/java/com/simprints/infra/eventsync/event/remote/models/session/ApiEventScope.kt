@@ -14,7 +14,7 @@ internal data class ApiEventScope(
     val projectId: String,
     val startTime: ApiTimestamp,
     val endTime: ApiTimestamp?,
-    val endCause: ApiSessionEndCause,
+    val endCause: ApiEventScopeEndCause,
     val modalities: List<ApiModality>,
     val sidVersion: String,
     val libSimprintsVersion: String,
