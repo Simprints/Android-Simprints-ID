@@ -4,9 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.fetchsubject.screen.usecase.FetchSubjectUseCase
 import com.simprints.feature.fetchsubject.screen.usecase.SaveSubjectFetchEventUseCase
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -37,7 +38,7 @@ internal class FetchSubjectViewModelTest {
     lateinit var saveSubjectFetchEventUseCase: SaveSubjectFetchEventUseCase
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     private lateinit var viewModel: FetchSubjectViewModel
 
@@ -51,7 +52,7 @@ internal class FetchSubjectViewModelTest {
             timeHelper,
             fetchSubjectUseCase,
             saveSubjectFetchEventUseCase,
-            configManager,
+            configRepository,
         )
     }
 
@@ -98,7 +99,7 @@ internal class FetchSubjectViewModelTest {
 
     @Test
     fun `startExitForm returns list of modalities`() {
-        coEvery { configManager.getProjectConfiguration().general.modalities } returns listOf(
+        coEvery { configRepository.getProjectConfiguration().general.modalities } returns listOf(
             GeneralConfiguration.Modality.FACE
         )
 
@@ -110,7 +111,7 @@ internal class FetchSubjectViewModelTest {
     }
 
     companion object {
-        private const val TIMESTAMP = 1L
+        private val TIMESTAMP = Timestamp(1L)
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
     }

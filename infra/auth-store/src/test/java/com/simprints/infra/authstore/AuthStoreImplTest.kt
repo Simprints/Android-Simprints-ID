@@ -3,6 +3,7 @@ package com.simprints.infra.authstore
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.FirebaseApp
+import com.simprints.core.domain.tokenization.asTokenizableRaw
 import com.simprints.infra.authstore.db.FirebaseAuthManager
 import com.simprints.infra.authstore.domain.LoginInfoStore
 import com.simprints.infra.authstore.domain.models.Token
@@ -27,6 +28,22 @@ class AuthStoreImplTest {
         firebaseAuthManager,
         simApiClientFactory
     )
+
+    @Test
+    fun `get signedUserId should call the correct method`() {
+        every { loginInfoStore.signedInUserId } returns USER_ID
+        val receivedUserId = loginManagerManagerImpl.signedInUserId
+
+        assertThat(receivedUserId).isEqualTo(USER_ID)
+    }
+
+    @Test
+    fun `set signedUserId should call the correct method`() {
+        every { loginInfoStore.signedInUserId } returns USER_ID
+        loginManagerManagerImpl.signedInUserId = USER_ID
+
+        verify { loginInfoStore.setProperty("signedInUserId").value(USER_ID) }
+    }
 
     @Test
     fun `get signedInProjectId should call the correct method`() {
@@ -65,13 +82,6 @@ class AuthStoreImplTest {
         loginManagerManagerImpl.cleanCredentials()
 
         verify(exactly = 1) { loginInfoStore.cleanCredentials() }
-    }
-
-    @Test
-    fun `storeCredentials should call the correct method`() {
-        loginManagerManagerImpl.storeCredentials(PROJECT_ID)
-
-        verify(exactly = 1) { loginInfoStore.storeCredentials(PROJECT_ID) }
     }
 
     @Test
@@ -122,6 +132,7 @@ class AuthStoreImplTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
+        private val USER_ID = "userId".asTokenizableRaw()
         private val TOKEN = Token("token", "projectId", "apiKey", "application")
         private val FIREBASE_APP = mockk<FirebaseApp>()
         private val SIM_API_CLIENT = mockk<SimNetwork.SimApiClient<SimRemoteInterface>>()

@@ -1,5 +1,6 @@
 package com.simprints.feature.fetchsubject.screen.usecase
 
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
@@ -11,8 +12,8 @@ internal class SaveSubjectFetchEventUseCase @Inject constructor(
 
     suspend operator fun invoke(
         subjectState: FetchSubjectState,
-        fetchStartTime: Long,
-        fetchEndTime: Long,
+        fetchStartTime: Timestamp,
+        fetchEndTime: Timestamp,
         subjectId: String
     ) {
         eventRepository.addOrUpdateEvent(CandidateReadEvent(

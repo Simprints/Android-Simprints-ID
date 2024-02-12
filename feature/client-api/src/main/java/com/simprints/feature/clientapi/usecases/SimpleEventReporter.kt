@@ -2,7 +2,6 @@ package com.simprints.feature.clientapi.usecases
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.core.tools.utils.SimNetworkUtils
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.CompletionCheckEvent
 import com.simprints.infra.events.event.domain.models.InvalidIntentEvent

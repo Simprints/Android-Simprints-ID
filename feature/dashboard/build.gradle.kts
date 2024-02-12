@@ -18,7 +18,6 @@ dependencies {
     implementation(project(":infra:auth-logic"))
     implementation(project(":infra:recent-user-activity"))
     implementation(project(":feature:consent"))
-    implementation(project(":infra:project-security-store"))
 
     implementation(libs.fuzzywuzzy.core)
 

@@ -3,6 +3,7 @@ package com.simprints.fingerprint.connect.usecase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
@@ -36,7 +37,7 @@ class ReportAlertScreenEventUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelper.now() } returns 0L
+        every { timeHelper.now() } returns Timestamp(0L)
 
         useCase = ReportAlertScreenEventUseCase(
             timeHelper,

@@ -18,7 +18,7 @@ interface EventSyncManager {
     fun scheduleSync()
     fun cancelScheduledSync()
 
-    suspend fun countEventsToUpload(projectId: String, type: EventType?): Flow<Int>
+    suspend fun countEventsToUpload(type: EventType?): Flow<Int>
     suspend fun countEventsToDownload(): DownSyncCounts
 
     suspend fun downSyncSubject(projectId: String, subjectId: String)

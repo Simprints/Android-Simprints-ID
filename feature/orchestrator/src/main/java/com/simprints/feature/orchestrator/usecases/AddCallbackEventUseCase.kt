@@ -4,7 +4,6 @@ import com.simprints.core.ExternalScope
 import com.simprints.core.domain.response.AppMatchConfidence
 import com.simprints.core.domain.response.AppResponseTier
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.orchestration.data.responses.AppVerifyResponse
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.callback.CallbackComparisonScore
 import com.simprints.infra.events.event.domain.models.callback.ConfirmationCallbackEvent
@@ -13,13 +12,7 @@ import com.simprints.infra.events.event.domain.models.callback.ErrorCallbackEven
 import com.simprints.infra.events.event.domain.models.callback.IdentificationCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.RefusalCallbackEvent
 import com.simprints.infra.events.event.domain.models.callback.VerificationCallbackEvent
-import com.simprints.infra.orchestration.data.responses.AppConfirmationResponse
-import com.simprints.infra.orchestration.data.responses.AppEnrolResponse
-import com.simprints.infra.orchestration.data.responses.AppErrorResponse
-import com.simprints.infra.orchestration.data.responses.AppIdentifyResponse
-import com.simprints.infra.orchestration.data.responses.AppMatchResult
-import com.simprints.infra.orchestration.data.responses.AppRefusalResponse
-import com.simprints.infra.orchestration.data.responses.AppResponse
+import com.simprints.infra.orchestration.data.responses.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,9 +33,7 @@ internal class AddCallbackEventUseCase @Inject constructor(
             is AppErrorResponse -> buildErrorCallbackEvent(result)
         }
 
-        if (callbackEvent != null) {
-            externalScope.launch { eventRepository.addOrUpdateEvent(callbackEvent) }
-        }
+        externalScope.launch { eventRepository.addOrUpdateEvent(callbackEvent) }
     }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) = EnrolmentCallbackEvent(

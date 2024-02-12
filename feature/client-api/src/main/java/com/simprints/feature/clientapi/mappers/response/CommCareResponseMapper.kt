@@ -6,7 +6,6 @@ import com.simprints.feature.clientapi.models.CommCareConstants
 import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 import javax.inject.Inject
 
@@ -16,18 +15,21 @@ internal class CommCareResponseMapper @Inject constructor() {
         is ActionResponse.EnrolActionResponse -> bundleOf(
             CommCareConstants.SIMPRINTS_SESSION_ID to response.sessionId,
             CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY to "true",
-            CommCareConstants.REGISTRATION_GUID_KEY to Registration(response.enrolledGuid),
+            CommCareConstants.REGISTRATION_GUID_KEY to response.enrolledGuid,
         ).appendCoSyncData(response.eventsJson, response.subjectActions).toCommCareBundle()
 
         /**
-         * CommCare expect Identification result in LibSimprints 1.0.12 format.
-         * That's why it is being returned in a different way from others (not inside [CommCareConstants.COMMCARE_BUNDLE_KEY]).
+         * CommCare expects Identification result as ParcelableArrayList containing Identification
+         * objects in LibSimprints 1.0.12 format. That's why it is being returned in a different way
+         * from others (not inside [CommCareConstants.COMMCARE_BUNDLE_KEY]).
          */
         is ActionResponse.IdentifyActionResponse -> bundleOf(
             Constants.SIMPRINTS_SESSION_ID to response.sessionId,
-            Constants.SIMPRINTS_IDENTIFICATIONS to response.identifications
-                .map { Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name)) }
-                .toTypedArray()
+            Constants.SIMPRINTS_IDENTIFICATIONS to ArrayList<Identification>(
+                response.identifications.map {
+                    Identification(it.guid, it.confidenceScore, Tier.valueOf(it.tier.name))
+                }
+            )
         ).appendCoSyncData(response.eventsJson)
 
         is ActionResponse.ConfirmActionResponse -> bundleOf(

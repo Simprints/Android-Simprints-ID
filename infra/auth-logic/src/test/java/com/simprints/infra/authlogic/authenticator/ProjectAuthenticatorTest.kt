@@ -7,7 +7,7 @@ import com.simprints.infra.authlogic.integrity.exceptions.RequestingIntegrityTok
 import com.simprints.infra.authlogic.model.NonceScope
 import com.simprints.infra.authstore.domain.models.AuthenticationData
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
@@ -16,7 +16,6 @@ import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import kotlinx.coroutines.flow.emptyFlow
@@ -29,13 +28,10 @@ import java.io.IOException
 class ProjectAuthenticatorTest {
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var secureDataManager: SecurityManager
-
-    @MockK
-    private lateinit var projectSecretManager: ProjectSecretManager
 
     @MockK
     private lateinit var signerManager: SignerManager
@@ -54,9 +50,8 @@ class ProjectAuthenticatorTest {
         mockManagers()
 
         authenticator = ProjectAuthenticator(
-            projectSecretManager,
             secureDataManager,
-            configManager,
+            configRepository,
             signerManager,
             authenticationRemoteDataSource,
             integrityTokenRequester,
@@ -134,12 +129,13 @@ class ProjectAuthenticatorTest {
     }
 
     @Test
-    fun `authenticate should fetch the correct long consents`() = runTest(StandardTestDispatcher()) {
-        authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
+    fun `authenticate should fetch the correct long consents`() =
+        runTest(StandardTestDispatcher()) {
+            authenticator.authenticate(NonceScope(PROJECT_ID, DEVICE_ID), PROJECT_SECRET)
 
-        coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
-        coVerify(exactly = 1) { configManager.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
-    }
+            coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE_1) }
+            coVerify(exactly = 1) { configRepository.getPrivacyNotice(PROJECT_ID, LANGUAGE_2) }
+        }
 
     @Test
     fun integrityFailed_shouldThrowRightException() = runTest(StandardTestDispatcher()) {
@@ -153,18 +149,17 @@ class ProjectAuthenticatorTest {
     }
 
     private fun mockManagers() {
-        every { projectSecretManager.encryptProjectSecret(any(), any()) } returns PROJECT_SECRET
-
         coEvery {
             authenticationRemoteDataSource.requestAuthenticationData(any(), any())
-        } returns AuthenticationData(PUBLIC_KEY, "")
+        } returns AuthenticationData( "")
 
         coEvery {
             authenticationRemoteDataSource.requestAuthToken(PROJECT_ID, DEVICE_ID, any())
         } returns Token("", "", "", "")
 
-        coEvery { configManager.getProjectConfiguration() } returns ProjectConfiguration(
+        coEvery { configRepository.getProjectConfiguration() } returns ProjectConfiguration(
             PROJECT_ID,
+            "",
             general = GeneralConfiguration(
                 modalities = mockk(),
                 languageOptions = listOf(LANGUAGE_1, LANGUAGE_2),
@@ -179,14 +174,13 @@ class ProjectAuthenticatorTest {
             mockk(),
             mockk(),
         )
-        coEvery { configManager.getPrivacyNotice(any(), any()) } returns emptyFlow()
+        coEvery { configRepository.getPrivacyNotice(any(), any()) } returns emptyFlow()
 
         coEvery { integrityTokenRequester.getToken(any()) } returns "token"
     }
 
     private companion object {
-        private const val PUBLIC_KEY =
-            "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB"
+
         private const val PROJECT_ID = "project_id"
         private const val PROJECT_SECRET = "encrypted_project_secret"
         private const val DEVICE_ID = "device_id"

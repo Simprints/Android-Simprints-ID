@@ -2,30 +2,29 @@ package com.simprints.infra.events.event.domain.models.face
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.core.tools.utils.randomUUID
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.Event
-import com.simprints.infra.events.event.domain.models.EventLabels
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType
 
 @Keep
 data class FaceCaptureBiometricsEvent(
     override val id: String = randomUUID(),
-    override var labels: EventLabels,
     override val payload: FaceCaptureBiometricsPayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        startTime: Long,
+        startTime: Timestamp,
         face: FaceCaptureBiometricsPayload.Face,
-        labels: EventLabels = EventLabels(),
         id: String = randomUUID(),
-        payloadId: String = randomUUID()
+        payloadId: String = randomUUID(),
     ) : this(
         id,
-        labels,
         FaceCaptureBiometricsPayload(
             createdAt = startTime,
             eventVersion = EVENT_VERSION,
@@ -37,16 +36,17 @@ data class FaceCaptureBiometricsEvent(
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
+        this // No tokenized fields
 
     @Keep
     data class FaceCaptureBiometricsPayload(
         val id: String,
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
         val face: Face,
-        override var endedAt: Long = 0,
-        override val type: EventType = EventType.FACE_CAPTURE_BIOMETRICS
+        override val endedAt: Timestamp? = null,
+        override val type: EventType = EventType.FACE_CAPTURE_BIOMETRICS,
     ) : EventPayload() {
 
         @Keep
@@ -55,11 +55,12 @@ data class FaceCaptureBiometricsEvent(
             var roll: Float,
             val template: String,
             val quality: Float,
-            val format: String
+            val format: String,
         )
     }
 
     companion object {
-        const val EVENT_VERSION = 0
+
+        const val EVENT_VERSION = 1
     }
 }

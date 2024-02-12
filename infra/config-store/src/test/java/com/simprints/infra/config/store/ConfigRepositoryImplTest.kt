@@ -2,16 +2,18 @@ package com.simprints.infra.config.store
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.config.store.ConfigRepositoryImpl.Companion.PRIVACY_NOTICE_FILE
+import com.simprints.infra.config.store.local.ConfigLocalDataSource
 import com.simprints.infra.config.store.models.DeviceConfiguration
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Failed
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.FailedBecauseBackendMaintenance
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.InProgress
 import com.simprints.infra.config.store.models.PrivacyNoticeResult.Succeed
 import com.simprints.infra.config.store.models.Project
-import com.simprints.infra.config.store.models.ProjectConfiguration
-import com.simprints.infra.config.store.local.ConfigLocalDataSource
+import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.config.store.remote.ConfigRemoteDataSource
 import com.simprints.infra.config.store.testtools.deviceConfiguration
+import com.simprints.infra.config.store.testtools.deviceState
 import com.simprints.infra.config.store.testtools.project
 import com.simprints.infra.config.store.testtools.projectConfiguration
 import com.simprints.infra.network.SimNetwork
@@ -21,7 +23,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.*
+import io.mockk.verify
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -31,6 +33,7 @@ class ConfigRepositoryImplTest {
 
     companion object {
         private const val PROJECT_ID = "projectId"
+        private const val DEVICE_ID = "deviceId"
         private const val LANGUAGE = "fr"
         private const val PRIVACY_NOTICE = "privacy notice"
     }
@@ -47,6 +50,7 @@ class ConfigRepositoryImplTest {
             localDataSource,
             remoteDataSource,
             simNetwork,
+            DEVICE_ID
         )
     }
 
@@ -65,13 +69,14 @@ class ConfigRepositoryImplTest {
     fun `should get the project remotely if not available locally and save it`() = runTest {
         coEvery { localDataSource.saveProject(project) } returns Unit
         coEvery { localDataSource.getProject() } throws NoSuchElementException()
-        coEvery { remoteDataSource.getProject(PROJECT_ID) } returns project
+        coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
         val receivedProject = configServiceImpl.getProject(PROJECT_ID)
 
         assertThat(receivedProject).isEqualTo(project)
         coVerify(exactly = 1) { localDataSource.getProject() }
         coVerify(exactly = 1) { localDataSource.saveProject(project) }
+        coVerify(exactly = 1) { localDataSource.saveProjectConfiguration(projectConfiguration) }
         coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
     }
 
@@ -92,10 +97,11 @@ class ConfigRepositoryImplTest {
     fun `refreshProject() should get the project remotely and save it and update the api base url if not empty`() =
         runTest {
             coEvery { localDataSource.saveProject(project) } returns Unit
-            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns project
+            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
             configServiceImpl.refreshProject(PROJECT_ID)
             coVerify(exactly = 1) { localDataSource.saveProject(project) }
+            coVerify(exactly = 1) { localDataSource.saveProjectConfiguration(projectConfiguration) }
             coVerify(exactly = 1) { remoteDataSource.getProject(PROJECT_ID) }
             coVerify(exactly = 1) { simNetwork.setApiBaseUrl(project.baseUrl) }
         }
@@ -106,6 +112,7 @@ class ConfigRepositoryImplTest {
             val project = Project(
                 "id",
                 "name",
+                ProjectState.RUNNING,
                 "description",
                 "creator",
                 "url",
@@ -113,7 +120,7 @@ class ConfigRepositoryImplTest {
                 tokenizationKeys = emptyMap()
             )
             coEvery { localDataSource.saveProject(project) } returns Unit
-            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns project
+            coEvery { remoteDataSource.getProject(PROJECT_ID) } returns ProjectWithConfig(project, projectConfiguration)
 
             configServiceImpl.refreshProject(PROJECT_ID)
             coVerify(exactly = 1) { localDataSource.saveProject(project) }
@@ -122,54 +129,14 @@ class ConfigRepositoryImplTest {
         }
 
     @Test
-    fun `getConfiguration() should get the project configuration locally`() = runTest {
-        coEvery { localDataSource.getProjectConfiguration() } returns projectConfiguration
+    fun `getDeviceState should call the correct method`() = runTest {
+        coEvery { localDataSource.getProject() } returns project
+        coEvery { localDataSource.getDeviceConfiguration() } returns deviceConfiguration
+        coEvery { remoteDataSource.getDeviceState(any(), any(), any()) } returns deviceState
 
-        val receivedProject = configServiceImpl.getConfiguration()
-
-        assertThat(receivedProject).isEqualTo(projectConfiguration)
-        coVerify(exactly = 1) { localDataSource.getProjectConfiguration() }
+        val result = configServiceImpl.getDeviceState()
+        assertThat(result).isEqualTo(deviceState)
     }
-
-    @Test
-    fun `refreshConfiguration() should get the project configuration remotely and save it`() =
-        runTest {
-            coEvery { localDataSource.saveProjectConfiguration(projectConfiguration) } returns Unit
-            coEvery { remoteDataSource.getConfiguration(PROJECT_ID) } returns projectConfiguration
-
-            configServiceImpl.refreshConfiguration(PROJECT_ID)
-            coVerify(exactly = 1) { localDataSource.saveProjectConfiguration(projectConfiguration) }
-            coVerify(exactly = 1) { remoteDataSource.getConfiguration(PROJECT_ID) }
-        }
-
-    @Test
-    fun `getConfiguration() should get the project configuration remotely if local one is empty`() =
-        runTest {
-            coEvery { localDataSource.getProjectConfiguration() } returns mockk(relaxed = true)
-            coEvery { localDataSource.getProject().id } returns PROJECT_ID
-            coEvery { remoteDataSource.getConfiguration(PROJECT_ID) } returns projectConfiguration
-
-            val receivedProject = configServiceImpl.getConfiguration()
-
-            assertThat(receivedProject).isEqualTo(projectConfiguration)
-            coVerify(exactly = 1) { localDataSource.getProjectConfiguration() }
-            coVerify(exactly = 1) { remoteDataSource.getConfiguration(PROJECT_ID) }
-        }
-
-    @Test
-    fun `getConfiguration() should still return empty config if getting it remotely fails`() =
-        runTest {
-            val localConfig = mockk<ProjectConfiguration>(relaxed = true)
-            coEvery { localDataSource.getProjectConfiguration() } returns localConfig
-            coEvery { localDataSource.getProject().id } returns PROJECT_ID
-            coEvery { remoteDataSource.getConfiguration(PROJECT_ID) } throws Exception()
-
-            val receivedProject = configServiceImpl.getConfiguration()
-
-            assertThat(receivedProject).isEqualTo(localConfig)
-            coVerify(exactly = 1) { localDataSource.getProjectConfiguration() }
-            coVerify(exactly = 1) { remoteDataSource.getConfiguration(PROJECT_ID) }
-        }
 
     @Test
     fun `getDeviceConfiguration should call the correct method`() = runTest {

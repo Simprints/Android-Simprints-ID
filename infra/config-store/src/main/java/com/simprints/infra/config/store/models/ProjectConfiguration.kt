@@ -2,6 +2,7 @@ package com.simprints.infra.config.store.models
 
 data class ProjectConfiguration(
     val projectId: String,
+    val updatedAt: String,
     val general: GeneralConfiguration,
     val face: FaceConfiguration?,
     val fingerprint: FingerprintConfiguration?,

@@ -7,6 +7,6 @@ internal class GetCurrentSessionIdUseCase @Inject constructor(
     private val eventRepository: EventRepository,
 ) {
 
-    suspend operator fun invoke(): String = eventRepository.getCurrentCaptureSessionEvent().id
+    suspend operator fun invoke(): String = eventRepository.getCurrentSessionScope().id
 
 }

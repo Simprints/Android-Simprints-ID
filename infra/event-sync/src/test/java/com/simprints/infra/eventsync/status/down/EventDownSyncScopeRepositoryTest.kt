@@ -43,6 +43,7 @@ import org.junit.Test
 internal class EventDownSyncScopeRepositoryTest {
 
     companion object {
+
         private val LAST_EVENT_ID = GUID1
         private val LAST_SYNC_TIME = TIME1
         private val LAST_STATE = DownSyncState.COMPLETE
@@ -80,126 +81,125 @@ internal class EventDownSyncScopeRepositoryTest {
     }
 
     @Test
-    fun buildProjectDownSyncScope() {
-        runTest(UnconfinedTestDispatcher()) {
-            val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+    fun buildProjectDownSyncScope() = runTest(UnconfinedTestDispatcher()) {
+        val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+            listOf(Modes.FINGERPRINT),
+            DEFAULT_MODULES.toList(),
+            Partitioning.GLOBAL
+        )
+
+        assertProjectSyncScope(syncScope)
+    }
+
+    @Test
+    fun buildUserDownSyncScope() = runTest(UnconfinedTestDispatcher()) {
+        every { authStore.signedInUserId } returns DEFAULT_USER_ID
+
+        val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+            listOf(Modes.FINGERPRINT),
+            DEFAULT_MODULES.toList(),
+            Partitioning.USER
+        )
+
+        assertUserSyncScope(syncScope)
+    }
+
+    @Test
+    fun buildUserDownSyncScopeWhenNoSaved() = runTest(UnconfinedTestDispatcher()) {
+        every { authStore.signedInUserId } returns null
+
+        val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+            listOf(Modes.FINGERPRINT),
+            DEFAULT_MODULES.toList(),
+            Partitioning.USER
+        )
+
+        assertUserSyncScope(syncScope)
+    }
+
+    @Test
+    fun buildModuleDownSyncScope() = runTest(UnconfinedTestDispatcher()) {
+        val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+            listOf(Modes.FINGERPRINT),
+            DEFAULT_MODULES.toList(),
+            Partitioning.MODULE
+        )
+
+        assertModuleSyncScope(syncScope)
+    }
+
+    @Test
+    fun throwWhenProjectIsMissing() = runTest(UnconfinedTestDispatcher()) {
+        every { authStore.signedInProjectId } returns ""
+
+        assertThrows<MissingArgumentForDownSyncScopeException> {
+            eventDownSyncScopeRepository.getDownSyncScope(
                 listOf(Modes.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
                 Partitioning.GLOBAL
             )
-
-            assertProjectSyncScope(syncScope)
         }
+
     }
 
     @Test
-    fun buildUserDownSyncScope() {
-        runTest(UnconfinedTestDispatcher()) {
+    fun throwWhenUserIsMissing() = runTest(UnconfinedTestDispatcher()) {
+        coEvery { authStore.signedInUserId } returns null
+        coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
+            every { lastUserUsed } returns "".asTokenizableEncrypted()
+        }
 
-            val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
+        assertThrows<MissingArgumentForDownSyncScopeException> {
+            eventDownSyncScopeRepository.getDownSyncScope(
                 listOf(Modes.FINGERPRINT),
                 DEFAULT_MODULES.toList(),
                 Partitioning.USER
             )
-
-            assertUserSyncScope(syncScope)
         }
     }
 
     @Test
-    fun buildModuleDownSyncScope() {
-        runTest(UnconfinedTestDispatcher()) {
-            val syncScope = eventDownSyncScopeRepository.getDownSyncScope(
-                listOf(Modes.FINGERPRINT),
-                DEFAULT_MODULES.toList(),
-                Partitioning.MODULE
-            )
+    fun downSyncOp_refresh_shouldReturnARefreshedOp() = runTest(UnconfinedTestDispatcher()) {
+        val refreshedSyncOp =
+            eventDownSyncScopeRepository.refreshState(projectDownSyncScope.operations.first())
 
-            assertModuleSyncScope(syncScope)
-        }
+        assertThat(refreshedSyncOp).isNotNull()
+        refreshedSyncOp.assertProjectSyncOpIsRefreshed()
     }
 
     @Test
-    fun throwWhenProjectIsMissing() {
-        runTest(UnconfinedTestDispatcher()) {
-            every { authStore.signedInProjectId } returns ""
+    fun insertOrUpdate_shouldInsertIntoTheDb() = runTest {
+        eventDownSyncScopeRepository.insertOrUpdate(projectDownSyncScope.operations.first())
 
-            assertThrows<MissingArgumentForDownSyncScopeException> {
-                eventDownSyncScopeRepository.getDownSyncScope(
-                    listOf(Modes.FINGERPRINT),
-                    DEFAULT_MODULES.toList(),
-                    Partitioning.GLOBAL
-                )
-            }
-        }
+        coVerify { downSyncOperationOperationDao.insertOrUpdate(any()) }
     }
 
     @Test
-    fun throwWhenUserIsMissing() {
-        runTest(UnconfinedTestDispatcher()) {
-            coEvery { recentUserActivityManager.getRecentUserActivity() } returns mockk {
-                every { lastUserUsed } returns "".asTokenizableEncrypted()
-            }
+    fun deleteOperations_shouldDeleteOpsFromDb() = runTest {
+        eventDownSyncScopeRepository.deleteOperations(
+            DEFAULT_MODULES.toList(),
+            listOf(Modes.FINGERPRINT)
+        )
 
-            assertThrows<MissingArgumentForDownSyncScopeException> {
-                eventDownSyncScopeRepository.getDownSyncScope(
-                    listOf(Modes.FINGERPRINT),
-                    DEFAULT_MODULES.toList(),
-                    Partitioning.GLOBAL
-                )
-            }
-        }
-    }
-
-    @Test
-    fun downSyncOp_refresh_shouldReturnARefreshedOp() {
-        runTest(UnconfinedTestDispatcher()) {
-
-            val refreshedSyncOp =
-                eventDownSyncScopeRepository.refreshState(projectDownSyncScope.operations.first())
-
-            assertThat(refreshedSyncOp).isNotNull()
-            refreshedSyncOp.assertProjectSyncOpIsRefreshed()
-        }
-    }
-
-    @Test
-    fun insertOrUpdate_shouldInsertIntoTheDb() {
-        runTest {
-            eventDownSyncScopeRepository.insertOrUpdate(projectDownSyncScope.operations.first())
-
-            coVerify { downSyncOperationOperationDao.insertOrUpdate(any()) }
-        }
-    }
-
-    @Test
-    fun deleteOperations_shouldDeleteOpsFromDb() {
-        runTest {
-
-            eventDownSyncScopeRepository.deleteOperations(
-                DEFAULT_MODULES.toList(),
+        DEFAULT_MODULES.forEach { moduleId ->
+            val scope = SubjectModuleScope(
+                DEFAULT_PROJECT_ID,
+                listOf(moduleId),
                 listOf(Modes.FINGERPRINT)
             )
-
-            DEFAULT_MODULES.forEach { moduleId ->
-                val scope = SubjectModuleScope(
-                    DEFAULT_PROJECT_ID,
-                    listOf(moduleId),
-                    listOf(Modes.FINGERPRINT)
+            coVerify(exactly = 1) {
+                downSyncOperationOperationDao.delete(
+                    scope.operations.first().getUniqueKey()
                 )
-                coVerify(exactly = 1) { downSyncOperationOperationDao.delete(scope.operations.first().getUniqueKey()) }
             }
         }
     }
 
     @Test
-    fun deleteAll_shouldDeleteAllOpsFromDb() {
-        runTest {
+    fun deleteAll_shouldDeleteAllOpsFromDb() = runTest {
+        eventDownSyncScopeRepository.deleteAll()
 
-            eventDownSyncScopeRepository.deleteAll()
-
-            coVerify { downSyncOperationOperationDao.deleteAll() }
-        }
+        coVerify { downSyncOperationOperationDao.deleteAll() }
     }
 
     private fun getSyncOperationsWithLastResult() =
@@ -250,7 +250,10 @@ internal class EventDownSyncScopeRepositoryTest {
         assertThat(syncScope).isInstanceOf(SubjectModuleScope::class.java)
         with((syncScope as SubjectModuleScope)) {
             assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
-            assertThat(moduleIds).containsExactly(DEFAULT_MODULE_ID.value, DEFAULT_MODULE_ID_2.value)
+            assertThat(moduleIds).containsExactly(
+                DEFAULT_MODULE_ID.value,
+                DEFAULT_MODULE_ID_2.value
+            )
             assertThat(modes).isEqualTo(listOf(Modes.FINGERPRINT))
         }
     }
@@ -260,7 +263,7 @@ internal class EventDownSyncScopeRepositoryTest {
         assertThat(lastSyncTime).isEqualTo(LAST_SYNC_TIME)
         assertThat(state).isEqualTo(LAST_STATE)
         assertThat(queryEvent.projectId).isNotNull()
-        assertThat(queryEvent.moduleIds).isNull()
+        assertThat(queryEvent.moduleId).isNull()
         assertThat(queryEvent.modes).isEqualTo(DEFAULT_MODES)
     }
 }

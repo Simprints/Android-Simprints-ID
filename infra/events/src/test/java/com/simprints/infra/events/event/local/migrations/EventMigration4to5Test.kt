@@ -4,7 +4,6 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
@@ -13,16 +12,12 @@ import com.simprints.core.tools.extentions.getStringWithColumnName
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.migrations.*
 import com.simprints.infra.events.local.migrations.*
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigration4to5Test {
 
     private val TEST_DB = "test"
@@ -38,13 +33,15 @@ class EventMigration4to5Test {
         EventMigration7to8(),
         EventMigration8to9(),
         EventMigration9to10(),
+        EventMigration10to11(),
+        EventMigration11to12(),
+        EventMigration12to13(),
     )
 
     @get:Rule
     val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        EventRoomDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        EventRoomDatabase::class.java,
     )
 
 

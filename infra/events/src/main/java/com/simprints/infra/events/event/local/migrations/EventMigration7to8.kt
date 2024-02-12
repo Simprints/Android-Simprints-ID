@@ -33,9 +33,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
                 } catch (t: Throwable) {
                     Simber.e(
                         t, "Fail to migrate fingerprint capture ${
-                            it.getStringWithColumnName(
-                                DB_ID_FIELD
-                            )
+                            it.getStringWithColumnName(DB_ID_FIELD)
                         } in session ${it.getStringWithColumnName("sessionId")}"
                     )
                 }
@@ -46,7 +44,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
     private fun createAndInsertFingerprintCaptureBiometricsEventValues(
         database: SupportSQLiteDatabase,
         cursor: Cursor?,
-        payloadId: String?
+        payloadId: String?,
     ) {
         val originalObject = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
         val payload = originalObject.getJSONObject(DB_EVENT_JSON_EVENT_PAYLOAD)
@@ -86,7 +84,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
     private fun isPayloadIdReferencedInPersonCreation(
         payload: JSONObject,
         sessionId: String,
-        database: SupportSQLiteDatabase
+        database: SupportSQLiteDatabase,
     ): Boolean {
         val isFingerprintEventBadQuality = payload.getString("result") == "BAD_QUALITY"
         val payloadId = payload.getString("id")
@@ -123,7 +121,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
         labelsObject: JSONObject,
         createdAt: Long,
         fingerprintObject: JSONObject,
-        payloadId: String?
+        payloadId: String?,
     ): ContentValues {
         val event =
             "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"createdAt\":$createdAt,\"eventVersion\":0,\"fingerprint\":{\"finger\":\"${
@@ -156,7 +154,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
     private fun migrateFingerprintCaptureEventPayloadType(
         it: Cursor?,
         database: SupportSQLiteDatabase,
-        id: String?
+        id: String?,
     ) {
         val json = JSONObject(it?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
 
@@ -236,7 +234,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
         labelsObject: JSONObject,
         createdAt: Long,
         faceObject: JSONObject,
-        payloadId: String?
+        payloadId: String?,
     ): ContentValues {
         val event =
             "{\"id\":\"${eventId}\",\"labels\":$labelsObject,\"payload\":{\"id\":\"$payloadId\",\"createdAt\":$createdAt,\"eventVersion\":0,\"face\":{\"yaw\":${
@@ -270,7 +268,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
     private fun migrateFaceCaptureEventPayloadType(
         cursor: Cursor?,
         database: SupportSQLiteDatabase,
-        id: String?
+        id: String?,
     ) {
 
         val json = JSONObject(cursor?.getStringWithColumnName(DB_EVENT_JSON_FIELD)!!)
@@ -288,6 +286,7 @@ internal class EventMigration7to8 : Migration(7, 8) {
     }
 
     companion object {
+
         private const val PERSON_CREATION_EVENT = "PERSON_CREATION"
         private const val FACE_CAPTURE_EVENT = "FACE_CAPTURE"
         private const val FINGERPRINT_CAPTURE_EVENT = "FINGERPRINT_CAPTURE"

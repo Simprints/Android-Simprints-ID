@@ -40,8 +40,41 @@ class SimNetworkUtilsImplTest {
     }
 
     @Test
-    fun `getConnectionsStates mobile connected and wifi not connected`() {
+    fun `getConnectionsStates mobile connected but has no internet and wifi not connected`() {
         //Given
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns false
+        buildConnections(mobileState = true, wifiState = false)
+        //When
+        val connectionStates = simNetworkUtils.connectionsStates
+        //Then
+        verifyConnectionStates(
+            connectionStates,
+            mobileState = SimNetworkUtils.ConnectionState.DISCONNECTED,
+            wifiState = SimNetworkUtils.ConnectionState.DISCONNECTED
+        )
+    }
+
+    @Test
+    fun `getConnectionsStates mobile connected but not validated and wifi not connected`() {
+        //Given
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns true
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) } returns false
+        buildConnections(mobileState = true, wifiState = false)
+        //When
+        val connectionStates = simNetworkUtils.connectionsStates
+        //Then
+        verifyConnectionStates(
+            connectionStates,
+            mobileState = SimNetworkUtils.ConnectionState.DISCONNECTED,
+            wifiState = SimNetworkUtils.ConnectionState.DISCONNECTED
+        )
+    }
+
+    @Test
+    fun `getConnectionsStates mobile connected and verified and wifi not connected`() {
+        //Given
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns true
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) } returns true
         buildConnections(mobileState = true, wifiState = false)
         //When
         val connectionStates = simNetworkUtils.connectionsStates
@@ -54,8 +87,41 @@ class SimNetworkUtilsImplTest {
     }
 
     @Test
-    fun `getConnectionsStates mobile not  connected and wifi  connected`() {
+    fun `getConnectionsStates mobile not connected and wifi connected but has no internet`() {
         //Given
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns false
+        buildConnections(mobileState = false, wifiState = true)
+        //When
+        val connectionStates = simNetworkUtils.connectionsStates
+        //Then
+        verifyConnectionStates(
+            connectionStates,
+            mobileState = SimNetworkUtils.ConnectionState.DISCONNECTED,
+            wifiState = SimNetworkUtils.ConnectionState.DISCONNECTED
+        )
+    }
+
+    @Test
+    fun `getConnectionsStates mobile not connected and wifi connected but not validated`() {
+        //Given
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns true
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) } returns false
+        buildConnections(mobileState = false, wifiState = true)
+        //When
+        val connectionStates = simNetworkUtils.connectionsStates
+        //Then
+        verifyConnectionStates(
+            connectionStates,
+            mobileState = SimNetworkUtils.ConnectionState.DISCONNECTED,
+            wifiState = SimNetworkUtils.ConnectionState.DISCONNECTED
+        )
+    }
+
+    @Test
+    fun `getConnectionsStates mobile not  connected and wifi  connected and  verified`() {
+        //Given
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns true
+        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) } returns true
         buildConnections(mobileState = false, wifiState = true)
         //When
         val connectionStates = simNetworkUtils.connectionsStates

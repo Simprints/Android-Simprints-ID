@@ -6,6 +6,7 @@ import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.R
 import com.simprints.face.capture.databinding.FragmentConfirmationBinding
 import com.simprints.infra.uibase.viewbinding.viewBinding
@@ -27,7 +28,7 @@ internal class ConfirmationFragment : Fragment(R.layout.fragment_confirmation) {
     @Inject
     lateinit var faceTimeHelper: TimeHelper
 
-    private var startTime: Long = 0
+    private var startTime = Timestamp(0L)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         startTime = faceTimeHelper.now()

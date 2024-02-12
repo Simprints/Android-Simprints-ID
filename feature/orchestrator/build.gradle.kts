@@ -21,7 +21,6 @@ dependencies {
     implementation(project(":feature:exit-form"))
     implementation(project(":feature:matcher"))
 
-    implementation(project(":face:configuration"))
     implementation(project(":face:capture"))
 
     implementation(project(":fingerprint:connect"))
@@ -31,7 +30,6 @@ dependencies {
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:recent-user-activity"))
     implementation(project(":infra:config-store"))
-    implementation(project(":infra:config-sync"))
     implementation(project(":infra:events"))
     implementation(project(":infra:event-sync"))
     implementation(project(":infra:images"))

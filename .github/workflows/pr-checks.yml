@@ -30,7 +30,6 @@ jobs:
             modules: |
                 infra:orchestrator-data
                 infra:realm
-                infra:project-security-store
                 infra:recent-user-activity
                 infra:config-store
                 infra:config-sync
@@ -94,7 +93,6 @@ jobs:
         secrets: inherit
         with:
             modules: |
-                face:configuration
                 face:capture
                 face:infra:face-bio-sdk
                 face:infra:roc-wrapper
@@ -112,6 +110,8 @@ jobs:
                 fingerprint:infra:simprints-bio-sdk
                 fingerprint:infra:scanner
                 fingerprint:infra:simafis-wrapper
+                fingerprint:infra:simprints-bio-sdk
+                fingerprint:infra:nec-bio-sdk
             reportsId: fingerprint
 
     sonarqube:

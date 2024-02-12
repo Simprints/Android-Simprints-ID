@@ -77,7 +77,7 @@ internal class EventSyncManagerTest {
         mockkStatic(WorkManager::class)
         every { WorkManager.getInstance(ctx) } returns workManager
 
-        coEvery { configRepository.getConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general.modalities } returns listOf()
             every { synchronization.down.partitionType.toDomain() } returns Partitioning.MODULE
         }
@@ -161,9 +161,9 @@ internal class EventSyncManagerTest {
 
     @Test
     fun `countEventsToUpload should call event repo`() = runTest {
-        eventSyncManagerImpl.countEventsToUpload("projectId", null).toList()
+        eventSyncManagerImpl.countEventsToUpload(null).toList()
 
-        coVerify { eventRepository.observeEventCount(any(), any()) }
+        coVerify { eventRepository.observeEventCount(any()) }
     }
 
     @Test

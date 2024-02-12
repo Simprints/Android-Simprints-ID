@@ -12,6 +12,7 @@ import com.simprints.infra.events.event.domain.models.face.FaceCaptureEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -45,10 +46,10 @@ internal class CreatePersonEventUseCaseTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        every { timeHelper.now() } returns 0L
+        every { timeHelper.now() } returns Timestamp(0L)
         every { encodingUtils.byteArrayToBase64(any()) } returns TEMPLATE
 
-        coEvery { eventRepository.getCurrentCaptureSessionEvent() } returns mockk {
+        coEvery { eventRepository.getCurrentSessionScope() } returns mockk {
             every { id } returns "sessionId"
         }
         coEvery { eventRepository.observeEventsFromSession(any()) }

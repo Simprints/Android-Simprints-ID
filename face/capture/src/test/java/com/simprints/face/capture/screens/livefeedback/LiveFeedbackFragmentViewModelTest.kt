@@ -8,9 +8,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.camera.core.ImageProxy
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.face.capture.models.FaceDetection
 import com.simprints.face.capture.usecases.SimpleCaptureEventReporter
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.facebiosdk.detection.FaceDetector
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -51,7 +52,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     lateinit var rectF: RectF
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var eventReporter: SimpleCaptureEventReporter
@@ -63,13 +64,12 @@ internal class LiveFeedbackFragmentViewModelTest {
 
     private lateinit var viewModel: LiveFeedbackFragmentViewModel
 
-
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
-        coEvery { configManager.getProjectConfiguration().face?.qualityThreshold } returns QUALITY_THRESHOLD
-        every { timeHelper.now() } returnsMany (0..100L).toList()
+        coEvery { configRepository.getProjectConfiguration().face?.qualityThreshold } returns QUALITY_THRESHOLD
+        every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
         justRun { frameProcessor.init(any(), any()) }
         justRun { frame.close() }
         justRun { previewFrame.recycle() }
@@ -78,7 +78,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         viewModel = LiveFeedbackFragmentViewModel(
             frameProcessor,
             faceDetector,
-            configManager,
+            configRepository,
             eventReporter,
             timeHelper
         )
@@ -154,7 +154,7 @@ internal class LiveFeedbackFragmentViewModelTest {
         val validFace: Face = getFace()
         every { frameProcessor.cropRotateFrame(frame) } returns previewFrame
         every { faceDetector.analyze(previewFrame) } returns validFace
-        every { timeHelper.now() } returnsMany (0..100L).toList()
+        every { timeHelper.now() } returnsMany (0..100L).map { Timestamp(it) }
 
         val currentDetectionObserver = viewModel.currentDetection.testObserver()
         val capturingStateObserver = viewModel.capturingState.testObserver()
@@ -195,7 +195,7 @@ internal class LiveFeedbackFragmentViewModelTest {
             assertThat(get(1).isFallback).isEqualTo(false)
         }
 
-        coVerify { eventReporter.addFallbackCaptureEvent(0, 1) }
+        coVerify { eventReporter.addFallbackCaptureEvent(any(), any()) }
         coVerify(exactly = 3) { eventReporter.addCaptureEvents(any(), any(), any()) }
     }
 
@@ -207,6 +207,7 @@ internal class LiveFeedbackFragmentViewModelTest {
     ) = Face(100, 100, rect, yaw, roll, quality, Random.nextBytes(20), "format")
 
     companion object {
+
         private const val QUALITY_THRESHOLD = -1
     }
 }

@@ -2,8 +2,8 @@ package com.simprints.feature.dashboard.logout
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
-import com.simprints.infra.authlogic.AuthManager
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.feature.dashboard.logout.usecase.LogoutUseCase
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.SettingsPasswordConfig
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.getOrAwaitValue
@@ -22,10 +22,10 @@ import org.junit.Test
 internal class LogoutSyncViewModelTest {
 
     @MockK
-    lateinit var authManager: AuthManager
+    lateinit var logoutUseCase: LogoutUseCase
 
     @MockK
-    lateinit var configManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @get:Rule
     val rule = InstantTaskExecutorRule()
@@ -41,27 +41,27 @@ internal class LogoutSyncViewModelTest {
     @Test
     fun `should logout correctly`() {
         val viewModel = LogoutSyncViewModel(
-            configManager = configManager,
-            authManager = authManager,
+            configRepository = configRepository,
+            logoutUseCase = logoutUseCase,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher)
         )
 
         viewModel.logout()
 
-        coVerify(exactly = 1) { authManager.signOut() }
+        coVerify(exactly = 1) { logoutUseCase.invoke() }
     }
 
     @Test
     fun `password config should be fetched after initialization`() {
         val config = SettingsPasswordConfig.Locked(password = "123")
-        coEvery { configManager.getProjectConfiguration() } returns mockk {
+        coEvery { configRepository.getProjectConfiguration() } returns mockk {
             every { general } returns mockk {
                 every { settingsPassword } returns config
             }
         }
         val viewModel = LogoutSyncViewModel(
-            configManager = configManager,
-            authManager = authManager,
+            configRepository = configRepository,
+            logoutUseCase = logoutUseCase,
             externalScope = CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
         val resultConfig = viewModel.settingsLocked.getOrAwaitValue()

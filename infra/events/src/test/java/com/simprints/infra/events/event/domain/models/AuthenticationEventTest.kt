@@ -12,7 +12,6 @@ import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_USER_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class AuthenticationEventTest {
@@ -53,11 +52,10 @@ class AuthenticationEventTest {
     }
 
     private fun createAuthenticationEvent(result: AuthenticationPayload.Result) {
-        val labels = EventLabels(sessionId = GUID1)
         val userInfo = UserInfo(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)
-        val event = AuthenticationEvent(CREATED_AT, ENDED_AT, userInfo, result, labels)
+        val event = AuthenticationEvent(CREATED_AT, ENDED_AT, userInfo, result)
+
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(AUTHENTICATION)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

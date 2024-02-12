@@ -2,25 +2,22 @@ package com.simprints.infra.events.event.domain.models
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.infra.events.event.domain.models.ConsentEvent.Companion.EVENT_VERSION
-import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Result.ACCEPTED
 import com.simprints.infra.events.event.domain.models.ConsentEvent.ConsentPayload.Type.INDIVIDUAL
 import com.simprints.infra.events.event.domain.models.EventType.CONSENT
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class ConsentEventTest {
 
     @Test
     fun create_ConsentEvent() {
-        val labels = EventLabels(sessionId = GUID1)
-        val event = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED, labels)
+        val event = ConsentEvent(CREATED_AT, ENDED_AT, INDIVIDUAL, ACCEPTED)
+
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CONSENT)
-        with(event.payload as ConsentPayload) {
+        with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)
             assertThat(endedAt).isEqualTo(ENDED_AT)
             assertThat(eventVersion).isEqualTo(EVENT_VERSION)

@@ -4,9 +4,10 @@ import android.database.sqlite.SQLiteDatabaseCorruptException
 import android.database.sqlite.SQLiteException
 import com.simprints.core.DispatcherIO
 import com.simprints.core.NonCancellableIO
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
-import com.simprints.infra.events.event.local.models.DbEvent
+import com.simprints.infra.events.event.domain.models.session.SessionScope
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
@@ -24,11 +25,15 @@ import kotlin.coroutines.CoroutineContext
 
 internal open class EventLocalDataSourceImpl @Inject constructor(
     private val eventDatabaseFactory: EventDatabaseFactory,
+    private val jsonHelper: JsonHelper,
     @DispatcherIO private val readingDispatcher: CoroutineDispatcher,
     @NonCancellableIO private val writingContext: CoroutineContext,
 ) : EventLocalDataSource {
 
     private var eventDao: EventRoomDao = eventDatabaseFactory.build().eventDao
+
+    private var scopeDao: SessionScopeRoomDao = eventDatabaseFactory.build().scopeDao
+
     private val mutex = Mutex()
 
     private suspend fun <R> useRoom(context: CoroutineContext, block: suspend () -> R): R =
@@ -83,75 +88,63 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         Simber.tag(DB_CORRUPTION.name).e(ex)
         //4. Rebuild database
         eventDao = eventDatabaseFactory.build().eventDao
+        scopeDao = eventDatabaseFactory.build().scopeDao
     }
 
-    override suspend fun loadAll(): Flow<Event> =
-        useRoom(readingDispatcher) {
-            eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
+    override suspend fun saveSessionScope(scope: SessionScope) = useRoom(writingContext) {
+        scopeDao.insertOrUpdate(scope.fromDomainToDb(jsonHelper))
+    }
+
+    override suspend fun countSessions(): Int = useRoom(readingDispatcher) {
+        scopeDao.count()
+    }
+
+    override suspend fun loadOpenedSessions(): List<SessionScope> = useRoom(readingDispatcher) {
+        scopeDao.loadOpen().map { it.fromDbToDomain(jsonHelper) }
+    }
+
+    override suspend fun loadClosedSessions(): List<SessionScope> = useRoom(readingDispatcher) {
+        scopeDao.loadClosed().map { it.fromDbToDomain(jsonHelper) }
+    }
+
+    override suspend fun deleteSession(sessionId: String) = useRoom(writingContext) {
+        scopeDao.delete(listOf(sessionId))
+    }
+
+    override suspend fun saveEvent(event: Event) = useRoom(writingContext) {
+        eventDao.insertOrUpdate(event.fromDomainToDb())
+    }
+
+    override suspend fun observeEventCount(): Flow<Int> = useRoomFlow(readingDispatcher) {
+        eventDao.observeCount()
+    }
+
+    override suspend fun observeEventCount(type: EventType): Flow<Int> =
+        useRoomFlow(readingDispatcher) {
+            eventDao.observeCountFromType(type = type)
         }
 
-    override suspend fun loadAllEventJsonFromSession(sessionId: String): List<String> =
+    override suspend fun loadAllEvents(): Flow<Event> = useRoom(readingDispatcher) {
+        eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
+    }
+
+    override suspend fun loadEventJsonInSession(sessionId: String): List<String> =
         useRoom(readingDispatcher) {
             eventDao.loadEventJsonFromSession(sessionId)
         }
 
-    override suspend fun loadAllFromSession(sessionId: String): List<Event> =
+    override suspend fun loadEventsInSession(sessionId: String): List<Event> =
         useRoom(readingDispatcher) {
             eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }
         }
 
-    override suspend fun loadAllFromProject(projectId: String): List<Event> =
-        useRoom(readingDispatcher) {
-            eventDao.loadFromProject(projectId).map(DbEvent::fromDbToDomain)
-        }
-
-    override suspend fun loadOpenedSessions(): Flow<Event> =
-        useRoom(readingDispatcher) {
-            eventDao.loadOpenedSessions().map { it.fromDbToDomain() }.asFlow()
-        }
-
-    override suspend fun loadAllClosedSessionIds(projectId: String): List<String> =
-        useRoom(readingDispatcher) {
-            eventDao.loadAllClosedSessionIds(projectId)
-        }
-
-    override suspend fun count(projectId: String): Int =
-        useRoom(readingDispatcher) {
-            eventDao.countFromProject(projectId = projectId)
-        }
-
-    override suspend fun count(type: EventType): Int =
-        useRoom(readingDispatcher) {
-            eventDao.countFromType(type = type)
-        }
-
-    override suspend fun observeCount(projectId: String): Flow<Int> =
-        useRoomFlow(readingDispatcher) {
-            eventDao.observeCount(projectId = projectId)
-        }
-
-    override suspend fun observeCount(projectId: String, type: EventType): Flow<Int> =
-        useRoomFlow(readingDispatcher) {
-            eventDao.observeCountFromType(projectId = projectId, type = type)
-        }
-
-    override suspend fun insertOrUpdate(event: Event) =
-        useRoom(writingContext) {
-            eventDao.insertOrUpdate(event.fromDomainToDb())
-        }
-
-    override suspend fun delete(ids: List<String>) =
-        useRoom(writingContext) {
-            eventDao.delete(ids)
-        }
-
-    override suspend fun deleteAllFromSession(sessionId: String) =
-        useRoom(writingContext) {
-            eventDao.deleteAllFromSession(sessionId = sessionId)
-        }
+    override suspend fun deleteEventsInSession(sessionId: String) = useRoom(writingContext) {
+        eventDao.deleteAllFromSession(sessionId = sessionId)
+    }
 
     override suspend fun deleteAll() =
         useRoom(writingContext) {
+            scopeDao.deleteAll()
             eventDao.deleteAll()
         }
 }

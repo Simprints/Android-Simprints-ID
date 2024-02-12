@@ -5,7 +5,7 @@ import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintImagePr
 import com.simprints.fingerprint.infra.basebiosdk.acquisition.FingerprintTemplateProvider
 import com.simprints.fingerprint.infra.basebiosdk.initialization.SdkInitializer
 import com.simprints.fingerprint.infra.basebiosdk.matching.FingerprintMatcher
-import com.simprints.fingerprint.infra.basebiosdk.matching.SimAfisMatcher
+import com.simprints.fingerprint.infra.biosdkimpl.matching.SimAfisMatcher
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.image.FingerprintImageProviderImpl
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateAcquisitionSettings
 import com.simprints.fingerprint.infra.biosdkimpl.acquisition.template.FingerprintTemplateMetadata
@@ -18,20 +18,26 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class SimprintsSdk
+
 @Module
 @InstallIn(SingletonComponent::class)
-object BioSdkModule {
+object SimprintsBioSdkModule {
+
 
     @Provides
     @Singleton
-    fun provideFingerprintBioSdk(
-        sdkInitializer: SdkInitializer<Unit>,
-        fingerprintImageProvider: FingerprintImageProvider<Unit, Unit>,
-        fingerprintTemplateProvider: FingerprintTemplateProvider<FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata>,
-        fingerprintMatcher: FingerprintMatcher<SimAfisMatcherSettings>
+    internal fun provideFingerprintBioSdk(
+        sdkInitializer: SdkInitializerImpl,
+        fingerprintImageProvider: FingerprintImageProviderImpl,
+        fingerprintTemplateProvider: FingerprintTemplateProviderImpl,
+        fingerprintMatcher: FingerprintMatcherImpl
     ): FingerprintBioSdk<Unit, Unit, Unit, FingerprintTemplateAcquisitionSettings, FingerprintTemplateMetadata, SimAfisMatcherSettings> {
         return FingerprintBioSdk(
             sdkInitializer,

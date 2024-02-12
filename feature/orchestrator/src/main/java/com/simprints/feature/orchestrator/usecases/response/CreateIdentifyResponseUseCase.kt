@@ -19,7 +19,7 @@ internal class CreateIdentifyResponseUseCase @Inject constructor(
         projectConfiguration: ProjectConfiguration,
         results: List<Serializable>,
     ): AppResponse {
-        val currentSessionId = eventRepository.getCurrentCaptureSessionEvent().id
+        val currentSessionId = eventRepository.getCurrentSessionScope().id
 
         val faceDecisionPolicy = projectConfiguration.face?.decisionPolicy
         val faceResults = getFaceMatchResults(faceDecisionPolicy, results, projectConfiguration)

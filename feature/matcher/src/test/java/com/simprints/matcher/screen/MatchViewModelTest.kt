@@ -6,6 +6,7 @@ import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.matcher.FaceMatchResult
 import com.simprints.matcher.FingerprintMatchResult
 import com.simprints.matcher.MatchParams
@@ -53,7 +54,7 @@ internal class MatchViewModelTest {
 
         cb1 = slot()
 
-        every { timeHelper.now() } returns 0
+        every { timeHelper.now() } returns Timestamp(0L)
         every { faceMatcherUseCase.matcherName } returns MATCHER_NAME
         every { fingerprintMatcherUseCase.matcherName } returns MATCHER_NAME
 

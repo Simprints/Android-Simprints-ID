@@ -1,6 +1,7 @@
 package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
@@ -77,7 +78,8 @@ internal class SaveSubjectFetchEventUseCaseTest {
     }
 
     companion object {
-        private const val TIMESTAMP = 1L
+
+        private val TIMESTAMP = Timestamp(1L)
         private const val SUBJECT_ID = "subjectID"
     }
 }

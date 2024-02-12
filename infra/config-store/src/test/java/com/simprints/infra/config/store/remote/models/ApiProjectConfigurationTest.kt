@@ -16,6 +16,7 @@ class ApiProjectConfigurationTest {
     fun `should map correctly the model when both fingerprint and face are missing`() {
         val apiProjectConfiguration = ApiProjectConfiguration(
             "projectId",
+            "updatedAt",
             apiGeneralConfiguration,
             null,
             null,
@@ -25,6 +26,7 @@ class ApiProjectConfigurationTest {
         )
         val projectConfiguration = ProjectConfiguration(
             "projectId",
+            "updatedAt",
             generalConfiguration,
             null,
             null,

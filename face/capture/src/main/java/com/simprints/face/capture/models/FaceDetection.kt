@@ -1,6 +1,7 @@
 package com.simprints.face.capture.models
 
 import android.graphics.Bitmap
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.facebiosdk.detection.Face
 import com.simprints.infra.images.model.SecuredImageRef
 import java.util.UUID
@@ -10,11 +11,12 @@ internal data class FaceDetection(
     val face: Face?,
     val status: Status,
     var securedImageRef: SecuredImageRef? = null,
-    var detectionStartTime: Long = System.currentTimeMillis(),
+    var detectionStartTime: Timestamp,
     var isFallback: Boolean = false,
     var id: String = UUID.randomUUID().toString(),
-    var detectionEndTime: Long = System.currentTimeMillis()
+    var detectionEndTime: Timestamp,
 ) {
+
     enum class Status {
         VALID,
         VALID_CAPTURING,

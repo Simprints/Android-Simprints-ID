@@ -2,7 +2,11 @@ package com.simprints.fingerprint.infra.scanner.capture
 
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintImageResponse
 import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireFingerprintTemplateResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireImageDistortionMatrixConfigurationResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.AcquireUnprocessedImageResponse
+import com.simprints.fingerprint.infra.scanner.domain.fingerprint.RawUnprocessedImage
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedException
+import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoImageDistortionConfigurationMatrixException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.infra.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.CaptureFingerprintResult
@@ -22,15 +26,52 @@ internal class FingerprintCaptureWrapperV2(
     private val scannerUiHelper: ScannerUiHelper,
     private val ioDispatcher: CoroutineDispatcher,
 ) : FingerprintCaptureWrapper {
-    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse {
-        return withContext(ioDispatcher) {
+
+    override suspend fun acquireImageDistortionMatrixConfiguration(): AcquireImageDistortionMatrixConfigurationResponse =
+        withContext(ioDispatcher) {
+            scannerV2.acquireImageDistortionConfigurationMatrix()
+                .map { AcquireImageDistortionMatrixConfigurationResponse(it) }
+                .switchIfEmpty(Single.error(NoImageDistortionConfigurationMatrixException()))
+                .wrapErrorsFromScanner().await()
+        }
+
+    override suspend fun acquireFingerprintImage(): AcquireFingerprintImageResponse =
+        withContext(ioDispatcher) {
             scannerV2.acquireImage(IMAGE_FORMAT).map { imageBytes ->
                 AcquireFingerprintImageResponse(imageBytes.image)
-            }.switchIfEmpty(Single.error(NoFingerDetectedException())).wrapErrorsFromScanner()
+            }
+                .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image")))
+                .wrapErrorsFromScanner()
                 .await()
         }
 
-    }
+
+    override suspend fun acquireUnprocessedImage(
+        captureDpi: Dpi?,
+    ): AcquireUnprocessedImageResponse =
+
+        withContext(ioDispatcher) {
+            require(captureDpi != null && (captureDpi.value in MIN_CAPTURE_DPI..MAX_CAPTURE_DPI)) {
+                "Capture DPI must be between $MIN_CAPTURE_DPI and $MAX_CAPTURE_DPI"
+            }
+            // Capture fingerprint and ensure it's OK
+            scannerV2.captureFingerprint().ensureCaptureResultOkOrError().await()
+            // Transfer the unprocessed image from the scanner
+            acquireUnprocessedImage().switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire unprocessed image data")))
+                .wrapErrorsFromScanner().await()
+
+        }
+
+
+    private fun acquireUnprocessedImage() =
+        scannerV2.acquireUnprocessedImage(IMAGE_FORMAT)
+            .map { imageData ->
+                AcquireUnprocessedImageResponse(
+                    RawUnprocessedImage(
+                        imageData.image
+                    )
+                )
+            }
 
     override suspend fun acquireFingerprintTemplate(
         captureDpi: Dpi?,
@@ -44,10 +85,10 @@ internal class FingerprintCaptureWrapperV2(
             .captureFingerprint(captureDpi)
             .ensureCaptureResultOkOrError()
             .andThen(scannerV2.getImageQualityScore())
-            .switchIfEmpty(Single.error(NoFingerDetectedException()))
+            .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire image quality score")))
             .setLedStateBasedOnQualityScoreOrInterpretAsNoFingerDetected(qualityThreshold)
             .acquireTemplateAndAssembleResponse()
-            .switchIfEmpty(Single.error(NoFingerDetectedException()))
+            .switchIfEmpty(Single.error(NoFingerDetectedException("Failed to acquire template")))
             .ifNoFingerDetectedThenSetBadScanLedState()
             .wrapErrorsFromScanner()
             .await()
@@ -58,7 +99,7 @@ internal class FingerprintCaptureWrapperV2(
             when (it) {
                 CaptureFingerprintResult.OK -> Completable.complete()
                 CaptureFingerprintResult.FINGERPRINT_NOT_FOUND -> Completable.error(
-                    NoFingerDetectedException()
+                    NoFingerDetectedException("Fingerprint not found")
                 )
 
                 CaptureFingerprintResult.DPI_UNSUPPORTED -> Completable.error(
@@ -84,7 +125,7 @@ internal class FingerprintCaptureWrapperV2(
                 scannerV2.setSmileLedState(ledState)
                     .andThen(Single.just(qualityScore))
             } else {
-                Single.error(NoFingerDetectedException())
+                Single.error(NoFingerDetectedException("Image quality score below detection threshold"))
             }
         }
 
@@ -97,6 +138,7 @@ internal class FingerprintCaptureWrapperV2(
                     )
                 }
         }
+
 
     private fun Single<AcquireFingerprintTemplateResponse>.ifNoFingerDetectedThenSetBadScanLedState() =
         onErrorResumeNext {

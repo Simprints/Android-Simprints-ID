@@ -3,7 +3,6 @@ package com.simprints.infra.events.event.local.migrations
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase.CONFLICT_NONE
 import androidx.room.testing.MigrationTestHelper
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.fasterxml.jackson.core.type.TypeReference
@@ -18,12 +17,10 @@ import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.local.EventRoomDatabase
 import com.simprints.infra.events.event.local.migrations.*
 import com.simprints.infra.events.local.migrations.*
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import dagger.hilt.android.testing.HiltTestApplication
+import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.io.File
 
 /**
@@ -32,14 +29,12 @@ import java.io.File
  * new events create a new file in src/test/resources/all-events.
  */
 @RunWith(AndroidJUnit4::class)
-@Config(application = HiltTestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class EventMigrationTest {
 
     @get:Rule
-    val helper: MigrationTestHelper = MigrationTestHelper(
+    val helper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        EventRoomDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
+        EventRoomDatabase::class.java,
     )
 
     private val allEventTypes = EventType.values()
@@ -55,18 +50,18 @@ class EventMigrationTest {
             }
             close()
         }
-        val db = helper.runMigrationsAndValidate(TEST_DB, 10, true, *ALL_MIGRATIONS)
-        val cursor = db.query("SELECT * FROM $TABLE_NAME")
-
-        while (cursor.moveToNext()) {
-            val eventJson = cursor.getStringWithColumnName("eventJson")!!
-            JsonHelper.fromJson(
-                json = eventJson,
-                type = object : TypeReference<Event>() {},
-                module = tokenizeSerializationModule
-            )
+        val db = helper.runMigrationsAndValidate(TEST_DB, 13, true, *ALL_MIGRATIONS)
+        db.query("SELECT * FROM $TABLE_NAME").use { cursor ->
+            while (cursor.moveToNext()) {
+                val eventJson = cursor.getStringWithColumnName("eventJson")!!
+                JsonHelper.fromJson(
+                    json = eventJson,
+                    type = object : TypeReference<Event>() {},
+                    module = tokenizeSerializationModule
+                )
+            }
         }
-        cursor.close()
+        helper.closeWhenFinished(db)
     }
 
     private fun loadAllEvents(): List<ContentValues> =
@@ -76,15 +71,17 @@ class EventMigrationTest {
 
     private fun loadEvent(file: File): ContentValues =
         try {
-            val eventJsonStr = file.readText()
-            val eventJson = JsonHelper.fromJson<Map<String, Any>>(eventJsonStr)
-            val payload = eventJson["payload"] as Map<*, *>
+            // Some migrations expect that eventJson is a string without spaces or new lines as it is in the real database
+            val eventJsonStr = file.readText().replace("\n", "").replace(" ", "")
+            val eventJson = JSONObject(eventJsonStr)
+            val payload = eventJson.getJSONObject("payload")
+
             ContentValues().apply {
-                this.put("id", eventJson["id"] as String)
-                this.put("type", eventJson["type"] as String)
+                this.put("id", eventJson.getString("id"))
+                this.put("type", eventJson.getString("type"))
                 this.put("eventJson", eventJsonStr)
-                this.put("createdAt", (payload["createdAt"] as Number).toLong())
-                this.put("endedAt", (payload["endedAt"] as Number).toLong())
+                this.put("createdAt", payload.getLong("createdAt"))
+                this.put("endedAt", payload.getLong("endedAt"))
             }
         } catch (e: Exception) {
             println("Fail to parse $file")
@@ -100,6 +97,7 @@ class EventMigrationTest {
     }
 
     companion object {
+
         private const val TEST_DB = "test"
         private const val TABLE_NAME = "DbEvent"
         private val ALL_MIGRATIONS = arrayOf(
@@ -112,6 +110,9 @@ class EventMigrationTest {
             EventMigration7to8(),
             EventMigration8to9(),
             EventMigration9to10(),
+            EventMigration10to11(),
+            EventMigration11to12(),
+            EventMigration12to13(),
         )
         val tokenizeSerializationModule = SimpleModule().apply {
             addSerializer(TokenizableString::class.java, TokenizationClassNameSerializer())

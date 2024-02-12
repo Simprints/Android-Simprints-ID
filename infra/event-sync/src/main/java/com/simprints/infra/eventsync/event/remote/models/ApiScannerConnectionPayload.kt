@@ -8,33 +8,35 @@ import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.Sca
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_1
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerGeneration.VERO_2
-import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent.ScannerConnectionPayload.ScannerInfo
 import com.simprints.infra.eventsync.event.remote.models.ApiScannerConnectionPayload.ApiScannerGeneration
 
 @Keep
 @JsonInclude(Include.NON_NULL)
 internal data class ApiScannerConnectionPayload(
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     override val version: Int,
     val scannerInfo: ApiScannerInfo,
-) : ApiEventPayload(ApiEventPayloadType.ScannerConnection, version, startTime) {
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     @JsonInclude(Include.NON_NULL)
-    class ApiScannerInfo(val scannerId: String,
-                         val macAddress: String,
-                         val generation: ApiScannerGeneration?,
-                         var hardwareVersion: String?) {
-
-        constructor(scannerInfo: ScannerInfo) :
-            this(scannerInfo.scannerId, scannerInfo.macAddress,
-                scannerInfo.generation.toApiScannerGeneration(), scannerInfo.hardwareVersion)
-    }
+    data class ApiScannerInfo(
+        val scannerId: String,
+        val macAddress: String,
+        val generation: ApiScannerGeneration?,
+        var hardwareVersion: String?,
+    )
 
     constructor(domainPayload: ScannerConnectionPayload) : this(
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.eventVersion,
-        ApiScannerInfo(domainPayload.scannerInfo))
+        ApiScannerInfo(
+            domainPayload.scannerInfo.scannerId,
+            domainPayload.scannerInfo.macAddress,
+            domainPayload.scannerInfo.generation.toApiScannerGeneration(),
+            domainPayload.scannerInfo.hardwareVersion,
+        ),
+    )
 
     enum class ApiScannerGeneration {
         VERO_1,

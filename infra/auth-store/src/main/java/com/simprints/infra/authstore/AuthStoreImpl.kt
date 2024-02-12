@@ -1,6 +1,7 @@
 package com.simprints.infra.authstore
 
 import com.google.firebase.FirebaseApp
+import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.infra.authstore.db.FirebaseAuthManager
 import com.simprints.infra.authstore.domain.LoginInfoStore
 import com.simprints.infra.authstore.domain.models.Token
@@ -17,6 +18,12 @@ internal class AuthStoreImpl @Inject constructor(
     private val simApiClientFactory: SimApiClientFactory,
 ) : AuthStore {
 
+    override var signedInUserId: TokenizableString?
+        get() = loginInfoStore.signedInUserId
+        set(value) {
+            loginInfoStore.signedInUserId = value
+        }
+
     override var signedInProjectId: String
         get() = loginInfoStore.signedInProjectId
         set(value) {
@@ -28,10 +35,6 @@ internal class AuthStoreImpl @Inject constructor(
 
     override fun cleanCredentials() {
         loginInfoStore.cleanCredentials()
-    }
-
-    override fun storeCredentials(projectId: String) {
-        loginInfoStore.storeCredentials(projectId)
     }
 
     override suspend fun storeFirebaseToken(token: Token) {

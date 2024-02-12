@@ -1,6 +1,6 @@
 package com.simprints.infra.authstore.domain.models
 
 data class AuthRequest(
-    var encryptedProjectSecret: String = "",
+    var projectSecret: String = "",
     var integrityToken: String = "",
 )

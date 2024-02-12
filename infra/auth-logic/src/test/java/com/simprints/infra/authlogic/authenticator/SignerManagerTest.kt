@@ -1,16 +1,17 @@
 package com.simprints.infra.authlogic.authenticator
 
-import com.simprints.infra.authlogic.worker.SecurityStateScheduler
+import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.authstore.domain.models.Token
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Project
+import com.simprints.infra.config.store.models.ProjectConfiguration
+import com.simprints.infra.config.store.models.ProjectState
+import com.simprints.infra.config.store.models.ProjectWithConfig
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
-import com.simprints.infra.eventsync.EventSyncManager
 import com.simprints.infra.images.ImageRepository
-import com.simprints.infra.images.ImageUpSyncScheduler
 import com.simprints.infra.network.SimNetwork
 import com.simprints.infra.recent.user.activity.RecentUserActivityManager
 import com.simprints.testtools.common.syntax.assertThrows
@@ -29,22 +30,13 @@ import org.junit.Test
 internal class SignerManagerTest {
 
     @MockK
-    lateinit var mockConfigManager: ConfigManager
+    lateinit var configRepository: ConfigRepository
 
     @MockK
     lateinit var mockAuthStore: AuthStore
 
     @MockK
-    lateinit var mockEventSyncManager: EventSyncManager
-
-    @MockK
-    lateinit var mockSecurityStateScheduler: SecurityStateScheduler
-
-    @MockK
     lateinit var mockRecentUserActivityManager: RecentUserActivityManager
-
-    @MockK
-    lateinit var mockImageUpSyncScheduler: ImageUpSyncScheduler
 
     @MockK
     lateinit var mockSimNetwork: SimNetwork
@@ -57,6 +49,9 @@ internal class SignerManagerTest {
 
     @MockK
     lateinit var mockEnrolmentRecordRepository: EnrolmentRecordRepository
+
+    @MockK
+    lateinit var scannerManager: ScannerManager
 
     private lateinit var signerManager: SignerManager
 
@@ -72,16 +67,14 @@ internal class SignerManagerTest {
         MockKAnnotations.init(this, relaxed = true)
 
         signerManager = SignerManager(
-            mockConfigManager,
+            configRepository,
             mockAuthStore,
-            mockEventSyncManager,
-            mockSecurityStateScheduler,
             mockRecentUserActivityManager,
-            mockImageUpSyncScheduler,
             mockSimNetwork,
             mockImageRepository,
             mockEventRepository,
             mockEnrolmentRecordRepository,
+            scannerManager,
             UnconfinedTestDispatcher(),
         )
     }
@@ -90,7 +83,6 @@ internal class SignerManagerTest {
     fun signIn_shouldSignInToRemoteDb() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
         mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
 
         signIn()
 
@@ -109,17 +101,16 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
 
         signIn()
 
-        verify { mockAuthStore.storeCredentials(DEFAULT_PROJECT_ID) }
+        verify { mockAuthStore.signedInProjectId = DEFAULT_PROJECT_ID }
     }
 
     @Test
     fun storeCredentialsFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
         mockRemoteSignedIn()
-        mockStoreCredentialsLocally(true)
+        every { mockAuthStore.signedInProjectId = any() } throws Throwable("Failed to store credentials")
 
         assertThrows<Throwable> { signIn() }
     }
@@ -129,11 +120,10 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
 
         signIn()
 
-        coVerify { mockConfigManager.refreshProject(DEFAULT_PROJECT_ID) }
+        coVerify { configRepository.refreshProject(DEFAULT_PROJECT_ID) }
     }
 
     @Test
@@ -141,26 +131,11 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo(true)
-        mockFetchingProjectConfiguration()
 
         assertThrows<Throwable> { signIn() }
 
         verify { mockAuthStore.clearFirebaseToken() }
-        coVerify { mockConfigManager.clearData() }
-        verify { mockAuthStore.cleanCredentials() }
-    }
-
-    @Test
-    fun refreshProjectConfigurationFails_signInShouldFail() = runTest(UnconfinedTestDispatcher()) {
-        mockRemoteSignedIn()
-        mockStoreCredentialsLocally()
-        mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration(true)
-
-        assertThrows<Throwable> { signIn() }
-
-        verify { mockAuthStore.clearFirebaseToken() }
-        coVerify { mockConfigManager.clearData() }
+        coVerify { configRepository.clearData() }
         verify { mockAuthStore.cleanCredentials() }
     }
 
@@ -169,7 +144,6 @@ internal class SignerManagerTest {
         mockRemoteSignedIn()
         mockStoreCredentialsLocally()
         mockFetchingProjectInfo()
-        mockFetchingProjectConfiguration()
 
         signIn()
     }
@@ -178,26 +152,9 @@ internal class SignerManagerTest {
     fun signOut_shouldRemoveAnyState() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        verifyStoredCredentialsGotCleaned()
-        verifyRemoteManagerGotSignedOut()
-        verifyLastSyncInfoGotDeleted()
-        coVerify(exactly = 1) { mockConfigManager.clearData() }
-    }
-
-    @Test
-    fun signOut_shouldCancelPeriodicSecurityStateCheck() = runTest(UnconfinedTestDispatcher()) {
-        signerManager.signOut()
-
-        verify { mockSecurityStateScheduler.cancelSecurityStateCheck() }
-    }
-
-    @Test
-    fun signOut_backgroundSyncWorkersAreCancelled() = runTest(UnconfinedTestDispatcher()) {
-        signerManager.signOut()
-
-        coVerify { mockEventSyncManager.cancelScheduledSync() }
-        verify { mockImageUpSyncScheduler.cancelImageUpSync() }
-        coVerify { mockConfigManager.cancelScheduledSyncConfiguration() }
+        verify { mockAuthStore.cleanCredentials() }
+        verify { mockAuthStore.clearFirebaseToken() }
+        coVerify(exactly = 1) { configRepository.clearData() }
     }
 
     @Test
@@ -218,7 +175,7 @@ internal class SignerManagerTest {
     fun signOut_clearConfiguration() = runTest(UnconfinedTestDispatcher()) {
         signerManager.signOut()
 
-        coVerify { mockConfigManager.clearData() }
+        coVerify { configRepository.clearData() }
     }
 
     @Test
@@ -228,6 +185,7 @@ internal class SignerManagerTest {
         coVerify { mockImageRepository.deleteStoredImages() }
         coVerify { mockEventRepository.deleteAll() }
         coVerify { mockEnrolmentRecordRepository.deleteAll() }
+        coVerify { scannerManager.deleteFirmwareFiles() }
     }
 
     @Test
@@ -239,14 +197,8 @@ internal class SignerManagerTest {
 
     private suspend fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, token)
 
-    private fun mockStoreCredentialsLocally(error: Boolean = false) =
-        every { mockAuthStore.storeCredentials(DEFAULT_PROJECT_ID) }.apply {
-            if (!error) {
-                this.returns(Unit)
-            } else {
-                this.throws(Throwable("Failed to store credentials"))
-            }
-        }
+    private fun mockStoreCredentialsLocally() =
+        every { mockAuthStore.signedInProjectId } returns (DEFAULT_PROJECT_ID)
 
     private fun mockRemoteSignedIn(error: Boolean = false) =
         coEvery { mockAuthStore.storeFirebaseToken(token) }.apply {
@@ -258,17 +210,23 @@ internal class SignerManagerTest {
         }
 
     private fun mockFetchingProjectInfo(error: Boolean = false) =
-        coEvery { mockConfigManager.refreshProject(any()) }.apply {
+        coEvery { configRepository.refreshProject(any()) }.apply {
             if (!error) {
                 this.returns(
-                    Project(
-                        DEFAULT_PROJECT_ID,
-                        "local",
-                        "",
-                        "",
-                        "some_bucket_url",
-                        "",
-                        tokenizationKeys = emptyMap()
+                    ProjectWithConfig(
+                        Project(
+                            DEFAULT_PROJECT_ID,
+                            "local",
+                            ProjectState.RUNNING,
+                            "",
+                            "",
+                            "some_bucket_url",
+                            "",
+                            tokenizationKeys = emptyMap()
+                        ),
+                        ProjectConfiguration(
+                            DEFAULT_PROJECT_ID, "", mockk(), mockk(), mockk(), mockk(), mockk(), mockk()
+                        )
                     )
                 )
             } else {
@@ -276,18 +234,4 @@ internal class SignerManagerTest {
             }
         }
 
-    private fun mockFetchingProjectConfiguration(error: Boolean = false) =
-        coEvery { mockConfigManager.refreshProjectConfiguration(any()) }.apply {
-            if (!error) {
-                this.returns(mockk())
-            } else {
-                this.throws(Exception("Failed to fetch project configuration"))
-            }
-        }
-
-    private fun verifyStoredCredentialsGotCleaned() =
-        verify { mockAuthStore.cleanCredentials() }
-
-    private fun verifyRemoteManagerGotSignedOut() = verify { mockAuthStore.clearFirebaseToken() }
-    private fun verifyLastSyncInfoGotDeleted() = coVerify { mockEventSyncManager.deleteSyncInfo() }
 }

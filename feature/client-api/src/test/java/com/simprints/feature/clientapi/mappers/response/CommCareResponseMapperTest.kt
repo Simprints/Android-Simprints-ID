@@ -16,7 +16,6 @@ import com.simprints.infra.orchestration.data.ActionResponse
 import com.simprints.infra.orchestration.data.responses.AppMatchResult
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +36,7 @@ class CommCareResponseMapperTest {
         )).getBundle(CommCareConstants.COMMCARE_BUNDLE_KEY) ?: bundleOf()
 
         assertThat(extras.getString(CommCareConstants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelable<Registration>(CommCareConstants.REGISTRATION_GUID_KEY)).isEqualTo(Registration("guid"))
+        assertThat(extras.getString(CommCareConstants.REGISTRATION_GUID_KEY)).isEqualTo("guid")
         assertThat(extras.getString(CommCareConstants.BIOMETRICS_COMPLETE_CHECK_KEY)).isEqualTo("true")
     }
 
@@ -64,10 +63,14 @@ class CommCareResponseMapperTest {
         ))
 
         assertThat(extras.getString(Constants.SIMPRINTS_SESSION_ID)).isEqualTo("sessionId")
-        assertThat(extras.getParcelableArray(Constants.SIMPRINTS_IDENTIFICATIONS))
-            .isEqualTo(arrayOf(
-                Identification("guid-1", 100, Tier.TIER_5),
-                Identification("guid-2", 75, Tier.TIER_3),
+        @Suppress("DEPRECATION")
+        //Intentionally using deprecated getParcelableArrayList() as this is what CommCare uses
+        assertThat(extras.getParcelableArrayList<Identification>(Constants.SIMPRINTS_IDENTIFICATIONS))
+            .isEqualTo(ArrayList<Identification>(
+                listOf(
+                    Identification("guid-1", 100, Tier.TIER_5),
+                    Identification("guid-2", 75, Tier.TIER_3),
+                )
             ))
     }
 

@@ -4,6 +4,7 @@ import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20M
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.Un20Response
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.models.Un20MessageType
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.CaptureFingerprintResponse
+import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageDistortionConfigurationMatrixResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageQualityPreviewResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageQualityResponse
 import com.simprints.fingerprint.infra.scanner.v2.domain.main.message.un20.responses.GetImageResponse
@@ -34,6 +35,9 @@ class Un20ResponseParser : MessageParser<Un20Response> {
                     is Un20MessageType.GetTemplate -> GetTemplateResponse.fromBytes(minorTypeByte, data)
                     Un20MessageType.GetSupportedImageFormats -> GetSupportedImageFormatsResponse.fromBytes(data)
                     is Un20MessageType.GetImage -> GetImageResponse.fromBytes(minorTypeByte, data)
+                    is Un20MessageType.GetUnprocessedImage -> GetImageResponse.fromBytes(minorTypeByte,data)
+                    Un20MessageType.GetImageDistortionConfigurationMatrix ->  GetImageDistortionConfigurationMatrixResponse.fromBytes(data)
+
                     Un20MessageType.GetImageQuality -> GetImageQualityResponse.fromBytes(data)
                     Un20MessageType.StartOta -> StartOtaResponse.fromBytes(data)
                     Un20MessageType.WriteOtaChunk -> WriteOtaChunkResponse.fromBytes(data)

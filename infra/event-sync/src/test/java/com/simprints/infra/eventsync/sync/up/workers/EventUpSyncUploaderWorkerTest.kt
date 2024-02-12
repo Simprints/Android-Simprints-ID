@@ -20,6 +20,7 @@ import com.simprints.infra.eventsync.sync.up.tasks.EventUpSyncTask
 import com.simprints.infra.eventsync.sync.up.EventUpSyncProgress
 import com.simprints.infra.eventsync.sync.up.workers.EventUpSyncUploaderWorker.Companion.INPUT_UP_SYNC
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.events.EventRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.network.exceptions.BackendMaintenanceException
 import com.simprints.infra.network.exceptions.SyncCloudIntegrationException
@@ -57,6 +58,9 @@ class EventUpSyncUploaderWorkerTest {
         every { signedInProjectId } returns PROJECT_ID
     }
     private val upSyncTask = mockk<EventUpSyncTask>()
+    private val eventRepository = mockk<EventRepository> {
+        coEvery { observeEventCount(any()) } returns flowOf(12)
+    }
 
     @Before
     fun setUp() {
@@ -90,7 +94,8 @@ class EventUpSyncUploaderWorkerTest {
         assertThat(result).isEqualTo(
             ListenableWorker.Result.success(
                 workDataOf(
-                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 12
+                    EventUpSyncUploaderWorker.OUTPUT_UP_SYNC to 12,
+                    EventUpSyncUploaderWorker.OUTPUT_UP_MAX_SYNC to 12
                 )
             )
         )
@@ -275,6 +280,7 @@ class EventUpSyncUploaderWorkerTest {
                 upSyncTask,
                 mockk(relaxed = true),
                 authStore,
+                eventRepository,
                 testCoroutineRule.testCoroutineDispatcher
             )
         ).build()
@@ -284,6 +290,7 @@ private class TestWorkerFactory(
     private val upSyncTask: EventUpSyncTask,
     private val eventSyncCache: EventSyncCache,
     private val authStore: AuthStore,
+    private val eventRepository: EventRepository,
     private val dispatcher: CoroutineDispatcher,
 ) : WorkerFactory() {
     override fun createWorker(
@@ -297,6 +304,7 @@ private class TestWorkerFactory(
         eventSyncCache,
         authStore,
         JsonHelper,
+        eventRepository,
         dispatcher
     )
 }

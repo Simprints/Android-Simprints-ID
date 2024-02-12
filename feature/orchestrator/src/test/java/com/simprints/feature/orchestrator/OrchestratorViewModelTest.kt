@@ -6,10 +6,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.domain.common.FlowType
+import com.simprints.core.domain.response.AppErrorReason
 import com.simprints.face.capture.FaceCaptureResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.orchestrator.cache.OrchestratorCache
-import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.feature.orchestrator.steps.MatchStepStubPayload
 import com.simprints.feature.orchestrator.steps.Step
 import com.simprints.feature.orchestrator.steps.StepId
@@ -24,9 +24,9 @@ import com.simprints.feature.orchestrator.usecases.steps.BuildStepsUseCase
 import com.simprints.feature.setup.LocationStore
 import com.simprints.feature.setup.SetupResult
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
-import com.simprints.infra.config.sync.ConfigManager
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
-import com.simprints.core.domain.response.AppErrorReason
+import com.simprints.infra.orchestration.data.responses.AppErrorResponse
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
@@ -52,7 +52,7 @@ internal class OrchestratorViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var cache: OrchestratorCache
@@ -89,7 +89,7 @@ internal class OrchestratorViewModelTest {
         MockKAnnotations.init(this, relaxed = true)
 
         viewModel = OrchestratorViewModel(
-            configManager,
+            configRepository,
             cache,
             locationStore,
             stepsBuilder,

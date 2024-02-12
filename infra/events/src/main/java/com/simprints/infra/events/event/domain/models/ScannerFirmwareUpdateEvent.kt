@@ -2,6 +2,7 @@ package com.simprints.infra.events.event.domain.models
 
 import androidx.annotation.Keep
 import com.simprints.core.domain.tokenization.TokenizableString
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
 import java.util.UUID
@@ -9,21 +10,20 @@ import java.util.UUID
 @Keep
 data class ScannerFirmwareUpdateEvent(
     override val id: String = UUID.randomUUID().toString(),
-    override var labels: EventLabels,
     override val payload: ScannerFirmwareUpdatePayload,
-    override val type: EventType
+    override val type: EventType,
+    override var sessionId: String? = null,
+    override var projectId: String? = null,
 ) : Event() {
 
     constructor(
-        createdAt: Long,
-        endTime: Long,
+        createdAt: Timestamp,
+        endTime: Timestamp,
         chip: String,
         targetAppVersion: String,
         failureReason: String? = null,
-        labels: EventLabels = EventLabels()
     ) : this(
         UUID.randomUUID().toString(),
-        labels,
         ScannerFirmwareUpdatePayload(
             createdAt = createdAt,
             eventVersion = EVENT_VERSION,
@@ -38,20 +38,22 @@ data class ScannerFirmwareUpdateEvent(
 
     override fun getTokenizedFields(): Map<TokenKeyType, TokenizableString> = emptyMap()
 
-    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) = this // No tokenized fields
+    override fun setTokenizedFields(map: Map<TokenKeyType, TokenizableString>) =
+        this // No tokenized fields
 
     @Keep
     data class ScannerFirmwareUpdatePayload(
-        override val createdAt: Long,
+        override val createdAt: Timestamp,
         override val eventVersion: Int,
-        override var endedAt: Long,
+        override var endedAt: Timestamp?,
         val chip: String,
         val targetAppVersion: String,
         var failureReason: String? = null,
-        override val type: EventType = SCANNER_FIRMWARE_UPDATE
+        override val type: EventType = SCANNER_FIRMWARE_UPDATE,
     ) : EventPayload()
 
     companion object {
-        const val EVENT_VERSION = 1
+
+        const val EVENT_VERSION = 2
     }
 }

@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.events.EventRepository
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -85,7 +86,8 @@ internal class SelectSubjectViewModelTest {
     }
 
     companion object {
-        private const val TIMESTAMP = 1L
+
+        private val TIMESTAMP = Timestamp(1L)
         private const val PROJECT_ID = "projectId"
         private const val SUBJECT_ID = "subjectId"
     }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload
-import com.simprints.infra.events.event.domain.models.ArtificialTerminationEvent.ArtificialTerminationPayload
 import com.simprints.infra.events.event.domain.models.AuthenticationEvent.AuthenticationPayload
 import com.simprints.infra.events.event.domain.models.AuthorizationEvent.AuthorizationPayload
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent.CandidateReadPayload
@@ -16,7 +15,6 @@ import com.simprints.infra.events.event.domain.models.EnrolmentEventV1
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.EventPayload
 import com.simprints.infra.events.event.domain.models.EventType.ALERT_SCREEN
-import com.simprints.infra.events.event.domain.models.EventType.ARTIFICIAL_TERMINATION
 import com.simprints.infra.events.event.domain.models.EventType.AUTHENTICATION
 import com.simprints.infra.events.event.domain.models.EventType.AUTHORIZATION
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_CONFIRMATION
@@ -52,7 +50,6 @@ import com.simprints.infra.events.event.domain.models.EventType.PERSON_CREATION
 import com.simprints.infra.events.event.domain.models.EventType.REFUSAL
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_CONNECTION
 import com.simprints.infra.events.event.domain.models.EventType.SCANNER_FIRMWARE_UPDATE
-import com.simprints.infra.events.event.domain.models.EventType.SESSION_CAPTURE
 import com.simprints.infra.events.event.domain.models.EventType.SUSPICIOUS_INTENT
 import com.simprints.infra.events.event.domain.models.EventType.VERO_2_INFO_SNAPSHOT
 import com.simprints.infra.events.event.domain.models.GuidSelectionEvent.GuidSelectionPayload
@@ -84,7 +81,6 @@ import com.simprints.infra.events.event.domain.models.face.FaceFallbackCaptureEv
 import com.simprints.infra.events.event.domain.models.face.FaceOnboardingCompleteEvent.FaceOnboardingCompletePayload
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureEvent
-import com.simprints.infra.events.event.domain.models.session.SessionCaptureEvent.SessionCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType.Companion
 import com.simprints.infra.eventsync.event.remote.models.callback.ApiCallbackPayload
 import com.simprints.infra.eventsync.event.remote.models.callout.ApiCalloutPayload
@@ -93,7 +89,6 @@ import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCaptureConf
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceFallbackCapturePayload
 import com.simprints.infra.eventsync.event.remote.models.face.ApiFaceOnboardingCompletePayload
-import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionCapturePayload
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = true)
 @JsonSubTypes(
@@ -102,9 +97,7 @@ import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionCaptu
     JsonSubTypes.Type(value = ApiFaceCaptureBiometricsPayload::class, name = Companion.FACE_CAPTURE_BIOMETRICS_KEY),
     JsonSubTypes.Type(value = ApiFaceFallbackCapturePayload::class, name = Companion.FACE_FALLBACK_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiFaceOnboardingCompletePayload::class, name = Companion.FACE_ONBOARDING_COMPLETE_KEY),
-    JsonSubTypes.Type(value = ApiSessionCapturePayload::class, name = Companion.SESSION_CAPTURE_KEY),
     JsonSubTypes.Type(value = ApiAlertScreenPayload::class, name = Companion.ALERT_SCREEN_KEY),
-    JsonSubTypes.Type(value = ApiArtificialTerminationPayload::class, name = Companion.ARTIFICIAL_TERMINATION_KEY),
     JsonSubTypes.Type(value = ApiAuthenticationPayload::class, name = Companion.AUTHENTICATION_KEY),
     JsonSubTypes.Type(value = ApiAuthorizationPayload::class, name = Companion.AUTHORIZATION_KEY),
     JsonSubTypes.Type(value = ApiCandidateReadPayload::class, name = Companion.CANDIDATE_READ_KEY),
@@ -130,9 +123,8 @@ import com.simprints.infra.eventsync.event.remote.models.session.ApiSessionCaptu
 )
 @Keep
 internal abstract class ApiEventPayload(
-    val type: ApiEventPayloadType,
     open val version: Int,
-    open val startTime: Long
+    open val startTime: ApiTimestamp,
 ) {
 
     abstract fun getTokenizedFieldJsonPath(tokenKeyType: TokenKeyType): String?
@@ -141,7 +133,6 @@ internal abstract class ApiEventPayload(
 
 internal fun EventPayload.fromDomainToApi(): ApiEventPayload =
     when (this.type) {
-        ARTIFICIAL_TERMINATION -> ApiArtificialTerminationPayload(this as ArtificialTerminationPayload)
         AUTHENTICATION -> ApiAuthenticationPayload(this as AuthenticationPayload)
         CONSENT -> ApiConsentPayload(this as ConsentPayload)
         ENROLMENT_V1 -> ApiEnrolmentPayloadV1(this as EnrolmentEventV1.EnrolmentPayload)
@@ -162,7 +153,6 @@ internal fun EventPayload.fromDomainToApi(): ApiEventPayload =
         SUSPICIOUS_INTENT -> ApiSuspiciousIntentPayload(this as SuspiciousIntentPayload)
         INTENT_PARSING -> ApiIntentParsingPayload(this as IntentParsingPayload)
         COMPLETION_CHECK -> ApiCompletionCheckPayload(this as CompletionCheckPayload)
-        SESSION_CAPTURE -> ApiSessionCapturePayload(this as SessionCapturePayload)
         FACE_ONBOARDING_COMPLETE -> ApiFaceOnboardingCompletePayload(this as FaceOnboardingCompletePayload)
         FACE_FALLBACK_CAPTURE -> ApiFaceFallbackCapturePayload(this as FaceFallbackCapturePayload)
         FACE_CAPTURE -> ApiFaceCapturePayload(this as FaceCaptureEvent.FaceCapturePayload)

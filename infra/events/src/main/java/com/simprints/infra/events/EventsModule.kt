@@ -1,19 +1,13 @@
 package com.simprints.infra.events
 
 import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
-import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactoryImpl
+import com.simprints.infra.events.event.domain.validators.SessionEventValidatorsFactoryImpl
 import com.simprints.infra.events.event.local.*
 import com.simprints.infra.events.local.*
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.NonCancellable
-import javax.inject.Singleton
-import kotlin.coroutines.CoroutineContext
 
 
 @Module

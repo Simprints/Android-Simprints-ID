@@ -61,7 +61,7 @@ class SubjectFactory @Inject constructor(
             projectId = projectId,
             attendantId = attendantId,
             moduleId = moduleId,
-            createdAt = Date(timeHelper.now()),
+            createdAt = Date(timeHelper.now().ms),
             fingerprintSamples = fingerprintResponse?.let { extractFingerprintSamples(it) }.orEmpty(),
             faceSamples = faceResponse?.let { extractFaceSamples(it) }.orEmpty(),
         )

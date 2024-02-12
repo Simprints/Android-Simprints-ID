@@ -9,20 +9,21 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.feature.login.LoginError
 import com.simprints.feature.login.LoginResult
+import com.simprints.feature.logincheck.usecases.*
 import com.simprints.feature.logincheck.usecases.AddAuthorizationEventUseCase
 import com.simprints.feature.logincheck.usecases.CancelBackgroundSyncUseCase
 import com.simprints.feature.logincheck.usecases.ExtractCrashKeysUseCase
 import com.simprints.feature.logincheck.usecases.ExtractParametersForAnalyticsUseCase
-import com.simprints.feature.logincheck.usecases.GetProjectStateUseCase
-import com.simprints.feature.logincheck.usecases.GetProjectStateUseCase.ProjectState
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.MISMATCHED_PROJECT_ID
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.NOT_SIGNED_IN
 import com.simprints.feature.logincheck.usecases.IsUserSignedInUseCase.SignedInState.SIGNED_IN
 import com.simprints.feature.logincheck.usecases.ReportActionRequestEventsUseCase
 import com.simprints.feature.logincheck.usecases.StartBackgroundSyncUseCase
-import com.simprints.feature.logincheck.usecases.UpdateDatabaseCountsInCurrentSessionUseCase
 import com.simprints.feature.logincheck.usecases.UpdateProjectInCurrentSessionUseCase
+import com.simprints.feature.logincheck.usecases.UpdateSessionScopePayloadUseCase
+import com.simprints.infra.config.store.ConfigRepository
+import com.simprints.infra.config.store.models.ProjectState
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.orchestration.data.ActionRequest
 import com.simprints.infra.security.SecurityManager
@@ -42,11 +43,12 @@ class LoginCheckViewModel @Inject internal constructor(
     private val extractParametersForCrashReport: ExtractCrashKeysUseCase,
     private val addAuthorizationEvent: AddAuthorizationEventUseCase,
     private val isUserSignedIn: IsUserSignedInUseCase,
-    private val getProjectStatus: GetProjectStateUseCase,
+    private val configRepository: ConfigRepository,
     private val startBackgroundSync: StartBackgroundSyncUseCase,
     private val cancelBackgroundSync: CancelBackgroundSyncUseCase,
-    private val updateDatabaseCountsInCurrentSession: UpdateDatabaseCountsInCurrentSessionUseCase,
+    private val updateDatabaseCountsInCurrentSession: UpdateSessionScopePayloadUseCase,
     private val updateProjectInCurrentSession: UpdateProjectInCurrentSessionUseCase,
+    private val updateStoredUserId: UpdateStoredUserIdUseCase,
 ) : ViewModel() {
 
     private var cachedRequest: ActionRequest? = null
@@ -59,7 +61,6 @@ class LoginCheckViewModel @Inject internal constructor(
     val showLoginFlow: LiveData<LiveDataEventWithContent<ActionRequest>>
         get() = _showLoginFlow
     private val _showLoginFlow = MutableLiveData<LiveDataEventWithContent<ActionRequest>>()
-
 
     val proceedWithAction: LiveData<LiveDataEventWithContent<ActionRequest>>
         get() = _proceedWithAction
@@ -130,16 +131,17 @@ class LoginCheckViewModel @Inject internal constructor(
     }
 
     private suspend fun validateProjectAndProceed(actionRequest: ActionRequest) {
-        when (getProjectStatus()) {
-            ProjectState.PAUSED -> _showAlert.send(LoginCheckError.PROJECT_PAUSED)
-            ProjectState.ENDING -> _showAlert.send(LoginCheckError.PROJECT_ENDING)
-            ProjectState.ENDED -> startSignInAttempt(actionRequest)
-            ProjectState.ACTIVE -> proceedWithAction(actionRequest)
+        when (configRepository.getProject(actionRequest.projectId).state) {
+            ProjectState.PROJECT_PAUSED -> _showAlert.send(LoginCheckError.PROJECT_PAUSED)
+            ProjectState.PROJECT_ENDING -> _showAlert.send(LoginCheckError.PROJECT_ENDING)
+            ProjectState.PROJECT_ENDED -> startSignInAttempt(actionRequest)
+            ProjectState.RUNNING -> proceedWithAction(actionRequest)
         }
     }
 
     private suspend fun proceedWithAction(actionRequest: ActionRequest) = viewModelScope.launch {
         updateProjectInCurrentSession()
+        updateStoredUserId(actionRequest.userId)
         awaitAll(
             async { updateDatabaseCountsInCurrentSession() },
             async { addAuthorizationEvent(actionRequest, true) },

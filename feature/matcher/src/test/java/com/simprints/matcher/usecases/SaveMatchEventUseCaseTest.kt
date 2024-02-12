@@ -3,8 +3,9 @@ package com.simprints.matcher.usecases
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.domain.common.FlowType
 import com.simprints.core.domain.fingerprint.IFingerIdentifier
+import com.simprints.core.tools.time.Timestamp
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration.FingerComparisonStrategy
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.enrolment.records.store.domain.models.SubjectQuery
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.OneToManyMatchEvent
@@ -33,8 +34,7 @@ class SaveMatchEventUseCaseTest {
     private lateinit var eventRepository: EventRepository
 
     @MockK
-    private lateinit var configManager: ConfigManager
-
+    private lateinit var configRepository: ConfigRepository
 
     private lateinit var useCase: SaveMatchEventUseCase
 
@@ -45,12 +45,12 @@ class SaveMatchEventUseCaseTest {
         coEvery { eventRepository.addOrUpdateEvent(any()) } just Runs
 
         coEvery {
-            configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.comparisonStrategyForVerification
+            configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration?.comparisonStrategyForVerification
         } returns FingerComparisonStrategy.SAME_FINGER
 
         useCase = SaveMatchEventUseCase(
             eventRepository,
-            configManager,
+            configRepository,
             CoroutineScope(testCoroutineRule.testCoroutineDispatcher),
         )
     }
@@ -58,8 +58,8 @@ class SaveMatchEventUseCaseTest {
     @Test
     fun `Correctly saves one to one face match event`() = runTest {
         useCase.invoke(
-            1L,
-            2L,
+            Timestamp(1L),
+            Timestamp(2L),
             MatchParams(
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
@@ -77,8 +77,8 @@ class SaveMatchEventUseCaseTest {
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<OneToOneMatchEvent> {
                 assertThat(it).isInstanceOf(OneToOneMatchEvent::class.java)
-                assertThat(it.payload.createdAt).isEqualTo(1L)
-                assertThat(it.payload.endedAt).isEqualTo(2L)
+                assertThat(it.payload.createdAt).isEqualTo(Timestamp(1L))
+                assertThat(it.payload.endedAt).isEqualTo(Timestamp(2L))
                 assertThat(it.payload.candidateId).isEqualTo("subjectId")
                 assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                 assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
@@ -90,13 +90,17 @@ class SaveMatchEventUseCaseTest {
     @Test
     fun `Correctly saves one to one fingerprint match event`() = runTest {
         useCase.invoke(
-            1L,
-            2L,
+            Timestamp(1L),
+            Timestamp(2L),
             MatchParams(
                 flowType = FlowType.VERIFY,
                 queryForCandidates = SubjectQuery(subjectId = "subjectId"),
                 probeFingerprintSamples = listOf(
-                    MatchParams.FingerprintSample(IFingerIdentifier.RIGHT_5TH_FINGER, "format", byteArrayOf(1, 2, 3))
+                    MatchParams.FingerprintSample(
+                        IFingerIdentifier.RIGHT_5TH_FINGER,
+                        "format",
+                        byteArrayOf(1, 2, 3)
+                    )
                 ),
             ),
             2,
@@ -111,8 +115,8 @@ class SaveMatchEventUseCaseTest {
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<OneToOneMatchEvent> {
                 assertThat(it).isInstanceOf(OneToOneMatchEvent::class.java)
-                assertThat(it.payload.createdAt).isEqualTo(1L)
-                assertThat(it.payload.endedAt).isEqualTo(2L)
+                assertThat(it.payload.createdAt).isEqualTo(Timestamp(1L))
+                assertThat(it.payload.endedAt).isEqualTo(Timestamp(2L))
                 assertThat(it.payload.candidateId).isEqualTo("subjectId")
                 assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                 assertThat(it.payload.result?.candidateId).isEqualTo("guid1")
@@ -124,8 +128,8 @@ class SaveMatchEventUseCaseTest {
     @Test
     fun `Correctly saves one to many match event`() = runTest {
         useCase.invoke(
-            1L,
-            2L,
+            Timestamp(1L),
+            Timestamp(2L),
             MatchParams(
                 emptyList(),
                 emptyList(),
@@ -144,8 +148,8 @@ class SaveMatchEventUseCaseTest {
         coVerify {
             eventRepository.addOrUpdateEvent(withArg<OneToManyMatchEvent> {
                 assertThat(it).isInstanceOf(OneToManyMatchEvent::class.java)
-                assertThat(it.payload.createdAt).isEqualTo(1L)
-                assertThat(it.payload.endedAt).isEqualTo(2L)
+                assertThat(it.payload.createdAt).isEqualTo(Timestamp(1L))
+                assertThat(it.payload.endedAt).isEqualTo(Timestamp(2L))
                 assertThat(it.payload.matcher).isEqualTo("faceMatcherName")
                 assertThat(it.payload.result?.first()?.candidateId).isEqualTo("guid1")
                 assertThat(it.payload.result?.last()?.candidateId).isEqualTo("guid2")
@@ -156,8 +160,8 @@ class SaveMatchEventUseCaseTest {
     @Test
     fun `Correctly saves one to many match event with USER pool`() = runTest {
         useCase.invoke(
-            1L,
-            2L,
+            Timestamp(1L),
+            Timestamp(2L),
             MatchParams(
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(attendantId = "userId"),
@@ -175,12 +179,11 @@ class SaveMatchEventUseCaseTest {
         }
     }
 
-
     @Test
     fun `Correctly saves one to many match event with MODULE pool`() = runTest {
         useCase.invoke(
-            1L,
-            2L,
+            Timestamp(1L),
+            Timestamp(2L),
             MatchParams(
                 flowType = FlowType.IDENTIFY,
                 queryForCandidates = SubjectQuery(moduleId = "moduleId"),
@@ -201,8 +204,8 @@ class SaveMatchEventUseCaseTest {
     @Test
     fun `Correctly saves one to many match event with PROJECT pool`() = runTest {
         useCase.invoke(
-            1L,
-            2L,
+            Timestamp(1L),
+            Timestamp(2L),
             MatchParams(
                 emptyList(),
                 flowType = FlowType.IDENTIFY,

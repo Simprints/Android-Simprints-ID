@@ -7,7 +7,7 @@ internal interface LicenseLocalDataSource {
 
     suspend fun saveLicense(vendor: Vendor, license: String)
 
-    suspend fun deleteCachedLicense()
+    suspend fun deleteCachedLicense(vendor: Vendor)
 
     companion object {
         const val LICENSES_FOLDER = "licenses"

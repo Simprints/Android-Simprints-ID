@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.simprints.core.domain.tokenization.TokenizableString
 import com.simprints.feature.dashboard.settings.syncinfo.modulecount.ModuleCount
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.config.store.models.DownSynchronizationConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.config.store.models.SynchronizationConfiguration
@@ -21,6 +20,7 @@ import com.simprints.infra.eventsync.status.models.EventSyncWorkerState
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.logging.Simber
 import com.simprints.infra.authstore.AuthStore
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.config.store.tokenization.TokenizationProcessor
 import com.simprints.infra.enrolment.records.store.EnrolmentRecordRepository
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncInfoViewModel @Inject constructor(
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     connectivityTracker: ConnectivityTracker,
     private val enrolmentRecordRepository: EnrolmentRecordRepository,
     private val authStore: AuthStore,
@@ -149,9 +149,9 @@ internal class SyncInfoViewModel @Inject constructor(
         val projectId = authStore.signedInProjectId
 
         awaitAll(
-            async { _configuration.postValue(configManager.getProjectConfiguration()) },
+            async { _configuration.postValue(configRepository.getProjectConfiguration()) },
             async { _recordsInLocal.postValue(getRecordsInLocal(projectId)) },
-            async { _recordsToUpSync.postValue(getRecordsToUpSync(projectId)) },
+            async { _recordsToUpSync.postValue(getRecordsToUpSync()) },
             async {
                 fetchRecordsToCreateAndDeleteCount().let {
                     _recordsToDownSync.postValue(it.toCreate)
@@ -184,13 +184,13 @@ internal class SyncInfoViewModel @Inject constructor(
     private suspend fun getRecordsInLocal(projectId: String): Int =
         enrolmentRecordRepository.count(SubjectQuery(projectId = projectId))
 
-    private suspend fun getRecordsToUpSync(projectId: String): Int =
-        eventSyncManager.countEventsToUpload(projectId, EventType.ENROLMENT_V2)
+    private suspend fun getRecordsToUpSync(): Int =
+        eventSyncManager.countEventsToUpload(EventType.ENROLMENT_V2)
             .firstOrNull()
             ?: 0
 
     private suspend fun fetchRecordsToCreateAndDeleteCount(): DownSyncCounts =
-        if (configManager.getProjectConfiguration().isEventDownSyncAllowed()) {
+        if (configRepository.getProjectConfiguration().isEventDownSyncAllowed()) {
             fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         } else {
             DownSyncCounts(0, 0)
@@ -205,7 +205,7 @@ internal class SyncInfoViewModel @Inject constructor(
         }
 
     private suspend fun getModuleCounts(projectId: String): List<ModuleCount> =
-        configManager.getDeviceConfiguration().selectedModules.map { moduleName ->
+        configRepository.getDeviceConfiguration().selectedModules.map { moduleName ->
             val count = enrolmentRecordRepository.count(
                 SubjectQuery(projectId = projectId, moduleId = moduleName.value)
             )
@@ -214,7 +214,7 @@ internal class SyncInfoViewModel @Inject constructor(
                 is TokenizableString.Tokenized -> tokenizationProcessor.decrypt(
                     encrypted = moduleName,
                     tokenKeyType = TokenKeyType.ModuleId,
-                    project = configManager.getProject(projectId)
+                    project = configRepository.getProject(projectId)
                 )
             }
             return@map ModuleCount(name = decryptedName.value, count = count)

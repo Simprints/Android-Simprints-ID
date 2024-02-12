@@ -6,19 +6,16 @@ import com.simprints.infra.events.event.domain.models.RefusalEvent.Companion.EVE
 import com.simprints.infra.events.event.domain.models.RefusalEvent.RefusalPayload.Answer.OTHER
 import com.simprints.infra.events.sampledata.SampleDefaults.CREATED_AT
 import com.simprints.infra.events.sampledata.SampleDefaults.ENDED_AT
-import com.simprints.infra.events.sampledata.SampleDefaults.GUID1
 import org.junit.Test
 
 class RefusalEventTest {
 
     @Test
     fun create_RefusalEvent() {
-        val labels = EventLabels(sessionId = GUID1)
         val otherTextArg = "other_text"
-        val event = RefusalEvent(CREATED_AT, ENDED_AT, OTHER, otherTextArg, labels)
+        val event = RefusalEvent(CREATED_AT, ENDED_AT, OTHER, otherTextArg)
 
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(REFUSAL)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

@@ -6,7 +6,6 @@ import androidx.annotation.Keep
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.simprints.face.capture.FaceCaptureResult
-import com.simprints.face.configuration.FaceConfigurationResult
 import com.simprints.feature.alert.AlertResult
 import com.simprints.feature.consent.ConsentResult
 import com.simprints.feature.enrollast.EnrolLastBiometricResult
@@ -44,7 +43,6 @@ import java.io.Serializable
         name = "FingerprintMatchResult.Item"
     ),
 
-    JsonSubTypes.Type(value = FaceConfigurationResult::class, name = "FaceConfigurationResult"),
     JsonSubTypes.Type(value = FaceCaptureResult::class, name = "FaceCaptureResult"),
     JsonSubTypes.Type(value = FaceCaptureResult.Item::class, name = "FaceCaptureResult.Item"),
     JsonSubTypes.Type(value = FaceCaptureResult.Sample::class, name = "FaceCaptureResult.Sample"),
@@ -70,7 +68,8 @@ internal data class Step(
 ) : Serializable {
     // Do not remove.
     // Even though it may be marked as unused by IDE, it is referenced in the JsonTypeInfo annotation
-    val type
+    @Suppress("unused")
+    val type: String
         get() = this::class.java.simpleName
 }
 

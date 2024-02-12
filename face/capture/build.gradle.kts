@@ -19,12 +19,13 @@ dependencies {
 
     implementation(project(":infra:orchestrator-data"))
     implementation(project(":infra:config-store"))
-    implementation(project(":infra:config-sync"))
     implementation(project(":infra:enrolment-records-store"))
     implementation(project(":infra:events"))
     implementation(project(":infra:images"))
     implementation(project(":infra:resources"))
     implementation(project(":feature:exit-form"))
+    implementation(project(":infra:license"))
+    implementation(project(":feature:alert"))
 
     //BIO SDK
     implementation(project(":face:infra:face-bio-sdk"))

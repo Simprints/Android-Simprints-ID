@@ -47,12 +47,12 @@ class CypressOtaHelperTest {
         every { scannerMock.getCypressFirmwareVersion() } returns Single.just(OLD_CYPRESS_VERSION)
         every { scannerMock.getCypressExtendedFirmwareVersion() } returns Single.just(NEW_CYPRESS_VERSION)
 
-        every {
+        coEvery {
             firmwareFileManagerMock.getAvailableScannerFirmwareVersions()
         } returns mutableMapOf(
             DownloadableFirmwareVersion.Chip.CYPRESS to mutableSetOf(NEW_CYPRESS_VERSION_STRING)
         )
-        every { firmwareFileManagerMock.loadCypressFirmwareBytes(NEW_CYPRESS_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
+        coEvery { firmwareFileManagerMock.loadCypressFirmwareBytes(NEW_CYPRESS_VERSION_STRING) } returns byteArrayOf(0x00, 0x01, 0x02, 0xFF.toByte())
     }
 
     @Test

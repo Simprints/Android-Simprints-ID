@@ -4,8 +4,10 @@ import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import io.mockk.MockKAnnotations
 import io.mockk.impl.annotations.RelaxedMockK
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
@@ -21,11 +23,18 @@ class DefaultOkHttpClientBuilderTest {
     @RelaxedMockK
     lateinit var ctx: Context
 
+    @RelaxedMockK
+    lateinit var networkCache: okhttp3.Cache
+
+    private lateinit var okHttpBuilder: DefaultOkHttpClientBuilder
+
     @Before
     fun setup() {
         MockKAnnotations.init(this)
         mockWebServer = MockWebServer()
         mockWebServer.start()
+
+        okHttpBuilder = DefaultOkHttpClientBuilder(ctx, networkCache)
     }
 
     @After
@@ -40,9 +49,8 @@ class DefaultOkHttpClientBuilderTest {
         val versionName = "cxxlvxzn.12.2049"
 
         // create okHttp client using default builder
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(ctx, "", "", versionName)
+            .get("", "", versionName)
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -64,9 +72,8 @@ class DefaultOkHttpClientBuilderTest {
 
         val deviceId = "symeAwxomedyvexeid"
 
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(ctx, "", deviceId, "")
+            .get("", deviceId, "")
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -86,10 +93,8 @@ class DefaultOkHttpClientBuilderTest {
     fun `should not include auth token in request headers, when auth token is null`() {
         mockWebServer.enqueue(MockResponse())
 
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
-
         okHttpClient = okHttpBuilder
-            .get(ctx, null, "", "")
+            .get(null, "", "")
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -111,9 +116,8 @@ class DefaultOkHttpClientBuilderTest {
 
         val authToken = "eyxSomeAwesomeAuth.TokenThatIsUsed.ForUnitTesting"
 
-        val okHttpBuilder = DefaultOkHttpClientBuilder()
         okHttpClient = okHttpBuilder
-            .get(ctx, authToken, "", "")
+            .get(authToken, "", "")
             .build()
 
         val mockHttpRequest = Request.Builder()
@@ -128,5 +132,48 @@ class DefaultOkHttpClientBuilderTest {
 
         assertThat(recordedRequest.getHeader(DefaultOkHttpClientBuilder.AUTHORIZATION_HEADER))
             .isEqualTo("Bearer $authToken")
+    }
+
+    @Test
+    fun `should not compress request body if gzip header not provided`() {
+        mockWebServer.enqueue(MockResponse())
+
+        okHttpClient = okHttpBuilder
+            .get(null, "", "")
+            .build()
+
+        val mockHttpRequest = Request.Builder()
+            .url(mockWebServer.url("/"))
+            .post("some request body".toRequestBody("text/plain".toMediaTypeOrNull()))
+            .build()
+
+        // execute mock request
+        okHttpClient.newCall(mockHttpRequest).execute()
+        // read recorded request
+        val recordedRequest = mockWebServer.takeRequest()
+
+        assertThat(recordedRequest.body.readUtf8()).isEqualTo("some request body")
+    }
+
+    @Test
+    fun `should compress request body if gzip header provided`() {
+        mockWebServer.enqueue(MockResponse())
+
+        okHttpClient = okHttpBuilder
+            .get(null, "", "")
+            .build()
+
+        val mockHttpRequest = Request.Builder()
+            .header("Content-Encoding", "gzip")
+            .url(mockWebServer.url("/"))
+            .post("some request body".toRequestBody("text/plain".toMediaTypeOrNull()))
+            .build()
+
+        // execute mock request
+        okHttpClient.newCall(mockHttpRequest).execute()
+        // read recorded request
+        val recordedRequest = mockWebServer.takeRequest()
+
+        assertThat(recordedRequest.body.readUtf8()).isNotEqualTo("some request body")
     }
 }

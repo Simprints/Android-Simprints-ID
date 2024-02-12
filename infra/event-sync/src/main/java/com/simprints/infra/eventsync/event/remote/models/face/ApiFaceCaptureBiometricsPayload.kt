@@ -4,15 +4,16 @@ import androidx.annotation.Keep
 import com.simprints.infra.config.store.models.TokenKeyType
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.eventsync.event.remote.models.ApiEventPayload
-import com.simprints.infra.eventsync.event.remote.models.ApiEventPayloadType
+import com.simprints.infra.eventsync.event.remote.models.ApiTimestamp
+import com.simprints.infra.eventsync.event.remote.models.fromDomainToApi
 
 @Keep
 internal class ApiFaceCaptureBiometricsPayload(
     override val version: Int,
-    override val startTime: Long,
+    override val startTime: ApiTimestamp,
     val id: String,
-    val face: Face?
-) : ApiEventPayload(ApiEventPayloadType.FaceCaptureBiometrics, version, startTime) {
+    val face: Face?,
+) : ApiEventPayload(version, startTime) {
 
     @Keep
     data class Face(
@@ -20,8 +21,9 @@ internal class ApiFaceCaptureBiometricsPayload(
         val roll: Float,
         val template: String,
         val quality: Float,
-        val format: String
+        val format: String,
     ) {
+
         constructor(face: FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload.Face) : this(
             yaw = face.yaw,
             roll = face.roll,
@@ -33,7 +35,7 @@ internal class ApiFaceCaptureBiometricsPayload(
 
     constructor(domainPayload: FaceCaptureBiometricsEvent.FaceCaptureBiometricsPayload) : this(
         domainPayload.eventVersion,
-        domainPayload.createdAt,
+        domainPayload.createdAt.fromDomainToApi(),
         domainPayload.id,
         Face(domainPayload.face)
     )

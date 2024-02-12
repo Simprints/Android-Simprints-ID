@@ -74,7 +74,7 @@ class LicenseLocalDataSourceImplTest {
 
     @Test
     fun `check file delete deletes the dir`() = runTest {
-        localSource.deleteCachedLicense()
+        localSource.deleteCachedLicense(licenseVendor)
 
         assertThat(File("${filesDirPath}/${LicenseLocalDataSource.LICENSES_FOLDER}/$licenseVendor").exists()).isFalse()
     }

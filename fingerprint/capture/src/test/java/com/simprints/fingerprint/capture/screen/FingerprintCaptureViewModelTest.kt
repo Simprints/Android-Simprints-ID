@@ -20,6 +20,8 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
+import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
+import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
@@ -29,10 +31,10 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedE
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.testtools.FingerprintGenerator
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.Vero1Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.config.store.models.Vero2Configuration.ImageSavingStrategy
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.model.Path
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import com.simprints.testtools.common.livedata.assertEventNotReceived
@@ -72,7 +74,7 @@ class FingerprintCaptureViewModelTest {
     private lateinit var vero2Configuration: Vero2Configuration
 
     @MockK
-    private lateinit var configManager: ConfigManager
+    private lateinit var configRepository: ConfigRepository
 
     @MockK
     private lateinit var scanner: ScannerWrapper
@@ -82,6 +84,9 @@ class FingerprintCaptureViewModelTest {
 
     @MockK
     private lateinit var bioSdkWrapper: BioSdkWrapper
+
+    @MockK
+    private lateinit var resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase
 
     @MockK
     private lateinit var timeHelper: TimeHelper
@@ -101,11 +106,12 @@ class FingerprintCaptureViewModelTest {
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
 
+        coEvery {resolveBioSdkWrapperUseCase()} returns bioSdkWrapper
         every { vero2Configuration.qualityThreshold } returns 60
         every { vero2Configuration.displayLiveFeedback } returns false
         every { vero2Configuration.captureStrategy } returns Vero2Configuration.CaptureStrategy.SECUGEN_ISO_1000_DPI
         every { vero2Configuration.imageSavingStrategy } returns ImageSavingStrategy.NEVER
-        coEvery { configManager.getProjectConfiguration().fingerprint?.bioSdkConfiguration } returns mockk {
+        coEvery { configRepository.getProjectConfiguration().fingerprint?.bioSdkConfiguration } returns mockk {
             every { vero1 } returns Vero1Configuration(60)
             every { vero2 } returns vero2Configuration
         }
@@ -122,9 +128,9 @@ class FingerprintCaptureViewModelTest {
 
         vm = FingerprintCaptureViewModel(
             scannerManager,
-            configManager,
+            configRepository,
             timeHelper,
-            bioSdkWrapper,
+            resolveBioSdkWrapperUseCase,
             saveImageUseCase,
             getNextFingerToAddUseCase,
             getStartStateUseCase,
@@ -1038,6 +1044,16 @@ class FingerprintCaptureViewModelTest {
     }
 
     @Test
+    fun `test init bioSDK success should show invalid license dialog if init fail`() = runTest {
+        coEvery {
+            bioSdkWrapper.initialize()
+        } throws  BioSdkException.BioSdkInitializationException(Exception())
+        vm.handleOnViewCreated(TWO_FINGERS_IDS)
+
+        vm.invalidLicense.assertEventReceived()
+    }
+
+    @Test
     @ExperimentalTime
     fun whenScanButtonPressed_AndLiveFeedbackIsEnabled_liveFeedbackIsPaused() = runTest {
         mockScannerSetUiIdle()
@@ -1283,7 +1299,7 @@ class FingerprintCaptureViewModelTest {
             )
 
             BAD_SCAN -> AcquireFingerprintTemplateResponse(TEMPLATE, TEMPLATE_FORMAT, BAD_QUALITY)
-            NO_FINGER_DETECTED -> NoFingerDetectedException()
+            NO_FINGER_DETECTED -> NoFingerDetectedException("No finger detected")
             DISCONNECTED -> ScannerDisconnectedException()
             UNKNOWN_ERROR -> Error("Oops!")
             NEVER_RETURNS -> {

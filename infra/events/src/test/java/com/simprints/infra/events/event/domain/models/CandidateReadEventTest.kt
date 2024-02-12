@@ -15,10 +15,9 @@ class CandidateReadEventTest {
 
     @Test
     fun create_CandidateReadEvent() {
-        val labels = EventLabels(sessionId = GUID1)
-        val event = CandidateReadEvent(CREATED_AT, ENDED_AT, GUID1, LocalResult.NOT_FOUND, NOT_FOUND, labels)
+        val event = CandidateReadEvent(CREATED_AT, ENDED_AT, GUID1, LocalResult.NOT_FOUND, NOT_FOUND)
+
         assertThat(event.id).isNotNull()
-        assertThat(event.labels).isEqualTo(labels)
         assertThat(event.type).isEqualTo(CANDIDATE_READ)
         with(event.payload) {
             assertThat(createdAt).isEqualTo(CREATED_AT)

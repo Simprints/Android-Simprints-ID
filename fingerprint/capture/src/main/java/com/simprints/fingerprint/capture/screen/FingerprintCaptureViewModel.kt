@@ -12,6 +12,7 @@ import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.core.tools.extentions.updateOnIndex
 import com.simprints.core.tools.time.TimeHelper
+import com.simprints.core.tools.time.Timestamp
 import com.simprints.fingerprint.capture.FingerprintCaptureResult
 import com.simprints.fingerprint.capture.extensions.isEager
 import com.simprints.fingerprint.capture.extensions.isImageTransferRequired
@@ -27,7 +28,9 @@ import com.simprints.fingerprint.capture.usecase.AddCaptureEventsUseCase
 import com.simprints.fingerprint.capture.usecase.GetNextFingerToAddUseCase
 import com.simprints.fingerprint.capture.usecase.GetStartStateUseCase
 import com.simprints.fingerprint.capture.usecase.SaveImageUseCase
+import com.simprints.fingerprint.infra.basebiosdk.exceptions.BioSdkException
 import com.simprints.fingerprint.infra.biosdk.BioSdkWrapper
+import com.simprints.fingerprint.infra.biosdk.ResolveBioSdkWrapperUseCase
 import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.ScannerTriggerListener
@@ -37,8 +40,8 @@ import com.simprints.fingerprint.infra.scanner.exceptions.safe.NoFingerDetectedE
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerDisconnectedException
 import com.simprints.fingerprint.infra.scanner.exceptions.safe.ScannerOperationInterruptedException
 import com.simprints.fingerprint.infra.scanner.wrapper.ScannerWrapper
+import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.FingerprintConfiguration
-import com.simprints.infra.config.sync.ConfigManager
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.FINGER_CAPTURE
@@ -56,9 +59,9 @@ import kotlin.math.min
 @HiltViewModel
 internal class FingerprintCaptureViewModel @Inject constructor(
     private val scannerManager: ScannerManager,
-    private val configManager: ConfigManager,
+    private val configRepository: ConfigRepository,
     private val timeHelper: TimeHelper,
-    private val bioSdk: BioSdkWrapper,
+    private val resolveBioSdkWrapperUseCase: ResolveBioSdkWrapperUseCase,
     private val saveImage: SaveImageUseCase,
     private val getNextFingerToAdd: GetNextFingerToAddUseCase,
     private val getStartState: GetStartStateUseCase,
@@ -69,6 +72,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     lateinit var configuration: FingerprintConfiguration
     private lateinit var bioSdkConfiguration: FingerprintConfiguration.FingerprintSdkConfiguration
 
+    private lateinit var bioSdkWrapper: BioSdkWrapper
     private var state: CollectFingerprintsState = CollectFingerprintsState.EMPTY
         private set(value) {
             field = value
@@ -116,6 +120,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         get() = _launchReconnect
     private val _launchReconnect = MutableLiveData<LiveDataEvent>()
 
+    val invalidLicense: LiveData<LiveDataEvent>
+        get() = _invalidLicense
+    private val _invalidLicense = MutableLiveData<LiveDataEvent>()
+
     val finishWithFingerprints: LiveData<LiveDataEventWithContent<FingerprintCaptureResult>>
         get() = _finishWithFingerprints
     private val _finishWithFingerprints =
@@ -124,7 +132,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
     private lateinit var originalFingerprintsToCapture: List<IFingerIdentifier>
     private val captureEventIds: MutableMap<CaptureId, String> = mutableMapOf()
     private val imageRefs: MutableMap<CaptureId, SecuredImageRef?> = mutableMapOf()
-    private var lastCaptureStartedAt: Long = 0
+    private var lastCaptureStartedAt: Timestamp = Timestamp(0L)
     private var hasStarted: Boolean = false
 
     @VisibleForTesting
@@ -153,10 +161,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             hasStarted = true
 
             runBlocking {
-                bioSdk.initialize()
+                initBioSdk()
                 // Configuration must be initialised when start returns for UI to be initialised correctly,
                 // and since fetching happens on IO thread execution must be suspended until it is available
-                configuration = configManager.getProjectConfiguration().fingerprint!!
+                configuration = configRepository.getProjectConfiguration().fingerprint!!
                 bioSdkConfiguration = configuration.bioSdkConfiguration
             }
 
@@ -166,6 +174,15 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         }
     }
 
+    private suspend fun initBioSdk() {
+        try {
+            bioSdkWrapper= resolveBioSdkWrapperUseCase()
+            bioSdkWrapper.initialize()
+        } catch (e: BioSdkException.BioSdkInitializationException) {
+            Simber.e(e)
+            _invalidLicense.send()
+        }
+    }
     private fun launchReconnect() {
         if (!state.isShowingConnectionScreen) {
             updateState {
@@ -311,7 +328,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
         scanningTask = viewModelScope.launch {
             try {
                 scannerManager.scanner.setUiIdle()
-                val capturedFingerprint = bioSdk.acquireFingerprintTemplate(
+                val capturedFingerprint = bioSdkWrapper.acquireFingerprintTemplate(
                     bioSdkConfiguration.vero2?.captureStrategy?.toInt(),
                     scanningTimeoutMs.toInt(),
                     qualityThreshold()
@@ -321,6 +338,11 @@ internal class FingerprintCaptureViewModel @Inject constructor(
             } catch (ex: CancellationException) {
                 // ignore cancellation exception, but log behaviour
                 Simber.d("Fingerprint scanning was cancelled")
+            } catch (ex: BioSdkException.ImageQualityBelowThresholdException) {
+                // this exception is thrown when the image quality is below the threshold
+                // and it is thrown from NEC SDK it should be handled as a no finger detected exception not
+                // as a low quality scan issue because there is no template extracted from the image
+                handleNoFingerDetected()
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
             }
@@ -355,7 +377,7 @@ internal class FingerprintCaptureViewModel @Inject constructor(
 
         imageTransferTask = viewModelScope.launch {
             try {
-                val acquiredImage = bioSdk.acquireFingerprintImage()
+                val acquiredImage = bioSdkWrapper.acquireFingerprintImage()
                 handleImageTransferSuccess(acquiredImage)
             } catch (ex: Throwable) {
                 handleScannerCommunicationsError(ex)
@@ -473,7 +495,10 @@ internal class FingerprintCaptureViewModel @Inject constructor(
                 launchReconnect()
             }
 
-            is NoFingerDetectedException -> handleNoFingerDetected()
+            is NoFingerDetectedException -> {
+                Simber.e(e)
+                handleNoFingerDetected()
+            }
             else -> {
                 updateCaptureState { toNotCollected() }
                 Simber.e(e)

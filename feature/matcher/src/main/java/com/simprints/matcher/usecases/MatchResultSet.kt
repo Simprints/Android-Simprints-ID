@@ -40,7 +40,6 @@ internal class MatchResultSet<T : MatchResultItem>(
 
     companion object {
 
-        // TODO add as parameters
         /**
          * Default max size of the result set.
          */

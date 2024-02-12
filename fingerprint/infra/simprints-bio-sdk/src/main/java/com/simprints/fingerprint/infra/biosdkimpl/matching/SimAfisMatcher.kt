@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.infra.basebiosdk.matching
+package com.simprints.fingerprint.infra.biosdkimpl.matching
 
 import com.simprints.core.ExcludedFromGeneratedTestCoverageReports
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifier
@@ -15,12 +15,12 @@ import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerIdentifi
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.Fingerprint
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.FingerprintIdentity
 import com.simprints.fingerprint.infra.basebiosdk.matching.domain.MatchResult
-import com.simprints.fingerprint.infra.biosdkimpl.matching.crossFingerMatching
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfis
 import com.simprints.fingerprint.infra.simafiswrapper.JNILibAfisInterface
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerIdentifier
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisFingerprint
 import com.simprints.fingerprint.infra.simafiswrapper.models.SimAfisPerson
+import java.nio.ByteBuffer
 import javax.inject.Inject
 
 /**
@@ -32,7 +32,7 @@ import javax.inject.Inject
  * list. It does not currently support progress indication and matching results are only available
  * when all matching is completed.
  */
-class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
+internal class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
 
     @Inject
     constructor() : this(JNILibAfis)
@@ -98,7 +98,55 @@ class SimAfisMatcher(private val jniLibAfis: JNILibAfisInterface) {
         candidates: List<FingerprintIdentity>
     ) = candidates.map { crossFingerMatching(probe, it, jniLibAfis) }
 
+
+
+
+    /**
+     * This method gets the matching score by:
+     * - Getting the maximum matching score for each probe finger template with all candidate finger templates
+     * - The overall score is the average of the individual finger match scores
+     * @param probe
+     * @param candidate
+     * @return MatchResult
+     */
+    private fun crossFingerMatching(
+        probe: FingerprintIdentity,
+        candidate: FingerprintIdentity,
+        jniLibAfis: JNILibAfisInterface
+    ): MatchResult {
+
+        // Number of fingers used in matching
+        val fingers = probe.fingerprintsTemplates.size
+        // Sum of maximum matching score for each finger
+        val total = probe.fingerprintsTemplates
+            .sumOf { probeTemplate ->
+                candidate.fingerprintsTemplates
+                    .maxOf { candidateTemplate ->
+                        jniLibAfis.verify(
+                            probeTemplate,
+                            candidateTemplate
+                        )
+                    }.toDouble()
+            }
+        // Matching score  = total/number of fingers
+        return MatchResult(candidate.id, getOverallScore(total, fingers))
+    }
+
+
+    private fun getOverallScore(total: Double, fingers: Int) =
+        if (fingers == 0) {
+            0.toFloat()
+        } else {
+            (total / fingers).toFloat()
+        }
+
+
+
     companion object {
         const val SIMAFIS_MATCHER_SUPPORTED_TEMPLATE_FORMAT = "ISO_19794_2"
     }
 }
+val FingerprintIdentity.fingerprintsTemplates
+    get() = fingerprints.map { it.template.toByteBuffer() }
+private fun ByteArray.toByteBuffer(): ByteBuffer =
+    ByteBuffer.allocateDirect(size).put(this)

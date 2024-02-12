@@ -25,7 +25,7 @@ internal class BuildSubjectUseCase @Inject constructor(
         params.projectId,
         params.userId,
         params.moduleId,
-        createdAt = Date(timeHelper.now()),
+        createdAt = Date(timeHelper.now().ms),
         fingerprintSamples = getFingerprintCaptureResult(params.steps)?.map(::fingerprintSample)
             .orEmpty(),
         faceSamples = getFaceCaptureResult(params.steps)?.map(::faceSample).orEmpty()
