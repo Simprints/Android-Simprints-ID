@@ -1,10 +1,13 @@
 # Auto create jira task for github issues
 name: Jira Sync
+
 on:
-    issues:
-        types: [ opened, labeled, unlabeled ]
-    issue_comment:
-        types: [ created ]
+
+# [TODO] enable this workflow once the jira integration is ready
+#    issues:
+#        types: [ opened, labeled, unlabeled ]
+#    issue_comment:
+#        types: [ created ]
 jobs:
     sync:
         name: Sync Items
