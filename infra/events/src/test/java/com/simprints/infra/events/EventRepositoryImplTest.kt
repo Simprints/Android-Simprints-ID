@@ -7,8 +7,8 @@ import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration.Modality
 import com.simprints.infra.events.EventRepositoryImpl.Companion.PROJECT_ID_FOR_NOT_SIGNED_IN
-import com.simprints.infra.events.domain.validators.EventValidator
-import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
+import com.simprints.infra.events.event.domain.validators.EventValidator
+import com.simprints.infra.events.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.infra.events.event.domain.models.EventType.CALLBACK_ENROLMENT
 import com.simprints.infra.events.sampledata.SampleDefaults.DEFAULT_PROJECT_ID
 import com.simprints.infra.events.sampledata.SampleDefaults.GUID1

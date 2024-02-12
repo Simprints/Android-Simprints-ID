@@ -1,6 +1,5 @@
 package com.simprints.infra.events.event.domain.validators
 
-import com.simprints.infra.events.domain.validators.EventValidator
 import com.simprints.infra.events.event.domain.models.EnrolmentEventV2
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.PersonCreationEvent

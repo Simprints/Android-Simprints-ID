@@ -8,7 +8,7 @@ import com.simprints.core.PackageVersionName
 import com.simprints.core.tools.time.TimeHelper
 import com.simprints.infra.authstore.AuthStore
 import com.simprints.infra.config.store.ConfigRepository
-import com.simprints.infra.events.domain.validators.SessionEventValidatorsFactory
+import com.simprints.infra.events.event.domain.validators.SessionEventValidatorsFactory
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.DatabaseInfo
