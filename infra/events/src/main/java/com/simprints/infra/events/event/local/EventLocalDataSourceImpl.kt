@@ -8,6 +8,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.local.models.fromDbToDomain
 import com.simprints.infra.events.event.local.models.fromDomainToDb
 import com.simprints.infra.logging.LoggingConstants.CrashReportTag.DB_CORRUPTION
@@ -103,12 +104,22 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         scopeDao.loadOpen().map { it.fromDbToDomain(jsonHelper) }
     }
 
+    override suspend fun loadOpenedScopes(type: EventScopeType): List<EventScope> =
+        useRoom(readingDispatcher) {
+            scopeDao.loadOpen(type).map { it.fromDbToDomain(jsonHelper) }
+        }
+
     override suspend fun loadClosedScopes(): List<EventScope> = useRoom(readingDispatcher) {
         scopeDao.loadClosed().map { it.fromDbToDomain(jsonHelper) }
     }
 
-    override suspend fun deleteEventScope(sessionId: String) = useRoom(writingContext) {
-        scopeDao.delete(listOf(sessionId))
+    override suspend fun loadClosedScopes(type: EventScopeType): List<EventScope> =
+        useRoom(readingDispatcher) {
+            scopeDao.loadClosed(type).map { it.fromDbToDomain(jsonHelper) }
+        }
+
+    override suspend fun deleteEventScope(scopeId: String) = useRoom(writingContext) {
+        scopeDao.delete(listOf(scopeId))
     }
 
     override suspend fun saveEvent(event: Event) = useRoom(writingContext) {
@@ -128,18 +139,18 @@ internal open class EventLocalDataSourceImpl @Inject constructor(
         eventDao.loadAll().map { it.fromDbToDomain() }.asFlow()
     }
 
-    override suspend fun loadEventJsonInSession(sessionId: String): List<String> =
+    override suspend fun loadEventJsonInScope(scopeId: String): List<String> =
         useRoom(readingDispatcher) {
-            eventDao.loadEventJsonFromSession(sessionId)
+            eventDao.loadEventJsonFromSession(scopeId)
         }
 
-    override suspend fun loadEventsInSession(sessionId: String): List<Event> =
+    override suspend fun loadEventsInScope(scopeId: String): List<Event> =
         useRoom(readingDispatcher) {
-            eventDao.loadFromSession(sessionId = sessionId).map { it.fromDbToDomain() }
+            eventDao.loadFromSession(sessionId = scopeId).map { it.fromDbToDomain() }
         }
 
-    override suspend fun deleteEventsInSession(sessionId: String) = useRoom(writingContext) {
-        eventDao.deleteAllFromSession(sessionId = sessionId)
+    override suspend fun deleteEventsInScope(scopeId: String) = useRoom(writingContext) {
+        eventDao.deleteAllFromSession(sessionId = scopeId)
     }
 
     override suspend fun deleteAll() =

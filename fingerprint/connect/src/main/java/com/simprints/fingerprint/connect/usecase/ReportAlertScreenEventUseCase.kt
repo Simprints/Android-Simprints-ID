@@ -2,7 +2,7 @@ package com.simprints.fingerprint.connect.usecase
 
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent.AlertScreenPayload.AlertScreenEventType
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 internal class ReportAlertScreenEventUseCase @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     @ExternalScope private val externalScope: CoroutineScope,
 ) {
 

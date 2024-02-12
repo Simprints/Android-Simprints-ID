@@ -17,6 +17,7 @@ import com.simprints.infra.events.event.domain.models.PersonCreationEvent
 import com.simprints.infra.events.event.domain.models.face.FaceCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.fingerprint.FingerprintCaptureBiometricsEvent
 import com.simprints.infra.events.event.domain.models.scope.EventScope
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.exceptions.TryToUploadEventsForNotSignedProject
 import com.simprints.infra.eventsync.status.up.EventUpSyncScopeRepository
@@ -90,9 +91,9 @@ internal class EventUpSyncTask @Inject constructor(
     ) = flow {
         Simber.d("[EVENT_REPO] Uploading")
         try {
-            val sessionScopes = eventRepository.getAllClosedSessions().associateWith {
+            val sessionScopes = eventRepository.getClosedEventScopes(EventScopeType.SESSION).associateWith {
                 try {
-                    eventRepository.getEventsFromSession(it.id)
+                    eventRepository.getEventsFromScope(it.id)
                         .also { listOfEvents -> emit(listOfEvents.size) }
                 } catch (ex: JsonParseException) {
                     Simber.i("Failed to un-marshal events")
@@ -116,7 +117,7 @@ internal class EventUpSyncTask @Inject constructor(
             }
 
             Simber.d("[EVENT_REPO] Deleting ${scopesToUpload.size} session scopes")
-            scopesToUpload.keys.forEach { eventRepository.deleteSession(it.id) }
+            scopesToUpload.keys.forEach { eventRepository.deleteEventScope(it.id) }
         } catch (ex: Exception) {
             when (ex) {
                 is JsonParseException, is JsonMappingException -> {
@@ -163,11 +164,11 @@ internal class EventUpSyncTask @Inject constructor(
             try {
                 Simber.i("Uploading invalid events for session ${scope.id}")
                 val scopeString = jsonHelper.toJson(scope)
-                val eventJsons = eventRepository.getEventsJsonFromSession(scope.id)
+                val eventJsons = eventRepository.getEventsJsonFromScope(scope.id)
                 emit(eventJsons.size)
 
                 eventRemoteDataSource.dumpInvalidEvents(projectId, listOf(scopeString) + eventJsons)
-                eventRepository.deleteSession(scope.id)
+                eventRepository.deleteEventScope(scope.id)
             } catch (t: Throwable) {
                 when (t) {
                     // We don't need to report http exceptions as cloud logs all of them.

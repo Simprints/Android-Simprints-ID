@@ -6,6 +6,7 @@ import com.simprints.fingerprint.capture.state.ScanResult
 import com.simprints.infra.config.store.models.FingerprintConfiguration
 import com.simprints.infra.config.store.models.Vero2Configuration
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.images.ImageRepository
 import com.simprints.infra.images.model.Path
 import com.simprints.infra.images.model.SecuredImageRef
@@ -25,10 +26,7 @@ class SaveImageUseCaseTest {
     lateinit var imageRepo: ImageRepository
 
     @MockK
-    lateinit var eventRepo: EventRepository
-
-    @MockK
-    lateinit var configuration: FingerprintConfiguration
+    lateinit var eventRepo: SessionEventRepository
 
     @MockK
     lateinit var vero2Configuration: Vero2Configuration

@@ -3,7 +3,7 @@ package com.simprints.feature.alert.screen
 import androidx.lifecycle.ViewModel
 import com.simprints.core.ExternalScope
 import com.simprints.core.tools.time.TimeHelper
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.AlertScreenEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AlertViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     @ExternalScope private val ioScope: CoroutineScope,
 ) : ViewModel() {
 

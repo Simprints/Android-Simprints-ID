@@ -20,6 +20,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.GeneralConfiguration
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ConsentEvent
 import com.simprints.infra.resources.R
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,7 @@ import javax.inject.Inject
 internal class ConsentViewModel @Inject constructor(
     private val timeHelper: TimeHelper,
     private val configRepository: ConfigRepository,
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
     private val generalConsentTextHelper: GeneralConsentTextHelper,
     private val parentalConsentTextHelper: ParentalConsentTextHelper,
     @ExternalScope private val externalScope: CoroutineScope,

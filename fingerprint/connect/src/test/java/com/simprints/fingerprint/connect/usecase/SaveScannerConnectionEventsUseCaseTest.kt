@@ -7,7 +7,7 @@ import com.simprints.fingerprint.infra.scanner.ScannerManager
 import com.simprints.fingerprint.infra.scanner.domain.BatteryInfo
 import com.simprints.fingerprint.infra.scanner.domain.ScannerGeneration
 import com.simprints.fingerprint.infra.scanner.domain.versions.ScannerFirmwareVersions
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.ScannerConnectionEvent
 import com.simprints.infra.events.event.domain.models.Vero2InfoSnapshotEvent
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
@@ -36,7 +36,7 @@ class SaveScannerConnectionEventsUseCaseTest {
     lateinit var timeHelper: TimeHelper
 
     @MockK
-    lateinit var eventRepository: EventRepository
+    lateinit var eventRepository: SessionEventRepository
 
     private lateinit var useCase: SaveScannerConnectionEventsUseCase
 

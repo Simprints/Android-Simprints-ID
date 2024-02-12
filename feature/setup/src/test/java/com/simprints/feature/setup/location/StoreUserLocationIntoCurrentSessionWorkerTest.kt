@@ -1,6 +1,6 @@
 package com.simprints.feature.setup.location
 
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.sampledata.createSessionScope
 import com.simprints.testtools.common.coroutines.TestCoroutineRule
 import io.mockk.MockKAnnotations
@@ -16,6 +16,7 @@ import org.junit.Rule
 import org.junit.Test
 
 internal class StoreUserLocationIntoCurrentSessionWorkerTest {
+
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
@@ -23,7 +24,7 @@ internal class StoreUserLocationIntoCurrentSessionWorkerTest {
     private lateinit var locationManager: LocationManager
 
     @MockK
-    private lateinit var eventRepository: EventRepository
+    private lateinit var eventRepository: SessionEventRepository
 
     private lateinit var worker: StoreUserLocationIntoCurrentSessionWorker
 

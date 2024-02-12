@@ -4,6 +4,7 @@ import com.simprints.infra.events.event.domain.models.Event
 import com.simprints.infra.events.event.domain.models.EventType
 import com.simprints.infra.events.event.domain.models.scope.EventScope
 import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import kotlinx.coroutines.flow.Flow
 
 
@@ -11,43 +12,23 @@ interface EventRepository {
 
     val libSimprintsVersionName: String
 
-    suspend fun createSession(): EventScope
-
-    suspend fun hasOpenSession(): Boolean
-
-    /**
-     * If the session is closing for normal reasons (i.e. came to a normal end), then it should be `null`.
-     */
-    suspend fun closeCurrentSession(reason: EventScopeEndCause? = null)
-
-    /**
-     * Get current capture session event from event cache or from room db.
-     * or create a new event if needed
-     * @return SessionCaptureEvent
-     */
-    suspend fun getCurrentSessionScope(): EventScope
-
-    suspend fun getAllClosedSessions(): List<EventScope>
-
-    suspend fun saveSessionScope(eventScope: EventScope)
-
+    suspend fun createEventScope(type: EventScopeType): EventScope
     suspend fun closeEventScope(eventScope: EventScope, reason: EventScopeEndCause?)
+    suspend fun closeAllOpenScopes(type: EventScopeType, reason: EventScopeEndCause?)
+    suspend fun saveEventScope(eventScope: EventScope)
+    suspend fun getOpenEventScopes(type: EventScopeType): List<EventScope>
+    suspend fun getClosedEventScopes(type: EventScopeType): List<EventScope>
+    suspend fun deleteEventScope(scopeId: String)
 
-    suspend fun observeEventsFromSession(sessionId: String): Flow<Event>
-
-    suspend fun getEventsFromSession(sessionId: String): List<Event>
-
-    suspend fun getEventsJsonFromSession(sessionId: String): List<String>
-
+    suspend fun getEventsFromScope(scopeId: String): List<Event>
+    suspend fun getEventsJsonFromScope(scopeId: String): List<String>
+    suspend fun getAllEvents(): Flow<Event>
     suspend fun observeEventCount(type: EventType?): Flow<Int>
-
-    suspend fun loadAll(): Flow<Event>
-
-    suspend fun addOrUpdateEvent(event: Event)
-
-    suspend fun removeLocationDataFromCurrentSession()
-
-    suspend fun deleteSession(sessionId: String)
+    suspend fun addOrUpdateEvent(
+        scope: EventScope,
+        event: Event,
+        scopeEvents: List<Event>? = null,
+    ): Event
 
     suspend fun deleteAll()
 

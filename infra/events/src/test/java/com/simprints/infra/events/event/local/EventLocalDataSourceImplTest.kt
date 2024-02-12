@@ -331,7 +331,7 @@ internal class EventLocalDataSourceImplTest {
     @Test
     fun loadAllEventJsonFromSession() = runTest {
         val sessionId = GUID1
-        eventLocalDataSource.loadEventJsonInSession(sessionId)
+        eventLocalDataSource.loadEventJsonInScope(sessionId)
 
         coVerify { eventDao.loadEventJsonFromSession(sessionId) }
     }
@@ -339,7 +339,7 @@ internal class EventLocalDataSourceImplTest {
     @Test
     fun loadAllFromSession() = runTest {
         val sessionId = GUID1
-        eventLocalDataSource.loadEventsInSession(sessionId)
+        eventLocalDataSource.loadEventsInScope(sessionId)
 
         coVerify { eventDao.loadFromSession(sessionId) }
     }
@@ -435,7 +435,7 @@ internal class EventLocalDataSourceImplTest {
 
     @Test
     fun deleteAllFromSession() = runTest {
-        eventLocalDataSource.deleteEventsInSession(GUID1)
+        eventLocalDataSource.deleteEventsInScope(GUID1)
 
         coVerify { eventDao.deleteAllFromSession(GUID1) }
     }

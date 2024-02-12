@@ -2,12 +2,12 @@ package com.simprints.feature.fetchsubject.screen.usecase
 
 import com.simprints.core.tools.time.Timestamp
 import com.simprints.feature.fetchsubject.screen.FetchSubjectState
-import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.SessionEventRepository
 import com.simprints.infra.events.event.domain.models.CandidateReadEvent
 import javax.inject.Inject
 
 internal class SaveSubjectFetchEventUseCase @Inject constructor(
-    private val eventRepository: EventRepository,
+    private val eventRepository: SessionEventRepository,
 ) {
 
     suspend operator fun invoke(
