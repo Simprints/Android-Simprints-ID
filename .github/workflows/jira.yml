@@ -2,6 +2,8 @@
 name: Jira Sync
 
 on:
+    workflow_dispatch:
+
 
 # [TODO] enable this workflow once the jira integration is ready
 #    issues:
