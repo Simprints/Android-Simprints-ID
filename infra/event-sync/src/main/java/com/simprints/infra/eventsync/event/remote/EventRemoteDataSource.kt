@@ -68,6 +68,8 @@ internal class EventRemoteDataSource @Inject constructor(
 
             EventDownSyncResult(
                 totalCount = totalCount.takeUnless { isTotalLowerBound },
+                requestId = response.headers()[REQUEST_ID_HEADER].orEmpty(),
+                status = response.code(),
                 eventStream = scope.produce(capacity = CHANNEL_CAPACITY_FOR_PROPAGATION) {
                     parseStreamAndEmitEvents(streaming, this)
                 }
@@ -142,6 +144,7 @@ internal class EventRemoteDataSource @Inject constructor(
         private const val TOO_MANY_REQUEST_STATUS = 429
 
         private const val COUNT_HEADER = "x-event-count"
+        private const val REQUEST_ID_HEADER = "x-request-id"
         private const val IS_COUNT_HEADER_LOWER_BOUND = "x-event-count-is-lower-bound"
     }
 }

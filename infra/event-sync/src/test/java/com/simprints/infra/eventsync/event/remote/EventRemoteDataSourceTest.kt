@@ -266,6 +266,33 @@ class EventRemoteDataSourceTest {
     }
 
     @Test
+    fun getEvents_shouldReturnCorrectRequestId() = runTest {
+        coEvery {
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
+        } returns Response.success(
+            "".toResponseBody(),
+            mapOf("x-request-id" to "requestId").toHeaders()
+        )
+
+        val mockedScope: CoroutineScope = mockk()
+
+        every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
+        assertThat(eventRemoteDataSource.getEvents(query, mockedScope).requestId).isEqualTo("requestId")
+    }
+
+    @Test
+    fun getEvents_shouldReturnCorrectStatus() = runTest {
+        coEvery {
+            eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())
+        } returns Response.success(205, "".toResponseBody(),)
+
+        val mockedScope: CoroutineScope = mockk()
+
+        every { mockedScope.produce<Event>(capacity = 2000, block = any()) } returns mockk()
+        assertThat(eventRemoteDataSource.getEvents(query, mockedScope).status).isEqualTo(205)
+    }
+
+    @Test
     fun getEvents_shouldNotReturnTotalHeaderWhenLowerBound() = runTest {
         coEvery {
             eventRemoteInterface.downloadEvents(any(), any(), any(), any(), any(), any())

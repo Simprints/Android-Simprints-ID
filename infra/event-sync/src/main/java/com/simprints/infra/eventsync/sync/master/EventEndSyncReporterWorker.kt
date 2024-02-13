@@ -5,6 +5,8 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.simprints.core.DispatcherBG
 import com.simprints.core.workers.SimCoroutineWorker
+import com.simprints.infra.events.EventRepository
+import com.simprints.infra.events.event.domain.models.scope.EventScopeEndCause
 import com.simprints.infra.eventsync.sync.common.EventSyncCache
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -21,6 +23,7 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted params: WorkerParameters,
     private val syncCache: EventSyncCache,
+    private val eventRepository: EventRepository,
     @DispatcherBG private val dispatcher: CoroutineDispatcher,
 ) : SimCoroutineWorker(appContext, params) {
 
@@ -32,6 +35,10 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
                 val syncId = inputData.getString(SYNC_ID_TO_MARK_AS_COMPLETED)
                 crashlyticsLog("Start - Params: $syncId")
                 showProgressNotification()
+
+                inputData.getString(EVENT_DOWN_SYNC_SCOPE_TO_CLOSE)?.let { scopeId ->
+                    eventRepository.closeEventScope(scopeId, EventScopeEndCause.WORKFLOW_ENDED)
+                }
 
                 if (!syncId.isNullOrEmpty()) {
                     syncCache.storeLastSuccessfulSyncTime(Date())
@@ -45,6 +52,8 @@ internal class EventEndSyncReporterWorker @AssistedInject constructor(
         }
 
     companion object {
+
         const val SYNC_ID_TO_MARK_AS_COMPLETED = "SYNC_ID_TO_MARK_AS_COMPLETED"
+        const val EVENT_DOWN_SYNC_SCOPE_TO_CLOSE = "EVENT_DOWN_SYNC_SCOPE_TO_CLOSE "
     }
 }

@@ -17,12 +17,20 @@ internal class EventSyncSubMasterWorkersBuilder @Inject constructor() {
             .build() as OneTimeWorkRequest
 
 
-    fun buildEndSyncReporterWorker(uniqueSyncID: String): OneTimeWorkRequest =
-        OneTimeWorkRequest.Builder(EventEndSyncReporterWorker::class.java)
-            .addTagForMasterSyncId(uniqueSyncID)
-            .addTagForScheduledAtNow()
-            .addCommonTagForAllSyncWorkers()
-            .addTagForEndSyncReporter()
-            .setInputData(workDataOf(EventEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncID))
-            .build() as OneTimeWorkRequest
+    fun buildEndSyncReporterWorker(
+        uniqueSyncID: String,
+        downSyncWorkerScopeId: String,
+    ): OneTimeWorkRequest = OneTimeWorkRequest
+        .Builder(EventEndSyncReporterWorker::class.java)
+        .addTagForMasterSyncId(uniqueSyncID)
+        .addTagForScheduledAtNow()
+        .addCommonTagForAllSyncWorkers()
+        .addTagForEndSyncReporter()
+        .setInputData(
+            workDataOf(
+                EventEndSyncReporterWorker.SYNC_ID_TO_MARK_AS_COMPLETED to uniqueSyncID,
+                EventEndSyncReporterWorker.EVENT_DOWN_SYNC_SCOPE_TO_CLOSE to downSyncWorkerScopeId,
+            )
+        )
+        .build() as OneTimeWorkRequest
 }

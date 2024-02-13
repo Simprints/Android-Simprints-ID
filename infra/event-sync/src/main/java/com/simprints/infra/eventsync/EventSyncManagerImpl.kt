@@ -15,6 +15,7 @@ import com.simprints.infra.config.store.ConfigRepository
 import com.simprints.infra.config.store.models.ProjectConfiguration
 import com.simprints.infra.events.EventRepository
 import com.simprints.infra.events.event.domain.models.EventType
+import com.simprints.infra.events.event.domain.models.scope.EventScopeType
 import com.simprints.infra.events.event.domain.models.subject.EnrolmentRecordEventType
 import com.simprints.infra.eventsync.event.remote.EventRemoteDataSource
 import com.simprints.infra.eventsync.status.down.EventDownSyncScopeRepository
@@ -163,12 +164,13 @@ internal class EventSyncManagerImpl @Inject constructor(
         projectId: String,
         subjectId: String,
     ): Unit = withContext(dispatcher) {
+        val eventScope = eventRepository.createEventScope(EventScopeType.DOWN_SYNC)
         val op = EventDownSyncOperation(RemoteEventQuery(
             projectId = projectId,
             subjectId = subjectId,
             modes = getProjectModes(configRepository.getProjectConfiguration()),
         ))
-        downSyncTask.downSync(this, op).toList()
+        downSyncTask.downSync(this, op, eventScope).toList()
     }
 
     private fun getProjectModes(projectConfiguration: ProjectConfiguration) =
